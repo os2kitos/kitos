@@ -83,6 +83,7 @@ namespace Presentation.Web.Models.API.V1
         public IEnumerable<NamedEntityDTO> DataProcessingRegistrations { get; set; }
 
         public Guid Uuid { get; set; }
-        public virtual OptionDTO CriticalityType { get; set; }
+        public int? CriticalityTypeId { get; set; }
+        public string CriticalityTypeName { get; set; }
     }
 }

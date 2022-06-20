@@ -345,6 +345,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-field-filter-helpers.ts" />
+    <TypeScriptCompile Include="app\helpers\OdataQueryHelper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\criticality-type.ts" />

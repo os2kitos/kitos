@@ -266,7 +266,7 @@
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
                                         "LastChangedByUser($select=Name,LastName)," +
-                                        "CriticalityType($select=Name)";
+                                        "CriticalityType";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -292,8 +292,9 @@
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
-                                parameterMap.$filter =
-                                    self.fixCriticalityFilter(parameterMap.$filter, "Criticality");
+                                parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
+                                    "Criticality",
+                                    Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }

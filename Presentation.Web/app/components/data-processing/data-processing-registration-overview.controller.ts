@@ -40,29 +40,11 @@
 
             //Helper functions
             const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
-
-            const extractOptionKey = (filterRequest: string, optionName: string): number => {
-                var pattern = new RegExp(`(.*\\(?${optionName} eq ')(\\d)('.*)`);
-                var matchedString = filterRequest.replace(pattern, "$2");
-                return parseInt(matchedString);
-            }
+            
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
-            };
-
-            const replaceOptionQuery = (filterUrl: string, optionName: string, emptyOptionKey: number): string => {
-                if (filterUrl.indexOf(optionName) === -1) {
-                    return filterUrl; // optionName not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
-                }
-
-                var pattern = new RegExp(`(.+)?(${optionName} eq '\\d')( and .+'\\)|\\)|)`, "i");
-                var key = extractOptionKey(filterUrl, optionName);
-                if (key === emptyOptionKey) {
-                    return filterUrl.replace(pattern, `$1(${optionName} eq '${key}' or ${optionName} eq null)$3`);
-                }
-                return filterUrl;
             };
 
             const replaceNullOptionQuery = (filterUrl: string): string => {
@@ -107,19 +89,19 @@
                                     replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.id);
                             });
 
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter,
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
                                 transferToInsecureThirdCountriesColumnName,
                                 Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter,
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
                                 isAgreementConcludedColumnName,
                                 Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
 
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter,
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
                                 oversightIntervalColumnName,
                                 Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided);
 
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter,
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
                                 isOversightCompletedColumnName,
                                 Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
