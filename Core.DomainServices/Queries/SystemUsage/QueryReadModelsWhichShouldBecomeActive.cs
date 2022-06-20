@@ -26,7 +26,7 @@ namespace Core.DomainServices.Queries.SystemUsage
                         // Exclude those which were enforced as valid - dates have no effect
                         x.SourceEntity.Active == false &&
                         // Include systems where concluded (start time) has passed or is not defined
-                        (x.SourceEntity.Concluded == null || x.SourceEntity.Concluded >= currentTime) &&
+                        (x.SourceEntity.Concluded == null || x.SourceEntity.Concluded <= currentTime) &&
                         // Include only if not expired or no expiration defined
                         (x.SourceEntity.ExpirationDate == null || currentTime <= x.SourceEntity.ExpirationDate)
                         ) ||
