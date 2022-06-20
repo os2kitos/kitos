@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries.SystemUsage;
 
 
 namespace Core.DomainServices.Repositories.SystemUsage
@@ -118,6 +120,17 @@ namespace Core.DomainServices.Repositories.SystemUsage
             return _repository
                 .AsQueryable()
                 .Where(x => x.DependsOnInterfaces.Select(y => y.InterfaceId).Contains(interfaceId));
+        }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetReadModelsMustUpdateToChangeActiveState()
+        {
+            var now = DateTime.Now;
+            var expiringReadModelIds = _repository.AsQueryable().Transform(new QueryReadModelsWhichShouldExpire(now).Apply).Select(x => x.Id).ToList();
+            var activatingReadModelIds = _repository.AsQueryable().Transform(new QueryReadModelsWhichShouldBecomeActive(now).Apply).Select(x => x.Id).ToList();
+
+            var idsOfReadModelsWhichMustUpdate = expiringReadModelIds.Concat(activatingReadModelIds).Distinct().ToList();
+
+            return _repository.AsQueryable().ByIds(idsOfReadModelsWhichMustUpdate);
         }
     }
 }

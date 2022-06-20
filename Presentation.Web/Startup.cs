@@ -65,19 +65,34 @@ namespace Presentation.Web
 
             var recurringJobManager = new RecurringJobManager();
 
+            /******************
+             * RECURRING JOBS *
+             *****************/
+
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync(CancellationToken.None)),
                 cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
                 timeZone: TimeZoneInfo.Local);
 
-            new RecurringJobManager().AddOrUpdate(
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.CheckExternalLinks,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchScheduleUpdatesItSystemUsagesWhichChangesActiveStateAsync(CancellationToken.None)),
+                cronExpression: Cron.Daily(), // Every night at 00:00
+                timeZone: TimeZoneInfo.Local);
+
+
+            /******************
+             * ON-DEMAND JOBS *
+             *****************/
+
+            recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.RebuildDataProcessingReadModels,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.DataProcessingRegistration, CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
                 timeZone: TimeZoneInfo.Local);
 
-            new RecurringJobManager().AddOrUpdate(
+            recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.RebuildItSystemUsageReadModels,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.ItSystemUsage, CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand

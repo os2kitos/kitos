@@ -21,6 +21,7 @@ namespace Core.BackgroundJobs.Services
         private readonly ScheduleItSystemUsageOverviewReadModelUpdates _scheduleItSystemUsageOverviewReadModelUpdates;
         private readonly IRebuildReadModelsJobFactory _rebuildReadModelsJobFactory;
         private readonly PurgeDuplicatePendingReadModelUpdates _purgeDuplicatePendingReadModelUpdates;
+        private readonly ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState _scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive;
 
         public BackgroundJobLauncher(
             ILogger logger,
@@ -30,7 +31,8 @@ namespace Core.BackgroundJobs.Services
             RebuildItSystemUsageOverviewReadModelsBatchJob rebuildItSystemUsageOverviewReadModels,
             ScheduleItSystemUsageOverviewReadModelUpdates scheduleItSystemUsageOverviewReadModelUpdates,
             IRebuildReadModelsJobFactory rebuildReadModelsJobFactory,
-            PurgeDuplicatePendingReadModelUpdates purgeDuplicatePendingReadModelUpdates)
+            PurgeDuplicatePendingReadModelUpdates purgeDuplicatePendingReadModelUpdates,
+            ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -40,6 +42,7 @@ namespace Core.BackgroundJobs.Services
             _scheduleItSystemUsageOverviewReadModelUpdates = scheduleItSystemUsageOverviewReadModelUpdates;
             _rebuildReadModelsJobFactory = rebuildReadModelsJobFactory;
             _purgeDuplicatePendingReadModelUpdates = purgeDuplicatePendingReadModelUpdates;
+            _scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive = scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive;
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)
@@ -76,6 +79,11 @@ namespace Core.BackgroundJobs.Services
         public async Task LaunchPurgeDuplicatedReadModelUpdates(CancellationToken token)
         {
             await Launch(_purgeDuplicatePendingReadModelUpdates, token);
+        }
+
+        public async Task LaunchScheduleUpdatesItSystemUsagesWhichChangesActiveStateAsync(CancellationToken token = default)
+        {
+            await Launch(_scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive, token);
         }
 
         private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)
