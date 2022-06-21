@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202206160929335_AddCriticalityType"; }
+            get { return "202206210625440_AddCriticalityType"; }
         }
         
         string IMigrationMetadata.Source

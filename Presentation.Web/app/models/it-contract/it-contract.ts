@@ -59,7 +59,7 @@
         Children: Array<IItContract>;
         /** Gets or sets the chosen agreement elements. */
         AgreementElements: Array<IAgreementElement>;
-        CriticalityId: number,
+        CriticalityTypeId: number,
         CriticalityType: ICriticalityType,
 
         /** When the contract began. (indgået) */

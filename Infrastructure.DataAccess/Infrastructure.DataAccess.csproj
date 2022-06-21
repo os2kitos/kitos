@@ -878,9 +878,9 @@
     <Compile Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.designer.cs">
       <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202206160929335_AddCriticalityType.cs" />
-    <Compile Include="Migrations\202206160929335_AddCriticalityType.designer.cs">
-      <DependentUpon>202206160929335_AddCriticalityType.cs</DependentUpon>
+    <Compile Include="Migrations\202206210625440_AddCriticalityType.cs" />
+    <Compile Include="Migrations\202206210625440_AddCriticalityType.designer.cs">
+      <DependentUpon>202206210625440_AddCriticalityType.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1454,8 +1454,8 @@
     <EmbeddedResource Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.resx">
       <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202206160929335_AddCriticalityType.resx">
-      <DependentUpon>202206160929335_AddCriticalityType.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202206210625440_AddCriticalityType.resx">
+      <DependentUpon>202206210625440_AddCriticalityType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

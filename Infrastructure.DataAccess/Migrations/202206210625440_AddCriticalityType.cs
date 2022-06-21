@@ -51,9 +51,9 @@
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
-            AddColumn("dbo.ItContract", "CriticalityId", c => c.Int());
-            CreateIndex("dbo.ItContract", "CriticalityId");
-            AddForeignKey("dbo.ItContract", "CriticalityId", "dbo.CriticalityTypes", "Id");
+            AddColumn("dbo.ItContract", "CriticalityTypeId", c => c.Int());
+            CreateIndex("dbo.ItContract", "CriticalityTypeId");
+            AddForeignKey("dbo.ItContract", "CriticalityTypeId", "dbo.CriticalityTypes", "Id");
         }
         
         public override void Down()
@@ -61,7 +61,7 @@
             DropForeignKey("dbo.LocalCriticalityTypes", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.LocalCriticalityTypes", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.LocalCriticalityTypes", "LastChangedByUserId", "dbo.User");
-            DropForeignKey("dbo.ItContract", "CriticalityId", "dbo.CriticalityTypes");
+            DropForeignKey("dbo.ItContract", "CriticalityTypeId", "dbo.CriticalityTypes");
             DropForeignKey("dbo.CriticalityTypes", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.CriticalityTypes", "LastChangedByUserId", "dbo.User");
             DropIndex("dbo.LocalCriticalityTypes", new[] { "LastChangedByUserId" });
@@ -70,8 +70,8 @@
             DropIndex("dbo.CriticalityTypes", new[] { "LastChangedByUserId" });
             DropIndex("dbo.CriticalityTypes", new[] { "ObjectOwnerId" });
             DropIndex("dbo.CriticalityTypes", "UX_Option_Uuid");
-            DropIndex("dbo.ItContract", new[] { "CriticalityId" });
-            DropColumn("dbo.ItContract", "CriticalityId");
+            DropIndex("dbo.ItContract", new[] { "CriticalityTypeId" });
+            DropColumn("dbo.ItContract", "CriticalityTypeId");
             DropTable("dbo.LocalCriticalityTypes");
             DropTable("dbo.CriticalityTypes");
         }

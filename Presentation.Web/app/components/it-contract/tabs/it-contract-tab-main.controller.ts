@@ -329,7 +329,7 @@
                 }
 
                 function bindCriticalities() {
-
+                    
                     const optionMap = criticalityOptions.reduce((acc, next, _) => {
                         acc[next.Id] = {
                             text: next.Name,
@@ -344,8 +344,11 @@
                     }, {});
 
                     //If selected state is expired, add it for presentation reasons
-                    const existingChoice = $scope.criticality?.selectedElement;
-                    if(existingChoice && !optionMap[existingChoice.id]) {
+                    const existingChoice = {
+                        id: $scope.contract.criticalityTypeId,
+                        name: $scope.contract.criticalityTypeName
+                    };
+                    if(existingChoice.id && !optionMap[existingChoice.id]) {
                         optionMap[existingChoice.id] = {
                             text: existingChoice.name,
                             id: existingChoice.id,
@@ -357,13 +360,13 @@
                     const options = criticalityOptions.map(option => optionMap[option.Id]);
 
                     $scope.criticality = {
-                        selectedElement: existingChoice && optionMap[existingChoice.id],
+                        selectedElement: (existingChoice.id && optionMap[existingChoice.id]) ?? existingChoice,
                         select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
                         elementSelected: (newElement) => {
                             if (!newElement)
                                 return;
 
-                            var payload = { criticalityId: newElement.id };
+                            var payload = { criticalityTypeId: newElement.id };
                             patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         }
                     };

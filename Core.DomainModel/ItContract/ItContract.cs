@@ -334,7 +334,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     The criticality type identifier.
         /// </value>
-        public int? CriticalityId { get; set; }
+        public int? CriticalityTypeId { get; set; }
 
         /// <summary>
         ///     The criticality of ItContract

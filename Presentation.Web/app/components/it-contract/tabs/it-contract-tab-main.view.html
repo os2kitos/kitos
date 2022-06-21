@@ -110,21 +110,11 @@
                     </div>
                     <div class="col-xs-12"  data-ng-hide="!hasViewAccess">
                         <div class="form-group">
+                            <label for="criticality" class="control-label small">Kritikalitet</label>
                             <single-select-select2 id="criticality"
-                                                   data-label="Kritikalitet"
                                                    data-placeholder="Vælg kritikalitet"
                                                    ng-model="criticality"
                                                    ng-disabled="!hasWriteAccess" />
-                            <!--<select2-option data-id="contract-criticality"
-                    data-label="Kritikalitet"
-                    data-placeholder="Vælg kritikalitet"
-                    data-selected-text="{{ contract.criticalityName }}"
-                    data-ng-disabled="!hasWriteAccess"
-                    data-ng-model="contract.criticalityId"
-                    data-options="criticalities"
-                    data-auto-save-url="{{ autoSaveUrl }}"
-                    data-field="criticalityId">
-    </select2-option>-->
                         </div>
                     </div>
                     <div class="col-xs-12"  data-ng-hide="!hasViewAccess">

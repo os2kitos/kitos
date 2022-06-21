@@ -61,7 +61,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             HasOptional(t => t.CriticalityType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.CriticalityId);
+                .HasForeignKey(d => d.CriticalityTypeId);
 
             HasMany(t => t.AssociatedAgreementElementTypes)
                .WithRequired(t => t.ItContract)

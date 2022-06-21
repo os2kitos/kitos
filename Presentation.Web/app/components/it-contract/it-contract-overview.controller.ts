@@ -58,7 +58,8 @@
             "needsWidthFixService",
             "exportGridToExcelService",
             "userAccessRights",
-            "uiState"
+            "uiState",
+            "criticalityOptions"
         ];
 
         constructor(
@@ -81,7 +82,8 @@
             private needsWidthFixService,
             private exportGridToExcelService,
             private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
-            private uiState: Models.UICustomization.ICustomizedModuleUI) {
+            private uiState: Models.UICustomization.ICustomizedModuleUI,
+            private criticalityOptions: Kitos.Models.IOptionEntity[]) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
             
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -172,11 +174,6 @@
         private fixSystemFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
             return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
-        }
-
-        private fixCriticalityFilter(filterUrl, column) {
-            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, `contains(CriticalityType/Name$2`);
         }
 
         // loads kendo grid options from localstorage
@@ -293,7 +290,7 @@
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
                                 parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
-                                    "Criticality",
+                                    "CriticalityType",
                                     Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
@@ -757,7 +754,7 @@
                         filterable: false
                     },
                     {
-                        field: "Criticality", title: "Kritikalitet", width: 90,
+                        field: "CriticalityType", title: "Kritikalitet", width: 90,
                         persistId: "kritikalitet",
                         template: dataItem => dataItem.CriticalityType ? dataItem.CriticalityType.Name : "",
                         excelTemplate: dataItem =>
@@ -1002,6 +999,12 @@
                         ],
                         uiState: [
                             "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
+                        ],
+                        criticalityOptions: [
+                            "localOptionServiceFactory",
+                            (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
+                            localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.CriticalityTypes)
+                            .getAll()
                         ]
                     }
                 });
