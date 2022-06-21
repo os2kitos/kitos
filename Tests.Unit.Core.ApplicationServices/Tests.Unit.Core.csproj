@@ -199,6 +199,7 @@
     <Compile Include="ApplicationServices\UIModuleCustomizationTest\UIModuleCustomizationTests.cs" />
     <Compile Include="ApplicationServices\UserRightsServiceTest.cs" />
     <Compile Include="ApplicationServices\UserServiceTest.cs" />
+    <Compile Include="BackgroundJobs\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveStateTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
     <Compile Include="DomainServices\Contract\ContractDataProcessingRegistrationAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
