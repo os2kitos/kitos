@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries.SystemUsage;
+using Core.DomainServices.Time;
 
 
 namespace Core.DomainServices.Repositories.SystemUsage
@@ -125,8 +126,15 @@ namespace Core.DomainServices.Repositories.SystemUsage
         public IQueryable<ItSystemUsageOverviewReadModel> GetReadModelsMustUpdateToChangeActiveState()
         {
             var now = DateTime.Now;
-            var expiringReadModelIds = _repository.AsQueryable().Transform(new QueryReadModelsWhichShouldExpire(now).Apply).Select(x => x.Id).ToList();
-            var activatingReadModelIds = _repository.AsQueryable().Transform(new QueryReadModelsWhichShouldBecomeActive(now).Apply).Select(x => x.Id).ToList();
+            var expiringReadModelIds = _repository
+                .AsQueryable()
+                .Transform(new QueryReadModelsWhichShouldExpire(now).Apply)
+                .Select(x => x.Id);
+
+            var activatingReadModelIds = _repository
+                .AsQueryable()
+                .Transform(new QueryReadModelsWhichShouldBecomeActive(now).Apply)
+                .Select(x => x.Id);
 
             var idsOfReadModelsWhichMustUpdate = expiringReadModelIds.Concat(activatingReadModelIds).Distinct().ToList();
 
