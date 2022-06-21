@@ -131,6 +131,8 @@
     <Compile Include="Queries\SystemUsage\QueryByRelationToSystemUsage.cs" />
     <Compile Include="Queries\SystemUsage\QueryBySystemNameContent.cs" />
     <Compile Include="Queries\SystemUsage\QueryBySystemUuid.cs" />
+    <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldBecomeActive.cs" />
+    <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
