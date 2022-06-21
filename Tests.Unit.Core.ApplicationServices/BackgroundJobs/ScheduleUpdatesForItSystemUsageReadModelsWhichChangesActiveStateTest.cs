@@ -67,7 +67,7 @@ namespace Tests.Unit.Core.BackgroundJobs
             //Act
             await _sut.ExecuteAsync();
 
-            //Assert
+            //Assert - only 2 updates are expected since two read models point to the same source.
             _databaseControlMock.Verify(x => x.SaveChanges(), Times.Once());
             transaction.Verify(x => x.Commit(), Times.Once());
             _pendingReadModelUpdatesRepository.Verify(x => x.AddMany(It.Is<IEnumerable<PendingReadModelUpdate>>(updates => VerifyExpectedUpdates(updates, new[] { readModel1ForSystemUsage1.SourceEntity.Id, readModelForSystemUsage2.SourceEntity.Id }))), Times.Once());
