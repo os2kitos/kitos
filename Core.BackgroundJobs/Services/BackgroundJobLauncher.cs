@@ -81,7 +81,7 @@ namespace Core.BackgroundJobs.Services
             await Launch(_purgeDuplicatePendingReadModelUpdates, token);
         }
 
-        public async Task LaunchScheduleUpdatesItSystemUsagesWhichChangesActiveStateAsync(CancellationToken token = default)
+        public async Task LaunchUpdateStaleSystemUsageRmAsync(CancellationToken token = default)
         {
             await Launch(_scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive, token);
         }
