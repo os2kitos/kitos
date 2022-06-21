@@ -56,8 +56,6 @@ namespace Tests.Unit.Core.BackgroundJobs
         {
             //Arrange - two read models for the same system usage and one for another
             var transaction = SetupTransaction();
-            //TODO: Test data helper - use it
-
             var readModel1ForSystemUsage1 = CreateReadModel(A<int>());
             var readModel2ForSystemUsage1 = CreateReadModel(readModel1ForSystemUsage1.SourceEntity.Id);
             var readModelForSystemUsage2 = CreateReadModel(A<int>());
