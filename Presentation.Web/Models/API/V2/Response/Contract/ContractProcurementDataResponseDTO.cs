@@ -1,6 +1,7 @@
 ﻿using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Types.Contract;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
 {
@@ -19,5 +20,9 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Procurement plan
         /// </summary>
         public ProcurementPlanDTO ProcurementPlan { get; set; }
+        /// <summary>
+        ///     Repurchase Initiated for IT-Contract. (Genanskaffelse igangsat)
+        /// </summary>
+        public YesNoUndecidedChoice? ProcurementInitiated { get; set; }
     }
 }
