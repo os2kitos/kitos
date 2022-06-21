@@ -9,7 +9,6 @@ using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Hangfire;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
@@ -65,19 +64,34 @@ namespace Presentation.Web
 
             var recurringJobManager = new RecurringJobManager();
 
+            /******************
+             * RECURRING JOBS *
+             *****************/
+
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync(CancellationToken.None)),
                 cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
                 timeZone: TimeZoneInfo.Local);
 
-            new RecurringJobManager().AddOrUpdate(
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleSystemUsageRmAsync(CancellationToken.None)),
+                cronExpression: Cron.Daily(), // Every night at 00:00
+                timeZone: TimeZoneInfo.Local);
+
+
+            /******************
+             * ON-DEMAND JOBS *
+             *****************/
+
+            recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.RebuildDataProcessingReadModels,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.DataProcessingRegistration, CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
                 timeZone: TimeZoneInfo.Local);
 
-            new RecurringJobManager().AddOrUpdate(
+            recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.RebuildItSystemUsageReadModels,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.ItSystemUsage, CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
