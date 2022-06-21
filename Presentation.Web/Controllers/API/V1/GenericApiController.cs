@@ -278,7 +278,7 @@ namespace Presentation.Web.Controllers.API.V1
                 var itemType = item.GetType();
                 // get name of mapped property
                 var map = Mapper.ConfigurationProvider.FindTypeMapFor<TDto, TModel>().PropertyMaps;
-                var nonNullMaps = map.Where(x => x.SourceMember != null ).ToList();
+                var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
 
                 foreach (var valuePair in obj)
                 {

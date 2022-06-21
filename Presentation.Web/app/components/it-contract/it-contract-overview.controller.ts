@@ -268,17 +268,18 @@
                                         "Supplier($select=Name)," +
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
-                                        "LastChangedByUser($select=Name,LastName)"; //+
-                                        //"CriticalityType($select=Id)";
+                                        "LastChangedByUser($select=Name,LastName)";
+
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 var query;
                                 // if orgunit is set then the org unit filter is active
                                 if (orgUnitId === null) {
-                                    query = `/odata/Organizations(${self.user.currentOrganizationId})/ItContracts`;// + urlParameters;
+                                    query = `/odata/Organizations(${self.user.currentOrganizationId})/ItContracts`;
                                 } else {
                                     query = `/odata/Organizations(${self.user
-                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts`; //+ urlParameters;
+                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts`;
                                 }
+
                                 var criticalityId = self.$window.sessionStorage.getItem(self.criticalityTypeStorageKey);
                                 if (criticalityId === null) {
                                     urlParameters += ",CriticalityType($select=Id)";
@@ -301,10 +302,7 @@
 
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
-
-                                /*parameterMap.$filter =
-                                    this.fixCriticalityFilter(parameterMap.$filter, "CriticalityType");
-*/
+                                
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
 
