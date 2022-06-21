@@ -31,6 +31,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
+        private criticalityTypeStorageKey = "it-contract-overview-criticalitytype";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
@@ -176,6 +177,11 @@
             return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
         }
 
+        private fixCriticalityFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, `contains(${column}$2`);
+        }
+
         // loads kendo grid options from localstorage
         private loadGridOptions() {
             this.gridState.loadGridOptions(this.mainGrid);
@@ -262,18 +268,25 @@
                                         "Supplier($select=Name)," +
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
-                                        "LastChangedByUser($select=Name,LastName)," +
-                                        "CriticalityType";
-                                // if orgunit is set then the org unit filter is active
+                                        "LastChangedByUser($select=Name,LastName)"; //+
+                                        //"CriticalityType($select=Id)";
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
+                                var query;
+                                // if orgunit is set then the org unit filter is active
                                 if (orgUnitId === null) {
-                                    return `/odata/Organizations(${self.user.currentOrganizationId})/ItContracts` +
-                                        urlParameters;
+                                    query = `/odata/Organizations(${self.user.currentOrganizationId})/ItContracts`;// + urlParameters;
                                 } else {
-                                    return `/odata/Organizations(${self.user
-                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts` +
-                                        urlParameters;
+                                    query = `/odata/Organizations(${self.user
+                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts`; //+ urlParameters;
                                 }
+                                var criticalityId = self.$window.sessionStorage.getItem(self.criticalityTypeStorageKey);
+                                if (criticalityId === null) {
+                                    urlParameters += ",CriticalityType($select=Id)";
+                                } else {
+                                    urlParameters += `,CriticalityType($select=Id)&%24filter=CriticalityType/Id eq ${criticalityId}`;
+                                }
+
+                                return query + urlParameters;
                             },
                             dataType: "json"
                         },
@@ -289,10 +302,9 @@
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
-                                parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
-                                    "CriticalityType",
-                                    Models.Api.Shared.YesNoUndecidedOption.Undecided);
-
+                                /*parameterMap.$filter =
+                                    this.fixCriticalityFilter(parameterMap.$filter, "CriticalityType");
+*/
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
 
@@ -754,18 +766,13 @@
                         filterable: false
                     },
                     {
-                        field: "CriticalityType", title: "Kritikalitet", width: 90,
-                        persistId: "kritikalitet",
-                        template: dataItem => dataItem.CriticalityType ? dataItem.CriticalityType.Name : "",
-                        excelTemplate: dataItem =>
-                            dataItem.CriticalityType ? dataItem.CriticalityType.Name : "",
-                        sortable: false,
+                        field: "CriticalityType", title: "Kritikalitet", width: 150,
+                        persistId: "criticalitytype",
+                        template: dataItem => dataItem.CriticalityType ? this.getCriticalityName(dataItem.CriticalityType.Id) : "",
                         filterable: {
                             cell: {
-                                template: customFilter,
-                                dataSource: [],
                                 showOperators: false,
-                                operator: "contains"
+                                template: this.criticalityOptionsDropDownList
                             }
                         }
                     }
@@ -864,7 +871,11 @@
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
-        private orgUnitDropDownList = (args) => {
+        private orgUnitDropDownList = (args) => this.createFilterDropDown(this.orgUnitStorageKey, this.orgUnits, args, false);
+        private criticalityOptionsDropDownList = (args) => this.createFilterDropDown(this.criticalityTypeStorageKey, this.criticalityOptions, args, true);
+
+        private createFilterDropDown(key: string, dataSource: any, args: any, insertEmptyValue: boolean)
+        {
             var self = this;
 
             function indent(dataItem: any) {
@@ -872,9 +883,16 @@
                 return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
             }
 
-            function setDefaultOrgUnit() {
+            function setDefaultValue() {
                 var kendoElem = this;
-                var idTofind = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
+                
+                var idTofind = self.$window.sessionStorage.getItem(key);
+
+                if (insertEmptyValue && !idTofind) {
+                    const defaultIndex = "0";
+                    dataSource.splice(defaultIndex, 0, { Id: defaultIndex, Name: "" });
+                    idTofind = defaultIndex;
+                }
 
                 if (!idTofind) {
                     // if no id was found then do nothing
@@ -885,14 +903,14 @@
                 var index = self._.findIndex(kendoElem.dataItems(), (item: any) => (item.Id == idTofind));
 
                 // -1 = no match
-                //  0 = root org unit, which should display all. So remove org unit filter
+                //  0 = root value, which should display all. So remove org unit filter
                 if (index > 0) {
-                    // select the users default org unit
+                    // select the users default value
                     kendoElem.select(index);
                 }
             }
 
-            function orgUnitChanged() {
+            function valueChanged() {
                 var kendoElem = this;
                 // can't use args.dataSource directly,
                 // if we do then the view doesn't update.
@@ -903,10 +921,10 @@
 
                 if (selectedIndex > 0) {
                     // filter by selected
-                    self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
+                    self.$window.sessionStorage.setItem(key, selectedId.toString());
                 } else {
                     // else clear filter because the 0th element should act like a placeholder
-                    self.$window.sessionStorage.removeItem(self.orgUnitStorageKey);
+                    self.$window.sessionStorage.removeItem(key);
                 }
                 // setting the above session value will cause the grid to fetch from a different URL
                 // see the function part of this http://docs.telerik.com/kendo-ui/api/javascript/data/datasource#configuration-transport.read.url
@@ -917,12 +935,12 @@
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
-                dataSource: this.orgUnits,
+                dataSource: dataSource,
                 dataValueField: "Id",
                 dataTextField: "Name",
                 template: indent,
-                dataBound: setDefaultOrgUnit,
-                change: orgUnitChanged
+                dataBound: setDefaultValue,
+                change: valueChanged
             });
         }
 
@@ -960,6 +978,15 @@
             }
 
             return concatRoles;
+        }
+
+        private getCriticalityName(id: number): string {
+            const criticalitiesWithSameId = this.criticalityOptions.filter(x => x.Id === id);
+            if (criticalitiesWithSameId.length < 1)
+                return "";
+
+            const criticality = criticalitiesWithSameId[0];
+            return criticality.Name;
         }
     }
 

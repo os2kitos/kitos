@@ -37,5 +37,16 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Validity of the it-contract
         /// </summary>
         public ValidityWriteRequestDTO Validity { get; set; }
+        /// <summary>
+        /// User-assigned criticality type id
+        /// </summary>
+        public string CriticalityTypeId { get; set; }
+        /// <summary>
+        /// Optionally assigned criticality type
+        /// Constraints:
+        ///     - If changed from current state, the option type must be available in the organization
+        /// </summary>
+        [NonEmptyGuid]
+        public Guid? CriticalityTypeUuid { get; set; }
     }
 }
