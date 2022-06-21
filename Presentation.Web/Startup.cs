@@ -9,7 +9,6 @@ using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Hangfire;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
@@ -76,7 +75,7 @@ namespace Presentation.Web
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
-                recurringJobId: StandardJobIds.CheckExternalLinks,
+                recurringJobId: StandardJobIds.ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchScheduleUpdatesItSystemUsagesWhichChangesActiveStateAsync(CancellationToken.None)),
                 cronExpression: Cron.Daily(), // Every night at 00:00
                 timeZone: TimeZoneInfo.Local);
