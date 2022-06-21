@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.DomainModel.Shared;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 
@@ -38,9 +37,5 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Validity of the it-contract
         /// </summary>
         public ValidityWriteRequestDTO Validity { get; set; }
-        /// <summary>
-        ///     Repurchase Initiated for IT-Contract. (Genanskaffelse igangsat)
-        /// </summary>
-        public YesNoUndecidedOption? ProcurementInitiated { get; set; }
     }
 }

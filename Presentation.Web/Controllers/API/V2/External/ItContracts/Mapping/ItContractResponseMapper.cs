@@ -10,6 +10,7 @@ using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -173,7 +174,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             {
                 ProcurementStrategy = contract.ProcurementStrategy?.MapIdentityNamePairDTO(),
                 PurchaseType = contract.PurchaseForm?.MapIdentityNamePairDTO(),
-                ProcurementPlan = MapProcurementPlan(contract)
+                ProcurementPlan = MapProcurementPlan(contract),
+                ProcurementInitiated = contract.ProcurementInitiated?.ToYesNoUndecidedChoice(),
             };
         }
 
@@ -196,7 +198,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new()
             {
-                ProcurementInitiated = contract.ProcurementInitiated,
                 ContractId = contract.ItContractId,
                 Notes = contract.Note,
                 ContractTemplate = contract.ContractTemplate?.MapIdentityNamePairDTO(),
