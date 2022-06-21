@@ -9,6 +9,14 @@ using Infrastructure.Services.DataAccess;
 
 namespace Core.BackgroundJobs.Model.ReadModels
 {
+    /// <summary>
+    /// The purpose of this task is to:
+    ///     - Query the current state of the read models for IT-System Usage and identify those who must be scheduled for an update since their Active state contains stale data
+    ///
+    /// Why do we need this?:
+    ///     - Read models are normally updated whenever a change to it or one of its dependencies (or parents) change but if no user changes occur, the data will be stable
+    ///     - Active state depends on the current time, and since read models are computed snapshots (to enable queries in the grid) we must keep them in sync using this job which is triggered daily (See Startup.cs)
+    /// </summary>
     public class ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState : IAsyncBackgroundJob
     {
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
