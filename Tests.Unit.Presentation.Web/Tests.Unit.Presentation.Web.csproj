@@ -215,6 +215,7 @@
     <Compile Include="DomainServices\DPR\QueryBySystemUuidTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelRepositoryTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByDescriptionContentTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByKeyPrefixTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByParentKeyTest.cs" />
