@@ -121,6 +121,7 @@
     <Compile Include="Generic\Write\AssignmentUpdateService.cs" />
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
+    <Compile Include="Helpers\NamedEntityMappingHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Model\Contracts\Write\ItContractAgreementPeriodModificationParameters.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
+    <Compile Include="Model\Users\UserRoleAssignments.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="OptionTypes\IOptionResolver.cs" />

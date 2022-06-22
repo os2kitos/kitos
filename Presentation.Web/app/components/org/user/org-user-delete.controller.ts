@@ -2,13 +2,13 @@
     "use strict";
 
     class UserRole {
-        public modul: any;
-        public rightId: any;
-        public objectId: any;
+        modul: any;
+        rightId: any;
+        objectId: any;
     }
 
     class Map<T> {
-        public items: { [key: string]: T };
+        items: { [key: string]: T };
 
         constructor() {
             this.items = {};
@@ -33,43 +33,38 @@
 
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
-        public orgRoles: Map<UserRole> = new Map<UserRole>();
-        public projectRoles: Map<UserRole> = new Map<UserRole>();
-        public systemRoles: Map<UserRole> = new Map<UserRole>();
-        public contractRoles: Map<UserRole> = new Map<UserRole>();
-        public adminRoles: Map<UserRole> = new Map<UserRole>();
-        public vmOrgRoles: Map<UserRole> = new Map<UserRole>();
-        public vmProjectRoles: Map<UserRole> = new Map<UserRole>();
-        public vmSystemRoles: Map<UserRole> = new Map<UserRole>();
-        public vmContractRoles: Map<UserRole> = new Map<UserRole>();
-        public vmAdminRoles: Map<UserRole> = new Map<UserRole>();
+        orgRoles = new Map<UserRole>();
+        projectRoles = new Map<UserRole>();
+        systemRoles = new Map<UserRole>();
+        contractRoles = new Map<UserRole>();
+        adminRoles = new Map<UserRole>();
+        vmOrgRoles = new Map<UserRole>();
+        vmProjectRoles = new Map<UserRole>();
+        vmSystemRoles = new Map<UserRole>();
+        vmContractRoles = new Map<UserRole>();
+        vmAdminRoles = new Map<UserRole>();
 
-        public vmOrgUnits: any;
-        public vmProject: any;
-        public vmSystem: any;
-        public vmItContracts: any;
-        public vmGetUsers: any;
-        public vmOrgAdmin: any;
-        public vmUsersInOrganization: any;
-        public selectedUser: any;
-        public isUserSelected: boolean;
-        public curOrganization: string;
-        public dirty: boolean;
-        public disabled: boolean;
+        vmOrgUnits: any;
+        vmProject: any;
+        vmSystem: any;
+        vmItContracts: any;
+        vmGetUsers: any;
+        vmOrgAdmin: any;
+        vmUsersInOrganization: any;
+        selectedUser: any;
+        isUserSelected: boolean;
+        curOrganization: string;
+        dirty: boolean;
+        disabled: boolean;
 
-        private userId: number;
-        private firstName: string;
-        private lastName: string;
-        private email: string;
-        private itemSelected: boolean;
-        private vmText: string;
+        readonly firstName: string;
+        readonly lastName: string;
+        readonly email: string;
+        readonly vmText: string;
 
-        // injecter resolve request i ctoren
-        public static $inject: string[] = [
+        static $inject: string[] = [
             "$uibModalInstance",
             "$http",
-            "$q",
-            "$scope",
             "notify",
             "user",
             "usersInOrganization",
@@ -79,25 +74,25 @@
             "orgUnits",
             "orgAdmin",
             "_",
-            "text"
-            ];
+            "text",
+            "allRoles"
+        ];
 
-        constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private $http: IHttpServiceWithCustomConfig,
-            private $q: ng.IQService,
-            private $scope,
-            private notify,
-            private user: any,
-            private usersInOrganization: any,
+        constructor(
+            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+            private readonly $http: IHttpServiceWithCustomConfig,
+            private readonly notify,
+            user: any,
+            usersInOrganization: any,
             public projects,
             public system,
             public itContracts,
             public orgUnits,
             public orgAdmin,
-            private _: ILoDashWithMixins,
-            private text) {
+            private readonly _: ILoDashWithMixins,
+            text,
+            allRoles: Models.Users.UserRoleAssigmentDTO) {
 
-            this.userId = user.Id;
             this.firstName = user.Name;
             this.lastName = user.LastName;
             this.email = user.Email;
@@ -107,31 +102,30 @@
             this.initCollections(system, this.vmSystemRoles);
             this.initCollections(itContracts, this.vmContractRoles);
             this.initCollections(orgAdmin, this.vmAdminRoles);
-      
+
             this.vmUsersInOrganization = usersInOrganization.filter(x => x.Id !== user.Id);
             this.vmProject = projects;
             this.vmSystem = system;
             this.vmItContracts = itContracts;
             this.vmOrgUnits = orgUnits;
-            this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User")).filter(bar => (bar.Role !== "ReadOnly"));
-            this.itemSelected = false;
+            this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User"));
             this.isUserSelected = true;
             this.curOrganization = user.currentOrganizationName;
             this.disabled = true;
             this.vmText = text;
         }
 
-        public initCollections = (collection, output) => {
+        initCollections = (collection, output) => {
             for (var item of collection) {
                 output.add(item.Id, item);
             }
         }
 
-        public disableBtns(val) {
+        disableBtns(val) {
             this.disabled = val;
         }
 
-        public collectionUpdate = (module, object, isChecked) => {
+        collectionUpdate = (module, object, isChecked) => {
             this.disableBtns(this.isUserSelected);
             if (isChecked) {
                 this.dirty = false;
@@ -177,7 +171,7 @@
             }
         }
 
-        public setSelectedUser = () => {
+        setSelectedUser = () => {
             if (this.selectedUser == null) {
                 this.isUserSelected = true;
             } else {
@@ -186,12 +180,12 @@
             }
         }
 
-        public patchData() {
-            var orgRoles = this.orgRoles;
-            var projRoles = this.projectRoles;
-            var sysRoles = this.systemRoles;
-            var contRoles = this.contractRoles;
-            var adminRoles = this.adminRoles;
+        patchData() {
+            const orgRoles = this.orgRoles;
+            const projRoles = this.projectRoles;
+            const sysRoles = this.systemRoles;
+            const contRoles = this.contractRoles;
+            const adminRoles = this.adminRoles;
 
             if (orgRoles != null) {
                 _.each(orgRoles.items,
@@ -255,9 +249,11 @@
         }
 
         public delete(module, rightId) {
+            //TODO: Is this endpoint even used?
             var id = rightId.Id;
             this.$http.delete(`/odata/${module}(${id})`)
                 .then(() => {
+                    //TODO: Bind the object to the containing colletion in stead so we don't need this switch
                     if (module === "OrganizationUnitRights") {
                         this.orgRoles.del(id);
                         this.vmOrgUnits = this.vmOrgUnits.filter(bar => (bar.Id !== id));
@@ -284,12 +280,14 @@
         }
 
         public ok() {
+            //TODO: Should call a custom endpoint in stead and respect the promise
             this.patchData();
             this.$uibModalInstance.close();
             this.notify.addSuccessMessage("Brugerens roller er ændret");
         }
 
         public assign() {
+            //TODO: Should call a custom endpoint in stead and respect the promise
             this.patchData();
             this.notify.addSuccessMessage("Brugerens roller er ændret");
             this.disableBtns(true);
@@ -300,6 +298,7 @@
         }
 
         public deleteUser() {
+            //TODO: Should respect the promise response i stead
             this.deleteAllUserRoles(this.vmOrgUnits, "OrganizationUnitRights");
             this.deleteAllUserRoles(this.vmProject, "ItProjectRights");
             this.deleteAllUserRoles(this.vmSystem, "ItSystemRights");
@@ -310,8 +309,7 @@
         }
 
         public deleteSelectedRoles() {
-            if (!confirm('Er du sikker på du vil slette de valgte roller?'))
-            {
+            if (!confirm('Er du sikker på du vil slette de valgte roller?')) {
                 return;
             }
 
@@ -320,6 +318,7 @@
             var sysRoles = this.systemRoles;
             var contRoles = this.contractRoles;
             var adminRoles = this.adminRoles;
+            //TODO: Should call a custom endpoint in stead
 
             if (orgRoles != null) {
                 _.each(orgRoles.items,
@@ -398,9 +397,9 @@
                                 user: [
                                     "$http", "userService",
                                     ($http: ng.IHttpService, userService) =>
-                                    userService.getUser()
-                                        .then((currentUser) => $http.get(`/odata/Users(${$stateParams["id"]})?$expand=OrganizationRights($filter=OrganizationId eq ${currentUser.currentOrganizationId})`)
-                                            .then(result => result.data))
+                                        userService.getUser()
+                                            .then((currentUser) => $http.get(`/odata/Users(${$stateParams["id"]})?$expand=OrganizationRights($filter=OrganizationId eq ${currentUser.currentOrganizationId})`)
+                                                .then(result => result.data))
                                 ],
                                 usersInOrganization: [
                                     "$http", "userService", "UserGetService",
@@ -421,9 +420,9 @@
                                 system: [
                                     "$http", "ItSystemService", "userService",
                                     ($http: ng.IHttpService, itSystems, userService) =>
-                                    userService.getUser()
-                                        .then((currentUser) => itSystems.GetSystemDataByIdFiltered($stateParams["id"], `${currentUser.currentOrganizationId}`)
-                                            .then(systemResult => systemResult.data.value))
+                                        userService.getUser()
+                                            .then((currentUser) => itSystems.GetSystemDataByIdFiltered($stateParams["id"], `${currentUser.currentOrganizationId}`)
+                                                .then(systemResult => systemResult.data.value))
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItContractService"
                                 itContracts: [
@@ -456,8 +455,14 @@
                                                 } else {
                                                     return "Ingen hjælpetekst defineret.";
                                                 }
-                                        });
+                                            });
                                     }
+                                ],
+                                allRoles: ["userRoleAdministrationService", "userService",
+                                    (userRoleAdministrationService: Services.IUserRoleAdministrationService, userService: Services.IUserService) =>
+                                        userService
+                                            .getUser()
+                                            .then(user => userRoleAdministrationService.getAssignedRoles(user.currentOrganizationId, $stateParams["id"]))
                                 ]
                             }
                         })
@@ -466,11 +471,11 @@
                                 // GOTO parent state and reload
                                 $state.go("^", null, { reload: true });
                             },
-                            () => {
-                                // Cancel
-                                // GOTO parent state
-                                $state.go("^", null, { reload: true });
-                            });
+                                () => {
+                                    // Cancel
+                                    // GOTO parent state
+                                    $state.go("^", null, { reload: true });
+                                });
                     }
                 ]
             });

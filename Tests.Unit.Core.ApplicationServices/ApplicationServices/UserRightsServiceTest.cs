@@ -10,6 +10,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -28,7 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _userServiceMock = new Mock<IUserService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _authServiceMock = new Mock<IAuthorizationContext>();
-            _sut = new UserRightsService(_userServiceMock.Object,_organizationServiceMock.Object, _authServiceMock.Object);
+            _sut = new UserRightsService(_userServiceMock.Object, _organizationServiceMock.Object, _authServiceMock.Object, Mock.Of<IOrganizationalUserContext>(), Mock.Of<IEntityIdentityResolver>());
         }
 
         [Fact]
@@ -47,7 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
-            SetupUserService(users,role);
+            SetupUserService(users, role);
             SetupOrganizationService(new List<Organization> { org1, org2 });
 
             //Act
@@ -80,7 +81,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
-            SetupUserService(users,role);
+            SetupUserService(users, role);
             SetupOrganizationService(new List<Organization>() { org1, org2 });
 
             //Act
@@ -147,8 +148,8 @@ namespace Tests.Unit.Core.ApplicationServices
 
             ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
-            SetupUserService(users,role); 
-            
+            SetupUserService(users, role);
+
             _organizationServiceMock
                 .Setup(x => x.GetAllOrganizations())
                 .Returns(Result<IQueryable<Organization>, OperationError>.Failure(operationError));
@@ -166,7 +167,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authServiceMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(value);
         }
 
-        private void SetupUserService(IEnumerable<User> users,OrganizationRole role)
+        private void SetupUserService(IEnumerable<User> users, OrganizationRole role)
         {
             _userServiceMock
                 .Setup(x => x.GetUsersWithRoleAssignedInAnyOrganization(role))

@@ -6,6 +6,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
@@ -535,9 +536,7 @@ namespace Core.ApplicationServices.System
             return itSystemUsages.Select(
                 itSystemUsage => new UsingOrganization(
                     itSystemUsage.Id,
-                    new NamedEntity(
-                        itSystemUsage.Organization.Id,
-                        itSystemUsage.Organization.Name)))
+                    itSystemUsage.Organization.ToNamedEntity()))
                 .ToList()
                 .AsReadOnly();
         }
