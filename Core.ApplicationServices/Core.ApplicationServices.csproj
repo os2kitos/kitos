@@ -164,7 +164,8 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
-    <Compile Include="Model\Users\UserRoleAssignments.cs" />
+    <Compile Include="Model\Users\UserRightsAssignments.cs" />
+    <Compile Include="Model\Users\UserRightsChangeParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="OptionTypes\IOptionResolver.cs" />

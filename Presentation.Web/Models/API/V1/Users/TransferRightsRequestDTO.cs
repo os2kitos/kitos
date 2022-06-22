@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Models.API.V1.Users
 {
@@ -8,6 +9,8 @@ namespace Presentation.Web.Models.API.V1.Users
         [Required]
         public int ToUserId { get; set; }
         [Required]
-        public IEnumerable<AssignedRightDTO> RightsToTransfer { get; set; }
+        public IEnumerable<OrganizationRole> AdminRoles { get; set; }
+        [Required]
+        public IEnumerable<AssignedRightDTO> BusinessRights { get; set; }
     }
 }

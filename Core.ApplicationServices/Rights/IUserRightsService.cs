@@ -9,6 +9,9 @@ namespace Core.ApplicationServices.Rights
     public interface IUserRightsService
     {
         Result<IEnumerable<UserRoleAssociationDTO>, OperationError> GetUsersWithRoleAssignment(OrganizationRole role);
-        Result<UserRoleAssignments, OperationError> GetUserRoles(int userId, int organizationId);
+        Result<UserRightsAssignments, OperationError> GetUserRights(int userId, int organizationId);
+        Maybe<OperationError> RemoveAllRights(int userId, int organizationId);
+        Maybe<OperationError> RemoveRights(int userId, int organizationId, UserRightsChangeParameters parameters);
+        Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters);
     }
 }

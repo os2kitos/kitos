@@ -1,10 +1,13 @@
-﻿namespace Presentation.Web.Models.API.V1.Users
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Presentation.Web.Models.API.V1.Users
 {
     public class AssignedRightDTO
     {
         /// <summary>
         /// The ID of the right, which is the assignment of the role to the business object.
         /// </summary>
+        [Required]
         public int RightId { get; set; }
         /// <summary>
         /// The name of the role associated with he right
@@ -17,6 +20,7 @@
         /// <summary>
         /// The role scope of the right assignment
         /// </summary>
+        [Required]
         public BusinessRoleScope Scope { get; set; }
     }
 }

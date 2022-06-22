@@ -8,16 +8,16 @@ using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.Model.Users
 {
-    public class UserRoleAssignments
+    public class UserRightsAssignments
     {
         public IEnumerable<OrganizationRole> AdministrativeAccessRoles { get; }
-        public IEnumerable<DataProcessingRegistrationRight> DataProcessingRegistrationRoles { get; }
+        public IEnumerable<DataProcessingRegistrationRight> DataProcessingRegistrationRights { get; }
         public IEnumerable<ItSystemRight> SystemRoles { get; }
         public IEnumerable<ItContractRight> ContractRoles { get; }
         public IEnumerable<ItProjectRight> ProjectRoles { get; }
         public IEnumerable<OrganizationUnitRight> OrganizationUnitRights { get; }
 
-        public UserRoleAssignments(
+        public UserRightsAssignments(
             IEnumerable<OrganizationRole> organizationRoles,
             IEnumerable<DataProcessingRegistrationRight> dataProcessingRegistrationRoles,
             IEnumerable<ItSystemRight> systemRoles,
@@ -26,7 +26,7 @@ namespace Core.ApplicationServices.Model.Users
             IEnumerable<OrganizationUnitRight> organizationUnitRights)
         {
             AdministrativeAccessRoles = organizationRoles.ToList();
-            DataProcessingRegistrationRoles = dataProcessingRegistrationRoles.ToList();
+            DataProcessingRegistrationRights = dataProcessingRegistrationRoles.ToList();
             SystemRoles = systemRoles.ToList();
             ContractRoles = contractRoles.ToList();
             ProjectRoles = projectRoles.ToList();

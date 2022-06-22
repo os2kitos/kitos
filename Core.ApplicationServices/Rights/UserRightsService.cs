@@ -1,9 +1,9 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Model.RightsHolder;
 using Core.ApplicationServices.Model.Users;
 using Core.DomainModel;
@@ -48,7 +48,7 @@ namespace Core.ApplicationServices.Rights
                 .Bind(users => MapOrganizationalRightsHolderRelation(users, role));
         }
 
-        public Result<UserRoleAssignments, OperationError> GetUserRoles(int userId, int organizationId)
+        public Result<UserRightsAssignments, OperationError> GetUserRights(int userId, int organizationId)
         {
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
             {
@@ -67,7 +67,7 @@ namespace Core.ApplicationServices.Rights
 
             return _userService
                 .GetUserInOrganization(orgUuid.Value, userUuid.Value)
-                .Select(user => new UserRoleAssignments
+                .Select(user => new UserRightsAssignments
                     (
                         user.GetRolesInOrganization(orgUuid.Value).Where(x => x != OrganizationRole.User),
                         user.DataProcessingRegistrationRights.Where(right => right.Object.OrganizationId == organizationId).ToList(),
@@ -77,6 +77,21 @@ namespace Core.ApplicationServices.Rights
                         user.OrganizationUnitRights.Where(right => right.Object.OrganizationId == organizationId).ToList()
                     )
                 );
+        }
+
+        public Maybe<OperationError> RemoveAllRights(int userId, int organizationId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Maybe<OperationError> RemoveRights(int userId, int organizationId, UserRightsChangeParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters)
+        {
+            throw new NotImplementedException();
         }
 
         private Result<IEnumerable<UserRoleAssociationDTO>, OperationError> MapOrganizationalRightsHolderRelation(IQueryable<User> users, OrganizationRole role)

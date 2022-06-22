@@ -1,9 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Rights;
+using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Users;
 
@@ -32,7 +33,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage Get(int organizationId, int userId)
         {
             return _rightsService
-                .GetUserRoles(userId, organizationId)
+                .GetUserRights(userId, organizationId)
                 .Select(ToRoleAssignmentsDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -47,8 +48,9 @@ namespace Presentation.Web.Controllers.API.V1
         [HttpDelete]
         public HttpResponseMessage Delete(int organizationId, int userId)
         {
-            //TODO: Also remove the org unit roles
-            throw new NotImplementedException();
+            return _rightsService
+                .RemoveAllRights(userId, organizationId)
+                .Match(FromOperationError, Ok);
         }
 
         /// <summary>
@@ -62,7 +64,15 @@ namespace Presentation.Web.Controllers.API.V1
         [HttpDelete]
         public HttpResponseMessage DeleteRange(int organizationId, int userId, [FromBody] RemoveUserRightsRequest assignmentsToDelete)
         {
-            throw new NotImplementedException();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var changeParameters = CreateChangeParameters(assignmentsToDelete.AdminRoles, assignmentsToDelete.BusinessRights);
+
+            return _rightsService
+                .RemoveRights(userId, organizationId, changeParameters)
+                .Match(FromOperationError, Ok);
         }
 
         /// <summary>
@@ -70,16 +80,20 @@ namespace Presentation.Web.Controllers.API.V1
         /// </summary>
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
-        /// <param name="assignmentsToDelete"></param>
+        /// <param name="assignmentsToTransfer"></param>
         /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assigment state</returns>
         [Route("range/transfer")]
         [HttpPatch]
-        public HttpResponseMessage PatchTransferToAnotherUser(int organizationId, int userId, TransferRightsRequestDTO assignmentsToDelete)
+        public HttpResponseMessage PatchTransferToAnotherUser(int organizationId, int userId, TransferRightsRequestDTO assignmentsToTransfer)
         {
-            throw new NotImplementedException();
+            var changeParameters = CreateChangeParameters(assignmentsToTransfer.AdminRoles, assignmentsToTransfer.BusinessRights);
+
+            return _rightsService
+                .TransferRights(userId, organizationId, assignmentsToTransfer.ToUserId, changeParameters)
+                .Match(FromOperationError, Ok);
         }
 
-        private static OrganizationUserRoleAssignmentsDTO ToRoleAssignmentsDTO(UserRoleAssignments arg)
+        private static OrganizationUserRoleAssignmentsDTO ToRoleAssignmentsDTO(UserRightsAssignments arg)
         {
             return new OrganizationUserRoleAssignmentsDTO
             {
@@ -110,7 +124,7 @@ namespace Presentation.Web.Controllers.API.V1
                     .Concat
                     (
                         arg
-                            .DataProcessingRegistrationRoles
+                            .DataProcessingRegistrationRights
                             .Select(x => new AssignedRightDTO
                             {
                                 RoleName = x.Role.Name,
@@ -148,6 +162,31 @@ namespace Presentation.Web.Controllers.API.V1
                     )
                     .ToList()
             };
+        }
+
+        private static UserRightsChangeParameters CreateChangeParameters(IEnumerable<OrganizationRole> adminRoles, IEnumerable<AssignedRightDTO> rightsToTransfer)
+        {
+            var rightIds = rightsToTransfer
+                .GroupBy(rights => rights.Scope)
+                .ToDictionary
+                (
+                    grp => grp.Key,
+                    grp => grp.Select(x => x.RightId).ToList()
+                );
+
+            return new UserRightsChangeParameters(
+                adminRoles,
+                GetIdsByScope(rightIds, BusinessRoleScope.DataProcessingRegistration),
+                GetIdsByScope(rightIds, BusinessRoleScope.ItSystemUsage),
+                GetIdsByScope(rightIds, BusinessRoleScope.ItContract),
+                GetIdsByScope(rightIds, BusinessRoleScope.ItProject),
+                GetIdsByScope(rightIds, BusinessRoleScope.OrganizationUnit)
+            );
+        }
+
+        private static IEnumerable<int> GetIdsByScope(Dictionary<BusinessRoleScope, List<int>> rightIds, BusinessRoleScope scope)
+        {
+            return rightIds.TryGetValue(scope, out var result) ? result : new List<int>();
         }
     }
 }
