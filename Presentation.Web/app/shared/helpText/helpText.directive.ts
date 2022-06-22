@@ -1,7 +1,8 @@
 ﻿((ng, app) => {
     "use strict";
 
-    app.directive("helpText", [
+    app
+        .directive("helpText", [
         () => ({
             templateUrl: "app/shared/helpText/helpText.view.html",
             scope: {
@@ -10,7 +11,7 @@
                 noButtonLayout: "@"
             },
             controller: [
-                "$scope", "$uibModal", "helpTextService", "notify", ($scope, $uibModal, helpTextService: Kitos.Services.IHelpTextService, notify) => {
+                "$scope", "$uibModal", "helpTextService", "userService", ($scope, $uibModal, helpTextService: Kitos.Services.IHelpTextService, userService) => {
                     var parent = $scope;
 
                     $scope.showHelpTextModal = () => {
@@ -20,37 +21,46 @@
                             controller: ["$scope", "$uibModalInstance", ($scope, $uibModalInstance) => {
                                 const helpTextKey = parent.key;
 
-                                helpTextService.loadHelpText(helpTextKey)
-                                    .then(helpText => {
-                                        if (helpText != null) {
-                                            $scope.title = helpText.title;
-                                            $scope.description = helpText.htmlText;
-                                        } else {
-                                            $scope.title = parent.defaultTitle;
-                                            $scope.description = "Ingen hjælpetekst defineret.";
+                                userService.getUser().then(result => {
+                                    $scope.canEditHelpTexts = result.isGlobalAdmin;
 
-                                            helpTextService.createHelpText(helpTextKey, $scope.title);
-                                        }
-                                    });
-
-                                $scope.navigateToHelpTextEdit = () => {
-                                    //TODO: Change text to danish
-                                    var msg = notify.addInfoMessage("CHANGE TO DANISH: Navigating to edit page", true);
-
-                                    helpTextService.getHelpTextFromApi(helpTextKey)
-                                        .then((response) => {
-                                            if (response.data.value.length < 1) {
-                                                //TODO: Change text to danish
-                                                msg.toErrorMessage(`CHANGE TO DANISH: Failed to find "${helpTextKey}" help text`);
+                                    helpTextService.loadHelpText(helpTextKey)
+                                        .then(helpText => {
+                                            if (helpText != null) {
+                                                $scope.title = helpText.title;
+                                                $scope.description = helpText.htmlText;
+                                            } else {
+                                                $scope.title = parent.defaultTitle;
+                                                $scope.description = "Ingen hjælpetekst defineret.";
                                             }
-
-                                            const helpText = response.data.value[0];
-                                            const helpTextId = helpText.Id;
-                                            window.location.href = `/#/global-admin/help-texts/edit/${helpTextId}`;
-
-                                            $uibModalInstance.close();
                                         });
-                                }
+
+                                    $scope.navigateToHelpTextEdit = () => {
+                                        helpTextService.loadHelpText(helpTextKey, true)
+                                            .then((helpText) => {
+                                                if (helpText === null || helpText === undefined) {
+                                                    createHelpTextAndNavigateToEdit(helpTextKey);
+                                                    return;
+                                                }
+
+                                                navigateToEdit(helpText.id);
+                                            });
+                                    }
+
+                                    function createHelpTextAndNavigateToEdit(key: string) {
+                                        helpTextService.createHelpText(key, $scope.title).then((response: any) => {
+                                            if (response.data?.Id !== undefined) {
+                                                navigateToEdit(response.data.Id);
+                                            }
+                                        });
+                                    }
+
+                                    function navigateToEdit(id: number) {
+                                        window.location.href = `/#/global-admin/help-texts/edit/${id}`;
+
+                                        $uibModalInstance.close();
+                                    }
+                                });
                             }]
                         });
                     }
