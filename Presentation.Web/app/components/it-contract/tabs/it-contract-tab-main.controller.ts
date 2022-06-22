@@ -344,23 +344,27 @@
                     }, {});
 
                     //If selected state is expired, add it for presentation reasons
-                    const existingChoice = {
-                        id: $scope.contract.criticalityTypeId,
-                        name: $scope.contract.criticalityTypeName
-                    };
-                    if(existingChoice.id && !optionMap[existingChoice.id]) {
-                        optionMap[existingChoice.id] = {
-                            text: existingChoice.name,
-                            id: existingChoice.id,
-                            disabled: true,
-                            optionalObjectContext: existingChoice
+                    let existingChoice = null;
+                    if ($scope.contract.criticalityTypeId !== undefined && $scope.contract.criticalityTypeId !== null) {
+                        existingChoice = {
+                            id: $scope.contract.criticalityTypeId,
+                            name: $scope.contract.criticalityTypeName
+                        };
+
+                        if (!optionMap[$scope.contract.criticalityTypeId]) {
+                            optionMap[existingChoice.id] = {
+                                text: existingChoice.name,
+                                id: existingChoice.id,
+                                disabled: true,
+                                optionalObjectContext: existingChoice
+                            }
                         }
                     }
 
                     const options = criticalityOptions.map(option => optionMap[option.Id]);
 
                     $scope.criticality = {
-                        selectedElement: (existingChoice.id && optionMap[existingChoice.id]) ?? existingChoice,
+                        selectedElement: existingChoice && optionMap[existingChoice.id],
                         select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
                         elementSelected: (newElement) => {
                             if (!newElement)
