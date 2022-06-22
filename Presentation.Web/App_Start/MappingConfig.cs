@@ -357,7 +357,6 @@ namespace Presentation.Web
                   .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)))
                   .ForMember(dest => dest.LastChangedByName, opt => opt.MapFrom(src => src.LastChangedByUser.GetFullName()))
                   .ForMember(dest => dest.ObjectOwnerFullName, opt => opt.MapFrom(src => src.ObjectOwner.GetFullName()))
-                  .ForMember(dest => dest.LastChangedByName, opt => opt.MapFrom(src => src.LastChangedByUser != null ? src.LastChangedByUser.GetFullName() : ""))
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore())
