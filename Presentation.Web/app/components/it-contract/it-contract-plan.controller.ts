@@ -20,6 +20,7 @@
     export class OverviewPlanController implements IOverviewPlanController {
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
+        private procurementInitiatedStorageKey = "it-contract-overview-procuremeninitiated";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
@@ -70,8 +71,7 @@
             private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             private uiState: Models.UICustomization.ICustomizedModuleUI) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
-
-
+            
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
                     // the event is emitted for every widget; if we have multiple
@@ -240,16 +240,25 @@
                                     "AssociatedSystemRelations($select=Id)," +              //Only using the length, so select 1 field
                                     "Reference($select=URL,Title,ExternalReferenceId)," +
                                     "LastChangedByUser($select=Name,LastName)";
+
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+                                var filterParameters = "";
+                                var query;
+                                // if orgunit is set then the org unit filter is active
                                 if (orgUnitId === null) {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts` +
-                                        urlParameters;
+                                    query = `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts`;
                                 } else {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId
-                                        })/OrganizationUnits(${orgUnitId})/ItContracts` +
-                                        urlParameters;
+                                    query = `/odata/Organizations(${this.user
+                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts`;
                                 }
+
+                                var procurementId = this.$window.sessionStorage.getItem(this.procurementInitiatedStorageKey);
+                                if (procurementId !== null) {
+                                    filterParameters += `&%24filter=ProcurementInitiated eq '${procurementId}'`;
+                                }
+
+                                return query + urlParameters + filterParameters;
                             },
                             dataType: "json"
                         },
@@ -805,10 +814,8 @@
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: customFilter,
-                                dataSource: [],
                                 showOperators: false,
-                                operator: "contains"
+                                template: this.procurementInitiatedOptionsDropDownList
                             }
                         }
                     },
@@ -994,7 +1001,18 @@
             return concatRoles;
         }
 
-        private orgUnitDropDownList = (args) => {
+        private orgUnitDropDownList = (args) => this.createFilterDropDown(this.orgUnitStorageKey, this.orgUnits, args, false);
+        private procurementInitiatedOptionsDropDownList = (args) => {
+            const yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
+            var options = [];
+            yesNoUndecided.options.forEach((value) => {
+                options.push({ Id: value.id, Name: value.text });
+            });
+
+            this.createFilterDropDown(this.procurementInitiatedStorageKey, options, args, true);
+        };
+
+        private createFilterDropDown(key: string, dataSource: any, args: any, insertEmptyValue: boolean, customDefaultIndex?: number) {
             var self = this;
 
             function indent(dataItem: any) {
@@ -1002,9 +1020,20 @@
                 return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
             }
 
-            function setDefaultOrgUnit() {
+            function setDefaultValue() {
                 var kendoElem = this;
-                var idTofind = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
+
+                var idTofind = self.$window.sessionStorage.getItem(key);
+
+                if (insertEmptyValue && !idTofind) {
+                    const defaultIndex = `${customDefaultIndex}` ?? "0";
+                    const valueWithIndexZero = dataSource.filter(x => x.Id == defaultIndex);
+                    if (valueWithIndexZero === null) {
+                            dataSource.splice(defaultIndex, 0, { Id: defaultIndex, Name: "" });
+                    }
+
+                    idTofind = defaultIndex;
+                }
 
                 if (!idTofind) {
                     // if no id was found then do nothing
@@ -1012,17 +1041,17 @@
                 }
 
                 // find the index of the org unit that matches the users default org unit
-                var index = self._.findIndex(kendoElem.dataItems(), (item: any) => item.Id == idTofind);
+                var index = self._.findIndex(kendoElem.dataItems(), (item: any) => (item.Id == idTofind));
 
                 // -1 = no match
-                //  0 = root org unit, which should display all. So remove org unit filter
+                //  0 = root value, which should display all. So remove org unit filter
                 if (index > 0) {
-                    // select the users default org unit
+                    // select the users default value
                     kendoElem.select(index);
                 }
             }
 
-            function orgUnitChanged() {
+            function valueChanged() {
                 var kendoElem = this;
                 // can't use args.dataSource directly,
                 // if we do then the view doesn't update.
@@ -1033,10 +1062,10 @@
 
                 if (selectedIndex > 0) {
                     // filter by selected
-                    self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
+                    self.$window.sessionStorage.setItem(key, selectedId.toString());
                 } else {
                     // else clear filter because the 0th element should act like a placeholder
-                    self.$window.sessionStorage.removeItem(self.orgUnitStorageKey);
+                    self.$window.sessionStorage.removeItem(key);
                 }
                 // setting the above session value will cause the grid to fetch from a different URL
                 // see the function part of this http://docs.telerik.com/kendo-ui/api/javascript/data/datasource#configuration-transport.read.url
@@ -1047,14 +1076,13 @@
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
-                dataSource: this.orgUnits,
+                dataSource: dataSource,
                 dataValueField: "Id",
                 dataTextField: "Name",
                 template: indent,
-                dataBound: setDefaultOrgUnit,
-                change: orgUnitChanged
+                dataBound: setDefaultValue,
+                change: valueChanged
             });
-
         }
 
         public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {

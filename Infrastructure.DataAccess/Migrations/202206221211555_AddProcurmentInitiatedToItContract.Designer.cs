@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddProcurmentInitiatedToitContract : IMigrationMetadata
+    public sealed partial class AddProcurmentInitiatedToItContract : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddProcurmentInitiatedToitContract));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddProcurmentInitiatedToItContract));
         
         string IMigrationMetadata.Id
         {
-            get { return "202206171137197_AddProcurmentInitiatedToitContract"; }
+            get { return "202206221211555_AddProcurmentInitiatedToItContract"; }
         }
         
         string IMigrationMetadata.Source

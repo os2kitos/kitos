@@ -120,6 +120,6 @@
         AssociatedAgreementElementTypes: Array<IAssociatedAgreementElementTypes>;
 
         DataProcessingRegistrations: Models.DataProcessing.IDataProcessingRegistration[];
-        ProcurementInitiated: Models.Api.Shared.YesNoUndecidedOption;
+        ProcurementInitiated: Models.Api.Shared.YesNoUndecidedOption | null;
     }
 }

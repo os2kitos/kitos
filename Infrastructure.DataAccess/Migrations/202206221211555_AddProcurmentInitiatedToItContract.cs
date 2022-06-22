@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddProcurmentInitiatedToitContract : DbMigration
+    public partial class AddProcurmentInitiatedToItContract : DbMigration
     {
         public override void Up()
         {

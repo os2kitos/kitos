@@ -21,7 +21,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// </summary>
         public ProcurementPlanDTO ProcurementPlan { get; set; }
         /// <summary>
-        ///     Repurchase Initiated for IT-Contract. (Genanskaffelse igangsat)
+        /// Procurement Initiated for IT-Contract. (Genanskaffelse igangsat)
         /// </summary>
         public YesNoUndecidedChoice? ProcurementInitiated { get; set; }
     }
