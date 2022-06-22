@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="organizationUuid">organization context for the criticality type availability</param>
         /// <returns>A uuid and name pair with boolean to mark if the criticality type is available in the organization</returns>
         [HttpGet]
-        [Route("{purchaseTypeUuid}")]
+        [Route("{criticalityTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
