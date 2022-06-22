@@ -2,6 +2,7 @@
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Validity;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
 {
