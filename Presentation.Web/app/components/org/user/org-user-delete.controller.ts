@@ -1,61 +1,36 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    class UserRole {
-        modul: any;
-        rightId: any;
-        objectId: any;
+    interface IHasSelection {
+        selected: boolean;
     }
 
-    class Map<T> {
-        items: { [key: string]: T };
 
-        constructor() {
-            this.items = {};
-        }
+    interface IAssignedRightViewModel extends IHasSelection {
+        right: Models.Users.IAssignedRightDTO;
+    }
 
-        add(key: string, value: T): void {
-            this.items[key] = value;
-        }
-
-        has(key: string): boolean {
-            return key in this.items;
-        }
-
-        get(key: string): T {
-            return this.items[key];
-        }
-
-        del(key: string): void {
-            delete this.items[key];
-        }
+    interface IAssignedAdminRoleViewModel extends IHasSelection {
+        role: Models.OrganizationRole;
     }
 
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
-        orgRoles = new Map<UserRole>();
-        projectRoles = new Map<UserRole>();
-        systemRoles = new Map<UserRole>();
-        contractRoles = new Map<UserRole>();
-        adminRoles = new Map<UserRole>();
-        vmOrgRoles = new Map<UserRole>();
-        vmProjectRoles = new Map<UserRole>();
-        vmSystemRoles = new Map<UserRole>();
-        vmContractRoles = new Map<UserRole>();
-        vmAdminRoles = new Map<UserRole>();
+        vmOrgRights = new Array<IAssignedRightViewModel>();
+        vmProjectRights = new Array<IAssignedRightViewModel>();
+        vmAdminRights = new Array<IAssignedAdminRoleViewModel>();
+        vmSystemRights = new Array<IAssignedRightViewModel>();
+        vmContractRights = new Array<IAssignedRightViewModel>();
+        vmDprRights = new Array<IAssignedRightViewModel>();
 
-        vmOrgUnits: any;
-        vmProject: any;
-        vmSystem: any;
-        vmItContracts: any;
         vmGetUsers: any;
-        vmOrgAdmin: any;
         vmUsersInOrganization: any;
         selectedUser: any;
         isUserSelected: boolean;
         curOrganization: string;
         dirty: boolean;
         disabled: boolean;
+        noRights: boolean;
 
         readonly firstName: string;
         readonly lastName: string;
@@ -64,15 +39,9 @@
 
         static $inject: string[] = [
             "$uibModalInstance",
-            "$http",
             "notify",
             "user",
             "usersInOrganization",
-            "projects",
-            "system",
-            "itContracts",
-            "orgUnits",
-            "orgAdmin",
             "_",
             "text",
             "allRoles"
@@ -80,15 +49,9 @@
 
         constructor(
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private readonly $http: IHttpServiceWithCustomConfig,
             private readonly notify,
             user: any,
             usersInOrganization: any,
-            public projects,
-            public system,
-            public itContracts,
-            public orgUnits,
-            public orgAdmin,
             private readonly _: ILoDashWithMixins,
             text,
             allRoles: Models.Users.UserRoleAssigmentDTO) {
@@ -97,78 +60,40 @@
             this.lastName = user.LastName;
             this.email = user.Email;
 
-            this.initCollections(orgUnits, this.vmOrgRoles);
-            this.initCollections(projects, this.vmProjectRoles);
-            this.initCollections(system, this.vmSystemRoles);
-            this.initCollections(itContracts, this.vmContractRoles);
-            this.initCollections(orgAdmin, this.vmAdminRoles);
+            this.vmAdminRights = allRoles.administrativeAccessRoles.map(role => {
+                return {
+                    selected: false,
+                    role: role
+                }
+            });
+            this.noRights = allRoles.administrativeAccessRoles.length === 0 && allRoles.rights.length === 0;
+            this.vmOrgRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.OrganizationUnit);
+            this.vmContractRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItContract);
+            this.vmDprRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.DataProcessingRegistration);
+            this.vmProjectRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItProject);
+            this.vmSystemRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItSystemUsage);
 
             this.vmUsersInOrganization = usersInOrganization.filter(x => x.Id !== user.Id);
-            this.vmProject = projects;
-            this.vmSystem = system;
-            this.vmItContracts = itContracts;
-            this.vmOrgUnits = orgUnits;
-            this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User"));
+
             this.isUserSelected = true;
             this.curOrganization = user.currentOrganizationName;
             this.disabled = true;
             this.vmText = text;
         }
 
-        initCollections = (collection, output) => {
-            for (var item of collection) {
-                output.add(item.Id, item);
-            }
+        createViewModel = (fullCollection: Array<Models.Users.IAssignedRightDTO>, roleScope: Models.Users.BusinessRoleScope) => {
+            return fullCollection
+                .filter(entry => entry.scope === roleScope)
+                .map(item => {
+                    return {
+                        right: item,
+                        selected: false
+                    };
+                });
         }
 
         disableBtns(val) {
             this.disabled = val;
-        }
-
-        collectionUpdate = (module, object, isChecked) => {
-            this.disableBtns(this.isUserSelected);
-            if (isChecked) {
-                this.dirty = false;
-
-                var userRoles: UserRole = {
-                    modul: module,
-                    rightId: object.Id,
-                    objectId: object.ObjectId
-                };
-
-                if (module === "OrganizationUnitRights") {
-                    this.orgRoles.add(object.Id, userRoles);
-                }
-                if (module === "ItProjectRights") {
-                    this.projectRoles.add(object.Id, userRoles);
-                }
-                if (module === "ItSystemRights") {
-                    this.systemRoles.add(object.Id, userRoles);
-                }
-                if (module === "ItContractRights") {
-                    this.contractRoles.add(object.Id, userRoles);
-                }
-                if (module === "OrganizationRights") {
-                    this.adminRoles.add(object.Id, userRoles);
-                }
-            }
-            if (!isChecked) {
-                if (module === "OrganizationUnitRights") {
-                    this.orgRoles.del(object.Id);
-                }
-                if (module === "ItProjectRights") {
-                    this.projectRoles.del(object.Id);
-                }
-                if (module === "ItSystemRights") {
-                    this.systemRoles.del(object.Id);
-                }
-                if (module === "ItContractRights") {
-                    this.contractRoles.del(object.Id);
-                }
-                if (module === "OrganizationRights") {
-                    this.adminRoles.del(object.Id);
-                }
-            }
         }
 
         setSelectedUser = () => {
@@ -180,199 +105,40 @@
             }
         }
 
-        patchData() {
-            const orgRoles = this.orgRoles;
-            const projRoles = this.projectRoles;
-            const sysRoles = this.systemRoles;
-            const contRoles = this.contractRoles;
-            const adminRoles = this.adminRoles;
-
-            if (orgRoles != null) {
-                _.each(orgRoles.items,
-                    (value, key) => {
-                        let payload = {
-                            UserId: this.selectedUser.Id
-                        }
-                        this.$http.patch(`/odata/OrganizationUnitRights(${value.rightId})`, payload)
-                            .then(() => this.orgRoles.del(value.rightId));
-                        this.vmOrgUnits = this.vmOrgUnits.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-
-            if (projRoles != null) {
-                _.each(projRoles.items,
-                    (value, key) => {
-                        let payload = {
-                            UserId: this.selectedUser.Id
-                        }
-                        this.$http.patch(`/odata/ItProjectRights(${value.rightId})`, payload)
-                            .then(() => this.projectRoles.del(value.rightId));
-                        this.vmProject = this.vmProject.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-
-            if (sysRoles != null) {
-                _.each(sysRoles.items,
-                    (value, key) => {
-                        let payload = {
-                            UserId: this.selectedUser.Id
-                        }
-                        this.$http.patch(`/odata/ItSystemRights(${value.rightId})`, payload)
-                            .then(() => this.systemRoles.del(value.rightId));
-                        this.vmSystem = this.vmSystem.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-
-            if (contRoles != null) {
-                _.each(contRoles.items,
-                    (value, key) => {
-                        let payload = {
-                            UserId: this.selectedUser.Id
-                        }
-                        this.$http.patch(`/odata/ItContractRights(${value.rightId})`, payload)
-                            .then(() => this.contractRoles.del(value.rightId));
-                        this.vmItContracts = this.vmItContracts.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-            if (adminRoles != null) {
-                _.each(adminRoles.items,
-                    (value, key) => {
-                        let payload = {
-                            UserId: this.selectedUser.Id
-                        }
-                        this.$http.patch(`/odata/OrganizationRights(${value.rightId})`, payload)
-                            .then(() => this.adminRoles.del(value.rightId));
-                        this.vmOrgAdmin = this.vmOrgAdmin.filter(bar => (bar.Id !== value.rightId));
-                        this.orgAdmin = this.orgAdmin.filter(orgRoleRelation => (orgRoleRelation.Id !== value.rightId));
-                    });
-            }
+        deleteRight(scope, rightId) {
+            //TODO: also confirm here!
+            //TODO: Invoke deleterights with some selected
         }
 
-        public delete(module, rightId) {
-            //TODO: Is this endpoint even used?
-            var id = rightId.Id;
-            this.$http.delete(`/odata/${module}(${id})`)
-                .then(() => {
-                    //TODO: Bind the object to the containing colletion in stead so we don't need this switch
-                    if (module === "OrganizationUnitRights") {
-                        this.orgRoles.del(id);
-                        this.vmOrgUnits = this.vmOrgUnits.filter(bar => (bar.Id !== id));
-
-                    }
-                    if (module === "ItProjectRights") {
-                        this.projectRoles.del(id);
-                        this.vmProject = this.vmProject.filter(bar => (bar.Id !== id));
-
-                    }
-                    if (module === "ItSystemRights") {
-                        this.systemRoles.del(id);
-                        this.vmSystem = this.vmSystem.filter(bar => (bar.Id !== id));
-                    }
-                    if (module === "ItContractRights") {
-                        this.contractRoles.del(id);
-                        this.vmItContracts = this.vmItContracts.filter(bar => (bar.Id !== id));
-                    }
-                    if (module === "OrganizationRights") {
-                        this.adminRoles.del(id);
-                        this.vmOrgAdmin = this.vmOrgAdmin.filter(bar => (bar.Id !== id));
-                    }
-                });
+        deleteAdminRole(role: Models.OrganizationRole) {
+            //TODO
         }
 
-        public ok() {
+        assign() {
             //TODO: Should call a custom endpoint in stead and respect the promise
-            this.patchData();
-            this.$uibModalInstance.close();
-            this.notify.addSuccessMessage("Brugerens roller er ændret");
-        }
-
-        public assign() {
-            //TODO: Should call a custom endpoint in stead and respect the promise
-            this.patchData();
-            this.notify.addSuccessMessage("Brugerens roller er ændret");
+            //TODO: Run the scenario, and in the "then" update view models and disable btns
+            //TODO: also confirm here!
             this.disableBtns(true);
         }
 
-        public cancel() {
+        cancel() {
             this.$uibModalInstance.dismiss();
         }
 
-        public deleteUser() {
-            //TODO: Should respect the promise response i stead
-            this.deleteAllUserRoles(this.vmOrgUnits, "OrganizationUnitRights");
-            this.deleteAllUserRoles(this.vmProject, "ItProjectRights");
-            this.deleteAllUserRoles(this.vmSystem, "ItSystemRights");
-            this.deleteAllUserRoles(this.vmItContracts, "ItContractRights");
-            this.deleteAllUserRoles(this.orgAdmin, "OrganizationRights");
+        deleteUser() {
+            //TODO: Delete the user from org and then close the modal
+            //TODO: also confirm here!
             this.$uibModalInstance.close();
-            this.notify.addSuccessMessage("Brugeren og dennes roller er slettet fra organisationen");
+
         }
 
-        public deleteSelectedRoles() {
+        deleteSelectedRoles() {
             if (!confirm('Er du sikker på du vil slette de valgte roller?')) {
                 return;
             }
 
-            var orgRoles = this.orgRoles;
-            var projRoles = this.projectRoles;
-            var sysRoles = this.systemRoles;
-            var contRoles = this.contractRoles;
-            var adminRoles = this.adminRoles;
-            //TODO: Should call a custom endpoint in stead
-
-            if (orgRoles != null) {
-                _.each(orgRoles.items,
-                    (value, key) => {
-                        this.$http.delete(`/odata/OrganizationUnitRights(${value.rightId})`)
-                            .then(() => this.orgRoles.del(value.rightId));
-                        this.vmOrgUnits = this.vmOrgUnits.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-
-            if (projRoles != null) {
-                _.each(projRoles.items,
-                    (value, key) => {
-                        this.$http.delete(`/odata/ItProjectRights(${value.rightId})`)
-                            .then(() => this.projectRoles.del(value.rightId));
-                        this.vmProject = this.vmProject.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-
-            if (sysRoles != null) {
-                _.each(sysRoles.items,
-                    (value, key) => {
-                        this.$http.delete(`/odata/ItSystemRights(${value.rightId})`)
-                            .then(() => this.systemRoles.del(value.rightId));
-                        this.vmSystem = this.vmSystem.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-
-            if (contRoles != null) {
-                _.each(contRoles.items,
-                    (value, key) => {
-                        this.$http.delete(`/odata/ItContractRights(${value.rightId})`)
-                            .then(() => this.contractRoles.del(value.rightId));
-                        this.vmItContracts = this.vmItContracts.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-            if (adminRoles != null) {
-                _.each(adminRoles.items,
-                    (value, key) => {
-                        this.$http.delete(`/odata/OrganizationRights(${value.rightId})`)
-                            .then(() => this.adminRoles.del(value.rightId));
-                        this.vmOrgAdmin = this.vmOrgAdmin.filter(bar => (bar.Id !== value.rightId));
-                    });
-            }
-
-            this.notify.addSuccessMessage("Rollerne er slettede.");
+            //TODO: Delete the selected view models, then remove them from the state if successful
             this.disableBtns(true);
-        }
-
-        public deleteAllUserRoles(roles: any, module: string) {
-            for (var obj of roles) {
-                var id = obj.Id;
-                this.$http.delete(`/odata/${module}(${id})`)
-            }
         }
     }
 
@@ -390,10 +156,6 @@
                             controller: DeleteOrganizationUserController,
                             controllerAs: "ctrl",
                             resolve: {
-                                currentUser: [
-                                    "userService",
-                                    (userService) => userService.getUser()
-                                ],
                                 user: [
                                     "$http", "userService",
                                     ($http: ng.IHttpService, userService) =>
@@ -406,44 +168,6 @@
                                     ($http: ng.IHttpService, userService, userGetService) =>
                                         userService.getUser()
                                             .then((currentUser) => userGetService.GetAllUsersFromOrganizationById(`${currentUser.currentOrganizationId}`)
-                                                .then(result => result.data.value))
-                                ],
-                                //Henter data for de forskellige collections ved brug er servicen "ItProjectService"
-                                projects: [
-                                    "$http", "ItProjectService", "userService",
-                                    ($http: ng.IHttpService, itProjects, userService) =>
-                                        userService.getUser()
-                                            .then((currentUser) => itProjects.GetProjectDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
-                                                .then(projectResult => projectResult.data.value))
-                                ],
-                                //Henter data for de forskellige collections ved brug er servicen "ItSystemService"
-                                system: [
-                                    "$http", "ItSystemService", "userService",
-                                    ($http: ng.IHttpService, itSystems, userService) =>
-                                        userService.getUser()
-                                            .then((currentUser) => itSystems.GetSystemDataByIdFiltered($stateParams["id"], `${currentUser.currentOrganizationId}`)
-                                                .then(systemResult => systemResult.data.value))
-                                ],
-                                //Henter data for de forskellige collections ved brug er servicen "ItContractService"
-                                itContracts: [
-                                    "$http", "ItContractsService", "userService",
-                                    ($http: ng.IHttpService, itContracts, userService) =>
-                                        userService.getUser()
-                                            .then((currentUser) => itContracts.GetContractDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
-                                                .then(systemResult => systemResult.data.value))
-                                ],
-                                //Henter data for de forskellige collections ved brug er servicen "OrganizationService"
-                                orgUnits: [
-                                    "$http", "organizationService", "userService",
-                                    ($http: ng.IHttpService, organizationService, userService) =>
-                                        userService.getUser()
-                                            .then((currentUser) => organizationService.GetOrganizationUnitDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
-                                                .then(result => result.data.value))
-                                ],
-                                orgAdmin: ["$http", "userService", "organizationService",
-                                    ($http: ng.IHttpService, userService, organizationService) =>
-                                        userService.getUser()
-                                            .then((currentUser) => organizationService.GetOrganizationData($stateParams["id"], `${currentUser.currentOrganizationId}`)
                                                 .then(result => result.data.value))
                                 ],
                                 text: ["$http", "$sce",

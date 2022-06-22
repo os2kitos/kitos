@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Rights;
-using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Users;
 
 namespace Presentation.Web.Controllers.API.V1
@@ -91,6 +88,7 @@ namespace Presentation.Web.Controllers.API.V1
                     .ContractRoles
                     .Select(x => new AssignedRightDTO
                     {
+                        RoleName = x.Role.Name,
                         BusinessObjectName = x.Object.Name,
                         RightId = x.Id,
                         Scope = BusinessRoleScope.ItContract
@@ -102,6 +100,7 @@ namespace Presentation.Web.Controllers.API.V1
                             .ProjectRoles
                             .Select(x => new AssignedRightDTO
                             {
+                                RoleName = x.Role.Name,
                                 BusinessObjectName = x.Object.Name,
                                 RightId = x.Id,
                                 Scope = BusinessRoleScope.ItProject
@@ -114,6 +113,7 @@ namespace Presentation.Web.Controllers.API.V1
                             .DataProcessingRegistrationRoles
                             .Select(x => new AssignedRightDTO
                             {
+                                RoleName = x.Role.Name,
                                 BusinessObjectName = x.Object.Name,
                                 RightId = x.Id,
                                 Scope = BusinessRoleScope.DataProcessingRegistration
@@ -126,19 +126,28 @@ namespace Presentation.Web.Controllers.API.V1
                             .SystemRoles
                             .Select(x => new AssignedRightDTO
                             {
+                                RoleName = x.Role.Name,
                                 BusinessObjectName = x.Object.ItSystem.Name,
                                 RightId = x.Id,
                                 Scope = BusinessRoleScope.ItSystemUsage
 
                             })
                     )
+                    .Concat
+                    (
+                        arg
+                            .OrganizationUnitRights
+                            .Select(x => new AssignedRightDTO
+                            {
+                                RoleName = x.Role.Name,
+                                BusinessObjectName = x.Object.Name,
+                                RightId = x.Id,
+                                Scope = BusinessRoleScope.OrganizationUnit
+
+                            })
+                    )
                     .ToList()
             };
-        }
-
-        private static UserRoleAssignments FromRoleAssignmentsDTO(OrganizationUserRoleAssignmentsDTO arg)
-        {
-            throw new NotImplementedException();
         }
     }
 }

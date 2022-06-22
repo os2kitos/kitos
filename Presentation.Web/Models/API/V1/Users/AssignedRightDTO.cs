@@ -7,6 +7,10 @@
         /// </summary>
         public int RightId { get; set; }
         /// <summary>
+        /// The name of the role associated with he right
+        /// </summary>
+        public string RoleName { get; set; }
+        /// <summary>
         /// The name of the business object for which the right is created
         /// </summary>
         public string BusinessObjectName { get; set; }

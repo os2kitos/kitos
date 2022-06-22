@@ -1283,10 +1283,7 @@
     <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\services\itContractsService.ts" />
-    <TypeScriptCompile Include="app\services\itProjectService.ts" />
-    <TypeScriptCompile Include="app\services\itSystemService.ts" />
     <TypeScriptCompile Include="app\services\NavigationService.ts" />
-    <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\userGetService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />

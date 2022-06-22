@@ -1,16 +1,18 @@
 ﻿module Kitos.Models.Users {
 
     export enum BusinessRoleScope {
-        ItSystemUsage,
-        ItContract,
-        DataProcessingRegistration,
-        ItProject
+        ItSystemUsage = 0,
+        ItContract = 1,
+        DataProcessingRegistration = 2,
+        ItProject = 3,
+        OrganizationUnit = 4
     }
 
     export interface IAssignedRightDTO {
         rightId: number;
+        roleName: string;
         businessObjectName: string;
-        bBusinessRoleScope: BusinessRoleScope;
+        scope: BusinessRoleScope;
     }
 
     export interface UserRoleAssigmentDTO {

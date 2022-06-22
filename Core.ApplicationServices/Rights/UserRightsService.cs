@@ -73,7 +73,8 @@ namespace Core.ApplicationServices.Rights
                         user.DataProcessingRegistrationRights.Where(right => right.Object.OrganizationId == organizationId).ToList(),
                         user.ItSystemRights.Where(right => right.Object.OrganizationId == organizationId).ToList(),
                         user.ItContractRights.Where(right => right.Object.OrganizationId == organizationId).ToList(),
-                        user.ItProjectRights.Where(right => right.Object.OrganizationId == organizationId).ToList()
+                        user.ItProjectRights.Where(right => right.Object.OrganizationId == organizationId).ToList(),
+                        user.OrganizationUnitRights.Where(right => right.Object.OrganizationId == organizationId).ToList()
                     )
                 );
         }
