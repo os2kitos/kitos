@@ -19,9 +19,7 @@
 
     export class OverviewPlanController implements IOverviewPlanController {
         private storageKey = "it-contract-plan-options";
-        private modifiedStorageKey = "2-1-" + this.storageKey;
         private orgUnitStorageKey = "it-contract-plan-orgunit";
-        private procurementInitiatedStorageKey = "it-contract-overview-procuremeninitiated";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
@@ -89,8 +87,6 @@
                         });
                     }
                 });
-
-            this.$window.sessionStorage.removeItem(this.procurementInitiatedStorageKey);
 
             //Defer until page change is complete
             setTimeout(() => this.activate(), 1);
@@ -247,17 +243,15 @@
 
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-                                var filterParameters = "";
-                                var query;
+                                var query = `/odata/Organizations(${this.user.currentOrganizationId})`;
                                 // if orgunit is set then the org unit filter is active
                                 if (orgUnitId === null) {
-                                    query = `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts`;
+                                    query += `/ItContracts`;
                                 } else {
-                                    query = `/odata/Organizations(${this.user
-                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts`;
+                                    query += `/OrganizationUnits(${orgUnitId})/ItContracts`;
                                 }
-                                
-                                return query + urlParameters + filterParameters;
+
+                                return query + urlParameters;
                             },
                             dataType: "json"
                         },
@@ -1074,7 +1068,7 @@
             }
 
             // http://dojo.telerik.com/ODuDe/5
-            //args.element.removeAttr("data-bind");
+            args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
                 dataSource: dataSource,
                 dataValueField: "Id",
