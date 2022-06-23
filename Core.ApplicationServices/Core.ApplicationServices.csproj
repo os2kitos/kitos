@@ -192,7 +192,7 @@
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
     <Compile Include="KendoOrganizationalConfigurationService.cs" />
-    <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
+    <Compile Include="Model\EventHandler\ClearCacheOnAdministrativeAccessRightsChangedHandler.cs" />
     <Compile Include="Model\EventHandler\ContractDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\ProjectDeletedAdvicesHandler.cs" />

@@ -36,7 +36,7 @@ namespace Core.DomainModel
             HandoverParticipants = new List<Handover>();
             LockedOutDate = null;
             FailedAttempts = 0;
-            Uuid = Guid.NewGuid(); 
+            Uuid = Guid.NewGuid();
         }
 
         public string Name { get; set; }
@@ -75,20 +75,40 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<OrganizationUnitRight> OrganizationUnitRights { get; set; }
 
+        public IEnumerable<OrganizationUnitRight> GetOrganizationUnitRights(int organiztionId)
+        {
+            return OrganizationUnitRights.Where(x => x.Object.OrganizationId == organiztionId);
+        }
+
         /// <summary>
         ///     The project rights for the user
         /// </summary>
         public virtual ICollection<ItProjectRight> ItProjectRights { get; set; }
+
+        public IEnumerable<ItProjectRight> GetItProjectRights(int organizationId)
+        {
+            return ItProjectRights.Where(x => x.Object.OrganizationId == organizationId);
+        }
 
         /// <summary>
         ///     The system rights for the user
         /// </summary>
         public virtual ICollection<ItSystemRight> ItSystemRights { get; set; }
 
+        public IEnumerable<ItSystemRight> GetItSystemRights(int organizationId)
+        {
+            return ItSystemRights.Where(x => x.Object.OrganizationId == organizationId);
+        }
+
         /// <summary>
         ///     The system rights for the user
         /// </summary>
         public virtual ICollection<ItContractRight> ItContractRights { get; set; }
+
+        public IEnumerable<ItContractRight> GetItContractRights(int organizationId)
+        {
+            return ItContractRights.Where(x => x.Object.OrganizationId == organizationId);
+        }
 
         /// <summary>
         ///     Passwords reset request issued for the user
@@ -121,6 +141,11 @@ namespace Core.DomainModel
         /// Rights withing dpa
         /// </summary>
         public virtual ICollection<DataProcessingRegistrationRight> DataProcessingRegistrationRights { get; set; }
+
+        public IEnumerable<DataProcessingRegistrationRight> GetDataProcessingRegistrationRights(int organizationId)
+        {
+            return DataProcessingRegistrationRights.Where(x => x.Object.OrganizationId == organizationId);
+        }
 
         public DateTime? LockedOutDate { get; set; }
 
