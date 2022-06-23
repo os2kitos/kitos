@@ -188,6 +188,19 @@ namespace Core.ApplicationServices.Rights
             var organizationUnitRights = user.GetOrganizationUnitRights(organization.Id).ToList();
             var rolesInOrganization = user.GetRolesInOrganization(organization.Uuid);
 
+            return RemoveRights(user, organization, dprRights, contractRights, projectRights, systemRights, organizationUnitRights, rolesInOrganization);
+        }
+
+        private Maybe<OperationError> RemoveRights(
+            User user,
+            Organization organization,
+            IEnumerable<DataProcessingRegistrationRight> dprRights,
+            IEnumerable<ItContractRight> contractRights,
+            IEnumerable<ItProjectRight> projectRights,
+            IEnumerable<ItSystemRight> systemRights,
+            IEnumerable<OrganizationUnitRight> organizationUnitRights,
+            IEnumerable<OrganizationRole> rolesInOrganization)
+        {
             return RemoveBusinessRights(user, organization, dprRights, _dprRoleAssignmentsService)
                 .Match
                 (
