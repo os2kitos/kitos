@@ -5,7 +5,6 @@
         selected: boolean;
     }
 
-
     interface IAssignedRightViewModel extends IHasSelection {
         right: Models.Users.IAssignedRightDTO;
     }
@@ -27,9 +26,8 @@
         vmDprRights = new Array<IAssignedRightViewModel>();
 
         vmGetUsers: any;
-        vmUsersInOrganization: any;
-        selectedUser: any;
-        isUserSelected: boolean;
+        vmUsersInOrganization: Array<Models.IUser>;
+        selectedUser: Models.IUser | undefined | null;
         curOrganization: string;
         dirty: boolean;
         disabled: boolean;
@@ -58,7 +56,7 @@
             private readonly notify,
             private readonly userToModify: Models.IUser,
             private readonly loggedInUser: Services.IUser,
-            usersInOrganization: any,
+            usersInOrganization: Array<Models.IUser>,
             private readonly _: ILoDashWithMixins,
             text,
             allRoles: Models.Users.UserRoleAssigmentDTO,
@@ -83,7 +81,6 @@
 
             this.vmUsersInOrganization = usersInOrganization.filter(x => x.Id !== userToModify.Id);
 
-            this.isUserSelected = false;
             this.curOrganization = loggedInUser.currentOrganizationName;
             this.vmText = text;
             this.updateNoRights();
@@ -108,14 +105,6 @@
                         selected: false
                     };
                 });
-        }
-
-        setSelectedUser = () => {
-            if (this.selectedUser == null) {
-                this.isUserSelected = true;
-            } else {
-                this.isUserSelected = false;
-            }
         }
 
         updateAnySelections() {
@@ -191,11 +180,25 @@
             if (!confirm('Er du sikker på, at du vil overføre rollerne?')) {
                 return;
             }
-            //TODO: Should call a custom endpoint in stead and respect the promise
-            //TODO: Run the scenario, and in the "then" update view models and disable btns
-            //TODO: also confirm here!
+
             const selectedRoles = this.collectSelectedRoles();
             const selectedAdminRoles = this.collectSelectedAdminRoles();
+            this.userRoleAdministrationService
+                .transferAssignedRoles(
+                    this.loggedInUser.currentOrganizationId,
+                    this.userToModify.Id,
+                    this.selectedUser.Id,
+                    {
+                        administrativeAccessRoles: selectedAdminRoles.map(x => x.role),
+                        rights: selectedRoles.reduce<Array<Models.Users.IAssignedRightDTO>>((result, next) => result.concat(next.selectedModels.map(x => x.right)),
+                            [])
+                    }
+                ).then(success => {
+                        if (success) {
+                            this.updateViewModels(selectedRoles, selectedAdminRoles);
+                        }
+                    }
+                );
         }
 
         cancel() {
@@ -225,6 +228,16 @@
             this.deleteRoles(selectedRoles, selectedAdminRoles);
         }
 
+        updateViewModels(removedRoles: Array<RoleSelectionSnapshot>, removedAdminRoles: Array<IAssignedAdminRoleViewModel>) {
+            this.vmAdminRights = this.vmAdminRights.filter(vm => removedAdminRoles.indexOf(vm) === -1);
+            for (var roles of removedRoles) {
+                roles.updateSourceCollection(
+                    roles.sourceCollection.filter(vm => roles.selectedModels.indexOf(vm) === -1));
+            }
+            this.updateNoRights();
+            this.updateAnySelections();
+        }
+
         deleteRoles(selectedRoles: Array<RoleSelectionSnapshot>, selectedAdminRoles: Array<IAssignedAdminRoleViewModel>) {
             this.userRoleAdministrationService
                 .removeAssignedRoles(this.loggedInUser.currentOrganizationId,
@@ -237,13 +250,7 @@
                     }
                 ).then(success => {
                     if (success) {
-                        this.vmAdminRights = this.vmAdminRights.filter(vm => selectedAdminRoles.indexOf(vm) === -1);
-                        for (var roles of selectedRoles) {
-                            roles.updateSourceCollection(
-                                roles.sourceCollection.filter(vm => roles.selectedModels.indexOf(vm) === -1));
-                        }
-                        this.updateNoRights();
-                        this.updateAnySelections();
+                        this.updateViewModels(selectedRoles, selectedAdminRoles);
                     }
                 }
                 );

@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.API.V1
             var changeParameters = CreateChangeParameters(assignmentsToTransfer.AdminRoles, assignmentsToTransfer.BusinessRights);
 
             return _rightsService
-                .TransferRights(userId, organizationId, assignmentsToTransfer.ToUserId, changeParameters)
+                .TransferRights(userId, assignmentsToTransfer.ToUserId, organizationId, changeParameters)
                 .Match(FromOperationError, Ok);
         }
 

@@ -2,7 +2,8 @@
 
     export interface IUserRoleAdministrationService {
         getAssignedRoles(organizationId: number, userId: number): ng.IPromise<Models.Users.UserRoleAssigmentDTO>;
-        removeAssignedRoles(organizationId: number, userId: number, rolesToRemove:  Models.Users.UserRoleAssigmentDTO): ng.IPromise<boolean>;
+        removeAssignedRoles(organizationId: number, userId: number, rolesToRemove: Models.Users.UserRoleAssigmentDTO): ng.IPromise<boolean>;
+        transferAssignedRoles(organizationId: number, userId: number, toUserId: number, rolesToTransfer: Models.Users.UserRoleAssigmentDTO): ng.IPromise<boolean>;
         removeUser(organizationId: number, userId: number): ng.IPromise<boolean>;
     }
 
@@ -63,7 +64,7 @@
                     () => this.genericApiWrapper.delete(this.getBaseUri(organizationId, userId, "/range"),
                         {
                             adminRoles: rolesToRemove.administrativeAccessRoles,
-                            businessRights : rolesToRemove.rights
+                            businessRights: rolesToRemove.rights
                         }))
                 .executeAsync();
         }
@@ -72,6 +73,22 @@
             return this.apiUseCaseFactory
                 .createDeletion("Brugeren", () => this.genericApiWrapper.delete(this.getBaseUri(organizationId, userId)))
                 .executeAsync();
+        }
+
+        transferAssignedRoles(organizationId: number,
+            userId: number,
+            toUserId: number,
+            rolesToTransfer: Models.Users.UserRoleAssigmentDTO): angular.IPromise<boolean> {
+            return this.apiUseCaseFactory
+                .createUpdate("Rettigheder",
+                    () => this.genericApiWrapper.patch(this.getBaseUri(organizationId, userId, "/range/transfer"),
+                        {
+                            toUserId: toUserId,
+                            adminRoles: rolesToTransfer.administrativeAccessRoles,
+                            businessRights: rolesToTransfer.rights
+                        }))
+                .executeAsync()
+                .then(() => true, () => false);
         }
 
         static $inject = ["genericApiWrapper", "apiUseCaseFactory"];

@@ -373,17 +373,24 @@ namespace Core.ApplicationServices.Rights
 
         private Maybe<OperationError> TransferAdministrativeRoles(User user, Organization organization, int toUserId, IEnumerable<OrganizationRole> rolesInOrganization)
         {
-            foreach (var organizationRole in rolesInOrganization.ToList())
+            var organizationRoles = rolesInOrganization.ToList();
+
+            //Start by removing the old assignments
+            var removeResult = RemoveAdministrativeRoles(user, organization, organizationRoles);
+            if (removeResult.HasValue)
             {
-                var removeRoleResult = _organizationRightsService.RemoveRole(organization.Id, user.Id, organizationRole);
-                if (removeRoleResult.Failed)
+                return removeResult;
+            }
+
+            // Re-assign the roles to the specified user
+            foreach (var role in organizationRoles)
+            {
+                var assignResult = _organizationRightsService.AssignRole(organization.Id, toUserId, role);
+                if (assignResult.Failed)
                 {
-                    var operationFailure = removeRoleResult.Error;
-                    _logger.Error(
-                        "Failed to remove role {role} from user {userId} in organization {organizationId}. Failed with {errorCode}",
-                        organizationRole, user.Id, organization.Id, operationFailure);
+                    _logger.Error("Failed to assign role of type {roleType} user {userId} in organization {organizationId}. Failed with {error}", role, user.Id, organization.Id, assignResult.Error.ToString());
                     {
-                        return new OperationError("Failed removing organization role:" + organizationRole.ToString("G"), operationFailure);
+                        return new OperationError($"Failed to assign role of type {role:G}:{assignResult.Error}", assignResult.Error);
                     }
                 }
             }

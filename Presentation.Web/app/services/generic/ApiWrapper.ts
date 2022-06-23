@@ -54,6 +54,13 @@
                 .then(_ => { }, error => this.handleServerError(error));
         }
 
+        patch(url: string, payload?: any): ng.IPromise<void> {
+            return this
+                .$http
+                .patch(url, payload ?? {})
+                .then(_ => { }, error => this.handleServerError(error));
+        }
+
         handleServerError(error) {
             console.log("Request failed with:", error);
             let errorCategory: Models.Api.ApiResponseErrorCategory;
