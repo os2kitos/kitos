@@ -25,6 +25,7 @@
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
+        private yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;
@@ -163,17 +164,6 @@
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
 
-        private fixProcurmentInitiatedFilter(parameterMap, procurementId, procurementColumnName) {
-            const filterString = `${procurementColumnName} eq '${procurementId}'`;
-            const filter = `${procurementColumnName} eq '[object Object]'`;
-
-            parameterMap.$filter = parameterMap.$filter.replace(filter, filterString);
-            
-            return Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
-                "ProcurementInitiated",
-                Models.Api.Shared.YesNoUndecidedOption.Undecided);
-        }
-
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
@@ -295,11 +285,9 @@
 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
 
-                                /*const procurementId = this.$window.sessionStorage.getItem(this.procurementInitiatedStorageKey);
-                                if (procurementId != null) {
-                                    const procurementColumnName = "ProcurementInitiated";
-                                    parameterMap.$filter = this.fixProcurmentInitiatedFilter(parameterMap, procurementId, procurementColumnName);
-                                }*/
+                                parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
+                                    "ProcurementInitiated",
+                                    Models.Api.Shared.YesNoUndecidedOption.Undecided);
                             }
 
 
@@ -831,7 +819,20 @@
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: this.procurementInitiatedOptionsDropDownList
+                                template: (args) => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: this.yesNoUndecided.options.map(value => {
+                                            return {
+                                                remoteValue: value.id,
+                                                text: value.text,
+                                                optionalContext: value
+                                            };
+                                        }),
+                                        dataTextField: "text",
+                                        dataValueField: "remoteValue",
+                                        valuePrimitive: true,
+                                    });
+                                }
                             }
                         }
                     },
@@ -1017,18 +1018,9 @@
             return concatRoles;
         }
 
-        private orgUnitDropDownList = (args) => this.createFilterDropDown(this.orgUnitStorageKey, this.orgUnits, args, false, true);
-        private procurementInitiatedOptionsDropDownList = (args) => {
-            const yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
-            var options = [];
-            yesNoUndecided.options.forEach((value) => {
-                options.push({ Id: value.id, Name: value.text });
-            });
-            
-            this.createFilterDropDown(this.procurementInitiatedStorageKey, options, args, true, false);
-        };
+        private orgUnitDropDownList = (args) => this.createFilterDropDown(this.orgUnitStorageKey, this.orgUnits, args);
 
-        private createFilterDropDown(key: string, dataSource: any, args: any, insertEmptyValue: boolean, deleteFilteringItemOnIndexZero: boolean, customDefaultIndex?: number) {
+        private createFilterDropDown(key: string, dataSource: any, args: any) {
             var self = this;
 
             function indent(dataItem: any) {
@@ -1040,16 +1032,6 @@
                 var kendoElem = this;
 
                 var idTofind = self.$window.sessionStorage.getItem(key);
-
-                if (insertEmptyValue && !idTofind) {
-                    const defaultIndex = `${customDefaultIndex}` ?? "0";
-                    const valueWithIndexZero = dataSource.filter(x => x.Id == defaultIndex);
-                    if (valueWithIndexZero === null) {
-                            dataSource.splice(defaultIndex, 0, { Id: defaultIndex, Name: "" });
-                    }
-
-                    idTofind = defaultIndex;
-                }
 
                 if (!idTofind) {
                     // if no id was found then do nothing
@@ -1076,11 +1058,11 @@
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
 
-                if (selectedIndex > 0 || !deleteFilteringItemOnIndexZero) {
+                if (selectedIndex > 0) {
                     // filter by selected
                     self.$window.sessionStorage.setItem(key, selectedId.toString());
                 }
-                else if(selectedIndex <= 0 && deleteFilteringItemOnIndexZero) {
+                else {
                     // else clear filter because the 0th element should act like a placeholder
                     self.$window.sessionStorage.removeItem(key);
                 }
@@ -1092,15 +1074,9 @@
             }
 
             // http://dojo.telerik.com/ODuDe/5
-            args.element.removeAttr("data-bind");
+            //args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
-                dataSource: dataSource/*.map(value => {
-                    return {
-                        remoteValue: value.Id,
-                        text: value.Name,
-                        optionalContext: value
-                    };
-                })*/,
+                dataSource: dataSource,
                 dataValueField: "Id",
                 dataTextField: "Name",
                 template: indent,
