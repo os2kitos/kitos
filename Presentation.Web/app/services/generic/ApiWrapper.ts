@@ -23,10 +23,19 @@
                 );
         }
 
-        delete(url: string): ng.IPromise<boolean> {
+        delete(url: string, payload?: any): ng.IPromise<boolean> {
+            let config: ng.IRequestShortcutConfig;
+            if (payload) {
+                config = {
+                    data: payload,
+                    headers: {
+                        "content-type":"application/json"
+                    }
+                }
+            }
             return this
                 .$http
-                .delete(url)
+                .delete(url, config)
                 .then(
                     result => {
                         return true;

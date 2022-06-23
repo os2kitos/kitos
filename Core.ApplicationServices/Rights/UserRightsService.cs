@@ -241,7 +241,7 @@ namespace Core.ApplicationServices.Rights
                     var projectRights = user.GetItProjectRights(organization.Id).ToList();
                     var systemRights = user.GetItSystemRights(organization.Id).ToList();
                     var organizationUnitRights = user.GetOrganizationUnitRights(organization.Id).ToList();
-                    var rolesInOrganization = user.GetRolesInOrganization(organization.Uuid);
+                    var rolesInOrganization = user.GetRolesInOrganization(organization.Uuid).ToList();
 
                     return
                     (
@@ -265,6 +265,10 @@ namespace Core.ApplicationServices.Rights
             {
                 _databaseControl.SaveChanges();
                 transaction.Commit();
+            }
+            else
+            {
+                transaction.Rollback();
             }
 
             return error;
@@ -349,7 +353,7 @@ namespace Core.ApplicationServices.Rights
 
         private Maybe<OperationError> RemoveAdministrativeRoles(User user, Organization organization, IEnumerable<OrganizationRole> rolesInOrganization)
         {
-            foreach (var organizationRole in rolesInOrganization)
+            foreach (var organizationRole in rolesInOrganization.ToList())
             {
                 var removeRoleResult = _organizationRightsService.RemoveRole(organization.Id, user.Id, organizationRole);
                 if (removeRoleResult.Failed)
@@ -369,7 +373,7 @@ namespace Core.ApplicationServices.Rights
 
         private Maybe<OperationError> TransferAdministrativeRoles(User user, Organization organization, int toUserId, IEnumerable<OrganizationRole> rolesInOrganization)
         {
-            foreach (var organizationRole in rolesInOrganization)
+            foreach (var organizationRole in rolesInOrganization.ToList())
             {
                 var removeRoleResult = _organizationRightsService.RemoveRole(organization.Id, user.Id, organizationRole);
                 if (removeRoleResult.Failed)
@@ -396,7 +400,7 @@ namespace Core.ApplicationServices.Rights
             where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
             where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
         {
-            foreach (var right in rights)
+            foreach (var right in rights.ToList())
             {
                 var removeRoleResult = assignmentService.RemoveRole(right.Object, right.RoleId, right.UserId);
                 if (removeRoleResult.Failed)
