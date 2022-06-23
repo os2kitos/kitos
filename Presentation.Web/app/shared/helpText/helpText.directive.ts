@@ -3,26 +3,28 @@
 
     app
         .directive("helpText", [
-        () => ({
-            templateUrl: "app/shared/helpText/helpText.view.html",
-            scope: {
-                key: "@",
-                defaultTitle: "@",
-                noButtonLayout: "@"
-            },
-            controller: [
-                "$scope", "$uibModal", "helpTextService", "userService", ($scope, $uibModal, helpTextService: Kitos.Services.IHelpTextService, userService) => {
-                    var parent = $scope;
+            () => ({
+                templateUrl: "app/shared/helpText/helpText.view.html",
+                scope: {
+                    key: "@",
+                    defaultTitle: "@",
+                    noButtonLayout: "@"
+                },
+                controller: [
+                    "$scope", "$uibModal", "helpTextService", "userService", ($scope, $uibModal, helpTextService: Kitos.Services.IHelpTextService, userService) => {
+                        var parent = $scope;
 
-                    $scope.showHelpTextModal = () => {
-                        $uibModal.open({
-                            windowClass: "modal fade in",
-                            templateUrl: "app/shared/helpText/helpTextModal.view.html",
-                            controller: ["$scope", "$uibModalInstance", ($scope, $uibModalInstance) => {
-                                const helpTextKey = parent.key;
+                        $scope.showHelpTextModal = () => {
+                            $uibModal.open({
+                                windowClass: "modal fade in",
+                                templateUrl: "app/shared/helpText/helpTextModal.view.html",
+                                controller: ["$scope", "$uibModalInstance", ($scope, $uibModalInstance) => {
+                                    const helpTextKey = parent.key;
 
-                                userService.getUser().then(result => {
-                                    $scope.canEditHelpTexts = result.isGlobalAdmin;
+                                    userService.getUser()
+                                        .then(user => {
+                                            $scope.canEditHelpTexts = user.isGlobalAdmin;
+                                        });
 
                                     helpTextService.loadHelpText(helpTextKey)
                                         .then(helpText => {
@@ -38,12 +40,11 @@
                                     $scope.navigateToHelpTextEdit = () => {
                                         helpTextService.loadHelpText(helpTextKey, true)
                                             .then((helpText) => {
-                                                if (helpText === null || helpText === undefined) {
-                                                    createHelpTextAndNavigateToEdit(helpTextKey);
-                                                    return;
+                                                if (helpText === null) {
+                                                    return createHelpTextAndNavigateToEdit(helpTextKey);
+                                                } else {
+                                                    return navigateToEdit(helpText.id);
                                                 }
-
-                                                navigateToEdit(helpText.id);
                                             });
                                     }
 
@@ -60,11 +61,10 @@
 
                                         $uibModalInstance.close();
                                     }
-                                });
-                            }]
-                        });
-                    }
-                }]
-        })
-    ]);
+                                }]
+                            });
+                        }
+                    }]
+            })
+        ]);
 })(angular, app);
