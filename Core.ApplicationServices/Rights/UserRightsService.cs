@@ -27,7 +27,6 @@ namespace Core.ApplicationServices.Rights
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IOrganizationalUserContext _organizationalUserContext;
         private readonly IEntityIdentityResolver _identityResolver;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _itContractRightService;
@@ -43,7 +42,6 @@ namespace Core.ApplicationServices.Rights
             IUserService userService,
             IOrganizationService organizationService,
             IAuthorizationContext authorizationContext,
-            IOrganizationalUserContext organizationalUserContext,
             IEntityIdentityResolver identityResolver,
             IOrganizationRightsService organizationRightsService,
             IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> itContractRightService,
@@ -58,7 +56,6 @@ namespace Core.ApplicationServices.Rights
             _userService = userService;
             _organizationService = organizationService;
             _authorizationContext = authorizationContext;
-            _organizationalUserContext = organizationalUserContext;
             _identityResolver = identityResolver;
             _organizationRightsService = organizationRightsService;
             _itContractRightService = itContractRightService;
@@ -156,7 +153,27 @@ namespace Core.ApplicationServices.Rights
 
         public Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters)
         {
-            throw new NotImplementedException();
+            if (fromUserId == toUserId)
+            {
+                return Maybe<OperationError>.None;
+            }
+            return MutateUserRights(
+                fromUserId,
+                organizationId,
+                context =>
+                    TransferRights
+                    (
+                        context.user,
+                        context.organization,
+                        toUserId,
+                        context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.Id)).ToList(),
+                        context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.Id)).ToList(),
+                        context.projectRights.Where(right => parameters.ProjectRightIds.Contains(right.Id)).ToList(),
+                        context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.Id)).ToList(),
+                        context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.Id)).ToList(),
+                        context.rolesInOrganization.Where(role => parameters.AdministrativeAccessRoles.Contains(role)).ToList()
+                    )
+            );
         }
 
         private Result<IEnumerable<UserRoleAssociationDTO>, OperationError> MapOrganizationalRightsHolderRelation(IQueryable<User> users, OrganizationRole role)
@@ -282,8 +299,7 @@ namespace Core.ApplicationServices.Rights
                 .Match
                 (
                     error => error,
-                    () => RemoveBusinessRights(user, organization, organizationUnitRights,
-                        _organizationUnitRightService)
+                    () => RemoveBusinessRights(user, organization, organizationUnitRights, _organizationUnitRightService)
                 )
                 .Match
                 (
@@ -292,7 +308,66 @@ namespace Core.ApplicationServices.Rights
                 );
         }
 
+        private Maybe<OperationError> TransferRights(
+            User fromUser,
+            Organization organization,
+            int toUserId,
+            IEnumerable<DataProcessingRegistrationRight> dprRights,
+            IEnumerable<ItContractRight> contractRights,
+            IEnumerable<ItProjectRight> projectRights,
+            IEnumerable<ItSystemRight> systemRights,
+            IEnumerable<OrganizationUnitRight> organizationUnitRights,
+            IEnumerable<OrganizationRole> rolesInOrganization)
+        {
+            return TransferBusinessRights(fromUser, organization, toUserId, dprRights, _dprRoleAssignmentsService)
+                .Match
+                (
+                    error => error,
+                    () => TransferBusinessRights(fromUser, organization, toUserId, contractRights, _itContractRightService)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferBusinessRights(fromUser, organization, toUserId, projectRights, _itProjectRightService)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferBusinessRights(fromUser, organization, toUserId, systemRights, _itSystemRightService)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferBusinessRights(fromUser, organization, toUserId, organizationUnitRights, _organizationUnitRightService)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferAdministrativeRoles(fromUser, organization, toUserId, rolesInOrganization)
+                );
+        }
+
         private Maybe<OperationError> RemoveAdministrativeRoles(User user, Organization organization, IEnumerable<OrganizationRole> rolesInOrganization)
+        {
+            foreach (var organizationRole in rolesInOrganization)
+            {
+                var removeRoleResult = _organizationRightsService.RemoveRole(organization.Id, user.Id, organizationRole);
+                if (removeRoleResult.Failed)
+                {
+                    var operationFailure = removeRoleResult.Error;
+                    _logger.Error(
+                        "Failed to remove role {role} from user {userId} in organization {organizationId}. Failed with {errorCode}",
+                        organizationRole, user.Id, organization.Id, operationFailure);
+                    {
+                        return new OperationError("Failed removing organization role:" + organizationRole.ToString("G"), operationFailure);
+                    }
+                }
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> TransferAdministrativeRoles(User user, Organization organization, int toUserId, IEnumerable<OrganizationRole> rolesInOrganization)
         {
             foreach (var organizationRole in rolesInOrganization)
             {
@@ -332,6 +407,46 @@ namespace Core.ApplicationServices.Rights
                         );
                     {
                         return new OperationError($"Failed to remove right of type {right.GetType().Name} with rightId {right.Id}:{removeRoleResult.Error}", removeRoleResult.Error.FailureType);
+                    }
+                }
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> TransferBusinessRights<TRight, TRole, TModel>(
+            User user,
+            Organization organization,
+            int toUserId,
+            IEnumerable<TRight> rights,
+            IRoleAssignmentService<TRight, TRole, TModel> assignmentService)
+            where TRight : Entity, IRight<TModel, TRight, TRole>
+            where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
+            where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
+        {
+            var businessRights = rights.ToList();
+
+            //Take a snapshot of the rights info before we remove all relations
+            var rightsInfoSnapshot = businessRights.Select(r => (r.Object, r.RoleId)).ToList();
+
+            //Start by removing the original assignments
+            var removeResult = RemoveBusinessRights(user, organization, businessRights, assignmentService);
+
+            if (removeResult.HasValue)
+                return removeResult.Value;
+
+            // Re-assign the roles to the specified user
+            foreach (var right in rightsInfoSnapshot)
+            {
+                var assignResult = assignmentService.AssignRole(right.Object, right.RoleId, toUserId);
+                if (assignResult.Failed)
+                {
+                    _logger.Error(
+                        "Failed to assign right of type {rightType} with role {roleId} on object: {objectType}:{objectId} to user {userId} in organization {organizationId}. Failed with {error}",
+                        typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, user.Id, organization.Id, assignResult.Error.ToString()
+                    );
+                    {
+                        return new OperationError($"Failed to assign role of type {typeof(TRight).Name} with role {right.RoleId}:{assignResult.Error}", assignResult.Error.FailureType);
                     }
                 }
             }
