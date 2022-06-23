@@ -75,18 +75,15 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '_', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', 'kitosUsers', "uiState",
-            function ($scope, $http, _, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess, user: Kitos.Services.IUser, autofocus, kitosUsers, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) {
+            '$scope', '$http', '_', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', 'kitosUsers', "uiState", "select2LoadingService",
+            function ($scope, $http, _, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess, user: Kitos.Services.IUser, autofocus, kitosUsers, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, select2LoadingService: Kitos.Services.ISelect2LoadingService,) {
 
                 const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
-                const yesNoUndecided = new Kitos.Models.ViewModel.Shared.YesNoUndecidedOptions();
-
+                
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
-                $scope.yesNoUndecidedValues = yesNoUndecided.options;
                 $scope.contract = contract;
                 $scope.lastChanged = Kitos.Helpers.RenderFieldsHelper.renderDate(contract.lastChanged);
-                $scope.procurementInitiated = yesNoUndecided.getById(contract.procurementInitiated);
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.kitosUsers = kitosUsers;
                 autofocus();
@@ -98,6 +95,7 @@
                 $scope.allowClear = true;
                 $scope.showprocurementPlanSelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementPlan);
                 $scope.showProcurementStrategySelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementStrategy);
+                bindProcurementInitiated();
                 var today = new Date();
 
                 if (!contract.active) {
@@ -186,14 +184,6 @@
                     $scope.contract.procurementPlanYear = payload.procurementPlanYear;
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
                 }
-
-                $scope.saveProcurementInitiated = procurementInitiated => {
-                    if (procurementInitiated === null)
-                        return;
-
-                    var payload = { procurementInitiated: procurementInitiated };
-                    patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
-                };
 
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
@@ -314,6 +304,22 @@
                         payload[field] = dateString;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         isActive();
+                    }
+                }
+
+                function bindProcurementInitiated() {
+                    const options = new Kitos.Models.ViewModel.Shared.YesNoUndecidedOptions();
+                    $scope.procurementInitiated = {
+                        selectedElement: options.getById($scope.contract.procurementInitiated),
+                        select2Config: select2LoadingService.select2LocalDataNoSearch(() => options.options, false),
+                        elementSelected: (newElement) => {
+                            if (!!newElement) {
+                                $scope.contract.procurementInitiated = newElement.id;
+                                var payload = { procurementInitiated: newElement.id };
+
+                                patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                            }
+                        }
                     }
                 }
             }]);

@@ -19,6 +19,7 @@
 
     export class OverviewPlanController implements IOverviewPlanController {
         private storageKey = "it-contract-plan-options";
+        private modifiedStorageKey = "2-1-" + this.storageKey;
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private procurementInitiatedStorageKey = "it-contract-overview-procuremeninitiated";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
@@ -87,6 +88,8 @@
                         });
                     }
                 });
+
+            this.$window.sessionStorage.removeItem(this.procurementInitiatedStorageKey);
 
             //Defer until page change is complete
             setTimeout(() => this.activate(), 1);
@@ -158,6 +161,17 @@
 
         private fixProcurmentFilter(filterUrl) {
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
+        }
+
+        private fixProcurmentInitiatedFilter(parameterMap, procurementId, procurementColumnName) {
+            const filterString = `${procurementColumnName} eq '${procurementId}'`;
+            const filter = `${procurementColumnName} eq '[object Object]'`;
+
+            parameterMap.$filter = parameterMap.$filter.replace(filter, filterString);
+            
+            return Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
+                "ProcurementInitiated",
+                Models.Api.Shared.YesNoUndecidedOption.Undecided);
         }
 
         public saveGridProfile() {
@@ -252,12 +266,7 @@
                                     query = `/odata/Organizations(${this.user
                                         .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts`;
                                 }
-
-                                var procurementId = this.$window.sessionStorage.getItem(this.procurementInitiatedStorageKey);
-                                if (procurementId !== null) {
-                                    filterParameters += `&%24filter=ProcurementInitiated eq '${procurementId}'`;
-                                }
-
+                                
                                 return query + urlParameters + filterParameters;
                             },
                             dataType: "json"
@@ -285,7 +294,14 @@
                                 parameterMap.$filter = this.fixProcurmentFilter(parameterMap.$filter);
 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
+
+                                /*const procurementId = this.$window.sessionStorage.getItem(this.procurementInitiatedStorageKey);
+                                if (procurementId != null) {
+                                    const procurementColumnName = "ProcurementInitiated";
+                                    parameterMap.$filter = this.fixProcurmentInitiatedFilter(parameterMap, procurementId, procurementColumnName);
+                                }*/
                             }
+
 
                             return parameterMap;
                         }
@@ -1001,18 +1017,18 @@
             return concatRoles;
         }
 
-        private orgUnitDropDownList = (args) => this.createFilterDropDown(this.orgUnitStorageKey, this.orgUnits, args, false);
+        private orgUnitDropDownList = (args) => this.createFilterDropDown(this.orgUnitStorageKey, this.orgUnits, args, false, true);
         private procurementInitiatedOptionsDropDownList = (args) => {
             const yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
             var options = [];
             yesNoUndecided.options.forEach((value) => {
                 options.push({ Id: value.id, Name: value.text });
             });
-
-            this.createFilterDropDown(this.procurementInitiatedStorageKey, options, args, true);
+            
+            this.createFilterDropDown(this.procurementInitiatedStorageKey, options, args, true, false);
         };
 
-        private createFilterDropDown(key: string, dataSource: any, args: any, insertEmptyValue: boolean, customDefaultIndex?: number) {
+        private createFilterDropDown(key: string, dataSource: any, args: any, insertEmptyValue: boolean, deleteFilteringItemOnIndexZero: boolean, customDefaultIndex?: number) {
             var self = this;
 
             function indent(dataItem: any) {
@@ -1060,13 +1076,15 @@
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
 
-                if (selectedIndex > 0) {
+                if (selectedIndex > 0 || !deleteFilteringItemOnIndexZero) {
                     // filter by selected
                     self.$window.sessionStorage.setItem(key, selectedId.toString());
-                } else {
+                }
+                else if(selectedIndex <= 0 && deleteFilteringItemOnIndexZero) {
                     // else clear filter because the 0th element should act like a placeholder
                     self.$window.sessionStorage.removeItem(key);
                 }
+
                 // setting the above session value will cause the grid to fetch from a different URL
                 // see the function part of this http://docs.telerik.com/kendo-ui/api/javascript/data/datasource#configuration-transport.read.url
                 // so that's why it works
@@ -1076,7 +1094,13 @@
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
-                dataSource: dataSource,
+                dataSource: dataSource/*.map(value => {
+                    return {
+                        remoteValue: value.Id,
+                        text: value.Name,
+                        optionalContext: value
+                    };
+                })*/,
                 dataValueField: "Id",
                 dataTextField: "Name",
                 template: indent,
@@ -1084,7 +1108,7 @@
                 change: valueChanged
             });
         }
-
+        
         public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
             return {
                 autoBind: false,
