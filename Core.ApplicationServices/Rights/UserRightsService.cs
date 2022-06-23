@@ -116,31 +116,42 @@ namespace Core.ApplicationServices.Rights
 
         public Maybe<OperationError> RemoveAllRights(int userId, int organizationId)
         {
-            var transaction = _transactionManager.Begin();
-            var uuidResult = _identityResolver.ResolveUuid<Organization>(organizationId);
-
-            if (uuidResult.IsNone)
-            {
-                return new OperationError(nameof(organizationId), OperationFailure.BadInput);
-            }
-
-            var removeAllRightsError = _organizationService
-                .GetOrganization(uuidResult.Value, OrganizationDataReadAccessLevel.All)
-                .Bind(WithWriteAccess)
-                .Match(organization => RemoveAllRights(userId, organization), error => error);
-
-            if (removeAllRightsError.IsNone)
-            {
-                _databaseControl.SaveChanges();
-                transaction.Commit();
-            }
-
-            return removeAllRightsError;
+            return MutateUserRights(
+                userId,
+                organizationId,
+                context =>
+                    RemoveRights
+                    (
+                        context.user,
+                        context.organization,
+                        context.dprRights,
+                        context.contractRights,
+                        context.projectRights,
+                        context.systemRights,
+                        context.organizationUnitRights,
+                        context.rolesInOrganization
+                    )
+            );
         }
 
         public Maybe<OperationError> RemoveRights(int userId, int organizationId, UserRightsChangeParameters parameters)
         {
-            throw new NotImplementedException();
+            return MutateUserRights(
+                userId,
+                organizationId,
+                context =>
+                    RemoveRights
+                    (
+                        context.user,
+                        context.organization,
+                        context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.Id)).ToList(),
+                        context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.Id)).ToList(),
+                        context.projectRights.Where(right => parameters.ProjectRightIds.Contains(right.Id)).ToList(),
+                        context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.Id)).ToList(),
+                        context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.Id)).ToList(),
+                        context.rolesInOrganization.Where(role => parameters.AdministrativeAccessRoles.Contains(role)).ToList()
+                    )
+            );
         }
 
         public Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters)
@@ -172,23 +183,74 @@ namespace Core.ApplicationServices.Rights
             return result;
         }
 
-        private Maybe<OperationError> RemoveAllRights(int userId, Organization organization)
+        private Maybe<OperationError> MutateUserRights(
+          int userId,
+          int organizationId,
+          Func<(Organization organization, User user, IEnumerable<DataProcessingRegistrationRight> dprRights, IEnumerable<ItContractRight> contractRights, List<ItProjectRight> projectRights, IEnumerable<ItSystemRight> systemRights, IEnumerable<OrganizationUnitRight> organizationUnitRights, IEnumerable<OrganizationRole> rolesInOrganization), Maybe<OperationError>> mutation)
         {
-            return _userService
-                .GetUsersInOrganization(organization.Uuid).Select(users => users.ById(userId))
-                .Match(user => RemoveAllRights(user, organization), error => error);
-        }
+            var transaction = _transactionManager.Begin();
+            var uuidResult = _identityResolver.ResolveUuid<Organization>(organizationId);
 
-        private Maybe<OperationError> RemoveAllRights(User user, Organization organization)
-        {
-            var dprRights = user.GetDataProcessingRegistrationRights(organization.Id).ToList();
-            var contractRights = user.GetItContractRights(organization.Id).ToList();
-            var projectRights = user.GetItProjectRights(organization.Id).ToList();
-            var systemRights = user.GetItSystemRights(organization.Id).ToList();
-            var organizationUnitRights = user.GetOrganizationUnitRights(organization.Id).ToList();
-            var rolesInOrganization = user.GetRolesInOrganization(organization.Uuid);
+            if (uuidResult.IsNone)
+            {
+                return new OperationError(nameof(organizationId), OperationFailure.BadInput);
+            }
 
-            return RemoveRights(user, organization, dprRights, contractRights, projectRights, systemRights, organizationUnitRights, rolesInOrganization);
+            var error = _organizationService
+                .GetOrganization(uuidResult.Value, OrganizationDataReadAccessLevel.All)
+                .Bind(WithWriteAccess)
+                .Bind<(Organization organization, User user)>(organization =>
+                {
+                    var userResult = _userService.GetUsersInOrganization(organization.Uuid);
+                    if (userResult.Failed)
+                    {
+                        return userResult.Error;
+                    }
+
+                    var user = userResult.Value.ById(userId);
+                    if (user == null)
+                    {
+                        return new OperationError($"User with id: {userId} not found in the organization",
+                            OperationFailure.NotFound);
+                    }
+
+                    return (organization, user);
+                })
+                .Select(orgAndUser =>
+                {
+                    var (organization, user) = orgAndUser;
+                    var dprRights = user.GetDataProcessingRegistrationRights(organization.Id).ToList();
+                    var contractRights = user.GetItContractRights(organization.Id).ToList();
+                    var projectRights = user.GetItProjectRights(organization.Id).ToList();
+                    var systemRights = user.GetItSystemRights(organization.Id).ToList();
+                    var organizationUnitRights = user.GetOrganizationUnitRights(organization.Id).ToList();
+                    var rolesInOrganization = user.GetRolesInOrganization(organization.Uuid);
+
+                    return
+                    (
+                        organization,
+                        user,
+                        dprRights,
+                        contractRights,
+                        projectRights,
+                        systemRights,
+                        organizationUnitRights,
+                        rolesInOrganization
+                    );
+                })
+                .Match
+                (
+                    context => mutation(context),
+                    error => error
+                );
+
+            if (error.IsNone)
+            {
+                _databaseControl.SaveChanges();
+                transaction.Commit();
+            }
+
+            return error;
         }
 
         private Maybe<OperationError> RemoveRights(

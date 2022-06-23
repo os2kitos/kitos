@@ -6,12 +6,12 @@ namespace Core.ApplicationServices.Model.Users
 {
     public class UserRightsChangeParameters
     {
-        public IEnumerable<OrganizationRole> AdministrativeAccessRoles { get; }
-        public IEnumerable<int> DataProcessingRegistrationRightIds { get; }
-        public IEnumerable<int> SystemRightIds { get; }
-        public IEnumerable<int> ContractRightIds { get; }
-        public IEnumerable<int> ProjectRightIds { get; }
-        public IEnumerable<int> OrganizationUnitRightsIds { get; }
+        public ISet<OrganizationRole> AdministrativeAccessRoles { get; }
+        public ISet<int> DataProcessingRegistrationRightIds { get; }
+        public ISet<int> SystemRightIds { get; }
+        public ISet<int> ContractRightIds { get; }
+        public ISet<int> ProjectRightIds { get; }
+        public ISet<int> OrganizationUnitRightsIds { get; }
 
         public UserRightsChangeParameters(
             IEnumerable<OrganizationRole> organizationRoles,
@@ -21,12 +21,12 @@ namespace Core.ApplicationServices.Model.Users
             IEnumerable<int> projectRoles,
             IEnumerable<int> organizationUnitRights)
         {
-            AdministrativeAccessRoles = organizationRoles.ToList();
-            DataProcessingRegistrationRightIds = dataProcessingRegistrationRoles.ToList();
-            SystemRightIds = systemRoles.ToList();
-            ContractRightIds = contractRoles.ToList();
-            ProjectRightIds = projectRoles.ToList();
-            OrganizationUnitRightsIds = organizationUnitRights.ToList();
+            AdministrativeAccessRoles = organizationRoles.ToHashSet();
+            DataProcessingRegistrationRightIds = dataProcessingRegistrationRoles.ToHashSet();
+            SystemRightIds = systemRoles.ToHashSet();
+            ContractRightIds = contractRoles.ToHashSet();
+            ProjectRightIds = projectRoles.ToHashSet();
+            OrganizationUnitRightsIds = organizationUnitRights.ToHashSet();
         }
     }
 }

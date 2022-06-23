@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
@@ -35,7 +36,8 @@ namespace Tests.Unit.Core.DomainServices.Role
                 _optionsServiceMock.Object,
                 _userRepository.Object,
                 _rightRepositoryMock.Object,
-                Mock.Of<ITransactionManager>(x => x.Begin() == _transaction.Object));
+                Mock.Of<ITransactionManager>(x => x.Begin() == _transaction.Object),
+                Mock.Of<IDomainEvents>());
         }
 
         [Fact]
