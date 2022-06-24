@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -28,15 +29,7 @@ namespace Tests.Integration.Presentation.Web.Users
             var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, CreateName(), CreateName(), organization.Id);
-            var organizationRoles = new[]
-            {
-                OrganizationRole.ContractModuleAdmin,
-                OrganizationRole.OrganizationModuleAdmin,
-                OrganizationRole.ProjectModuleAdmin,
-                OrganizationRole.RightsHolderAccess,
-                OrganizationRole.SystemModuleAdmin,
-                OrganizationRole.LocalAdmin
-            };
+            var organizationRoles = GetAllOrganizationAdminRoles();
             var businessRoleScopes = EnumRange.All<BusinessRoleScope>().ToList();
             await AssignRoles(organization, userWithRoles.userId, organizationRoles, businessRoleScopes);
 
@@ -54,15 +47,7 @@ namespace Tests.Integration.Presentation.Web.Users
             var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, CreateName(), CreateName(), organization.Id);
-            var organizationRoles = new[]
-            {
-                OrganizationRole.ContractModuleAdmin,
-                OrganizationRole.OrganizationModuleAdmin,
-                OrganizationRole.ProjectModuleAdmin,
-                OrganizationRole.RightsHolderAccess,
-                OrganizationRole.SystemModuleAdmin,
-                OrganizationRole.LocalAdmin
-            };
+            var organizationRoles = GetAllOrganizationAdminRoles();
             var businessRoleScopes = EnumRange.All<BusinessRoleScope>().ToList();
             await AssignRoles(organization, userWithRoles.userId, organizationRoles, businessRoleScopes);
             var getAfterAssignResult = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
@@ -97,21 +82,38 @@ namespace Tests.Integration.Presentation.Web.Users
         public async Task Can_Delete_User_From_Organization()
         {
             // Arrange
+            var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, CreateName(), CreateName(), organization.Id);
+            var organizationRoles = GetAllOrganizationAdminRoles();
+            var businessRoleScopes = EnumRange.All<BusinessRoleScope>().ToList();
+            await AssignRoles(organization, userWithRoles.userId, organizationRoles, businessRoleScopes);
 
             // Act
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles");
+            using var deleteResult = await HttpApi.DeleteWithCookieAsync(url, globalAdminCookie);
 
-            // Assert
-
+            // Assert that deletion went ok and that the GET now returns "not found" (user is not found in the organization)
+            Assert.Equal(HttpStatusCode.OK, deleteResult.StatusCode);
+            using var getAfterRemoveResult = await SendGetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
+            Assert.Equal(HttpStatusCode.NotFound, getAfterRemoveResult.StatusCode);
         }
 
         private static async Task<OrganizationUserRoleAssignmentsDTO> GetUserRolesAsync(OrganizationDTO organization,
             (int userId, KitosCredentials credentials, Cookie loginCookie) userWithRoles, Cookie globalAdminCookie)
         {
-            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles");
-            using var response = await HttpApi.GetWithCookieAsync(url, globalAdminCookie);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            using var response = await SendGetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
             var result = await response.ReadResponseBodyAsKitosApiResponseAsync<OrganizationUserRoleAssignmentsDTO>();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return result;
+        }
+
+        private static async Task<HttpResponseMessage> SendGetUserRolesAsync(OrganizationDTO organization,
+            (int userId, KitosCredentials credentials, Cookie loginCookie) userWithRoles, Cookie globalAdminCookie)
+        {
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles");
+            var response = await HttpApi.GetWithCookieAsync(url, globalAdminCookie);
+            return response;
         }
 
         private async Task AssignRoles(OrganizationDTO organization, int userId, IEnumerable<OrganizationRole> orgRoles, IEnumerable<BusinessRoleScope> businessRole)
@@ -172,6 +174,19 @@ namespace Tests.Integration.Presentation.Web.Users
             {
                 Assert.Equal(expected, actual);
             }
+        }
+
+        private static OrganizationRole[] GetAllOrganizationAdminRoles()
+        {
+            return new[]
+            {
+                OrganizationRole.ContractModuleAdmin,
+                OrganizationRole.OrganizationModuleAdmin,
+                OrganizationRole.ProjectModuleAdmin,
+                OrganizationRole.RightsHolderAccess,
+                OrganizationRole.SystemModuleAdmin,
+                OrganizationRole.LocalAdmin
+            };
         }
     }
 }
