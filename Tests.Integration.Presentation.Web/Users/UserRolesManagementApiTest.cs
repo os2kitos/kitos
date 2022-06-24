@@ -9,6 +9,7 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Users;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External.Rights;
+using Tests.Integration.Presentation.Web.Tools.Model;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -27,42 +28,65 @@ namespace Tests.Integration.Presentation.Web.Users
             var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.LocalAdmin, CreateName(), CreateName(), organization.Id);
-            await AssignRoles(
-                organization,
-                userWithRoles.userId,
-                new[]
-                {
-                    OrganizationRole.ContractModuleAdmin,
-                    OrganizationRole.OrganizationModuleAdmin,
-                    OrganizationRole.ProjectModuleAdmin,
-                    OrganizationRole.RightsHolderAccess,
-                    OrganizationRole.SystemModuleAdmin
-                },
-                EnumRange.All<BusinessRoleScope>()
-            );
-
-            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles");
+            var organizationRoles = new[]
+            {
+                OrganizationRole.ContractModuleAdmin,
+                OrganizationRole.OrganizationModuleAdmin,
+                OrganizationRole.ProjectModuleAdmin,
+                OrganizationRole.RightsHolderAccess,
+                OrganizationRole.SystemModuleAdmin
+            };
+            var businessRoleScopes = EnumRange.All<BusinessRoleScope>().ToList();
+            await AssignRoles(organization, userWithRoles.userId, organizationRoles, businessRoleScopes);
 
             // Act
-            using var response = await HttpApi.GetWithCookieAsync(url, globalAdminCookie);
+            var result = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
 
             // Assert
+            AssertGetRolesResult(result, organizationRoles.Append(OrganizationRole.LocalAdmin)/*Local admin was initial role*/, businessRoleScopes);
+        }
+
+        [Fact]
+        public async Task Can_Remove_Range_Of_User_Roles()
+        {
+            // Arrange
+
+            // Act
+
+            // Assert
+
+        }
+
+        [Fact]
+        public async Task Can_Transfer_Range_Of_User_Roles()
+        {
+            // Arrange
+
+            // Act
+
+            // Assert
+
+        }
+
+        [Fact]
+        public async Task Can_Delete_User_From_Organization()
+        {
+            // Arrange
+
+            // Act
+
+            // Assert
+
+        }
+
+        private static async Task<OrganizationUserRoleAssignmentsDTO> GetUserRolesAsync(OrganizationDTO organization,
+            (int userId, KitosCredentials credentials, Cookie loginCookie) userWithRoles, Cookie globalAdminCookie)
+        {
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles");
+            using var response = await HttpApi.GetWithCookieAsync(url, globalAdminCookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = await response.ReadResponseBodyAsKitosApiResponseAsync<OrganizationUserRoleAssignmentsDTO>();
-            var roleScopes = result.Rights.Select(x => x.Scope).ToList();
-            Assert.Equal(6, result.AdministrativeAccessRoles.Count());
-            Assert.Contains(OrganizationRole.LocalAdmin, result.AdministrativeAccessRoles);
-            Assert.Contains(OrganizationRole.ContractModuleAdmin, result.AdministrativeAccessRoles);
-            Assert.Contains(OrganizationRole.ProjectModuleAdmin, result.AdministrativeAccessRoles);
-            Assert.Contains(OrganizationRole.OrganizationModuleAdmin, result.AdministrativeAccessRoles);
-            Assert.Contains(OrganizationRole.RightsHolderAccess, result.AdministrativeAccessRoles);
-            Assert.Contains(OrganizationRole.SystemModuleAdmin, result.AdministrativeAccessRoles);
-            Assert.Equal(5, result.Rights.Count());
-            Assert.Contains(BusinessRoleScope.DataProcessingRegistration, roleScopes);
-            Assert.Contains(BusinessRoleScope.ItContract, roleScopes);
-            Assert.Contains(BusinessRoleScope.ItProject, roleScopes);
-            Assert.Contains(BusinessRoleScope.ItSystemUsage, roleScopes);
-            Assert.Contains(BusinessRoleScope.OrganizationUnit, roleScopes);
+            return result;
         }
 
         private async Task AssignRoles(OrganizationDTO organization, int userId, IEnumerable<OrganizationRole> orgRoles, IEnumerable<BusinessRoleScope> businessRole)
@@ -103,37 +127,26 @@ namespace Tests.Integration.Presentation.Web.Users
             }
         }
 
-        [Fact]
-        public async Task Can_Remove_Range_Of_User_Roles()
+        private static void AssertGetRolesResult(OrganizationUserRoleAssignmentsDTO result, IEnumerable<OrganizationRole> orgRoles, IEnumerable<BusinessRoleScope> businessRoles)
         {
-            // Arrange
+            var expectedOrgRoles = orgRoles.OrderBy(x => x).ToList();
+            var expectedBusinessRoles = businessRoles.OrderBy(x => x).ToList();
 
-            // Act
+            var actualBusinessRoles = result.Rights.Select(x => x.Scope).OrderBy(x => x).ToList();
+            var actualOrgRoles = result.AdministrativeAccessRoles.OrderBy(x => x).ToList();
 
-            // Assert
+            Assert.Equal(expectedBusinessRoles.Count, actualBusinessRoles.Count);
+            Assert.Equal(expectedOrgRoles.Count, actualOrgRoles.Count);
 
-        }
+            foreach (var (expected, actual) in expectedBusinessRoles.Zip(actualBusinessRoles, (expected, actual) => (expected, actual)))
+            {
+                Assert.Equal(expected, actual);
+            }
 
-        [Fact]
-        public async Task Can_Transfer_Range_Of_User_Roles()
-        {
-            // Arrange
-
-            // Act
-
-            // Assert
-
-        }
-
-        [Fact]
-        public async Task Can_Delete_User_From_Organization()
-        {
-            // Arrange
-
-            // Act
-
-            // Assert
-
+            foreach (var (expected, actual) in expectedOrgRoles.Zip(actualOrgRoles, (expected, actual) => (expected, actual)))
+            {
+                Assert.Equal(expected, actual);
+            }
         }
     }
 }
