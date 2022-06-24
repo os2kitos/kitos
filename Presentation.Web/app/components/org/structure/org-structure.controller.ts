@@ -33,8 +33,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) {
+        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService",
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -375,6 +375,27 @@
                                 'newParent': unit.parentId,
                                 'orgId': unit.organizationId,
                                 'isRoot': unit.parentId == undefined
+                            };
+                            
+                            if ($modalScope.orgUnits.length === 0) {
+                                $modalScope.orgUnits.push(unit);
+                            }
+
+                            var selectedUnit = $modalScope.orgUnits.filter(x => x.id === unit.parentId)[0];
+                            if (selectedUnit === null && $modalScope.orgUnit.parentId == undefined) {
+                                selectedUnit = unit;
+                            }
+
+                            $modalScope.orgUnitsSelectObject = function(){
+                                return {
+                                    selectedElement: selectedUnit ?? "",
+                                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => $modalScope.orgUnits, false),
+                                    elementSelected: (newElement) => {
+                                        if (!!newElement) {
+                                            this.$modalScope.orgUnit.newParent = newElement.id;
+                                        }
+                                    }
+                                }
                             };
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
