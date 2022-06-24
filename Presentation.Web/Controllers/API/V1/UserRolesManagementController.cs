@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V1
         /// </summary>
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
-        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assigment state</returns>
+        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assignment state</returns>
         [Route]
         [HttpDelete]
         public HttpResponseMessage Delete(int organizationId, int userId)
@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
         /// <param name="assignmentsToDelete"></param>
-        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assigment state</returns>
+        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assignment state</returns>
         [Route("range")]
         [HttpDelete]
         public HttpResponseMessage DeleteRange(int organizationId, int userId, [FromBody] RemoveUserRightsRequest assignmentsToDelete)
@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
         /// <param name="assignmentsToTransfer"></param>
-        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assigment state</returns>
+        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assignment state</returns>
         [Route("range/transfer")]
         [HttpPatch]
         public HttpResponseMessage PatchTransferToAnotherUser(int organizationId, int userId, TransferRightsRequestDTO assignmentsToTransfer)
