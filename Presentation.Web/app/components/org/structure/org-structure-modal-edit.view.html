@@ -10,11 +10,11 @@
                     Overordnet enhed
                 </label>
                 <div class="col-xs-8">
-                    <single-select-select2 id="parent" name="parent" ng-model="orgUnitsSelectObject" ng-disabled="!canChangeParent"/>
+                    <single-select-select2 id="parent-select" ng-model="orgUnitsSelectObject" ng-disabled="!canChangeParent"/>
                     <!--<select type="text" data-ui-select2="" name="parent" id="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent" tabindex="1">
-                        <option></option>
-                        <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
-                    </select>-->
+        <option></option>
+        <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
+    </select>-->
                 </div>
                 <div class="col-xs-8 col-xs-offset-3">
                     <p class="help-block" data-ng-show="canChangeParent">
