@@ -208,6 +208,7 @@
     <Compile Include="Tools\UserHelper.cs" />
     <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
     <Compile Include="UI_Configuration\UIConfigurationTests.cs" />
+    <Compile Include="Users\UserRolesManagementApiTest.cs" />
     <Compile Include="Users\UserTest.cs" />
   </ItemGroup>
   <ItemGroup>
