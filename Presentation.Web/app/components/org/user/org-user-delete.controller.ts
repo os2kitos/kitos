@@ -33,6 +33,7 @@
         disabled: boolean;
         noRights: boolean;
         anySelections = false;
+        roleViewModelCallbacks: Users.IOrgUserRolesTableCallbacks<IAssignedRightViewModel>;
 
         readonly firstName: string;
         readonly lastName: string;
@@ -41,7 +42,6 @@
 
         static $inject: string[] = [
             "$uibModalInstance",
-            "notify",
             "userToModify",
             "loggedInUser",
             "usersInOrganization",
@@ -53,7 +53,6 @@
 
         constructor(
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private readonly notify,
             private readonly userToModify: Models.IUser,
             private readonly loggedInUser: Services.IUser,
             usersInOrganization: Array<Models.IUser>,
@@ -84,6 +83,10 @@
             this.curOrganization = loggedInUser.currentOrganizationName;
             this.vmText = text;
             this.updateNoRights();
+            this.roleViewModelCallbacks = {
+                delete: right => this.deleteRight(right),
+                selectionChanged: () => this.updateAnySelections()
+            };
         }
 
         private updateNoRights() {

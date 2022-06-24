@@ -29,120 +29,36 @@
             </select>
         </div>
     </div>
-    
-    <!--TODO: Create a directive to render this once the final "transfer" works!!!!-->
 
     <!-- Table containing organization data -->
-    <table class="table table-hover" ng-if="ctrl.vmOrgRights.length > 0">
-        <thead>
-            <tr>
-                <th class="col-xs-1">Vælg</th>
-                <th class="col-xs-3">Organisation</th>
-                <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Tildel til</th>
-                <th class="col-xs-1">Slet</th>
-            </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="right in ctrl.vmOrgRights | orderBy: 'right.roleName'">
-            <td><input type="checkbox" ng-model="right.selected" ng-change="ctrl.updateAnySelections()"/></td>
-            <td>{{right.right.businessObjectName}}</td>
-            <td>{{right.right.roleName}}</td>
-            <td ng-if="right.selected && ctrl.selectedUser">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>
-            <td ng-if="!(right.selected && ctrl.selectedUser)"> </td>
-            <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.deleteRight(right)"></button></td>
-        </tr>
-        </tbody>
-    </table>
+    <org-user-roles-table ng-model="ctrl.vmOrgRights"
+                          data-role-type-name="Organisation"
+                          data-callbacks="ctrl.roleViewModelCallbacks"
+                          data-selected-user="ctrl.selectedUser" />
+
     <!-- Table containing project data -->
-    <table class="table table-hover" ng-if="ctrl.vmProjectRights.length > 0">
-        <thead>
-            <tr>
-                <th class="col-xs-1">Vælg</th>
-                <th class="col-xs-3">Projektnavn</th>
-                <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Tildel til</th>
-                <th class="col-xs-1">Slet</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="right in ctrl.vmProjectRights | orderBy: 'right.roleName'">
-                <td><input type="checkbox" ng-model="right.selected" ng-change="ctrl.updateAnySelections()"/></td>
-                <td>{{right.right.businessObjectName}}</td>
-                <td>{{right.right.roleName}}</td>
-                <td ng-if="right.selected && ctrl.selectedUser">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>
-                <td ng-if="!(right.selected && ctrl.selectedUser)"> </td>
-                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.deleteRight(right)"></button></td>
-            </tr>
-        </tbody>
-    </table>
+    <org-user-roles-table ng-model="ctrl.vmProjectRights"
+                          data-role-type-name="Projektnavn"
+                          data-callbacks="ctrl.roleViewModelCallbacks"
+                          data-selected-user="ctrl.selectedUser" />
+
     <!-- Table containing ItSystem data -->
-    <table class="table table-hover" ng-if="ctrl.vmSystemRights.length > 0">
-        <thead>
-            <tr>
-                <th class="col-xs-1">Vælg</th>
-                <th class="col-xs-3">Systemnavn</th>
-                <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Tildel til</th>
-                <th class="col-xs-1">Slet</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="right in ctrl.vmSystemRights | orderBy: 'right.roleName'">
-                <td><input type="checkbox" ng-model="right.selected" ng-change="ctrl.updateAnySelections()"/></td>
-                <td>{{right.right.businessObjectName}}</td>
-                <td>{{right.right.roleName}}</td>
-                <td ng-if="right.selected && ctrl.selectedUser">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>
-                <td ng-if="!(right.selected && ctrl.selectedUser)"> </td>
-                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.deleteRight(right)"></button></td>
-            </tr>
-        </tbody>
-    </table>
+    <org-user-roles-table ng-model="ctrl.vmSystemRights"
+                          data-role-type-name="Systemnavn"
+                          data-callbacks="ctrl.roleViewModelCallbacks"
+                          data-selected-user="ctrl.selectedUser" />
+
     <!-- Table containing ItContract data -->
-    <table class="table table-hover" ng-if="ctrl.vmContractRights.length > 0">
-        <thead>
-            <tr>
-                <th class="col-xs-1">Vælg</th>
-                <th class="col-xs-3">Kontraktnavn</th>
-                <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Tildel til</th>
-                <th class="col-xs-1">Slet</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="right in ctrl.vmContractRights | orderBy: 'right.roleName'">
-                <td><input type="checkbox" ng-model="right.selected" ng-change="ctrl.updateAnySelections()"/></td>
-                <td>{{right.right.businessObjectName}}</td>
-                <td>{{right.right.roleName}}</td>
-                <td ng-if="right.selected && ctrl.selectedUser">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>
-                <td ng-if="!(right.selected && ctrl.selectedUser)"> </td>
-                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.deleteRight(right)"></button></td>
-            </tr>
-        </tbody>
-    </table>
+    <org-user-roles-table ng-model="ctrl.vmContractRights"
+                          data-role-type-name="Kontraktnavn"
+                          data-callbacks="ctrl.roleViewModelCallbacks"
+                          data-selected-user="ctrl.selectedUser" />
 
     <!-- Table containing DPR data -->
-    <table class="table table-hover" ng-if="ctrl.vmDprRights.length > 0">
-        <thead>
-            <tr>
-                <th class="col-xs-1">Vælg</th>
-                <th class="col-xs-3">Databehandling</th>
-                <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Tildel til</th>
-                <th class="col-xs-1">Slet</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="right in ctrl.vmDprRights | orderBy: 'right.roleName'">
-                <td><input type="checkbox" ng-model="right.selected" ng-change="ctrl.updateAnySelections()"/></td>
-                <td>{{right.right.businessObjectName}}</td>
-                <td>{{right.right.roleName}}</td>
-                <td ng-if="right.selected && ctrl.selectedUser">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>
-                <td ng-if="!(right.selected && ctrl.selectedUser)"> </td>
-                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.deleteRight(right)"></button></td>
-            </tr>
-        </tbody>
-    </table>
+    <org-user-roles-table ng-model="ctrl.vmDprRights"
+                          data-role-type-name="Databehandling"
+                          data-callbacks="ctrl.roleViewModelCallbacks"
+                          data-selected-user="ctrl.selectedUser" />
 
     <!-- Table containing administrative roller data -->
     <table class="table table-hover" ng-if="ctrl.vmAdminRights.length > 0">
