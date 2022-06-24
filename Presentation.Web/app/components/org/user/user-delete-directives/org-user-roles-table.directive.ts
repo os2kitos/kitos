@@ -10,7 +10,7 @@
         app.directive("orgUserRolesTable",
             [
                 () => ({
-                    templateUrl: "app/components/org/user/org-user-roles-table.view.html",
+                    templateUrl: "app/components/org/user/user-delete-directives/org-user-roles-table.view.html",
                     scope: {
                         id: "@",
                         model: "=ngModel",
