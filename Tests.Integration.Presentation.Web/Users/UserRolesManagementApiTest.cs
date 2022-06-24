@@ -27,14 +27,15 @@ namespace Tests.Integration.Presentation.Web.Users
             // Arrange
             var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.LocalAdmin, CreateName(), CreateName(), organization.Id);
+            var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, CreateName(), CreateName(), organization.Id);
             var organizationRoles = new[]
             {
                 OrganizationRole.ContractModuleAdmin,
                 OrganizationRole.OrganizationModuleAdmin,
                 OrganizationRole.ProjectModuleAdmin,
                 OrganizationRole.RightsHolderAccess,
-                OrganizationRole.SystemModuleAdmin
+                OrganizationRole.SystemModuleAdmin,
+                OrganizationRole.LocalAdmin
             };
             var businessRoleScopes = EnumRange.All<BusinessRoleScope>().ToList();
             await AssignRoles(organization, userWithRoles.userId, organizationRoles, businessRoleScopes);
@@ -43,18 +44,42 @@ namespace Tests.Integration.Presentation.Web.Users
             var result = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
 
             // Assert
-            AssertGetRolesResult(result, organizationRoles.Append(OrganizationRole.LocalAdmin)/*Local admin was initial role*/, businessRoleScopes);
+            AssertGetRolesResult(result, organizationRoles, businessRoleScopes);
         }
 
         [Fact]
         public async Task Can_Remove_Range_Of_User_Roles()
         {
             // Arrange
+            var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, CreateName(), CreateName(), organization.Id);
+            var organizationRoles = new[]
+            {
+                OrganizationRole.ContractModuleAdmin,
+                OrganizationRole.OrganizationModuleAdmin,
+                OrganizationRole.ProjectModuleAdmin,
+                OrganizationRole.RightsHolderAccess,
+                OrganizationRole.SystemModuleAdmin,
+                OrganizationRole.LocalAdmin
+            };
+            var businessRoleScopes = EnumRange.All<BusinessRoleScope>().ToList();
+            await AssignRoles(organization, userWithRoles.userId, organizationRoles, businessRoleScopes);
+            var getAfterAssignResult = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
 
             // Act
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles/range");
+            using var deleteResult = await HttpApi.DeleteWithCookieAsync(url, globalAdminCookie,
+                new RemoveUserRightsRequest
+                {
+                    AdminRoles = getAfterAssignResult.AdministrativeAccessRoles,
+                    BusinessRights = getAfterAssignResult.Rights
+                });
 
             // Assert
-
+            Assert.Equal(HttpStatusCode.OK, deleteResult.StatusCode);
+            var getAfterRemoveResult = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
+            AssertGetRolesResult(getAfterRemoveResult, Enumerable.Empty<OrganizationRole>(), Enumerable.Empty<BusinessRoleScope>());
         }
 
         [Fact]
