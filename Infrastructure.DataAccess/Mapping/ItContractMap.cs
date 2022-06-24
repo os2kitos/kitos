@@ -25,6 +25,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsUnique(false)
                 .HasName("IX_Name");
 
+            HasIndex(x => x.ProcurementInitiated)
+                .IsUnique(false)
+                .HasName("IX_ProcurementInitiated");
+
             // Table & Column Mappings
             ToTable("ItContract");
 

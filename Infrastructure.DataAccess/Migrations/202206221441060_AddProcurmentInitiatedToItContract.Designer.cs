@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddCriticalityType : IMigrationMetadata
+    public sealed partial class AddProcurmentInitiatedToItContract : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddCriticalityType));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddProcurmentInitiatedToItContract));
         
         string IMigrationMetadata.Id
         {
-            get { return "202206210625440_AddCriticalityType"; }
+            get { return "202206221441060_AddProcurmentInitiatedToItContract"; }
         }
         
         string IMigrationMetadata.Source

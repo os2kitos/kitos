@@ -383,10 +383,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var requestDto = new CreateNewContractRequestDTO()
+            var requestDto = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
-                Name = CreateName()
+                Name = CreateName(),
             };
 
             //Act
@@ -690,13 +690,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         [InlineData(true, true, false)]
         [InlineData(true, false, true)]
         [InlineData(false, true, true)]
+        [InlineData(true, true, true)]
         [InlineData(false, false, false)]
         public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
             var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements);
-            var request = new CreateNewContractRequestDTO()
+            var request = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName(),
@@ -2290,6 +2291,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             {
                 Assert.Equal(expected.ProcurementPlan.QuarterOfYear, actual.ProcurementPlan.QuarterOfYear);
                 Assert.Equal(expected.ProcurementPlan.Year, actual.ProcurementPlan.Year);
+                Assert.Equal(expected.ProcurementInitiated, actual.ProcurementInitiated);
             }
         }
 
@@ -2297,11 +2299,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             var procurementStrategy = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes, organizationUuid, 10, 0)).RandomItem();
             var purchaseType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes, organizationUuid, 10, 0)).RandomItem();
-            var request = new ContractProcurementDataWriteRequestDTO()
+            var request = new ContractProcurementDataWriteRequestDTO
             {
                 ProcurementStrategyUuid = procurementStrategy.Uuid,
                 PurchaseTypeUuid = purchaseType.Uuid,
-                ProcurementPlan = new ProcurementPlanDTO()
+                ProcurementInitiated = A<YesNoUndecidedChoice>(),
+                ProcurementPlan = new ProcurementPlanDTO
                 {
                     QuarterOfYear = Convert.ToByte((A<int>() % 4) + 1),
                     Year = A<int>()

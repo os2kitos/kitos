@@ -1,11 +1,13 @@
 ﻿module Kitos.Services {
 
     export interface IHelpText {
+        id: number | null;
         title: string | null;
         htmlText: string | null;
     }
 
     interface IHelpTextOdataModel {
+        Id?: number;
         Title?: string;
         Description?: string;
     }
@@ -32,6 +34,7 @@
         loadHelpText(key: string, ignoreCache?: boolean): ng.IPromise<IHelpText | null>;
         deleteHelpText(id: number, key: string): ng.IPromise<unknown>;
         updateHelpText(id: number, key: string, title: string, text: string): ng.IPromise<unknown>;
+        createHelpText(key: string, title: string): angular.IPromise<unknown>;
     }
 
     class HelpTextService implements IHelpTextService {
@@ -78,13 +81,14 @@
                     return this.$q.resolve(cachedValue);
                 }
             }
-            return this.$http.get<Models.IODataResult<IHelpTextOdataModel>>(`odata/HelpTexts?$filter=Key eq '${key}'`)
+            return this.sendGetHelpTextRequest(key)
                 .then((result) => {
                     let text: IHelpText | null = null;
                     if (result.data.value.length > 0) {
                         const translation = result.data.value[0];
 
                         text = {
+                            id: translation.Id == undefined ? null : translation.Id,
                             title: translation.Title == undefined ? null : translation.Title,
                             htmlText: translation.Description == undefined ? null : this.$sce.trustAsHtml(translation.Description),
                         }
@@ -92,16 +96,30 @@
                     helpTextCache[cacheKey] = text;
                     return text;
                 });
-
         }
 
-        static $inject = ["$http", "$sce", "$q", "apiUseCaseFactory"];
+        createHelpText(key: string, title: string): angular.IPromise<unknown> {
+            const user = this.userService.getUser();
+            const payload = {
+                Title: title,
+                Key: key
+            };
+
+            return this.$http.post(`odata/HelpTexts?organizationId=${user.$$state.value.currentOrganizationId}`, payload, { handleBusy: true });
+        }
+
+        private sendGetHelpTextRequest(key: string): angular.IHttpPromise<Models.IODataResult<IHelpTextOdataModel>> {
+            return this.$http.get<Models.IODataResult<IHelpTextOdataModel>>(`odata/HelpTexts?$filter=Key eq '${key}'`);
+        }
+
+        static $inject = ["$http", "$sce", "$q", "apiUseCaseFactory", "userService"];
 
         constructor(
-            private readonly $http: ng.IHttpService,
+            private readonly $http: IHttpServiceWithCustomConfig,
             private readonly $sce: ng.ISCEService,
             private readonly $q: ng.IQService,
-            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) { }
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
+            private readonly userService: Services.IUserService) { }
     }
 
     app.service("helpTextService", HelpTextService);

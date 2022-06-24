@@ -41,7 +41,6 @@
             //Helper functions
             const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
             
-
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);

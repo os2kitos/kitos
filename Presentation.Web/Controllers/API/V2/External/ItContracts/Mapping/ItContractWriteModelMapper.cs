@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Core.DomainModel.Shared;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -328,7 +330,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
                 ProcurementPlan = rule.MustUpdate(x => x.Procurement.ProcurementPlan)
                     ? MapProcurementPlan(dto.ProcurementPlan).AsChangedValue()
-                    : OptionalValueChange<Maybe<(byte half, int year)>>.None
+                    : OptionalValueChange<Maybe<(byte half, int year)>>.None,
+
+                ProcurementInitiated = rule.MustUpdate(x => x.Procurement.ProcurementInitiated)
+                    ? (dto.ProcurementInitiated?.ToYesNoUndecidedOption() ?? Maybe<YesNoUndecidedOption>.None).AsChangedValue()
+                    : OptionalValueChange<Maybe<YesNoUndecidedOption>>.None
             };
         }
 

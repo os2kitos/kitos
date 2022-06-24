@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web.Models.API.V1
 {
@@ -63,13 +64,9 @@ namespace Presentation.Web.Models.API.V1
         public DateTime LastChanged { get; set; }
         public string LastChangedByName { get; set; }
         public int LastChangedByUserId { get; set; }
+        
+        public string ObjectOwnerFullName { get; set; }
 
-        public string ObjectOwnerName { get; set; }
-        public string ObjectOwnerLastName { get; set; }
-        public string ObjectOwnerFullName
-        {
-            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
-        }
         public int? ObjectOwnerId { get; set; }
 
         public YearSegmentOption? Running { get; set; }
@@ -85,5 +82,7 @@ namespace Presentation.Web.Models.API.V1
         public Guid Uuid { get; set; }
         public int? CriticalityTypeId { get; set; }
         public string CriticalityTypeName { get; set; }
+
+        public YesNoUndecidedOption? ProcurementInitiated { get; set; }
     }
 }

@@ -102,7 +102,6 @@
                 $scope.contract = contract;
                 $scope.lastChanged = Kitos.Helpers.RenderFieldsHelper.renderDate(contract.lastChanged);
                 $scope.hasWriteAccess = hasWriteAccess;
-                $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
                 autofocus();
                 $scope.contractTypes = contractTypes;
@@ -113,6 +112,7 @@
                 $scope.allowClear = true;
                 $scope.showprocurementPlanSelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementPlan);
                 $scope.showProcurementStrategySelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementStrategy);
+                bindProcurementInitiated();
                 var today = new Date();
 
                 if (!contract.active) {
@@ -374,6 +374,22 @@
                             patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         }
                     };
+                }
+
+                function bindProcurementInitiated() {
+                    const options = new Kitos.Models.ViewModel.Shared.YesNoUndecidedOptions();
+                    $scope.procurementInitiated = {
+                        selectedElement: options.getById($scope.contract.procurementInitiated),
+                        select2Config: select2LoadingService.select2LocalDataNoSearch(() => options.options, false),
+                        elementSelected: (newElement) => {
+                            if (!!newElement) {
+                                $scope.contract.procurementInitiated = newElement.id;
+                                var payload = { procurementInitiated: newElement.id };
+
+                                patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                            }
+                        }
+                    }
                 }
             }]);
 })(angular, app);

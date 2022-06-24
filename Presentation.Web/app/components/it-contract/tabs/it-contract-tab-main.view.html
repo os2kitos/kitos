@@ -31,29 +31,38 @@
                         <!-- Type -->
                         <div class="form-group">
                             <select2-option data-id="contract-type"
-                                           data-label="Kontrakttype"
-                                           data-placeholder="Vælg kontrakttype"
-                                           data-selected-text="{{ contract.contractTypeName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.contractTypeId"
-                                           data-options="contractTypes"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="contractTypeId">
+                                            data-label="Kontrakttype"
+                                            data-placeholder="Vælg kontrakttype"
+                                            data-selected-text="{{ contract.contractTypeName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.contractTypeId"
+                                            data-options="contractTypes"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="contractTypeId">
                             </select2-option>
                         </div>
 
                         <!-- Contract template -->
                         <div class="form-group">
                             <select2-option data-id="contract-template"
-                                           data-label="Kontraktskabelon"
-                                           data-placeholder="Vælg kontraktskabelon"
-                                           data-selected-text="{{ contract.contractTemplateName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.contractTemplateId"
-                                           data-options="contractTemplates"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="contractTemplateId">
+                                            data-label="Kontraktskabelon"
+                                            data-placeholder="Vælg kontraktskabelon"
+                                            data-selected-text="{{ contract.contractTemplateName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.contractTemplateId"
+                                            data-options="contractTemplates"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="contractTemplateId">
                             </select2-option>
+                        </div>
+                        
+                        <!--Criticality type-->
+                        <div class="form-group">
+                            <label for="criticality" class="control-label small">Kritikalitet</label>
+                            <single-select-select2 id="criticality"
+                                                   data-placeholder="Vælg kritikalitet"
+                                                   ng-model="criticality"
+                                                   ng-disabled="!hasWriteAccess" />
                         </div>
                     </div>
 
@@ -70,28 +79,28 @@
                         <!-- Purchase form -->
                         <div class="form-group">
                             <select2-option data-id="contract-purchaseform"
-                                           data-label="Indkøbsform"
-                                           data-placeholder="Vælg indkøbsform"
-                                           data-selected-text="{{ contract.purchaseFormName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.purchaseFormId"
-                                           data-options="purchaseForms"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="purchaseFormId">
+                                            data-label="Indkøbsform"
+                                            data-placeholder="Vælg indkøbsform"
+                                            data-selected-text="{{ contract.purchaseFormName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.purchaseFormId"
+                                            data-options="purchaseForms"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="purchaseFormId">
                             </select2-option>
                         </div>
 
                         <!-- Procurement strategy -->
                         <div id="selectProcurementStrategy" class="form-group" ng-if="showProcurementStrategySelection">
                             <select2-option data-id="contract-strat"
-                                           data-label="Genanskaffelsesstrategi"
-                                           data-placeholder="Vælg genanskaffelsesstrategi"
-                                           data-selected-text="{{ contract.procurementStrategyName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.procurementStrategyId"
-                                           data-options="procurementStrategies"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="procurementStrategyId">
+                                            data-label="Genanskaffelsesstrategi"
+                                            data-placeholder="Vælg genanskaffelsesstrategi"
+                                            data-selected-text="{{ contract.procurementStrategyName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.procurementStrategyId"
+                                            data-options="procurementStrategies"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="procurementStrategyId">
                             </select2-option>
                         </div>
 
@@ -106,15 +115,11 @@
                                            data-ng-disabled="!hasWriteAccess">
                             </select-simple>
                         </div>
-
-                    </div>
-                    <div class="col-xs-12"  data-ng-hide="!hasViewAccess">
+                        
+                        <!-- Procurement initiated-->
                         <div class="form-group">
-                            <label for="criticality" class="control-label small">Kritikalitet</label>
-                            <single-select-select2 id="criticality"
-                                                   data-placeholder="Vælg kritikalitet"
-                                                   ng-model="criticality"
-                                                   ng-disabled="!hasWriteAccess" />
+                            <label for="procurement-initiated" class="control-label small">Genanskaffelse igangsat</label>
+                            <single-select-select2 id="procurement-initiated" ng-model="procurementInitiated" ng-disabled="!hasWriteAccess"/>
                         </div>
                     </div>
                     <div class="col-xs-12"  data-ng-hide="!hasViewAccess">

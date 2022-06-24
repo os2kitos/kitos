@@ -878,9 +878,13 @@
     <Compile Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.designer.cs">
       <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202206210625440_AddCriticalityType.cs" />
-    <Compile Include="Migrations\202206210625440_AddCriticalityType.designer.cs">
-      <DependentUpon>202206210625440_AddCriticalityType.cs</DependentUpon>
+    <Compile Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.cs" />
+    <Compile Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.designer.cs">
+      <DependentUpon>202206221441060_AddProcurmentInitiatedToItContract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206240625598_AddCriticalityType.cs" />
+    <Compile Include="Migrations\202206240625598_AddCriticalityType.designer.cs">
+      <DependentUpon>202206240625598_AddCriticalityType.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1454,8 +1458,11 @@
     <EmbeddedResource Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.resx">
       <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202206210625440_AddCriticalityType.resx">
-      <DependentUpon>202206210625440_AddCriticalityType.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.resx">
+      <DependentUpon>202206221441060_AddProcurmentInitiatedToItContract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206240625598_AddCriticalityType.resx">
+      <DependentUpon>202206240625598_AddCriticalityType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

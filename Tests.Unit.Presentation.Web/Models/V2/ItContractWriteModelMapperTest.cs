@@ -16,6 +16,7 @@ using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
 using Xunit;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
@@ -103,7 +104,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedProcurementPropertiesInput()
         {
-            return CreateGetUndefinedSectionsInput(3);
+            return CreateGetUndefinedSectionsInput(4);
         }
 
         public static IEnumerable<object[]> GetUndefinedResponsibleDataPropertiesInput()
@@ -317,11 +318,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPOST_Ignores_Undefined_Properties_In_ProcurementSection(
             bool noProcurementStrategyUuid,
             bool noPurchaseTypeUuid,
-            bool noProcurementPlan)
+            bool noProcurementPlan,
+            bool noProcurementInitiated)
         {
             //Arrange
             var input = new CreateNewContractRequestDTO();
-            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan);
+            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan, noProcurementInitiated);
 
             //Act
             var output = _sut.FromPOST(input).Procurement.Value;
@@ -337,11 +339,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPATCH_Ignores_Undefined_Properties_In_ProcurementSection(
             bool noProcurementStrategyUuid,
             bool noPurchaseTypeUuid,
-            bool noProcurementPlan)
+            bool noProcurementPlan,
+            bool noProcurementInitiated)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan);
+            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan, noProcurementInitiated);
 
             //Act
             var output = _sut.FromPATCH(input).Procurement.Value;
@@ -357,11 +360,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPUT_Enforces_Undefined_Properties_In_ProcurementSection(
             bool noProcurementStrategyUuid,
             bool noPurchaseTypeUuid,
-            bool noProcurementPlan)
+            bool noProcurementPlan,
+            bool noProcurementInitiated)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan);
+            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan, noProcurementInitiated);
 
             //Act
             var output = _sut.FromPUT(input).Procurement.Value;
@@ -1530,15 +1534,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             Assert.Equal(expected.ProcurementStrategyUuid, AssertPropertyContainsDataChange(actual.ProcurementStrategyUuid));
             Assert.Equal(expected.PurchaseTypeUuid, AssertPropertyContainsDataChange(actual.PurchaseTypeUuid));
+
             if (hasValues)
             {
                 var (half, year) = AssertPropertyContainsDataChange(actual.ProcurementPlan);
                 Assert.Equal(expected.ProcurementPlan.QuarterOfYear, half);
                 Assert.Equal(expected.ProcurementPlan.Year, year);
+                Assert.Equal(expected.ProcurementInitiated, AssertPropertyContainsDataChange(actual.ProcurementInitiated).ToYesNoUndecidedChoice());
             }
             else
             {
                 AssertPropertyContainsResetDataChange(actual.ProcurementPlan);
+                AssertPropertyContainsResetDataChange(actual.ProcurementInitiated);
             }
         }
 
@@ -1548,8 +1555,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 ProcurementStrategyUuid = hasValues ? A<Guid>() : null,
                 PurchaseTypeUuid = hasValues ? A<Guid>() : null,
+                ProcurementInitiated = hasValues ? A<YesNoUndecidedChoice>() : null,
                 ProcurementPlan = hasValues
-                    ? new ProcurementPlanDTO()
+                    ? new ProcurementPlanDTO
                     {
                         QuarterOfYear = Convert.ToByte(A<int>() % 1 + 1),
                         Year = A<int>()
@@ -1626,13 +1634,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private void ConfigureProcurementInputContext(
             bool noProcurementStrategyUuid,
             bool noPurchaseTypeUuid,
-            bool noProcurementPlan)
+            bool noProcurementPlan,
+            bool noProcurementInitiated)
         {
             var sectionProperties = GetAllInputPropertyNames<ContractProcurementDataWriteRequestDTO>();
 
             if (noProcurementStrategyUuid) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.ProcurementStrategyUuid));
             if (noPurchaseTypeUuid) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.PurchaseTypeUuid));
             if (noProcurementPlan) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.ProcurementPlan));
+            if (noProcurementInitiated) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.ProcurementInitiated));
 
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Procurement).WrapAsEnumerable().AsParameterMatch()))
