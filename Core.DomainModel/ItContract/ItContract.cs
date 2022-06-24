@@ -10,6 +10,7 @@ using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
 
 using Core.DomainModel.Notification;
+using Core.DomainModel.Shared;
 
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -254,6 +255,14 @@ namespace Core.DomainModel.ItContract
         ///     The procurement plan year.
         /// </value>
         public int? ProcurementPlanYear { get; set; }
+
+        /// <summary>
+        ///     Gets or sets if procurement has been initiated (Genanskaffelse igangsat)
+        /// </summary>
+        /// <value>
+        ///     Yes/No/Undecided procurment initiated.
+        /// </value>
+        public YesNoUndecidedOption? ProcurementInitiated { get; set; }
 
         /// <summary>
         ///     Gets or sets the chosen contract template identifier.
