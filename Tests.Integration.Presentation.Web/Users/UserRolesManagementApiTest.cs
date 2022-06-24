@@ -71,10 +71,29 @@ namespace Tests.Integration.Presentation.Web.Users
         public async Task Can_Transfer_Range_Of_User_Roles()
         {
             // Arrange
+            var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var userWithRoles = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, CreateName(), CreateName(), organization.Id);
+            var anotherUser = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, CreateName(), CreateName(), organization.Id);
+            var organizationRoles = GetAllOrganizationAdminRoles();
+            var businessRoleScopes = EnumRange.All<BusinessRoleScope>().ToList();
+            await AssignRoles(organization, userWithRoles.userId, organizationRoles, businessRoleScopes);
+            var resultAfterAssign = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
 
             // Act
-
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles/range/transfer");
+            using var deleteResult = await HttpApi.PatchWithCookieAsync(url, globalAdminCookie,
+                new TransferRightsRequestDTO
+                {
+                    ToUserId = anotherUser.userId,
+                    AdminRoles = resultAfterAssign.AdministrativeAccessRoles,
+                    BusinessRights = resultAfterAssign.Rights
+                });
             // Assert
+            var getAfterTransferOriginalUser = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
+            var getAfterTransferReceivingUser = await GetUserRolesAsync(organization, anotherUser, globalAdminCookie);
+            AssertGetRolesResult(getAfterTransferOriginalUser, Enumerable.Empty<OrganizationRole>(), Enumerable.Empty<BusinessRoleScope>());
+            AssertGetRolesResult(getAfterTransferReceivingUser, organizationRoles, businessRoleScopes);
 
         }
 
