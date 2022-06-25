@@ -342,6 +342,40 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(Enumerable.Empty<ItSystemRight>(), userRightsAssignments.SystemRights);
             Assert.Equal(Enumerable.Empty<DataProcessingRegistrationRight>(), userRightsAssignments.DataProcessingRegistrationRights);
         }
+        
+        [Fact]
+        public void RemoveAllRights_Fails_If_Get_Organization_Fails()
+        {
+
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void RemoveAllRights_Fails_If_No_Modification_Access_To_Organization()
+        {
+
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void RemoveAllRights_Fails_If_Get_Users_In_Org_Fails()
+        {
+
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void RemoveAllRights_Fails_If_User_Not_In_Org()
+        {
+            throw new NotImplementedException();
+
+        }
+
+        [Fact]
+        public void RemoveAllRights_RemovesAllRightsInOrganization()
+        {
+            throw new NotImplementedException();
+        }
 
         /*
        *

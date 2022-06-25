@@ -184,7 +184,7 @@ namespace Presentation.Web.Controllers.API.V1
             );
         }
 
-        private static IEnumerable<int> GetIdsByScope(Dictionary<BusinessRoleScope, List<int>> rightIds, BusinessRoleScope scope)
+        private static IEnumerable<int> GetIdsByScope(IReadOnlyDictionary<BusinessRoleScope, List<int>> rightIds, BusinessRoleScope scope)
         {
             return rightIds.TryGetValue(scope, out var result) ? result : new List<int>();
         }
