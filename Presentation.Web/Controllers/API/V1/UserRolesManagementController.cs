@@ -97,9 +97,9 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return new OrganizationUserRoleAssignmentsDTO
             {
-                AdministrativeAccessRoles = arg.AdministrativeAccessRoles,
+                AdministrativeAccessRoles = arg.LocalAdministrativeAccessRoles,
                 Rights = arg
-                    .ContractRoles
+                    .ContractRights
                     .Select(x => new AssignedRightDTO
                     {
                         RoleName = x.Role.Name,
@@ -111,7 +111,7 @@ namespace Presentation.Web.Controllers.API.V1
                     .Concat
                     (
                         arg
-                            .ProjectRoles
+                            .ProjectRights
                             .Select(x => new AssignedRightDTO
                             {
                                 RoleName = x.Role.Name,
@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API.V1
                     .Concat
                     (
                         arg
-                            .SystemRoles
+                            .SystemRights
                             .Select(x => new AssignedRightDTO
                             {
                                 RoleName = x.Role.Name,

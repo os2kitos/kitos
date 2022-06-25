@@ -37,6 +37,7 @@ namespace Core.DomainModel
             LockedOutDate = null;
             FailedAttempts = 0;
             Uuid = Guid.NewGuid();
+            DataProcessingRegistrationRights = new List<DataProcessingRegistrationRight>();
         }
 
         public string Name { get; set; }

@@ -101,7 +101,7 @@ namespace Core.ApplicationServices.Rights
                 .GetUserInOrganization(orgUuid.Value, userUuid.Value)
                 .Select(user => new UserRightsAssignments
                     (
-                        user.GetRolesInOrganization(orgUuid.Value).Where(x => x != OrganizationRole.User),
+                        user.GetRolesInOrganization(orgUuid.Value).Where(x => x != OrganizationRole.User && x != OrganizationRole.GlobalAdmin),
                         user.GetDataProcessingRegistrationRights(organizationId).ToList(),
                         user.GetItSystemRights(organizationId).ToList(),
                         user.GetItContractRights(organizationId).ToList(),
