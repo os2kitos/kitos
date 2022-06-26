@@ -31,15 +31,15 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IUserService> _userServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authServiceMock;
-        private Mock<IOrganizationRightsService> _orgRightsServiceMock;
-        private Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _contractRightsServiceMock;
-        private Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>> _systemRightsServiceMock;
-        private Mock<IRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject>> _projectRightsServiceMock;
-        private Mock<IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>> _organizationUnitRightsServiceMock;
-        private Mock<IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>> _dprRightsServiceMock;
-        private Mock<ITransactionManager> _transactionMgrMock;
-        private Mock<IDatabaseControl> _dbControlMock;
-        private Mock<IEntityIdentityResolver> _identityResolverMock;
+        private readonly Mock<IOrganizationRightsService> _orgRightsServiceMock;
+        private readonly Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _contractRightsServiceMock;
+        private readonly Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>> _systemRightsServiceMock;
+        private readonly Mock<IRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject>> _projectRightsServiceMock;
+        private readonly Mock<IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>> _organizationUnitRightsServiceMock;
+        private readonly Mock<IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>> _dprRightsServiceMock;
+        private readonly Mock<ITransactionManager> _transactionMgrMock;
+        private readonly Mock<IDatabaseControl> _dbControlMock;
+        private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
 
         public UserRightsServiceTest()
         {
@@ -372,16 +372,64 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
+        public void RemoveAllRights_Fails_If_Removal_Of_A_Right_Fails()
+        {
+            throw new NotImplementedException();
+
+        }
+
+        [Fact]
         public void RemoveAllRights_RemovesAllRightsInOrganization()
         {
             throw new NotImplementedException();
         }
 
+        [Fact]
+        public void RemoveRights_Fails_If_Get_Organization_Fails()
+        {
+
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void RemoveRights_Fails_If_No_Modification_Access_To_Organization()
+        {
+
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void RemoveRights_Fails_If_Get_Users_In_Org_Fails()
+        {
+
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void RemoveRights_Fails_If_User_Not_In_Org()
+        {
+            throw new NotImplementedException();
+
+        }
+
+        [Fact]
+        public void RemoveRights_Fails_If_Removal_Of_A_Right_Fails()
+        {
+            throw new NotImplementedException();
+
+        }
+
+        [Fact]
+        public void RemoveRights_RemovesAllRightsInOrganization()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
         /*
        *
-      Maybe<OperationError> RemoveAllRights(int userId, int organizationId);
-      Maybe<OperationError> RemoveRights(int userId, int organizationId, UserRightsChangeParameters parameters);
-      Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters);
+      TODO Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters);
        *
        */
 

@@ -23,10 +23,11 @@ namespace Core.ApplicationServices.UIConfiguration.Handlers
         {
             var user = domainEvent.Entity;
 
-            var organizations = user.GetOrganizations().ToList();
-            foreach (var organization in organizations)
+            var organizationIds = user.GetOrganizationIds().ToList();
+            
+            foreach (var organizationId in organizationIds)
             {
-                _userRightsService.RemoveAllRights(user.Id, organization.Id).ThrowOnValue();
+                _userRightsService.RemoveAllRights(user.Id, organizationId).ThrowOnValue();
             }
             
             ClearSsoIdentities(user);
