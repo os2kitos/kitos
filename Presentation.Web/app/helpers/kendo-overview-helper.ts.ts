@@ -1,0 +1,29 @@
+﻿module Kitos.Helpers {
+
+    export class KendoOverviewHelper {
+
+        /**
+          *  creates a select dropdown for given dataSource
+          * @param args
+          * @param dataSource - dataSource of the dropdown, should contain 'id' and 'text' properties
+          */
+        public static createSelectDropdownTemplate(args: any, dataSource: any, insertEmptyOption: boolean) {
+            if (insertEmptyOption) {
+                dataSource.push({ id: 0, text: "" });
+            }
+
+            return args.element.kendoDropDownList({
+                dataSource: dataSource.map(value => {
+                    return {
+                        remoteValue: value.id,
+                        text: value.text,
+                        optionalContext: value
+                    };
+                }),
+                dataTextField: "text",
+                dataValueField: "remoteValue",
+                valuePrimitive: true,
+            });
+        }
+    }
+}

@@ -32,6 +32,7 @@
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
         private criticalityTypeStorageKey = "it-contract-overview-criticalitytype";
+        private criticalityTypeName = "CriticalityType";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
@@ -178,8 +179,14 @@
         }
 
         private fixCriticalityFilter(filterUrl, column) {
-            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, `contains(${column}$2`);
+            const pattern = new RegExp(`(\\w+\\${column}( eq \'[0-9]+\'))`, "i");
+            const renamedColumn = filterUrl.replace(pattern, "CriticalityType/Id$2").replaceAll("'", "");
+
+            if (renamedColumn.includes("0")) {
+                return renamedColumn.replace("0", "null");
+            }
+
+            return renamedColumn.replaceAll("'", "");
         }
 
         // loads kendo grid options from localstorage
@@ -268,26 +275,17 @@
                                         "Supplier($select=Name)," +
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
-                                        "LastChangedByUser($select=Name,LastName)";
+                                        "LastChangedByUser($select=Name,LastName)," +
+                                        "CriticalityType($select=Id)";
 
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
-                                var query;
+                                var query = `/odata/Organizations(${self.user.currentOrganizationId})/`;
                                 // if orgunit is set then the org unit filter is active
                                 if (orgUnitId === null) {
-                                    query = `/odata/Organizations(${self.user.currentOrganizationId})/ItContracts`;
+                                    return query + `ItContracts` + urlParameters;
                                 } else {
-                                    query = `/odata/Organizations(${self.user
-                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts`;
+                                    return query + `OrganizationUnits(${orgUnitId})/ItContracts` + urlParameters;
                                 }
-
-                                var criticalityId = self.$window.sessionStorage.getItem(self.criticalityTypeStorageKey);
-                                if (criticalityId === null) {
-                                    urlParameters += ",CriticalityType($select=Id)";
-                                } else {
-                                    urlParameters += `,CriticalityType($select=Id)&%24filter=CriticalityType/Id eq ${criticalityId}`;
-                                }
-
-                                return query + urlParameters;
                             },
                             dataType: "json"
                         },
@@ -304,6 +302,8 @@
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
                                 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
+
+                                parameterMap.$filter = this.fixCriticalityFilter(parameterMap.$filter, this.criticalityTypeName);
                             }
 
                             return parameterMap;
@@ -764,13 +764,19 @@
                         filterable: false
                     },
                     {
-                        field: "CriticalityType", title: "Kritikalitet", width: 150,
+                        field: this.criticalityTypeName, title: "Kritikalitet", width: 150,
                         persistId: "criticalitytype",
-                        template: dataItem => dataItem.CriticalityType ? this.getCriticalityName(dataItem.CriticalityType.Id) : "",
+                        template: dataItem => dataItem.CriticalityType ? this.getCriticalityName(dataItem.CriticalityTypeId) : "",
+                        sortable: true,
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: this.criticalityOptionsDropDownList
+                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args, this.criticalityOptions.map(value => {
+                                        return {
+                                            id: value.Id, 
+                                            text: value.Name
+                                        }
+                                    }), true)
                             }
                         }
                     }
@@ -870,7 +876,6 @@
         }
 
         private orgUnitDropDownList = (args) => this.createFilterDropDown(this.orgUnitStorageKey, this.orgUnits, args, false);
-        private criticalityOptionsDropDownList = (args) => this.createFilterDropDown(this.criticalityTypeStorageKey, this.criticalityOptions, args, true);
 
         private createFilterDropDown(key: string, dataSource: any, args: any, insertEmptyValue: boolean)
         {

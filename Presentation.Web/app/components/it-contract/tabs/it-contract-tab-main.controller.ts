@@ -348,10 +348,10 @@
                     if ($scope.contract.criticalityTypeId !== undefined && $scope.contract.criticalityTypeId !== null) {
                         existingChoice = {
                             id: $scope.contract.criticalityTypeId,
-                            name: $scope.contract.criticalityTypeName
+                            name: `${$scope.contract.criticalityTypeName} (udgået)`
                         };
 
-                        if (!optionMap[$scope.contract.criticalityTypeId]) {
+                        if (!optionMap[existingChoice.id]) {
                             optionMap[existingChoice.id] = {
                                 text: existingChoice.name,
                                 id: existingChoice.id,
@@ -367,10 +367,8 @@
                         selectedElement: existingChoice && optionMap[existingChoice.id],
                         select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
                         elementSelected: (newElement) => {
-                            if (!newElement)
-                                return;
-
-                            var payload = { criticalityTypeId: newElement.id };
+                            var payload = { criticalityTypeId: newElement ? newElement.id : null };
+                            $scope.contract.criticalityTypeId = newElement.id;
                             patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         }
                     };

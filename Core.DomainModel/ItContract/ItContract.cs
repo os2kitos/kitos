@@ -601,6 +601,12 @@ namespace Core.DomainModel.ItContract
             ContractTemplate = null;
         }
 
+        public void ResetCriticalityType()
+        {
+            CriticalityType?.Track();
+            CriticalityType = null;
+        }
+
         public Maybe<OperationError> UpdateContractValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
         {
             var validFromDate = newValidFrom?.Date;

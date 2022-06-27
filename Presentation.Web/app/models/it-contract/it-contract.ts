@@ -63,7 +63,7 @@
         /** Gets or sets the chosen criticality type id. */
         CriticalityTypeId: number,
         /** Gets or sets the chosen criticality type. */
-        CriticalityType: ICriticalityType,
+        CriticalityType: Models.OData.Generic.IOptionDTO<IItContract>,
 
         /** When the contract began. (indgået) */
         Concluded: Date;

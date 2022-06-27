@@ -813,20 +813,7 @@
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: (args) => {
-                                    args.element.kendoDropDownList({
-                                        dataSource: this.yesNoUndecided.options.map(value => {
-                                            return {
-                                                remoteValue: value.id,
-                                                text: value.text,
-                                                optionalContext: value
-                                            };
-                                        }),
-                                        dataTextField: "text",
-                                        dataValueField: "remoteValue",
-                                        valuePrimitive: true,
-                                    });
-                                }
+                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args, this.yesNoUndecided.options, false)
                             }
                         }
                     },

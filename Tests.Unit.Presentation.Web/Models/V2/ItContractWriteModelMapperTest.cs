@@ -99,7 +99,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedGeneralDataPropertiesInput()
         {
-            return CreateGetUndefinedSectionsInput(10);
+            return CreateGetUndefinedSectionsInput(9);
         }
 
         public static IEnumerable<object[]> GetUndefinedProcurementPropertiesInput()
@@ -228,12 +228,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeId,
             bool noCriticalityTypeUuid)
         {
             //Arrange
             var input = new CreateNewContractRequestDTO();
-            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeId, noCriticalityTypeUuid);
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid);
 
             //Act
             var output = _sut.FromPOST(input).General.Value;
@@ -260,12 +259,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeId,
             bool noCriticalityTypeUuid)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeId, noCriticalityTypeUuid);
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid);
 
             //Act
             var output = _sut.FromPATCH(input).General.Value;
@@ -292,12 +290,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeId,
             bool noCriticalityTypeUuid)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeId, noCriticalityTypeUuid);
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid);
 
             //Act
             var output = _sut.FromPUT(input).General.Value;
@@ -1526,7 +1523,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Validity.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
             Assert.Equal(input.Validity.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
-            Assert.Equal(input.CriticalityTypeId, AssertPropertyContainsDataChange(output.CriticalityTypeId));
             Assert.Equal(input.CriticalityTypeUuid, AssertPropertyContainsDataChange(output.CriticalityTypeUuid));
         }
 
@@ -1605,7 +1601,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeId,
             bool noCriticalityTypeUuid)
         {
             var sectionProperties = GetAllInputPropertyNames<ItContractGeneralDataModificationParameters>();
@@ -1616,7 +1611,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noContractTemplateUuid) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.ContractTemplateUuid));
             if (noAgreementElementUuids) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.AgreementElementUuids));
             if (noNotes) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.Notes));
-            if (noCriticalityTypeId) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.CriticalityTypeId));
             if (noCriticalityTypeUuid) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.CriticalityTypeUuid));
 
             if (noEnforceValid) validitySectionProperties.Remove(nameof(ValidityWriteRequestDTO.EnforcedValid));
