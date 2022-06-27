@@ -138,23 +138,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Same(org2, result.Value.First(x => x.Organization.Id == orgId2).Organization);
         }
 
-        [Theory]
-        [InlineData(CrossOrganizationDataReadAccessLevel.None)]
-        [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
-        [InlineData(CrossOrganizationDataReadAccessLevel.Public)]
-        public void GetUsersWithRoleAssignment_Returns_Forbidden_If_User_Not_Full_Cross_Level_Access(CrossOrganizationDataReadAccessLevel crossOrganizationDataReadAccess)
-        {
-            //Arrange
-            ExpectUserHasCrossLevelAccess(crossOrganizationDataReadAccess);
-
-            //Act
-            var result = _sut.GetUsersWithRoleAssignment(A<OrganizationRole>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
         [Fact]
         public void GetUsersWithRoleAssignment_Returns_Error_If_GetUsersWithRole_Fails()
         {
@@ -316,6 +299,13 @@ namespace Tests.Unit.Core.ApplicationServices
             var orgUuid = A<Guid>();
             var userUuid = A<Guid>();
             var user = new User();
+            var dprRightIds = Many<int>().ToArray();
+            var contractRightIds = Many<int>().ToArray();
+            var projectRightIds = Many<int>().ToArray();
+            var systemRightIds = Many<int>().ToArray();
+            var orgUnitRightIds = Many<int>().ToArray();
+
+
             ExpectReadAccessLevel(OrganizationDataReadAccessLevel.All, organizationId);
             ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
             ExpectResolveUuidReturns<User>(userId, userUuid);
@@ -327,6 +317,26 @@ namespace Tests.Unit.Core.ApplicationServices
                 .Concat(CreateUserOrganizationRights(A<Guid>(), OrganizationRole.LocalAdmin))
                 .ToList();
 
+            user.DataProcessingRegistrationRights = CreateDprRights(orgUuid, dprRightIds)
+                .Concat(CreateDprRights(A<Guid>(), Many<int>().ToArray()))
+                .ToList();
+
+            user.ItSystemRights = CreateSystemRights(orgUuid, systemRightIds)
+                .Concat(CreateSystemRights(A<Guid>(), Many<int>().ToArray()))
+                .ToList();
+
+            user.ItContractRights = CreateContracRights(orgUuid, contractRightIds)
+                .Concat(CreateContracRights(A<Guid>(), Many<int>().ToArray()))
+                .ToList();
+
+            user.ItProjectRights = CreateProjectRights(orgUuid, projectRightIds)
+                .Concat(CreateProjectRights(A<Guid>(), Many<int>().ToArray()))
+                .ToList();
+
+            user.OrganizationUnitRights = CreateOrgUnitRights(orgUuid, orgUnitRightIds)
+                .Concat(CreateOrgUnitRights(A<Guid>(), Many<int>().ToArray()))
+                .ToList();
+
 
             //Act
             var result = _sut.GetUserRights(userId, organizationId);
@@ -335,14 +345,14 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.True(result.Ok);
             var userRightsAssignments = result.Value;
             var expectedRoles = userRolesInOrg.Intersect(GetLocalAdminRoles()).OrderBy(x => x).ToList();//only the local admin roles are expected - not user (non admin) and global admin (global role)
-            Assert.Equal(expectedRoles, userRightsAssignments.LocalAdministrativeAccessRoles.OrderBy(x => x).ToList()); 
-            Assert.Equal(Enumerable.Empty<OrganizationUnitRight>(), userRightsAssignments.OrganizationUnitRights);
-            Assert.Equal(Enumerable.Empty<ItContractRight>(), userRightsAssignments.ContractRights);
-            Assert.Equal(Enumerable.Empty<ItProjectRight>(), userRightsAssignments.ProjectRights);
-            Assert.Equal(Enumerable.Empty<ItSystemRight>(), userRightsAssignments.SystemRights);
-            Assert.Equal(Enumerable.Empty<DataProcessingRegistrationRight>(), userRightsAssignments.DataProcessingRegistrationRights);
+            Assert.Equal(expectedRoles, userRightsAssignments.LocalAdministrativeAccessRoles.OrderBy(x => x).ToList());
+            Assert.Equal(dprRightIds,userRightsAssignments.DataProcessingRegistrationRights.Select(x=>x.Id));
+            Assert.Equal(systemRightIds,userRightsAssignments.SystemRights.Select(x=>x.Id));
+            Assert.Equal(contractRightIds,userRightsAssignments.ContractRights.Select(x=>x.Id));
+            Assert.Equal(projectRightIds,userRightsAssignments.ProjectRights.Select(x=>x.Id));
+            Assert.Equal(orgUnitRightIds,userRightsAssignments.OrganizationUnitRights.Select(x=>x.Id));
         }
-        
+
         [Fact]
         public void RemoveAllRights_Fails_If_Get_Organization_Fails()
         {
@@ -443,13 +453,64 @@ namespace Tests.Unit.Core.ApplicationServices
             OrganizationRole.ProjectModuleAdmin
         };
 
-        private static IEnumerable<OrganizationRight> CreateUserOrganizationRights(Guid organizationId, params OrganizationRole[] roles)
+        private IEnumerable<OrganizationRight> CreateUserOrganizationRights(Guid organizationId, params OrganizationRole[] roles)
         {
             return roles.Select(role =>
                 new OrganizationRight
                 {
-                    Organization = new Organization { Uuid = organizationId},
+                    Id = A<int>(),
+                    Organization = new Organization { Uuid = organizationId },
                     Role = role,
+                }).ToList();
+        }
+
+        private static IEnumerable<DataProcessingRegistrationRight> CreateDprRights(Guid organizationId, params int[] rightIds)
+        {
+            return rightIds.Select(id =>
+                new DataProcessingRegistrationRight
+                {
+                    Id = id,
+                    Object = new() { Organization = new() { Uuid = organizationId } }
+                }).ToList();
+        }
+
+        private static IEnumerable<ItSystemRight> CreateSystemRights(Guid organizationId, params int[] rightIds)
+        {
+            return rightIds.Select(id =>
+                new ItSystemRight
+                {
+                    Id = id,
+                    Object = new() { Organization = new() { Uuid = organizationId } }
+                }).ToList();
+        }
+
+        private static IEnumerable<ItContractRight> CreateContracRights(Guid organizationId, params int[] rightIds)
+        {
+            return rightIds.Select(id =>
+                new ItContractRight
+                {
+                    Id = id,
+                    Object = new() { Organization = new() { Uuid = organizationId } }
+                }).ToList();
+        }
+
+        private static IEnumerable<ItProjectRight> CreateProjectRights(Guid organizationId, params int[] rightIds)
+        {
+            return rightIds.Select(id =>
+                new ItProjectRight
+                {
+                    Id = id,
+                    Object = new() { Organization = new() { Uuid = organizationId } }
+                }).ToList();
+        }
+
+        private static IEnumerable<OrganizationUnitRight> CreateOrgUnitRights(Guid organizationId, params int[] rightIds)
+        {
+            return rightIds.Select(id =>
+                new OrganizationUnitRight
+                {
+                    Id = id,
+                    Object = new() { Organization = new() { Uuid = organizationId } }
                 }).ToList();
         }
 

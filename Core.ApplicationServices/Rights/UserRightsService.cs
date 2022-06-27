@@ -99,14 +99,15 @@ namespace Core.ApplicationServices.Rights
 
             return _userService
                 .GetUserInOrganization(orgUuid.Value, userUuid.Value)
-                .Select(user => new UserRightsAssignments
+                .Select(user => ExtractAllRightsInOrganization(user, orgUuid.Value))
+                .Select(rights => new UserRightsAssignments
                     (
-                        user.GetRolesInOrganization(orgUuid.Value).Where(x => x != OrganizationRole.User && x != OrganizationRole.GlobalAdmin),
-                        user.GetDataProcessingRegistrationRights(organizationId).ToList(),
-                        user.GetItSystemRights(organizationId).ToList(),
-                        user.GetItContractRights(organizationId).ToList(),
-                        user.GetItProjectRights(organizationId).ToList(),
-                        user.GetOrganizationUnitRights(organizationId).ToList()
+                        rights.rolesInOrganization.Where(x => x != OrganizationRole.User && x != OrganizationRole.GlobalAdmin).ToList(),
+                        rights.dprRights.ToList(),
+                        rights.systemRights.ToList(),
+                        rights.contractRights.ToList(),
+                        rights.projectRights.ToList(),
+                        rights.organizationUnitRights.ToList()
                     )
                 );
         }
@@ -236,13 +237,7 @@ namespace Core.ApplicationServices.Rights
                 .Select(orgAndUser =>
                 {
                     var (organization, user) = orgAndUser;
-                    var dprRights = user.GetDataProcessingRegistrationRights(organization.Id).ToList();
-                    var contractRights = user.GetItContractRights(organization.Id).ToList();
-                    var projectRights = user.GetItProjectRights(organization.Id).ToList();
-                    var systemRights = user.GetItSystemRights(organization.Id).ToList();
-                    var organizationUnitRights = user.GetOrganizationUnitRights(organization.Id).ToList();
-                    var rolesInOrganization = user.GetRolesInOrganization(organization.Uuid).ToList();
-
+                    var (dprRights, contractRights, projectRights, systemRights, organizationUnitRights, rolesInOrganization) = ExtractAllRightsInOrganization(user, organization.Uuid);
                     return
                     (
                         organization,
@@ -272,6 +267,17 @@ namespace Core.ApplicationServices.Rights
             }
 
             return error;
+        }
+
+        private static (List<DataProcessingRegistrationRight> dprRights, List<ItContractRight> contractRights, List<ItProjectRight> projectRights, List<ItSystemRight> systemRights, List<OrganizationUnitRight> organizationUnitRights, List<OrganizationRole> rolesInOrganization) ExtractAllRightsInOrganization(User user, Guid organizationUuid)
+        {
+            var dprRights = user.GetDataProcessingRegistrationRights(organizationUuid).ToList();
+            var contractRights = user.GetItContractRights(organizationUuid).ToList();
+            var projectRights = user.GetItProjectRights(organizationUuid).ToList();
+            var systemRights = user.GetItSystemRights(organizationUuid).ToList();
+            var organizationUnitRights = user.GetOrganizationUnitRights(organizationUuid).ToList();
+            var rolesInOrganization = user.GetRolesInOrganization(organizationUuid).ToList();
+            return (dprRights, contractRights, projectRights, systemRights, organizationUnitRights, rolesInOrganization);
         }
 
         private Maybe<OperationError> RemoveRights(
