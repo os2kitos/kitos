@@ -16,6 +16,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Serilog;
@@ -325,8 +326,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 .Concat(CreateSystemRights(A<Guid>(), Many<int>().ToArray()))
                 .ToList();
 
-            user.ItContractRights = CreateContracRights(orgUuid, contractRightIds)
-                .Concat(CreateContracRights(A<Guid>(), Many<int>().ToArray()))
+            user.ItContractRights = CreateContractRights(orgUuid, contractRightIds)
+                .Concat(CreateContractRights(A<Guid>(), Many<int>().ToArray()))
                 .ToList();
 
             user.ItProjectRights = CreateProjectRights(orgUuid, projectRightIds)
@@ -346,52 +347,155 @@ namespace Tests.Unit.Core.ApplicationServices
             var userRightsAssignments = result.Value;
             var expectedRoles = userRolesInOrg.Intersect(GetLocalAdminRoles()).OrderBy(x => x).ToList();//only the local admin roles are expected - not user (non admin) and global admin (global role)
             Assert.Equal(expectedRoles, userRightsAssignments.LocalAdministrativeAccessRoles.OrderBy(x => x).ToList());
-            Assert.Equal(dprRightIds,userRightsAssignments.DataProcessingRegistrationRights.Select(x=>x.Id));
-            Assert.Equal(systemRightIds,userRightsAssignments.SystemRights.Select(x=>x.Id));
-            Assert.Equal(contractRightIds,userRightsAssignments.ContractRights.Select(x=>x.Id));
-            Assert.Equal(projectRightIds,userRightsAssignments.ProjectRights.Select(x=>x.Id));
-            Assert.Equal(orgUnitRightIds,userRightsAssignments.OrganizationUnitRights.Select(x=>x.Id));
+            Assert.Equal(dprRightIds, userRightsAssignments.DataProcessingRegistrationRights.Select(x => x.Id));
+            Assert.Equal(systemRightIds, userRightsAssignments.SystemRights.Select(x => x.Id));
+            Assert.Equal(contractRightIds, userRightsAssignments.ContractRights.Select(x => x.Id));
+            Assert.Equal(projectRightIds, userRightsAssignments.ProjectRights.Select(x => x.Id));
+            Assert.Equal(orgUnitRightIds, userRightsAssignments.OrganizationUnitRights.Select(x => x.Id));
         }
 
         [Fact]
         public void RemoveAllRights_Fails_If_Get_Organization_Fails()
         {
+            //Arrange
+            var userId = A<int>();
+            var organizationId = A<int>();
+            var orgUuid = A<Guid>();
+            var getOrganizationError = A<OperationError>();
+            var transaction = ExpectBeginTransaction();
+            ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
+            ExpectGetOrganizationReturns(orgUuid, getOrganizationError);
 
-            throw new NotImplementedException();
+            //Act
+            var error = _sut.RemoveAllRights(userId, organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Same(getOrganizationError, error.Value);
+            VerifyTransactionFailed(transaction);
         }
 
         [Fact]
         public void RemoveAllRights_Fails_If_No_Modification_Access_To_Organization()
         {
+            //Arrange
+            var userId = A<int>();
+            var organizationId = A<int>();
+            var orgUuid = A<Guid>();
+            var organization = new Organization() { Id = A<int>() };
+            var transaction = ExpectBeginTransaction();
+            ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(organization, false);
 
-            throw new NotImplementedException();
+            //Act
+            var error = _sut.RemoveAllRights(userId, organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
+            VerifyTransactionFailed(transaction);
         }
 
         [Fact]
         public void RemoveAllRights_Fails_If_Get_Users_In_Org_Fails()
         {
+            //Arrange
+            var userId = A<int>();
+            var organizationId = A<int>();
+            var orgUuid = A<Guid>();
+            var organization = new Organization() { Id = A<int>(), Uuid = orgUuid };
+            var transaction = ExpectBeginTransaction();
+            var getUserError = A<OperationError>();
+            ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(organization, true);
+            ExpectGetUsersInOrgReturns(orgUuid, getUserError);
 
-            throw new NotImplementedException();
+            //Act
+            var error = _sut.RemoveAllRights(userId, organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(getUserError.FailureType, error.Value.FailureType);
+            VerifyTransactionFailed(transaction);
         }
 
         [Fact]
         public void RemoveAllRights_Fails_If_User_Not_In_Org()
         {
-            throw new NotImplementedException();
+            //Arrange
+            var userId = A<int>();
+            var organizationId = A<int>();
+            var orgUuid = A<Guid>();
+            var organization = new Organization() { Id = A<int>(), Uuid = orgUuid };
+            var transaction = ExpectBeginTransaction();
+            ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(organization, true);
+            ExpectGetUsersInOrgReturns(orgUuid, Result<IQueryable<User>, OperationError>.Success(Enumerable.Empty<User>().AsQueryable()));
+
+            //Act
+            var error = _sut.RemoveAllRights(userId, organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+            VerifyTransactionFailed(transaction);
 
         }
 
         [Fact]
         public void RemoveAllRights_Fails_If_Removal_Of_A_Right_Fails()
         {
-            throw new NotImplementedException();
+            //Arrange
+            var organizationRole = GetLocalAdminRoles().RandomItem();
+            var orgUuid = A<Guid>();
+            var organizationId = A<int>();
+            var user = CreateUserWithRole(organizationId, organizationRole, orgUuid);
+            var organization = new Organization() { Id = organizationId, Uuid = orgUuid };
+            var transaction = ExpectBeginTransaction();
+            var removeRightError = A<OperationFailure>();
+            ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(organization, true);
+            ExpectGetUsersInOrgReturns(orgUuid, Result<IQueryable<User>, OperationError>.Success(new[] { user }.AsQueryable()));
+            ExpectRemoveOrgRightReturns(organizationId, user.Id, organizationRole, removeRightError);
 
+            //Act
+            var error = _sut.RemoveAllRights(user.Id, organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(removeRightError, error.Value.FailureType);
+            VerifyTransactionFailed(transaction);
         }
 
         [Fact]
         public void RemoveAllRights_RemovesAllRightsInOrganization()
         {
-            throw new NotImplementedException();
+            //Arrange
+            var organizationRole = GetLocalAdminRoles().RandomItem();
+            var orgUuid = A<Guid>();
+            var organizationId = A<int>();
+            var user = CreateUserWithRole(organizationId, organizationRole, orgUuid);
+            var organization = new Organization() { Id = organizationId, Uuid = orgUuid };
+            var transaction = ExpectBeginTransaction();
+            var removeRightError = A<OperationFailure>();
+            ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(organization, true);
+            ExpectGetUsersInOrgReturns(orgUuid, Result<IQueryable<User>, OperationError>.Success(new[] { user }.AsQueryable()));
+            ExpectRemoveOrgRightReturns(organizationId, user.Id, organizationRole, Result<OrganizationRight, OperationFailure>.Success(new OrganizationRight()));
+
+            //Act
+            var error = _sut.RemoveAllRights(user.Id, organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(removeRightError, error.Value.FailureType);
+            VerifyTransactionFailed(transaction);
+            throw new NotImplementedException("missing the other types");
         }
 
         [Fact]
@@ -484,7 +588,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 }).ToList();
         }
 
-        private static IEnumerable<ItContractRight> CreateContracRights(Guid organizationId, params int[] rightIds)
+        private static IEnumerable<ItContractRight> CreateContractRights(Guid organizationId, params int[] rightIds)
         {
             return rightIds.Select(id =>
                 new ItContractRight
@@ -533,16 +637,22 @@ namespace Tests.Unit.Core.ApplicationServices
                             .Returns(Result<IQueryable<Organization>, OperationError>.Success(orgs.AsQueryable()));
         }
 
-        private User CreateUserWithRole(int orgId, OrganizationRole role)
+        private User CreateUserWithRole(int orgId, OrganizationRole role = OrganizationRole.User, Guid? orgUuid = null)
         {
             return new()
             {
                 Id = A<int>(),
-                OrganizationRights = new List<OrganizationRight>()
+                OrganizationRights = new List<OrganizationRight>
                 {
                     new()
                     {
+                        Id = A<int>(),
                         OrganizationId = orgId,
+                        Organization = new Organization
+                        {
+                            Id = orgId,
+                            Uuid = orgUuid.GetValueOrDefault(A<Guid>())
+                        },
                         Role = role
                     }
                 }
@@ -561,6 +671,49 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ExpectGetUserInOrganization(Guid orgUuid, Guid userUuid, Result<User, OperationError> result)
         {
             _userServiceMock.Setup(x => x.GetUserInOrganization(orgUuid, userUuid)).Returns(result);
+        }
+
+        private void ExpectGetOrganizationReturns(Guid orgUuid, Result<Organization, OperationError> result)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganization(orgUuid, OrganizationDataReadAccessLevel.All))
+                .Returns(result);
+        }
+
+        private void VerifyTransactionFailed(Mock<IDatabaseTransaction> transaction)
+        {
+            transaction.Verify(x => x.Commit(), Times.Never());
+            transaction.Verify(x => x.Rollback(), Times.Once());
+            _dbControlMock.Verify(x => x.SaveChanges(), Times.Never());
+        }
+
+        private void VerifyTransactionSucceeded(Mock<IDatabaseTransaction> transaction)
+        {
+            transaction.Verify(x => x.Commit(), Times.Once());
+            transaction.Verify(x => x.Rollback(), Times.Never());
+            _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());
+        }
+
+        private void ExpectAllowModifyReturns(IEntity subject, bool allow)
+        {
+            _authServiceMock.Setup(x => x.AllowModify(subject)).Returns(allow);
+        }
+
+        private Mock<IDatabaseTransaction> ExpectBeginTransaction()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionMgrMock.Setup(x => x.Begin()).Returns(transaction.Object);
+            return transaction;
+        }
+
+        private void ExpectGetUsersInOrgReturns(Guid orgUuid, Result<IQueryable<User>, OperationError> result)
+        {
+            _userServiceMock.Setup(x => x.GetUsersInOrganization(orgUuid,
+                It.Is<IDomainQuery<User>[]>(q => q.OfType<QueryById<User>>().FirstOrDefault() != null))).Returns(result);
+        }
+
+        private void ExpectRemoveOrgRightReturns(int organizationId, int userId, OrganizationRole organizationRole, Result<OrganizationRight, OperationFailure> result)
+        {
+            _orgRightsServiceMock.Setup(x => x.RemoveRole(organizationId, userId, organizationRole)).Returns(result);
         }
     }
 }

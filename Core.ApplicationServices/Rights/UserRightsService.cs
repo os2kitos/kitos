@@ -16,6 +16,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Serilog;
@@ -219,17 +220,16 @@ namespace Core.ApplicationServices.Rights
                 .Bind(WithWriteAccess)
                 .Bind<(Organization organization, User user)>(organization =>
                 {
-                    var userResult = _userService.GetUsersInOrganization(organization.Uuid);
+                    var userResult = _userService.GetUsersInOrganization(organization.Uuid,new QueryById<User>(userId));
                     if (userResult.Failed)
                     {
                         return userResult.Error;
                     }
 
-                    var user = userResult.Value.ById(userId);
+                    var user = userResult.Value.FirstOrDefault();
                     if (user == null)
                     {
-                        return new OperationError($"User with id: {userId} not found in the organization",
-                            OperationFailure.NotFound);
+                        return new OperationError($"User with id: {userId} not found in the organization", OperationFailure.NotFound);
                     }
 
                     return (organization, user);
