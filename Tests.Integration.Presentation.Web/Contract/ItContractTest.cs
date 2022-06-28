@@ -94,6 +94,44 @@ namespace Tests.Integration.Presentation.Web.Contract
             }
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_CriticalityType(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
+            var criticalityTypeName = A<string>();
+            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, criticalityTypeName, OrganizationId);
+
+            //Act - perform the action with the actual role
+            await ItContractHelper.AssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
+            var contractResult = await ItContractHelper.GetItContract(contract.Id);
+
+            //Assert
+            Assert.Equal(contract.Id, contractResult.Id);
+            Assert.Equal(criticality.Id, contractResult.CriticalityTypeId);
+            Assert.Equal(criticality.Name, contractResult.CriticalityTypeName);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_CriticalityType(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
+            var criticalityTypeName = A<string>();
+            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, criticalityTypeName, OrganizationId);
+
+            //Act - perform the action with the actual role
+            using var result = await ItContractHelper.SendAssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
         [Fact]
         public async Task Can_Get_Available_DataProcessingRegistrations()
         {

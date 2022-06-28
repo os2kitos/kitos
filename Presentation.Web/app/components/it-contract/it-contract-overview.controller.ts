@@ -31,8 +31,8 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
-        private criticalityTypeStorageKey = "it-contract-overview-criticalitytype";
         private criticalityTypeName = "CriticalityType";
+        private criticalityOptionViewModel = new Models.ViewModel.ItContract.CriticalityOptions(this.criticalityOptions);
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
@@ -179,14 +179,14 @@
         }
 
         private fixCriticalityFilter(filterUrl, column) {
-            const pattern = new RegExp(`(\\w+\\${column}( eq \'[0-9]+\'))`, "i");
-            const renamedColumn = filterUrl.replace(pattern, "CriticalityType/Id$2").replaceAll("'", "");
+            const pattern = new RegExp(`(${column}( eq )\'([0-9]+)\')`, "i");
+            const renamedColumn = filterUrl.replace(pattern, "CriticalityType/Id$2$3");
 
             if (renamedColumn.includes("0")) {
                 return renamedColumn.replace("0", "null");
             }
 
-            return renamedColumn.replaceAll("'", "");
+            return renamedColumn;
         }
 
         // loads kendo grid options from localstorage
@@ -292,6 +292,12 @@
                         parameterMap: (options, type) => {
                             // get kendo to map parameters to an odata url
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+
+                            if (parameterMap.$orderby) {
+                                if (parameterMap.$orderby.includes("CriticalityType")) {
+                                    parameterMap.$orderby = parameterMap.$orderby.replace("CriticalityType", "CriticalityType/Name");
+                                }
+                            }
 
                             if (parameterMap.$filter) {
                                 self._.forEach(self.itContractRoles,
@@ -760,23 +766,18 @@
                         },
                         excelTemplate: dataItem =>
                             dataItem && dataItem.status && `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow}, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` || "",
-                        sortable: false,
+                        sortable: true,
                         filterable: false
                     },
                     {
                         field: this.criticalityTypeName, title: "Kritikalitet", width: 150,
                         persistId: "criticalitytype",
-                        template: dataItem => dataItem.CriticalityType ? this.getCriticalityName(dataItem.CriticalityTypeId) : "",
-                        sortable: true,
+                        template: dataItem => dataItem.CriticalityType ? this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityType.Id) : "",
+                        //sortable: true,
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args, this.criticalityOptions.map(value => {
-                                        return {
-                                            id: value.Id, 
-                                            text: value.Name
-                                        }
-                                    }), true)
+                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args, this.criticalityOptionViewModel.options, true)
                             }
                         }
                     }

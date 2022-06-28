@@ -8,7 +8,7 @@
           * @param dataSource - dataSource of the dropdown, should contain 'id' and 'text' properties
           */
         public static createSelectDropdownTemplate(args: any, dataSource: any, insertEmptyOption: boolean) {
-            if (insertEmptyOption) {
+            if (insertEmptyOption && dataSource.filter(x => x.text === "").length === 0) {
                 dataSource.push({ id: 0, text: "" });
             }
 
