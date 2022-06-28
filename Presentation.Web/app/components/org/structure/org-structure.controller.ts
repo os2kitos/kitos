@@ -376,21 +376,20 @@
                                 'orgId': unit.organizationId,
                                 'isRoot': unit.parentId == undefined
                             };
-
-                            var orgUnitsArray = $modalScope.orgUnits;
+                            
                             if ($modalScope.orgUnits.length === 0) {
-                                orgUnitsArray.push(unit);
+                                $modalScope.orgUnits.push(unit);
                             }
 
-                            var selectedUnit = orgUnitsArray.filter(x => x.id === unit.parentId)[0];
-                            if (selectedUnit === null && $modalScope.orgUnit.parentId == undefined) {
+                            var selectedUnit = $modalScope.orgUnits.filter(x => x.id === unit.parentId)[0];
+                            if (selectedUnit === null || $modalScope.orgUnit.parentId == undefined) {
                                 selectedUnit = unit;
                             }
 
-                            $modalScope.orgUnitsSelectObject = function(){
+                            $modalScope.orgUnitsSelectObject = () => {
                                 return {
                                     selectedElement: selectedUnit ?? "",
-                                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => orgUnitsArray, false),
+                                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => $modalScope.orgUnits, false),
                                     elementSelected: (newElement) => {
                                         if (!!newElement) {
                                             this.$modalScope.orgUnit.newParent = newElement.id;
