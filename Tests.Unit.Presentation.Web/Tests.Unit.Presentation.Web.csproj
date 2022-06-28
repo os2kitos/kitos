@@ -215,6 +215,7 @@
     <Compile Include="DomainServices\DPR\QueryBySystemUuidTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelRepositoryTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByDescriptionContentTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByKeyPrefixTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByParentKeyTest.cs" />
@@ -234,6 +235,8 @@
     <Compile Include="DomainServices\SystemUsage\QueryByRelationToSystemUsageTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryBySystemNameContentTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryBySystemUuidTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\QueryReadModelsWhichShouldBecomeActiveTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\QueryReadModelsWhichShouldExpireTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderIdOrOwnOrganizationIdsTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByRightsHolderTest.cs" />
@@ -256,6 +259,7 @@
     <Compile Include="Extensions\ItSystemExtensions.cs" />
     <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
+    <Compile Include="Helpers\ItSystemUsageOverviewReadModelTestData.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />

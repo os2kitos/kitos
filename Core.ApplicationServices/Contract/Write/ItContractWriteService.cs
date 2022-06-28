@@ -19,6 +19,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Role;
@@ -540,8 +541,12 @@ namespace Core.ApplicationServices.Contract.Write
         {
             return contract
                 .WithOptionalUpdate(procurementParameters.ProcurementStrategyUuid, UpdateProcurementStrategy)
-                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.PurchaseTypeUuid, UpdatePurchaseType))
-                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.ProcurementPlan, UpdateProcurementPlan));
+                .Bind(itContract =>
+                    itContract.WithOptionalUpdate(procurementParameters.PurchaseTypeUuid, UpdatePurchaseType))
+                .Bind(itContract =>
+                    itContract.WithOptionalUpdate(procurementParameters.ProcurementPlan, UpdateProcurementPlan))
+                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.ProcurementInitiated,
+                    (c, newValue) => c.ProcurementInitiated = newValue.GetValueOrFallback(YesNoUndecidedOption.Undecided)));
         }
 
         private static Maybe<OperationError> UpdateProcurementPlan(ItContract contract, Maybe<(byte half, int year)> plan)
@@ -611,7 +616,7 @@ namespace Core.ApplicationServices.Contract.Write
             contract.Name = newName;
             return Maybe<OperationError>.None;
         }
-
+        
         public Maybe<OperationError> Delete(Guid itContractUuid)
         {
             var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage.Read;
 
@@ -22,5 +21,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         IQueryable<ItSystemUsageOverviewReadModel> GetByProjectId(int projectId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByDataProcessingRegistrationId(int dataProcessingRegistrationId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByItInterfaceId(int interfaceId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetReadModelsMustUpdateToChangeActiveState();
     }
 }

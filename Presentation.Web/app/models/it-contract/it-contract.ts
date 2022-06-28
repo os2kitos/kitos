@@ -1,4 +1,5 @@
 ﻿module Kitos.Models.ItContract {
+
     /** Contains info about an it contract */
     export interface IItContract extends IEntity {
         /** Gets or sets the name. */
@@ -119,5 +120,6 @@
         AssociatedAgreementElementTypes: Array<IAssociatedAgreementElementTypes>;
 
         DataProcessingRegistrations: Models.DataProcessing.IDataProcessingRegistration[];
+        ProcurementInitiated: Models.Api.Shared.YesNoUndecidedOption | null;
     }
 }
