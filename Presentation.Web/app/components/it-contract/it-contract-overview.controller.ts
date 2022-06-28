@@ -983,15 +983,6 @@
 
             return concatRoles;
         }
-
-        private getCriticalityName(id: number): string {
-            const criticalitiesWithSameId = this.criticalityOptions.filter(x => x.Id === id);
-            if (criticalitiesWithSameId.length < 1)
-                return "";
-
-            const criticality = criticalitiesWithSameId[0];
-            return criticality.Name;
-        }
     }
 
     angular

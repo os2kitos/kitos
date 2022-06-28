@@ -102,8 +102,8 @@ namespace Tests.Integration.Presentation.Web.Contract
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var criticalityTypeName = A<string>();
-            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, criticalityTypeName, OrganizationId);
+            var critircalityName = A<string>();
+            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, critircalityName, OrganizationId);
 
             //Act - perform the action with the actual role
             await ItContractHelper.AssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
@@ -122,8 +122,8 @@ namespace Tests.Integration.Presentation.Web.Contract
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var criticalityTypeName = A<string>();
-            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, criticalityTypeName, OrganizationId);
+            var criticalityName = A<string>();
+            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, criticalityName, OrganizationId);
 
             //Act - perform the action with the actual role
             using var result = await ItContractHelper.SendAssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
