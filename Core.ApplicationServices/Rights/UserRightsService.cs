@@ -415,7 +415,7 @@ namespace Core.ApplicationServices.Rights
         {
             foreach (var right in rights.ToList())
             {
-                var removeRoleResult = assignmentService.RemoveRole(right.Object, right.RoleId, right.UserId);
+                var removeRoleResult = assignmentService.RemoveRole(right.Object, right.RoleId, user.Id);
                 if (removeRoleResult.Failed)
                 {
                     _logger.Error(
