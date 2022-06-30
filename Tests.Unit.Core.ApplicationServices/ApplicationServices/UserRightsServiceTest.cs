@@ -728,13 +728,79 @@ namespace Tests.Unit.Core.ApplicationServices
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.OrganizationUnitRights.ToList(), orgUnitRightsWhichAreRemoved, user, _organizationUnitRightsServiceMock);
         }
 
+        [Fact]
+        public void TransferRights_RemoveRights_From_Old_User_And_Assigns_Them_To_A_New_User()
+        {
+            //Arrange
+            var organizationRole = GetLocalAdminRoles().RandomItem();
+            var orgUuid = A<Guid>();
+            var organizationId = A<int>();
+            var user = CreateUserWithRole(organizationId, organizationRole, orgUuid);
+            var toUserId = A<int>();
 
+            var dprRights = CreateDprRights(orgUuid, Many<int>().ToArray()).ToList();
+            var itSystemRights = CreateSystemRights(orgUuid, Many<int>().ToArray()).ToList();
+            var organizationUnitRights = CreateOrgUnitRights(orgUuid, Many<int>().ToArray()).ToList();
+            var itProjectRights = CreateProjectRights(orgUuid, Many<int>().ToArray()).ToList();
+            var itContractRights = CreateContractRights(orgUuid, Many<int>().ToArray()).ToList();
 
-        /*
-       *
-      TODO Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters);
-       *
-       */
+            user.DataProcessingRegistrationRights = dprRights.Concat(CreateDprRights(A<Guid>(), Many<int>().ToArray())).ToList();
+            user.ItSystemRights = itSystemRights.Concat(CreateSystemRights(A<Guid>(), Many<int>().ToArray())).ToList();
+            user.OrganizationUnitRights = organizationUnitRights.Concat(CreateOrgUnitRights(A<Guid>(), Many<int>().ToArray())).ToList();
+            user.ItProjectRights = itProjectRights.Concat(CreateProjectRights(A<Guid>(), Many<int>().ToArray())).ToList();
+            user.ItContractRights = itContractRights.Concat(CreateContractRights(A<Guid>(), Many<int>().ToArray())).ToList();
+
+            var dprRightsWhichAreTransferred = dprRights.RandomItems(2).ToList();
+            var systemRightsWhichAreTransferred = itSystemRights.RandomItems(2).ToList();
+            var contractRightsWhichAreTransferred = itContractRights.RandomItems(2).ToList();
+            var projectRightsWhichAreTransferred = itProjectRights.RandomItems(2).ToList();
+            var orgUnitRightsWhichAreTransferred = organizationUnitRights.RandomItems(2).ToList();
+            var parameters = new UserRightsChangeParameters
+            (
+                organizationRole.WrapAsEnumerable(),
+                dprRightsWhichAreTransferred.Select(x => x.Id).ToList(),
+                systemRightsWhichAreTransferred.Select(x => x.Id).ToList(),
+                contractRightsWhichAreTransferred.Select(x => x.Id).ToList(),
+                projectRightsWhichAreTransferred.Select(x => x.Id).ToList(),
+                orgUnitRightsWhichAreTransferred.Select(x => x.Id).ToList()
+            );
+
+            var organization = new Organization() { Id = organizationId, Uuid = orgUuid };
+            var transaction = ExpectBeginTransaction();
+            ExpectResolveUuidReturns<Organization>(organizationId, orgUuid);
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(organization, true);
+            ExpectGetUsersInOrgReturns(orgUuid, Result<IQueryable<User>, OperationError>.Success(new[] { user }.AsQueryable()));
+            ExpectRemoveOrgRoleReturns(organizationId, user.Id, organizationRole, Result<OrganizationRight, OperationFailure>.Success(new OrganizationRight()));
+            ExpectAssignOrgRoleReturns(organizationId, toUserId, organizationRole, Result<OrganizationRight, OperationFailure>.Success(new OrganizationRight()));
+            ExpectSuccessfulRemovalOf(dprRightsWhichAreTransferred, user, _dprRightsServiceMock);
+            ExpectSuccessfulRemovalOf(systemRightsWhichAreTransferred, user, _systemRightsServiceMock);
+            ExpectSuccessfulRemovalOf(projectRightsWhichAreTransferred, user, _projectRightsServiceMock);
+            ExpectSuccessfulRemovalOf(contractRightsWhichAreTransferred, user, _contractRightsServiceMock);
+            ExpectSuccessfulRemovalOf(orgUnitRightsWhichAreTransferred, user, _organizationUnitRightsServiceMock);
+            ExpectSuccessfulAssignmentOf(dprRightsWhichAreTransferred, toUserId, _dprRightsServiceMock);
+            ExpectSuccessfulAssignmentOf(systemRightsWhichAreTransferred, toUserId, _systemRightsServiceMock);
+            ExpectSuccessfulAssignmentOf(projectRightsWhichAreTransferred, toUserId, _projectRightsServiceMock);
+            ExpectSuccessfulAssignmentOf(contractRightsWhichAreTransferred, toUserId, _contractRightsServiceMock);
+            ExpectSuccessfulAssignmentOf(orgUnitRightsWhichAreTransferred, toUserId, _organizationUnitRightsServiceMock);
+
+            //Act
+            var error = _sut.TransferRights(user.Id, toUserId,organizationId, parameters);
+
+            //Assert
+            Assert.True(error.IsNone);
+            VerifyTransactionSucceeded(transaction);
+            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.DataProcessingRegistrationRights.ToList(), dprRightsWhichAreTransferred, user, _dprRightsServiceMock);
+            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItSystemRights.ToList(), systemRightsWhichAreTransferred, user, _systemRightsServiceMock);
+            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItProjectRights.ToList(), projectRightsWhichAreTransferred, user, _projectRightsServiceMock);
+            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItContractRights.ToList(), contractRightsWhichAreTransferred, user, _contractRightsServiceMock);
+            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.OrganizationUnitRights.ToList(), orgUnitRightsWhichAreTransferred, user, _organizationUnitRightsServiceMock);
+            VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.DataProcessingRegistrationRights.ToList(), dprRightsWhichAreTransferred, toUserId, _dprRightsServiceMock);
+            VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.ItSystemRights.ToList(), systemRightsWhichAreTransferred, toUserId, _systemRightsServiceMock);
+            VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.ItProjectRights.ToList(), projectRightsWhichAreTransferred, toUserId, _projectRightsServiceMock);
+            VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.ItContractRights.ToList(), contractRightsWhichAreTransferred, toUserId, _contractRightsServiceMock);
+            VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.OrganizationUnitRights.ToList(), orgUnitRightsWhichAreTransferred, toUserId, _organizationUnitRightsServiceMock);
+        }
 
         private static IEnumerable<OrganizationRole> GetLocalAdminRoles() => new[]
         {
@@ -915,6 +981,12 @@ namespace Tests.Unit.Core.ApplicationServices
             _orgRightsServiceMock.Setup(x => x.RemoveRole(organizationId, userId, organizationRole)).Returns(result);
         }
 
+        private void ExpectAssignOrgRoleReturns(int organizationId, int userId, OrganizationRole organizationRole,
+            Result<OrganizationRight, OperationFailure> result)
+        {
+            _orgRightsServiceMock.Setup(x => x.AssignRole(organizationId, userId, organizationRole)).Returns(result);
+        }
+
         private static void ExpectSuccessfulRemovalOf<TRight, TRole, TModel>(List<TRight> rights, User user,
             Mock<IRoleAssignmentService<TRight, TRole, TModel>> assignmentService)
             where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
@@ -939,6 +1011,32 @@ namespace Tests.Unit.Core.ApplicationServices
             {
                 var times = rightsExpectedToBeRemoved.Contains(right) ? Times.Once() : Times.Never();
                 assignmentService.Verify(x => x.RemoveRole(right.Object, right.RoleId, user.Id), times);
+            }
+        }
+
+        private static void ExpectSuccessfulAssignmentOf<TRight, TRole, TModel>(List<TRight> rights, int userId,
+            Mock<IRoleAssignmentService<TRight, TRole, TModel>> assignmentService)
+            where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
+            where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
+            where TRight : Entity, IRight<TModel, TRight, TRole>, new()
+        {
+            foreach (var right in rights)
+            {
+                assignmentService.Setup(x => x.AssignRole(right.Object, right.RoleId, userId)).Returns(Result<TRight, OperationError>.Success(new TRight()));
+            }
+        }
+
+        private static void VerifyThatAssignmentWasOnlyCalledForExpectedRights<TRight, TRole, TModel>(List<TRight> allRights,
+            List<TRight> rightsExpectedToBeAssigned, int userId,
+            Mock<IRoleAssignmentService<TRight, TRole, TModel>> assignmentService)
+            where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
+            where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
+            where TRight : Entity, IRight<TModel, TRight, TRole>, new()
+        {
+            foreach (var right in allRights)
+            {
+                var times = rightsExpectedToBeAssigned.Contains(right) ? Times.Once() : Times.Never();
+                assignmentService.Verify(x => x.AssignRole(right.Object, right.RoleId, userId), times);
             }
         }
     }
