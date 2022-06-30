@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.API.V1
         /// </summary>
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <returns>A <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents current assignment of administrative and business roles within the organization with id: <param name="organizationId"></param></returns>
         [HttpGet]
         [Route]
         public HttpResponseMessage Get(int organizationId, int userId)
@@ -43,7 +43,6 @@ namespace Presentation.Web.Controllers.API.V1
         /// </summary>
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
-        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assignment state</returns>
         [Route]
         [HttpDelete]
         public HttpResponseMessage Delete(int organizationId, int userId)
@@ -59,7 +58,6 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
         /// <param name="assignmentsToDelete"></param>
-        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assignment state</returns>
         [Route("range")]
         [HttpDelete]
         public HttpResponseMessage DeleteRange(int organizationId, int userId, [FromBody] RemoveUserRightsRequest assignmentsToDelete)
@@ -81,7 +79,6 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="organizationId"></param>
         /// <param name="userId"></param>
         /// <param name="assignmentsToTransfer"></param>
-        /// <returns>A new <see cref="OrganizationUserRoleAssignmentsDTO"/> which represents the changes assignment state</returns>
         [Route("range/transfer")]
         [HttpPatch]
         public HttpResponseMessage PatchTransferToAnotherUser(int organizationId, int userId, TransferRightsRequestDTO assignmentsToTransfer)
