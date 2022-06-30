@@ -15,18 +15,18 @@ namespace Core.ApplicationServices.Model.Users
 
         public UserRightsChangeParameters(
             IEnumerable<OrganizationRole> organizationRoles,
-            IEnumerable<int> dataProcessingRegistrationRoles,
-            IEnumerable<int> systemRoles,
-            IEnumerable<int> contractRoles,
-            IEnumerable<int> projectRoles,
-            IEnumerable<int> organizationUnitRights)
+            IEnumerable<int> dataProcessingRegistrationRightIds,
+            IEnumerable<int> systemRightIds,
+            IEnumerable<int> contractRightIds,
+            IEnumerable<int> projectRightIds,
+            IEnumerable<int> organizationUnitRightIds)
         {
             AdministrativeAccessRoles = organizationRoles.ToHashSet();
-            DataProcessingRegistrationRightIds = dataProcessingRegistrationRoles.ToHashSet();
-            SystemRightIds = systemRoles.ToHashSet();
-            ContractRightIds = contractRoles.ToHashSet();
-            ProjectRightIds = projectRoles.ToHashSet();
-            OrganizationUnitRightsIds = organizationUnitRights.ToHashSet();
+            DataProcessingRegistrationRightIds = dataProcessingRegistrationRightIds.ToHashSet();
+            SystemRightIds = systemRightIds.ToHashSet();
+            ContractRightIds = contractRightIds.ToHashSet();
+            ProjectRightIds = projectRightIds.ToHashSet();
+            OrganizationUnitRightsIds = organizationUnitRightIds.ToHashSet();
         }
     }
 }
