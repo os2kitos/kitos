@@ -460,7 +460,7 @@ namespace Core.ApplicationServices.Rights
                 {
                     _logger.Error(
                         "Failed to assign right of type {rightType} with role {roleId} on object: {objectType}:{objectId} to user {userId} in organization {organizationId}. Failed with {error}",
-                        typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, user.Id, organization.Id, assignResult.Error.ToString()
+                        typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, toUserId, organization.Id, assignResult.Error.ToString()
                     );
                     {
                         return new OperationError($"Failed to assign role of type {typeof(TRight).Name} with role {right.RoleId}:{assignResult.Error}", assignResult.Error.FailureType);
