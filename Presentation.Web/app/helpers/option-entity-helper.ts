@@ -2,8 +2,8 @@
 
     export class OptionEntityHelper {
 
-        static createDictionaryFromOptionList(criticalities: Kitos.Models.IOptionEntity[]) {
-            return criticalities.reduce((acc, next, _) => {
+        static createDictionaryFromOptionList(options: Kitos.Models.IOptionEntity[]) {
+            return options.reduce((acc, next, _) => {
                 acc[next.Id] = {
                     text: next.Name,
                     id: next.Id,
