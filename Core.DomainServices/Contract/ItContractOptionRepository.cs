@@ -5,6 +5,7 @@ using Core.DomainServices.Options;
 
 namespace Core.DomainServices.Contract
 {
+    //TODO: Not needed
     public class ItContractOptionRepository: IItContractOptionRepository
     {
         private readonly IOptionsService<ItContract, CriticalityType> _criticalityTypesService;
