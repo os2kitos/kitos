@@ -10,9 +10,9 @@ namespace Core.ApplicationServices.Model.Contracts
         public IReadOnlyList<OptionDescriptor<CriticalityType>> CriticalityOptions { get; }
 
         public ContractOptions(
-            IEnumerable<OptionDescriptor<CriticalityType>> dataResponsibleOptions)
+            IEnumerable<OptionDescriptor<CriticalityType>>criticalityOptions)
         {
-            CriticalityOptions = dataResponsibleOptions.ToList();
+            CriticalityOptions = criticalityOptions.ToList();
         }
     }
 }

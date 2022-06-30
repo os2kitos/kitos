@@ -61,7 +61,7 @@
             "exportGridToExcelService",
             "userAccessRights",
             "uiState",
-            "criticalityOptions"
+            "itContractOptions"
         ];
 
         constructor(
@@ -308,7 +308,7 @@
 
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
-                                
+
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
 
                                 parameterMap.$filter = this.fixCriticalityFilter(parameterMap.$filter, this.criticalityTypeName);
@@ -1024,7 +1024,7 @@
                         uiState: [
                             "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
                         ],
-                        criticalityOptions: [
+                        itContractOptions: [
                             "ItContractsService", "user",
                             (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
                                 ItContractsService.getApplicableItContractOptions(user.currentOrganizationId)

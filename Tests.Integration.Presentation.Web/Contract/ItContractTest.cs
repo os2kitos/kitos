@@ -103,7 +103,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes)).RandomItem();
+            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, OrganizationId)).RandomItem();
 
             //Act - perform the action with the actual role
             await ItContractHelper.AssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
@@ -122,7 +122,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes)).RandomItem();
+            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, OrganizationId)).RandomItem();
 
             //Act - perform the action with the actual role
             using var result = await ItContractHelper.SendAssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
