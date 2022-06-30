@@ -813,7 +813,7 @@
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args, this.yesNoUndecided.options, false)
+                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args.element, this.yesNoUndecided.options, false)
                             }
                         }
                     },

@@ -96,7 +96,7 @@
 
                 const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
-                bindCriticalities();
+                bindCriticalities(contract);
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
@@ -328,27 +328,16 @@
                     }
                 }
 
-                function bindCriticalities() {
+                function bindCriticalities(contract: any) {
                     
-                    const optionMap = criticalityOptions.reduce((acc, next, _) => {
-                        acc[next.Id] = {
-                            text: next.Name,
-                            id: next.Id,
-                            optionalObjectContext: {
-                                id: next.Id,
-                                name: next.Name,
-                                description: next.Description
-                            }
-                        };
-                        return acc;
-                    }, {});
+                    const optionMap = Kitos.Helpers.OptionEntityHelper.createDictionaryFromOptionList(criticalityOptions);
 
                     //If selected state is expired, add it for presentation reasons
                     let existingChoice = null;
-                    if ($scope.contract.criticalityTypeId !== undefined && $scope.contract.criticalityTypeId !== null) {
+                    if (contract.criticalityTypeId !== undefined && contract.criticalityTypeId !== null) {
                         existingChoice = {
-                            id: $scope.contract.criticalityTypeId,
-                            name: `${$scope.contract.criticalityTypeName} (udgået)`
+                            id: contract.criticalityTypeId,
+                            name: `${contract.criticalityTypeName} (udgået)`
                         };
 
                         if (!optionMap[existingChoice.id]) {
@@ -368,7 +357,7 @@
                         select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
                         elementSelected: (newElement) => {
                             var payload = { criticalityTypeId: newElement ? newElement.id : null };
-                            $scope.contract.criticalityTypeId = newElement.id;
+                            $scope.contract.criticalityTypeId = newElement?.id;
                             patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         }
                     };

@@ -246,6 +246,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noEnforceValid, output.EnforceValid.IsUnchanged);
             Assert.Equal(noValidFrom, output.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, output.ValidTo.IsUnchanged);
+            Assert.Equal(noCriticalityTypeUuid, output.CriticalityTypeUuid.IsUnchanged);
         }
 
         [Theory]
@@ -277,6 +278,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noEnforceValid, output.EnforceValid.IsUnchanged);
             Assert.Equal(noValidFrom, output.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, output.ValidTo.IsUnchanged);
+            Assert.Equal(noCriticalityTypeUuid, output.CriticalityTypeUuid.IsUnchanged);
         }
 
         [Theory]
@@ -308,6 +310,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.EnforceValid.HasChange);
             Assert.True(output.ValidFrom.HasChange);
             Assert.True(output.ValidTo.HasChange);
+            Assert.True(output.CriticalityTypeUuid.HasChange);
         }
 
         [Theory]

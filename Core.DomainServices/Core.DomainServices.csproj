@@ -62,6 +62,8 @@
     <Compile Include="Context\IFallbackUserResolver.cs" />
     <Compile Include="Contract\ContractDataProcessingRegistrationAssignmentService.cs" />
     <Compile Include="Contract\IContractDataProcessingRegistrationAssignmentService.cs" />
+    <Compile Include="Contract\IItContractOptionRepository.cs" />
+    <Compile Include="Contract\ItContractOptionRepository.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="Factories\ItProjectFactory.cs" />

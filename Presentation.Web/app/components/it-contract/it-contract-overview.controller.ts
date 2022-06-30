@@ -29,10 +29,10 @@
     }
 
     export class OverviewController implements IOverviewController {
-        private storageKey = "it-contract-overview-options";
-        private orgUnitStorageKey = "it-contract-overview-orgunit";
-        private criticalityTypeName = "CriticalityType";
-        private criticalityOptionViewModel = new Models.ViewModel.ItContract.CriticalityOptions(this.criticalityOptions);
+        private readonly storageKey = "it-contract-overview-options";
+        private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
+        private readonly criticalityTypeName = "CriticalityType";
+        private criticalityOptionViewModel;
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
@@ -85,9 +85,11 @@
             private exportGridToExcelService,
             private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             private uiState: Models.UICustomization.ICustomizedModuleUI,
-            private criticalityOptions: Kitos.Models.IOptionEntity[]) {
+            private itContractOptions: Models.ItContract.IItContractOptions) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
-            
+
+            this.criticalityOptionViewModel = new Models.ViewModel.ItContract.CriticalityOptions(this.itContractOptions.criticalityOptions);
+
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
@@ -766,18 +768,18 @@
                         },
                         excelTemplate: dataItem =>
                             dataItem && dataItem.status && `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow}, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` || "",
-                        sortable: true,
+                        sortable: false,
                         filterable: false
                     },
                     {
                         field: this.criticalityTypeName, title: "Kritikalitet", width: 150,
                         persistId: "criticalitytype",
                         template: dataItem => dataItem.CriticalityType ? this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityType.Id) : "",
-                        //sortable: true,
+                        sortable: true,
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args, this.criticalityOptionViewModel.options, true)
+                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args.element, this.criticalityOptionViewModel.options, true)
                             }
                         }
                     }
@@ -1023,10 +1025,9 @@
                             "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
                         ],
                         criticalityOptions: [
-                            "localOptionServiceFactory",
-                            (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
-                            localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.CriticalityTypes)
-                            .getAll()
+                            "ItContractsService", "user",
+                            (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
+                                ItContractsService.getApplicableItContractOptions(user.currentOrganizationId)
                         ]
                     }
                 });

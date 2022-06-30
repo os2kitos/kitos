@@ -8,14 +8,18 @@ using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Contract;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Options;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItContract;
+using Presentation.Web.Models.API.V1.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
@@ -28,18 +32,21 @@ namespace Presentation.Web.Controllers.API.V1
         private readonly IGenericRepository<ItContractItSystemUsage> _itContractItSystemUsageRepository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
         private readonly IItContractService _itContractService;
+        private readonly IItContractOptionsApplicationService _itContractOptionsApplicationService;
 
         public ItContractController(IGenericRepository<ItContract> repository,
             IGenericRepository<ItSystemUsage> usageRepository,
             IGenericRepository<AgreementElementType> agreementElementRepository,
             IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository,
-            IItContractService itContractService)
+            IItContractService itContractService,
+            IItContractOptionsApplicationService itContractOptionsApplicationService)
             : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
             _itContractItSystemUsageRepository = itContractItSystemUsageRepository;
             _itContractService = itContractService;
+            _itContractOptionsApplicationService = itContractOptionsApplicationService;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
@@ -337,6 +344,23 @@ namespace Presentation.Web.Controllers.API.V1
                 return LogError(e);
             }
         }
+        
+        [HttpGet]
+        [Route("available-options-in/{organizationId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetContractOptions(int organizationId)
+        {
+            return _itContractOptionsApplicationService
+                .GetAssignableContractOptions(organizationId)
+                .Select(result => new ContractOptionsDTO
+                {
+                    CriticalityOptions = ToDTOs(result.CriticalityOptions, organizationId).ToList()
+                })
+                .Match(Ok, FromOperationError);
+        }
 
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
@@ -387,6 +411,16 @@ namespace Presentation.Web.Controllers.API.V1
             return _itContractService
                 .Create(organizationId, dto.Name)
                 .Match(NewObjectCreated, FromOperationError);
+        }
+
+        private static IEnumerable<OptionWithDescriptionDTO> ToDTOs<T>(IEnumerable<OptionDescriptor<T>> options, int organizationId) where T : OptionEntity<ItContract>
+        {
+            return options.Select(ToDTO);
+        }
+
+        private static OptionWithDescriptionDTO ToDTO<T>(OptionDescriptor<T> option) where T : OptionEntity<ItContract>
+        {
+            return new OptionWithDescriptionDTO(option.Option.Id, option.Option.Name, option.Description);
         }
     }
 }

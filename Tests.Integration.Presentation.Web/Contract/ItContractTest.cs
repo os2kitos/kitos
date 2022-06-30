@@ -7,6 +7,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -102,8 +103,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var critircalityName = A<string>();
-            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, critircalityName, OrganizationId);
+            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes)).RandomItem();
 
             //Act - perform the action with the actual role
             await ItContractHelper.AssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
@@ -122,8 +122,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var criticalityName = A<string>();
-            var criticality = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, criticalityName, OrganizationId);
+            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes)).RandomItem();
 
             //Act - perform the action with the actual role
             using var result = await ItContractHelper.SendAssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);

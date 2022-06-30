@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
@@ -105,6 +106,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.PatchWithCookieAsync(url, cookie, body);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
+        }
+
+        public static async Task<List<OptionDTO>> GetOptionsAsync(string resource, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/{resource}");
+
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<OptionDTO>();
         }
     }
 }

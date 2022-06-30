@@ -10,17 +10,17 @@
         }
 
         //Cache texts for quick lookup texts
-        private readonly valueToTextMap;
+        private readonly valueToTextMap: { [key: number]: string };
 
         getOptionText(id?: number) {
             return this.valueToTextMap[id] ?? "";
         }
 
         options: Select2OptionViewModel<any>[];
-        constructor(dataSource: IOptionEntity[]) {
+        constructor(dataSource: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[]) {
             this.options = [];
             dataSource.forEach(option => {
-                const item = { id: option.Id as number, text: option.Name, optionalObjectContext: option };
+                const item = { id: option.id as number, text: option.name, optionalObjectContext: option };
                 this.options.push(item);
             });
 

@@ -103,6 +103,8 @@
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Contract\ItContractOptionsApplicationService.cs" />
+    <Compile Include="Contract\IItContractOptionsApplicationService.cs" />
     <Compile Include="Contract\Write\IItContractWriteService.cs" />
     <Compile Include="Contract\Write\ItContractWriteService.cs" />
     <Compile Include="Extensions\ChangedValueExtensions.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\Contracts\ContractOptions.cs" />
     <Compile Include="Model\Contracts\Write\ItContractAgreementPeriodModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractHandoverTrialUpdate.cs" />

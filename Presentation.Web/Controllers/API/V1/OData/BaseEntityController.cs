@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             var result = refinement
                 .Select(x => x.Apply(mainQuery))
                 .GetValueOrFallback(mainQuery);
-
+            
             return Ok(result);
         }
 
