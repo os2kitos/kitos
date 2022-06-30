@@ -774,7 +774,7 @@
                     {
                         field: this.criticalityTypeName, title: "Kritikalitet", width: 150,
                         persistId: "criticalitytype",
-                        template: dataItem => dataItem.CriticalityType ? this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityType.Id) : "",
+                        template: dataItem => dataItem.CriticalityType ? this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityType.Id, true) : "",
                         sortable: true,
                         filterable: {
                             cell: {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Contracts;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Queries;
@@ -23,5 +24,6 @@ namespace Core.ApplicationServices.Contract
         Result<bool,OperationError> CanCreateNewContractWithName(string name, int organizationId);
         Maybe<OperationError> ValidateNewName(int contractId, string name);
         IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions);
+        Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId);
     }
 }

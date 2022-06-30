@@ -32,21 +32,18 @@ namespace Presentation.Web.Controllers.API.V1
         private readonly IGenericRepository<ItContractItSystemUsage> _itContractItSystemUsageRepository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
         private readonly IItContractService _itContractService;
-        private readonly IItContractOptionsApplicationService _itContractOptionsApplicationService;
 
         public ItContractController(IGenericRepository<ItContract> repository,
             IGenericRepository<ItSystemUsage> usageRepository,
             IGenericRepository<AgreementElementType> agreementElementRepository,
             IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository,
-            IItContractService itContractService,
-            IItContractOptionsApplicationService itContractOptionsApplicationService)
+            IItContractService itContractService)
             : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
             _itContractItSystemUsageRepository = itContractItSystemUsageRepository;
             _itContractService = itContractService;
-            _itContractOptionsApplicationService = itContractOptionsApplicationService;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
@@ -353,7 +350,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetContractOptions(int organizationId)
         {
-            return _itContractOptionsApplicationService
+            return _itContractService
                 .GetAssignableContractOptions(organizationId)
                 .Select(result => new ContractOptionsDTO
                 {
@@ -413,14 +410,14 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(NewObjectCreated, FromOperationError);
         }
 
-        private static IEnumerable<OptionWithDescriptionDTO> ToDTOs<T>(IEnumerable<OptionDescriptor<T>> options, int organizationId) where T : OptionEntity<ItContract>
+        private static IEnumerable<OptionWithDescriptionAndExpirationDTO> ToDTOs<T>(IEnumerable<(OptionDescriptor<T> option, bool available)> options, int organizationId) where T : OptionEntity<ItContract>
         {
             return options.Select(ToDTO);
         }
 
-        private static OptionWithDescriptionDTO ToDTO<T>(OptionDescriptor<T> option) where T : OptionEntity<ItContract>
+        private static OptionWithDescriptionAndExpirationDTO ToDTO<T>((OptionDescriptor<T> option, bool available) optionObject) where T : OptionEntity<ItContract>
         {
-            return new OptionWithDescriptionDTO(option.Option.Id, option.Option.Name, option.Description);
+            return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available, optionObject.option.Description);
         }
     }
 }

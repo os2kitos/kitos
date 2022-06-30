@@ -8,6 +8,6 @@ namespace Presentation.Web.Models.API.V1.ItContract
 {
     public class ContractOptionsDTO
     {
-        public IEnumerable<OptionWithDescriptionDTO> CriticalityOptions{ get; set; }
+        public IEnumerable<OptionWithDescriptionAndExpirationDTO> CriticalityOptions{ get; set; }
     }
 }

@@ -211,7 +211,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
             kernel.Bind<IItContractService>().To<ItContractService>().InCommandScope(Mode);
             kernel.Bind<IItContractWriteService>().To<ItContractWriteService>().InCommandScope(Mode);
-            kernel.Bind<IItContractOptionsApplicationService>().To<ItContractOptionsApplicationService>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InCommandScope(Mode);
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InCommandScope(Mode).Intercept().With(new LogInterceptor());
@@ -553,7 +552,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationReadModelRepository>().To<DataProcessingRegistrationReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IPendingReadModelUpdateRepository>().To<PendingReadModelUpdateRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOptionRepository>().To<DataProcessingRegistrationOptionRepository>().InCommandScope(Mode);
-            kernel.Bind<IItContractOptionRepository>().To<ItContractOptionRepository>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageOverviewReadModelRepository>().To<ItSystemUsageOverviewReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationRepository>().To<KendoOrganizationalConfigurationRepository>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationRepository>().To<UIModuleCustomizationRepository>().InCommandScope(Mode);
