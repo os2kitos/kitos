@@ -65,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     if (objectId == null)
                     {
                         var itSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(name, orgId, AccessModifier.Local);
-                        var itSystemUsage = await ItSystemHelper.TakeIntoUseAsync(objectId.Value, orgId);
+                        var itSystemUsage = await ItSystemHelper.TakeIntoUseAsync(itSystem.Id, orgId);
                         objectId = itSystemUsage.Id;
                     }
                     return $"api/itSystemUsageRights/{objectId.Value}?organizationId={orgId}";
