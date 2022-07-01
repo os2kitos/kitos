@@ -344,6 +344,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-field-filter-helpers.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
     <TypeScriptCompile Include="app\helpers\OdataQueryHelper.ts" />
@@ -363,7 +364,13 @@
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
+    <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
+    <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
+    <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
+    <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
+    <Compile Include="Models\API\V1\Users\TransferRightsRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Users\BusinessRoleScope.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRoleOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRegularOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseOptionTypeV2Controller.cs" />
@@ -600,6 +607,7 @@
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\components\local-config\ui-customization\local-ui-customization.view.html" />
+    <Content Include="app\components\org\user\user-delete-directives\org-user-roles-table.view.html" />
     <Content Include="app\components\user-notification\user-notification-modal.view.html" />
     <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
@@ -756,6 +764,7 @@
     <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\ui-customization.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
+    <TypeScriptCompile Include="app\models\users\user-role-assignment-dto.ts" />
     <TypeScriptCompile Include="app\models\users\user-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
@@ -826,6 +835,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
     <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
     <TypeScriptCompile Include="app\services\helpTextService.ts" />
@@ -1284,10 +1294,7 @@
     <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\services\itContractsService.ts" />
-    <TypeScriptCompile Include="app\services\itProjectService.ts" />
-    <TypeScriptCompile Include="app\services\itSystemService.ts" />
     <TypeScriptCompile Include="app\services\NavigationService.ts" />
-    <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\userGetService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />

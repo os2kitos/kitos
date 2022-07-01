@@ -2,11 +2,11 @@
 
 namespace Core.DomainModel.Organization.DomainEvents
 {
-    public class AccessRightsChanged : IDomainEvent
+    public class AdministrativeAccessRightsChanged : IDomainEvent
     {
         public int UserId { get; }
 
-        public AccessRightsChanged(int userId)
+        public AdministrativeAccessRightsChanged(int userId)
         {
             UserId = userId;
         }

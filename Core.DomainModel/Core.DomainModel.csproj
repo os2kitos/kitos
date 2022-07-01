@@ -186,7 +186,7 @@
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\DataProtectionAdvisor.cs" />
     <Compile Include="Organization\DataResponsible.cs" />
-    <Compile Include="Organization\DomainEvents\AccessRightsChanged.cs" />
+    <Compile Include="Organization\DomainEvents\AdministrativeAccessRightsChanged.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />

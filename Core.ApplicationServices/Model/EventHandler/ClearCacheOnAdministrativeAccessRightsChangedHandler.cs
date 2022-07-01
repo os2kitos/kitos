@@ -5,16 +5,16 @@ using Infrastructure.Services.Caching;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
-    public class ClearCacheOnAccessRightsChangedHandler : IDomainEventHandler<AccessRightsChanged>
+    public class ClearCacheOnAdministrativeAccessRightsChangedHandler : IDomainEventHandler<AdministrativeAccessRightsChanged>
     {
         private readonly IObjectCache _objectCache;
 
-        public ClearCacheOnAccessRightsChangedHandler(IObjectCache objectCache)
+        public ClearCacheOnAdministrativeAccessRightsChangedHandler(IObjectCache objectCache)
         {
             _objectCache = objectCache;
         }
 
-        public void Handle(AccessRightsChanged domainEvent)
+        public void Handle(AdministrativeAccessRightsChanged domainEvent)
         {
             _objectCache.Clear(OrganizationalUserContextCacheKeyFactory.Create(domainEvent.UserId));
         }

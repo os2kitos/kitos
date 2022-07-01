@@ -121,6 +121,7 @@
     <Compile Include="Generic\Write\AssignmentUpdateService.cs" />
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
+    <Compile Include="Helpers\NamedEntityMappingHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Model\Contracts\ContractOptions.cs" />
@@ -164,6 +165,8 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
+    <Compile Include="Model\Users\UserRightsAssignments.cs" />
+    <Compile Include="Model\Users\UserRightsChangeParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="OptionTypes\IOptionResolver.cs" />
@@ -190,7 +193,7 @@
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
     <Compile Include="KendoOrganizationalConfigurationService.cs" />
-    <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
+    <Compile Include="Model\EventHandler\ClearCacheOnAdministrativeAccessRightsChangedHandler.cs" />
     <Compile Include="Model\EventHandler\ContractDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\ProjectDeletedAdvicesHandler.cs" />

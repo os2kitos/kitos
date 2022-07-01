@@ -266,7 +266,7 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result.IsNone);
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<User>>(deleteEvent => deleteEvent.Entity.Id == user.Id)), Times.Once);
-            _domainEventsMock.Verify(x => x.Raise(It.Is<AccessRightsChanged>(changedEvent => changedEvent.UserId == user.Id)), Times.Once);
+            _domainEventsMock.Verify(x => x.Raise(It.Is<AdministrativeAccessRightsChanged>(changedEvent => changedEvent.UserId == user.Id)), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 

@@ -31,7 +31,7 @@ namespace Core.ApplicationServices
             });
             
             _organizationRights.Save();
-            _domainEvents.Raise(new AccessRightsChanged(user.Id));
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
 
             return result;
         }

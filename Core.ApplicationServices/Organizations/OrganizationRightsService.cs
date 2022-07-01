@@ -44,7 +44,7 @@ namespace Core.ApplicationServices.Organizations
 
             right = _organizationRightRepository.Insert(right);
             _organizationRightRepository.Save();
-            _domainEvents.Raise(new AccessRightsChanged(userId));
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(userId));
             return right;
         }
 
@@ -86,7 +86,7 @@ namespace Core.ApplicationServices.Organizations
 
             _organizationRightRepository.DeleteByKey(right.Id);
             _organizationRightRepository.Save();
-            _domainEvents.Raise(new AccessRightsChanged(right.UserId));
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(right.UserId));
 
             return right;
         }
