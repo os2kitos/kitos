@@ -417,7 +417,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         private static OptionWithDescriptionAndExpirationDTO ToDTO<T>((OptionDescriptor<T> option, bool available) optionObject) where T : OptionEntity<ItContract>
         {
-            return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available, optionObject.option.Description);
+            return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available == false, optionObject.option.Description);
         }
     }
 }

@@ -1,18 +1,14 @@
-﻿module Kitos.Models.ViewModel.ItContract {
-    import Select2OptionViewModel = ViewModel.Generic.Select2OptionViewModel;
-
+﻿module Kitos.Models.ViewModel.Generic {
     export interface IOptionValues {
-        text: string,
-        unavailableText: string,
-        available: boolean,
+        text: string
     }
 
-    export class CriticalityOptions {
+    export class OptionTypeViewModel {
 
         private getValueToTextMap() {
             var result = {};
             this.options.forEach(value => {
-                result[value.id] = { text: value.text, unavailableText: `${value.text} (udgået)`, available: value.optionalObjectContext.expired }
+                result[value.id] = { text: value.text + (value.optionalObjectContext.expired ? " (udgået)" : "")}
             });
             return result;
         }
@@ -20,21 +16,16 @@
         //Cache texts for quick lookup texts
         private readonly valueToTextMap: { [key: number]: IOptionValues };
 
-        getOptionText(id: number, takeUnavailableText: boolean): string {
+        getOptionText(id: number): string {
             const value = this.valueToTextMap[id];
             if (!value) {
                 return "";
             }
-            if (takeUnavailableText) {
-                return value.available
-                    ? value.text
-                    : value.unavailableText;
-            }
-
+            
             return value.text;
         }
 
-        options: Select2OptionViewModel<any>[];
+        options: Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[];
         constructor(dataSource: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[]) {
             this.options = [];
             dataSource.forEach(option => {

@@ -32,7 +32,7 @@
         private readonly storageKey = "it-contract-overview-options";
         private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
         private readonly criticalityTypeName = "CriticalityType";
-        private criticalityOptionViewModel;
+        private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
@@ -88,7 +88,7 @@
             private itContractOptions: Models.ItContract.IItContractOptions) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
 
-            this.criticalityOptionViewModel = new Models.ViewModel.ItContract.CriticalityOptions(this.itContractOptions.criticalityOptions);
+            this.criticalityOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(this.itContractOptions.criticalityOptions);
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -774,12 +774,12 @@
                     {
                         field: this.criticalityTypeName, title: "Kritikalitet", width: 150,
                         persistId: "criticalitytype",
-                        template: dataItem => dataItem.CriticalityType ? this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityType.Id, true) : "",
+                        template: dataItem => dataItem.CriticalityType ? this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityType.Id) : "",
                         sortable: true,
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args.element, this.criticalityOptionViewModel.options, true)
+                                template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args.element, this.criticalityOptionViewModel.options.filter(option=>!option.optionalObjectContext.expired), true)
                             }
                         }
                     }
