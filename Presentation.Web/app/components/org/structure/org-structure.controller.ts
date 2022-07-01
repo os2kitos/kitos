@@ -367,7 +367,7 @@
                             $modalScope.isNew = false;
 
                             // holds a list of org units, which the user can select as the parent
-                            var orgUnits: IBaseUnit[] = [];
+                            const orgUnits: IBaseUnit[] = [];
 
                             // filter out those orgunits, that are outside the organisation
                             // or is currently a subdepartment of the unit
