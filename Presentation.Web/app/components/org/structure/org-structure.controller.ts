@@ -358,7 +358,15 @@
                                 // this avoid every subdepartment
                                 if (node.id === unit.id) return;
 
-                                orgUnits.push(node);
+                                orgUnits.push(
+                                    {
+                                        id: node.id,
+                                        name: node.name,
+                                        ean: node.ean,
+                                        localId: node.localId,
+                                        parentId: node.parentId,
+                                        organizationId: node.organizationId
+                                    });
 
                                 _.each(node.children, filter);
                             }
@@ -366,7 +374,7 @@
                             _.each($scope.nodes, filter);
 
                             // format the selected unit for editing
-                            const orgUnit = {
+                            $modalScope.orgUnit = {
                                 'id': unit.id,
                                 'oldName': unit.name,
                                 'newName': unit.name,
@@ -377,38 +385,37 @@
                                 'isRoot': unit.parentId == undefined
                             };
 
-                            orgUnits.push(unit);
+                            if ($modalScope.orgUnit.isRoot) {
+                                orgUnits.push(
+                                    {
+                                        id: unit.id,
+                                        name: unit.name,
+                                        ean: unit.ean,
+                                        localId: unit.localId,
+                                        parentId: unit.parentId,
+                                        organizationId: unit.organizationId
+                                    });
+                            }
 
-                            var selectedUnit = orgUnits.filter(x => x.id === orgUnit.newParent)[0];
-                            if (!!selectedUnit || orgUnit.isRoot) {
-                                selectedUnit = orgUnit;
+                            var selectedUnit = orgUnits.filter(x => x.id === $modalScope.orgUnit.newParent)[0];
+                            if (!!selectedUnit || $modalScope.orgUnit.isRoot) {
+                                selectedUnit = $modalScope.orgUnit;
                             }
 
                             bindParentSelect();
-                            /*$modalScope.parentSelect = {
-                                selectedElement: selectedUnit ?? "",
-                                select2Config: select2LoadingService.select2LocalDataNoSearch(() => mappedUnits, false),
-                                elementSelected: (newElement) => {
-                                    if (!!newElement) {
-                                        $modalScope.orgUnit.newParent = newElement.id;
-                                    }
-                                }
-                            };*/
-                            //bindParentSelect($modalScope, selectedUnit, units, unit);
-                            //bindParentSelect($scope, selectedUnit, $modalScope.orgUnits, $modalScope.orgUnit);
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
-                            $modalScope.canChangeParent = $modalScope.isAdmin && !orgUnit.isRoot;
+                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
                             $modalScope.patch = function() {
                                 // don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
-                                var name = orgUnit.newName;
-                                var parent = orgUnit.newParent;
-                                var ean = orgUnit.newEan;
-                                var localId = orgUnit.localId;
+                                var name = $modalScope.orgUnit.newName;
+                                var parent = $modalScope.orgUnit.newParent;
+                                var ean = $modalScope.orgUnit.newEan;
+                                var localId = $modalScope.orgUnit.localId;
 
                                 if (!name) return;
 
@@ -491,8 +498,8 @@
                                 $modalScope.createNew = true;
                                 $modalScope.newOrgUnit = {
                                     name: "",
-                                    parent: orgUnit.id,
-                                    orgId: orgUnit.orgId
+                                    parent: $modalScope.orgUnit.id,
+                                    orgId: $modalScope.orgUnit.orgId
                                 };
                             };
 
@@ -525,13 +532,16 @@
 
                             function bindParentSelect() {
 
-                                var existingChoice;
-                                if (!selectedUnit.isRoot) {
-                                    orgUnits.push({ id: null, name: "" });
+                                let existingChoice: { id; text };
+                                if (selectedUnit.isRoot) {
                                     existingChoice = { id: selectedUnit.id, text: selectedUnit.newName };
                                 } else {
-                                    const parentNode = $scope.nodes.filter(x => x.id === selectedUnit.newParent)[0];
-                                    existingChoice = { id: parentNode.id, test: parentNode.name };
+                                    const parentNodes = orgUnits.filter(x => x.id === selectedUnit.newParent);
+                                    if (parentNodes.length < 1) {
+                                        return;
+                                    }
+                                    const parentNode = parentNodes[0];
+                                    existingChoice = { id: parentNode.id, text: parentNode.name };
                                 }
 
                                 const options = orgUnits.map(value => {
@@ -547,7 +557,7 @@
                                     select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
                                     elementSelected: (newElement) => {
                                         if (!!newElement) {
-                                            orgUnit.newParent = newElement.id;
+                                            $modalScope.orgUnit.newParent = newElement.id;
                                         }
                                 }
                             };
