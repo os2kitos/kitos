@@ -338,6 +338,25 @@
             };
 
             $scope.editUnit = function (unit) {
+                interface IBaseUnit {
+                    id: number,
+                    name: string,
+                    ean: string,
+                    localId: number,
+                    parentId: number,
+                    organizationId: number,
+                }
+                interface IConvertedUnit {
+                    id: number,
+                    oldName: string,
+                    newName: string,
+                    newEan: string,
+                    newParent: number,
+                    localId: number,
+                    orgId: number,
+                    isRoot: boolean,
+                }
+
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     controller: [
@@ -348,7 +367,7 @@
                             $modalScope.isNew = false;
 
                             // holds a list of org units, which the user can select as the parent
-                            var orgUnits = [];
+                            var orgUnits: IBaseUnit[] = [];
 
                             // filter out those orgunits, that are outside the organisation
                             // or is currently a subdepartment of the unit
@@ -375,15 +394,15 @@
 
                             // format the selected unit for editing
                             $modalScope.orgUnit = {
-                                'id': unit.id,
-                                'oldName': unit.name,
-                                'newName': unit.name,
-                                'newEan': unit.ean,
-                                'localId': unit.localId,
-                                'newParent': unit.parentId,
-                                'orgId': unit.organizationId,
-                                'isRoot': unit.parentId == undefined
-                            };
+                                id: unit.id,
+                                oldName: unit.name,
+                                newName: unit.name,
+                                newEan: unit.ean,
+                                localId: unit.localId,
+                                newParent: unit.parentId,
+                                orgId: unit.organizationId,
+                                isRoot: unit.parentId == undefined
+                            } as IConvertedUnit;
 
                             if ($modalScope.orgUnit.isRoot) {
                                 orgUnits.push(
@@ -397,12 +416,7 @@
                                     });
                             }
 
-                            var selectedUnit = orgUnits.filter(x => x.id === $modalScope.orgUnit.newParent)[0];
-                            if (!!selectedUnit || $modalScope.orgUnit.isRoot) {
-                                selectedUnit = $modalScope.orgUnit;
-                            }
-
-                            bindParentSelect();
+                            bindParentSelect($modalScope.orgUnit, orgUnits);
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
@@ -529,14 +543,14 @@
                             $modalScope.cancel = function() {
                                 $modalInstance.dismiss("cancel");
                             };
+                            
+                            function bindParentSelect(currentUnit: IConvertedUnit, otherOrgUnits: IBaseUnit[]) {
 
-                            function bindParentSelect() {
-
-                                let existingChoice: { id; text };
-                                if (selectedUnit.isRoot) {
-                                    existingChoice = { id: selectedUnit.id, text: selectedUnit.newName };
+                                let existingChoice: { id: number; text: string };
+                                if (currentUnit.isRoot) {
+                                    existingChoice = { id: currentUnit.id, text: currentUnit.newName };
                                 } else {
-                                    const parentNodes = orgUnits.filter(x => x.id === selectedUnit.newParent);
+                                    const parentNodes = otherOrgUnits.filter(x => x.id === currentUnit.newParent);
                                     if (parentNodes.length < 1) {
                                         return;
                                     }
@@ -544,7 +558,7 @@
                                     existingChoice = { id: parentNode.id, text: parentNode.name };
                                 }
 
-                                const options = orgUnits.map(value => {
+                                const options = otherOrgUnits.map(value => {
                                     return {
                                         id: value.id,
                                         text: value.name,
