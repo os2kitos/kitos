@@ -116,6 +116,7 @@
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
+    <Compile Include="Options\V1\OptionApiTests.cs" />
     <Compile Include="Organizations\OrganizationSequentialTests.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
@@ -208,6 +209,7 @@
     <Compile Include="Tools\UserHelper.cs" />
     <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
     <Compile Include="UI_Configuration\UIConfigurationTests.cs" />
+    <Compile Include="Users\UserRolesManagementApiTest.cs" />
     <Compile Include="Users\UserTest.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
+using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
@@ -35,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private readonly Mock<IOptionsService<ItContract, CriticalityType>> _optionsServiceMock;
 
         public ItContractServiceTest()
         {
@@ -47,6 +49,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
+            _optionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
@@ -56,7 +59,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _authorizationContext.Object,
                 _logger.Object,
                 _contractDataProcessingRegistrationAssignmentService.Object,
-                _userContextMock.Object);
+                _userContextMock.Object,
+                _optionsServiceMock.Object);
         }
 
         [Fact]

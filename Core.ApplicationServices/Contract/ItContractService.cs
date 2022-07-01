@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Contracts;
 using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
@@ -12,6 +13,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
@@ -31,6 +33,7 @@ namespace Core.ApplicationServices.Contract
         private readonly ILogger _logger;
         private readonly IContractDataProcessingRegistrationAssignmentService _contractDataProcessingRegistrationAssignmentService;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IOptionsService<ItContract, CriticalityType> _criticalityOptionsService;
 
         public ItContractService(
             IItContractRepository repository,
@@ -41,7 +44,8 @@ namespace Core.ApplicationServices.Contract
             IAuthorizationContext authorizationContext,
             ILogger logger,
             IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService, 
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            IOptionsService<ItContract, CriticalityType> criticalityOptionsService)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
@@ -52,6 +56,7 @@ namespace Core.ApplicationServices.Contract
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
             _userContext = userContext;
+            _criticalityOptionsService = criticalityOptionsService;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -217,6 +222,22 @@ namespace Core.ApplicationServices.Contract
                             overlapsFound ? new OperationError(OperationFailure.Conflict) : Maybe<OperationError>.None,
                         error => error
                     );
+        }
+
+        public Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId)
+        {
+            return WithOrganizationReadAccess(organizationId,
+                () => new ContractOptions(
+                    _criticalityOptionsService.GetAllOptionsDetails(organizationId)));
+        }
+
+        private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
+        {
+            var readAccessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
+
+            return readAccessLevel < OrganizationDataReadAccessLevel.All
+                ? new OperationError(OperationFailure.Forbidden)
+                : authorizedAction();
         }
 
         private IQueryable<ItContract> SearchByName(int organizationId, string name)

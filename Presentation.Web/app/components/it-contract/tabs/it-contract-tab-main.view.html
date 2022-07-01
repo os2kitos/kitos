@@ -55,6 +55,15 @@
                                             data-field="contractTemplateId">
                             </select2-option>
                         </div>
+                        
+                        <!--Criticality type-->
+                        <div class="form-group">
+                            <label for="criticality" class="control-label small">Kritikalitet</label>
+                            <single-select-select2 id="criticality"
+                                                   data-placeholder="Vælg kritikalitet"
+                                                   ng-model="criticality"
+                                                   ng-disabled="!hasWriteAccess" />
+                        </div>
                     </div>
 
                     <!-- 2nd column -->

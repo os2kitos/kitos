@@ -304,7 +304,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
                 EnforceValid = rule.MustUpdate(x => x.General.Validity.EnforcedValid)
                     ? (dto.Validity?.EnforcedValid ?? Maybe<bool>.None).AsChangedValue()
-                    : OptionalValueChange<Maybe<bool>>.None
+                    : OptionalValueChange<Maybe<bool>>.None,
+
+                CriticalityTypeUuid = rule.MustUpdate(x => x.General.CriticalityTypeUuid)
+                    ? dto.CriticalityTypeUuid.AsChangedValue()
+                    : OptionalValueChange<Guid?>.None,
             };
         }
 

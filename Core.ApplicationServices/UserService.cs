@@ -326,7 +326,7 @@ namespace Core.ApplicationServices
             _userRepository.Save();
             transaction.Commit();
             
-            _domainEvents.Raise(new AccessRightsChanged(user.Id));
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
 
             return Maybe<OperationError>.None;
         }

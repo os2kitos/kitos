@@ -72,7 +72,7 @@ namespace Presentation.Web.Controllers.API.V1
 
                 user.IsGlobalAdmin = true;
                 _userRepository.Save();
-                _domainEvents.Raise(new AccessRightsChanged(dto.UserId));
+                _domainEvents.Raise(new AdministrativeAccessRightsChanged(dto.UserId));
 
                 var outDto = Mapper.Map<UserDTO>(user);
 
@@ -100,7 +100,7 @@ namespace Presentation.Web.Controllers.API.V1
 
                     user.IsGlobalAdmin = false;
                     _userRepository.Save();
-                    _domainEvents.Raise(new AccessRightsChanged(userId));
+                    _domainEvents.Raise(new AdministrativeAccessRightsChanged(userId));
 
                     var outDto = Mapper.Map<UserDTO>(user);
 

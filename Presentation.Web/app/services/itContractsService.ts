@@ -4,6 +4,7 @@
         assignDataProcessingRegistration(contractId: number, dataProcessingRegistrationId: number): angular.IPromise<IContractPatchResult>;
         removeDataProcessingRegistration(contractId: number, dataProcessingRegistrationId: number): angular.IPromise<IContractPatchResult>;
         getAvailableDataProcessingRegistrations(contractId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityDTO[]>;
+        getApplicableItContractOptions(organizationId: number): angular.IPromise<Models.ItContract.IItContractOptions>;
     }
 
     export interface IContractPatchResult {
@@ -77,30 +78,23 @@
                 );
         }
 
-
-        public static $inject: string[] = ["$http"];
-
-        constructor(private $http: IHttpServiceWithCustomConfig) {
+        getApplicableItContractOptions(organizationId: number): angular.IPromise<Models.ItContract.IItContractOptions> {
+            return this
+                    .$http
+                    .get<API.Models.IApiWrapper<any>>(`api/itcontract/available-options-in/${organizationId}`)
+                    .then(
+                        result => {
+                            var response = result.data as { response: Models.ItContract.IItContractOptions}
+                            return response.response;
+                        },
+                error => this.handleServerError(error)
+            );
         }
 
-        GetItContractById = (id: number) => {
-            return this.$http.get(`odata/ItContracts(${id})`);
-        }
+        static $inject: string[] = ["$http"];
 
-        GetItContractRoleById = (roleId: number) => {
-            return this.$http.get(`odata/ItContractRoles(${roleId})`);
-        }
+        constructor(private readonly $http: IHttpServiceWithCustomConfig) {
 
-        GetAllItContractRoles = () => {
-            return this.$http.get(`odata/ItContractRoles`);
-        }
-
-        GetItContractRightsById = (id: number) => {
-            return this.$http.get(`odata/ItContractRights?$filter=UserId eq (${id})`);
-        }
-
-        GetContractDataById = (id: number, orgId: number) => {
-            return this.$http.get(`odata/ItContractRights?$expand=role,object&$filter=UserId eq (${id}) AND Object/OrganizationId eq (${orgId})`);
         }
 
         private getUriWithIdAndSuffix(id: number, suffix: string) {

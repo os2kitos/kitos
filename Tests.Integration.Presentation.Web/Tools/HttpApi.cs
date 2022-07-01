@@ -178,9 +178,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return SendWithCookieAsync(cookie, requestMessage);
         }
 
-        public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie)
+        public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie, object body = null)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Delete, url);
+            if (body != null)
+            {
+                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+            }
 
             return SendWithCookieAsync(cookie, requestMessage);
         }
