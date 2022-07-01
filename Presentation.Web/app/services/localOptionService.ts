@@ -89,6 +89,7 @@
         DataProcessingOversightOptions,
         DataProcessingDataResponsibleOptions,
         DataProcessingCountryOptions,
+        CriticalityTypes,
     }
 
     export interface ILocalOptionUrlResolver {
@@ -185,6 +186,8 @@
                     return "LocalDataProcessingDataResponsibleOptions";
                 case LocalOptionType.DataProcessingCountryOptions:
                     return "LocalDataProcessingCountryOptions";
+                case LocalOptionType.CriticalityTypes:
+                    return "LocalCriticalityTypes";
                 default:
                     throw new Error(`Unknown option type ${type}`);
             }

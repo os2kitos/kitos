@@ -20,7 +20,13 @@
                     hasWriteAccess: ["userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit],
                     uiState: [
                         "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
-                    ]
+                    ],
+                    criticalityOptions: [
+                        "localOptionServiceFactory",
+                        (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.CriticalityTypes)
+                        .getAll()
+                    ],
                 }
             });
         }

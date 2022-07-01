@@ -254,6 +254,8 @@ namespace Presentation.Web
 
             BindEntitySet<PurchaseFormType, PurchaseFormTypesController>(builder);
 
+            BindEntitySet<CriticalityType, CriticalityTypesController>(builder);
+
             //Local options
 
             var localAgreementElementType = BindEntitySet<LocalAgreementElementType, LocalAgreementElementTypesController>(builder);
@@ -325,6 +327,9 @@ namespace Presentation.Web
 
             var localPurchaseFormType = BindEntitySet<LocalPurchaseFormType, LocalPurchaseFormTypesController>(builder);
             localPurchaseFormType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
+
+            var localCriticalityType = BindEntitySet<LocalCriticalityType, LocalCriticalityTypesController>(builder);
+            localCriticalityType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var removeOption = builder.Function("RemoveOption");
             removeOption.Parameter<int>("id");

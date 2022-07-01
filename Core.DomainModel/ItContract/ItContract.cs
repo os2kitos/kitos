@@ -336,6 +336,23 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual ICollection<ItContract> Children { get; set; }
 
+
+        /// <summary>
+        ///     Id of criticality type ItContract
+        /// </summary>
+        /// <value>
+        ///     The criticality type identifier.
+        /// </value>
+        public int? CriticalityTypeId { get; set; }
+
+        /// <summary>
+        ///     The criticality of ItContract
+        /// </summary>
+        /// <value>
+        ///     The criticality.
+        /// </value>
+        public virtual CriticalityType CriticalityType { get; set; }
+
         #endregion
 
         #region Deadlines (aftalefrister)
@@ -582,6 +599,12 @@ namespace Core.DomainModel.ItContract
         {
             ContractTemplate?.Track();
             ContractTemplate = null;
+        }
+
+        public void ResetCriticalityType()
+        {
+            CriticalityType?.Track();
+            CriticalityType = null;
         }
 
         public Maybe<OperationError> UpdateContractValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)

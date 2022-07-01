@@ -470,6 +470,8 @@ namespace Presentation.Web.Ninject
 
             RegisterOptionsService<ItContract, TerminationDeadlineType, LocalTerminationDeadlineType>(kernel);
 
+            RegisterOptionsService<ItContract, CriticalityType, LocalCriticalityType>(kernel);
+
             RegisterOptionsService<HandoverTrial, HandoverTrialType, LocalHandoverTrialType>(kernel);
 
             //IT-Project
