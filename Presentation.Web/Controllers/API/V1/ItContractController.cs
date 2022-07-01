@@ -8,14 +8,18 @@ using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Contract;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Options;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItContract;
+using Presentation.Web.Models.API.V1.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
@@ -337,6 +341,23 @@ namespace Presentation.Web.Controllers.API.V1
                 return LogError(e);
             }
         }
+        
+        [HttpGet]
+        [Route("available-options-in/{organizationId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetContractOptions(int organizationId)
+        {
+            return _itContractService
+                .GetAssignableContractOptions(organizationId)
+                .Select(result => new ContractOptionsDTO
+                {
+                    CriticalityOptions = ToDTOs(result.CriticalityOptions, organizationId).ToList()
+                })
+                .Match(Ok, FromOperationError);
+        }
 
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
@@ -387,6 +408,16 @@ namespace Presentation.Web.Controllers.API.V1
             return _itContractService
                 .Create(organizationId, dto.Name)
                 .Match(NewObjectCreated, FromOperationError);
+        }
+
+        private static IEnumerable<OptionWithDescriptionAndExpirationDTO> ToDTOs<T>(IEnumerable<(OptionDescriptor<T> option, bool available)> options, int organizationId) where T : OptionEntity<ItContract>
+        {
+            return options.Select(ToDTO);
+        }
+
+        private static OptionWithDescriptionAndExpirationDTO ToDTO<T>((OptionDescriptor<T> option, bool available) optionObject) where T : OptionEntity<ItContract>
+        {
+            return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available == false, optionObject.option.Description);
         }
     }
 }

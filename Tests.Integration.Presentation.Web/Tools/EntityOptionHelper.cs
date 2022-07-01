@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
@@ -33,6 +34,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string NoticePeriodMonthTypes = "TerminationDeadlineTypes";
             public const string HandoverTrialTypes = "HandoverTrialTypes";
             public const string ContractRoles = "ItContractRoles";
+            public const string CriticalityTypes = "CriticalityTypes";
 
             public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";
             public const string DataProcessingBasisForTransferOptions = "DataProcessingBasisForTransferOptions";
@@ -104,6 +106,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.PatchWithCookieAsync(url, cookie, body);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
+        }
+
+        public static async Task<List<OptionDTO>> GetOptionsAsync(string resource, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/{resource}?organizationId={organizationId}");
+
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<OptionDTO>();
         }
     }
 }

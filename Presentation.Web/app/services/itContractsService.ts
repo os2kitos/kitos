@@ -4,6 +4,7 @@
         assignDataProcessingRegistration(contractId: number, dataProcessingRegistrationId: number): angular.IPromise<IContractPatchResult>;
         removeDataProcessingRegistration(contractId: number, dataProcessingRegistrationId: number): angular.IPromise<IContractPatchResult>;
         getAvailableDataProcessingRegistrations(contractId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityDTO[]>;
+        getApplicableItContractOptions(organizationId: number): angular.IPromise<Models.ItContract.IItContractOptions>;
     }
 
     export interface IContractPatchResult {
@@ -77,10 +78,22 @@
                 );
         }
 
+        getApplicableItContractOptions(organizationId: number): angular.IPromise<Models.ItContract.IItContractOptions> {
+            return this
+                    .$http
+                    .get<API.Models.IApiWrapper<any>>(`api/itcontract/available-options-in/${organizationId}`)
+                    .then(
+                        result => {
+                            var response = result.data as { response: Models.ItContract.IItContractOptions}
+                            return response.response;
+                        },
+                error => this.handleServerError(error)
+            );
+        }
 
         public static $inject: string[] = ["$http"];
 
-        constructor(private $http: IHttpServiceWithCustomConfig) {
+        constructor(private readonly $http: IHttpServiceWithCustomConfig) {
         }
 
         GetItContractById = (id: number) => {

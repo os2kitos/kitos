@@ -30,5 +30,10 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Validity of the it-contract
         /// </summary>
         public ValidityResponseDTO Validity { get; set; }
+        /// <summary>
+        /// Optionally assigned criticality type
+        /// </summary>
+        [NonEmptyGuid]
+        public IdentityNamePairResponseDTO CriticalityType { get; set; }
     }
 }

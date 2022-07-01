@@ -58,6 +58,8 @@ namespace Infrastructure.DataAccess
         public DbSet<Handover> Handovers { get; set; }
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
+        public DbSet<CriticalityType> CriticalityTypes { get; set; }
+        public DbSet<LocalCriticalityType> LocalCriticalityTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
@@ -206,6 +208,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
+            modelBuilder.Configurations.Add(new CriticalityTypeMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());

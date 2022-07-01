@@ -35,6 +35,18 @@ namespace Core.DomainServices.Options
                 .ToList();
         }
 
+        public IEnumerable<(OptionDescriptor<TOption> option, bool available)> GetAllOptionsDetails(int organizationId)
+        {
+            var availableDescriptors = GetAvailableOptionsFromOrganization(organizationId).descriptors.ToDictionary(x => x.Option.Id);
+            return _optionRepository
+                .AsQueryable()
+                .ToList()
+                .Select(option => availableDescriptors.TryGetValue(option.Id, out var availableOption)
+                    ? (availableOption, true)
+                    : (new OptionDescriptor<TOption>(option, option.Description), false))
+                .ToList();
+        }
+
         public IEnumerable<TOption> GetAvailableOptions(int organizationId)
         {
             return GetAvailableOptionsFromOrganization(organizationId)

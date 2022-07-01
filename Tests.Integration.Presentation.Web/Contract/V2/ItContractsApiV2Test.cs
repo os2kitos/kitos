@@ -686,17 +686,17 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(true, true, false)]
-        [InlineData(true, false, true)]
-        [InlineData(false, true, true)]
-        [InlineData(true, true, true)]
-        [InlineData(false, false, false)]
-        public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements)
+        [InlineData(true, true, true, true)]
+        [InlineData(true, true, true, false)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, false, true, true)]
+        [InlineData(false, true, true, true)]
+        [InlineData(false, false, false, false)]
+        public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements);
+            var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements, withCriticalityType);
             var request = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
@@ -709,7 +709,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(request.General, contractType, contractTemplateType, agreementElements, freshDTO);
+            AssertGeneralDataSection(request.General, contractType, contractTemplateType, agreementElements, criticalityType, freshDTO);
         }
 
         [Fact]
@@ -725,24 +725,23 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var dto = await ItContractV2Helper.PostContractAsync(token, request);
 
             //Act
-            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             using var response1 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, freshDTO);
+            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, criticalityType, freshDTO);
 
             //Act - new values
-            (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, false, true, false);
+            (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, false, true, false, false);
             using var response2 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
-
-
+            
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, freshDTO);
+            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, criticalityType, freshDTO);
 
             //Act - reset
             var resetRequest = new ContractGeneralDataWriteRequestDTO();
@@ -751,7 +750,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(resetRequest, null, null, null, freshDTO);
+            AssertGeneralDataSection(resetRequest, null, null, null, null, freshDTO);
         }
 
         [Theory]
@@ -1667,7 +1666,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (token, _, organization) = await CreatePrerequisitesAsync();
             var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
             var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
-            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequest) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequest) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest = await CreateContractSupplierDataRequestDTO(true, true, true);
             var handoverTrials = await CreateHandoverTrials(organization, true, true, true);
@@ -1710,7 +1709,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             AssertCrossReference(parent, contractDTO.ParentContract);
             AssertProcurement(procurementRequest, procurementStrategy, purchaseType, contractDTO.Procurement);
-            AssertGeneralDataSection(generalDataWriteRequest, contractType, contractTemplateType, agreementElements, contractDTO);
+            AssertGeneralDataSection(generalDataWriteRequest, contractType, contractTemplateType, agreementElements, criticalityType, contractDTO);
             AssertResponsible(contractResponsibleDataWriteRequest, contractDTO);
             AssertSupplier(supplierRequest, contractDTO);
             AssertHandoverTrials(handoverTrials, contractDTO);
@@ -1735,7 +1734,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             var parent1 = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
             var (procurementRequest1, procurementStrategy1, purchaseType1) = await CreateProcurementRequestAsync(organization.Uuid);
-            var (contractType1, contractTemplateType1, agreementElements1, generalDataWriteRequest1) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType1, contractTemplateType1, agreementElements1, criticalityType1, generalDataWriteRequest1) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest1 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest1 = await CreateContractSupplierDataRequestDTO(true, true, true);
             var handoverTrials1 = await CreateHandoverTrials(organization, true, true, true);
@@ -1776,7 +1775,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(requestDto1.Name, contractDTO1.Name);
             AssertCrossReference(parent1, contractDTO1.ParentContract);
             AssertProcurement(procurementRequest1, procurementStrategy1, purchaseType1, contractDTO1.Procurement);
-            AssertGeneralDataSection(generalDataWriteRequest1, contractType1, contractTemplateType1, agreementElements1, contractDTO1);
+            AssertGeneralDataSection(generalDataWriteRequest1, contractType1, contractTemplateType1, agreementElements1, criticalityType1, contractDTO1);
             AssertResponsible(contractResponsibleDataWriteRequest1, contractDTO1);
             AssertSupplier(supplierRequest1, contractDTO1);
             AssertHandoverTrials(handoverTrials1, contractDTO1);
@@ -1792,7 +1791,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange - Put on filled
             var parent2 = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
             var (procurementRequest2, procurementStrategy2, purchaseType2) = await CreateProcurementRequestAsync(organization.Uuid);
-            var (contractType2, contractTemplateType2, agreementElements2, generalDataWriteRequest2) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType2, contractTemplateType2, agreementElements2, criticalityType2, generalDataWriteRequest2) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest2 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest2 = await CreateContractSupplierDataRequestDTO(true, true, true);
             var handoverTrials2 = await CreateHandoverTrials(organization, true, true, true);
@@ -1833,7 +1832,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(requestDto2.Name, contractDTO2.Name);
             AssertCrossReference(parent2, contractDTO2.ParentContract);
             AssertProcurement(procurementRequest2, procurementStrategy2, purchaseType2, contractDTO2.Procurement);
-            AssertGeneralDataSection(generalDataWriteRequest2, contractType2, contractTemplateType2, agreementElements2, contractDTO2);
+            AssertGeneralDataSection(generalDataWriteRequest2, contractType2, contractTemplateType2, agreementElements2, criticalityType2, contractDTO2);
             AssertResponsible(contractResponsibleDataWriteRequest2, contractDTO2);
             AssertSupplier(supplierRequest2, contractDTO2);
             AssertHandoverTrials(handoverTrials2, contractDTO2);
@@ -1862,7 +1861,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(requestDto3.Name, contractDTO3.Name);
             AssertCrossReference((ItContractResponseDTO)null, contractDTO3.ParentContract);
             AssertProcurement(requestDto3.Procurement, null, null, contractDTO3.Procurement);
-            AssertGeneralDataSection(requestDto3.General, null, null, null, contractDTO3);
+            AssertGeneralDataSection(requestDto3.General, null, null, null, null, contractDTO3);
 
             var responsibleResponse = contractDTO3.Responsible;
             Assert.Null(responsibleResponse.OrganizationUnit);
@@ -2110,7 +2109,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements)
+        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, IdentityNamePairResponseDTO criticalityType,ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             var contractType = withContractType
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
@@ -2124,12 +2123,17 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractAgreementElementTypes,
                     organization.Uuid, 10, 0)).RandomItems(2).ToList()
                 : null;
+            var criticalityType = withCriticalityType
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.CriticalityTypes,
+                    organization.Uuid, 10, 0)).RandomItem()
+                : null;
             var generalDataWriteRequestDto = new ContractGeneralDataWriteRequestDTO()
             {
                 Notes = A<string>(),
                 ContractId = A<string>(),
                 ContractTypeUuid = contractType?.Uuid,
                 ContractTemplateUuid = contractTemplateType?.Uuid,
+                CriticalityTypeUuid = criticalityType?.Uuid,
                 AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
                 Validity = new ValidityWriteRequestDTO()
                 {
@@ -2139,7 +2143,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 }
             };
 
-            return (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto);
+            return (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto);
         }
 
         private static void AssertGeneralDataSection(
@@ -2147,6 +2151,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             IdentityNamePairResponseDTO expectedContractType,
             IdentityNamePairResponseDTO expectedContractTemplateType,
             List<IdentityNamePairResponseDTO> expectedAgreementElements,
+            IdentityNamePairResponseDTO criticalityType,
             ItContractResponseDTO freshDTO)
         {
             Assert.Equal(request?.Notes, freshDTO.General.Notes);
@@ -2156,6 +2161,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(request?.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
             Assert.Equal(request?.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
             Assert.Equal(request?.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
+            AssertCrossReference(criticalityType, freshDTO.General.CriticalityType);
 
             if (expectedAgreementElements == null)
                 Assert.Empty(freshDTO.General.AgreementElements);
