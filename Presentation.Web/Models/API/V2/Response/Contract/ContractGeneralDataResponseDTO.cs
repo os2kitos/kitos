@@ -33,7 +33,6 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Optionally assigned criticality type
         /// </summary>
-        [NonEmptyGuid]
         public IdentityNamePairResponseDTO CriticalityType { get; set; }
     }
 }
