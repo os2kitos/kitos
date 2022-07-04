@@ -568,7 +568,7 @@
 
                                 $modalScope.parentSelect = {
                                     selectedElement: existingChoice,
-                                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
+                                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, false),
                                     elementSelected: (newElement) => {
                                         if (!!newElement) {
                                             $modalScope.orgUnit.newParent = newElement.id;
