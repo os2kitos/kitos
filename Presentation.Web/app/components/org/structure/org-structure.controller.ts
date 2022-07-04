@@ -348,7 +348,7 @@
                             $modalScope.isNew = false;
 
                             // holds a list of org units, which the user can select as the parent
-                            const orgUnits: Kitos.Models.IOrganizationUnitDto[] = [];
+                            const orgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[] = [];
 
                             // filter out those orgunits, that are outside the organisation
                             // or is currently a subdepartment of the unit
@@ -525,7 +525,7 @@
                                 $modalInstance.dismiss("cancel");
                             };
                             
-                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.IOrganizationUnitDto[]) {
+                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {
 
                                 let existingChoice: { id: number; text: string };
                                 if (currentUnit.isRoot) {

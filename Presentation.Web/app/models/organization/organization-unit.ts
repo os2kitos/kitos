@@ -26,13 +26,4 @@
         /** The Organization Unit is listed in these economy streams */
         EconomyStreams: Array<ItContract.IEconomyStream>;
     }
-
-    export interface IOrganizationUnitDto {
-        id: number,
-        name: string,
-        ean: string,
-        localId: number,
-        parentId: number,
-        organizationId: number,
-    }
 }
