@@ -338,25 +338,6 @@
             };
 
             $scope.editUnit = function (unit) {
-                interface IBaseUnit {
-                    id: number,
-                    name: string,
-                    ean: string,
-                    localId: number,
-                    parentId: number,
-                    organizationId: number,
-                }
-                interface IConvertedUnit {
-                    id: number,
-                    oldName: string,
-                    newName: string,
-                    newEan: string,
-                    newParent: number,
-                    localId: number,
-                    orgId: number,
-                    isRoot: boolean,
-                }
-
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     controller: [
@@ -367,7 +348,7 @@
                             $modalScope.isNew = false;
 
                             // holds a list of org units, which the user can select as the parent
-                            const orgUnits: IBaseUnit[] = [];
+                            const orgUnits: Kitos.Models.IOrganizationUnitDto[] = [];
 
                             // filter out those orgunits, that are outside the organisation
                             // or is currently a subdepartment of the unit
@@ -402,7 +383,7 @@
                                 newParent: unit.parentId,
                                 orgId: unit.organizationId,
                                 isRoot: unit.parentId == undefined
-                            } as IConvertedUnit;
+                            } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
 
                             if ($modalScope.orgUnit.isRoot) {
                                 orgUnits.push(
@@ -544,7 +525,7 @@
                                 $modalInstance.dismiss("cancel");
                             };
                             
-                            function bindParentSelect(currentUnit: IConvertedUnit, otherOrgUnits: IBaseUnit[]) {
+                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.IOrganizationUnitDto[]) {
 
                                 let existingChoice: { id: number; text: string };
                                 if (currentUnit.isRoot) {

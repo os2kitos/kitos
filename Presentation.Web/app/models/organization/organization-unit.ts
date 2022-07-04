@@ -1,5 +1,4 @@
 ﻿module Kitos.Models {
-    import IItSystemUsage = Models.ItSystemUsage.IItSystemUsage;
     import IItSystemUsageOrgUnitUsage = Models.ItSystemUsage.IItSystemUsageOrgUnitUsage;
 
     export interface IOrganizationUnit extends IEntity {
@@ -26,5 +25,14 @@
         ItContracts: Array<ItContract.IItContract>;
         /** The Organization Unit is listed in these economy streams */
         EconomyStreams: Array<ItContract.IEconomyStream>;
+    }
+
+    export interface IOrganizationUnitDto {
+        id: number,
+        name: string,
+        ean: string,
+        localId: number,
+        parentId: number,
+        organizationId: number,
     }
 }
