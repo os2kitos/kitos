@@ -350,6 +350,7 @@
     <TypeScriptCompile Include="app\helpers\OdataQueryHelper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
@@ -800,6 +801,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\GDPR\OversightDateViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\option-type-view-model.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\edit-org-unit-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\OrganizationDeletionConflictsViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />

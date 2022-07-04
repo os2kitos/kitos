@@ -1,5 +1,4 @@
 ﻿module Kitos.Models {
-    import IItSystemUsage = Models.ItSystemUsage.IItSystemUsage;
     import IItSystemUsageOrgUnitUsage = Models.ItSystemUsage.IItSystemUsageOrgUnitUsage;
 
     export interface IOrganizationUnit extends IEntity {
