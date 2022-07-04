@@ -7,18 +7,19 @@
      */
     export function fixODataUserByNameFilter(filterUrl: string, replaceQueryParameter: string, userDataPropertyName: string) {
         const pattern = new RegExp(`(\\w+\\()${replaceQueryParameter}(.*?\\))`, "i");
-        const res = filterUrl.replace(pattern, `contains(${userDataPropertyName}/Name$2 or contains(${userDataPropertyName}/LastName$2`);
-        const test = pattern.exec(filterUrl);
-        var items = test[2].replace(",'", "").replace(/\)'$/, "").split(" ");
+        const matchingFilterPart = pattern.exec(filterUrl);
+        const userFilterQueryElements = matchingFilterPart[2].replace(",'", "").replace(/\)$/, "").replace(/'$/, "").split(" ");
+
         var result = "(";
-        items.forEach((value, i) => {
-            result += `contains(${userDataPropertyName}/Name,'${value}') or contains(${userDataPropertyName}/LastName,'${value}')`;
-            if (i < items.length - 1) {
+        userFilterQueryElements.forEach((value, i) => {
+            result += `(contains(${userDataPropertyName}/Name,'${value}') or contains(${userDataPropertyName}/LastName,'${value}'))`;
+            if (i < userFilterQueryElements.length - 1) {
                 result += " and ";
             } else {
                 result += ")";
             }
         });
+
         filterUrl = filterUrl.replace(pattern, result);
         return filterUrl;
     }
