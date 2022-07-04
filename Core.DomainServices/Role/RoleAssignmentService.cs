@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Options;
 using Infrastructure.Services.DataAccess;
@@ -20,17 +21,20 @@ namespace Core.DomainServices.Role
         private readonly IUserRepository _userRepository;
         private readonly IGenericRepository<TRight> _rightsRepository;
         private readonly ITransactionManager _transactionManager;
+        private readonly IDomainEvents _domainEvents;
 
         public RoleAssignmentService(
             IOptionsService<TRight, TRole> localRoleOptionsService,
             IUserRepository userRepository,
             IGenericRepository<TRight> rightsRepository,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IDomainEvents domainEvents)
         {
             _localRoleOptionsService = localRoleOptionsService;
             _userRepository = userRepository;
             _rightsRepository = rightsRepository;
             _transactionManager = transactionManager;
+            _domainEvents = domainEvents;
         }
 
         public IEnumerable<TRole> GetApplicableRoles(TModel model)
@@ -83,7 +87,12 @@ namespace Core.DomainServices.Role
             if (role.IsNone)
                 return new OperationError("Invalid role id", OperationFailure.BadInput);
 
-            return model.AssignRole(role.Value, user.Value);
+            var assignRoleResult = model.AssignRole(role.Value, user.Value);
+            if (assignRoleResult.Ok)
+            {
+                _domainEvents.Raise(new EntityUpdatedEvent<TModel>(model));
+            }
+            return assignRoleResult;
         }
 
         public Result<TRight, OperationError> AssignRole(TModel model, Guid roleUuid, Guid userUuid)
@@ -124,6 +133,7 @@ namespace Core.DomainServices.Role
                 return removeResult.Error;
 
             _rightsRepository.Delete(removeResult.Value);
+            _domainEvents.Raise(new EntityUpdatedEvent<TModel>(model));
             _rightsRepository.Save();
             return removeResult.Value;
         }

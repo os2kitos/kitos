@@ -6,6 +6,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Serilog;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -15,17 +16,18 @@ namespace Core.ApplicationServices.Organizations
         private readonly IGenericRepository<OrganizationRight> _organizationRightRepository;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IDomainEvents _domainEvents;
+        private readonly ILogger _logger;
 
-        public OrganizationRightsService(
-            IAuthorizationContext authorizationContext,
+        public OrganizationRightsService(IAuthorizationContext authorizationContext,
             IGenericRepository<OrganizationRight> organizationRightRepository,
             IOrganizationalUserContext userContext,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents, ILogger logger)
         {
             _authorizationContext = authorizationContext;
             _organizationRightRepository = organizationRightRepository;
             _userContext = userContext;
             _domainEvents = domainEvents;
+            _logger = logger;
         }
 
         public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
@@ -42,9 +44,16 @@ namespace Core.ApplicationServices.Organizations
                 return OperationFailure.Forbidden;
             }
 
+            var existingRight = _organizationRightRepository.AsQueryable().FirstOrDefault(x => x.OrganizationId == organizationId && x.UserId == userId && x.Role == roleId);
+            if (existingRight != null)
+            {
+                _logger.Warning("Attempt to assign existing organization ({orgId}) role ({roleId}) to user ({userId}). Existing right ({rightId}) returned", organizationId, roleId, userId, existingRight.Id);
+                return right;
+            }
+
             right = _organizationRightRepository.Insert(right);
             _organizationRightRepository.Save();
-            _domainEvents.Raise(new AccessRightsChanged(userId));
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(userId));
             return right;
         }
 
@@ -86,7 +95,7 @@ namespace Core.ApplicationServices.Organizations
 
             _organizationRightRepository.DeleteByKey(right.Id);
             _organizationRightRepository.Save();
-            _domainEvents.Raise(new AccessRightsChanged(right.UserId));
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(right.UserId));
 
             return right;
         }

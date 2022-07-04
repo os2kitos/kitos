@@ -13,13 +13,19 @@ namespace Core.DomainServices.Options
         /// Returns a list of options available to the organization
         /// </summary>
         /// <param name="organizationId"></param>
-        /// <returns></returns>
+        /// <returns>An IEnumerable of <see cref="OptionDescriptor{TOption}"/> containing only available options with their details</returns>
         IEnumerable<OptionDescriptor<TOption>> GetAvailableOptionsDetails(int organizationId);
+        /// <summary>
+        /// Returns a list of options and a boolean indicating whether it is available
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <returns>An IEnumerable of <see cref="OptionDescriptor{TOption}"/> containing both available/unavailable options with their details</returns>
+        IEnumerable<(OptionDescriptor<TOption> option, bool available)> GetAllOptionsDetails(int organizationId);
         /// <summary>
         /// Returns a list of options available to the organization
         /// </summary>
         /// <param name="organizationId"></param>
-        /// <returns></returns>
+        /// <returns>An IEnumerable of <see cref="OptionDescriptor{TOption}"/> containing only available options without details</returns>
         IEnumerable<TOption> GetAvailableOptions(int organizationId);
         /// <summary>
         /// Returns the option if it is available in the organization

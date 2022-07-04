@@ -50,11 +50,11 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var url = TestEnvironment.CreateUrl($"api/ItContract/{contractId}");
-            using (var result = await HttpApi.GetWithCookieAsync(url, cookie))
-            {
-                var contract = await result.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
-                return contract;
-            }
+
+            using var result = await HttpApi.GetWithCookieAsync(url, cookie);
+            var contract = await result.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
+
+            return contract;
         }
 
         public static async Task<ItSystemUsageSimpleDTO> AddItSystemUsage(int contractId, int usageId, int organizationId)
@@ -185,6 +185,24 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId={organizationId}"), cookie, new { supplierId = supplierId });
+        }
+
+
+        public static async Task<ItContractDTO> AssignCriticalityTypeAsync(int organizationId, int contractId, int criticalityId, Cookie optionalLogin = null)
+        {
+            using var response =
+                await SendAssignCriticalityTypeAsync(organizationId, contractId, criticalityId, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
+            
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignCriticalityTypeAsync(int organizationId, int contractId, int criticalityId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId={organizationId}"), cookie, new { criticalityTypeId = criticalityId });
         }
 
         public static async Task<List<ItContractRole>> GetRolesAsync(Cookie optionalLogin = null)

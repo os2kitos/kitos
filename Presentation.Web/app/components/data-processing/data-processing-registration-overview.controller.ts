@@ -445,7 +445,7 @@
                             .withSourceValueEchoExcelOutput())
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("LastChanged")
+                            .withDataSourceName("LastChangedAt")
                             .withTitle("Sidste redigeret: Dato")
                             .withId("changed")
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)

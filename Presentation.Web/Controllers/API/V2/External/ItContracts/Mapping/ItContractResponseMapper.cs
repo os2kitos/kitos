@@ -203,6 +203,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ContractTemplate = contract.ContractTemplate?.MapIdentityNamePairDTO(),
                 ContractType = contract.ContractType?.MapIdentityNamePairDTO(),
                 AgreementElements = contract.AssociatedAgreementElementTypes?.Select(x => x.AgreementElementType?.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
+                CriticalityType = contract.CriticalityType?.MapIdentityNamePairDTO(),
                 Validity = new ValidityResponseDTO
                 {
                     EnforcedValid = contract.Active,

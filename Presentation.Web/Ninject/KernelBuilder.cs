@@ -327,7 +327,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-            RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
+            RegisterDomainEvent<AdministrativeAccessRightsChanged, ClearCacheOnAdministrativeAccessRightsChangedHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent>(kernel);
@@ -469,6 +469,8 @@ namespace Presentation.Web.Ninject
             RegisterOptionsService<ItContract, OptionExtendType, LocalOptionExtendType>(kernel);
 
             RegisterOptionsService<ItContract, TerminationDeadlineType, LocalTerminationDeadlineType>(kernel);
+
+            RegisterOptionsService<ItContract, CriticalityType, LocalCriticalityType>(kernel);
 
             RegisterOptionsService<HandoverTrial, HandoverTrialType, LocalHandoverTrialType>(kernel);
 

@@ -65,6 +65,7 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\AttachedOptionMap.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\CriticalityTypeMap.cs" />
     <Compile Include="Mapping\CustomizedUINodeMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationOversightDateMap.cs" />
@@ -881,6 +882,10 @@
     <Compile Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.designer.cs">
       <DependentUpon>202206221441060_AddProcurmentInitiatedToItContract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206240625598_AddCriticalityType.cs" />
+    <Compile Include="Migrations\202206240625598_AddCriticalityType.designer.cs">
+      <DependentUpon>202206240625598_AddCriticalityType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1455,6 +1460,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.resx">
       <DependentUpon>202206221441060_AddProcurmentInitiatedToItContract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206240625598_AddCriticalityType.resx">
+      <DependentUpon>202206240625598_AddCriticalityType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

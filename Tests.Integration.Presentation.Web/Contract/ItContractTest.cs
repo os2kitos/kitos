@@ -7,6 +7,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -92,6 +93,42 @@ namespace Tests.Integration.Presentation.Web.Contract
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_CriticalityType(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
+            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, OrganizationId)).RandomItem();
+
+            //Act - perform the action with the actual role
+            await ItContractHelper.AssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
+            var contractResult = await ItContractHelper.GetItContract(contract.Id);
+
+            //Assert
+            Assert.Equal(contract.Id, contractResult.Id);
+            Assert.Equal(criticality.Id, contractResult.CriticalityTypeId);
+            Assert.Equal(criticality.Name, contractResult.CriticalityTypeName);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_CriticalityType(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
+            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, OrganizationId)).RandomItem();
+
+            //Act - perform the action with the actual role
+            using var result = await ItContractHelper.SendAssignCriticalityTypeAsync(contract.OrganizationId, contract.Id, criticality.Id, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         [Fact]

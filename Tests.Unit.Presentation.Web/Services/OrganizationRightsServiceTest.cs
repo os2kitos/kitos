@@ -5,6 +5,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -23,7 +24,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _organizationUserContext = new Mock<IOrganizationalUserContext>();
             _sut = new OrganizationRightsService(_authorizationContext.Object,
-                _organizationRightRepository.Object, _organizationUserContext.Object,Mock.Of<IDomainEvents>());
+                _organizationRightRepository.Object, _organizationUserContext.Object,Mock.Of<IDomainEvents>(), Mock.Of<ILogger>());
         }
 
         [Fact]
