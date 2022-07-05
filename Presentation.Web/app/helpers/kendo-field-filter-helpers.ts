@@ -8,7 +8,7 @@
     export function fixODataUserByNameFilter(filterUrl: string, replaceQueryParameter: string, userDataPropertyName: string) {
         const pattern = new RegExp(`(\\w+\\()${replaceQueryParameter}(.*?\\))`, "i");
         const matchingFilterPart = pattern.exec(filterUrl);
-        if (matchingFilterPart?.length === 3) {
+        if (matchingFilterPart?.length !== 3) {
             return filterUrl;
         }
         const userFilterQueryElements = matchingFilterPart[2].replace(",'", "").replace(/\)$/, "").replace(/'$/, "").split(" ");
