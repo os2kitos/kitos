@@ -1,7 +1,7 @@
 ﻿((ng, app) => {
     app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-system.usage.dataprocessing", {
-            url: "/interfaces",
+            url: "/dataprocessing",
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-data-processing.view.html",
             controller: "systemUsage.DataProcessing",
             resolve: {
