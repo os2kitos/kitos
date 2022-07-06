@@ -5,7 +5,7 @@ import NavigationBarHelper = require("../../object-wrappers/navigationBarWrapper
 import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
 import SystemUsageHelper = require("../../Helpers/SystemUsageHelper");
 import LocalItSystemNavigation = require("../../Helpers/SideNavigation/LocalItSystemNavigation");
-import SystemTabGDPR = require("../../PageObjects/it-system/Usage/Tabs/ItSystemUsageGDPR.po");
+import SystemTabDPR = require("../../PageObjects/it-system/Usage/Tabs/ItSystemUsageDataProcessing.po");
 
 describe("Local admin is able to toggle DataProcessing", () => {
 
@@ -52,8 +52,8 @@ describe("Local admin is able to toggle DataProcessing", () => {
 
     function checkSystemGdprPageDataProcessingVisibility(visibility: boolean, sysName: string) {
         SystemUsageHelper.openLocalSystem(sysName)
-            .then(() => LocalItSystemNavigation.openGDPRPage())
-            .then(() => expect((SystemTabGDPR.getDataProcessingRegistrationView()).isPresent()).toBe(visibility));
+            .then(() => LocalItSystemNavigation.openDataProcessingPage())
+            .then(() => expect((SystemTabDPR.getDataProcessingRegistrationView()).isPresent()).toBe(visibility));
     }
 
     function expectCheckboxValueToBe(currentValueIs: boolean) {

@@ -1193,6 +1193,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageDataProcessing.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageGDPR.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />

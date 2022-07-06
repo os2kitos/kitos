@@ -211,6 +211,8 @@
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
     readonly gdprDataProcessingRegistrationView = "gdprDataProcessingRegistrationView";
 
+    readonly dataProcessingRegistrationView = "dataProcessingRegistrationView";
+
     readonly filterOrgButton = "filterOrgButton";
 
     //Local admin
