@@ -11,6 +11,7 @@
         ($scope) => {
             const itSystemUsage= $scope.usage;
             $scope.dataProcessingRegistrations = itSystemUsage.associatedDataProcessingRegistrations;
+            $scope.filterDataProcessor = itSystemUsage.associatedDataProcessingRegistrations.length > 0;
         }
     ]);
 })(angular, app);
