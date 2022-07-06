@@ -15,11 +15,14 @@ namespace Infrastructure.Services.Http
     {
         private const string ChromeUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36";
         private const string AnyMediaType = "*/*";
+        private const string EXCEPTION_TEXT_CouldNotCreateSslTlsSecureChannel = "Could not create SSL/TLS secure channel";
+
         private static readonly IEnumerable<string> ErrorContentWhichShouldNotBeRetried = new[]
         {
             "Unable to connect to the remote server",
             "An existing connection was forcibly closed by the remote host",
-            "The remote name could not be resolved"
+            "The remote name could not be resolved",
+            EXCEPTION_TEXT_CouldNotCreateSslTlsSecureChannel
         };
 
         private readonly ILogger _logger;
@@ -98,8 +101,18 @@ namespace Infrastructure.Services.Http
                 _logger.Information(e, "Failed to validate url {url}", url);
 
                 //This is typically where we end up if we get a connection timeout or other type of communication error where the http client is unable to proceed
-                return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.CommunicationError));
+                return new EndpointValidation(url, new EndpointValidationError(MapExceptionError(e)));
             }
+        }
+
+        private static EndpointValidationErrorType MapExceptionError(Exception exception)
+        {
+            var chain = BuildExceptionChain(exception);
+            if (chain.IndexOf(EXCEPTION_TEXT_CouldNotCreateSslTlsSecureChannel, StringComparison.OrdinalIgnoreCase) != -1)
+            {
+                return EndpointValidationErrorType.TlsError;
+            }
+            return EndpointValidationErrorType.CommunicationError;
         }
 
         private Task<HttpResponseMessage> LoadEndpointWithBackOffRetryAsync(Uri uri)

@@ -6,6 +6,7 @@
         InvalidWebsiteUri = 1,
         DnsLookupFailed = 2,
         CommunicationError = 3,
-        ErrorResponseCode = 4
+        ErrorResponseCode = 4,
+        TlsError = 5
     }
 }
