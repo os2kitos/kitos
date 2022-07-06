@@ -470,7 +470,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
                 .Bind(itContract => UpdateValidityPeriod(itContract, generalData).Match<Result<ItContract, OperationError>>(error => error, () => itContract))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements))
-                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityTypeUuid, UpdateContractCriticality));
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityUuid, UpdateContractCriticality));
         }
 
         private Maybe<OperationError> UpdateAgreementElements(ItContract contract, IEnumerable<Guid> agreementElements)
