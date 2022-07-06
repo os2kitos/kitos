@@ -60,7 +60,7 @@
         Children: Array<IItContract>;
         /** Gets or sets the chosen agreement elements. */
         AgreementElements: Array<IAgreementElement>;
-        /** Gets or sets the chosen criticality type. */
+        /** Gets or sets the chosen criticality. */
         Criticality: Models.OData.Generic.IOptionDTO<IItContract>,
 
         /** When the contract began. (indgået) */

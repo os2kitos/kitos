@@ -117,7 +117,7 @@ namespace Tests.Integration.Presentation.Web.Contract
 
         [Theory]
         [InlineData(OrganizationRole.User)]
-        public async Task Cannot_Add_CriticalityType(OrganizationRole role)
+        public async Task Cannot_Add_Criticality(OrganizationRole role)
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);

@@ -617,12 +617,12 @@ namespace Core.ApplicationServices.Contract.Write
             contract.Name = newName;
             return Maybe<OperationError>.None;
         }
-        private Maybe<OperationError> UpdateContractCriticality(ItContract contract, Guid? criticalityTypeUuid)
+        private Maybe<OperationError> UpdateContractCriticality(ItContract contract, Guid? criticalityUuid)
         {
             return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
             (
                 contract,
-                criticalityTypeUuid,
+                criticalityUuid,
                 c => c.ResetCriticality(),
                 c => c.Criticality,
                 (c, newValue) => c.Criticality = newValue
