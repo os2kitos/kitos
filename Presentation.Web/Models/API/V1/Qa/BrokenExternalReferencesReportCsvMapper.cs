@@ -53,6 +53,8 @@ namespace Presentation.Web.Models.API.V1.Qa
                     return "Se fejlkode";
                 case BrokenLinkCause.CommunicationError:
                     return "Kommunikationsfejl";
+                case BrokenLinkCause.TlsError:
+                    return "Kommunikationsfejl (TLS)";
                 default:
                     return UnknownValueString;
             }
