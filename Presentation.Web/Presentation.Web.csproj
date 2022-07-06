@@ -343,6 +343,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-field-filter-helpers.ts" />
@@ -605,6 +606,7 @@
     <Content Include="app\components\global-admin\global-admin-organization-modal-delete.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\components\local-config\ui-customization\local-ui-customization.view.html" />
