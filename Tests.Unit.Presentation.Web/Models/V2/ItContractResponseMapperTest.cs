@@ -75,6 +75,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(general.ContractType);
             Assert.Null(general.ContractTemplate);
             Assert.Empty(general.AgreementElements);
+            Assert.Null(general.CriticalityType);
             var validity = general.Validity;
             Assert.Equal(contract.IsActive, validity.Valid);
             Assert.False(validity.EnforcedValid);
@@ -85,6 +86,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(procurement.ProcurementStrategy);
             Assert.Null(procurement.PurchaseType);
             Assert.Null(procurement.ProcurementPlan);
+            Assert.Null(procurement.ProcurementInitiated);
 
             var supplier = dto.Supplier;
             Assert.False(supplier.Signed);

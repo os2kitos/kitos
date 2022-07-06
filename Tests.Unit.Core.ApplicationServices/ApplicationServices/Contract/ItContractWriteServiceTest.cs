@@ -24,9 +24,11 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Role;
+using FluentAssertions;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Extensions;
@@ -278,14 +280,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true)]
-        [InlineData(true, true, true, true, false)]
-        [InlineData(true, true, true, false, true)]
-        [InlineData(true, true, false, true, true)]
-        [InlineData(true, false, true, true, true)]
-        [InlineData(false, true, true, true, true)]
-        [InlineData(false, false, false, false, false)]
-        public void Can_Create_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withValidFrom, bool withValidTo)
+        [InlineData(true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, false, true)]
+        [InlineData(true, true, true, false, true, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, false, true, true, true, true)]
+        [InlineData(false, true, true, true, true, true)]
+        [InlineData(false, false, false, false, false, false)]
+        public void Can_Create_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withValidFrom, bool withValidTo, bool withCriticalityType)
         {
             // Arrange
             var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
@@ -296,9 +299,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 enforceValid,
                 validFrom,
                 validTo,
+                criticalityTypeUuid,
                 agreementElementUuids,
                 agreementElementTypes,
-                parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, createdContract, organizationUuid);
+                parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, withCriticalityType, createdContract, organizationUuid);
 
             itContractModificationParameters.General = parameters;
 
@@ -310,7 +314,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
             var contract = result.Value;
-            AssertGeneralSection(contractId, contractTypeUuid, contractTemplateUuid, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
         }
 
         [Fact]
@@ -477,16 +481,40 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownError(result, operationError, transaction);
         }
 
+        [Fact]
+        public void Cannot_Create_With_GeneralData_If_UpdateIndependentOptionTypeAssignment_For_CriticalityType_Fails()
+        {
+            // Arrange
+            var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+
+            var criticalityTypeUuid = A<Guid>();
+            var parameters = new ItContractGeneralDataModificationParameters
+            {
+                CriticalityTypeUuid = ((Guid?)criticalityTypeUuid).AsChangedValue()
+            };
+            itContractModificationParameters.General = parameters;
+
+            var operationError = A<OperationError>();
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<CriticalityType>(createdContract, criticalityTypeUuid, operationError);
+
+            // Act
+            var result = _sut.Create(organizationUuid, itContractModificationParameters);
+
+            // Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
         [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(true, false, false)]
-        [InlineData(false, true, false)]
-        [InlineData(false, false, true)]
-        [InlineData(false, false, false)]
-        public void Can_Create_With_Procurement(bool withStrategy, bool withPurchase, bool withPlan)
+        [InlineData(true, true, true, true)]
+        [InlineData(true, false, false, false)]
+        [InlineData(false, true, false, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, false, false, true)]
+        [InlineData(false, false, false, false)]
+        public void Can_Create_With_Procurement(bool withStrategy, bool withPurchase, bool withPlan, bool withInitiated)
         {
             //Arrange
-            var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(withStrategy, withPurchase, withPlan);
+            var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(withStrategy, withPurchase, withPlan, withInitiated);
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
             ExpectUpdateIndependentOptionTypeAssignmentReturns<ProcurementStrategyType>(createdContract, procurementStrategyUuid, Maybe<OperationError>.None);
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PurchaseFormType>(createdContract, purchaseTypeUuid, Maybe<OperationError>.None);
@@ -1424,14 +1452,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 enforceValid,
                 validFrom,
                 validTo,
+                criticalityType,
                 agreementElementUuids,
                 agreementElementTypes,
-                generalData) = SetupGeneralSectionInput(true, true, true, true, true, createdContract, organizationUuid);
+                generalData) = SetupGeneralSectionInput(true, true, true, true, true, true, createdContract, organizationUuid);
 
             parameters.General = generalData;
 
             //Procurement setup
-            var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(true, true, true);
+            var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(true, true, true, true);
             parameters.Procurement = procurement;
             ExpectUpdateIndependentOptionTypeAssignmentReturns<ProcurementStrategyType>(createdContract, procurement.ProcurementStrategyUuid.NewValue, Maybe<OperationError>.None);
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PurchaseFormType>(createdContract, procurement.PurchaseTypeUuid.NewValue, Maybe<OperationError>.None);
@@ -1532,7 +1561,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             Assert.Equal(parent, contract.Parent);
 
-            AssertGeneralSection(contractId, contractTypeUuid, contractTemplateUuid, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
 
             AssertProcurement(parameters.Procurement.Value, contract);
 
@@ -1647,15 +1676,17 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _authContext.Setup(x => x.AllowModify(contract)).Returns(true);
         }
 
-        private (Guid? procurementStrategyUuid, Guid? purchaseTypeUuid, ItContractProcurementModificationParameters parameters) CreateProcurementParameters(bool withStrategy, bool withPurchase, bool withPlan)
+        private (Guid? procurementStrategyUuid, Guid? purchaseTypeUuid, ItContractProcurementModificationParameters parameters) CreateProcurementParameters(bool withStrategy, bool withPurchase, bool withPlan, bool withInitiated)
         {
             var procurementStrategyUuid = withStrategy ? A<Guid>() : (Guid?)null;
             var purchaseTypeUuid = withPurchase ? A<Guid>() : (Guid?)null;
+            var procurementInitiated = withInitiated ? A<YesNoUndecidedOption>().FromNullable() : Maybe<YesNoUndecidedOption>.None;
             var procurement = new ItContractProcurementModificationParameters
             {
                 ProcurementStrategyUuid = procurementStrategyUuid.AsChangedValue(),
                 PurchaseTypeUuid = purchaseTypeUuid.AsChangedValue(),
-                ProcurementPlan = (withPlan ? (CreateValidHalfOfYearByte(), A<int>()) : Maybe<(byte half, int year)>.None).AsChangedValue()
+                ProcurementPlan = (withPlan ? (CreateValidHalfOfYearByte(), A<int>()) : Maybe<(byte half, int year)>.None).AsChangedValue(),
+                ProcurementInitiated = procurementInitiated.AsChangedValue() ?? Maybe<YesNoUndecidedOption>.None.AsChangedValue()
             };
             return (procurementStrategyUuid, purchaseTypeUuid, procurement);
         }
@@ -1676,6 +1707,14 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             {
                 Assert.Null(actual.ProcurementPlanQuarter);
                 Assert.Null(actual.ProcurementPlanYear);
+            }
+            if (expected.ProcurementInitiated.HasChange && expected.ProcurementInitiated.NewValue.HasValue)
+            {
+                Assert.Equal(expected.ProcurementInitiated.NewValue.Value, actual.ProcurementInitiated);
+            }
+            else
+            {
+                Assert.Equal(YesNoUndecidedOption.Undecided, actual.ProcurementInitiated);
             }
         }
 
@@ -1789,12 +1828,13 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             };
         }
 
-        private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(
+        private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, Guid? criticalityTypeUuid, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(
           bool withContractType,
           bool withContractTemplate,
           bool withAgreementElements,
           bool withValidFrom,
           bool withValidTo,
+          bool withCriticalityType,
           ItContract contract,
           Guid organizationUuid)
         {
@@ -1804,6 +1844,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var enforceValid = A<bool>();
             var validFrom = withValidFrom ? A<DateTime>().Date : (DateTime?)null;
             var validTo = withValidTo ? (validFrom ?? A<DateTime>()).AddDays(Math.Abs(A<int>() % 100)).Date : (DateTime?)null;
+            var criticalityTypeUuid = withCriticalityType? A<Guid>() : (Guid?)null;
             var agreementElementUuids = withAgreementElements ? Many<Guid>().ToList() : new List<Guid>();
             var parameters = new ItContractGeneralDataModificationParameters
             {
@@ -1813,6 +1854,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 EnforceValid = enforceValid.FromNullable().AsChangedValue(),
                 ValidFrom = validFrom?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
                 ValidTo = validTo?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
+                CriticalityTypeUuid = criticalityTypeUuid.AsChangedValue(),
                 AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
             };
 
@@ -1820,19 +1862,19 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             ExpectUpdateIndependentOptionTypeAssignmentReturns<ItContractTemplateType>(contract, contractTemplateUuid, Maybe<OperationError>.None);
 
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<CriticalityType>(contract, criticalityTypeUuid, Maybe<OperationError>.None);
+
             var agreementElementTypes = agreementElementUuids.ToDictionary(uuid => uuid,
                 uuid => new AgreementElementType() { Id = A<int>(), Uuid = uuid });
 
             foreach (var agreementElementType in agreementElementTypes)
                 ExpectGetOptionTypeReturnsIfInputIdIsDefined<AgreementElementType>(organizationUuid, agreementElementType.Key,
                     (agreementElementType.Value, true));
-            return (contractId, contractTypeUuid, contractTemplateUuid, enforceValid, validFrom, validTo, agreementElementUuids, agreementElementTypes, parameters);
+            return (contractId, contractTypeUuid, contractTemplateUuid, enforceValid, validFrom, validTo, criticalityTypeUuid, agreementElementUuids, agreementElementTypes, parameters);
         }
 
         private static void AssertGeneralSection(
             string expectedContractId,
-            Guid? expectedContractTypeUuid,
-            Guid? expectedContractTemplateUuid,
             DateTime? expectedValidFrom,
             DateTime? expectedValidTo,
             bool expectedEnforceValid,
