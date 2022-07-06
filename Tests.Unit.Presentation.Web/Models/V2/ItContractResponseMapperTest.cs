@@ -7,6 +7,8 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
@@ -75,6 +77,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(general.ContractType);
             Assert.Null(general.ContractTemplate);
             Assert.Empty(general.AgreementElements);
+            Assert.Null(general.CriticalityType);
             var validity = general.Validity;
             Assert.Equal(contract.IsActive, validity.Valid);
             Assert.False(validity.EnforcedValid);
@@ -85,6 +88,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(procurement.ProcurementStrategy);
             Assert.Null(procurement.PurchaseType);
             Assert.Null(procurement.ProcurementPlan);
+            Assert.Null(procurement.ProcurementInitiated);
 
             var supplier = dto.Supplier;
             Assert.False(supplier.Signed);
@@ -153,6 +157,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(contract.Note, dto.General.Notes);
             AssertOptionalIdentity(contract.ContractTemplate, dto.General.ContractTemplate);
             AssertOptionalIdentity(contract.ContractType, dto.General.ContractType);
+            AssertOptionalIdentity(contract.CriticalityType, dto.General.CriticalityType);
             AssertAgreementElements(contract.AssociatedAgreementElementTypes, dto.General.AgreementElements);
 
             Assert.Equal(contract.Concluded, dto.General.Validity.ValidFrom);
@@ -181,10 +186,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 Assert.Equal(Convert.ToByte(contract.ProcurementPlanQuarter.Value), dto.Procurement.ProcurementPlan.QuarterOfYear);
                 Assert.Equal(contract.ProcurementPlanYear.Value, dto.Procurement.ProcurementPlan.Year);
+                Assert.Equal(contract.ProcurementInitiated.Value.ToYesNoUndecidedChoice(), dto.Procurement.ProcurementInitiated);
             }
             else
             {
                 Assert.Null(dto.Procurement.ProcurementPlan);
+                Assert.Null(dto.Procurement.ProcurementInitiated);
             }
         }
 
@@ -701,6 +708,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.ProcurementPlanYear = withOptionalCrossReferences 
                 ? A<int>() 
                 : null;
+            contract.ProcurementInitiated = withOptionalCrossReferences 
+                ? A<YesNoUndecidedOption>() 
+                : null;
         }
 
         private void AssignGeneralPropertiesSection(ItContract contract, bool withOptionalCrossReferences)
@@ -716,12 +726,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.AssociatedAgreementElementTypes = withOptionalCrossReferences
                 ? new List<ItContractAgreementElementTypes>()
                 {
-                    new ItContractAgreementElementTypes()
+                    new ()
                     {
                         ItContract = contract,
                         AgreementElementType = new AgreementElementType() { Uuid = A<Guid>(), Name = A<string>() }
                     }
                 }
+                : null;
+            contract.CriticalityType = withOptionalCrossReferences
+                ? new CriticalityType {Uuid = A<Guid>(), Name = A<string>()}
                 : null;
             contract.Active = A<bool>();
             contract.Concluded = A<DateTime>();
