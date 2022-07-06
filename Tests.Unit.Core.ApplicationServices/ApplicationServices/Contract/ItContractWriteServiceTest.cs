@@ -28,7 +28,6 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Role;
-using FluentAssertions;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Extensions;
