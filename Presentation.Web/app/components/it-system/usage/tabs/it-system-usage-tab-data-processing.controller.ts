@@ -3,12 +3,7 @@
         $stateProvider.state("it-system.usage.dataprocessing", {
             url: "/dataprocessing",
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-data-processing.view.html",
-            controller: "systemUsage.DataProcessing",
-            resolve: {
-                user: [
-                    "userService", userService => userService.getUser()
-                ]
-            }
+            controller: "systemUsage.DataProcessing"
         });
     }]);
 
