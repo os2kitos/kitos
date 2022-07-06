@@ -489,7 +489,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var criticalityTypeUuid = A<Guid>();
             var parameters = new ItContractGeneralDataModificationParameters
             {
-                CriticalityTypeUuid = ((Guid?)criticalityTypeUuid).AsChangedValue()
+                CriticalityUuid = ((Guid?)criticalityTypeUuid).AsChangedValue()
             };
             itContractModificationParameters.General = parameters;
 
@@ -1853,7 +1853,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 EnforceValid = enforceValid.FromNullable().AsChangedValue(),
                 ValidFrom = validFrom?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
                 ValidTo = validTo?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
-                CriticalityTypeUuid = criticalityTypeUuid.AsChangedValue(),
+                CriticalityUuid = criticalityTypeUuid.AsChangedValue(),
                 AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
             };
 
