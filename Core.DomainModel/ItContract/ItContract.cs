@@ -343,7 +343,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     The criticality type identifier.
         /// </value>
-        public int? CriticalityTypeId { get; set; }
+        public int? CriticalityId { get; set; }
 
         /// <summary>
         ///     The criticality of ItContract
@@ -351,7 +351,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     The criticality.
         /// </value>
-        public virtual CriticalityType CriticalityType { get; set; }
+        public virtual CriticalityType Criticality { get; set; }
 
         #endregion
 
@@ -601,10 +601,10 @@ namespace Core.DomainModel.ItContract
             ContractTemplate = null;
         }
 
-        public void ResetCriticalityType()
+        public void ResetCriticality()
         {
-            CriticalityType?.Track();
-            CriticalityType = null;
+            Criticality?.Track();
+            Criticality = null;
         }
 
         public Maybe<OperationError> UpdateContractValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)

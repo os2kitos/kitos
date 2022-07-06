@@ -1526,7 +1526,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Validity.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
             Assert.Equal(input.Validity.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
-            Assert.Equal(input.CriticalityTypeUuid, AssertPropertyContainsDataChange(output.CriticalityTypeUuid));
+            Assert.Equal(input.CriticalityUuid, AssertPropertyContainsDataChange(output.CriticalityTypeUuid));
         }
 
         private static void AssertProcurement(bool hasValues, ContractProcurementDataWriteRequestDTO expected, ItContractProcurementModificationParameters actual)

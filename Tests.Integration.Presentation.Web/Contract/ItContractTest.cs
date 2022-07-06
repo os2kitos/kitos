@@ -111,8 +111,8 @@ namespace Tests.Integration.Presentation.Web.Contract
 
             //Assert
             Assert.Equal(contract.Id, contractResult.Id);
-            Assert.Equal(criticality.Id, contractResult.CriticalityTypeId);
-            Assert.Equal(criticality.Name, contractResult.CriticalityTypeName);
+            Assert.Equal(criticality.Id, contractResult.CriticalityId);
+            Assert.Equal(criticality.Name, contractResult.CriticalityName);
         }
 
         [Theory]

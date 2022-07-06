@@ -470,7 +470,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
                 .Bind(itContract => UpdateValidityPeriod(itContract, generalData).Match<Result<ItContract, OperationError>>(error => error, () => itContract))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements))
-                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityTypeUuid, UpdateContractCriticalityType));
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityTypeUuid, UpdateContractCriticality));
         }
 
         private Maybe<OperationError> UpdateAgreementElements(ItContract contract, IEnumerable<Guid> agreementElements)
@@ -617,15 +617,15 @@ namespace Core.ApplicationServices.Contract.Write
             contract.Name = newName;
             return Maybe<OperationError>.None;
         }
-        private Maybe<OperationError> UpdateContractCriticalityType(ItContract contract, Guid? criticalityTypeUuid)
+        private Maybe<OperationError> UpdateContractCriticality(ItContract contract, Guid? criticalityTypeUuid)
         {
             return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
             (
                 contract,
                 criticalityTypeUuid,
-                c => c.ResetCriticalityType(),
-                c => c.CriticalityType,
-                (c, newValue) => c.CriticalityType = newValue
+                c => c.ResetCriticality(),
+                c => c.Criticality,
+                (c, newValue) => c.Criticality = newValue
             );
         }
 
