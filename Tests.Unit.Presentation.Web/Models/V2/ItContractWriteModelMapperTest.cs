@@ -246,7 +246,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noEnforceValid, output.EnforceValid.IsUnchanged);
             Assert.Equal(noValidFrom, output.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, output.ValidTo.IsUnchanged);
-            Assert.Equal(noCriticalityTypeUuid, output.CriticalityTypeUuid.IsUnchanged);
+            Assert.Equal(noCriticalityTypeUuid, output.CriticalityUuid.IsUnchanged);
         }
 
         [Theory]
@@ -278,7 +278,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noEnforceValid, output.EnforceValid.IsUnchanged);
             Assert.Equal(noValidFrom, output.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, output.ValidTo.IsUnchanged);
-            Assert.Equal(noCriticalityTypeUuid, output.CriticalityTypeUuid.IsUnchanged);
+            Assert.Equal(noCriticalityTypeUuid, output.CriticalityUuid.IsUnchanged);
         }
 
         [Theory]
@@ -310,7 +310,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.EnforceValid.HasChange);
             Assert.True(output.ValidFrom.HasChange);
             Assert.True(output.ValidTo.HasChange);
-            Assert.True(output.CriticalityTypeUuid.HasChange);
+            Assert.True(output.CriticalityUuid.HasChange);
         }
 
         [Theory]
@@ -1526,7 +1526,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Validity.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
             Assert.Equal(input.Validity.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
-            Assert.Equal(input.CriticalityTypeUuid, AssertPropertyContainsDataChange(output.CriticalityTypeUuid));
+            Assert.Equal(input.CriticalityUuid, AssertPropertyContainsDataChange(output.CriticalityUuid));
         }
 
         private static void AssertProcurement(bool hasValues, ContractProcurementDataWriteRequestDTO expected, ItContractProcurementModificationParameters actual)
@@ -1606,15 +1606,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noValidTo,
             bool noCriticalityTypeUuid)
         {
-            var sectionProperties = GetAllInputPropertyNames<ItContractGeneralDataModificationParameters>();
+            var sectionProperties = GetAllInputPropertyNames<ContractGeneralDataWriteRequestDTO>();
             var validitySectionProperties = GetAllInputPropertyNames<ValidityWriteRequestDTO>();
 
-            if (noContractId) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.ContractId));
-            if (noContractTypeUuid) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.ContractTypeUuid));
-            if (noContractTemplateUuid) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.ContractTemplateUuid));
-            if (noAgreementElementUuids) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.AgreementElementUuids));
-            if (noNotes) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.Notes));
-            if (noCriticalityTypeUuid) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.CriticalityTypeUuid));
+            if (noContractId) sectionProperties.Remove(nameof(ContractGeneralDataWriteRequestDTO.ContractId));
+            if (noContractTypeUuid) sectionProperties.Remove(nameof(ContractGeneralDataWriteRequestDTO.ContractTypeUuid));
+            if (noContractTemplateUuid) sectionProperties.Remove(nameof(ContractGeneralDataWriteRequestDTO.ContractTemplateUuid));
+            if (noAgreementElementUuids) sectionProperties.Remove(nameof(ContractGeneralDataWriteRequestDTO.AgreementElementUuids));
+            if (noNotes) sectionProperties.Remove(nameof(ContractGeneralDataWriteRequestDTO.Notes));
+            if (noCriticalityTypeUuid) sectionProperties.Remove(nameof(ContractGeneralDataWriteRequestDTO.CriticalityUuid));
 
             if (noEnforceValid) validitySectionProperties.Remove(nameof(ValidityWriteRequestDTO.EnforcedValid));
             if (noValidFrom) validitySectionProperties.Remove(nameof(ValidityWriteRequestDTO.ValidFrom));

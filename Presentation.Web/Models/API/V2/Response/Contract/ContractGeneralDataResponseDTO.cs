@@ -31,8 +31,8 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// </summary>
         public ValidityResponseDTO Validity { get; set; }
         /// <summary>
-        /// Optionally assigned criticality type
+        /// Optionally assigned criticality
         /// </summary>
-        public IdentityNamePairResponseDTO CriticalityType { get; set; }
+        public IdentityNamePairResponseDTO Criticality { get; set; }
     }
 }
