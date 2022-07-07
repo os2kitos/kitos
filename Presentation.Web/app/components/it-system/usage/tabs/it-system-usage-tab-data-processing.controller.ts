@@ -1,17 +1,28 @@
-﻿((ng, app) => {
-    app.config(["$stateProvider", $stateProvider => {
-        $stateProvider.state("it-system.usage.dataprocessing", {
-            url: "/dataprocessing",
-            templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-data-processing.view.html",
-            controller: "systemUsage.DataProcessing"
-        });
-    }]);
+﻿module Kitos.ItSystem.Usage.Tabs {
+    "use strict";
 
-    app.controller("systemUsage.DataProcessing", ["$scope",
-        ($scope) => {
-            const itSystemUsage= $scope.usage;
-            $scope.dataProcessingRegistrations = itSystemUsage.associatedDataProcessingRegistrations;
-            $scope.filterDataProcessor = itSystemUsage.associatedDataProcessingRegistrations.length > 0;
+    export class ItSystemUsageTabDataProcessingController {
+        static $inject: Array<string> = [
+            "itSystemUsage"
+        ];
+
+        constructor(
+            private readonly itSystemUsage) {
+
+            this.dataProcessingRegistrations = this.itSystemUsage.associatedDataProcessingRegistrations;
         }
-    ]);
-})(angular, app);
+
+        dataProcessingRegistrations: Models.OData.DataProcessing.IDataProcessingRegistration[];
+    }
+
+    angular
+        .module("app")
+        .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+            $stateProvider.state("it-system.usage.dataprocessing", {
+                url: "/dataprocessing",
+                templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-data-processing.view.html",
+                controller: ItSystemUsageTabDataProcessingController,
+                controllerAs: "vm"
+            });
+        }]);
+}

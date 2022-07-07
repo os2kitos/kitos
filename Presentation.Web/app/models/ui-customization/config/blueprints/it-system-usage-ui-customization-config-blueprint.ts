@@ -16,8 +16,10 @@
             systemRelations: {
                 text: "Relationer"
             },
-            dataProcessings: {
-                text: "Databehandling"
+            dataProcessing: {
+                text: "Databehandling",
+                readOnly: true,
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
             },
             contracts: {
                 text: "Kontrakter",
