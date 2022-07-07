@@ -77,7 +77,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(general.ContractType);
             Assert.Null(general.ContractTemplate);
             Assert.Empty(general.AgreementElements);
-            Assert.Null(general.CriticalityType);
+            Assert.Null(general.Criticality);
             var validity = general.Validity;
             Assert.Equal(contract.IsActive, validity.Valid);
             Assert.False(validity.EnforcedValid);
@@ -157,7 +157,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(contract.Note, dto.General.Notes);
             AssertOptionalIdentity(contract.ContractTemplate, dto.General.ContractTemplate);
             AssertOptionalIdentity(contract.ContractType, dto.General.ContractType);
-            AssertOptionalIdentity(contract.CriticalityType, dto.General.CriticalityType);
+            AssertOptionalIdentity(contract.Criticality, dto.General.Criticality);
             AssertAgreementElements(contract.AssociatedAgreementElementTypes, dto.General.AgreementElements);
 
             Assert.Equal(contract.Concluded, dto.General.Validity.ValidFrom);
@@ -733,7 +733,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     }
                 }
                 : null;
-            contract.CriticalityType = withOptionalCrossReferences
+            contract.Criticality = withOptionalCrossReferences
                 ? new CriticalityType {Uuid = A<Guid>(), Name = A<string>()}
                 : null;
             contract.Active = A<bool>();

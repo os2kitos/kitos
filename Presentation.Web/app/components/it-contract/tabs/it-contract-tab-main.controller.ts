@@ -334,10 +334,10 @@
 
                     //If selected state is expired, add it for presentation reasons
                     let existingChoice = null;
-                    if (contract.criticalityTypeId !== undefined && contract.criticalityTypeId !== null) {
+                    if (contract.criticalityId !== undefined && contract.criticalityId !== null) {
                         existingChoice = {
-                            id: contract.criticalityTypeId,
-                            name: `${contract.criticalityTypeName} (udgået)`
+                            id: contract.criticalityId,
+                            name: `${contract.criticalityName} (udgået)`
                         };
 
                         if (!optionMap[existingChoice.id]) {
@@ -356,8 +356,8 @@
                         selectedElement: existingChoice && optionMap[existingChoice.id],
                         select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
                         elementSelected: (newElement) => {
-                            var payload = { criticalityTypeId: newElement ? newElement.id : null };
-                            $scope.contract.criticalityTypeId = newElement?.id;
+                            var payload = { criticalityId: newElement ? newElement.id : null };
+                            $scope.contract.criticalityId = newElement?.id;
                             patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         }
                     };

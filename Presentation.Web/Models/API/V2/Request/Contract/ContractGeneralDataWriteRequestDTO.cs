@@ -39,11 +39,11 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         public ValidityWriteRequestDTO Validity { get; set; }
 
         /// <summary>
-        /// Optionally assigned criticality type
+        /// Optionally assigned criticality
         /// Constraints:
         ///     - If changed from current state, the option type must be available in the organization
         /// </summary>
         [NonEmptyGuid]
-        public Guid? CriticalityTypeUuid { get; set; }
+        public Guid? CriticalityUuid { get; set; }
     }
 }
