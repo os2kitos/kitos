@@ -13,6 +13,7 @@ class ItSystemUsageGDPR {
     }
 
     static getDataProcessingRegistrationView() {
+        console.log("Getting dpr view element");
         return element(this.cssHelper.byDataElementType(this.consts.dataProcessingRegistrationView));
     }
 

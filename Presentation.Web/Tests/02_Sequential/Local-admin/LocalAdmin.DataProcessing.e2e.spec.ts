@@ -4,16 +4,16 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import NavigationBarHelper = require("../../object-wrappers/navigationBarWrapper");
 import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
 import SystemUsageHelper = require("../../Helpers/SystemUsageHelper");
-import LocalItSystemNavigation = require("../../Helpers/SideNavigation/LocalItSystemNavigation");
-import SystemTabDPR = require("../../PageObjects/it-system/Usage/Tabs/ItSystemUsageDataProcessing.po");
+//import NavigationHelper = require("../../Utility/NavigationHelper");
 
 describe("Local admin is able to toggle DataProcessing", () => {
 
     var loginHelper = new Login();
     var dpPageHelper = new LocalDataProcessing();
     var testFixture = new TestFixtureWrapper();
-    var naviHelper = new NavigationBarHelper();
+    var navigationBarHelper = new NavigationBarHelper();
     var systemName = createName("SystemName");
+    //var navigationHelper = new NavigationHelper();
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
@@ -51,17 +51,19 @@ describe("Local admin is able to toggle DataProcessing", () => {
     });
 
     function checkSystemGdprPageDataProcessingVisibility(visibility: boolean, sysName: string) {
+        console.log(`Checking DPR visibility, expected: ${visibility}, sysName: ${sysName}`);
         SystemUsageHelper.openLocalSystem(sysName)
-            .then(() => LocalItSystemNavigation.openDataProcessingPage())
-            .then(() => expect((SystemTabDPR.getDataProcessingRegistrationView()).isPresent()).toBe(visibility));
+            .then(() => expect(navigationBarHelper.headerNavigations.dataProcessingButton.isPresent()).toBe(visibility));
     }
 
     function expectCheckboxValueToBe(currentValueIs: boolean) {
+        console.log(`Expecting Checkbox value to be: ${currentValueIs}`);
         expect((dpPageHelper.getToggleDataProcessingCheckbox()).isSelected()).toBe(currentValueIs);
     }
 
     function expectSystemGdprDataProcessingViewToBe(shown: boolean) {
-        expect((naviHelper.headerNavigations.dataProcessingButton).isPresent()).toBe(shown);
+        console.log(`Expecting Data processing view to be: ${shown}`);
+        expect((navigationBarHelper.headerNavigations.dataProcessingButton).isPresent()).toBe(shown);
     }
 
     function createName(prefix: string) {

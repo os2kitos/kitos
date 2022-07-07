@@ -16,6 +16,9 @@
             systemRelations: {
                 text: "Relationer"
             },
+            dataProcessings: {
+                text: "Databehandling"
+            },
             contracts: {
                 text: "Kontrakter",
                 readOnly: true,
