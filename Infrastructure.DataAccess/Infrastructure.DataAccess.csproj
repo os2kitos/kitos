@@ -890,6 +890,10 @@
     <Compile Include="Migrations\202207060929536_Rename_Criticality_fields_on_contract.designer.cs">
       <DependentUpon>202207060929536_Rename_Criticality_fields_on_contract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202207071127465_UserCountUndecided.cs" />
+    <Compile Include="Migrations\202207071127465_UserCountUndecided.designer.cs">
+      <DependentUpon>202207071127465_UserCountUndecided.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1470,6 +1474,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207060929536_Rename_Criticality_fields_on_contract.resx">
       <DependentUpon>202207060929536_Rename_Criticality_fields_on_contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207071127465_UserCountUndecided.resx">
+      <DependentUpon>202207071127465_UserCountUndecided.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

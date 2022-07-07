@@ -1734,9 +1734,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             }
             else
             {
-                // 0 and 9 are the default values being reset to
-                Assert.Equal(0, actual.NumberOfExpectedUsers.LowerBound);
-                Assert.Equal(9, actual.NumberOfExpectedUsers.UpperBound);
+                Assert.Null(actual.NumberOfExpectedUsers);
 
                 Assert.False(actual.Validity.EnforcedValid);
                 Assert.Null(actual.Validity.ValidFrom);

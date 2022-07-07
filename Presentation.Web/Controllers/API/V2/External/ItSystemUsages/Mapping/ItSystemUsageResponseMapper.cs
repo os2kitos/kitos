@@ -267,6 +267,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             return systemUsage.UserCount switch
             {
+                null => null,
+                UserCount.UNDECIDED => new ExpectedUsersIntervalDTO() {LowerBound = null, UpperBound = null}, 
                 UserCount.BELOWTEN => new ExpectedUsersIntervalDTO { LowerBound = 0, UpperBound = 9 },
                 UserCount.TENTOFIFTY => new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
                 UserCount.FIFTYTOHUNDRED => new ExpectedUsersIntervalDTO { LowerBound = 50, UpperBound = 100 },

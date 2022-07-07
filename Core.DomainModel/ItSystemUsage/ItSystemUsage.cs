@@ -269,7 +269,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-        public UserCount UserCount { get; set; }
+        public UserCount? UserCount { get; set; }
 
         #region GDPR
         public string GeneralPurpose { get; set; }
@@ -550,28 +550,29 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetUserCount()
         {
-            UserCount = UserCount.BELOWTEN;
+            UserCount = null;
         }
 
-        public Maybe<OperationError> SetExpectedUsersInterval((int lower, int? upperBound) newIntervalValue)
+        public Maybe<OperationError> SetExpectedUsersInterval((int? lower, int? upperBound) newIntervalValue)
         {
             switch (newIntervalValue)
             {
                 case (0, 9):
-                    UserCount = UserCount.BELOWTEN;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.BELOWTEN;
                     break;
                 case (10, 50):
-                    UserCount = UserCount.TENTOFIFTY;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.TENTOFIFTY;
                     break;
                 case (50, 100):
-                    UserCount = UserCount.FIFTYTOHUNDRED;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.FIFTYTOHUNDRED;
                     break;
                 case (100, null):
                 case (100, int.MaxValue):
-                    UserCount = UserCount.HUNDREDPLUS;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.HUNDREDPLUS;
                     break;
                 default:
-                    return new OperationError("Invalid user count. Please refer to input documentation", OperationFailure.BadInput);
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.UNDECIDED;
+                    break;
             }
             return Maybe<OperationError>.None;
         }
