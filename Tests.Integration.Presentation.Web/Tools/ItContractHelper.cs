@@ -202,7 +202,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId={organizationId}"), cookie, new { criticalityTypeId = criticalityId });
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId={organizationId}"), cookie, new { criticalityId = criticalityId });
         }
 
         public static async Task<List<ItContractRole>> GetRolesAsync(Cookie optionalLogin = null)

@@ -31,7 +31,7 @@
     export class OverviewController implements IOverviewController {
         private readonly storageKey = "it-contract-overview-options";
         private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
-        private readonly criticalityTypeName = "CriticalityType";
+        private readonly criticalityPropertyName = "Criticality";
         private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
@@ -182,7 +182,7 @@
 
         private fixCriticalityFilter(filterUrl, column) {
             const pattern = new RegExp(`(${column}( eq )\'([0-9]+)\')`, "i");
-            const renamedColumn = filterUrl.replace(pattern, "CriticalityType/Id$2$3");
+            const renamedColumn = filterUrl.replace(pattern, `${this.criticalityPropertyName}/Id$2$3`);
 
             if (renamedColumn.includes("0")) {
                 return renamedColumn.replace("0", "null");
@@ -278,7 +278,7 @@
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
                                         "LastChangedByUser($select=Name,LastName)," +
-                                        "CriticalityType($select=Id)";
+                                        `${this.criticalityPropertyName}($select=Id)`;
 
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 var query = `/odata/Organizations(${self.user.currentOrganizationId})/`;
@@ -296,8 +296,8 @@
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$orderby) {
-                                if (parameterMap.$orderby.includes("CriticalityType")) {
-                                    parameterMap.$orderby = parameterMap.$orderby.replace("CriticalityType", "CriticalityType/Name");
+                                if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
+                                    parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName, `${this.criticalityPropertyName}/Name`);
                                 }
                             }
 
@@ -311,7 +311,7 @@
 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
 
-                                parameterMap.$filter = this.fixCriticalityFilter(parameterMap.$filter, this.criticalityTypeName);
+                                parameterMap.$filter = this.fixCriticalityFilter(parameterMap.$filter, this.criticalityPropertyName);
                             }
 
                             return parameterMap;
@@ -772,9 +772,9 @@
                         filterable: false
                     },
                     {
-                        field: this.criticalityTypeName, title: "Kritikalitet", width: 150,
-                        persistId: "criticalitytype",
-                        template: dataItem => dataItem.CriticalityType ? this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityType.Id) : "",
+                        field: this.criticalityPropertyName, title: "Kritikalitet", width: 150,
+                        persistId: "criticality",
+                        template: dataItem => dataItem.Criticality ? this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id) : "",
                         sortable: true,
                         filterable: {
                             cell: {

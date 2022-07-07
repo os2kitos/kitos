@@ -63,9 +63,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ParentId)
                 .WillCascadeOnDelete(false);
 
-            HasOptional(t => t.CriticalityType)
+            HasOptional(t => t.Criticality)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.CriticalityTypeId);
+                .HasForeignKey(d => d.CriticalityId);
 
             HasMany(t => t.AssociatedAgreementElementTypes)
                .WithRequired(t => t.ItContract)

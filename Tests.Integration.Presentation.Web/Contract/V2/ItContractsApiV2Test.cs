@@ -2133,7 +2133,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 ContractId = A<string>(),
                 ContractTypeUuid = contractType?.Uuid,
                 ContractTemplateUuid = contractTemplateType?.Uuid,
-                CriticalityTypeUuid = criticalityType?.Uuid,
+                CriticalityUuid = criticalityType?.Uuid,
                 AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
                 Validity = new ValidityWriteRequestDTO()
                 {
@@ -2161,7 +2161,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(request?.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
             Assert.Equal(request?.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
             Assert.Equal(request?.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
-            AssertCrossReference(criticalityType, freshDTO.General.CriticalityType);
+            AssertCrossReference(criticalityType, freshDTO.General.Criticality);
 
             if (expectedAgreementElements == null)
                 Assert.Empty(freshDTO.General.AgreementElements);
