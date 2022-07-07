@@ -4,7 +4,6 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import NavigationBarHelper = require("../../object-wrappers/navigationBarWrapper");
 import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
 import SystemUsageHelper = require("../../Helpers/SystemUsageHelper");
-//import NavigationHelper = require("../../Utility/NavigationHelper");
 
 describe("Local admin is able to toggle DataProcessing", () => {
 
@@ -13,7 +12,6 @@ describe("Local admin is able to toggle DataProcessing", () => {
     var testFixture = new TestFixtureWrapper();
     var navigationBarHelper = new NavigationBarHelper();
     var systemName = createName("SystemName");
-    //var navigationHelper = new NavigationHelper();
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
@@ -38,19 +36,19 @@ describe("Local admin is able to toggle DataProcessing", () => {
         var isDataProcessingEnabled;
         dpPageHelper.getPage()
             .then(async () => isDataProcessingEnabled = await dpPageHelper.getToggleDataProcessingCheckbox().isSelected())
-            .then(() => checkSystemGdprPageDataProcessingVisibility(isDataProcessingEnabled, systemName))
+            .then(() => checkSystemDataProcessingVisibility(isDataProcessingEnabled, systemName))
             .then(() => dpPageHelper.getPage())
             .then(() => expectCheckboxValueToBe(isDataProcessingEnabled))
-            .then(() => expectSystemGdprDataProcessingViewToBe(isDataProcessingEnabled))
+            .then(() => expectSystemDataProcessingViewToBe(isDataProcessingEnabled))
             .then(() => dpPageHelper.getToggleDataProcessingCheckbox().click())
             .then(() => browser.waitForAngular())
             .then(() => expectCheckboxValueToBe(!isDataProcessingEnabled))
-            .then(() => expectSystemGdprDataProcessingViewToBe(!isDataProcessingEnabled) )
-            .then(() => checkSystemGdprPageDataProcessingVisibility(!isDataProcessingEnabled, systemName));
+            .then(() => expectSystemDataProcessingViewToBe(!isDataProcessingEnabled) )
+            .then(() => checkSystemDataProcessingVisibility(!isDataProcessingEnabled, systemName));
 
     });
 
-    function checkSystemGdprPageDataProcessingVisibility(visibility: boolean, sysName: string) {
+    function checkSystemDataProcessingVisibility(visibility: boolean, sysName: string) {
         console.log(`Checking DPR visibility, expected: ${visibility}, sysName: ${sysName}`);
         SystemUsageHelper.openLocalSystem(sysName)
             .then(() => expect(navigationBarHelper.headerNavigations.dataProcessingButton.isPresent()).toBe(visibility));
@@ -61,7 +59,7 @@ describe("Local admin is able to toggle DataProcessing", () => {
         expect((dpPageHelper.getToggleDataProcessingCheckbox()).isSelected()).toBe(currentValueIs);
     }
 
-    function expectSystemGdprDataProcessingViewToBe(shown: boolean) {
+    function expectSystemDataProcessingViewToBe(shown: boolean) {
         console.log(`Expecting Data processing view to be: ${shown}`);
         expect((navigationBarHelper.headerNavigations.dataProcessingButton).isPresent()).toBe(shown);
     }
