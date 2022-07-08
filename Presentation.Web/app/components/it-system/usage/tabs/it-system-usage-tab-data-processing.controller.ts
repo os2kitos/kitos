@@ -12,7 +12,7 @@
             this.dataProcessingRegistrations = this.itSystemUsage.associatedDataProcessingRegistrations;
         }
 
-        dataProcessingRegistrations: Models.OData.DataProcessing.IDataProcessingRegistration[];
+        dataProcessingRegistrations: Models.Generic.NamedEntity.NamedEntityDTO[];
     }
 
     angular
