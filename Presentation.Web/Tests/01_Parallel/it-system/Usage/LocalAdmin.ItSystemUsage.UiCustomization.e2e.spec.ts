@@ -36,7 +36,6 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
             .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.gdpr", LocalItSystemNavigationSrefs.GPDRSref))
-            .then(() => testTabCustomization(systemName, "ItSystemUsages.dataProcessing", LocalItSystemNavigationSrefs.dataProcessingSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.advice", LocalItSystemNavigationSrefs.adviceSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.archiving", LocalItSystemNavigationSrefs.archivingSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.interfaces", LocalItSystemNavigationSrefs.exposedInterfacesSref))
