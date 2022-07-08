@@ -1,57 +1,46 @@
-﻿(function (ng, app) {
-    app.config(["$stateProvider", function ($stateProvider) {
+﻿((ng, app) => {
+    app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-contract.edit.economy", {
             url: "/economy",
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-economy.view.html",
             controller: "contract.EditEconomyCtrl",
             resolve: {
                 orgUnits: [
-                    '$http', 'contract', function ($http, contract) {
-                        return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
+                    "$http", "contract", ($http, contract) => $http.get("api/organizationUnit?organization=" + contract.organizationId).then(result => {
 
-                            var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = [];
+                        var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = [];
 
-                            function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
-                                var option = {
-                                    id: String(orgUnit.id),
-                                    text: orgUnit.name,
-                                    indentationLevel: indentationLevel,
-                                    optionalExtraObject: orgUnit.ean
-                                };
+                        function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
+                            const option = {
+                                id: String(orgUnit.id),
+                                text: orgUnit.name,
+                                indentationLevel: indentationLevel,
+                                optionalExtraObject: orgUnit.ean
+                            };
 
-                                options.push(option);
+                            options.push(option);
 
-                                _.each(orgUnit.children, function (child) {
-                                    return visit(child, indentationLevel + 1);
-                                });
+                            _.each(orgUnit.children, child => visit(child, indentationLevel + 1));
 
-                            }
-                            visit(result.data.response, 0);
-                            return options;
-                        });
-                    }
+                        }
+                        visit(result.data.response, 0);
+                        return options;
+                    })
                 ],
-                externalEconomyStreams: ["$http", "contract", "$state", function ($http, contract) {
-                    return $http.get(`api/EconomyStream/?externPaymentForContractWithId=${contract.id}`).then(function (result) {
-                        return result.data.response;
-                    }, function (error) {
-                        return error;
-                    });
-                }],
-                internalEconomyStreams: ["$http", "contract", "$state", function ($http, contract) {
-                    return $http.get(`api/EconomyStream/?internPaymentForContractWithId=${contract.id}`).then(function (result) {
-                        return result.data.response;
-                    }, function (error) {
-                        return error;
-                    });
-                }]
+                externalEconomyStreams: ["$http", "contract", "$state",
+                    ($http, contract) => $http.get(`api/EconomyStream/?externPaymentForContractWithId=${contract.id}`)
+                    .then(result => result.data.response, error => error)],
+                internalEconomyStreams:
+                ["$http", "contract", "$state",
+                    ($http, contract) => $http.get(`api/EconomyStream/?internPaymentForContractWithId=${contract.id}`)
+                    .then(result => result.data.response, error => error)]
             }
         });
     }]);
 
     app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
         "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess",
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
+        ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) => {
             $scope.orgUnits = orgUnits;
             $scope.allowClear = true;
             $scope.hasWriteAccess = hasWriteAccess;
@@ -67,73 +56,25 @@
 
                 var allStreams = [];
                 _.each(externalEconomyStreams,
-                    function (stream) {
+                    stream => {
                         allStreams.push(stream);
                     });
 
-                _.each(internalEconomyStreams, function (stream) {
+                _.each(internalEconomyStreams, stream => {
                     allStreams.push(stream);
                 });
 
-                if (allStreams.length > 0) {
-                    $scope.visibility = allStreams[0].accessModifier;
-                } else {
-                    $scope.visibility = 0;
-                }
-
                 var externEconomyStreams = [];
                 $scope.externEconomyStreams = externEconomyStreams;
-                _.each(externalEconomyStreams, function (stream) {
+                _.each(externalEconomyStreams, stream => {
                     pushStream(stream, externEconomyStreams);
                 });
 
                 var internEconomyStreams = [];
                 $scope.internEconomyStreams = internEconomyStreams;
-                _.each(internalEconomyStreams, function (stream) {
+                _.each(internalEconomyStreams, stream => {
                     pushStream(stream, internEconomyStreams);
                 });
-
-                $scope.changeVisibility = function () {
-                    if ($scope.hasWriteAccess) {
-                        if (externalEconomyStreams.length !== 0) {
-                            _.each(externalEconomyStreams,
-                                function (stream) {
-                                    patchEconomyStream(stream).then(function () {
-                                        notify.addSuccessMessage("Synligheden for ekstern betaling blev opdateret");
-                                    }, function (error) {
-                                        if (error.status === 403) {
-                                            notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
-                                        } else {
-                                            notify.addErrorMessage("Synligheden for ekstern betaling blev ikke opdateret");
-                                        }
-                                    });
-                                });
-                        }
-
-                        if (internalEconomyStreams !== 0) {
-                            _.each(internalEconomyStreams,
-                                function (stream) {
-                                    patchEconomyStream(stream).then(function () {
-                                        notify.addSuccessMessage("Synligheden for intern betaling blev opdateret");
-                                    }, function (error) {
-                                        if (error.status === 403) {
-                                            notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
-                                        } else {
-                                            notify.addErrorMessage("Synligheden for intern betaling blev ikke opdateret");
-                                        }
-                                    });
-                                });
-                        }
-
-                    }
-                }
-
-                function patchEconomyStream(stream) {
-                    const payload = {
-                        "accessModifier": `${$scope.visibility}`
-                    };
-                    return $http.patch(`api/EconomyStream/?id=${stream.id}&organizationId=${user.currentOrganizationId}`, payload);
-                }
 
                 function pushStream(stream, collection) {
                     stream.show = true;
@@ -143,11 +84,11 @@
                         var msg = notify.addInfoMessage("Sletter række...");
 
                         $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId)
-                            .then(function onSuccess(result) {
+                            .then(result => {
                                 stream.show = false;
                                 collection = _.remove(collection, (item) => item.id === stream.id);
                                 msg.toSuccessMessage("Rækken er slettet!");
-                            }, function onError(result) {
+                            }, result => {
                                 msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
                             }).finally(reload);
                     };
@@ -166,23 +107,23 @@
                 }
 
                 function postStream(field, organizationId) {
-                    var stream = {};
+                    const stream = {};
                     stream[field] = contract.id;
                     stream[organizationId] = user.currentOrganizationId;
 
                     var msg = notify.addInfoMessage("Tilføjer ny række...");
                     $http.post(`api/EconomyStream/?contractId=${contract.id}`, stream)
-                        .then(function onSuccess(result) {
+                        .then(result => {
                             msg.toSuccessMessage("Rækken er tilføjet!");
-                        }, function onError(result) {
+                        }, result => {
                             msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
                         }).finally(reload);
                 }
 
-                $scope.newExtern = function () {
+                $scope.newExtern = () => {
                     postStream("ExternPaymentForId", "OrganizationId");
                 };
-                $scope.newIntern = function () {
+                $scope.newIntern = () => {
                     postStream("InternPaymentForId", "OrganizationId");
                 };
                 $scope.patchDate = (field, value, id) => {
@@ -196,7 +137,7 @@
 
                     }
                     else {
-                        var dateString = date.format("YYYY-MM-DD");
+                        const dateString = date.format("YYYY-MM-DD");
                         var payload = {};
                         payload[field] = dateString;
                         patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
@@ -204,10 +145,10 @@
                 }
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
-                    $http({ method: 'PATCH', url: url, data: payload })
-                        .then(function onSuccess(result) {
+                    $http({ method: "PATCH", url: url, data: payload })
+                        .then(result => {
                             msg.toSuccessMessage("Feltet er opdateret.");
-                        }, function onError(result) {
+                        }, result => {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }
@@ -216,11 +157,9 @@
                 function reload() {
                     return $state.transitionTo($state.current, $stateParams, {
                         reload: true
-                    }).then(function () {
+                    }).then(() => {
                         $scope.hideContent = true;
-                        return $timeout(function () {
-                            return $scope.hideContent = false;
-                        }, 1);
+                        return $timeout(() => $scope.hideContent = false, 1);
                     });
                 };
             }

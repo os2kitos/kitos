@@ -73,7 +73,7 @@ namespace Tests.Unit.Presentation.Web.OData
             const int orgKey = 1;
             const int contractKey = 1;
             ExpectGetOrganizationalReadAccessReturns(orgKey, OrganizationDataReadAccessLevel.Public);
-            IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new EconomyStream { AccessModifier = AccessModifier.Public, ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
+            IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new() { ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
             _economyStreamRepository.Setup(x => x.AsQueryable()).Returns(list);
 
             // Act
@@ -95,7 +95,7 @@ namespace Tests.Unit.Presentation.Web.OData
             const int orgKey = 1;
             const int contractKey = 1;
             ExpectGetOrganizationalReadAccessReturns(orgKey, OrganizationDataReadAccessLevel.None);
-            IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new EconomyStream { AccessModifier = AccessModifier.Local, ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
+            IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new() { ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
             _economyStreamRepository.Setup(x => x.AsQueryable()).Returns(list);
 
             // Act

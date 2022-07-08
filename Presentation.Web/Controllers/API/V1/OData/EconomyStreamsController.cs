@@ -5,7 +5,6 @@ using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.AspNet.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -50,6 +49,13 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByOrganization(int orgKey)
         {
+            var accessLevel = GetOrganizationReadAccessLevel(orgKey);
+
+            if (accessLevel < OrganizationDataReadAccessLevel.All)
+            {
+                return Forbidden();
+            }
+
             var result =
                 _repository.AsQueryable()
                     .Where(
@@ -57,48 +63,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                             m.ExternPaymentFor.OrganizationId == orgKey &&
                             m.InternPaymentFor == null);
 
-            var economyStream = result.FirstOrDefault();
-
-            var accessLevel = GetOrganizationReadAccessLevel(orgKey);
-
-            if (economyStream != null)
-            {
-                var contractId = economyStream.ExternPaymentFor.Id;
-
-                var economyStreamIsPublic = EconomyStreamIsPublic(contractId);
-
-                if (accessLevel < OrganizationDataReadAccessLevel.All && economyStreamIsPublic == false)
-                {
-                    return Forbidden();
-                }
-
-                if (economyStreamIsPublic && accessLevel < OrganizationDataReadAccessLevel.Public)
-                {
-                    return Forbidden();
-                }
-
-            }
-            //No access to organization -> forbidden, not empty response
-            else if (accessLevel < OrganizationDataReadAccessLevel.Public)
-            {
-                return Forbidden();
-            }
-
             return Ok(result);
-        }
-
-        private bool EconomyStreamIsPublic(int contractKey)
-        {
-            if (contractKey == 0)
-            {
-                // contractKey is zero by default if GetByOrganization does not find any EconomyStreams
-                return false;
-            }
-
-            var economyStream = _repository.AsQueryable()
-                .FirstOrDefault(e => e.ExternPaymentFor.Id == contractKey || e.InternPaymentFor.Id == contractKey);
-
-            return economyStream != null && economyStream.AccessModifier == AccessModifier.Public;
         }
     }
 }

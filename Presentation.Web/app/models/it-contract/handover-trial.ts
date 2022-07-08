@@ -5,6 +5,6 @@
         ItContractId: number;
         ItContract: IItContract;
         HandoverTrialTypeId: number;
-        HandoverTrialType: IHandoverTrialType;
+        HandoverTrialType: Models.OData.Generic.IOptionDTO<IHandoverTrial>;
     }
 }
