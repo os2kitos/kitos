@@ -4,7 +4,7 @@ import TestFixtureWrapper = require("../../../Utility/TestFixtureWrapper");
 import DataProcessingRegistrationOverviewPageObject = require("../../../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import DataProcessingRegistrationHelper = require("../../../Helpers/DataProcessingRegistrationHelper")
 import SystemCatalogHelper = require("../../../Helpers/SystemCatalogHelper");
-import ItSystemUsageGdpr = require("../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageGDPR.po");
+import ItSystemUsageDataProcessing = require("../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageDataProcessing.po");
 import LocalItSystemNavigation = require("../../../Helpers/SideNavigation/LocalItSystemNavigation");
 
 describe("Data processing registration it-systems test", () => {
@@ -64,9 +64,9 @@ describe("Data processing registration it-systems test", () => {
     function verifyDPRIsPresentOnItSystemGDPRPage(systemName: string, dprName: string) {
         console.log(`Expecting system ${systemName} contain reference to DPR:${dprName}`);
         return dpaHelper.clickSystem(systemName)
-            .then(() => LocalItSystemNavigation.openGDPRPage())
-            .then(() => expect(ItSystemUsageGdpr.getDataProcessingLink(dprName).isPresent()).toBeTruthy())
-            .then(() => ItSystemUsageGdpr.getDataProcessingLink(dprName).click())
+            .then(() => LocalItSystemNavigation.openDataProcessingPage())
+            .then(() => expect(ItSystemUsageDataProcessing.getDataProcessingLink(dprName).isPresent()).toBeTruthy())
+            .then(() => ItSystemUsageDataProcessing.getDataProcessingLink(dprName).click())
             .then(() => browser.waitForAngular())
             .then(() => dpaHelper.goToItSystems());
     }
