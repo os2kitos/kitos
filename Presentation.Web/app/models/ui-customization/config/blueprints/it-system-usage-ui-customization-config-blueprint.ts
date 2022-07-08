@@ -48,12 +48,6 @@
             organization: {
                 text: "Organisation"
             },
-            systemRelations: {
-                text: "Relationer"
-            },
-            interfaces: {
-                text: "Udstillede snitflader"
-            },
             archiving: {
                 text: "Arkivering"
             },
