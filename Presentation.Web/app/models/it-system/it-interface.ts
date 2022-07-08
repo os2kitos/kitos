@@ -6,7 +6,7 @@
         ItInterfaceId: string;
         InterfaceId: number;
         /** Gets or sets the interface option.Provides details about an it system of type interface. */
-        Interface: IInterface;
+        Interface: Models.OData.Generic.IOptionDTO<IItInterface>;
         DataRows: Array<IDataRow>;
         Note: string;
         Disabled: boolean;
