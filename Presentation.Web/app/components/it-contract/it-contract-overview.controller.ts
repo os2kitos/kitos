@@ -57,7 +57,7 @@
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
             private _: ILoDashWithMixins,
-            private moment: moment.MomentStatic,
+            private readonly moment: moment.MomentStatic,
             private notify,
             private user,
             private gridStateService: Services.IGridStateFactory,
@@ -261,7 +261,7 @@
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
                                         "LastChangedByUser($select=Name,LastName)," +
-                                        "ExternEconomyStreams($expand=Name($select=Acquisition,Operation,Other,AuditStatus,AuditDate))," +
+                                        "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
                                         `${this.criticalityPropertyName}($select=Id)`;
 
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
@@ -329,16 +329,15 @@
                             // iterrate each contract
                             self._.forEach(response.value,
                                 (contract: Models.ViewModel.ItContract.IItContractOverviewViewModel) => {
-                                    // HACK to add economy data to result
                                     var ecoData = contract.ExternEconomyStreams ?? [];
                                     contract.Acquisition = self._.sumBy(ecoData, "Acquisition");
                                     contract.Operation = self._.sumBy(ecoData, "Operation");
                                     contract.Other = self._.sumBy(ecoData, "Other");
 
-                                    var earliestAuditDate = self._
-                                        .first(self._.sortBy(ecoData, ["AuditDate"], ["desc"]));
-                                    if (earliestAuditDate && earliestAuditDate.AuditDate) {
-                                        contract.AuditDate = earliestAuditDate.AuditDate;
+                                    const streamsSortedByAuditDate = self._.sortBy(ecoData, ["AuditDate"]);
+                                    var streamWithEarliestAuditDate = self._.last(streamsSortedByAuditDate);
+                                    if (streamWithEarliestAuditDate && streamWithEarliestAuditDate.AuditDate) {
+                                        contract.AuditDate = streamWithEarliestAuditDate.AuditDate;
                                     }
 
                                     var totalWhiteStatuses = self._.filter(ecoData, { AuditStatus: "White" }).length;

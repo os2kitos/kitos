@@ -106,11 +106,6 @@
         /** Number of system relations. */
         AssociatedSystemRelations: Models.Odata.ItSystemUsage.ISystemRelationDTO[];
 
-        /** Gets or sets the intern economy streams. */
-        InternEconomyStreams: Array<IEconomyStream>;
-        /** Gets or sets the extern economy streams. */
-        ExternEconomyStreams: Array<IEconomyStream>;
-
         /** Gets or sets the advices. */
         Advices: Array<IAdvice>;
 
@@ -123,6 +118,7 @@
 
         DataProcessingRegistrations: Models.DataProcessing.IDataProcessingRegistration[];
         ProcurementInitiated: Models.Api.Shared.YesNoUndecidedOption | null;
-        Rights : Array<Models.IRightEntity<IItContract>>;
+        Rights: Array<Models.IRightEntity<IItContract>>;
+        ExternEconomyStreams: Array<IEconomyStream>;
     }
 }

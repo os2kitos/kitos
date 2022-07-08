@@ -4,7 +4,7 @@
         Acquisition: number;
         Operation: number;
         Other: number;
-        AuditDate: Date;
+        AuditDate: string;
         status: {
             max: number;
             white: number;
