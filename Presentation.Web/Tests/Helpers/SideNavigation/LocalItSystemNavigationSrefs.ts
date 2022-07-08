@@ -11,6 +11,7 @@
     static hierarchySref = "it-system.usage.hierarchy";
     static organizationSref = "it-system.usage.org";
     static contractsSref = "it-system.usage.contracts";
+    static dataProcessingSref = "it-system.usage.dataprocessing";
 }
 
 export = LocalItSystemNavigationSrefs;

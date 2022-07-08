@@ -37,34 +37,6 @@
                                    data-field="HostedAt">
                     </select-simple>
                 </div>
-                <!-- Data processing agreement -->
-                <div data-ng-if="user.currentConfig.showDataProcessing">
-                    <div class="form-group" data-element-type="gdprDataProcessingRegistrationView">
-                        <div ng-show="filterDataProcessor">
-                            <label for="dataProcessingAgreement" class="control-label small">Databehandling</label>
-                            <div class="well">
-                                <ul id="dataProcessingAgreement"
-                                    style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
-                                    ng-repeat="dpr in dataProcessingRegistrations">
-                                    <li><a data-element-type="gdpr_data-processing-registration--link" data-ui-sref="data-processing.edit-registration.main({id: dpr.id})"> {{dpr.name}} </a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div ng-hide="filterDataProcessor">
-                            <label for="dataProcessingAgreementNone" class="control-label small">Databehandling</label>
-                            <ul ng-disabled="true"
-                                id="dataProcessingAgreementNone"
-                                class="form-control input-sm"
-                                style="list-style-type:none">
-                                Ingen
-                            </ul>
-                        </div>
-                        <span class="help-block small">
-                            <i class="fa fa-info-circle" aria-hidden="true"></i>
-                            Link til registreringer i Databehandlingsmodulet der er oprettet med tilknytning til dette IT System.
-                        </span>
-                    </div>
-                </div>
                 <!-- Link til fortegnelse -->
                 <div class="form-group">
                     <label for="directory-link" class="control-label small">Link til fortegnelse</label>
