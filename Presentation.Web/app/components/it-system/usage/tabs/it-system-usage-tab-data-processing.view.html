@@ -1,18 +1,23 @@
 ﻿<div class="object-section-container" ng-if="isDataProcessingEnabled">
     <h4>{{systemUsageName}}</h4>
     <div class="panel panel-default" >
-        <div class="panel-heading"><strong>Databehandling</strong></div>
+        <div class="panel-heading">Systemet er omfattet af følgende registreringer i modulet "Databehandling"</div>
 
-        <table class="table table-striped table-condensed table-fixed" ng-show="filterDataProcessor" data-element-type="dataProcessingRegistrationView">
+        <table  class="table table-striped table-fixed" >
             <thead>
                 <tr>
-                    <th class="col-xs-1">Registering</th>
+                    <th class="col-xs-1">Databehandling</th>
                 </tr>
             </thead>
             <tbody class="small">
-                <tr ng-repeat="dpr in dataProcessingRegistrations">
+                <tr id="dataProcessingRegistrationView" ng-repeat="dpr in vm.dataProcessingRegistrations" ng-if="(vm.dataProcessingRegistrations.length > 0)">
                     <td>
-                        <a data-element-type="gdpr_data-processing-registration--link" data-ui-sref="data-processing.edit-registration.main({id: dpr.id})"> {{dpr.name}} </a>
+                        <a id="data-processing-registration--link" data-ui-sref="data-processing.edit-registration.main({id: dpr.id})"> {{dpr.name}} </a>
+                    </td>
+                </tr>
+                <tr ng-if="(vm.dataProcessingRegistrations.length == 0)">
+                    <td class="text-center">
+                        Systemet er ikke omfattet af registreringer i modulet "Databehandling"
                     </td>
                 </tr>
             </tbody>

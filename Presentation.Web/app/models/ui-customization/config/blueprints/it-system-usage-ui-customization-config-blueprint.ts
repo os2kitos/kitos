@@ -10,6 +10,17 @@
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab
             },
+            interfaces: {
+                text: "Udstillede snitflader"
+            },
+            systemRelations: {
+                text: "Relationer"
+            },
+            dataProcessing: {
+                text: "Databehandling",
+                readOnly: true,
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
+            },
             contracts: {
                 text: "Kontrakter",
                 readOnly: true,
