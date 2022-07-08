@@ -29,121 +29,44 @@
                 ],
                 externalEconomyStreams: ["$http", "contract", "$state",
                     ($http, contract) => $http.get(`api/EconomyStream/?externPaymentForContractWithId=${contract.id}`)
-                    .then(result => result.data.response, error => error)],
+                        .then(result => result.data.response, error => error)],
                 internalEconomyStreams:
-                ["$http", "contract", "$state",
-                    ($http, contract) => $http.get(`api/EconomyStream/?internPaymentForContractWithId=${contract.id}`)
-                    .then(result => result.data.response, error => error)]
+                    ["$http", "contract", "$state",
+                        ($http, contract) => $http.get(`api/EconomyStream/?internPaymentForContractWithId=${contract.id}`)
+                            .then(result => result.data.response, error => error)],
+                paymentFrequencies: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PaymentFrequencyTypes).getAll()
+                ],
+                paymentModels: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PaymentModelTypes).getAll()
+                ],
+                priceRegulations: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PriceRegulationTypes).getAll()]
             }
         });
     }]);
 
-    app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
-        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess",
-        ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) => {
+    app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess", "paymentFrequencies", "paymentModels", "priceRegulations",
+        ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess, paymentFrequencies: Kitos.Models.IOptionEntity[], paymentModels: Kitos.Models.IOptionEntity[], priceRegulations: Kitos.Models.IOptionEntity[]) => {
             $scope.orgUnits = orgUnits;
             $scope.allowClear = true;
             $scope.hasWriteAccess = hasWriteAccess;
+            $scope.contract = contract;
+            $scope.paymentFrequencies = paymentFrequencies;
+            $scope.paymentModels = paymentModels;
+            $scope.priceRegulations = priceRegulations;
+            $scope.patchPaymentModelUrl = `api/itcontract/${contract.id}`;
 
-            if (externalEconomyStreams.status === 401 && internalEconomyStreams.status === 401) {
-                notify.addInfoMessage("Du har ikke lov til at se disse informationer. Kontakt venligst din lokale administrator eller kontrakt administrator.");
-            } else {
-                var baseUrl = "api/economyStream";
-                $scope.datepickerOptions = {
-                    format: "dd-MM-yyyy",
-                    parseFormats: ["yyyy-MM-dd"]
-                };
+            function convertDate(value: string): moment.Moment {
+                return moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
+            }
 
-                var allStreams = [];
-                _.each(externalEconomyStreams,
-                    stream => {
-                        allStreams.push(stream);
-                    });
+            function isDateInvalid(date: moment.Moment) {
+                return !date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099;
+            }
 
-                _.each(internalEconomyStreams, stream => {
-                    allStreams.push(stream);
-                });
-
-                var externEconomyStreams = [];
-                $scope.externEconomyStreams = externEconomyStreams;
-                _.each(externalEconomyStreams, stream => {
-                    pushStream(stream, externEconomyStreams);
-                });
-
-                var internEconomyStreams = [];
-                $scope.internEconomyStreams = internEconomyStreams;
-                _.each(internalEconomyStreams, stream => {
-                    pushStream(stream, internEconomyStreams);
-                });
-
-                function pushStream(stream, collection) {
-                    stream.show = true;
-                    stream.updateUrl = baseUrl + "/" + stream.id;
-
-                    stream.delete = function () {
-                        var msg = notify.addInfoMessage("Sletter række...");
-
-                        $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId)
-                            .then(result => {
-                                stream.show = false;
-                                collection = _.remove(collection, (item) => item.id === stream.id);
-                                msg.toSuccessMessage("Rækken er slettet!");
-                            }, result => {
-                                msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
-                            }).finally(reload);
-                    };
-
-                    function updateEan() {
-                        stream.ean = " - ";
-
-                        if (stream.organizationUnitId !== null && stream.organizationUnitId !== undefined) {
-                            stream.ean = stream.organizationUnitId.optionalExtraObject;
-                        }
-                    };
-                    stream.updateEan = updateEan;
-
-                    updateEan();
-                    collection.push(stream);
-                }
-
-                function postStream(field, organizationId) {
-                    const stream = {};
-                    stream[field] = contract.id;
-                    stream[organizationId] = user.currentOrganizationId;
-
-                    var msg = notify.addInfoMessage("Tilføjer ny række...");
-                    $http.post(`api/EconomyStream/?contractId=${contract.id}`, stream)
-                        .then(result => {
-                            msg.toSuccessMessage("Rækken er tilføjet!");
-                        }, result => {
-                            msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
-                        }).finally(reload);
-                }
-
-                $scope.newExtern = () => {
-                    postStream("ExternPaymentForId", "OrganizationId");
-                };
-                $scope.newIntern = () => {
-                    postStream("InternPaymentForId", "OrganizationId");
-                };
-                $scope.patchDate = (field, value, id) => {
-                    var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-                    if (value === "") {
-                        var payload = {};
-                        payload[field] = null;
-                        patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
-                    } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
-
-                    }
-                    else {
-                        const dateString = date.format("YYYY-MM-DD");
-                        var payload = {};
-                        payload[field] = dateString;
-                        patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
-                    }
-                }
-                function patch(payload, url) {
+            $scope.patchPaymentModelDate = (field, value) => {
+                function patchContract(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
                     $http({ method: "PATCH", url: url, data: payload })
                         .then(result => {
@@ -152,17 +75,140 @@
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }
-                // work around for $state.reload() not updating scope
-                // https://github.com/angular-ui/ui-router/issues/582
-                function reload() {
-                    return $state.transitionTo($state.current, $stateParams, {
-                        reload: true
-                    }).then(() => {
-                        $scope.hideContent = true;
-                        return $timeout(() => $scope.hideContent = false, 1);
-                    });
-                };
+
+                const date = convertDate(value);
+                if (value === "") {
+                    var payload = {};
+                    payload[field] = null;
+                    patchContract(payload, $scope.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
+                } else if (value == null) {
+
+                } else if (isDateInvalid(date)) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                }
+                else {
+                    const dateString = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = dateString;
+                    patchContract(payload, $scope.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
+                }
             }
+
+            var baseUrl = "api/economyStream";
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
+            var allStreams = [];
+            _.each(externalEconomyStreams,
+                stream => {
+                    allStreams.push(stream);
+                });
+
+            _.each(internalEconomyStreams, stream => {
+                allStreams.push(stream);
+            });
+
+            var externEconomyStreams = [];
+            $scope.externEconomyStreams = externEconomyStreams;
+            _.each(externalEconomyStreams, stream => {
+                pushStream(stream, externEconomyStreams);
+            });
+
+            var internEconomyStreams = [];
+            $scope.internEconomyStreams = internEconomyStreams;
+            _.each(internalEconomyStreams, stream => {
+                pushStream(stream, internEconomyStreams);
+            });
+
+            function pushStream(stream, collection) {
+                stream.show = true;
+                stream.updateUrl = baseUrl + "/" + stream.id;
+
+                stream.delete = function () {
+                    const msg = notify.addInfoMessage("Sletter række...");
+
+                    $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId)
+                        .then(result => {
+                            stream.show = false;
+                            collection = _.remove(collection, (item) => item.id === stream.id);
+                            msg.toSuccessMessage("Rækken er slettet!");
+                        }, result => {
+                            msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
+                        }).finally(reload);
+                };
+
+                function updateEan() {
+                    stream.ean = " - ";
+
+                    if (stream.organizationUnitId !== null && stream.organizationUnitId !== undefined) {
+                        stream.ean = stream.organizationUnitId.optionalExtraObject;
+                    }
+                };
+                stream.updateEan = updateEan;
+
+                updateEan();
+                collection.push(stream);
+            }
+
+            function postStream(field, organizationId) {
+                const stream = {};
+                stream[field] = contract.id;
+                stream[organizationId] = user.currentOrganizationId;
+
+                const msg = notify.addInfoMessage("Tilføjer ny række...");
+                $http.post(`api/EconomyStream/?contractId=${contract.id}`, stream)
+                    .then(result => {
+                        msg.toSuccessMessage("Rækken er tilføjet!");
+                    }, result => {
+                        msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
+                    }).finally(reload);
+            }
+
+            $scope.newExtern = () => {
+                postStream("ExternPaymentForId", "OrganizationId");
+            };
+            $scope.newIntern = () => {
+                postStream("InternPaymentForId", "OrganizationId");
+            };
+            $scope.patchDate = (field, value, id) => {
+                const date = convertDate(value);
+                if (value === "") {
+                    var payload = {};
+                    payload[field] = null;
+                    patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
+                } else if (isDateInvalid(date)) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                }
+                else {
+                    const dateString = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = dateString;
+                    patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
+                }
+            }
+            function patch(payload, url) {
+                const msg = notify.addInfoMessage("Gemmer...", false);
+                $http({ method: "PATCH", url: url, data: payload })
+                    .then(result => {
+                        msg.toSuccessMessage("Feltet er opdateret.");
+                    }, result => {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                    });
+            }
+            // work around for $state.reload() not updating scope
+            // https://github.com/angular-ui/ui-router/issues/582
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(() => {
+                    $scope.hideContent = true;
+                    return $timeout(() => $scope.hideContent = false, 1);
+                });
+            };
         }]);
 
 })(angular, app);
