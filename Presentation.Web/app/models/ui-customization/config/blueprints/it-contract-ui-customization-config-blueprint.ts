@@ -33,11 +33,6 @@
                 helpText: Configs.helpTexts.cannotChangeTab,
                 readOnly: true
             },
-            paymentModel: {
-                text: "Betalingsmodel",
-                helpText: Configs.helpTexts.cannotChangeTab,
-                readOnly: true
-            },
             economy: {
                 text: "Økonomi",
                 helpText: Configs.helpTexts.cannotChangeTab,

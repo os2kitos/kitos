@@ -69,7 +69,6 @@ namespace Presentation.Web
             const string kitosNamespace = "Kitos";
             const string entitySetOrganizations = "Organizations";
             const string entitySetItSystems = "ItSystems";
-            const string entitySetEconomyStreams = "EconomyStreams";
 
             var builder = new ODataConventionModelBuilder();
 
@@ -99,13 +98,6 @@ namespace Presentation.Web
             BindEntitySet<ItContractTemplateType, ItContractTemplateTypesController>(builder);
 
             BindEntitySet<ItContractType, ItContractTypesController>(builder);
-
-            var economyStream = builder.EntitySet<EconomyStream>(entitySetEconomyStreams);
-            economyStream.EntityType.HasKey(x => x.Id);
-
-            var economyFunc = builder.Function("ExternEconomyStreams");
-            economyFunc.Parameter<int>("Organization");
-            economyFunc.ReturnsCollectionFromEntitySet<EconomyStream>(entitySetEconomyStreams);
 
             BindEntitySet<RelationFrequencyType, FrequencyTypesController>(builder);
 
@@ -210,8 +202,6 @@ namespace Presentation.Web
             var contracts = BindEntitySet<ItContract, ItContractsController>(builder);
             contracts.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             contracts.HasRequiredBinding(o => o.Supplier, entitySetOrganizations);
-            contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
-            contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
 
             BindEntitySet<InterfaceType, InterfaceTypesController>(builder);
 
@@ -241,13 +231,6 @@ namespace Presentation.Web
 
             BindEntitySet<PriceRegulationType, PriceRegulationTypesController>(builder);
 
-            // These two lines causes an 404 error when requesting odata/ProcurementStrategyTypes at https://localhost:44300/#/global-config/contract
-            // Requesting api/ProcurementStrategy works but not odata/ProcurementStrategyTypes
-            //var procurementStrategy = builder.EntitySet<ProcurementStrategyType>(nameof(ProcurementStrategyController).Replace("Controller", string.Empty));
-            //procurementStrategy.EntityType.HasKey(x => x.Id);
-
-            // There two lines fixes the 404 error at https://localhost:44300/#/global-config/contract
-            // Requesting api/ProcurementStrategy and odata/ProcurementStrategyTypes both work
             BindEntitySet<ProcurementStrategyType, ProcurementStrategyTypesController>(builder);
 
             BindEntitySet<ItProjectType, ItProjectTypesController>(builder);

@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract economy stream.
     /// </summary>
-    public class EconomyStream : Entity, IIsPartOfOrganization, IContractModule, IHasAccessModifier
+    public class EconomyStream : Entity, IIsPartOfOrganization, IContractModule
     {
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract.
@@ -95,12 +95,9 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public string Note { get; set; }
 
-        public AccessModifier AccessModifier { get; set; }
-
         public EconomyStream()
         {
-            // Default "Synlighed" must be local
-            AccessModifier = AccessModifier.Local;
+            
         }
 
         public static EconomyStream CreateInternalEconomyStream(ItContract contract, OrganizationUnit optionalOrganizationUnit, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
@@ -131,7 +128,6 @@ namespace Core.DomainModel.ItContract
                 Acquisition = acquisition,
                 Note = note,
                 AuditDate = auditDate?.Date,
-                AccessModifier = AccessModifier.Local,
                 AuditStatus = auditStatus,
                 Operation = operation,
                 Other = other,

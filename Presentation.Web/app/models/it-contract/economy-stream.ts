@@ -20,7 +20,7 @@
         /** Traffic light for audit. */
         AuditStatus: any;
         /** DateTime for audit. */
-        AuditDate: Date;
+        AuditDate: string;
         /** Gets or sets the note. */
         Note: string;
     }

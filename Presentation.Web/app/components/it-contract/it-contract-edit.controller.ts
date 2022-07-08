@@ -50,7 +50,6 @@
             $scope.isItSystemsEnabled = user.currentConfig.showItSystemModule && uiState.isBluePrintNodeAvailable(blueprint.children.itSystems);
             $scope.isDataProcessingEnabled = user.currentConfig.showDataProcessing && uiState.isBluePrintNodeAvailable(blueprint.children.dataProcessing);
             $scope.isDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines);
-            $scope.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.paymentModel);
             $scope.isEconomyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy);
             $scope.isContractRolesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.contractRoles);
             $scope.isHierarchyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.hierarchy);
