@@ -67,28 +67,6 @@ namespace Tests.Unit.Presentation.Web.OData
         }
 
         [Fact]
-        public void GetByOrganizationWithPublic_Access_ReturnOk()
-        {
-            // Arrange
-            const int orgKey = 1;
-            const int contractKey = 1;
-            ExpectGetOrganizationalReadAccessReturns(orgKey, OrganizationDataReadAccessLevel.Public);
-            IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new() { ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
-            _economyStreamRepository.Setup(x => x.AsQueryable()).Returns(list);
-
-            // Act
-            var result = _sut.GetByOrganization(orgKey);
-
-            // Assert
-            Assert.IsType<OkNegotiatedContentResult<IQueryable<EconomyStream>>>(result);
-            var okNegotiatedContentResult = result as OkNegotiatedContentResult<IQueryable<EconomyStream>>;
-            if (okNegotiatedContentResult == null) return;
-
-            var data = okNegotiatedContentResult.Content;
-            Assert.Equal(list, data);
-        }
-
-        [Fact]
         public void GetByOrganizationWithLocal_NoAccess_ReturnForbidden()
         {
             // Arrange
