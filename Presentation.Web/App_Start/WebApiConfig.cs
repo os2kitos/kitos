@@ -69,7 +69,6 @@ namespace Presentation.Web
             const string kitosNamespace = "Kitos";
             const string entitySetOrganizations = "Organizations";
             const string entitySetItSystems = "ItSystems";
-            const string entitySetEconomyStreams = "EconomyStreams";
 
             var builder = new ODataConventionModelBuilder();
 
@@ -99,13 +98,6 @@ namespace Presentation.Web
             BindEntitySet<ItContractTemplateType, ItContractTemplateTypesController>(builder);
 
             BindEntitySet<ItContractType, ItContractTypesController>(builder);
-
-            var economyStream = builder.EntitySet<EconomyStream>(entitySetEconomyStreams);
-            economyStream.EntityType.HasKey(x => x.Id);
-
-            var economyFunc = builder.Function("ExternEconomyStreams");
-            economyFunc.Parameter<int>("Organization");
-            economyFunc.ReturnsCollectionFromEntitySet<EconomyStream>(entitySetEconomyStreams);
 
             BindEntitySet<RelationFrequencyType, FrequencyTypesController>(builder);
 

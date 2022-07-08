@@ -2,7 +2,7 @@
     "use strict";
 
     export interface IOverviewController {
-        mainGrid: IKendoGrid<IItContractOverview>;
+        mainGrid: IKendoGrid<Models.ViewModel.ItContract.IItContractOverviewViewModel>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: any;
 
@@ -13,21 +13,6 @@
         clearOptions(): void;
     }
 
-    export interface IItContractOverview extends Models.ItContract.IItContract {
-        Acquisition: number;
-        Operation: number;
-        Other: number;
-        AuditDate: string;
-        status: {
-            max: number;
-            white: number;
-            red: number;
-            yellow: number;
-            green: number;
-        };
-        roles: Array<any>;
-    }
-
     export class OverviewController implements IOverviewController {
         private readonly storageKey = "it-contract-overview-options";
         private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
@@ -36,7 +21,7 @@
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
-        public mainGrid: IKendoGrid<IItContractOverview>;
+        public mainGrid: IKendoGrid<Models.ViewModel.ItContract.IItContractOverviewViewModel>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;
 
@@ -55,7 +40,6 @@
             "gridStateService",
             "itContractRoles",
             "orgUnits",
-            "ecoStreamData",
             "$uibModal",
             "needsWidthFixService",
             "exportGridToExcelService",
@@ -79,7 +63,6 @@
             private gridStateService: Services.IGridStateFactory,
             private itContractRoles,
             private orgUnits,
-            private ecoStreamData,
             private $modal,
             private needsWidthFixService,
             private exportGridToExcelService,
@@ -259,7 +242,7 @@
 
             this.canCreate = this.userAccessRights.canCreate;
 
-            var mainGridOptions: IKendoGridOptions<IItContractOverview> = {
+            var mainGridOptions: IKendoGridOptions<Models.ViewModel.ItContract.IItContractOverviewViewModel> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -278,6 +261,7 @@
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
                                         "LastChangedByUser($select=Name,LastName)," +
+                                        "ExternEconomyStreams($expand=Name($select=Acquisition,Operation,Other,AuditStatus,AuditDate))," +
                                         `${this.criticalityPropertyName}($select=Id)`;
 
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
@@ -344,10 +328,9 @@
                         parse: response => {
                             // iterrate each contract
                             self._.forEach(response.value,
-                                contract => {
+                                (contract: Models.ViewModel.ItContract.IItContractOverviewViewModel) => {
                                     // HACK to add economy data to result
-                                    var ecoData = <Array<any>>self._
-                                        .filter(self.ecoStreamData, { "ExternPaymentForId": contract.Id });
+                                    var ecoData = contract.ExternEconomyStreams ?? [];
                                     contract.Acquisition = self._.sumBy(ecoData, "Acquisition");
                                     contract.Operation = self._.sumBy(ecoData, "Operation");
                                     contract.Other = self._.sumBy(ecoData, "Other");
@@ -387,13 +370,13 @@
                                             contract.roles[right.RoleId]
                                                 .push([right.User.Name, right.User.LastName].join(" "));
                                         });
-                                    if (!contract.Parent) { contract.Parent = { Name: "" }; }
-                                    if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" }; }
-                                    if (!contract.Supplier) { contract.Supplier = { Name: "" }; }
-                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
-                                    if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" }; }
-                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
-                                    if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" }; }
+                                    if (!contract.Parent) { contract.Parent = { Name: "" } as any; }
+                                    if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" } as any; }
+                                    if (!contract.Supplier) { contract.Supplier = { Name: "" } as any; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
+                                    if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" } as any; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
+                                    if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" } as any; }
                                 });
                             return response;
                         }
@@ -816,7 +799,7 @@
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles, role => {
-                var roleColumn: Kitos.IKendoGridColumn<Kitos.ItContract.Overview.IItContractOverview> = {
+                var roleColumn: IKendoGridColumn<Models.ViewModel.ItContract.IItContractOverviewViewModel> = {
                     field: `role${role.Id}`,
                     title: role.Name,
                     persistId: `role${role.Id}`,
@@ -874,7 +857,7 @@
         private readonly excelConfig: Kitos.Models.IExcelConfig = {
         };
 
-        private exportToExcel = (e: Kitos.IKendoGridExcelExportEvent<Kitos.ItContract.Overview.IItContractOverview>) => {
+        private exportToExcel = (e: Kitos.IKendoGridExcelExportEvent<Models.ViewModel.ItContract.IItContractOverviewViewModel>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
@@ -1014,12 +997,6 @@
                             ($http, user, _) => $http
                                 .get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
-                        ],
-                        // TODO this isn't a sustainable solution - but a workaround for now...
-                        ecoStreamData: [
-                            "$http", "user", "notify", ($http, user, notify) =>
-                                $http.get(`/odata/ExternEconomyStreams(Organization=${user.currentOrganizationId})`)
-                                    .then(result => result.data.value, () => $stateProvider.transitionTo("home", { q: "updated search term" }))
                         ],
                         uiState: [
                             "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)

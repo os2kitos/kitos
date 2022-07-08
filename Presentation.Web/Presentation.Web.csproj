@@ -353,6 +353,7 @@
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\right-entity.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-contract-ui-customization-config-blueprint.ts" />
@@ -801,6 +802,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\GDPR\OversightDateViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\option-type-view-model.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\edit-org-unit-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\OrganizationDeletionConflictsViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
@@ -896,7 +898,6 @@
     <Compile Include="Controllers\API\V1\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\API\V1\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\V1\OData\ConfigsController.cs" />
-    <Compile Include="Controllers\API\V1\OData\EconomyStreamsController.cs" />
     <Compile Include="Controllers\API\V1\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractRightsController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractsController.cs" />
@@ -1499,7 +1500,6 @@
     <TypeScriptCompile Include="app\models\entity.ts" />
     <TypeScriptCompile Include="app\models\it-contract\advice.ts" />
     <TypeScriptCompile Include="app\models\it-contract\handover-trial.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\it-contract-rights.ts" />
     <TypeScriptCompile Include="app\models\it-contract\payment-milestone.ts" />
     <TypeScriptCompile Include="app\models\it-project\communication.ts" />
     <TypeScriptCompile Include="app\models\it-project\economy-year.ts" />

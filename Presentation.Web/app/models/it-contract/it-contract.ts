@@ -123,5 +123,6 @@
 
         DataProcessingRegistrations: Models.DataProcessing.IDataProcessingRegistration[];
         ProcurementInitiated: Models.Api.Shared.YesNoUndecidedOption | null;
+        Rights : Array<Models.IRightEntity<IItContract>>;
     }
 }
