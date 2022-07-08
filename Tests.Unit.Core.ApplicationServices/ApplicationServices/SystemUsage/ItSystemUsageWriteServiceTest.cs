@@ -195,11 +195,13 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Theory]
+        [InlineData(null, null, UserCount.UNDECIDED)]
+        [InlineData(null, 100, UserCount.UNDECIDED)]
         [InlineData(0, 9, UserCount.BELOWTEN)]
         [InlineData(10, 50, UserCount.TENTOFIFTY)]
         [InlineData(50, 100, UserCount.FIFTYTOHUNDRED)]
         [InlineData(100, null, UserCount.HUNDREDPLUS)]
-        public void Can_Create_With_General_Data_With_All_Data_Defined(int minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
+        public void Can_Create_With_General_Data_With_All_Data_Defined(int? minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
@@ -224,7 +226,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue(),
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue(),
                     AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
-                    NumberOfExpectedUsersInterval = Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers, maxNumberOfUsers)).AsChangedValue(),
+                    NumberOfExpectedUsersInterval = Maybe<(int? lower, int? upperBound)>.Some((minimumNumberOfUsers, maxNumberOfUsers)).AsChangedValue(),
                 }
             };
 
@@ -465,7 +467,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         [InlineData(-1, null)]
         [InlineData(0, null)]
         [InlineData(101, 102)]
-        public void Cannot_Create_If_User_Count_Us_Not_Supported(int lower, int? upper)
+        public void Cannot_Create_If_User_Count_Us_Not_Supported(int? lower, int? upper)
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
