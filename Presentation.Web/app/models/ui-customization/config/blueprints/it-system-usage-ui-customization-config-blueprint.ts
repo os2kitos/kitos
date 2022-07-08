@@ -10,17 +10,6 @@
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab
             },
-            interfaces: {
-                text: "Udstillede snitflader"
-            },
-            systemRelations: {
-                text: "Relationer"
-            },
-            dataProcessing: {
-                text: "Databehandling",
-                readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
-            },
             contracts: {
                 text: "Kontrakter",
                 readOnly: true,
@@ -36,8 +25,10 @@
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
             },
-            dataProcessings: {
-                text: "Databehandling"
+            dataProcessing: {
+                text: "Databehandling",
+                readOnly: true,
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
             },
             gdpr: {
                 text: "GDPR"
@@ -47,6 +38,12 @@
             },
             organization: {
                 text: "Organisation"
+            },
+            systemRelations: {
+                text: "Relationer"
+            },
+            interfaces: {
+                text: "Udstillede snitflader"
             },
             archiving: {
                 text: "Arkivering"
