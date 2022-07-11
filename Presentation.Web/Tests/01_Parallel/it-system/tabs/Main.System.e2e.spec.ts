@@ -1,6 +1,6 @@
 ﻿import login = require("../../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../../Utility/TestFixtureWrapper");
-import ItSystemHelper = require("../../../Helpers/SystemCatalogHelper");
+import ItSystemCatalogHelper = require("../../../Helpers/SystemCatalogHelper");
 import ItSystemReference = require("../../../PageObjects/it-system/Tabs/ItSystemFrontpage.po");
 import Select2Helper = require("../../../Helpers/Select2Helper");
 
@@ -18,7 +18,7 @@ describe("Global Admin can",
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
-                .then(() => ItSystemHelper.createSystem(itSystemName));
+                .then(() => ItSystemCatalogHelper.createSystem(itSystemName));
         });
 
         beforeEach(() => {
@@ -49,7 +49,7 @@ describe("Global Admin can",
         it("Edit Recommended ArchiveDuty and add comment", () => {
             var comment = `Comment${new Date().getTime()}`;
 
-            return ItSystemHelper.openSystem(itSystemName)
+            return ItSystemCatalogHelper.openSystem(itSystemName)
                 .then(() => verifyCommentAvailability(false))
                 .then(() => selectArchiveDuty(optionInputs.B.text))
                 .then(() => {

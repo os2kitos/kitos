@@ -71,6 +71,10 @@ class ItSystemUsageMain {
     static getKLE() {
         return element(by.id(this.consts.mainKLE)).all(by.tagName("td"));
     }
+
+    static getUserCount() {
+        return element(by.id(this.consts.mainUserCount));
+    }
 }
 
 export = ItSystemUsageMain;

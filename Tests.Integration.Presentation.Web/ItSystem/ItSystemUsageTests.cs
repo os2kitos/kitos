@@ -1,5 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
@@ -62,6 +65,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
             var response = await httpResponse.ReadResponseBodyAsAsync<ItSystemUsage>();
             Assert.True(response.OrganizationId == TestEnvironment.DefaultOrganizationId);
+        }
+
+        [Fact]
+        public async Task Can_Post_It_System_Usage()
+        {
+            var newSystemName = A<string>();
+            var accessModifier = AccessModifier.Public;
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(newSystemName, TestEnvironment.DefaultOrganizationId, accessModifier);
+            var newSystemUsage = new ItSystemUsage()
+            {
+                OrganizationId = system.OrganizationId,
+                ItSystemId = system.Id
+            };
+            var itSystemUsage = ItSystemUsageHelper.CreateItSystemUsageAsync(newSystemUsage);
+
+            var patchObject = new {UserCount = UserCount.UNDECIDED};
+            await ItSystemUsageHelper.PatchSystemUsage(itSystemUsage.Id, itSystemUsage.OrganizationId,
+                patchObject);
+            var getPatchedItSystemUsage = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(itSystemUsage.Id);
+
+            Assert.Equal(itSystemUsage.Id, getPatchedItSystemUsage.Id);
+            Assert.Equal(patchObject.UserCount, getPatchedItSystemUsage.UserCount);
         }
     }
 }

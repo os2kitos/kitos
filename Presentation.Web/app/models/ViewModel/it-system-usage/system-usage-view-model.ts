@@ -171,7 +171,7 @@
             this.DPIA = this.mapDataOption(itSystemUsage.dpia);
             this.answeringDataDPIA = this.mapDataOption(itSystemUsage.answeringDataDPIA);
             this.hostedAt = this.mapHostedAtOption(itSystemUsage.hostedAt);
-            this.userCount = itSystemUsage.userCount.toString();
+            this.userCount = itSystemUsage.userCount == null ? null : itSystemUsage.userCount.toString();
         }
 
         mapHostedAtOption(hostedAtOption: number) {

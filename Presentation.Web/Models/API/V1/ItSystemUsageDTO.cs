@@ -64,7 +64,7 @@ namespace Presentation.Web.Models.API.V1
 
         public int? ItSystemCategoriesId { get; set; }
 
-        public UserCount UserCount { get; set; }
+        public UserCount? UserCount { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public string ArchiveNotes { get; set; }
