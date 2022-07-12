@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class UserCountUndecided : DbMigration
+    public partial class AddedUserCountUndecided : DbMigration
     {
         public override void Up()
         {
@@ -13,7 +13,7 @@
             );
             AlterColumn("dbo.ItSystemUsage", "UserCount", c => c.Int());
         }
-        
+
         public override void Down()
         {
             Sql(@"UPDATE dbo.ItSystemUsage
