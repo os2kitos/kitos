@@ -890,6 +890,10 @@
     <Compile Include="Migrations\202207060929536_Rename_Criticality_fields_on_contract.designer.cs">
       <DependentUpon>202207060929536_Rename_Criticality_fields_on_contract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.cs" />
+    <Compile Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.designer.cs">
+      <DependentUpon>202207080532355_Remove_AccessModifier_From_Economystream.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202207071127465_UserCountUndecided.cs" />
     <Compile Include="Migrations\202207071127465_UserCountUndecided.designer.cs">
       <DependentUpon>202207071127465_UserCountUndecided.cs</DependentUpon>
@@ -1474,6 +1478,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207060929536_Rename_Criticality_fields_on_contract.resx">
       <DependentUpon>202207060929536_Rename_Criticality_fields_on_contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.resx">
+      <DependentUpon>202207080532355_Remove_AccessModifier_From_Economystream.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207071127465_UserCountUndecided.resx">
       <DependentUpon>202207071127465_UserCountUndecided.cs</DependentUpon>

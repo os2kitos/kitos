@@ -25,6 +25,10 @@ class LocalItSystemNavigation {
         return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.GPDRSref);
     }
 
+    public static openDataProcessingPage() {
+        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.dataProcessingSref);
+    }
+
     public static openAdvicePage() {
         return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.adviceSref);
     }
