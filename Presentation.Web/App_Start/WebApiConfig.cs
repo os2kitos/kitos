@@ -103,8 +103,6 @@ namespace Presentation.Web
 
             BindEntitySet<GoalType, GoalTypesController>(builder);
 
-            BindEntitySet<HandoverTrialType, HandoverTrialTypesController>(builder);
-
             BindEntitySet<ItContractRight, ItContractRightsController>(builder);
 
             BindEntitySet<ItContractRole, ItContractRolesController>(builder);
@@ -268,9 +266,6 @@ namespace Presentation.Web
 
             var localGoalType = BindEntitySet<LocalGoalType, LocalGoalTypesController>(builder);
             localGoalType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localHandoverTrialType = BindEntitySet<LocalHandoverTrialType, LocalHandoverTrialTypesController>(builder);
-            localHandoverTrialType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localInterfaceType = BindEntitySet<LocalInterfaceType, LocalInterfaceTypesController>(builder);
             localInterfaceType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);

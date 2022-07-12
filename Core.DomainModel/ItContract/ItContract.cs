@@ -34,7 +34,6 @@ namespace Core.DomainModel.ItContract
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
             UserNotifications = new List<UserNotification>();
-            HandoverTrials = new List<HandoverTrial>();
             Uuid = Guid.NewGuid();
             MarkAsDirty();
         }
@@ -440,14 +439,6 @@ namespace Core.DomainModel.ItContract
         public int ExtendMultiplier { get; set; }
 
         /// <summary>
-        ///     Gets or sets the handover trials.
-        /// </summary>
-        /// <value>
-        ///     The handover trials.
-        /// </value>
-        public virtual ICollection<HandoverTrial> HandoverTrials { get; set; }
-
-        /// <summary>
         ///
         /// </summary>
         /// <value>
@@ -760,29 +751,6 @@ namespace Core.DomainModel.ItContract
             if (Supplier == null || organization.Uuid != Supplier.Uuid)
                 Supplier = organization;
 
-            return Maybe<OperationError>.None;
-        }
-
-        public void ResetHandoverTrials()
-        {
-            HandoverTrials.Clear();
-        }
-
-        public Maybe<OperationError> AddHandoverTrial(HandoverTrialType trialType, DateTime? expected, DateTime? approved)
-        {
-            if (trialType == null)
-                throw new ArgumentNullException(nameof(trialType));
-
-            if (expected.HasValue == false && approved.HasValue == false)
-                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
-
-            HandoverTrials.Add(new HandoverTrial()
-            {
-                Approved = approved?.Date,
-                Expected = expected?.Date,
-                ItContract = this,
-                HandoverTrialType = trialType
-            });
             return Maybe<OperationError>.None;
         }
 

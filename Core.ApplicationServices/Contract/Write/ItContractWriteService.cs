@@ -38,7 +38,6 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
-        private readonly IGenericRepository<HandoverTrial> _handoverTrialRepository;
         private readonly IReferenceService _referenceService;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
@@ -57,7 +56,6 @@ namespace Core.ApplicationServices.Contract.Write
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
-            IGenericRepository<HandoverTrial> handoverTrialRepository,
             IReferenceService referenceService,
             IAssignmentUpdateService assignmentUpdateService,
             IItSystemUsageService usageService,
@@ -75,7 +73,6 @@ namespace Core.ApplicationServices.Contract.Write
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
-            _handoverTrialRepository = handoverTrialRepository;
             _referenceService = referenceService;
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
@@ -159,7 +156,6 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.DataProcessingRegistrationUuids, UpdateDataProcessingRegistrations))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.PaymentModel, UpdatePaymentModelParameters))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
@@ -285,37 +281,6 @@ namespace Core.ApplicationServices.Contract.Write
                     contract.Id,
                     externalReferences.ToList())
                 .Select(error => new OperationError($"Failed to update references with error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
-        }
-
-        private Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)
-        {
-            var handoverTrialTypes = new Dictionary<Guid, HandoverTrialType>();
-            var updates = parameters.ToList();
-            foreach (var uuid in updates.Select(x => x.HandoverTrialTypeUuid).Distinct().ToList())
-            {
-                var optionType = _optionResolver.GetOptionType<HandoverTrial, HandoverTrialType>(contract.Organization.Uuid, uuid);
-                if (optionType.Failed)
-                    return new OperationError($"Failed to fetch option with uuid:{uuid}. Message:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
-
-                if (!optionType.Value.available && contract.HandoverTrials.Any(x => x.HandoverTrialType.Uuid == uuid) == false)
-                    return new OperationError($"Cannot take new handover trial ({uuid}) into use which is not available in the organization", OperationFailure.BadInput);
-
-                handoverTrialTypes[uuid] = optionType.Value.option;
-            }
-
-            //Replace existing trials (duplicates are allowed so we cannot derive any meaningful unique identity)
-            var handoverTrials = contract.HandoverTrials.ToList();
-            handoverTrials.ForEach(_handoverTrialRepository.Delete);
-            contract.ResetHandoverTrials();
-
-            foreach (var newHandoverTrial in updates)
-            {
-                var error = contract.AddHandoverTrial(handoverTrialTypes[newHandoverTrial.HandoverTrialTypeUuid], newHandoverTrial.ExpectedAt, newHandoverTrial.ApprovedAt);
-                if (error.HasValue)
-                    return new OperationError("Failed adding handover trial:" + error.Value.Message.GetValueOrEmptyString(), error.Value.FailureType);
-            }
-
-            return Maybe<OperationError>.None;
         }
 
         private Result<ItContract, OperationError> UpdateSupplierData(ItContract contract, ItContractSupplierModificationParameters parameters)

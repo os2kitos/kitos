@@ -78,15 +78,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<HandoverTrialDTO> AddHandOverTrialAsync(int organizationId, int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
-        {
-            using (var response = await SendAddHandOverTrialAsync(organizationId, contractId, approved, expected, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<HandoverTrialDTO>();
-            }
-        }
-
         public static async Task<HttpResponseMessage> SendAddHandOverTrialAsync(int organizationId, int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

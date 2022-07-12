@@ -56,8 +56,6 @@ namespace Infrastructure.DataAccess
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<GoalType> GoalTypes { get; set; }
         public DbSet<Handover> Handovers { get; set; }
-        public DbSet<HandoverTrial> HandoverTrials { get; set; }
-        public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<CriticalityType> CriticalityTypes { get; set; }
         public DbSet<LocalCriticalityType> LocalCriticalityTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
@@ -109,7 +107,6 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalDataType> LocalDataTypes { get; set; }
         public DbSet<LocalRelationFrequencyType> LocalRelationFrequencyTypes { get; set; }
         public DbSet<LocalGoalType> LocalGoalTypes { get; set; }
-        public DbSet<LocalHandoverTrialType> LocalHandoverTrialTypes { get; set; }
         public DbSet<LocalInterfaceType> LocalInterfaceTypes { get; set; }
         public DbSet<LocalItContractRole> LocalItContractRoles { get; set; }
         public DbSet<LocalItContractTemplateType> LocalItContractTemplateTypes { get; set; }
@@ -206,8 +203,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new GoalTypeMap());
             modelBuilder.Configurations.Add(new HandoverMap());
-            modelBuilder.Configurations.Add(new HandoverTrialMap());
-            modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
             modelBuilder.Configurations.Add(new CriticalityTypeMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());

@@ -33,7 +33,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Responsible = MapResponsible(contract),
                 SystemUsages = contract.AssociatedSystemUsages?.Select(x => x.ItSystemUsage?.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
                 DataProcessingRegistrations = contract.DataProcessingRegistrations?.Select(x => x.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
-                HandoverTrials = MapHandoverTrials(contract),
                 PaymentModel = MapPaymentModel(contract),
                 AgreementPeriod = MapAgreementPeriod(contract),
                 Termination = MapTermination(contract),
@@ -128,21 +127,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Title = paymentMilestone.Title,
                 Approved = paymentMilestone.Approved,
                 Expected = paymentMilestone.Expected
-            };
-        }
-
-        private static List<HandoverTrialResponseDTO> MapHandoverTrials(ItContract contract)
-        {
-            return contract.HandoverTrials?.Select(MapHandoverTrial).ToList() ?? new List<HandoverTrialResponseDTO>();
-        }
-
-        private static HandoverTrialResponseDTO MapHandoverTrial(HandoverTrial handoverTrial)
-        {
-            return new ()
-            {
-                HandoverTrialType = handoverTrial.HandoverTrialType?.MapIdentityNamePairDTO(),
-                ApprovedAt = handoverTrial.Approved,
-                ExpectedAt = handoverTrial.Expected
             };
         }
 

@@ -472,8 +472,6 @@ namespace Presentation.Web.Ninject
 
             RegisterOptionsService<ItContract, CriticalityType, LocalCriticalityType>(kernel);
 
-            RegisterOptionsService<HandoverTrial, HandoverTrialType, LocalHandoverTrialType>(kernel);
-
             //IT-Project
             RegisterOptionsService<ItProjectRight, ItProjectRole, LocalItProjectRole>(kernel);
 

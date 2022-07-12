@@ -106,8 +106,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             Assert.Empty(dto.DataProcessingRegistrations);
 
-            Assert.Empty(dto.HandoverTrials);
-
             var paymentModel = dto.PaymentModel;
             Assert.Null(paymentModel.OperationsRemunerationStartedAt);
             Assert.Null(paymentModel.PaymentModel);
@@ -312,30 +310,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             else
             {
                 Assert.Empty(dto.DataProcessingRegistrations);
-            }
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void MapContractDTO_Maps_HandoverTrials_Section(bool withHandoverTrials)
-        {
-            //Arrange
-            var contract = CreateContract();
-            AssignBasicProperties(contract);
-            AssignHandoverTrialProperties(contract, withHandoverTrials);
-
-            //Act
-            var dto = _sut.MapContractDTO(contract);
-
-            //Assert
-            if (withHandoverTrials)
-            {
-                AssertHandoverTrials(contract, dto.HandoverTrials.ToList());
-            }
-            else
-            {
-                Assert.Empty(dto.HandoverTrials);
             }
         }
 
@@ -648,22 +622,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 : null;
         }
 
-        private void AssignHandoverTrialProperties(ItContract contract, bool withHandoverTrials)
-        {
-            contract.HandoverTrials = withHandoverTrials
-                ? new List<HandoverTrial>()
-                {
-                    new HandoverTrial()
-                    {
-                        HandoverTrialType = new HandoverTrialType(){ Uuid = A<Guid>(), Name = A<string>() },
-                        Approved = A<DateTime>(),
-                        Expected = A<DateTime>(),
-                        ItContract = contract
-                    }
-                }
-                : new List<HandoverTrial>(0);
-        }
-
         private void AssignDPRs(ItContract contract, DataProcessingRegistration[] dprs)
         {
             contract.DataProcessingRegistrations = dprs;
@@ -837,20 +795,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(comparison.expected.Title, comparison.actual.Title);
                 Assert.Equal(comparison.expected.Approved, comparison.actual.Approved);
                 Assert.Equal(comparison.expected.Expected, comparison.actual.Expected);
-            }
-        }
-
-        private void AssertHandoverTrials(ItContract contract, List<HandoverTrialResponseDTO> handoverTrials)
-        {
-            Assert.Equal(contract.HandoverTrials.Count, handoverTrials.Count);
-
-            foreach (var comparison in contract.HandoverTrials.OrderBy(x => x.HandoverTrialType.Uuid)
-                .Zip(handoverTrials.OrderBy(x => x.HandoverTrialType.Uuid), (expected, actual) => new { expected, actual })
-                .ToList())
-            {
-                AssertOptionalIdentity(comparison.expected.HandoverTrialType, comparison.actual.HandoverTrialType);
-                Assert.Equal(comparison.expected.Approved, comparison.actual.ApprovedAt);
-                Assert.Equal(comparison.expected.Expected, comparison.actual.ExpectedAt);
             }
         }
 

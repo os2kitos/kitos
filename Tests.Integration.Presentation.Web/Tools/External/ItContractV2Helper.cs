@@ -109,11 +109,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Supplier), dto));
         }
 
-        public static async Task<HttpResponseMessage> SendPatchContractHandOverTrialsAsync(string token, Guid contractUuid, IEnumerable<HandoverTrialRequestDTO> request)
-        {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.HandoverTrials), request));
-        }
-
         public static async Task<HttpResponseMessage> SendPatchSystemUsagesAsync(string token, Guid contractUuid, IEnumerable<Guid> dto)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.SystemUsageUuids), dto));

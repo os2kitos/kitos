@@ -67,7 +67,6 @@
         DataTypes,
         FrequencyTypes,
         GoalTypes,
-        HandoverTrialTypes,
         InterfaceTypes,
         ItContractTemplateTypes,
         ItContractTypes,
@@ -142,8 +141,6 @@
                     return "LocalFrequencyTypes";
                 case LocalOptionType.GoalTypes:
                     return "LocalGoalTypes";
-                case LocalOptionType.HandoverTrialTypes:
-                    return "LocalHandoverTrialTypes";
                 case LocalOptionType.InterfaceTypes:
                     return "LocalInterfaceTypes";
                 case LocalOptionType.ItContractTemplateTypes:

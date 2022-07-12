@@ -61,8 +61,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             dto.Responsible = WithResetDataIfSectionIsNotDefined(dto.Responsible, x => x.Responsible);
             dto.Procurement = WithResetDataIfSectionIsNotDefined(dto.Procurement, x => x.Procurement);
             dto.Supplier = WithResetDataIfSectionIsNotDefined(dto.Supplier, x => x.Supplier);
-            dto.HandoverTrials = WithResetDataIfSectionIsNotDefinedWithFallback(dto.HandoverTrials,
-                x => x.HandoverTrials, Array.Empty<HandoverTrialRequestDTO>);
             dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences,
                 x => x.ExternalReferences, Array.Empty<ExternalReferenceDataDTO>);
             dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids,
@@ -87,7 +85,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Responsible = dto.Responsible.FromNullable().Select(responsible => MapResponsible(responsible, rule)),
                 Supplier = dto.Supplier.FromNullable().Select(supplier => MapSupplier(supplier, rule)),
-                HandoverTrials = dto.HandoverTrials.FromNullable().Select(MapHandOverTrials),
                 ExternalReferences = dto.ExternalReferences.FromNullable().Select(MapReferences),
                 Roles = dto.Roles.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dto.DataProcessingRegistrationUuids.FromNullable(),
@@ -160,15 +157,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 .Match(assignments => assignments, Array.Empty<UserRolePair>);
         }
 
-        public IEnumerable<ItContractHandoverTrialUpdate> MapHandOverTrials(IEnumerable<HandoverTrialRequestDTO> dtos)
-        {
-            return dtos.Select(x => new ItContractHandoverTrialUpdate()
-            {
-                HandoverTrialTypeUuid = x.HandoverTrialTypeUuid,
-                ApprovedAt = x.ApprovedAt,
-                ExpectedAt = x.ExpectedAt
-            }).ToList();
-        }
 
         private static ItContractPaymentModelModificationParameters MapPaymentModel<TRootDto>(ContractPaymentModelDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {

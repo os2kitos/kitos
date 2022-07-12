@@ -10,25 +10,17 @@
                 ],
                 terminationDeadlines: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.TerminationDeadlineTypes).getAll()
-                ],
-                paymentMilestones: ["$http", "$stateParams", ($http, $stateParams) =>
-                    $http.get("api/paymentMilestone/" + $stateParams.id + "?contract=true").then(result => result.data.response)],
-                handoverTrialTypes: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.HandoverTrialTypes).getAll()],
-                handoverTrials: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(result => result.data.response)]
+                ]
             }
         });
     }]);
 
-    app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "paymentMilestones", "handoverTrialTypes", "handoverTrials", "user", "moment", "$q", "contract",
-        ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials, user, moment, $q, contract) => {
+    app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "user", "moment", "$q", "contract",
+        ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, user, moment, $q, contract) => {
             $scope.contract = contract;
             $scope.autosaveUrl = "api/itcontract/" + contract.id;
             $scope.optionExtensions = optionExtensions;
             $scope.terminationDeadlines = terminationDeadlines;
-            $scope.paymentMilestones = paymentMilestones;
-            $scope.handoverTrialTypes = handoverTrialTypes;
-            $scope.handoverTrials = handoverTrials;
             $scope.durationYears = contract.durationYears;
             $scope.durationMonths = contract.durationMonths;
             $scope.durationOngoing = contract.durationOngoing;

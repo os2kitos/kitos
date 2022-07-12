@@ -143,11 +143,6 @@ namespace Presentation.Web
                 .ForMember(dest => dest.References, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
 
-            CreateMap<HandoverTrialType, OptionDTO>()
-                .ReverseMap()
-                .ForMember(dest => dest.References, opt => opt.Ignore())
-                .IgnoreDestinationEntityFields();
-
             CreateMap<CriticalityType, OptionDTO>()
                 .ReverseMap()
                 .ForMember(dest => dest.References, opt => opt.Ignore())
@@ -386,10 +381,6 @@ namespace Presentation.Web
             CreateMap<AdviceUserRelation, AdviceUserRelationDTO>()
                   .ReverseMap()
                   .IgnoreDestinationEntityFields();
-
-            CreateMap<HandoverTrial, HandoverTrialDTO>()
-                .ReverseMap()
-                .IgnoreDestinationEntityFields();
 
             //Output only - this mapping should not be reversed
             CreateMap<ExcelImportError, ExcelImportErrorDTO>();

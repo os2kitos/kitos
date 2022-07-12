@@ -167,7 +167,6 @@
     <Compile Include="LocalOptions\LocalItProjectRole.cs" />
     <Compile Include="LocalOptions\LocalItProjectType.cs" />
     <Compile Include="LocalOptions\LocalAgreementElementType.cs" />
-    <Compile Include="LocalOptions\LocalHandoverTrialType.cs" />
     <Compile Include="LocalOptions\LocalItContractRole.cs" />
     <Compile Include="LocalOptions\LocalItContractTemplateType.cs" />
     <Compile Include="LocalOptions\LocalItContractType.cs" />
@@ -191,8 +190,6 @@
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="IHierarchy.cs" />
-    <Compile Include="ItContract\HandoverTrial.cs" />
-    <Compile Include="ItContract\HandoverTrialType.cs" />
     <Compile Include="ItContract\ItContractItSystemUsage.cs" />
     <Compile Include="ItContract\OptionExtendType.cs" />
     <Compile Include="ItContract\PaymentFreqencyType.cs" />

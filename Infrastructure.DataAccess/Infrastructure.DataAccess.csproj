@@ -119,8 +119,6 @@
     <Compile Include="Mapping\ItSystemUsageOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectStatusMap.cs" />
-    <Compile Include="Mapping\HandoverTrialMap.cs" />
-    <Compile Include="Mapping\HandoverTrialTypeMap.cs" />
     <Compile Include="Mapping\EntityMap.cs" />
     <Compile Include="Mapping\EconomyStreamMap.cs" />
     <Compile Include="Mapping\OptionEntityMap.cs" />
