@@ -93,7 +93,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(15);
+            return CreateGetUndefinedSectionsInput(14);
         }
 
         public static IEnumerable<object[]> GetUndefinedGeneralDataPropertiesInput()
