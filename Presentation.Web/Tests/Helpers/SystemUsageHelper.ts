@@ -30,7 +30,7 @@ class SystemUsageHelper {
 
     static validateSelectData(expectedValue: string) {
         console.log(`Validating if select contains value: '${expectedValue}'`);
-        return expect(Select2Helper.getData(this.consts.mainUserCount).getText()).toBe(expectedValue);
+        return Select2Helper.getData(this.consts.mainUserCount).getText().then(result => expect(result.trim()).toBe(expectedValue.trim()));
     };
 }
 export = SystemUsageHelper;
