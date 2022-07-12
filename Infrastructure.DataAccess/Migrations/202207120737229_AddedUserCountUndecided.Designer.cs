@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class UserCountUndecided : IMigrationMetadata
+    public sealed partial class AddedUserCountUndecided : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(UserCountUndecided));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedUserCountUndecided));
         
         string IMigrationMetadata.Id
         {
-            get { return "202207071127465_UserCountUndecided"; }
+            get { return "202207120737229_AddedUserCountUndecided"; }
         }
         
         string IMigrationMetadata.Source
