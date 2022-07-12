@@ -894,10 +894,6 @@
     <Compile Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.designer.cs">
       <DependentUpon>202207080532355_Remove_AccessModifier_From_Economystream.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202207071127465_UserCountUndecided.cs" />
-    <Compile Include="Migrations\202207071127465_UserCountUndecided.designer.cs">
-      <DependentUpon>202207071127465_UserCountUndecided.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\202207120737229_AddedUserCountUndecided.cs" />
     <Compile Include="Migrations\202207120737229_AddedUserCountUndecided.designer.cs">
       <DependentUpon>202207120737229_AddedUserCountUndecided.cs</DependentUpon>
@@ -1485,9 +1481,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.resx">
       <DependentUpon>202207080532355_Remove_AccessModifier_From_Economystream.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202207071127465_UserCountUndecided.resx">
-      <DependentUpon>202207071127465_UserCountUndecided.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207120737229_AddedUserCountUndecided.resx">
       <DependentUpon>202207120737229_AddedUserCountUndecided.cs</DependentUpon>
