@@ -557,6 +557,10 @@ namespace Core.DomainModel.ItSystemUsage
         {
             switch (newIntervalValue)
             {
+                case (null, 100):
+                case (null, null):
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.UNDECIDED;
+                    break;
                 case (0, 9):
                     UserCount = DomainModel.ItSystem.DataTypes.UserCount.BELOWTEN;
                     break;
@@ -571,8 +575,7 @@ namespace Core.DomainModel.ItSystemUsage
                     UserCount = DomainModel.ItSystem.DataTypes.UserCount.HUNDREDPLUS;
                     break;
                 default:
-                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.UNDECIDED;
-                    break;
+                    return new OperationError("Invalid user count. Please refer to input documentation", OperationFailure.BadInput);
             }
             return Maybe<OperationError>.None;
         }
