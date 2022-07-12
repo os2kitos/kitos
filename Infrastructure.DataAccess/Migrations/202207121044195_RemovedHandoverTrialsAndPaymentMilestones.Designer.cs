@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class RemovedHandoverTrials : IMigrationMetadata
+    public sealed partial class RemovedHandoverTrialsAndPaymentMilestones : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(RemovedHandoverTrials));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(RemovedHandoverTrialsAndPaymentMilestones));
         
         string IMigrationMetadata.Id
         {
-            get { return "202207120938452_RemovedHandoverTrials"; }
+            get { return "202207121044195_RemovedHandoverTrialsAndPaymentMilestones"; }
         }
         
         string IMigrationMetadata.Source

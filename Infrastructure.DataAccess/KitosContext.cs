@@ -84,7 +84,6 @@ namespace Infrastructure.DataAccess
         public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentFreqencyType> PaymentFreqencyTypes { get; set; }
-        public DbSet<PaymentMilestone> PaymentMilestones { get; set; }
         public DbSet<PaymentModelType> PaymentModelTypes { get; set; }
         public DbSet<PriceRegulationType> PriceRegulationTypes { get; set; }
         public DbSet<ProcurementStrategyType> ProcurementStrategyTypes { get; set; }

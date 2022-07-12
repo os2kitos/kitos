@@ -486,7 +486,6 @@
     <Compile Include="Models\API\V2\Response\Contract\PaymentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Tracking\TrackingEventResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\PaymentAuditStatus.cs" />
-    <Compile Include="Models\API\V2\Types\Contract\PaymentMileStoneDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\ProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Validity\ValidityWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
@@ -1000,11 +999,9 @@
     <Compile Include="Models\API\V1\ItProjectStatusDTO.cs" />
     <Compile Include="Models\API\V1\ExcelImportErrorDTO.cs" />
     <Compile Include="Models\API\V1\PagingModel.cs" />
-    <Compile Include="Controllers\API\V1\PaymentMilestoneController.cs" />
     <Compile Include="Models\API\V1\ItContractSystemDTO.cs" />
     <Compile Include="Models\API\V1\ItProjectSimpleDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemSimpleDTO.cs" />
-    <Compile Include="Models\API\V1\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\V1\EconomyStreamController.cs" />
     <Compile Include="Models\API\V1\EconomyStreamDTO.cs" />
     <Compile Include="Controllers\API\V1\ItContractController.cs" />
@@ -1495,8 +1492,6 @@
     <TypeScriptCompile Include="app\models\config.ts" />
     <TypeScriptCompile Include="app\models\entity.ts" />
     <TypeScriptCompile Include="app\models\it-contract\advice.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\handover-trial.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\payment-milestone.ts" />
     <TypeScriptCompile Include="app\models\it-project\communication.ts" />
     <TypeScriptCompile Include="app\models\it-project\economy-year.ts" />
     <TypeScriptCompile Include="app\models\it-project\goal-status.ts" />

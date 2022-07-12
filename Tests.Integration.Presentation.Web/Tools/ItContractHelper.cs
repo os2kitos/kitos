@@ -94,15 +94,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<PaymentMilestoneDTO> AddPaymentMilestoneAsync(int organizationId, int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
-        {
-            using (var response = await SendAddPaymentMilestoneRequestAsync(organizationId, contractId, approved, expected, title, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<PaymentMilestoneDTO>();
-            }
-        }
-
         public static async Task<HttpResponseMessage> SendAddPaymentMilestoneRequestAsync(int organizationId, int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

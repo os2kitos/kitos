@@ -365,11 +365,7 @@ namespace Presentation.Web
             //Output only - this mapping should not be reversed
             CreateMap<ItContract, ItContractSystemDTO>()
                 .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)));
-
-            CreateMap<PaymentMilestone, PaymentMilestoneDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
+            
             CreateMap<EconomyStream, EconomyStreamDTO>()
                 .ReverseMap()
                 .IgnoreDestinationEntityFields();

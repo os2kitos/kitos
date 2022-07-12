@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class RemovedHandoverTrials : DbMigration
+    public partial class RemovedHandoverTrialsAndPaymentMilestones : DbMigration
     {
         public override void Up()
         {
@@ -13,6 +13,9 @@
             DropForeignKey("dbo.HandoverTrial", "ItContractId", "dbo.ItContract");
             DropForeignKey("dbo.HandoverTrial", "LastChangedByUserId", "dbo.User");
             DropForeignKey("dbo.HandoverTrial", "ObjectOwnerId", "dbo.User");
+            DropForeignKey("dbo.PaymentMilestones", "ItContractId", "dbo.ItContract");
+            DropForeignKey("dbo.PaymentMilestones", "LastChangedByUserId", "dbo.User");
+            DropForeignKey("dbo.PaymentMilestones", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.LocalHandoverTrialTypes", "LastChangedByUserId", "dbo.User");
             DropForeignKey("dbo.LocalHandoverTrialTypes", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.LocalHandoverTrialTypes", "OrganizationId", "dbo.Organization");
@@ -23,11 +26,15 @@
             DropIndex("dbo.HandoverTrialTypes", "UX_Option_Uuid");
             DropIndex("dbo.HandoverTrialTypes", new[] { "ObjectOwnerId" });
             DropIndex("dbo.HandoverTrialTypes", new[] { "LastChangedByUserId" });
+            DropIndex("dbo.PaymentMilestones", new[] { "ItContractId" });
+            DropIndex("dbo.PaymentMilestones", new[] { "ObjectOwnerId" });
+            DropIndex("dbo.PaymentMilestones", new[] { "LastChangedByUserId" });
             DropIndex("dbo.LocalHandoverTrialTypes", new[] { "OrganizationId" });
             DropIndex("dbo.LocalHandoverTrialTypes", new[] { "ObjectOwnerId" });
             DropIndex("dbo.LocalHandoverTrialTypes", new[] { "LastChangedByUserId" });
             DropTable("dbo.HandoverTrial");
             DropTable("dbo.HandoverTrialTypes");
+            DropTable("dbo.PaymentMilestones");
             DropTable("dbo.LocalHandoverTrialTypes");
         }
         
@@ -42,6 +49,21 @@
                         OrganizationId = c.Int(nullable: false),
                         OptionId = c.Int(nullable: false),
                         IsActive = c.Boolean(nullable: false),
+                        ObjectOwnerId = c.Int(),
+                        LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        LastChangedByUserId = c.Int(),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.PaymentMilestones",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Title = c.String(),
+                        Expected = c.DateTime(precision: 7, storeType: "datetime2"),
+                        Approved = c.DateTime(precision: 7, storeType: "datetime2"),
+                        ItContractId = c.Int(nullable: false),
                         ObjectOwnerId = c.Int(),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         LastChangedByUserId = c.Int(),
@@ -84,6 +106,9 @@
             CreateIndex("dbo.LocalHandoverTrialTypes", "LastChangedByUserId");
             CreateIndex("dbo.LocalHandoverTrialTypes", "ObjectOwnerId");
             CreateIndex("dbo.LocalHandoverTrialTypes", "OrganizationId");
+            CreateIndex("dbo.PaymentMilestones", "LastChangedByUserId");
+            CreateIndex("dbo.PaymentMilestones", "ObjectOwnerId");
+            CreateIndex("dbo.PaymentMilestones", "ItContractId");
             CreateIndex("dbo.HandoverTrialTypes", "LastChangedByUserId");
             CreateIndex("dbo.HandoverTrialTypes", "ObjectOwnerId");
             CreateIndex("dbo.HandoverTrialTypes", "Uuid", unique: true, name: "UX_Option_Uuid");
@@ -94,6 +119,9 @@
             AddForeignKey("dbo.LocalHandoverTrialTypes", "OrganizationId", "dbo.Organization", "Id", cascadeDelete: true);
             AddForeignKey("dbo.LocalHandoverTrialTypes", "ObjectOwnerId", "dbo.User", "Id");
             AddForeignKey("dbo.LocalHandoverTrialTypes", "LastChangedByUserId", "dbo.User", "Id");
+            AddForeignKey("dbo.PaymentMilestones", "ObjectOwnerId", "dbo.User", "Id");
+            AddForeignKey("dbo.PaymentMilestones", "LastChangedByUserId", "dbo.User", "Id");
+            AddForeignKey("dbo.PaymentMilestones", "ItContractId", "dbo.ItContract", "Id", cascadeDelete: true);
             AddForeignKey("dbo.HandoverTrial", "ObjectOwnerId", "dbo.User", "Id");
             AddForeignKey("dbo.HandoverTrial", "LastChangedByUserId", "dbo.User", "Id");
             AddForeignKey("dbo.HandoverTrial", "ItContractId", "dbo.ItContract", "Id", cascadeDelete: true);

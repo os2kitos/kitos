@@ -80,8 +80,6 @@
         TerminationDeadlineId: number;
         /** Gets or sets the termination deadline option. (opsigelsesfrist) */
         TerminationDeadline: Models.OData.Generic.IOptionDTO<IItContract>;
-        /** Gets or sets the payment milestones. */
-        PaymentMilestones: Array<IPaymentMilestone>;
         OptionExtendId: number;
         OptionExtend: Models.OData.Generic.IOptionDTO<IItContract>;
         ExtendMultiplier: number;
@@ -89,8 +87,6 @@
         Running: YearSegmentOption;
         /** (indtil udgangen af) */
         ByEnding: YearSegmentOption;
-        /** Gets or sets the handover trials. */
-        HandoverTrials: Array<IHandoverTrial>;
 
         /** Gets or sets the operation remuneration begun. */
         OperationRemunerationBegun: Date;

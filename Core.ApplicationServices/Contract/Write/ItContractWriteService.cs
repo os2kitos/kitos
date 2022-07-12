@@ -43,7 +43,6 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IItSystemUsageService _usageService;
         private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _roleAssignmentService;
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
-        private readonly IGenericRepository<PaymentMilestone> _paymentMilestoneRepository;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
 
         public ItContractWriteService(
@@ -61,7 +60,6 @@ namespace Core.ApplicationServices.Contract.Write
             IItSystemUsageService usageService,
             IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IGenericRepository<PaymentMilestone> paymentMilestoneRepository,
             IGenericRepository<EconomyStream> economyStreamRepository)
         {
             _contractService = contractService;
@@ -78,7 +76,6 @@ namespace Core.ApplicationServices.Contract.Write
             _usageService = usageService;
             _roleAssignmentService = roleAssignmentService;
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
-            _paymentMilestoneRepository = paymentMilestoneRepository;
             _economyStreamRepository = economyStreamRepository;
         }
 
@@ -351,28 +348,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .WithOptionalUpdate(parameters.OperationsRemunerationStartedAt, (c, newValue) => c.OperationRemunerationBegun = newValue.Match(val => val, () => (DateTime?)null))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentFrequencyUuid, UpdatePaymentFrequency))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentModelUuid, UpdatePaymentModel))
-                .Bind(itContract => itContract.WithOptionalUpdate(parameters.PriceRegulationUuid, UpdatePriceRegulation))
-                .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentMileStones, UpdatePaymentMileStones));
-        }
-
-        private Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, Maybe<IEnumerable<ItContractPaymentMilestone>> milestones)
-        {
-            //Replace existing milestones (duplicates are allowed so we cannot derive any meaningful unique identity)
-            var paymentMilestones = contract.PaymentMilestones.ToList();
-            contract.ResetPaymentMilestones();
-            paymentMilestones.ForEach(_paymentMilestoneRepository.Delete);
-            
-            if (milestones.IsNone)
-                return Maybe<OperationError>.None;
-
-            foreach (var newMilestone in milestones.Value)
-            {
-                var error = contract.AddPaymentMilestone(newMilestone.Title, newMilestone.Expected, newMilestone.Approved);
-                if (error.HasValue)
-                    return new OperationError($"Failed adding payment milestone: {error.Value.Message.GetValueOrEmptyString()}", error.Value.FailureType);
-            }
-
-            return Maybe<OperationError>.None;
+                .Bind(itContract => itContract.WithOptionalUpdate(parameters.PriceRegulationUuid, UpdatePriceRegulation));
         }
 
         private Maybe<OperationError> UpdatePriceRegulation(ItContract contract, Guid? priceRegulationUuid)

@@ -176,19 +176,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
                 PriceRegulationUuid = rule.MustUpdate(x => x.PaymentModel.PriceRegulationUuid)
                     ? dto.PriceRegulationUuid.AsChangedValue()
-                    : OptionalValueChange<Guid?>.None,
-
-                PaymentMileStones = rule.MustUpdate(x => x.PaymentModel.PaymentMileStones)
-                    ? dto.PaymentMileStones
-                        .FromNullable()
-                        .Select(x => x
-                            .Select(y => new ItContractPaymentMilestone()
-                            {
-                                Title = y.Title,
-                                Approved = y.Approved,
-                                Expected = y.Expected
-                            })).AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<ItContractPaymentMilestone>>>.None
+                    : OptionalValueChange<Guid?>.None
             };
         }
 

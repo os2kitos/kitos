@@ -20,46 +20,6 @@ namespace Tests.Integration.Presentation.Web.Contract
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.LocalAdmin)]
-        public async Task Can_Add_PaymentMilestone(OrganizationRole role)
-        {
-            //Arrange
-            var login = await HttpApi.GetCookieAsync(role);
-            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var approved = A<DateTime>().Date;
-            var expected = A<DateTime>().Date;
-            var title = A<string>();
-
-            //Act - perform the action with the actual role
-            var result = await ItContractHelper.AddPaymentMilestoneAsync(contract.OrganizationId, contract.Id, approved, expected, title, login);
-
-            //Assert
-            Assert.Equal(contract.Id, result.ItContractId);
-            Assert.Equal(approved, result.Approved.GetValueOrDefault());
-            Assert.Equal(expected, result.Expected.GetValueOrDefault());
-        }
-
-        [Theory]
-        [InlineData(OrganizationRole.User)]
-        public async Task Cannot_Add_PaymentMilestone(OrganizationRole role)
-        {
-            //Arrange
-            var login = await HttpApi.GetCookieAsync(role);
-            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            var approved = A<DateTime>().Date;
-            var expected = A<DateTime>().Date;
-            var title = A<string>();
-
-            //Act - perform the action with the actual role
-            using (var result = await ItContractHelper.SendAddPaymentMilestoneRequestAsync(contract.OrganizationId, contract.Id, approved, expected, title, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-            }
-        }
-
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.LocalAdmin)]
         public async Task Can_Add_CriticalityType(OrganizationRole role)
         {
             //Arrange

@@ -32,6 +32,5 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// </summary>
         [NonEmptyGuid]
         public Guid? PriceRegulationUuid { get; set; }
-        public IEnumerable<PaymentMileStoneDTO> PaymentMileStones { get; set; }
     }
 }

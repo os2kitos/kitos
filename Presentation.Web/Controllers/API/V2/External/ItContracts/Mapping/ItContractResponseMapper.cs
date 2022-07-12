@@ -116,17 +116,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 PaymentModel = contract.PaymentModel?.MapIdentityNamePairDTO(),
                 PaymentFrequency = contract.PaymentFreqency?.MapIdentityNamePairDTO(),
                 PriceRegulation = contract.PriceRegulation?.MapIdentityNamePairDTO(),
-                PaymentMileStones = contract.PaymentMilestones?.Select(MapPaymentMilestones).ToList() ?? new List<PaymentMileStoneDTO>()
-            };
-        }
-
-        private static PaymentMileStoneDTO MapPaymentMilestones(PaymentMilestone paymentMilestone)
-        {
-            return new ()
-            {
-                Title = paymentMilestone.Title,
-                Approved = paymentMilestone.Approved,
-                Expected = paymentMilestone.Expected
             };
         }
 

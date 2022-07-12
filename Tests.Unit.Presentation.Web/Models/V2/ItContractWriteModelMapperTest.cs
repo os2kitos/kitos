@@ -39,7 +39,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity) }.AsParameterMatch())).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.Termination), nameof(ContractWriteRequestDTO.Termination.Terms) }.AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.PaymentModel), nameof(ContractWriteRequestDTO.PaymentModel.PaymentMileStones) }.AsParameterMatch())).Returns(GetAllInputPropertyNames<IEnumerable<ItContractPaymentMilestone>>());
             _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new ItContractWriteModelMapper(_currentHttpRequestMock.Object);
         }
@@ -141,7 +140,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noResponsible,
             bool noProcurement,
             bool noSupplier,
-            bool noHandoverTrials,
             bool noSystemUsages,
             bool noExternalReferences,
             bool noDataProcessingRegistrations,
@@ -152,7 +150,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noTermination)
         {
             //Arrange
-            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noHandoverTrials, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
+            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
 
             //Act
             var output = _sut.FromPATCH(emptyInput);
@@ -182,7 +180,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noResponsible,
             bool noProcurement,
             bool noSupplier,
-            bool noHandoverTrials,
             bool noSystemUsages,
             bool noExternalReferences,
             bool noDataProcessingRegistrations,
@@ -193,7 +190,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noTermination)
         {
             //Arrange
-            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noHandoverTrials, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
+            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
 
             //Act
             var output = _sut.FromPUT(emptyInput);
@@ -527,7 +524,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noPaymentFrequencyUuid, output.PaymentFrequencyUuid.IsUnchanged);
             Assert.Equal(noPaymentModelUuid, output.PaymentModelUuid.IsUnchanged);
             Assert.Equal(noPriceRegulationUuid, output.PriceRegulationUuid.IsUnchanged);
-            Assert.Equal(noPaymentMileStones, output.PaymentMileStones.IsUnchanged);
         }
 
         [Theory]
@@ -551,7 +547,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noPaymentFrequencyUuid, output.PaymentFrequencyUuid.IsUnchanged);
             Assert.Equal(noPaymentModelUuid, output.PaymentModelUuid.IsUnchanged);
             Assert.Equal(noPriceRegulationUuid, output.PriceRegulationUuid.IsUnchanged);
-            Assert.Equal(noPaymentMileStones, output.PaymentMileStones.IsUnchanged);
         }
 
         [Theory]
@@ -575,7 +570,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.PaymentFrequencyUuid.HasChange);
             Assert.True(output.PaymentModelUuid.HasChange);
             Assert.True(output.PriceRegulationUuid.HasChange);
-            Assert.True(output.PaymentMileStones.HasChange);
         }
 
         [Theory]
@@ -898,7 +892,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         private UpdateContractRequestDTO ConfigureRequestInput(bool noName, bool noGeneralData, bool noParent,
-           bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages,
+           bool noResponsible, bool noProcurement, bool noSupplier, bool noSystemUsages,
            bool noExternalReferences, bool noDataProcessingRegistrations, bool noRoles, bool noPaymentModel,
            bool noAgreementPeriod, bool noPayments, bool noTermination)
         {
@@ -1199,14 +1193,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_PaymentModel_FromPOST(bool hasValues)
         {
             //Arrange
-            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
             var input = new ContractPaymentModelDataWriteRequestDTO()
             {
                 OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
                 PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
                 PaymentModelUuid = hasValues ? A<Guid>() : null,
-                PriceRegulationUuid = hasValues ? A<Guid>() : null,
-                PaymentMileStones = milestones
+                PriceRegulationUuid = hasValues ? A<Guid>() : null
             };
 
             //Act
@@ -1222,14 +1214,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_PaymentModel_FromPUT(bool hasValues)
         {
             //Arrange
-            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
             var input = new ContractPaymentModelDataWriteRequestDTO()
             {
                 OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
                 PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
                 PaymentModelUuid = hasValues ? A<Guid>() : null,
-                PriceRegulationUuid = hasValues ? A<Guid>() : null,
-                PaymentMileStones = milestones
+                PriceRegulationUuid = hasValues ? A<Guid>() : null
             };
 
             //Act
@@ -1245,14 +1235,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_PaymentModel_FromPATCH(bool hasValues)
         {
             //Arrange
-            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
             var input = new ContractPaymentModelDataWriteRequestDTO()
             {
                 OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
                 PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
                 PaymentModelUuid = hasValues ? A<Guid>() : null,
-                PriceRegulationUuid = hasValues ? A<Guid>() : null,
-                PaymentMileStones = milestones
+                PriceRegulationUuid = hasValues ? A<Guid>() : null
             };
 
             //Act
@@ -1404,22 +1392,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
             Assert.Equal(input.PriceRegulationUuid, output.PriceRegulationUuid.NewValue);
             Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue.Match(val => val, () => (DateTime?)null));
-            AssertPaymentMilestones(
-                input.PaymentMileStones.FromNullable().Match(val => val, () => new List<PaymentMileStoneDTO>()),
-                output.PaymentMileStones.NewValue.Match(val => val, () => new List<ItContractPaymentMilestone>()));
-        }
-
-        private static void AssertPaymentMilestones(IEnumerable<PaymentMileStoneDTO> input, IEnumerable<ItContractPaymentMilestone> output)
-        {
-            var expected = input.OrderBy(x => x.Title).ToList();
-            var actual = output.OrderBy(x => x.Title).ToList();
-            Assert.Equal(expected.Count, actual.Count);
-            foreach (var pair in expected.Zip(actual, (e, a) => new { inputDTO = e, mappedChange = a }))
-            {
-                Assert.Equal(pair.inputDTO.Approved, pair.mappedChange.Approved);
-                Assert.Equal(pair.inputDTO.Expected, pair.mappedChange.Expected);
-                Assert.Equal(pair.inputDTO.Title, pair.mappedChange.Title);
-            }
         }
 
         private static void AssertUuids(IEnumerable<Guid> expected, IEnumerable<Guid> actual)
@@ -1628,7 +1600,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noPaymentFrequencyUuid) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PaymentFrequencyUuid));
             if (noPaymentModelUuid) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PaymentModelUuid));
             if (noPriceRegulationUuid) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PriceRegulationUuid));
-            if (noPaymentMileStones) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PaymentMileStones));
 
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel).WrapAsEnumerable().AsParameterMatch()))

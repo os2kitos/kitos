@@ -193,7 +193,6 @@
     <Compile Include="ItContract\ItContractItSystemUsage.cs" />
     <Compile Include="ItContract\OptionExtendType.cs" />
     <Compile Include="ItContract\PaymentFreqencyType.cs" />
-    <Compile Include="ItContract\PaymentMilestone.cs" />
     <Compile Include="ItContract\PaymentModelType.cs" />
     <Compile Include="ItContract\PriceRegulationType.cs" />
     <Compile Include="ItContract\EconomyStream.cs" />

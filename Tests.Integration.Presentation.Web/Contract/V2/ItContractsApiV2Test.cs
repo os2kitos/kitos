@@ -1943,24 +1943,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertCrossReference(paymentFrequencyType, actual.PaymentFrequency);
             AssertCrossReference(paymentModelType, actual.PaymentModel);
             AssertCrossReference(priceRegulationType, actual.PriceRegulation);
-
-            if (expected?.PaymentMileStones == null)
-            {
-                Assert.Empty(actual.PaymentMileStones);
-            }
-            else
-            {
-                var expectedMilestones = expected.PaymentMileStones.OrderBy(x => x.Title).ToList();
-                var actualMilestones = actual.PaymentMileStones.OrderBy(x => x.Title).ToList();
-
-                Assert.Equal(expectedMilestones.Count, actualMilestones.Count);
-                for (var i = 0; i < expectedMilestones.Count; i++)
-                {
-                    Assert.Equal(expectedMilestones[i].Title, actualMilestones[i].Title);
-                    Assert.Equal(expectedMilestones[i].Expected?.Date, actualMilestones[i].Expected?.Date);
-                    Assert.Equal(expectedMilestones[i].Approved?.Date, actualMilestones[i].Approved?.Date);
-                }
-            }
         }
 
         private async Task<(
@@ -1991,7 +1973,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 PaymentFrequencyUuid = paymentFrequencyType?.Uuid,
                 PaymentModelUuid = paymentModelType?.Uuid,
                 PriceRegulationUuid = priceRegulationType?.Uuid,
-                PaymentMileStones = withMilestones ? Many<PaymentMileStoneDTO>().ToList() : new List<PaymentMileStoneDTO>()
             };
 
             return (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType);

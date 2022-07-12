@@ -111,7 +111,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(paymentModel.PaymentModel);
             Assert.Null(paymentModel.PaymentFrequency);
             Assert.Null(paymentModel.PriceRegulation);
-            Assert.Empty(paymentModel.PaymentMileStones);
 
             var agreementPeriod = dto.AgreementPeriod;
             Assert.Null(agreementPeriod.DurationMonths);
@@ -331,14 +330,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentity(contract.PaymentModel, dto.PaymentModel.PaymentModel);
             AssertOptionalIdentity(contract.PaymentFreqency, dto.PaymentModel.PaymentFrequency);
             AssertOptionalIdentity(contract.PriceRegulation, dto.PaymentModel.PriceRegulation);
-            if (withOptionalCrossReferences)
-            {
-                AssertPaymentMilestones(contract, dto.PaymentModel.PaymentMileStones.ToList());
-            }
-            else
-            {
-                Assert.Empty(dto.PaymentModel.PaymentMileStones);
-            }
         }
 
         [Theory]
@@ -609,17 +600,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.PriceRegulation = withOptionalCrossReferences
                 ? new PriceRegulationType() { Uuid = A<Guid>(), Name = A<string>() }
                 : null;
-            contract.PaymentMilestones = withOptionalCrossReferences
-                ? new List<PaymentMilestone>()
-                {
-                    new PaymentMilestone()
-                    {
-                        Title = A<string>(),
-                        Approved = A<DateTime>(),
-                        Expected = A<DateTime>()
-                    }
-                }
-                : null;
         }
 
         private void AssignDPRs(ItContract contract, DataProcessingRegistration[] dprs)
@@ -782,20 +762,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 _ => throw new ArgumentOutOfRangeException(nameof(expectedFromSource), expectedFromSource, null)
             };
             Assert.Equal(expected, actual);
-        }
-
-        private void AssertPaymentMilestones(ItContract contract, List<PaymentMileStoneDTO> handoverTrials)
-        {
-            Assert.Equal(contract.PaymentMilestones.Count, handoverTrials.Count);
-
-            foreach (var comparison in contract.PaymentMilestones.OrderBy(x => x.Title)
-                .Zip(handoverTrials.OrderBy(x => x.Title), (expected, actual) => new { expected, actual })
-                .ToList())
-            {
-                Assert.Equal(comparison.expected.Title, comparison.actual.Title);
-                Assert.Equal(comparison.expected.Approved, comparison.actual.Approved);
-                Assert.Equal(comparison.expected.Expected, comparison.actual.Expected);
-            }
         }
 
         private void AssertSystemUsages(ItContract contract, List<IdentityNamePairResponseDTO> systemUsages)
