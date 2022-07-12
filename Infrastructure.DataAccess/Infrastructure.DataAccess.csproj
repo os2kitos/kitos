@@ -896,6 +896,10 @@
     <Compile Include="Migrations\202207120737229_AddedUserCountUndecided.designer.cs">
       <DependentUpon>202207120737229_AddedUserCountUndecided.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202207120938452_RemovedHandoverTrials.cs" />
+    <Compile Include="Migrations\202207120938452_RemovedHandoverTrials.designer.cs">
+      <DependentUpon>202207120938452_RemovedHandoverTrials.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1482,6 +1486,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207120737229_AddedUserCountUndecided.resx">
       <DependentUpon>202207120737229_AddedUserCountUndecided.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207120938452_RemovedHandoverTrials.resx">
+      <DependentUpon>202207120938452_RemovedHandoverTrials.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
