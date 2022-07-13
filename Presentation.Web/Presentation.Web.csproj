@@ -343,6 +343,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
@@ -1558,7 +1559,7 @@
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview1.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-plan.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.controller.ts" />
