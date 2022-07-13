@@ -3,17 +3,6 @@
     <div class="panel panel-default">
         <div class="row">
             <div class="col-xs-12">
-                <label>Relevante organisationsenheder</label>
-                <div data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'app/shared/organization-tree-item.html'"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="object-section-container">
-    <div class="panel panel-default">
-        <div class="row">
-            <div class="col-xs-12">
                 <div class="form-group">
                     <label class="control-label">Vælg ansvarlig organisationsenhed iblandt nedenstående</label>
                     <select-simple data-id="responsible-org"
@@ -24,6 +13,10 @@
                                    data-ng-disabled="!hasWriteAccess">
                     </select-simple>
                 </div>
+            </div>
+            <div class="col-xs-12">
+                <!--<label>Relevante organisationsenheder</label>-->
+                <div data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'app/shared/organization-tree-item.html'"></div>
             </div>
         </div>
     </div>
