@@ -21,6 +21,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             //No index of this, length is unknown since no bounds on system assignment.
             Property(x => x.SystemNamesAsCsv).IsOptional();
+            Property(x => x.SystemUuidsAsCsv).IsOptional();
 
             Property(x => x.MainReferenceUserAssignedId).IsOptional();
 

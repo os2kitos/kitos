@@ -104,7 +104,7 @@
             var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface($select=Name)," +
                                                         "ObjectOwner($select=Name,LastName)," +
                                                         "Organization($select=Name)," +
-                                                        "ExhibitedBy($expand=ItSystem($select=Name,Disabled;$expand=BelongsTo($select=Name)))," +
+                                                        "ExhibitedBy($expand=ItSystem($select=Id,Name,Uuid,Disabled;$expand=BelongsTo($select=Name)))," +
                                                         "LastChangedByUser($select=Name,LastName)," +
                                                         "DataRows($expand=DataType($select=Name))";
             this.canCreate = this.userAccessRights.canCreate;
@@ -324,11 +324,29 @@
                         }
                     },
                     {
-                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 230,
+                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillersystem", width: 230,
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Name)
                                 return Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Name, dataItem.ExhibitedBy.ItSystem.Disabled);
+                            else
+                                return "";
+                        },
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "ExhibitedBy.ItSystem.Uuid", title: "Udstillersystem (UUID)", width: 150,
+                        persistId: "isSystemUuid", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Uuid && dataItem.ExhibitedBy.ItSystem.Id)
+                                return `<a data-element-type='SystemUuid' data-ui-sref='it-system.usage.main({id: ${dataItem.ExhibitedBy.ItSystem.Id}})'>${dataItem.ExhibitedBy.ItSystem.Uuid}</a>`;
                             else
                                 return "";
                         },

@@ -28,5 +28,6 @@
         ContractNamesAsCsv: string;
         LastChangedAt: Date;
         LastChangedByName: string;
+        SystemUuidsAsCsv: string;
     }
 }

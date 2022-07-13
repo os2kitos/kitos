@@ -31,6 +31,7 @@ namespace Core.DomainModel.GDPR.Read
         public string MainReferenceTitle { get; set; }
 
         public string SystemNamesAsCsv { get; set; }
+        public string SystemUuidsAsCsv { get; set; }
         
         public string DataProcessorNamesAsCsv { get; set; }
         

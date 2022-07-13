@@ -453,6 +453,18 @@
                             .withInitialVisibility(false)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChangedAt)))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("ItSystemUuid")
+                            .withTitle("IT Systemer (UUID)")
+                            .withId("itSystemUuid")
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(
+                                dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.SystemUuidsAsCsv,
+                                    dataItem.SystemUuidsAsCsv))
+                            .withExcelOutput(
+                                dataItem => Helpers.ExcelExportHelper.renderReference(dataItem.SystemUuidsAsCsv,
+                                    dataItem.SystemUuidsAsCsv)))
                     .withStandardSorting("Name");
 
             dataProcessingRegistrationOptions.roles.forEach(role =>

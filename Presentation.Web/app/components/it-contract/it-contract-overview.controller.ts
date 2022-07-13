@@ -262,6 +262,7 @@
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
                                         "LastChangedByUser($select=Name,LastName)," +
                                         "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
+                                        "AssociatedSystemUsages($select=ItSystemUsage;$expand=ItSystemUsage($select=Uuid))," +
                                         `${this.criticalityPropertyName}($select=Id)`;
 
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
@@ -764,7 +765,30 @@
                                 template: (args) => Helpers.KendoOverviewHelper.createSelectDropdownTemplate(args.element, this.criticalityOptionViewModel.options.filter(option=>!option.optionalObjectContext.expired), true)
                             }
                         }
-                    }
+                    },
+                    {
+                        field: "ExhibitedBy.ItSystem.Uuid", title: "Udstillersystem (UUID)", width: 150,
+                        persistId: "isSystemUuid", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.AssociatedSystemUsages?.length > 0) {
+                                var uuids = [];
+                                dataItem.AssociatedSystemUsages.forEach(value => {
+                                    uuids.push(value.ItSystemUsage.Uuid);
+                                });
+                                return uuids.toString();
+                            }
+                            else
+                                return "";
+                        },
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
                 ]
             };
             
