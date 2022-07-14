@@ -968,9 +968,9 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider) => {
-            $stateProvider.state("it-contract.overview",
+            $stateProvider.state("it-contract.overview1",
                 {
-                    url: "/overview",
+                    url: "/overview1",
                     templateUrl: "app/components/it-contract/it-contract-overview1.view.html",
                     controller: OverviewController,
                     controllerAs: "contractOverviewVm",

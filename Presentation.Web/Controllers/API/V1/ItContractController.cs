@@ -354,7 +354,11 @@ namespace Presentation.Web.Controllers.API.V1
                 .GetAssignableContractOptions(organizationId)
                 .Select(result => new ContractOptionsDTO
                 {
-                    CriticalityOptions = ToDTOs(result.CriticalityOptions, organizationId).ToList()
+                    CriticalityOptions = ToDTOs(result.CriticalityOptions, organizationId).ToList(),
+                    ContractTypeOptions = ToDTOs(result.ContractTypeOptions, organizationId).ToList(),
+                    ContractTemplateOptions = ToDTOs(result.ContractTemplateOptions, organizationId).ToList(),
+                    PurchaseFormOptions = ToDTOs(result.PurchaseFormOptions, organizationId).ToList(),
+                    ProcurementStrategyOptions = ToDTOs(result.ProcurementStrategyOptions, organizationId).ToList()
                 })
                 .Match(Ok, FromOperationError);
         }
