@@ -11,12 +11,21 @@
         private readonly contractTemplatePropertyName = "ContractTemplate";
         private readonly purchaseFormPropertyName = "PurchaseForm";
         private readonly procurementStrategyPropertyName = "ProcurementStrategy";
+        private readonly paymentModelPropertyName = "PaymentModel";
+        private readonly paymentFrequencyPropertyName = "PaymentFreqency";
+        private readonly optionExtendPropertyName = "OptionExtend";
+        private readonly terminationDeadlinePropertyName = "TerminationDeadline";
         private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
+
         private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly contractTypeOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly contractTemplateOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly purchaseFormOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly procurementStrategyOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
+        private readonly paymentModelOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
+        private readonly paymentFrequencyOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
+        private readonly optionExtendOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
+        private readonly terminationDeadlineOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly yesNoUndecided: Models.ViewModel.Shared.YesNoUndecidedOptions;
 
         public static $inject: Array<string> = [
@@ -78,60 +87,17 @@
                 new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.purchaseFormOptions);
             this.procurementStrategyOptionViewModel =
                 new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.procurementStrategyOptions);
+            this.paymentModelOptionViewModel =
+                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentModelOptions);
+            this.paymentFrequencyOptionViewModel =
+                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentFrequencyOptions);
+            this.optionExtendOptionViewModel =
+                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.optionExtendOptions);
+            this.terminationDeadlineOptionViewModel =
+                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.terminationDeadlineOptions);
 
             this.yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
             
-            const createItContract = () => {
-
-                $modal.open({
-                    windowClass: "modal fade in",
-                    templateUrl: "app/components/it-contract/it-contract-modal-create.view.html",
-                    controller: [
-                        "$scope", "$uibModalInstance", function($scope, $modalInstance) {
-                            $scope.formData = {};
-                            $scope.type = "IT Kontrakt";
-                            $scope.checkAvailbleUrl = "api/itContract/";
-
-                            $scope.saveAndProceed = () => {
-
-                                var orgId = this.user.currentOrganizationId;
-                                var msg = this.notify.addInfoMessage("Opretter kontrakt...", false);
-
-                                this.$http.post(`api/itcontract?organizationId=${this.user.currentOrganizationId}`,
-                                        { organizationId: orgId, name: $scope.formData.name })
-                                    .then(function onSuccess(result: any) {
-                                            msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                                            var contract = result.data.response;
-                                            $modalInstance.close(contract.id);
-                                            this.$state.go("it-contract.edit.main", { id: contract.id });
-                                        },
-                                        function onError(result) {
-                                            msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
-                                        });
-                            };
-
-                            $scope.save = () => {
-
-                                var orgId = this.user.currentOrganizationId;
-                                var msg = this.notify.addInfoMessage("Opretter kontrakt...", false);
-
-                                this.$http.post(`api/itcontract?organizationId=${this.user.currentOrganizationId}`,
-                                        { organizationId: orgId, name: $scope.formData.name })
-                                    .then(function onSuccess(result: any) {
-                                            msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                                            var contract = result.data.response;
-                                            $modalInstance.close(contract.id);
-                                            this.$state.reload();
-                                        },
-                                        function onError(result) {
-                                            msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
-                                        });
-                            };
-                        }
-                    ]
-                });
-            }
-
             // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
             const replaceRoleFilter = (filterUrl: string, roleName: string, roleId: number) => {
                 const pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
@@ -184,22 +150,27 @@
                     .withUrlFactory(() => {
                         var urlParameters =
                             "?$expand=" +
-                                "Reference($select=URL,Title,ExternalReferenceId)," +
-                                "Parent($select=Id,Name)," +
-                                "ResponsibleOrganizationUnit($select=Name)," +
-                                "PaymentModel($select=Name)," +
-                                "PaymentFreqency($select=Name)," +
-                                "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
-                                "Supplier($select=Name)," +
-                                "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
-                                "DataProcessingRegistrations($select=IsAgreementConcluded,Name,Id)," +
-                                "LastChangedByUser($select=Name,LastName)," +
-                                "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
-                                `${this.criticalityPropertyName}($select=Id),` +
-                                `${this.contractTypePropertyName}($select=Id),` +
-                                `${this.contractTemplatePropertyName}($select=Id),` +
-                                `${this.purchaseFormPropertyName}($select=Id),` +
-                                `${this.procurementStrategyPropertyName}($select=Id)`;
+                            "Reference($select=URL,Title,ExternalReferenceId)," +
+                            "Parent($select=Id,Name)," +
+                            "ResponsibleOrganizationUnit($select=Name)," +
+                            "PaymentModel($select=Name)," +
+                            "PaymentFreqency($select=Name)," +
+                            "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
+                            "Supplier($select=Name)," +
+                            "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
+                            "DataProcessingRegistrations($select=IsAgreementConcluded,Name,Id)," +
+                            "LastChangedByUser($select=Name,LastName)," +
+                            "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
+                            `${this.criticalityPropertyName}($select=Id),` +
+                            `${this.contractTypePropertyName}($select=Id),` +
+                            `${this.contractTemplatePropertyName}($select=Id),` +
+                            `${this.purchaseFormPropertyName}($select=Id),` +
+                            `${this.procurementStrategyPropertyName}($select=Id),` +
+                            `${this.paymentModelPropertyName}($select=Id),` +
+                            `${this.paymentFrequencyPropertyName}($select=Id),` +
+                            `${this.optionExtendPropertyName}($select=Id),` +
+                            `${this.terminationDeadlinePropertyName}($select=Id),` +
+                            "AssociatedSystemRelations($select=Id)";
 
                         var orgUnitId = $window.sessionStorage.getItem(this.orgUnitStorageKey);
                         var query = `/odata/Organizations(${user.currentOrganizationId})/`;
@@ -215,6 +186,8 @@
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                         if (parameterMap.$orderby) {
+
+                            //Option types orderBy fixes
                             if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
                                 parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
                                     `${this.criticalityPropertyName}/Name`);
@@ -222,6 +195,34 @@
                             if (parameterMap.$orderby.includes(this.contractTypePropertyName)) {
                                 parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTypePropertyName,
                                     `${this.contractTypePropertyName}/Name`);
+                            }
+                            if (parameterMap.$orderby.includes(this.contractTemplatePropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTemplatePropertyName,
+                                    `${this.contractTemplatePropertyName}/Name`);
+                            }
+                            if (parameterMap.$orderby.includes(this.purchaseFormPropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.purchaseFormPropertyName,
+                                    `${this.purchaseFormPropertyName}/Name`);
+                            }
+                            if (parameterMap.$orderby.includes(this.procurementStrategyPropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.procurementStrategyPropertyName,
+                                    `${this.procurementStrategyPropertyName}/Name`);
+                            }
+                            if (parameterMap.$orderby.includes(this.paymentModelPropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.paymentModelPropertyName,
+                                    `${this.paymentModelPropertyName}/Name`);
+                            }
+                            if (parameterMap.$orderby.includes(this.paymentFrequencyPropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.paymentFrequencyPropertyName,
+                                    `${this.paymentFrequencyPropertyName}/Name`);
+                            }
+                            if (parameterMap.$orderby.includes(this.optionExtendPropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.optionExtendPropertyName,
+                                    `${this.optionExtendPropertyName}/Name`);
+                            }
+                            if (parameterMap.$orderby.includes(this.terminationDeadlinePropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.terminationDeadlinePropertyName,
+                                    `${this.terminationDeadlinePropertyName}/Name`);
                             }
                         }
 
@@ -237,6 +238,7 @@
                                 "LastChangedByUser/Name",
                                 "LastChangedByUser");
 
+                            //Option types filter fixes
                             parameterMap.$filter =
                                 replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
                             parameterMap.$filter =
@@ -247,6 +249,14 @@
                                 replaceOptionTypeFilter(parameterMap.$filter, this.purchaseFormPropertyName);
                             parameterMap.$filter =
                                 replaceOptionTypeFilter(parameterMap.$filter, this.procurementStrategyPropertyName);
+                            parameterMap.$filter =
+                                replaceOptionTypeFilter(parameterMap.$filter, this.paymentModelPropertyName);
+                            parameterMap.$filter =
+                                replaceOptionTypeFilter(parameterMap.$filter, this.paymentFrequencyPropertyName);
+                            parameterMap.$filter =
+                                replaceOptionTypeFilter(parameterMap.$filter, this.optionExtendPropertyName);
+                            parameterMap.$filter =
+                                replaceOptionTypeFilter(parameterMap.$filter, this.terminationDeadlinePropertyName);
 
                             parameterMap.$filter =
                                 replaceDprFilter(parameterMap.$filter, "DataProcessingRegistrations");
@@ -257,6 +267,35 @@
                     .withResponseParser(response => {
                         //Build lookups/mutations
                         response.forEach(contract => {
+                            
+                            var ecoData = contract.ExternEconomyStreams ?? [];
+
+                            contract.Acquisition = _.sumBy(ecoData, "Acquisition");
+                            contract.Operation = _.sumBy(ecoData, "Operation");
+                            contract.Other = _.sumBy(ecoData, "Other");
+
+                            const streamsSortedByAuditDate = _.sortBy(ecoData, ["AuditDate"]);
+                            var streamWithEarliestAuditDate = _.last(streamsSortedByAuditDate);
+                            if (streamWithEarliestAuditDate && streamWithEarliestAuditDate.AuditDate) {
+                                contract.AuditDate = streamWithEarliestAuditDate.AuditDate;
+                            }
+
+                            var totalWhiteStatuses = _.filter(ecoData, { AuditStatus: "White" }).length;
+                            var totalRedStatuses = _.filter(ecoData, { AuditStatus: "Red" }).length;
+                            var totalYellowStatuses = _.filter(ecoData, { AuditStatus: "Yellow" }).length;
+                            var totalGreenStatuses = _.filter(ecoData, { AuditStatus: "Green" }).length;
+
+                            contract.status = {
+                                max: totalWhiteStatuses +
+                                    totalRedStatuses +
+                                    totalYellowStatuses +
+                                    totalGreenStatuses,
+                                white: totalWhiteStatuses,
+                                red: totalRedStatuses,
+                                yellow: totalYellowStatuses,
+                                green: totalGreenStatuses
+                            };
+
                             contract.roles = [];
                             // iterrate each right
                             _.forEach(contract.Rights,
@@ -280,7 +319,7 @@
                         margins: [Utility.KendoGrid.KendoToolbarMargin.Left],
                         implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
                         enabled: () => userAccessRights.canCreate,
-                        onClick: () => createItContract()
+                        onClick: () => $state.go("it-contract.overview.create")
                     } as Utility.KendoGrid.IKendoToolbarEntry)
                     .withColumn(builder =>
                         builder
@@ -384,9 +423,9 @@
                         .withDataSourceName("Supplier.Name")
                         .withTitle("Leverandør")
                         .withId("supplierName")
-                        .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput()
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains))
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Supplier?.Name))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Supplier?.Name)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName("ContractSigner")
@@ -583,7 +622,253 @@
                             activeSystemUsages.push(system.ItSystemUsage.ItSystem.Name);
                         });
                         return activeSystemUsages.toString();
-                    }));
+                    }))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("AssociatedSystemRelations")
+                    .withTitle("Antal Relationer")
+                    .withId("associatedSystemRelations")
+                    .withoutSorting()
+                    .withRendering(dataItem => {
+                        if (dataItem.AssociatedSystemUsages === undefined)
+                            return "";
+
+                        return dataItem.AssociatedSystemRelations.length.toString();
+                    })
+                    .withExcelOutput(dataItem => {
+                        if (dataItem.AssociatedSystemUsages === undefined)
+                            return "";
+
+                        return dataItem.AssociatedSystemRelations.length.toString();
+                    }))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("Reference.Title")
+                    .withTitle("Reference")
+                    .withId("referenceTitle")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference))
+                    .withExcelOutput(dataItem => {
+                        if (dataItem.Reference === undefined) {
+                            return "";
+                        }
+                        return dataItem.Reference.Title;
+                    }))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("Reference.ExternalReferenceId")
+                    .withTitle("Dokument ID/Sagsnr.")
+                    .withId("referenceExternalReferenceId")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference))
+                    .withExcelOutput(
+                        dataItem => Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference)))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("ExternEconomyStreams")
+                    .withTitle("Anskaffelse")
+                    .withId("acquisition")
+                    .withoutSorting()
+                    .withRendering(dataItem => {
+                        return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
+                    })
+                    .withExcelOutput(dataItem => {
+                        return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
+                    }))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("ExternEconomyStreams")
+                    .withTitle("Drift/år")
+                    .withId("operation")
+                    .withoutSorting()
+                    .withRendering(dataItem => {
+                        return dataItem.Operation ? dataItem.Operation.toString() : "";
+                    })
+                    .withExcelOutput(dataItem => {
+                        return dataItem.Operation ? dataItem.Operation.toString() : "";
+                    }))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("ExternEconomyStreams")
+                    .withTitle("Andet")
+                    .withId("other")
+                    .withoutSorting()
+                    .withRendering(dataItem => {
+                        return dataItem.Other ? dataItem.Other.toString() : "";
+                    })
+                    .withExcelOutput(dataItem => {
+                        return dataItem.Other ? dataItem.Other.toString() : "";
+                    }))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("OperationRemunerationBegun")
+                    .withTitle("Driftsvederlag begyndt")
+                    .withId("operaitonRemunerationBegun")
+                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                    .withRendering(
+                        dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun))
+                    .withExcelOutput(
+                        dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.OperationRemunerationBegun)))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName(this.paymentModelPropertyName)
+                    .withTitle("Betalingsmodel")
+                    .withId("paymentModel")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                    .withFixedValueRange(
+                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            this.paymentModelOptionViewModel.options,
+                            true),
+                        false)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
+                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id))))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName(this.paymentFrequencyPropertyName)
+                    .withTitle("Betalingsfrekvens")
+                    .withId("paymentFrequency")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                    .withFixedValueRange(
+                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            this.paymentFrequencyOptionViewModel.options,
+                            true),
+                        false)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
+                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id)))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("ExternEconomyStreams")
+                    .withTitle("Audit dato")
+                    .withId("auditDate")
+                    .withoutSorting()
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AuditDate))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AuditDate)))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("ExternEconomyStreams")
+                    .withTitle("Audit status")
+                    .withId("auditStatus")
+                    .withoutSorting()
+                    .withRendering(dataItem => {
+                        if (dataItem.status.max > 0) {
+                            var str = JSON.stringify(dataItem.status);
+                            return `<div data-show-status='${str}'></div>`;
+                        }
+                        return "";
+                    })
+                    .withExcelOutput(dataItem => dataItem &&
+                        dataItem.status &&
+                        `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow
+                        }, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` ||
+                        ""))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("Duration")
+                    .withTitle("Verighed") //TODO: check if title is correct (possible typo): in the task documentation the title is: "Verighed", but the old field has a title "Varighed"
+                    .withId("duration")
+                    .withoutSorting()
+                    .withRendering(dataItem => {
+                        if (dataItem.DurationOngoing) {
+                            return "Løbende";
+                        }
+
+                        const years = dataItem.DurationYears || 0;
+                        const months = dataItem.DurationMonths || 0;
+
+                        if (years === 0 && months === 0) {
+                            return "Ikke angivet";
+                        }
+
+                        if (years > 0 && months > 0 && months < 2)
+                            return `${years} år og ${months} måned`;
+
+                        if (years > 0 && months > 0)
+                            return `${years} år og ${months} måneder`;
+
+                        if (years < 1 && months > 0 && months > 1)
+                            return `${months} måneder`;
+
+                        if (years < 1 && months < 2) {
+                            return `${months} måned`;
+                        }
+
+                        if (years > 0 && months < 1)
+                            return `${years} år`;
+
+                        return "Ikke angivet";
+                    }))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName(this.optionExtendPropertyName)
+                    .withTitle("Option")
+                    .withId("optionExtend")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                    .withFixedValueRange(
+                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            this.optionExtendOptionViewModel.options,
+                            true),
+                        false)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
+                        this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                        this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id))))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName(this.terminationDeadlinePropertyName)
+                    .withTitle("Opsigelse (måneder)")
+                    .withId("terminationDeadline")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                    .withFixedValueRange(
+                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            this.terminationDeadlineOptionViewModel.options,
+                            true),
+                        false)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
+                        this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                        this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id))))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("IrrevocableTo")
+                    .withTitle("Uopsigelig til")
+                    .withId("irrevocableTo")
+                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo)))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("Terminated")
+                    .withTitle("Opsagt")
+                    .withId("terminated")
+                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated)))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("LastChangedByUser.Name")
+                    .withTitle("Sidst redigeret: Bruger")
+                    .withId("lastChangedByUser")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                    .withRendering(
+                        dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`)
+                    .withExcelOutput(
+                        dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("LastChangedBy")
+                    .withTitle("Sidste redigeret: Dato")
+                    .withId("lastChangedDate")
+                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
+                    .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
 
             launcher.launch();
         }

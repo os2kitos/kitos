@@ -13,5 +13,9 @@ namespace Presentation.Web.Models.API.V1.ItContract
         public IEnumerable<OptionWithDescriptionAndExpirationDTO> ContractTemplateOptions { get; set; }
         public IEnumerable<OptionWithDescriptionAndExpirationDTO> PurchaseFormOptions { get; set; }
         public IEnumerable<OptionWithDescriptionAndExpirationDTO> ProcurementStrategyOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionAndExpirationDTO> PaymentModelOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionAndExpirationDTO> PaymentFrequencyOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionAndExpirationDTO> OptionExtendOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionAndExpirationDTO> TerminationDeadlineOptions { get; set; }
     }
 }

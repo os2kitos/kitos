@@ -358,7 +358,11 @@ namespace Presentation.Web.Controllers.API.V1
                     ContractTypeOptions = ToDTOs(result.ContractTypeOptions, organizationId).ToList(),
                     ContractTemplateOptions = ToDTOs(result.ContractTemplateOptions, organizationId).ToList(),
                     PurchaseFormOptions = ToDTOs(result.PurchaseFormOptions, organizationId).ToList(),
-                    ProcurementStrategyOptions = ToDTOs(result.ProcurementStrategyOptions, organizationId).ToList()
+                    ProcurementStrategyOptions = ToDTOs(result.ProcurementStrategyOptions, organizationId).ToList(),
+                    PaymentModelOptions = ToDTOs(result.PaymentModelOptions, organizationId).ToList(),
+                    PaymentFrequencyOptions = ToDTOs(result.PaymentFrequencyOptions, organizationId).ToList(),
+                    OptionExtendOptions = ToDTOs(result.OptionExtendOptions, organizationId).ToList(),
+                    TerminationDeadlineOptions = ToDTOs(result.TerminationDeadlineOptions, organizationId).ToList()
                 })
                 .Match(Ok, FromOperationError);
         }

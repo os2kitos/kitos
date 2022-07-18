@@ -104,8 +104,8 @@
             }
         }
 
-        static renderDate(date: Date) {
-            if (!!date) {
+        static renderDate(date: Date | string) {
+            if (!!date && moment(date).format(Constants.DateFormat.DanishDateFormat) !== "01-01-0001") {
                 return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return ExcelExportHelper.noValueFallback;

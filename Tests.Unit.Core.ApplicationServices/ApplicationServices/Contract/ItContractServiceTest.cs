@@ -41,6 +41,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IOptionsService<ItContract, ItContractTemplateType>> _contractTemplateOptionsServiceMock;
         private readonly Mock<IOptionsService<ItContract, PurchaseFormType>> _purchaseFromOptionsServiceMock;
         private readonly Mock<IOptionsService<ItContract, ProcurementStrategyType>> _procurementStrategyOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PaymentModelType>> _paymentModelOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PaymentFreqencyType>> _paymentFreqencyOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, OptionExtendType>> _optionExtendOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, TerminationDeadlineType>> _terminationDeadlineOptionsServiceMock;
 
         public ItContractServiceTest()
         {
@@ -58,6 +62,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _contractTemplateOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractTemplateType>>();
             _purchaseFromOptionsServiceMock = new Mock<IOptionsService<ItContract, PurchaseFormType>>();
             _procurementStrategyOptionsServiceMock = new Mock<IOptionsService<ItContract, ProcurementStrategyType>>();
+            _paymentModelOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentModelType>>();
+            _paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
+            _optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
+            _terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
@@ -72,7 +80,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _contractTypeOptionsServiceMock.Object,
                 _contractTemplateOptionsServiceMock.Object,
                 _purchaseFromOptionsServiceMock.Object,
-                _procurementStrategyOptionsServiceMock.Object);
+                _procurementStrategyOptionsServiceMock.Object,
+                _paymentModelOptionsServiceMock.Object,
+                _paymentFreqencyOptionsServiceMock.Object,
+                _optionExtendOptionsServiceMock.Object,
+                _terminationDeadlineOptionsServiceMock.Object);
         }
 
         [Fact]

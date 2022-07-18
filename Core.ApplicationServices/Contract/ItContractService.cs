@@ -38,6 +38,10 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, ItContractTemplateType> _contractTemplateOptionsService;
         private readonly IOptionsService<ItContract, PurchaseFormType> _purchaseFormOptionsService;
         private readonly IOptionsService<ItContract, ProcurementStrategyType> _procurementStrategyOptionsService;
+        private readonly IOptionsService<ItContract, PaymentModelType> _paymentModelOptionsService;
+        private readonly IOptionsService<ItContract, PaymentFreqencyType> _paymentFrequencyOptionsService;
+        private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
+        private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
 
         public ItContractService(
             IItContractRepository repository,
@@ -53,7 +57,11 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, ItContractType> contractTypeOptionsService,
             IOptionsService<ItContract, ItContractTemplateType> contractTemplateOptionsService, 
             IOptionsService<ItContract, PurchaseFormType> purchaseFormOptionsService, 
-            IOptionsService<ItContract, ProcurementStrategyType> procurementStrategyOptionsService)
+            IOptionsService<ItContract, ProcurementStrategyType> procurementStrategyOptionsService,
+            IOptionsService<ItContract, PaymentModelType> paymentModelOptionsService,
+            IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
+            IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService, 
+            IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
@@ -69,6 +77,10 @@ namespace Core.ApplicationServices.Contract
             _contractTemplateOptionsService = contractTemplateOptionsService;
             _purchaseFormOptionsService = purchaseFormOptionsService;
             _procurementStrategyOptionsService = procurementStrategyOptionsService;
+            _paymentModelOptionsService = paymentModelOptionsService;
+            _paymentFrequencyOptionsService = paymentFrequencyOptionsService;
+            _optionExtendOptionsService = optionExtendOptionsService;
+            _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -244,7 +256,11 @@ namespace Core.ApplicationServices.Contract
                     _contractTypeOptionsService.GetAllOptionsDetails(organizationId),
                     _contractTemplateOptionsService.GetAllOptionsDetails(organizationId),
                     _purchaseFormOptionsService.GetAllOptionsDetails(organizationId),
-                    _procurementStrategyOptionsService.GetAllOptionsDetails(organizationId)));
+                    _procurementStrategyOptionsService.GetAllOptionsDetails(organizationId),
+                    _paymentModelOptionsService.GetAllOptionsDetails(organizationId),
+                    _paymentFrequencyOptionsService.GetAllOptionsDetails(organizationId),
+                    _optionExtendOptionsService.GetAllOptionsDetails(organizationId),
+                    _terminationDeadlineOptionsService.GetAllOptionsDetails(organizationId)));
         }
 
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
