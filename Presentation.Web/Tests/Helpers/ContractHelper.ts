@@ -1,17 +1,14 @@
 ﻿import ContractPage = require("../PageObjects/It-contract/ItContractOverview.po");
 import ContractDprPage = require("../PageObjects/It-contract/Tabs/ContractDpr.po");
-import ContractTimePage = require("../PageObjects/It-contract/ContractTimeOverview.po");
 import CssHelper = require("../Object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
-import Select2 = Kitos.Constants.Select2;
 
 class ContractHelper {
 
     private static contractPage = new ContractPage();
-    private static contractTimePage = new ContractTimePage();
     private static cssHelper = new CssHelper();
     private static consts = new Constants();
     private static navigation = new NavigationHelper();
@@ -43,8 +40,8 @@ class ContractHelper {
     }
 
     public static getRelationCountFromContractName(name: string) {
-        return this.contractTimePage.getPage()
-            .then(() => this.waitForTimePageKendoGrid())
+        return this.contractPage.getPage()
+            .then(() => this.waitForEconomyPageKendoGrid())
             .then(() => {
                 const filteredRows = this.findCatalogColumnsFor(name);
                 return filteredRows.first().element(by.xpath("../.."))
@@ -56,12 +53,8 @@ class ContractHelper {
         return this.contractPage.kendoToolbarWrapper.getFilteredColumnElement(this.contractPage.kendoToolbarWrapper.columnObjects().contractName, name);
     }
 
-    public static waitForTimePageKendoGrid() {
-        browser.wait(this.contractTimePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
-    }
-
     public static waitForEconomyPageKendoGrid() {
-        browser.wait(this.contractTimePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
+        browser.wait(this.contractPage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
     }
 
     public static goToDpr() {

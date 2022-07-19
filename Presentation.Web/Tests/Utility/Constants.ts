@@ -37,7 +37,7 @@
     readonly kendoRemoveFilter = "removeFilterButton";
     readonly kendoUserDeleteButton = "userDeleteButton";
 
-    readonly kendoRelationCountObject = "relationCountObject";
+    readonly kendoRelationCountObject = "relationCountKendoObject";
 
     //Environmental variables
     readonly defaultSystemUsageName = "DefaultTestItSystem";

@@ -712,7 +712,7 @@
                     builder
                     .withDataSourceName("AssociatedSystemRelations")
                     .withTitle("Antal Relationer")
-                    .withId("associatedSystemRelations")
+                    .withId("relationCount")
                     .withoutSorting()
                     .withRendering(dataItem => {
                         if (dataItem.AssociatedSystemUsages === undefined)
