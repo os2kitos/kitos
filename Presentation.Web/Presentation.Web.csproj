@@ -1410,7 +1410,6 @@
     <Content Include="app\components\home\home.view.html" />
     <Content Include="app\components\it-contract\it-contract-edit.view.html" />
     <Content Include="app\components\it-contract\it-contract-overview.view.html" />
-    <Content Include="app\components\it-contract\it-contract-plan.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-deadlines.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-economy.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.view.html" />
@@ -1560,8 +1559,6 @@
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview1.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-plan.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-economy.controller.ts" />

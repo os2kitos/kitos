@@ -143,6 +143,28 @@
                 return filterUrl.replace(pattern, `${column}/Any (c:c/IsAgreementConcluded ne '${yesValue}')`);
             }
 
+            const replaceProcurementFilter = (filterUrl: string, column: string) => {
+                const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+                const matchingFilterPart = pattern.exec(filterUrl);
+                if (matchingFilterPart?.length !== 3) {
+                    return filterUrl;
+                }
+                const userFilterQueryElements = matchingFilterPart[2].replace(",'", "").replace(/\)$/, "").replace(/'$/, "").replace(",", "").replace("|", "").replace("Q", "").split(" ");
+
+                var result = "(";
+                userFilterQueryElements.forEach((value, i) => {
+                    result += `(ProcurementPlanYear eq ${value} or ProcurementPlanQuarter eq ${value})`;
+                    if (i < userFilterQueryElements.length - 1) {
+                        result += " and ";
+                    } else {
+                        result += ")";
+                    }
+                });
+
+                filterUrl = filterUrl.replace(pattern, result);
+                return filterUrl;
+            }
+
             var launcher =
                 kendoGridLauncherFactory
                     .create<Models.ViewModel.ItContract.IItContractOverviewViewModel>()
@@ -241,9 +263,14 @@
                             parameterMap.$filter =
                                 replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
-                            parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter,
+                            const lastChangedByUserSearchedProperties = ["Name", "LastName"];
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
                                 "LastChangedByUser/Name",
-                                "LastChangedByUser");
+                                "LastChangedByUser",
+                                lastChangedByUserSearchedProperties);
+                            
+                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter,
+                                "ProcurementPlanYear");
 
                             //Option types filter fixes
                             parameterMap.$filter =
@@ -323,6 +350,15 @@
                                     contract.roles[right.RoleId]
                                         .push([right.User.Name, right.User.LastName].join(" "));
                                 });
+
+
+                            if (!contract.Parent) { contract.Parent = { Name: "" } as any; }
+                            if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" } as any; }
+                            if (!contract.Supplier) { contract.Supplier = { Name: "" } as any; }
+                            if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
+                            if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" } as any; }
+                            if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
+                            if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" } as any; }
                         });
 
                         return response;
@@ -414,9 +450,9 @@
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
                             "kendo-parent-rendering",
                             "it-contract.edit.main",
-                            dataItem.Parent?.Id,
-                            dataItem.Parent?.Name))
-                        .withExcelOutput(dataItem => dataItem.Parent?.Name))
+                            dataItem.Parent.Id,
+                            dataItem.Parent.Name))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Parent.Name)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName("Name")
@@ -551,17 +587,15 @@
                         .withDataSourceName("ProcurementPlanYear")
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
-                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Number)
-                        //******************************
-                        //TODO: FINISH COLUMN
-                        //******************************
-                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                            .withFixedValueRange($scope.procurements, false)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                             ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
                             : "")
                         .withExcelOutput(
-                            dataItem => `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`))
+                            dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
+                            ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
+                            : ""))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName("ProcurementInitiated")
