@@ -106,6 +106,7 @@ class kendoToolbarWrapper {
             usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeader),
             userRightsHolderAccess: kendo.getColumnHeader(consts.kendoUserRightsHolderHeader),
             userStakeHolderAccess: kendo.getColumnHeader(consts.kendoUserStakeHolderHeader)
+
         };
         return columns;
     }
