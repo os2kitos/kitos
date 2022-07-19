@@ -5,7 +5,7 @@
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoDpaButtonCreate = "createDpaButton";
     readonly kendoContractNameHeader = "contractNameHeader";
-    readonly kendoContractNameObjects = "contractNameObject";
+    readonly kendoContractNameObjects = "contractNameKendoObject";
     readonly kendoButtonResetFilter = "resetFilterButton";
     readonly kendoButtonSaveFilter = "saveFilterButton";
     readonly kendoButtonUseFilter = "useFilterButton";

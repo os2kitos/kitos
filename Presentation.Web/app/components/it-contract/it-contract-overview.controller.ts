@@ -457,7 +457,7 @@
                         builder
                         .withDataSourceName("Name")
                         .withTitle("It Kontrakt")
-                        .withId("name")
+                        .withId("contractName")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
                             "contractNameObject",
