@@ -16,6 +16,7 @@
         private readonly paymentFrequencyPropertyName = "PaymentFreqency";
         private readonly optionExtendPropertyName = "OptionExtend";
         private readonly terminationDeadlinePropertyName = "TerminationDeadline";
+        private readonly procurementPlanYearPropertyName = "ProcurementPlanYear";
         private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
 
         private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
@@ -198,6 +199,11 @@
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                         if (parameterMap.$orderby) {
+
+                            if (parameterMap.$orderby.includes(this.procurementPlanYearPropertyName)) {
+                                parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
+                                    `${this.procurementPlanYearPropertyName},ProcurementPlanQuarter`);
+                            }
 
                             //Option types orderBy fixes
                             if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
@@ -569,10 +575,10 @@
                                 .ProcurementStrategy?.Id))))
                     .withColumn(builder =>
                         builder
-                        .withDataSourceName("ProcurementPlanYear")
+                        .withDataSourceName(this.procurementPlanYearPropertyName)
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        //.withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         //.withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                             ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
@@ -629,6 +635,7 @@
                     .withDataSourceName("DataProcessingRegistrations")
                     .withTitle("Databehandleraftale")
                     .withId("dataProcessingRegistrations")
+                    .withoutSorting()
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                     .withFixedValueRange(
                         [
