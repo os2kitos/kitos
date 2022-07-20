@@ -122,10 +122,10 @@
                 var searchedValue = matchingFilterParts[3];
                 const yesValue = `${Models.Api.Shared.YesNoIrrelevantOption.YES.valueOf()}`;
                 if (searchedValue.indexOf(yesValue) !== -1) {
-                    return filterUrl.replace(pattern, `${column}/Any (c:c/IsAgreementConcluded eq ${searchedValue})`);
+                    return filterUrl.replace(pattern, `${column}/Any (c:c/IsAgreementConcluded eq '${yesValue}')`);
                 }
                 
-                return filterUrl.replace(pattern, `${column}/Any (c:c/IsAgreementConcluded ne '${yesValue}')`);
+                return filterUrl.replace(pattern, `${column}/All (c:c/IsAgreementConcluded ne '${yesValue}')`);
             }
 
             const replaceProcurementFilter = (filterUrl: string, column: string) => {
@@ -134,7 +134,7 @@
                 if (matchingFilterPart?.length !== 3) {
                     return filterUrl;
                 }
-                const userFilterQueryElements = matchingFilterPart[2].replace(",'", "").replace(/\)$/, "").replace(/'$/, "").replace(",", "").replace("|", "").replace("Q", "").split(" ");
+                const userFilterQueryElements = matchingFilterPart[2].replace(",'", "").replace(",", "").replace(/\)$/, "").replace(/'$/, "").replace("|", "").replace("Q", "").split(" ");
 
                 var result = "(";
                 userFilterQueryElements.forEach((value, i) => {
@@ -572,8 +572,8 @@
                         .withDataSourceName("ProcurementPlanYear")
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange($scope.procurements, false)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        //.withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                             ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
                             : "")
