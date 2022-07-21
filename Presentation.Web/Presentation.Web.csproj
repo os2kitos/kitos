@@ -343,12 +343,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
-    <TypeScriptCompile Include="app\helpers\kendo-field-filter-helpers.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
-    <TypeScriptCompile Include="app\helpers\OdataQueryHelper.ts" />
+    <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
@@ -369,6 +370,7 @@
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
+    <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
     <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
@@ -1408,7 +1410,6 @@
     <Content Include="app\components\home\home.view.html" />
     <Content Include="app\components\it-contract\it-contract-edit.view.html" />
     <Content Include="app\components\it-contract\it-contract-overview.view.html" />
-    <Content Include="app\components\it-contract\it-contract-plan.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-deadlines.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-economy.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.view.html" />
@@ -1558,8 +1559,6 @@
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-plan.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-economy.controller.ts" />

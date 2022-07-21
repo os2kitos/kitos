@@ -33,5 +33,24 @@
             arr.splice(fromIndex, 1);
             arr.splice(toIndex, 0, element);
         }
+
+        static concatFirstNumberOfItemsAndAddElipsis(array: Array<string>, numberOfItemsToConcat: number): string {
+            let concatItems = "";
+
+            if (array === undefined)
+                return concatItems;
+
+            // join the first x username together
+            if (array.length > 0) {
+                concatItems = array.slice(0, numberOfItemsToConcat).join(", ");
+            }
+
+            // if more than x then add an elipsis
+            if (array.length > numberOfItemsToConcat) {
+                concatItems += ", ...";
+            }
+
+            return concatItems;
+        }
     }
 }

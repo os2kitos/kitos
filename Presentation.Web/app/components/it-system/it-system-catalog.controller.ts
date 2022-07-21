@@ -230,7 +230,11 @@
                                     "contains(CAST(Uuid, 'Edm.String'),");
 
                                 //Fix filter on users to include both the first and last name properties
-                                parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
+                                const lastChangedByUserSearchedProperties = ["Name", "LastName"];
+                                parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
+                                    "LastChangedByUser/Name",
+                                    "LastChangedByUser",
+                                    lastChangedByUserSearchedProperties);
                             }
 
                             const existing = parameterMap.$filter;

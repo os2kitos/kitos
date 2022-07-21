@@ -36,7 +36,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
-        private readonly Mock<IOptionsService<ItContract, CriticalityType>> _optionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, CriticalityType>> _criticalityOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, ItContractType>> _contractTypeOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, ItContractTemplateType>> _contractTemplateOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PurchaseFormType>> _purchaseFromOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, ProcurementStrategyType>> _procurementStrategyOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PaymentModelType>> _paymentModelOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PaymentFreqencyType>> _paymentFreqencyOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, OptionExtendType>> _optionExtendOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, TerminationDeadlineType>> _terminationDeadlineOptionsServiceMock;
 
         public ItContractServiceTest()
         {
@@ -49,7 +57,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
-            _optionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
+            _criticalityOptionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
+            _contractTypeOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractType>>();
+            _contractTemplateOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractTemplateType>>();
+            _purchaseFromOptionsServiceMock = new Mock<IOptionsService<ItContract, PurchaseFormType>>();
+            _procurementStrategyOptionsServiceMock = new Mock<IOptionsService<ItContract, ProcurementStrategyType>>();
+            _paymentModelOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentModelType>>();
+            _paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
+            _optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
+            _terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
@@ -60,7 +76,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _logger.Object,
                 _contractDataProcessingRegistrationAssignmentService.Object,
                 _userContextMock.Object,
-                _optionsServiceMock.Object);
+                _criticalityOptionsServiceMock.Object,
+                _contractTypeOptionsServiceMock.Object,
+                _contractTemplateOptionsServiceMock.Object,
+                _purchaseFromOptionsServiceMock.Object,
+                _procurementStrategyOptionsServiceMock.Object,
+                _paymentModelOptionsServiceMock.Object,
+                _paymentFreqencyOptionsServiceMock.Object,
+                _optionExtendOptionsServiceMock.Object,
+                _terminationDeadlineOptionsServiceMock.Object);
         }
 
         [Fact]

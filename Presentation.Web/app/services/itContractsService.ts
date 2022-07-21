@@ -5,6 +5,7 @@
         removeDataProcessingRegistration(contractId: number, dataProcessingRegistrationId: number): angular.IPromise<IContractPatchResult>;
         getAvailableDataProcessingRegistrations(contractId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityDTO[]>;
         getApplicableItContractOptions(organizationId: number): angular.IPromise<Models.ItContract.IItContractOptions>;
+        getAvailableProcurementPlans(organizationId: number): angular.IPromise<Models.ItContract.IContractProcurementPlanDTO[]>;
     }
 
     export interface IContractPatchResult {
@@ -89,6 +90,18 @@
                         },
                 error => this.handleServerError(error)
             );
+        }
+
+        getAvailableProcurementPlans(organizationId: number): angular.IPromise<Models.ItContract.IContractProcurementPlanDTO[]> {
+            return this.$http
+                .get<API.Models.IApiWrapper<any>>(`api/itcontract/available-procurements/${organizationId}`)
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.ItContract.IContractProcurementPlanDTO[] }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
         }
 
         static $inject: string[] = ["$http"];
