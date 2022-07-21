@@ -455,7 +455,7 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChangedAt)))
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("ItSystemUuid")
+                            .withDataSourceName("SystemUuidsAsCsv")
                             .withTitle("IT Systemer (UUID)")
                             .withId("itSystemUuid")
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)

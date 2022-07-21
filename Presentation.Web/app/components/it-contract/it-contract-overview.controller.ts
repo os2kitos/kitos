@@ -112,6 +112,11 @@
                 return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
             }
 
+            const replaceSystemUuidFilter = (filterUrl: string, column: string) => {
+                const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+                return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: contains(cast(c/ItSystemUsage/Uuid, Edm.String)$2)");
+            }
+
             const replaceOptionTypeFilter = (filterUrl: string, column: string) => {
                 const pattern = new RegExp(`(${column}( eq )\'([0-9]+)\')`, "i");
                 const matchingFilterParts = pattern.exec(filterUrl);
@@ -198,6 +203,7 @@
                                 `${this.paymentFrequencyPropertyName}($select=Id),` +
                                 `${this.optionExtendPropertyName}($select=Id),` +
                                 `${this.terminationDeadlinePropertyName}($select=Id),` +
+                                "AssociatedSystemUsages($select=ItSystemUsage;$expand=ItSystemUsage($select=Uuid))," +
                                 "AssociatedSystemRelations($select=Id)";
 
                         var orgUnitId = $window.sessionStorage.getItem(this.orgUnitStorageKey);
@@ -263,6 +269,8 @@
 
                             parameterMap.$filter =
                                 replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
+                            parameterMap.$filter =
+                                replaceSystemUuidFilter(parameterMap.$filter, "ExhibitedBy.ItSystem.Uuid");
 
                             const lastChangedByUserSearchedProperties = ["Name", "LastName"];
                             parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
@@ -955,7 +963,24 @@
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
-                    .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
+                    .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)))
+                .withColumn(builder =>
+                    builder
+                    .withDataSourceName("ExhibitedBy.ItSystem.Uuid")
+                    .withTitle("Udstillersystem (UUID)")
+                    .withId("isSystemUuid")
+                    .withoutSorting()
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                    .withRendering(dataItem => {
+                        if (dataItem.AssociatedSystemUsages?.length > 0) {
+                            var uuids = [];
+                            dataItem.AssociatedSystemUsages.forEach(value => {
+                                uuids.push(value.ItSystemUsage.Uuid);
+                            });
+                            return uuids.toString();
+                        } else
+                            return "";
+                    }));
 
             launcher.launch();
         }

@@ -90,6 +90,13 @@
             //Defer until page change is complete
             setTimeout(() => this.activate(), 1);
         }
+
+
+        replaceExhibitedByFilter = (filterUrl: string, column: string) => {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "contains(cast(ExhibitedBy/ItSystem/Uuid, Edm.String)$2");
+        }
+
         private activate() {
 
             var itInterfaceBaseUrl: string;
@@ -122,6 +129,8 @@
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
+
+                                parameterMap.$filter = this.replaceExhibitedByFilter(parameterMap.$filter, "ExhibitedBy.ItSystem.Uuid");
                                 // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
