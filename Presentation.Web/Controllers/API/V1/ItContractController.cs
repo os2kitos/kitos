@@ -354,17 +354,32 @@ namespace Presentation.Web.Controllers.API.V1
                 .GetAssignableContractOptions(organizationId)
                 .Select(result => new ContractOptionsDTO
                 {
-                    CriticalityOptions = ToDTOs(result.CriticalityOptions, organizationId).ToList(),
-                    ContractTypeOptions = ToDTOs(result.ContractTypeOptions, organizationId).ToList(),
-                    ContractTemplateOptions = ToDTOs(result.ContractTemplateOptions, organizationId).ToList(),
-                    PurchaseFormOptions = ToDTOs(result.PurchaseFormOptions, organizationId).ToList(),
-                    ProcurementStrategyOptions = ToDTOs(result.ProcurementStrategyOptions, organizationId).ToList(),
-                    PaymentModelOptions = ToDTOs(result.PaymentModelOptions, organizationId).ToList(),
-                    PaymentFrequencyOptions = ToDTOs(result.PaymentFrequencyOptions, organizationId).ToList(),
-                    OptionExtendOptions = ToDTOs(result.OptionExtendOptions, organizationId).ToList(),
-                    TerminationDeadlineOptions = ToDTOs(result.TerminationDeadlineOptions, organizationId).ToList()
+                    CriticalityOptions = ToDTOs(result.CriticalityOptions).ToList(),
+                    ContractTypeOptions = ToDTOs(result.ContractTypeOptions).ToList(),
+                    ContractTemplateOptions = ToDTOs(result.ContractTemplateOptions).ToList(),
+                    PurchaseFormOptions = ToDTOs(result.PurchaseFormOptions).ToList(),
+                    ProcurementStrategyOptions = ToDTOs(result.ProcurementStrategyOptions).ToList(),
+                    PaymentModelOptions = ToDTOs(result.PaymentModelOptions).ToList(),
+                    PaymentFrequencyOptions = ToDTOs(result.PaymentFrequencyOptions).ToList(),
+                    OptionExtendOptions = ToDTOs(result.OptionExtendOptions).ToList(),
+                    TerminationDeadlineOptions = ToDTOs(result.TerminationDeadlineOptions).ToList()
                 })
                 .Match(Ok, FromOperationError);
+        }
+        
+        [HttpGet]
+        [Route("available-procurements/{organizationId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAvailableProcurements(int organizationId)
+        {
+            var result = _itContractService
+                .GetAvailableProcurementPlans(organizationId)
+                .Select(ToProcurementPlanDTO)
+                .ToList();
+            return Ok(result);
         }
 
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
@@ -418,7 +433,7 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(NewObjectCreated, FromOperationError);
         }
 
-        private static IEnumerable<OptionWithDescriptionAndExpirationDTO> ToDTOs<T>(IEnumerable<(OptionDescriptor<T> option, bool available)> options, int organizationId) where T : OptionEntity<ItContract>
+        private static IEnumerable<OptionWithDescriptionAndExpirationDTO> ToDTOs<T>(IEnumerable<(OptionDescriptor<T> option, bool available)> options) where T : OptionEntity<ItContract>
         {
             return options.Select(ToDTO);
         }
@@ -426,6 +441,15 @@ namespace Presentation.Web.Controllers.API.V1
         private static OptionWithDescriptionAndExpirationDTO ToDTO<T>((OptionDescriptor<T> option, bool available) optionObject) where T : OptionEntity<ItContract>
         {
             return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available == false, optionObject.option.Description);
+        }
+
+        private static ContractProcurementPlanDTO ToProcurementPlanDTO(ItContract contract)
+        {
+            return new ContractProcurementPlanDTO
+            {
+                ProcurementPlanYear = contract.ProcurementPlanYear,
+                ProcurementPlanQuarter = contract.ProcurementPlanQuarter
+            };
         }
     }
 }

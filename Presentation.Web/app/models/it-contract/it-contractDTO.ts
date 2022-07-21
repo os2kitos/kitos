@@ -17,4 +17,9 @@
         optionExtendOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];
         terminationDeadlineOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];
     }
+
+    export interface IContractProcurementPlanDTO {
+        procurementPlanYear: number,
+        procurementPlanQuarter: number,
+    }
 }

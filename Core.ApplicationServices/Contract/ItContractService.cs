@@ -263,6 +263,13 @@ namespace Core.ApplicationServices.Contract
                     _terminationDeadlineOptionsService.GetAllOptionsDetails(organizationId)));
         }
 
+        public IEnumerable<ItContract> GetAvailableProcurementPlans(int organizationId)
+        {
+            var contracts = GetAllByOrganization(organizationId);
+
+            return contracts.Where(contract => contract.ProcurementPlanYear != null && contract.ProcurementPlanQuarter != null).ToList();
+        }
+
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
         {
             var readAccessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);

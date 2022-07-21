@@ -43,7 +43,8 @@
             "userAccessRights",
             "uiState",
             "itContractOptions",
-            "kendoGridLauncherFactory"
+            "kendoGridLauncherFactory",
+            "procurements"
         ];
 
         constructor(
@@ -59,10 +60,20 @@
             userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             uiState: Models.UICustomization.ICustomizedModuleUI,
             itContractOptions: Models.ItContract.IItContractOptions,
-            kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory) {
+            kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
+            procurements: Models.ItContract.IContractProcurementPlanDTO[]) {
             $rootScope.page.title = "IT Kontrakt";
 
-            $scope.procurements = [];
+            $scope.procurements = procurements.map(value => {
+                return {
+                    textValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`,
+                    remoteValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`
+                }
+            });
+            $scope.procurements.push({
+                textValue: " ",
+                remoteValue: -1
+            });
 
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
@@ -130,15 +141,19 @@
             }
 
             const replaceProcurementFilter = (filterUrl: string, column: string) => {
-                const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+                const pattern = new RegExp(`${column} eq \'([a-zA-Z0-9 |-]+)\'`, "i");
                 const matchingFilterPart = pattern.exec(filterUrl);
-                if (matchingFilterPart?.length !== 3) {
+                if (matchingFilterPart?.length !== 2) {
                     return filterUrl;
                 }
-                const userFilterQueryElements = matchingFilterPart[2].replace(",'", "").replace(",", "").replace(/\)$/, "").replace(/'$/, "").replace("|", "").replace("Q", "").split(" ");
+                const userFilterQueryElements = matchingFilterPart[1].replace(",'", "").replace(",", "").replace(/\)$/, "").replace(/'$/, "").replace(" |", "").replace("Q", "").split(" ");
 
                 var result = "(";
-                userFilterQueryElements.forEach((value, i) => {
+                userFilterQueryElements.forEach((filterValue, i) => {
+                    var value = filterValue;
+                    if (value === "-1")
+                        value = "null";
+
                     result += `(ProcurementPlanYear eq ${value} or ProcurementPlanQuarter eq ${value})`;
                     if (i < userFilterQueryElements.length - 1) {
                         result += " and ";
@@ -199,12 +214,7 @@
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                         if (parameterMap.$orderby) {
-
-                            if (parameterMap.$orderby.includes(this.procurementPlanYearPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
-                                    `${this.procurementPlanYearPropertyName},ProcurementPlanQuarter`);
-                            }
-
+                            
                             //Option types orderBy fixes
                             if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
                                 parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
@@ -578,8 +588,8 @@
                         .withDataSourceName(this.procurementPlanYearPropertyName)
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
-                        //.withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        //.withFixedValueRange($scope.procurements, false)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                             ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
                             : "")
@@ -986,6 +996,11 @@
                             "ItContractsService", "user",
                             (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
                                 ItContractsService.getApplicableItContractOptions(user.currentOrganizationId)
+                        ],
+                        procurements: [
+                            "ItContractsService", "user",
+                            (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
+                                ItContractsService.getAvailableProcurementPlans(user.currentOrganizationId)
                         ]
                     }
                 });
