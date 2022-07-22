@@ -6,59 +6,61 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Aftalefrister</div>
                     <div class="panel-body">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <label for="agreement-duration" class="control-label">Varighed</label>
+                        <div ng-if="isAgreementExpirationEnabled">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label for="agreement-duration" class="control-label">Varighed</label>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-xs-6 col-lg-4">
+                                    <input type="text" id="year" class="form-control input-sm"
+                                           data-ng-model="durationYears"
+                                           data-ng-disabled="!hasWriteAccess || durationOngoing"
+                                           data-ng-blur="saveDurationYears()"/>
+                                </div>
+                                <div class="col-xs-6 contractDurationLabelContainer">
+                                    <label class="control-label small contractDurationLabel" for="year">År</label>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-xs-6 col-lg-4">
+                                    <input type="text" id="month" class="form-control input-sm"
+                                           data-ng-model="durationMonths"
+                                           data-ng-disabled="!hasWriteAccess || durationOngoing"
+                                           data-ng-blur="saveDurationMonths()"/>
+                                </div>
+                                <div class="col-xs-6 contractDurationLabelContainer">
+                                    <label class="control-label small contractDurationLabel" for="month">Måneder</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="row form-group">
-                            <div class="col-xs-6 col-lg-4">
-                                <input type="text" id="year" class="form-control input-sm"
-                                       data-ng-model="durationYears"
-                                       data-ng-disabled="!hasWriteAccess || durationOngoing"
-                                       data-ng-blur="saveDurationYears()" />
-                            </div>
-                            <div class="col-xs-6 contractDurationLabelContainer">
-                                <label class="control-label small contractDurationLabel" for="year">År</label>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-xs-6 col-lg-4">
-                                <input type="text" id="month" class="form-control input-sm"
-                                       data-ng-model="durationMonths"
-                                       data-ng-disabled="!hasWriteAccess || durationOngoing"
-                                       data-ng-blur="saveDurationMonths()" />
-                            </div>
-                            <div class="col-xs-6 contractDurationLabelContainer">
-                                <label class="control-label small contractDurationLabel" for="month">Måneder</label>
-                            </div>
-                        </div>
-                        <div class="row form-group">
+                        <div class="row form-group" ng-if="isAgreementDurationOnGoingEnabled">
                             <div class="col-xs-1">
                                 <input type="checkbox" id="idl" class=""
                                        data-ng-checked="durationOngoing"
                                        data-ng-change="saveOngoingStatus()"
                                        data-ng-model="durationOngoing"
-                                       data-ng-disabled="!hasWriteAccess" />
+                                       data-ng-disabled="!hasWriteAccess"/>
                             </div>
                             <div class="col-xs-9">
                                 <label class="control-label small" for="idl">Løbende</label>
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isOptionExtendEnabled">
                             <select2-option data-id="agreement-option-extend"
-                                           data-label="Option forlæng"
-                                           data-placeholder="Vælg forlængelse"
-                                           data-selected-text="{{ contract.optionExtendName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.optionExtendId"
-                                           data-options="optionExtensions"
-                                           data-auto-save-url="{{ autosaveUrl }}"
-                                           data-field="optionExtendId">
+                                            data-label="Option forlæng"
+                                            data-placeholder="Vælg forlængelse"
+                                            data-selected-text="{{ contract.optionExtendName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.optionExtendId"
+                                            data-options="optionExtensions"
+                                            data-auto-save-url="{{ autosaveUrl }}"
+                                            data-field="optionExtendId">
                             </select2-option>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isOptionExtendMultiplierEnabled">
                             <label for="agreement-option-extend-multiplier" class="control-label small">Antal brugte optioner</label>
                             <input id="agreement-option-extend-multiplier"
                                    type="number"
@@ -69,7 +71,7 @@
                                    data-autosave="{{autosaveUrl}}"
                                    data-field="extendMultiplier">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isIrrevocableEnabled">
                             <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
                             <input type="text" class="form-control" id="agreement-irrevocable"
                                    data-kendo-date-picker
@@ -88,7 +90,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Opsigelse</div>
                     <div class="panel-body">
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isAgreementTerminatedEnabled">
                             <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
                             <input type="text" class="form-control" id="agreement-terminated"
                                    data-kendo-date-picker
@@ -99,7 +101,7 @@
                                    data-field="terminated">
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isAgreementNoticeEnabled">
                             <select2-option data-id="agreement-notice"
                                            data-label="Opsigelsesfrist (måneder)"
                                            data-placeholder="Vælg opsigelsesfrist"
@@ -112,7 +114,7 @@
                             </select2-option>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isAgreementRunningEnabled">
                             <select-simple data-id="agreement-running"
                                            data-label="Løbende"
                                            data-options="deadlineOptions"
@@ -125,7 +127,7 @@
                             </select-simple>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isAgreementByEndingEnabled">
                             <select-simple data-id="agreement-by-ending"
                                            data-label="Inden udgangen af"
                                            data-options="deadlineOptions"

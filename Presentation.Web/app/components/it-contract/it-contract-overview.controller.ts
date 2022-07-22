@@ -440,7 +440,7 @@
                         .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig")
                         .withoutSorting()
                         .withInclusionCriterion(
-                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
+                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.isActive)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName("ItContractId")
@@ -448,7 +448,9 @@
                         .withId("contractId")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(
+                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.contractId)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName("Parent.Name")
@@ -528,7 +530,9 @@
                         .withId("contractSigner")
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains))
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInclusionCriterion(
+                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.intSigner)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName(this.contractTypePropertyName)
@@ -543,7 +547,9 @@
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                             this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id)))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
+                            this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id)))
+                        .withInclusionCriterion(
+                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.contractType)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName(this.contractTemplatePropertyName)
@@ -573,7 +579,9 @@
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                             this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id)))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id))))
+                            this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id)))
+                        .withInclusionCriterion(
+                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.purchaseForm)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName(this.procurementStrategyPropertyName)
@@ -604,7 +612,9 @@
                         .withExcelOutput(
                             dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                             ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
-                            : ""))
+                                : "")
+                        .withInclusionCriterion(
+                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.procurementPlan)))
                     .withColumn(builder =>
                         builder
                         .withDataSourceName("ProcurementInitiated")
@@ -619,7 +629,9 @@
                             : "")
                         .withExcelOutput(dataItem => dataItem.ProcurementInitiated
                             ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
-                            : ""));
+                            : "")
+                        .withInclusionCriterion(
+                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.procurementStrategy)));
 
             itContractRoles.forEach(role => {
                 const roleColumnId = `itContract${role.Id}`;
@@ -819,7 +831,9 @@
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                         this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)))
                     .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id))))
+                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)))
+                    .withInclusionCriterion(
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.paymentModel)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName(this.paymentFrequencyPropertyName)
@@ -834,7 +848,9 @@
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                         this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id)))
                     .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
+                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id)))
+                    .withInclusionCriterion(
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.paymentModel)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName("ExternEconomyStreams.AuditDate")
@@ -896,7 +912,9 @@
                             return `${years} år`;
 
                         return "Ikke angivet";
-                    }))
+                    })
+                    .withInclusionCriterion(
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementDuration)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName(this.optionExtendPropertyName)
@@ -935,7 +953,9 @@
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo)))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo))
+                    .withInclusionCriterion(
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.irrevocable)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName("Terminated")
@@ -944,7 +964,9 @@
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated)))
+                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated))
+                    .withInclusionCriterion(
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementTerminated)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName("LastChangedByUser.Name")

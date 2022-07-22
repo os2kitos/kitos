@@ -72,9 +72,6 @@
                                 return results;
                             });
                         }
-                    ],
-                    uiState: [
-                        "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
                     ]
                 }
             });
@@ -110,8 +107,22 @@
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
                 $scope.allowClear = true;
+
                 $scope.showprocurementPlanSelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementPlan);
                 $scope.showProcurementStrategySelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementStrategy);
+                $scope.isContractIdEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractId);
+                $scope.isContractTypeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractType);
+                $scope.isPurchaseFormEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.purchaseForm);
+                $scope.isExtSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extSigner);
+                $scope.isExtSignedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extSigned);
+                $scope.isExtDateEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extDate);
+                $scope.isIntSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intSigner);
+                $scope.isIntSignedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intSigned);
+                $scope.isIntDateEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intDate);
+                $scope.isAgreementConcludedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementConcluded);
+                $scope.isAgreementExpirationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementExpiration);
+                $scope.isActiveEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.isActive);
+
                 bindProcurementInitiated();
                 var today = new Date();
 

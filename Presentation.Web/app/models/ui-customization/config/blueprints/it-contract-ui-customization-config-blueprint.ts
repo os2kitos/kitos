@@ -15,6 +15,42 @@
                     },
                     procurementPlan: {
                         text: "Genanskaffelsesplan"
+                    },
+                    contractId: {
+                        text: "KontraktID"
+                    },
+                    contractType: {
+                        text: "Kontrakttype"
+                    },
+                    purchaseForm: {
+                        text: "Indkøbsform"
+                    },
+                    extSigner: {
+                        text: "Leverandørs kontraktunderskriver"
+                    },
+                    extSigned: {
+                        text: "Leverandørs underskrevet"
+                    },
+                    extDate: {
+                        text: "Leverandørs dato"
+                    },
+                    intSigner: {
+                        text: "Kontraktunderskriver"
+                    },
+                    intSigned: {
+                        text: "Underskrevet"
+                    },
+                    intDate: {
+                        text: "Dato"
+                    },
+                    agreementConcluded: {
+                        text: "Gyldig fra"
+                    },
+                    agreementExpiration: {
+                        text: "Gyldig til"
+                    },
+                    isActive: {
+                        text: "Gyldig"
                     }
                 }
             },
@@ -31,12 +67,52 @@
             deadlines: {
                 text: "Aftalefrister",
                 helpText: Configs.helpTexts.cannotChangeTab,
-                readOnly: true
+                readOnly: true,
+                children: {
+                    agreementDuration: {
+                        text: "Varighed"
+                    },
+                    agreementDurationOnGoing: {
+                        text: "Løbende"
+                    },
+                    optionExtend: {
+                        text: "Option forlæng"
+                    },
+                    optionExtendMultiplier: {
+                        text: "Antal brugte optioner"
+                    },
+                    irrevocable: {
+                        text: "Uopsigelig til"
+                    },
+                    agreementTerminated: {
+                        text: "Kontrakten opsagt"
+                    },
+                    agreementNotice: {
+                        text: "Opsigelsesfrist"
+                    },
+                    agreementRunning: {
+                        text: "Opsigelse løbende"
+                    },
+                    agreementByEnding: {
+                        text: "Inden udgangen af"
+                    }
+                }
             },
             economy: {
                 text: "Økonomi",
                 helpText: Configs.helpTexts.cannotChangeTab,
-                readOnly: true
+                readOnly: true,
+                children: {
+                    paymentModel: {
+                        text: "Betalingsmodel"
+                    },
+                    extPayment: {
+                        text: "Ekstern betaling"
+                    },
+                    intPayment: {
+                        text: "Intern betaling"
+                    }
+                }
             },
             contractRoles: {
                 text: "Kontraktroller",

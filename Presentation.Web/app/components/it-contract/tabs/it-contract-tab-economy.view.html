@@ -1,7 +1,7 @@
 ﻿<div class="object-section-container">
     <h4>{{contract.name}}</h4>
 
-    <form role="form">
+    <form role="form" ng-if="isPaymentModelEnabled">
         <div class="panel panel-default">
             <div class="panel-heading">Betalingsmodel</div>
             <div class="panel-body">
@@ -54,7 +54,7 @@
             </div>
         </div>
     </form>
-    <div class="panel panel-default">
+    <div class="panel panel-default" ng-if="isExtPaymentEnabled">
 
         <div class="panel-heading">Ekstern betaling</div>
         <table class="table table-condensed small">
@@ -191,7 +191,7 @@
         </table>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-default" ng-if="isIntPaymentEnabled">
         <div class="panel-heading">Intern betaling</div>
         <table class="table table-condensed small">
             <thead>
