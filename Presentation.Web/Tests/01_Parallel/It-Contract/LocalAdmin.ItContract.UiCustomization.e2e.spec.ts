@@ -37,7 +37,29 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => testTabCustomization(contractName, "ItContracts.contractRoles", ContractNavigationSrefs.contractRolesSref))
             .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementPlan", ContractNavigationSrefs.frontPageSref, "selectProcurementPlan"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementStrategy", ContractNavigationSrefs.frontPageSref, "selectProcurementStrategy"));
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementStrategy", ContractNavigationSrefs.frontPageSref, "selectProcurementStrategy"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractId", ContractNavigationSrefs.frontPageSref, "contract-id"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractType", ContractNavigationSrefs.frontPageSref, "s2id_contract-type"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.purchaseForm", ContractNavigationSrefs.frontPageSref, "s2id_contract-purchaseform"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.extSigner", ContractNavigationSrefs.frontPageSref, "contract-ext-signer"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.extSigned", ContractNavigationSrefs.frontPageSref, "contract-ext-signed"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.extDate", ContractNavigationSrefs.frontPageSref, "contract-ext-date"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.intSigner", ContractNavigationSrefs.frontPageSref, "contract-int-signer"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.intSigned", ContractNavigationSrefs.frontPageSref, "contract-int-signed"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.intDate", ContractNavigationSrefs.frontPageSref, "contract-int-date"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.agreementConcluded", ContractNavigationSrefs.frontPageSref, "agreement-concluded"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.agreementExpiration", ContractNavigationSrefs.frontPageSref, "agreement-expiration"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.isActive", ContractNavigationSrefs.frontPageSref, "contractIsActive"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDuration", ContractNavigationSrefs.frontPageSref, "idl"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDurationOnGoing", ContractNavigationSrefs.frontPageSref, "s2id_agreement-option-extend"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.optionExtendMultiplier", ContractNavigationSrefs.frontPageSref, "agreement-option-extend-multiplier"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.irrevocable", ContractNavigationSrefs.frontPageSref, "agreement-irrevocable"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.irrevocable", ContractNavigationSrefs.frontPageSref, "agreement-terminated"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementTerminated", ContractNavigationSrefs.frontPageSref, "s2id_agreement-notice"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementNotice", ContractNavigationSrefs.frontPageSref, "s2id_agreement-notice"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementRunning", ContractNavigationSrefs.frontPageSref, "contractIsActive"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementByEnding", ContractNavigationSrefs.frontPageSref, "contractIsActive"))
+            ;
     });
 
     function testTabCustomization(name: string, settingId: string, tabSref: string) {
