@@ -914,7 +914,7 @@
                         return "Ikke angivet";
                     })
                     .withInclusionCriterion(
-                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementDuration)))
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementDeadlines)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName(this.optionExtendPropertyName)
@@ -955,7 +955,7 @@
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo))
                     .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo))
                     .withInclusionCriterion(
-                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.irrevocable)))
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementDeadlines)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName("Terminated")
@@ -966,7 +966,7 @@
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated))
                     .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated))
                     .withInclusionCriterion(
-                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementTerminated)))
+                        () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.termination)))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName("LastChangedByUser.Name")

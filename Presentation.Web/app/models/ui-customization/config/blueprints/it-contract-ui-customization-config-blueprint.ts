@@ -69,32 +69,11 @@
                 helpText: Configs.helpTexts.cannotChangeTab,
                 readOnly: true,
                 children: {
-                    agreementDuration: {
-                        text: "Varighed"
+                    agreementDeadlines: {
+                        text: "Aftalefrister"
                     },
-                    agreementDurationOnGoing: {
-                        text: "Løbende"
-                    },
-                    optionExtend: {
-                        text: "Option forlæng"
-                    },
-                    optionExtendMultiplier: {
-                        text: "Antal brugte optioner"
-                    },
-                    irrevocable: {
-                        text: "Uopsigelig til"
-                    },
-                    agreementTerminated: {
-                        text: "Kontrakten opsagt"
-                    },
-                    agreementNotice: {
-                        text: "Opsigelsesfrist"
-                    },
-                    agreementRunning: {
-                        text: "Opsigelse løbende"
-                    },
-                    agreementByEnding: {
-                        text: "Inden udgangen af"
+                    termination: {
+                        text: "Opsigelse"
                     }
                 }
             },

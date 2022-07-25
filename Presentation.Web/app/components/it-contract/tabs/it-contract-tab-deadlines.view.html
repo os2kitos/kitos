@@ -2,11 +2,11 @@
     <h4>{{contract.name}}</h4>
     <div class="panel panel-default">
         <div class="row">
-            <div class="col-xs-3">
+            <div class="col-xs-3" ng-if="isAgreementDeadlinesEnabled" id="agreement-deadlines">
                 <div class="panel panel-default">
                     <div class="panel-heading">Aftalefrister</div>
                     <div class="panel-body">
-                        <div ng-if="isAgreementDurationEnabled" id="agreement-duration">
+                        <div >
                             <div class="row">
                                 <div class="col-xs-12">
                                     <label class="control-label">Varighed</label>
@@ -35,7 +35,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group" ng-if="isAgreementDurationOnGoingEnabled">
+                        <div class="row form-group">
                             <div class="col-xs-1">
                                 <input type="checkbox" id="idl" class=""
                                        data-ng-checked="durationOngoing"
@@ -48,7 +48,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group" ng-if="isOptionExtendEnabled">
+                        <div class="form-group">
                             <select2-option data-id="agreement-option-extend"
                                             data-label="Option forlæng"
                                             data-placeholder="Vælg forlængelse"
@@ -60,7 +60,7 @@
                                             data-field="optionExtendId">
                             </select2-option>
                         </div>
-                        <div class="form-group" ng-if="isOptionExtendMultiplierEnabled">
+                        <div class="form-group">
                             <label for="agreement-option-extend-multiplier" class="control-label small">Antal brugte optioner</label>
                             <input id="agreement-option-extend-multiplier"
                                    type="number"
@@ -71,7 +71,7 @@
                                    data-autosave="{{autosaveUrl}}"
                                    data-field="extendMultiplier">
                         </div>
-                        <div class="form-group" ng-if="isIrrevocableEnabled">
+                        <div class="form-group">
                             <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
                             <input type="text" class="form-control" id="agreement-irrevocable"
                                    data-kendo-date-picker
@@ -86,11 +86,11 @@
             </div>
 
 
-            <div class="col-xs-3">
+            <div class="col-xs-3" ng-if="isTerminationEnabled" id="termination">
                 <div class="panel panel-default">
                     <div class="panel-heading">Opsigelse</div>
                     <div class="panel-body">
-                        <div class="form-group" ng-if="isAgreementTerminatedEnabled">
+                        <div class="form-group">
                             <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
                             <input type="text" class="form-control" id="agreement-terminated"
                                    data-kendo-date-picker
@@ -101,7 +101,7 @@
                                    data-field="terminated">
                         </div>
 
-                        <div class="form-group" ng-if="isAgreementNoticeEnabled">
+                        <div class="form-group">
                             <select2-option data-id="agreement-notice"
                                            data-label="Opsigelsesfrist (måneder)"
                                            data-placeholder="Vælg opsigelsesfrist"
@@ -114,7 +114,7 @@
                             </select2-option>
                         </div>
 
-                        <div class="form-group" ng-if="isAgreementRunningEnabled">
+                        <div class="form-group">
                             <select-simple data-id="agreement-running"
                                            data-label="Løbende"
                                            data-options="deadlineOptions"
@@ -127,7 +127,7 @@
                             </select-simple>
                         </div>
 
-                        <div class="form-group" ng-if="isAgreementByEndingEnabled">
+                        <div class="form-group">
                             <select-simple data-id="agreement-by-ending"
                                            data-label="Inden udgangen af"
                                            data-options="deadlineOptions"

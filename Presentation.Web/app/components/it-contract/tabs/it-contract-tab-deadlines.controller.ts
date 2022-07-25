@@ -27,15 +27,8 @@
 
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
-            $scope.isAgreementDurationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDuration);
-            $scope.isAgreementDurationOnGoingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDurationOnGoing);
-            $scope.isOptionExtendEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.optionExtend);
-            $scope.isOptionExtendMultiplierEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.optionExtendMultiplier);
-            $scope.isIrrevocableEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.irrevocable);
-            $scope.isAgreementTerminatedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementTerminated);
-            $scope.isAgreementNoticeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementNotice);
-            $scope.isAgreementRunningEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementRunning);
-            $scope.isAgreementByEndingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementByEnding);
+            $scope.isAgreementDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines);
+            $scope.isTerminationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination);
 
             $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.running);
             $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.byEnding);
