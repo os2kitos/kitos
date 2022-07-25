@@ -67,8 +67,7 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.price", ContractNavigationSrefs.economyPageSref, "agreement-price"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel", ContractNavigationSrefs.economyPageSref, "payment-model"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.extPayment", ContractNavigationSrefs.economyPageSref, "ext-payment"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.intPayment", ContractNavigationSrefs.economyPageSref, "int-payment"))
-            ;
+            .then(() => testFieldCustomization(contractName, "ItContracts.economy.intPayment", ContractNavigationSrefs.economyPageSref, "int-payment"));
     });
 
     function testTabCustomization(name: string, settingId: string, tabSref: string) {
