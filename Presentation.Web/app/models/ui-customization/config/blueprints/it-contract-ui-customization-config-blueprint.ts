@@ -70,10 +70,42 @@
                 readOnly: true,
                 children: {
                     agreementDeadlines: {
-                        text: "Aftalefrister"
+                        text: "Aftalefrister",
+                        children:
+                        {
+                            duration: {
+                                text: "Varighed"
+                            },
+                            ongoing: {
+                                text: "Løbende"
+                            },
+                            optionExtend: {
+                                text: "Option forlæng"
+                            },
+                            optionExtendMultiplier: {
+                                text: "Antal brugte optioner"
+                            },
+                            irrevocable: {
+                                text: "Uopsigelig til"
+                            }
+                        }
                     },
                     termination: {
-                        text: "Opsigelse"
+                        text: "Opsigelse",
+                        children: {
+                            terminated: {
+                                text: "Kontrakten opsagt"
+                            },
+                            notice: {
+                                text: "Opsigelsesfrist"
+                            },
+                            ongoing: {
+                                text: "Løbende"
+                            },
+                            byEndingOf: {
+                                text: "Inden udgangen af"
+                            }
+                        }
                     }
                 }
             },
@@ -83,7 +115,21 @@
                 readOnly: true,
                 children: {
                     paymentModel: {
-                        text: "Betalingsmodel"
+                        text: "Betalingsmodel",
+                        children: {
+                            operation: {
+                                text: "Driftsvederlag påbegyndt"
+                            },
+                            frequency: {
+                                text: "Betalingsfrekvens"
+                            },
+                            paymentModel: {
+                                text: "Betalingsmodel"
+                            },
+                            price: {
+                                text: "Prisregulering"
+                            }
+                        }
                     },
                     extPayment: {
                         text: "Ekstern betaling"
