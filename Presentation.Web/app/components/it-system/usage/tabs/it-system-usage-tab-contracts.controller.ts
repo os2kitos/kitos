@@ -7,8 +7,8 @@
         });
     }]);
 
-    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "apiUseCaseFactory",
-        ($scope, $http, itSystemUsage, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory) => {
+    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "apiUseCaseFactory", "contractUiState",
+        ($scope, $http, itSystemUsage, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory, contractUiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             var usageId = itSystemUsage.id;
 
             $scope.usage = itSystemUsage;
@@ -39,6 +39,14 @@
 
             //UI Customization
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+            const contractBlueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
+
             $scope.showMainContractSelection = uiState.isBluePrintNodeAvailable(blueprint.children.contracts.children.selectContractToDetermineIfItSystemIsActive);
+
+            $scope.showContractIsActive = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.isActive);
+            $scope.showContractType = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.contractType);
+            $scope.showContractAgreementConcluded = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.agreementConcluded);
+            $scope.showContractAgreementExpiration = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.agreementExpiration);
+            $scope.showContractAgreementTermination = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.deadlines.children.termination);
         }]);
 })(angular, app);

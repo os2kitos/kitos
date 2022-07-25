@@ -683,7 +683,7 @@
                         var activeDprs = [];
                         dataItem.DataProcessingRegistrations.forEach(dpr => {
                             //TODO: Comparing with an enum value always returns false
-                            if (dpr.IsAgreementConcluded.toString() === "YES") {
+                            if (dpr.IsAgreementConcluded && dpr.IsAgreementConcluded.toString() === "YES") {
                                 activeDprs.push(Helpers.RenderFieldsHelper.renderInternalReference(
                                     `kendo-contract-dpr-${dpr.Id}`,
                                     "data-processing.edit-registration.main",

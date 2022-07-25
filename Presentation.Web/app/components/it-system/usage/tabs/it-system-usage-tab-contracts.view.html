@@ -8,7 +8,7 @@
                     <th>
                         IT Kontrakt
                     </th>
-                    <th>
+                    <th ng-if="showContractType">
                         Kontrakttype
                     </th>
                     <th>
@@ -17,13 +17,13 @@
                     <th>
                         Drift
                     </th>
-                    <th>
+                    <th ng-if="showContractAgreementConcluded">
                         Indgået
                     </th>
-                    <th>
+                    <th ng-if="showContractAgreementExpiration">
                         Udløber
                     </th>
-                    <th>
+                    <th ng-if="showContractAgreementTermination">
                         Opsagt
                     </th>
                 </tr>
@@ -38,7 +38,7 @@
                     </td>
 
                     <!-- type -->
-                    <td>
+                    <td ng-if="showContractType">
                         {{ contract.contractTypeName }}
                     </td>
 
@@ -55,15 +55,15 @@
                     </td>
 
                     <!-- concluded ("indgået") -->
-                    <td>
+                    <td ng-if="showContractAgreementConcluded">
                         <span data-ng-model="contract.concluded" data-datereader=""></span>
                     </td>
                     <!-- expiration -->
-                    <td>
+                    <td ng-if="showContractAgreementExpiration">
                         <span data-ng-model="contract.expirationDate" data-datereader=""></span>
                     </td>
                     <!-- terminated -->
-                    <td>
+                    <td ng-if="showContractAgreementTermination">
                         <span data-ng-model="contract.terminated" data-datereader=""></span>
                     </td>
                 </tr>
@@ -71,7 +71,7 @@
         </table>
     </div>
 
-    <div id="selectMainContractSection" class="object-section-container" ng-if="showMainContractSelection">
+    <div id="selectMainContractSection" class="object-section-container" ng-if="showMainContractSelection && showContractIsActive">
         <div class="panel panel-default">
             <form class="form-horizontal">
                 <div class="form-group row">
