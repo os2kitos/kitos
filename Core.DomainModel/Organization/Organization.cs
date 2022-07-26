@@ -132,6 +132,8 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
 
         public virtual ICollection<UIModuleCustomization> UIModuleCustomizations { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> SuppliedItSystemUsages { get; set; }
+
 
         /// <summary>
         /// Determines if this is the "Default" organization in KITOS

@@ -107,10 +107,9 @@
                     itSystemUsageService.patchSystem($scope.usageId, payload);
                 }
             }
-            $scope.patchSupplier = (field, value) => {
+            $scope.patchSupplier = (value) => {
                 var payload = {};
-                payload[field] = value.id;
-                payload["ArchiveSupplier"] = value.text;
+                payload["ArchiveSupplierId"] = value.id;
                 itSystemUsageService.patchSystem($scope.usageId, payload);
             }
 

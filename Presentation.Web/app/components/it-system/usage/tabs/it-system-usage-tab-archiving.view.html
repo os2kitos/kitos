@@ -56,8 +56,8 @@
                 <input type="hidden" id="archiveSupplier" class="form-control input-sm"
                        data-ui-select2="suppliersSelectOptions"
                        data-ng-model="systemUsage.supplier"
-                       ng-click="patchSupplier('SupplierId', systemUsage.supplier)"
-                       data-field="SupplierId"
+                       ng-click="patchSupplier(systemUsage.supplier)"
+                       data-field="ArchiveSupplierId"
                        data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">
             </div>
         </div>

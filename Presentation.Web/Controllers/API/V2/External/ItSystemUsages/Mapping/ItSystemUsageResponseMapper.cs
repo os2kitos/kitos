@@ -122,7 +122,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
                 //TODO: Simplify mapping once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
                 Supplier = systemUsage
-                    .SupplierId?
+                    .ArchiveSupplierId?
                     .Transform(id => _organizationRepository.GetById(id).Select(org => org.MapShallowOrganizationResponseDTO()))?
                     .GetValueOrDefault(),
                 JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodDTO
