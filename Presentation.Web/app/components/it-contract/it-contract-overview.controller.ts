@@ -64,7 +64,7 @@
             procurements: Models.ItContract.IContractProcurementPlanDTO[]) {
             $rootScope.page.title = "IT Kontrakt";
 
-            const itSystemUsageOverviewType = Models.Generic.OverviewType.ItContract;
+            const itContractOverviewType = Models.Generic.OverviewType.ItContract;
 
             $scope.procurements = procurements.map(value => {
                 return {
@@ -181,7 +181,7 @@
                     .withUser(user)
                     .withEntityTypeName("IT Kontrakt")
                     .withExcelOutputName("IT Kontrakt")
-                    .withOverviewType(itSystemUsageOverviewType)
+                    .withOverviewType(itContractOverviewType)
                     .withStorageKey("it-contract-overview-options")
                     .withUrlFactory(() => {
                         var urlParameters =
