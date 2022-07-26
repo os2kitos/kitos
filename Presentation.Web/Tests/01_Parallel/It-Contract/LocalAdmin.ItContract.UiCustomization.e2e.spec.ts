@@ -30,14 +30,17 @@ describe("Local admin is able customize the IT-Contract UI", () => {
 
     var localContractPath: string | null = null;
 
-    it("Disabling Tabs/fields will hide the tabs/fields on the IT-Contract details page", () => {
+    it("Disabling tabs will hide the tabs on the IT-Contract details page", () => {
 
-        return navigation.getPage("/#/global-admin/local-admins")
-            .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
-            .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
+        return setupUser()
             .then(() => testTabCustomization(contractName, "ItContracts.contractRoles", ContractNavigationSrefs.contractRolesSref))
-            .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref))
-           /* .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementPlan", ContractNavigationSrefs.frontPageSref, "selectProcurementPlan"))
+            .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref));
+    });
+
+    it("Disabling fields will hide the fields on the IT-Contract front page", () => {
+
+        return setupUser()
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementPlan", ContractNavigationSrefs.frontPageSref, "selectProcurementPlan"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementStrategy", ContractNavigationSrefs.frontPageSref, "selectProcurementStrategy"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractId", ContractNavigationSrefs.frontPageSref, "contract-id"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractType", ContractNavigationSrefs.frontPageSref, "s2id_contract-type"))
@@ -50,8 +53,13 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.intDate", ContractNavigationSrefs.frontPageSref, "contract-int-date"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.agreementConcluded", ContractNavigationSrefs.frontPageSref, "agreement-concluded"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.agreementExpiration", ContractNavigationSrefs.frontPageSref, "agreement-expiration"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.isActive", ContractNavigationSrefs.frontPageSref, "contractIsActive"))*/
-            /*.then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.duration", ContractNavigationSrefs.deadlinesPageSref, "deadlines-duration"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.isActive", ContractNavigationSrefs.frontPageSref, "contractIsActive"));
+    });
+
+    it("Disabling fields will hide the fields on the IT-Contract deadlines page", () => {
+
+        return setupUser()
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.duration", ContractNavigationSrefs.deadlinesPageSref, "deadlines-duration"))
             .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.ongoing", ContractNavigationSrefs.deadlinesPageSref, "idl"))
             .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.optionExtend", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-option-extend"))
             .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.optionExtendMultiplier", ContractNavigationSrefs.deadlinesPageSref, "agreement-option-extend-multiplier"))
@@ -61,15 +69,26 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination.notice", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-notice"))
             .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination.ongoing", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-running"))
             .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination.byEndingOf", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-by-ending"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination", ContractNavigationSrefs.deadlinesPageSref, "termination"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination", ContractNavigationSrefs.deadlinesPageSref, "termination"));
+    });
+
+    it("Disabling fields will hide the fields on the IT-Contract economy page", () => {
+
+        return setupUser()
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.operation", ContractNavigationSrefs.economyPageSref, "agreement-operation"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.frequency", ContractNavigationSrefs.economyPageSref, "agreement-freq"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.paymentModel", ContractNavigationSrefs.economyPageSref, "agreement-payment"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.price", ContractNavigationSrefs.economyPageSref, "agreement-price"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel", ContractNavigationSrefs.economyPageSref, "payment-model"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.extPayment", ContractNavigationSrefs.economyPageSref, "ext-payment"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.intPayment", ContractNavigationSrefs.economyPageSref, "int-payment"));*/
+            .then(() => testFieldCustomization(contractName, "ItContracts.economy.intPayment", ContractNavigationSrefs.economyPageSref, "int-payment"));
     });
+
+    function setupUser() {
+        return navigation.getPage("/#/global-admin/local-admins")
+            .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
+            .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
+    }
 
     function testTabCustomization(name: string, settingId: string, tabSref: string) {
         console.log("testTabCustomization for ", name, " and tabSref:", tabSref, " settingId:", settingId);
