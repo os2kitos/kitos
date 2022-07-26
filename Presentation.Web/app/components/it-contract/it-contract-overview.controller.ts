@@ -180,6 +180,7 @@
                     .withEntityTypeName("IT Kontrakt")
                     .withExcelOutputName("IT Kontrakt")
                     .withStorageKey("it-contract-overview-options")
+                    .withOverviewType(Models.Generic.OverviewType.ItContract)
                     .withUrlFactory(() => {
                         var urlParameters =
                             "?$expand=" +
