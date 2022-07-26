@@ -300,17 +300,8 @@
                         return parameterMap;
                     })
                     .withResponseParser(response => {
-                        $scope.procurements = [];
 
                         response.forEach(contract => {
-                            if (contract.ProcurementPlanQuarter && contract.ProcurementPlanYear) {
-                                const procurement =
-                                    `${contract.ProcurementPlanYear} | Q${contract.ProcurementPlanQuarter}`;
-                                if ($scope.procurements.filter(value => value === procurement).length === 0) {
-                                    $scope.procurements.push(procurement);
-                                }
-                            }
-
                             var ecoData = contract.ExternEconomyStreams ?? [];
 
                             contract.Acquisition = _.sumBy(ecoData, "Acquisition");
