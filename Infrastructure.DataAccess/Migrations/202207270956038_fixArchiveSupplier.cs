@@ -24,11 +24,10 @@
         
         public override void Down()
         {
-            AddColumn("dbo.ItSystemUsage", "SupplierId", c => c.Int());
+            RenameColumn("dbo.ItSystemUsage", "ArchiveSupplierId", "SupplierId");
             AddColumn("dbo.ItSystemUsage", "ArchiveSupplier", c => c.String());
             DropForeignKey("dbo.ItSystemUsage", "ArchiveSupplierId", "dbo.Organization");
             DropIndex("dbo.ItSystemUsage", new[] { "ArchiveSupplierId" });
-            DropColumn("dbo.ItSystemUsage", "ArchiveSupplierId");
         }
     }
 }

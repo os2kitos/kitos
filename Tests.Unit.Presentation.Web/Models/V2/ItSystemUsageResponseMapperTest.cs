@@ -27,19 +27,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class ItSystemUsageResponseMapperTest : WithAutoFixture
     {
         private readonly ItSystemUsageResponseMapper _sut;
-        private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IItSystemUsageAttachedOptionRepository> _attachedOptionsRepositoryMock;
         private readonly Mock<ISensitivePersonalDataTypeRepository> _sensitivePersonalDataTypeRepositoryMock;
         private readonly Mock<IGenericRepository<RegisterType>> _registerTypeRepositoryMock;
 
         public ItSystemUsageResponseMapperTest()
         {
-            _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _attachedOptionsRepositoryMock = new Mock<IItSystemUsageAttachedOptionRepository>();
             _sensitivePersonalDataTypeRepositoryMock = new Mock<ISensitivePersonalDataTypeRepository>();
             _registerTypeRepositoryMock = new Mock<IGenericRepository<RegisterType>>();
             _sut = new ItSystemUsageResponseMapper(
-                _organizationRepositoryMock.Object,
                 _attachedOptionsRepositoryMock.Object,
                 _sensitivePersonalDataTypeRepositoryMock.Object,
                 _registerTypeRepositoryMock.Object
@@ -214,13 +211,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var itSystemUsage = new ItSystemUsage();
             AssignBasicProperties(itSystemUsage);
             AssignArchiving(itSystemUsage, withCrossReferences);
-            //TODO: fix
-            //Organization supplierOrganization = default;
-            //if (withCrossReferences)
-            //{
-            //    supplierOrganization = CreateOrganization();
-            //    _organizationRepositoryMock.Setup(x => x.GetById(itSystemUsage.SupplierId.Value)).Returns(supplierOrganization);
-            //}
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
@@ -233,8 +223,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentity(itSystemUsage.ArchiveLocation, dto.Archiving.Location);
             AssertOptionalIdentity(itSystemUsage.ArchiveTestLocation, dto.Archiving.TestLocation);
             AssertOptionalIdentity(itSystemUsage.ArchiveType, dto.Archiving.Type);
-            //TODO: fix
-            //AssertOptionalIdentity(supplierOrganization, dto.Archiving.Supplier);
+            AssertOptionalIdentity(itSystemUsage.ArchiveSupplier, dto.Archiving.Supplier);
             var expectedArchivePeriods = itSystemUsage.ArchivePeriods.OrderBy(x => x.UniqueArchiveId).ToList();
             var actualJournalPeriods = dto.Archiving.JournalPeriods.OrderBy(x => x.ArchiveId).ToList();
             Assert.Equal(expectedArchivePeriods.Count, actualJournalPeriods.Count);
@@ -421,9 +410,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 ? new ArchiveLocation { Uuid = A<Guid>(), Name = A<string>() }
                 : null;
             itSystemUsage.ArchiveTestLocation = withOptionalCrossReferences ? new ArchiveTestLocation { Uuid = A<Guid>(), Name = A<string>() } : null;
-            //TODO: fix
-            //itSystemUsage.ArchiveType = withOptionalCrossReferences ? new ArchiveType { Uuid = A<Guid>(), Name = A<string>() } : null;
-            //itSystemUsage.SupplierId = withOptionalCrossReferences ? A<int>() : null;
+            itSystemUsage.ArchiveType = withOptionalCrossReferences ? new ArchiveType { Uuid = A<Guid>(), Name = A<string>() } : null;
+            itSystemUsage.ArchiveSupplier = withOptionalCrossReferences ? new Organization() {Uuid = A<Guid>()} : null;
             itSystemUsage.ArchivePeriods = Many<string>().Select(id => new ArchivePeriod
             {
                 Approved = A<bool>(),

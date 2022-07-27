@@ -22,18 +22,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public class ItSystemUsageResponseMapper : IItSystemUsageResponseMapper
     {
-        private readonly IOrganizationRepository _organizationRepository;
         private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
         private readonly IGenericRepository<RegisterType> _registerTypesRepository;
 
         public ItSystemUsageResponseMapper(
-            IOrganizationRepository organizationRepository,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository,
             IGenericRepository<RegisterType> registerTypesRepository)
         {
-            _organizationRepository = organizationRepository;
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
             _registerTypesRepository = registerTypesRepository;
