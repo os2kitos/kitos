@@ -904,9 +904,9 @@
     <Compile Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.designer.cs">
       <DependentUpon>202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202207261229277_ArchiveSupplier.cs" />
-    <Compile Include="Migrations\202207261229277_ArchiveSupplier.designer.cs">
-      <DependentUpon>202207261229277_ArchiveSupplier.cs</DependentUpon>
+    <Compile Include="Migrations\202207270956038_fixArchiveSupplier.cs" />
+    <Compile Include="Migrations\202207270956038_fixArchiveSupplier.designer.cs">
+      <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1501,8 +1501,8 @@
     <EmbeddedResource Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.resx">
       <DependentUpon>202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202207261229277_ArchiveSupplier.resx">
-      <DependentUpon>202207261229277_ArchiveSupplier.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202207270956038_fixArchiveSupplier.resx">
+      <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

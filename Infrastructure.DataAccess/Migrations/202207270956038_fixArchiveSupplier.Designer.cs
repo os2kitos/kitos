@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class ArchiveSupplier : IMigrationMetadata
+    public sealed partial class fixArchiveSupplier : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ArchiveSupplier));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(fixArchiveSupplier));
         
         string IMigrationMetadata.Id
         {
-            get { return "202207261229277_ArchiveSupplier"; }
+            get { return "202207270956038_fixArchiveSupplier"; }
         }
         
         string IMigrationMetadata.Source

@@ -55,10 +55,16 @@
                 <label for="archiveSupplier" class="control-label small">Arkiveringsleverandør</label>
                 <input type="hidden" id="archiveSupplier" class="form-control input-sm"
                        data-ui-select2="suppliersSelectOptions"
-                       data-ng-model="systemUsage.supplier"
-                       ng-click="patchSupplier(systemUsage.supplier)"
-                       data-field="ArchiveSupplierId"
+                       data-ng-model="usage.supplier"
+                       data-autosave="{{autoSaveUrl}}"
+                       data-field="archiveSupplierId"
                        data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">
+                <!--<input type="hidden" id="archiveSupplier" class="form-control input-sm"
+                       data-ui-select2="suppliersSelectOptions"
+                       data-ng-model="supplier"
+                       ng-click="patchSupplier(supplier)"
+                       data-field="archiveSupplierId"
+                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">-->
             </div>
         </div>
         <!-- 2nd column -->

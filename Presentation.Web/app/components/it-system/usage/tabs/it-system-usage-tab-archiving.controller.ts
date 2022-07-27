@@ -41,17 +41,19 @@
             $scope.systemUsage = systemUsage;
             $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
-            $scope.ArchiveDuty = systemUsage.ArchiveDuty;
+            $scope.ArchiveDuty = $scope.usage.archiveDuty;
             $scope.archiveReadMoreLink = Kitos.Constants.Archiving.ReadMoreUri;
             $scope.translateArchiveDutyRecommendation = (value: number) => Kitos.Models.ItSystem.ArchiveDutyRecommendationFactory.mapFromNumeric(value).text;
             $scope.archiveDutyOptions = Kitos.Models.ItSystemUsage.ArchiveDutyOptions.getAll();
+
+            $scope.autoSaveUrl = 'api/itSystemUsage/' + $stateParams.id;
 
             if (!systemUsage.Archived) {
                 $scope.systemUsage.Archived = false;
             }
 
-            if (!systemUsage.ArchiveDuty) {
-                $scope.ArchiveDuty = itSystemUsage.itSystem.archiveDuty;
+            if (!$scope.ArchiveDuty) {
+                $scope.ArchiveDuty = $scope.usage.itSystem.archiveDuty;
             }
 
             if ($scope.archivePeriods) {
@@ -107,16 +109,11 @@
                     itSystemUsageService.patchSystem($scope.usageId, payload);
                 }
             }
-            $scope.patchSupplier = (value) => {
-                var payload = {};
-                payload["ArchiveSupplierId"] = value.id;
-                itSystemUsageService.patchSystem($scope.usageId, payload);
-            }
 
-            if (systemUsage.SupplierId) {
-                $scope.systemUsage.supplier = {
-                    id: systemUsage.SupplierId,
-                    text: systemUsage.ArchiveSupplier
+            if ($scope.usage.archiveSupplierId && $scope.usage.supplier === undefined) {
+                $scope.usage.supplier = {
+                    id: $scope.usage.archiveSupplierId,
+                    text: $scope.usage.archiveSupplierName
                 };
             }
 

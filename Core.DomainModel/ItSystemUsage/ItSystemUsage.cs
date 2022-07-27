@@ -249,7 +249,7 @@ namespace Core.DomainModel.ItSystemUsage
         public bool? Registertype { get; set; }
 
         public int? ArchiveSupplierId { get; set; }
-        public Organization.Organization ArchiveSupplier { get; set; }
+        public virtual Organization.Organization ArchiveSupplier { get; set; }
 
         /// <summary>
         ///     Gets or sets the organization marked as supplier for this contract.
@@ -789,21 +789,18 @@ namespace Core.DomainModel.ItSystemUsage
         public void ResetArchiveSupplierOrganization()
         {
             //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+            ArchiveSupplier.Track();
             ArchiveSupplier = null;
-            ArchiveSupplierId = null;
         }
 
         public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
         {
-            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
             if (newValue == null)
                 throw new ArgumentNullException(nameof(newValue));
 
-            ArchiveSupplier = newValue;
-
-            if (ArchiveSupplierId != newValue.Id)
+            if (ArchiveSupplier == null || ArchiveSupplier.Id != newValue.Id)
             {
-                ArchiveSupplierId = newValue.Id;
+                ArchiveSupplier = newValue;
             }
 
             return Maybe<OperationError>.None;

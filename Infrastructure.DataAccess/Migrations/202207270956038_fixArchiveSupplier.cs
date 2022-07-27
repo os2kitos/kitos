@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class ArchiveSupplier : DbMigration
+    public partial class fixArchiveSupplier : DbMigration
     {
         public override void Up()
         {
