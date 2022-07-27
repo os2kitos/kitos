@@ -7,11 +7,19 @@
     {
         public override void Up()
         {
-            AddColumn("dbo.ItSystemUsage", "ArchiveSupplierId", c => c.Int());
+            Sql(@"UPDATE ItSystemUsage
+                  SET SupplierId = NULL
+                  WHERE SupplierId IN (SELECT SupplierId 
+	                 FROM ItSystemUsage T0 
+	                 LEFT JOIN Organization T1
+	                 ON T0.SupplierId = T1.Id
+	                 WHERE T1.Id IS NULL);"
+            );
+
+            RenameColumn("dbo.ItSystemUsage", "SupplierId", "ArchiveSupplierId");
             CreateIndex("dbo.ItSystemUsage", "ArchiveSupplierId");
             AddForeignKey("dbo.ItSystemUsage", "ArchiveSupplierId", "dbo.Organization", "Id");
             DropColumn("dbo.ItSystemUsage", "ArchiveSupplier");
-            DropColumn("dbo.ItSystemUsage", "SupplierId");
         }
         
         public override void Down()
