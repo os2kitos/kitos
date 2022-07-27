@@ -120,11 +120,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Location = systemUsage.ArchiveLocation?.MapIdentityNamePairDTO(),
                 TestLocation = systemUsage.ArchiveTestLocation?.MapIdentityNamePairDTO(),
                 Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
-                //TODO: Simplify mapping once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
-                Supplier = systemUsage
-                    .ArchiveSupplierId?
-                    .Transform(id => _organizationRepository.GetById(id).Select(org => org.MapShallowOrganizationResponseDTO()))?
-                    .GetValueOrDefault(),
+                Supplier = systemUsage.ArchiveSupplier?.MapShallowOrganizationResponseDTO(),
                 JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodDTO
                 {
                     Approved = period.Approved,
