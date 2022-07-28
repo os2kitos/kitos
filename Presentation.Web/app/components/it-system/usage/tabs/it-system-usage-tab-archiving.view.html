@@ -11,7 +11,7 @@
                                data-options="archiveDutyOptions"
                                data-ng-model="usage.archiveDuty"
                                data-ng-disabled="!hasWriteAccess"
-                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-auto-save-url="{{autoSaveUrl}}"
                                data-field="ArchiveDuty">
                 </select-simple>
 
@@ -33,7 +33,7 @@
                                data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                data-ng-model="usage.archiveTypeId"
                                data-options="archiveTypes"
-                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-auto-save-url="{{autoSaveUrl}}"
                                data-field="archiveTypeId">
                 </select2-option>
             </div>
@@ -46,7 +46,7 @@
                                data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                data-ng-model="usage.archiveLocationId"
                                data-options="archiveLocations"
-                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-auto-save-url="{{autoSaveUrl}}"
                                data-field="archiveLocationId">
                 </select2-option>
             </div>
@@ -59,12 +59,6 @@
                        data-autosave="{{autoSaveUrl}}"
                        data-field="archiveSupplierId"
                        data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">
-                <!--<input type="hidden" id="archiveSupplier" class="form-control input-sm"
-                       data-ui-select2="suppliersSelectOptions"
-                       data-ng-model="supplier"
-                       ng-click="patchSupplier(supplier)"
-                       data-field="archiveSupplierId"
-                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">-->
             </div>
         </div>
         <!-- 2nd column -->
@@ -78,7 +72,7 @@
                                data-ng-model="usage.archiveTestLocationId"
                                data-options="archiveTestLocations"
                                data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
-                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-auto-save-url="{{autoSaveUrl}}"
                                data-field="archiveTestLocationId">
                 </select2-option>
             </div>

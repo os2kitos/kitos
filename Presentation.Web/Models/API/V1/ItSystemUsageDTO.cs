@@ -26,7 +26,7 @@ namespace Presentation.Web.Models.API.V1
         public int? ArchiveTestLocationId { get; set; }
         public string ArchiveTestLocationName { get; set; }
         public int? ArchiveSupplierId { get; set; }
-        public string ArchiveSupplierName { get; set; } //TODO: Remove once https://os2web.atlassian.net/browse/KITOSUDV-2118 is fixed
+        public string ArchiveSupplierName { get; set; } 
         public int SupplierId { get; set; }
         public string ResponsibleOrgUnitName { get; set; }
         public int OrganizationId { get; set; }
