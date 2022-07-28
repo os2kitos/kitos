@@ -12,6 +12,7 @@ namespace Presentation.Web.Models.API.V1.Organizations
         public IEnumerable<EntityWithOrganizationRelationshipDTO> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; set; }
         public IEnumerable<EntityWithOrganizationRelationshipDTO> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; set; }
         public IEnumerable<EntityWithOrganizationRelationshipDTO> SystemsInOtherOrganizationsWhereOrgIsRightsHolder { get; set; }
+        public IEnumerable<EntityWithOrganizationRelationshipDTO> SystemsWhereOrgIsArchiveSupplier { get; set; }
 
         public OrganizationRemovalConflictsDTO()
         {
@@ -25,7 +26,8 @@ namespace Presentation.Web.Models.API.V1.Organizations
             IEnumerable<EntityWithOrganizationRelationshipDTO> dprInOtherOrganizationsWhereOrgIsDataProcessor,
             IEnumerable<EntityWithOrganizationRelationshipDTO> dprInOtherOrganizationsWhereOrgIsSubDataProcessor,
             IEnumerable<EntityWithOrganizationRelationshipDTO> contractsInOtherOrganizationsWhereOrgIsSupplier,
-            IEnumerable<EntityWithOrganizationRelationshipDTO> systemsInOtherOrganizationsWhereOrgIsRightsHolder)
+            IEnumerable<EntityWithOrganizationRelationshipDTO> systemsInOtherOrganizationsWhereOrgIsRightsHolder,
+            IEnumerable<EntityWithOrganizationRelationshipDTO> systemsWhereOrgIsArchiveSupplier)
         {
             SystemsWithUsagesOutsideTheOrganization = systemsWithUsagesOutsideTheOrganization;
             InterfacesExposedOnSystemsOutsideTheOrganization = interfacesExposedOnSystemsOutsideTheOrganization;
@@ -35,6 +37,7 @@ namespace Presentation.Web.Models.API.V1.Organizations
             DprInOtherOrganizationsWhereOrgIsSubDataProcessor = dprInOtherOrganizationsWhereOrgIsSubDataProcessor;
             ContractsInOtherOrganizationsWhereOrgIsSupplier = contractsInOtherOrganizationsWhereOrgIsSupplier;
             SystemsInOtherOrganizationsWhereOrgIsRightsHolder = systemsInOtherOrganizationsWhereOrgIsRightsHolder;
+            SystemsWhereOrgIsArchiveSupplier = systemsWhereOrgIsArchiveSupplier;
         }
     }
 }

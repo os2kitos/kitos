@@ -235,6 +235,28 @@
                 </div>
             </div>
 
+            <div class="delete-org-consequences-block" ng-if="ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsWhereOrgIsArchiveSupplier.length > 0">
+                <!-- Interfaces moved to default org since they are exposed on systems created in other organizations -->
+                <h4>IT-Systemer hvor organisationen "{{::ctrl.orgName}}" er sat som "Arkiveringsleverandør", og hvor feltet dermed nulstilles:</h4>
+                <div class="panel panel-default">
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="col-xs-4">IT-System (i anvendelse)</th>
+                                <th class="col-xs-4">Anvendt i (organisation)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="itSystem in ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsWhereOrgIsArchiveSupplier">
+                                <td class="col-xs-4">{{::itSystem.name}}</td>
+                                <td class="col-xs-4">{{::itSystem.organizationName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="delete-org-consequences-block" ng-if="ctrl.conflictsModel.interfacesBeingMovedToDefaultOrg.exposedOnSystemsInOtherOrganizations.length > 0">
                 <!-- Interfaces moved to default org since they are exposed on systems created in other organizations -->
                 <h4>Snitflader som flyttes til "Fælles kommune", da de er udstillet på IT-Systemer oprettet i andre organisationer:</h4>

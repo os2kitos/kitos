@@ -290,9 +290,9 @@ namespace Core.ApplicationServices.Organizations
                         .ToList();
                     var systemsWhereOrgIsArchiveSupplier = organizationWhichCanBeDeleted
                         .SuppliedArchives
-                        .Where(x => x.ArchiveSupplierId != organizationWhichCanBeDeleted.Id)
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
-
+                    
                     return new OrganizationRemovalConflicts(
                         systemsWithUsagesOutsideTheOrganization,
                         interfacesExposedOnSystemsOutsideTheOrganization,

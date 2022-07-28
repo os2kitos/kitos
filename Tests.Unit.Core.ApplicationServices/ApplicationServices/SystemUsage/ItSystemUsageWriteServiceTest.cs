@@ -895,7 +895,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -1028,7 +1028,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -1140,7 +1140,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -1256,7 +1256,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -2401,7 +2401,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
         }
 
-        private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, int expectedSupplierId, ItSystemUsage actual)
+        private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, ItSystemUsage actual)
         {
             Assert.Equal(expected.ArchiveDuty.NewValue, actual.ArchiveDuty);
             Assert.Equal(expected.ArchiveTypeUuid.NewValue.Value, actual.ArchiveType.Uuid);

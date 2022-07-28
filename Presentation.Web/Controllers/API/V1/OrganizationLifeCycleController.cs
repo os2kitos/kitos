@@ -59,7 +59,8 @@ namespace Presentation.Web.Controllers.API.V1
                 result.DprInOtherOrganizationsWhereOrgIsDataProcessor.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
                 result.DprInOtherOrganizationsWhereOrgIsSubDataProcessor.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
                 result.ContractsInOtherOrganizationsWhereOrgIsSupplier.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
-                result.SystemsInOtherOrganizationsWhereOrgIsRightsHolder.Select(MapToEntityWithOrganizationRelationshipDto).ToList()
+                result.SystemsInOtherOrganizationsWhereOrgIsRightsHolder.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
+                MapSystemsWhereOrgIsArchiveSupplier(result)
             );
         }
 
@@ -140,6 +141,14 @@ namespace Presentation.Web.Controllers.API.V1
                                     .ToList()
                                 )
                         )
+                .ToList();
+        }
+
+        private static IEnumerable<EntityWithOrganizationRelationshipDTO> MapSystemsWhereOrgIsArchiveSupplier(OrganizationRemovalConflicts result)
+        {
+            return result
+                .SystemsWhereOrgIsArchiveSupplier
+                .Select(system => new EntityWithOrganizationRelationshipDTO(system.Id, system.ItSystem.Name, system.ArchiveSupplier.MapToShallowOrganizationDTO()))
                 .ToList();
         }
     }
