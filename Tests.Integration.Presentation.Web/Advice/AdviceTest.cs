@@ -342,7 +342,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         {
             return new AdviceUserRelation
             {
-                Name = name,
+                Email = name,
                 RecieverType = RecieverType.RECIEVER,
                 RecpientType = RecieverType.USER
             };

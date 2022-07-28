@@ -223,9 +223,9 @@ namespace Core.ApplicationServices
 
         private static void AddRecipientByName(AdviceUserRelation r, MailAddressCollection mailAddressCollection)
         {
-            if (!string.IsNullOrEmpty(r.Name))
+            if (!string.IsNullOrEmpty(r.Email))
             {
-                mailAddressCollection.Add(r.Name);
+                mailAddressCollection.Add(r.Email);
             }
         }
 
@@ -234,9 +234,8 @@ namespace Core.ApplicationServices
             switch (advice.Type)
             {
                 case RelatedEntityType.itContract:
-
                     var itContractRoles = _itContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                        && I.Role.Name == r.Name);
+                        && I.RoleId == r.RoleId.GetValueOrDefault());
                     foreach (var t in itContractRoles)
                     {
                         if(t.User.Deleted) continue;
@@ -246,7 +245,7 @@ namespace Core.ApplicationServices
                     break;
                 case RelatedEntityType.itProject:
                     var projectRoles = _itProjectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                        && I.Role.Name == r.Name);
+                        && I.RoleId == r.RoleId.GetValueOrDefault());
                     foreach (var t in projectRoles)
                     {
                         if(t.User.Deleted) continue;
@@ -257,7 +256,7 @@ namespace Core.ApplicationServices
                 case RelatedEntityType.itSystemUsage:
 
                     var systemRoles = _itSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                                                              && I.Role.Name == r.Name);
+                                                                              && I.RoleId == r.RoleId.GetValueOrDefault());
                     foreach (var t in systemRoles)
                     {
                         if(t.User.Deleted) continue;
@@ -269,7 +268,7 @@ namespace Core.ApplicationServices
 
                     var dpaRoles = _dataProcessingRegistrationRights.AsQueryable().Where(I =>
                         I.ObjectId == advice.RelationId
-                        && I.Role.Name == r.Name);
+                        && I.RoleId == r.RoleId.GetValueOrDefault());
                     foreach (var t in dpaRoles)
                     {
                         if(t.User.Deleted) continue;

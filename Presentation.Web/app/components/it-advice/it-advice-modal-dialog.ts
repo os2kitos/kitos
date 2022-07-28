@@ -71,26 +71,16 @@
                                 let recpientType = adviceData.Reciepients[i].RecpientType;
                                 let recieverType = adviceData.Reciepients[i].RecieverType;
                                 if (recpientType === "ROLE" && recieverType === "RECIEVER") {
-                                    var nameOfRoleReceiver = adviceData.Reciepients[i].Name;
-                                    var selectedReceiver = _.find(select2Roles, x => x.text === nameOfRoleReceiver);
+                                    var roleReceiverId = adviceData.Reciepients[i].RoleId;
+                                    var selectedReceiver = _.find(select2Roles, x => x.id === roleReceiverId);
                                     if (selectedReceiver) {
                                         $scope.preSelectedReceivers.push(selectedReceiver);
-                                    } else {
-                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
-                                        $scope.preSelectedReceivers.push({
-                                            text: nameOfRoleReceiver
-                                        });
                                     }
                                 } else if (recpientType === "ROLE" && recieverType === "CC") {
-                                    var nameOfRoleCC = adviceData.Reciepients[i].Name;
-                                    var selectedCC = _.find(select2Roles, x => x.text === nameOfRoleCC);
-                                    if (selectedCC) {
-                                        $scope.preSelectedCCs.push(selectedCC);
-                                    } else {
-                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
-                                        $scope.preSelectedCCs.push({
-                                            text: nameOfRoleCC
-                                        });
+                                    var roleReceiverCcId = adviceData.Reciepients[i].Name;
+                                    var selectedCc = _.find(select2Roles, x => x.id === roleReceiverCcId);
+                                    if (selectedCc) {
+                                        $scope.preSelectedCCs.push(selectedCc);
                                     }
                                 } else if (recpientType === "USER" && recieverType === "RECIEVER") {
                                     receivers.push(adviceData.Reciepients[i].Name);
@@ -376,7 +366,7 @@
                         for (let i = 0; i < $scope.selectedReceivers.length; i++) {
                             payload.Reciepients.push(
                                 {
-                                    Name: $scope.selectedReceivers[i].text,
+                                    RoleId: $scope.selectedReceivers[i].id,
                                     RecpientType: "ROLE",
                                     RecieverType: "RECIEVER"
                                 }
@@ -386,7 +376,7 @@
                         for (let i = 0; i < $scope.selectedCCs.length; i++) {
                             payload.Reciepients.push(
                                 {
-                                    Name: $scope.selectedCCs[i].text,
+                                    RoleId: $scope.selectedCCs[i].id,
                                     RecieverType: "CC",
                                     RecpientType: "ROLE"
                                 }
@@ -400,7 +390,7 @@
                                 if (toEmail && toEmail.length > 0) {
                                     payload.Reciepients.push(
                                         {
-                                            Name: toEmail,
+                                            Email: toEmail,
                                             RecpientType: "USER",
                                             RecieverType: "RECIEVER"
                                         }
@@ -415,7 +405,7 @@
                                 if (ccEmail && ccEmail.length > 0) {
                                     payload.Reciepients.push(
                                         {
-                                            Name: ccEmail,
+                                            Email: ccEmail,
                                             RecieverType: "CC",
                                             RecpientType: "USER"
                                         }

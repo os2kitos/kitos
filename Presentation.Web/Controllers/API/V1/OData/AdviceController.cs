@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 //Advice cannot be an orphan - it must belong to a root
                 return BadRequest($"Both {nameof(advice.RelationId)} AND {nameof(advice.Type)} MUST be defined");
             }
-            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Name)))
+            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
             {
                 return BadRequest("Invalid email exists among receivers or CCs");
             }

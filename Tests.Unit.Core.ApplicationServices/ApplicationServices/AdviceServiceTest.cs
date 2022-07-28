@@ -271,7 +271,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private static List<AdviceUserRelation> CreateDefaultReceivers()
         {
-            return new List<AdviceUserRelation> { new() { RecieverType = RecieverType.RECIEVER, RecpientType = RecieverType.USER, Name = "test@kitos.dk" } };
+            return new List<AdviceUserRelation> { new() { RecieverType = RecieverType.RECIEVER, RecpientType = RecieverType.USER, Email = "test@kitos.dk" } };
         }
     }
 }

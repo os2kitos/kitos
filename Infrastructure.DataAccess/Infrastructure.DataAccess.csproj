@@ -908,6 +908,10 @@
     <Compile Include="Migrations\202207270956038_fixArchiveSupplier.designer.cs">
       <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202207281043469_Updated_AdviceUserRelation.cs" />
+    <Compile Include="Migrations\202207281043469_Updated_AdviceUserRelation.designer.cs">
+      <DependentUpon>202207281043469_Updated_AdviceUserRelation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1503,6 +1507,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207270956038_fixArchiveSupplier.resx">
       <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207281043469_Updated_AdviceUserRelation.resx">
+      <DependentUpon>202207281043469_Updated_AdviceUserRelation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
