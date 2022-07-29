@@ -77,7 +77,7 @@
                                         $scope.preSelectedReceivers.push(selectedReceiver);
                                     }
                                 } else if (recpientType === "ROLE" && recieverType === "CC") {
-                                    var roleReceiverCcId = adviceData.Reciepients[i].Name;
+                                    var roleReceiverCcId = adviceData.Reciepients[i].RoleId;
                                     var selectedCc = _.find(select2Roles, x => x.id === roleReceiverCcId);
                                     if (selectedCc) {
                                         $scope.preSelectedCCs.push(selectedCc);
