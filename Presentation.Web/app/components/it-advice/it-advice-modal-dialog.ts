@@ -83,9 +83,11 @@
                                         $scope.preSelectedCCs.push(selectedCc);
                                     }
                                 } else if (recpientType === "USER" && recieverType === "RECIEVER") {
-                                    receivers.push(adviceData.Reciepients[i].Name);
+                                    const emailReceiver = adviceData.Reciepients[i].Email;
+                                    receivers.push(emailReceiver);
                                 } else if (recpientType === "USER" && recieverType === "CC") {
-                                    ccs.push(adviceData.Reciepients[i].Name);
+                                    const emailCc = adviceData.Reciepients[i].Email;
+                                    ccs.push(emailCc);
                                 }
                             }
                             $scope.externalTo = receivers.length === 0 ? null : receivers.join(", ");

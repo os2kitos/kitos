@@ -406,7 +406,7 @@ namespace Core.ApplicationServices
         public void CreateOrUpdateJob(int adviceId)
         {
             var advice = _adviceRepository.GetByKey(adviceId);
-            if (advice == null || advice.Scheduling == null || advice.AlarmDate == null)
+            if (advice?.Scheduling == null || advice.AlarmDate == null)
             {
                 throw new ArgumentException(nameof(adviceId) + " does not point to a valid id or points to an advice without alarm date or scheduling");
             }
