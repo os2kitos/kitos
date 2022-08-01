@@ -1542,12 +1542,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _optionResolverMock.Setup(x => x.GetOptionType<ItContract, TOption>(organizationUuid, optionTypeUuid.Value)).Returns(result);
         }
 
-        private void ExpectGetOptionTypeReturnsIfInputIdIsDefined<TReference, TOption>(Guid organizationUuid, Guid? optionTypeUuid, Result<(TOption, bool), OperationError> result) where TOption : OptionEntity<TReference>
-        {
-            if (optionTypeUuid.HasValue)
-                _optionResolverMock.Setup(x => x.GetOptionType<TReference, TOption>(organizationUuid, optionTypeUuid.Value)).Returns(result);
-        }
-
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             Guid? parentUuid = null,
             ItContractProcurementModificationParameters procurement = null,
