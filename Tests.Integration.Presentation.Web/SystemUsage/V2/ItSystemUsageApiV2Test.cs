@@ -1798,7 +1798,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             yield return (10, 50);
             yield return (100, null);
             yield return (100, int.MaxValue);
-            yield return Maybe<(int lower, int? upper)>.None;
         }
 
         private GeneralDataWriteRequestDTO CreateGeneralDataWriteRequestDTO(Guid dataClassificationUuid, Guid[] projectUuids)
