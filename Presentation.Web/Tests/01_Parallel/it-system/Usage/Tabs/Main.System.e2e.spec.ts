@@ -9,7 +9,7 @@ import ItSystemUsageCommon = require("../../../../PageObjects/it-system/Usage/Ta
 describe("User is able to view local it system main page information",
     () => {
         const userCountInputs = {
-            Undecided: { text: "" },
+            Undecided: { text: "\u00a0" },
             TenToFifty: { text: "10-50" }
         };
 
