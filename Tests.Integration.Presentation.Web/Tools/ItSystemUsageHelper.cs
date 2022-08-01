@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
@@ -225,6 +227,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.PatchWithCookieAsync(url, cookie, body);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
+        }
+
+        public static ItSystemUsage CreateItSystemUsageAsync(ItSystemUsage body, Cookie optionalLogin = null)
+        {
+            body.ObjectOwnerId ??= TestEnvironment.DefaultItSystemId;
+            body.LastChangedByUserId ??= TestEnvironment.DefaultUserId;
+
+            DatabaseAccess.MutateDatabase(x =>
+            {
+                x.ItSystemUsages.Add(body);
+                x.SaveChanges();
+            });
+            return body;
         }
     }
 }

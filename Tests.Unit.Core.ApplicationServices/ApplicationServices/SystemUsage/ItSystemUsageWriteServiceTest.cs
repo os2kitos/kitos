@@ -195,11 +195,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Theory]
+        [InlineData(null, null, UserCount.UNDECIDED)]
         [InlineData(0, 9, UserCount.BELOWTEN)]
         [InlineData(10, 50, UserCount.TENTOFIFTY)]
         [InlineData(50, 100, UserCount.FIFTYTOHUNDRED)]
         [InlineData(100, null, UserCount.HUNDREDPLUS)]
-        public void Can_Create_With_General_Data_With_All_Data_Defined(int minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
+        public void Can_Create_With_General_Data_With_All_Data_Defined(int? minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
@@ -224,7 +225,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue(),
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue(),
                     AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
-                    NumberOfExpectedUsersInterval = Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers, maxNumberOfUsers)).AsChangedValue(),
+                    NumberOfExpectedUsersInterval = minimumNumberOfUsers == null && maxNumberOfUsers == null ? 
+                        Maybe<(int lower, int? upperBound)>.None.AsChangedValue() : 
+                        Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers.GetValueOrDefault(), maxNumberOfUsers)).AsChangedValue(),
                 }
             };
 

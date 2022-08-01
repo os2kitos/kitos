@@ -153,6 +153,7 @@
     readonly mainBusinessType = "system-business-type";
     readonly mainArchive = "archiveDuty";
     readonly mainUUID = "system-uuid";
+    readonly mainUserCount = "s2id_numberOfUsers";
 
     readonly relationDescriptionField = "relationDescription";
     readonly relationReferenceField = "relationReference";

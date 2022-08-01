@@ -21,7 +21,8 @@
         BELOWTEN = 0,
         TENTOFIFTY = 1,
         FIFTYTOHUNDRED = 2,
-        HUNDREDPLUS = 3
+        HUNDREDPLUS = 3,
+        UNDECIDED = 4
     }
 
     public enum HostedAt
