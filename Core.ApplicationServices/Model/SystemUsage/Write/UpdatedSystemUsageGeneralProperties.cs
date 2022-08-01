@@ -13,7 +13,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public OptionalValueChange<Maybe<Guid>> DataClassificationUuid { get; set; } = OptionalValueChange<Maybe<Guid>>.None;
         public OptionalValueChange<string> Notes { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<string> SystemVersion { get; set; } = OptionalValueChange<string>.None;
-        public OptionalValueChange<Maybe<(int? lower, int? upperBound)>> NumberOfExpectedUsersInterval { get; set; } = OptionalValueChange<Maybe<(int? lower, int? upperBound)>>.None;
+        public OptionalValueChange<Maybe<(int lower, int? upperBound)>> NumberOfExpectedUsersInterval { get; set; } = OptionalValueChange<Maybe<(int lower, int? upperBound)>>.None;
         public OptionalValueChange<Maybe<bool>> EnforceActive { get; set; } = OptionalValueChange<Maybe<bool>>.None;
         public OptionalValueChange<Maybe<DateTime>> ValidFrom { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
         public OptionalValueChange<Maybe<DateTime>> ValidTo { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
