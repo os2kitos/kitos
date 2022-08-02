@@ -64,7 +64,7 @@
             procurements: Models.ItContract.IContractProcurementPlanDTO[]) {
             $rootScope.page.title = "IT Kontrakt";
 
-            //TODO: Odd stuff here - what is the purpose?... is it the unique types?
+            //TODO: Reuse the rendering here
             $scope.procurements = procurements.map(value => {
                 return {
                     textValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`,
@@ -91,7 +91,7 @@
             this.terminationDeadlineOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.terminationDeadlineOptions);
 
             this.yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
-            
+
             const replaceRoleFilter = (filterUrl: string, roleName: string, roleId: number) => {
                 const pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
                 return filterUrl.replace(pattern,
@@ -128,7 +128,7 @@
                 if (searchedValue.indexOf(yesValue) !== -1) {
                     return filterUrl.replace(pattern, `${column}/Any (c:c/IsAgreementConcluded eq '${yesValue}')`);
                 }
-                
+
                 return filterUrl.replace(pattern, `${column}/All (c:c/IsAgreementConcluded ne '${yesValue}')`);
             }
 
@@ -141,11 +141,13 @@
                 const userFilterQueryElements = matchingFilterPart[1].replace(",'", "").replace(",", "").replace(/\)$/, "").replace(/'$/, "").replace(" |", "").replace("Q", "").split(" ");
 
                 var result = "(";
+                //TODO: there should be only two components one being the year and one being the quarter so this will give incorrect results
                 userFilterQueryElements.forEach((filterValue, i) => {
                     var value = filterValue;
                     if (value === "-1")
                         value = "null";
 
+                    //TODO: Looks incorrect since it checks the same value which should not be the case
                     result += `(ProcurementPlanYear eq ${value} or ProcurementPlanQuarter eq ${value})`;
                     if (i < userFilterQueryElements.length - 1) {
                         result += " and ";
@@ -156,6 +158,10 @@
 
                 filterUrl = filterUrl.replace(pattern, result);
                 return filterUrl;
+            }
+
+            const matchDprWithConcludedAgreement = (dpr: { IsAgreementConcluded: string | null }): boolean => {
+                return dpr.IsAgreementConcluded && Models.Api.Shared.YesNoIrrelevantOption[dpr.IsAgreementConcluded] === Models.Api.Shared.YesNoIrrelevantOption.YES;
             }
 
             var launcher =
@@ -170,35 +176,36 @@
                     .withUrlFactory(() => {
                         var urlParameters =
                             "?$expand=" +
-                                "Reference($select=URL,Title,ExternalReferenceId)," +
-                                "Parent($select=Id,Name)," +
-                                "ResponsibleOrganizationUnit($select=Name)," +
-                                "PaymentModel($select=Name)," +
-                                "PaymentFreqency($select=Name)," +
-                                "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
-                                "Supplier($select=Name)," +
-                                "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
-                                "DataProcessingRegistrations($select=IsAgreementConcluded,Name,Id)," +
-                                "LastChangedByUser($select=Name,LastName)," +
-                                "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
-                                `${this.criticalityPropertyName}($select=Id),` +
-                                `${this.contractTypePropertyName}($select=Id),` +
-                                `${this.contractTemplatePropertyName}($select=Id),` +
-                                `${this.purchaseFormPropertyName}($select=Id),` +
-                                `${this.procurementStrategyPropertyName}($select=Id),` +
-                                `${this.paymentModelPropertyName}($select=Id),` +
-                                `${this.paymentFrequencyPropertyName}($select=Id),` +
-                                `${this.optionExtendPropertyName}($select=Id),` +
-                                `${this.terminationDeadlinePropertyName}($select=Id),` +
-                                "AssociatedSystemRelations($select=Id)";
+                            "Reference($select=URL,Title,ExternalReferenceId)," +
+                            "Parent($select=Id,Name)," +
+                            "ResponsibleOrganizationUnit($select=Name)," +
+                            "PaymentModel($select=Name)," +
+                            "PaymentFreqency($select=Name)," +
+                            "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
+                            "Supplier($select=Name)," +
+                            "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
+                            "DataProcessingRegistrations($select=IsAgreementConcluded,Name,Id)," +
+                            "LastChangedByUser($select=Name,LastName)," +
+                            "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
+                            `${this.criticalityPropertyName}($select=Id),` +
+                            `${this.contractTypePropertyName}($select=Id),` +
+                            `${this.contractTemplatePropertyName}($select=Id),` +
+                            `${this.purchaseFormPropertyName}($select=Id),` +
+                            `${this.procurementStrategyPropertyName}($select=Id),` +
+                            `${this.paymentModelPropertyName}($select=Id),` +
+                            `${this.paymentFrequencyPropertyName}($select=Id),` +
+                            `${this.optionExtendPropertyName}($select=Id),` +
+                            `${this.terminationDeadlinePropertyName}($select=Id),` +
+                            "AssociatedSystemRelations($select=Id)";
 
                         var orgUnitId = $window.sessionStorage.getItem(this.orgUnitStorageKey);
                         var query = `/odata/Organizations(${user.currentOrganizationId})/`;
+
                         // if orgunit is set then the org unit filter is active
                         if (orgUnitId === null) {
-                            return query + `ItContracts` + urlParameters;
+                            return `${query}ItContracts${urlParameters}`;
                         } else {
-                            return query + `OrganizationUnits(${orgUnitId})/ItContracts` + urlParameters;
+                            return `${query}OrganizationUnits(${orgUnitId})/ItContracts${urlParameters}`;
                         }
                     })
                     .withStandardSorting("Name")
@@ -206,13 +213,13 @@
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                         if (parameterMap.$orderby) {
-                            
+
                             //Option types orderBy fixes
                             //TODO: extract to helper since this is the same all the way down.. we can even iterate over a collection of property names
                             //TODO: Consider if the same fixes can be applied to other overviews
                             if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
                                 parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
-                                    `${this.criticalityPropertyName}/Name`); 
+                                    `${this.criticalityPropertyName}/Name`);
                             }
                             if (parameterMap.$orderby.includes(this.contractTypePropertyName)) {
                                 parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTypePropertyName,
@@ -253,7 +260,7 @@
                         if (parameterMap.$filter) {
                             _.forEach(itContractRoles,
                                 role => parameterMap.$filter =
-                                replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
+                                    replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
                             parameterMap.$filter =
                                 replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
@@ -263,32 +270,23 @@
                                 "LastChangedByUser/Name",
                                 "LastChangedByUser",
                                 lastChangedByUserSearchedProperties);
-                            
+
                             parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, //TODO: Might be ok since it is not a choice type but based on actual registrations
                                 "ProcurementPlanYear");
 
                             //Option types filter fixes
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.contractTypePropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.contractTemplatePropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.purchaseFormPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.procurementStrategyPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.paymentModelPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.paymentFrequencyPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.optionExtendPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.terminationDeadlinePropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.contractTypePropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.contractTemplatePropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.purchaseFormPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.procurementStrategyPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.paymentModelPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.paymentFrequencyPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.optionExtendPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.terminationDeadlinePropertyName);
 
-                            parameterMap.$filter =
-                                replaceDprFilter(parameterMap.$filter, "DataProcessingRegistrations");
+                            //DPR filter fix
+                            parameterMap.$filter = replaceDprFilter(parameterMap.$filter, "DataProcessingRegistrations");
                         }
 
                         return parameterMap;
@@ -337,14 +335,14 @@
                                         .push([right.User.Name, right.User.LastName].join(" "));
                                 });
 
-
-                            if (!contract.Parent) { contract.Parent = { Name: "" } as any; }
-                            if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" } as any; }
-                            if (!contract.Supplier) { contract.Supplier = { Name: "" } as any; }
-                            if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
-                            if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" } as any; }
-                            if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
-                            if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" } as any; }
+                            //TODO: No need for this as long as the rendering checks it
+                            //if (!contract.Parent) { contract.Parent = { Name: "" } as any; }
+                            //if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" } as any; }
+                            //if (!contract.Supplier) { contract.Supplier = { Name: "" } as any; }
+                            //if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
+                            //if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" } as any; }
+                            //if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
+                            //if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" } as any; }
                         });
 
                         return response;
@@ -392,137 +390,124 @@
                 } as Utility.KendoGrid.IKendoToolbarEntry);
             }
 
+            //TODO: Check column widths
+            //TODO: Check alignments
+            //TODO: Check content overflow is set on most columns
+
             launcher = launcher
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("IsActive")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                        .withTitle("Gyldig/Ikke gyldig")
+                        .withTitle("Gyldig/Ikke Gyldig")
                         .withId("isActive")
-                        .withFixedValueRange([
-                                {
-                                    textValue: "Gyldig",
-                                    remoteValue: true
-                                },
-                                {
-                                    textValue: "Ikke gyldig",
-                                    remoteValue: false
-                                }
-                            ],
-                            false)
-                        .withRendering(dataItem => dataItem.IsActive
-                            ? '<span class="fa fa-file text-success" aria-hidden="true"></span>'
-                            : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
+                        .withRendering(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke Gyldig")
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig")
-                        .withoutSorting()
-                        .withInclusionCriterion(
-                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
-                    .withColumn(builder =>
-                        builder
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke Gyldig")
+                        .withoutSorting())
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ItContractId")
                         .withTitle("Kontrakt ID")
                         .withId("contractId")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput())
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Parent.Name")
                         .withTitle("Overordnet kontrakt")
                         .withId("parentName")
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
+                        .withRendering(dataItem => dataItem.Parent ? Helpers.RenderFieldsHelper.renderInternalReference(
                             "kendo-parent-rendering",
                             "it-contract.edit.main",
                             dataItem.Parent.Id,
-                            dataItem.Parent.Name))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Parent.Name)))
-                    .withColumn(builder =>
-                        builder
+                            dataItem.Parent.Name) : "")
+                        .withExcelOutput(dataItem => dataItem.Parent ? Helpers.ExcelExportHelper.renderString(dataItem.Parent.Name) : ""))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Name")
                         .withTitle("It Kontrakt")
                         .withId("contractName")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
                             "contractNameObject",
                             "it-contract.edit.main",
                             dataItem.Id,
                             dataItem.Name))
-                        .withExcelOutput(dataItem => dataItem.Parent?.Name))
-                    .withColumn(builder =>
-                        builder
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.criticalityPropertyName)
                         .withTitle("Kritikalitet")
                         .withId("criticality")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withContentOverflow()
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.criticalityOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.criticalityOptionViewModel.getOptionText(dataItem.Criticality?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.criticalityOptionViewModel.getOptionText(dataItem.Criticality?.Id))))
-                    .withColumn(builder =>
-                        builder
+                        .withRendering(dataItem => dataItem.Criticality ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id)) : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => dataItem.Criticality ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id)) : ""))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ResponsibleOrganizationUnit.Name")
                         .withTitle("Ansvarlig org. enhed")
                         .withId("responsibleOrganizationUnitName")
-                        .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withContentOverflow()
                         .withFixedValueRange(orgUnits.map((unit) => {
-                                return {
-                                    textValue: unit.Name,
-                                    remoteValue: unit.Id,
-                                    optionalContext: unit
-                                };
-                            }),
+                            return {
+                                textValue: unit.Name,
+                                remoteValue: unit.Id,
+                                optionalContext: unit
+                            };
+                        }),
                             false,
-                            dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) +
-                            dataItem.optionalContext.Name)
-                        .withRendering(
-                            dataItem => Helpers.RenderFieldsHelper.renderString(dataItem
-                                .ResponsibleOrganizationUnit?.Name))
-                        .withExcelOutput(
-                            dataItem => Helpers.ExcelExportHelper.renderString(dataItem
-                                .ResponsibleOrganizationUnit?.Name)))
-                    .withColumn(builder =>
-                        builder
+                            //TODO: Check if this rendering strategy can be reused from other views that do the same
+                            dataItem => '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnit?.Name))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.ResponsibleOrganizationUnit?.Name)))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Supplier.Name")
                         .withTitle("Leverandør")
                         .withId("supplierName")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Supplier?.Name))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Supplier?.Name)))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ContractSigner")
                         .withTitle("Kontraktunderskriver")
                         .withId("contractSigner")
+                        .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.contractTypePropertyName)
                         .withTitle("Kontrakttype")
                         .withId("contractType")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.contractTypeOptionViewModel.options,
-                                true),
-                            false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
-                    .withColumn(builder =>
-                        builder
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.contractTypeOptionViewModel.options, true), false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id)))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.contractTemplatePropertyName)
                         .withTitle("Kontraktskabelon")
                         .withId("contractTemplate")
@@ -534,10 +519,11 @@
                             false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                             this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id)))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
                             this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id))))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.purchaseFormPropertyName)
                         .withTitle("Indkøbsform")
                         .withId("purchaseForm")
@@ -549,10 +535,11 @@
                             false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                             this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id)))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
                             this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id))))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.procurementStrategyPropertyName)
                         .withTitle("Genanskaffelsesstrategi")
                         .withId("procurementStrategy")
@@ -565,11 +552,12 @@
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                             this.procurementStrategyOptionViewModel.getOptionText(dataItem
                                 .ProcurementStrategy?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(
                             this.procurementStrategyOptionViewModel.getOptionText(dataItem
                                 .ProcurementStrategy?.Id))))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.procurementPlanYearPropertyName)
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
@@ -578,12 +566,13 @@
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                             ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
                             : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
                         .withExcelOutput(
                             dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
-                            ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
-                            : ""))
-                    .withColumn(builder =>
-                        builder
+                                ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
+                                : ""))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ProcurementInitiated")
                         .withTitle("Genanskaffelse igangsat")
                         .withId("procurementInitiated")
@@ -594,6 +583,7 @@
                         .withRendering(dataItem => dataItem.ProcurementInitiated
                             ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
                             : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
                         .withExcelOutput(dataItem => dataItem.ProcurementInitiated
                             ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
                             : ""));
@@ -605,342 +595,355 @@
                 launcher = launcher
                     .withColumn(builder =>
                         builder
-                        .withDataSourceName(roleKey)
-                        .withTitle(role.Name)
-                        .withId(roleColumnId)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withoutSorting()
-                        .withContentOverflow()
-                        .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
-                            `kendo-contract-${roleKey}-rendering`,
-                            "it-contract.edit.roles",
-                            dataItem.Id,
-                            Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(dataItem.roles[role.Id],
-                                numberOfRolesToConcat)))
-                        .withExcelOutput(
-                            dataItem => Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(
-                                dataItem.roles[role.Id],
-                                numberOfRolesToConcat)));
+                            .withDataSourceName(roleKey)
+                            .withTitle(role.Name)
+                            .withId(roleColumnId)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withoutSorting()
+                            .withContentOverflow()
+                            .withInitialVisibility(false)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
+                                `kendo-contract-${roleKey}-rendering`,
+                                "it-contract.edit.roles",
+                                dataItem.Id,
+                                //TODO: No just add content overflow - no need for elipsis
+                                Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(dataItem.roles[role.Id],
+                                    numberOfRolesToConcat)))
+                            .withExcelOutput(
+                                //TODO: No just add content overflow - no need for elipsis
+                                dataItem => Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(
+                                    dataItem.roles[role.Id],
+                                    numberOfRolesToConcat)));
             });
 
             launcher = launcher
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName("DataProcessingRegistrations")
-                    .withTitle("Databehandleraftale")
-                    .withId("dataProcessingRegistrations")
-                    .withoutSorting()
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        [
-                            Models.Api.Shared.YesNoIrrelevantOption.YES,
-                            Models.Api.Shared.YesNoIrrelevantOption.NO
-                        ].map(value => {
-                            return {
-                                textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
-                                remoteValue: value
-                            };
-                        }),
-                        false)
-                    .withContentOverflow()
-                    .withRendering(dataItem => {
-                        var activeDprs = [];
-                        dataItem.DataProcessingRegistrations.forEach(dpr => {
-                            //TODO: Comparing with an enum value always returns false
-                            if (dpr.IsAgreementConcluded.toString() === "YES") {
-                                activeDprs.push(Helpers.RenderFieldsHelper.renderInternalReference(
-                                    `kendo-contract-dpr-${dpr.Id}`,
-                                    "data-processing.edit-registration.main",
-                                    dpr.Id,
-                                    dpr.Name));
+                        .withDataSourceName("DataProcessingRegistrations")
+                        .withTitle("Databehandleraftale")
+                        .withId("dataProcessingRegistrations")
+                        .withoutSorting()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            [
+                                Models.Api.Shared.YesNoIrrelevantOption.YES,
+                                Models.Api.Shared.YesNoIrrelevantOption.NO //TODO: Check if it is fixed in the query since it will cover multiple case
+                            ].map(value => {
+                                return {
+                                    textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
+                                    remoteValue: value
+                                };
+                            }),
+                            false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => {
+                            var activeDprs = [];
+                            dataItem.DataProcessingRegistrations.forEach(dpr => {
+                                if (matchDprWithConcludedAgreement(dpr)) {
+                                    activeDprs.push(Helpers.RenderFieldsHelper.renderInternalReference(
+                                        `kendo-contract-dpr-${dpr.Id}`,
+                                        "data-processing.edit-registration.main",
+                                        dpr.Id,
+                                        dpr.Name));
+                                }
+                            });
+                            return activeDprs.toString();
+                        })
+                        .withExcelOutput(dataItem => {
+                            var activeDprs = [];
+                            dataItem.DataProcessingRegistrations.forEach(dpr => {
+                                if (matchDprWithConcludedAgreement(dpr)) {
+                                    activeDprs.push(dpr.Name);
+                                }
+                            });
+                            return activeDprs.toString();
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("AssociatedSystemUsages")
+                        .withTitle("IT Systemer")
+                        .withId("associatedSystemUsages")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withoutSorting()
+                        .withContentOverflow()
+                        .withRendering(dataItem => {
+                            var activeSystemUsages = [];
+                            dataItem.AssociatedSystemUsages.forEach(system => {
+                                activeSystemUsages.push(Helpers.RenderFieldsHelper.renderInternalReference(
+                                    `kendo-contract-system-usages-${system.ItSystemUsageId}`,
+                                    "it-system.usage.main",
+                                    system.ItSystemUsageId,
+                                    system.ItSystemUsage.ItSystem.Name)); //TODO: We must add the ikke aktive suffix if main system is inactive
+
+                            });
+                            return activeSystemUsages.toString();
+                        })
+                        .withExcelOutput(dataItem => {
+                            var systemUsages = [];
+                            dataItem.AssociatedSystemUsages.forEach(system => {
+                                systemUsages.push(system.ItSystemUsage.ItSystem.Name);//TODO: We must add the ikke aktive suffix if main system is inactive
+                            });
+                            return systemUsages.toString();
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("AssociatedSystemRelations")
+                        .withTitle("Antal Relationer")
+                        .withId("relationCount")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            if (dataItem.AssociatedSystemUsages === undefined)
+                                return "0";
+
+                            return dataItem.AssociatedSystemRelations.length.toString();
+                        })
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => {
+                            if (dataItem.AssociatedSystemUsages === undefined)
+                                return "0";
+
+                            return dataItem.AssociatedSystemRelations.length.toString();
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Reference.Title")
+                        .withTitle("Reference")
+                        .withId("referenceTitle")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => dataItem.Reference ? Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference) : "")
+                        .withExcelOutput(dataItem => {
+                            if (!dataItem.Reference) {
+                                return "";
                             }
-                        });
-                        return activeDprs.toString();
-                    })
-                    .withExcelOutput(dataItem => {
-                        var activeDprs = [];
-                        dataItem.DataProcessingRegistrations.forEach(dpr => {
-                            //TODO: Comparing with an enum value always returns false
-                            if (dpr.IsAgreementConcluded.toString() === "YES") {
-                                activeDprs.push(dpr.Name);
+                            return dataItem.Reference.Title;
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Reference.ExternalReferenceId")
+                        .withTitle("Dokument ID/Sagsnr.")
+                        .withId("referenceExternalReferenceId")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => dataItem.Reference ? Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference) : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => dataItem.Reference ? Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference) : ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.Acquisition")
+                        .withTitle("Anskaffelse")
+                        .withId("acquisition")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
+                        })
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => {
+                            return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.Operation")
+                        .withTitle("Drift/år")
+                        .withId("operation")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            return dataItem.Operation ? dataItem.Operation.toString() : "";
+                        })
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => {
+                            return dataItem.Operation ? dataItem.Operation.toString() : "";
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.Other")
+                        .withTitle("Andet")
+                        .withId("other")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            return dataItem.Other ? dataItem.Other.toString() : "";
+                        })
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => {
+                            return dataItem.Other ? dataItem.Other.toString() : "";
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("OperationRemunerationBegun")
+                        .withTitle("Driftsvederlag begyndt")
+                        .withId("operationRemunerationBegun")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(
+                            dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(
+                            dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.OperationRemunerationBegun)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(this.paymentModelPropertyName)
+                        .withTitle("Betalingsmodel")
+                        .withId("paymentModel")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.paymentModelOptionViewModel.options,
+                                true),
+                            false)
+                        .withRendering(dataItem => dataItem.PaymentModel ? Helpers.RenderFieldsHelper.renderString(
+                            this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)) : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => dataItem.PaymentModel ? Helpers.ExcelExportHelper.renderString(
+                            this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)) : ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(this.paymentFrequencyPropertyName)
+                        .withTitle("Betalingsfrekvens")
+                        .withId("paymentFrequency")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.paymentFrequencyOptionViewModel.options,
+                                true),
+                            false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
+                            this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id)))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                            this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.AuditDate")
+                        .withTitle("Audit dato")
+                        .withId("auditDate")
+                        .withoutSorting()
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AuditDate))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AuditDate)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.AuditStatus")
+                        .withTitle("Audit status")
+                        .withId("auditStatus")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            if (dataItem.status.max > 0) {
+                                const str = JSON.stringify(dataItem.status);
+                                return `<div data-show-status='${str}'></div>`;
                             }
-                        });
-                        return activeDprs.toString();
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("AssociatedSystemUsages")
-                    .withTitle("IT Systemer")
-                    .withId("associatedSystemUsages")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withoutSorting()
-                    .withContentOverflow()
-                    .withRendering(dataItem => {
-                        var activeSystemUsages = [];
-                        dataItem.AssociatedSystemUsages.forEach(system => {
-                            activeSystemUsages.push(Helpers.RenderFieldsHelper.renderInternalReference(
-                                `kendo-contract-system-usages-${system.ItSystemUsageId}`,
-                                "data-processing.edit-registration.main",
-                                system.ItSystemUsageId,
-                                system.ItSystemUsage.ItSystem.Name));
-
-                        });
-                        return activeSystemUsages.toString();
-                    })
-                    .withExcelOutput(dataItem => {
-                        var activeSystemUsages = [];
-                        dataItem.AssociatedSystemUsages.forEach(system => {
-                            activeSystemUsages.push(system.ItSystemUsage.ItSystem.Name);
-                        });
-                        return activeSystemUsages.toString();
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("AssociatedSystemRelations")
-                    .withTitle("Antal Relationer")
-                    .withId("relationCount")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        if (dataItem.AssociatedSystemUsages === undefined)
                             return "";
+                        })
+                        .withExcelOutput(dataItem => dataItem &&
+                            dataItem.status &&
+                            `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow
+                            }, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` ||
+                            ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Duration")
+                        .withTitle("Varighed")
+                        .withId("duration")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            if (dataItem.DurationOngoing) {
+                                return "Løbende";
+                            }
 
-                        return dataItem.AssociatedSystemRelations.length.toString();
-                    })
-                    .withExcelOutput(dataItem => {
-                        if (dataItem.AssociatedSystemUsages === undefined)
-                            return "";
+                            const years = dataItem.DurationYears || 0;
+                            const months = dataItem.DurationMonths || 0;
+                            //TODO: Simplify this. it looks horrendous
+                            if (years === 0 && months === 0) {
+                                return "Ikke angivet";
+                            }
 
-                        return dataItem.AssociatedSystemRelations.length.toString();
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("Reference.Title")
-                    .withTitle("Reference")
-                    .withId("referenceTitle")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference))
-                    .withExcelOutput(dataItem => {
-                        if (dataItem.Reference === undefined) {
-                            return "";
-                        }
-                        return dataItem.Reference.Title;
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("Reference.ExternalReferenceId")
-                    .withTitle("Dokument ID/Sagsnr.")
-                    .withId("referenceExternalReferenceId")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference))
-                    .withExcelOutput(
-                        dataItem => Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.Acquisition")
-                    .withTitle("Anskaffelse")
-                    .withId("acquisition")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
-                    })
-                    .withExcelOutput(dataItem => {
-                        return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.Operation")
-                    .withTitle("Drift/år")
-                    .withId("operation")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        return dataItem.Operation ? dataItem.Operation.toString() : "";
-                    })
-                    .withExcelOutput(dataItem => {
-                        return dataItem.Operation ? dataItem.Operation.toString() : "";
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.Other")
-                    .withTitle("Andet")
-                    .withId("other")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        return dataItem.Other ? dataItem.Other.toString() : "";
-                    })
-                    .withExcelOutput(dataItem => {
-                        return dataItem.Other ? dataItem.Other.toString() : "";
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("OperationRemunerationBegun")
-                    .withTitle("Driftsvederlag begyndt")
-                    .withId("operaitonRemunerationBegun")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(
-                        dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun))
-                    .withExcelOutput(
-                        dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.OperationRemunerationBegun)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName(this.paymentModelPropertyName)
-                    .withTitle("Betalingsmodel")
-                    .withId("paymentModel")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.paymentModelOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id))))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName(this.paymentFrequencyPropertyName)
-                    .withTitle("Betalingsfrekvens")
-                    .withId("paymentFrequency")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.paymentFrequencyOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.AuditDate")
-                    .withTitle("Audit dato")
-                    .withId("auditDate")
-                    .withoutSorting()
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AuditDate))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AuditDate)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.AuditStatus")
-                    .withTitle("Audit status")
-                    .withId("auditStatus")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        if (dataItem.status.max > 0) {
-                            var str = JSON.stringify(dataItem.status);
-                            return `<div data-show-status='${str}'></div>`;
-                        }
-                        return "";
-                    })
-                    .withExcelOutput(dataItem => dataItem &&
-                        dataItem.status &&
-                        `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow
-                        }, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` ||
-                        ""))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("Duration")
-                    .withTitle("Verighed") //TODO: check if title is correct (possible typo): in the task documentation the title is: "Verighed", but the old field has a title "Varighed"
-                    .withId("duration")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        if (dataItem.DurationOngoing) {
-                            return "Løbende";
-                        }
+                            if (years > 0 && months > 0 && months < 2)
+                                return `${years} år og ${months} måned`;
 
-                        const years = dataItem.DurationYears || 0;
-                        const months = dataItem.DurationMonths || 0;
+                            if (years > 0 && months > 0)
+                                return `${years} år og ${months} måneder`;
 
-                        if (years === 0 && months === 0) {
+                            if (years < 1 && months > 0 && months > 1)
+                                return `${months} måneder`;
+
+                            if (years < 1 && months < 2) {
+                                return `${months} måned`;
+                            }
+
+                            if (years > 0 && months < 1)
+                                return `${years} år`;
+
                             return "Ikke angivet";
-                        }
-
-                        if (years > 0 && months > 0 && months < 2)
-                            return `${years} år og ${months} måned`;
-
-                        if (years > 0 && months > 0)
-                            return `${years} år og ${months} måneder`;
-
-                        if (years < 1 && months > 0 && months > 1)
-                            return `${months} måneder`;
-
-                        if (years < 1 && months < 2) {
-                            return `${months} måned`;
-                        }
-
-                        if (years > 0 && months < 1)
-                            return `${years} år`;
-
-                        return "Ikke angivet";
-                    }))
+                        }))
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName(this.optionExtendPropertyName)
-                    .withTitle("Option")
-                    .withId("optionExtend")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.optionExtendOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id))))
+                        .withDataSourceName(this.optionExtendPropertyName)
+                        .withTitle("Option")
+                        .withId("optionExtend")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.optionExtendOptionViewModel.options,
+                                true),
+                            false)
+                        .withRendering(dataItem => dataItem.OptionExtend ? Helpers.RenderFieldsHelper.renderString(
+                            this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)) : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => dataItem.OptionExtend ? Helpers.RenderFieldsHelper.renderString(
+                            this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)) : ""))
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName(this.terminationDeadlinePropertyName)
-                    .withTitle("Opsigelse (måneder)")
-                    .withId("terminationDeadline")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.terminationDeadlineOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id))))
+                        .withDataSourceName(this.terminationDeadlinePropertyName)
+                        .withTitle("Opsigelse (måneder)")
+                        .withId("terminationDeadline")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.terminationDeadlineOptionViewModel.options,
+                                true),
+                            false)
+                        .withRendering(dataItem => dataItem.TerminationDeadline ? Helpers.RenderFieldsHelper.renderString(
+                            this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)) : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => dataItem.TerminationDeadline ? Helpers.ExcelExportHelper.renderString(
+                            this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)) : ""))
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName("IrrevocableTo")
-                    .withTitle("Uopsigelig til")
-                    .withId("irrevocableTo")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo)))
+                        .withDataSourceName("IrrevocableTo")
+                        .withTitle("Uopsigelig til")
+                        .withId("irrevocableTo")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo)))
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName("Terminated")
-                    .withTitle("Opsagt")
-                    .withId("terminated")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated)))
+                        .withDataSourceName("Terminated")
+                        .withTitle("Opsagt")
+                        .withId("terminated")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated)))
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName("LastChangedByUser.Name")
-                    .withTitle("Sidst redigeret: Bruger")
-                    .withId("lastChangedByUser")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withRendering(
-                        dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`)
-                    .withExcelOutput(
-                        dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`))
+                        .withDataSourceName("LastChangedByUser.Name")
+                        .withTitle("Sidst redigeret: Bruger")
+                        .withId("lastChangedByUser")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(
+                            dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : "")
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(
+                            dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : ""))
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName("LastChangedBy")
-                    .withTitle("Sidste redigeret: Dato")
-                    .withId("lastChangedDate")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
-                    .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
+                        .withDataSourceName("LastChangedBy")
+                        .withTitle("Sidste redigeret: Dato")
+                        .withId("lastChangedDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
+                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
+                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
 
             launcher.launch();
         }
