@@ -47,6 +47,10 @@
             "procurements"
         ];
 
+        private renderProcurementPlan(year: number, quarter: number) : string {
+            return `Q${quarter} | ${year}`;
+        }
+
         constructor(
             $rootScope: IRootScope,
             $scope: ng.IScope,
@@ -67,8 +71,8 @@
             //TODO: Reuse the rendering here
             $scope.procurements = procurements.map(value => {
                 return {
-                    textValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`,
-                    remoteValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`
+                    textValue: this.renderProcurementPlan(value.procurementPlanYear,value.procurementPlanQuarter),
+                    remoteValue: this.renderProcurementPlan(value.procurementPlanYear, value.procurementPlanQuarter)
                 }
             });
             $scope.procurements.push({
@@ -233,6 +237,9 @@
                                         `${optionTypePropertyName}/Name`);
                                 }
                             }
+
+                            //TODO: Missing combined ordering for procurement plan
+                            //TODO: Missing combined ordering for LastChangedByUser
                         }
 
                         if (parameterMap.$filter) {
@@ -241,15 +248,15 @@
                                     replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
                             parameterMap.$filter =
-                                replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
+                                replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages"); //TODO: Duplicated string
 
-                            const lastChangedByUserSearchedProperties = ["Name", "LastName"];
+                            const lastChangedByUserSearchedProperties = ["Name", "LastName"];//TODO: Duplicated string
                             parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
                                 "LastChangedByUser/Name",
-                                "LastChangedByUser",
+                                "LastChangedByUser",//TODO: Duplicated string
                                 lastChangedByUserSearchedProperties);
 
-                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, "ProcurementPlanYear");
+                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, "ProcurementPlanYear");//TODO: Duplicated string
 
                             //Option types filter fixes
                             parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
@@ -542,12 +549,12 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
-                            ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
+                            ? this.renderProcurementPlan(dataItem.ProcurementPlanYear, dataItem.ProcurementPlanQuarter)
                             : "")
                         //TODO: double check if std template is used if no excel is defined! - will simplify matters
                         .withExcelOutput(
                             dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
-                                ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
+                                ? this.renderProcurementPlan(dataItem.ProcurementPlanYear, dataItem.ProcurementPlanQuarter)
                                 : ""))
                 .withColumn(builder =>
                     builder
