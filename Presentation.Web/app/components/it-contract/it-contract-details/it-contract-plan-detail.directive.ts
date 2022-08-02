@@ -10,7 +10,7 @@
         mainGrid: IKendoGrid<any>;
         mainGridOptions: IKendoGridOptions<any>;
     }
-
+    //TODO: Kill this!
     class ContractDetails implements ng.IDirective {
         public templateUrl = "app/components/it-contract/it-contract-details/it-contract-details.view.html";
         public scope = {

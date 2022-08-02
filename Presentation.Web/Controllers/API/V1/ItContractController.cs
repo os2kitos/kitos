@@ -341,7 +341,8 @@ namespace Presentation.Web.Controllers.API.V1
                 return LogError(e);
             }
         }
-        
+
+        [InternalApi]
         [HttpGet]
         [Route("available-options-in/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
@@ -366,7 +367,8 @@ namespace Presentation.Web.Controllers.API.V1
                 })
                 .Match(Ok, FromOperationError);
         }
-        
+
+        [InternalApi]
         [HttpGet]
         [Route("available-procurements/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
@@ -443,12 +445,12 @@ namespace Presentation.Web.Controllers.API.V1
             return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available == false, optionObject.option.Description);
         }
 
-        private static ContractProcurementPlanDTO ToProcurementPlanDTO(ItContract contract)
+        private static ContractProcurementPlanDTO ToProcurementPlanDTO((int year, int quarter) plan)
         {
             return new ContractProcurementPlanDTO
             {
-                ProcurementPlanYear = contract.ProcurementPlanYear,
-                ProcurementPlanQuarter = contract.ProcurementPlanQuarter
+                ProcurementPlanYear = plan.year,
+                ProcurementPlanQuarter = plan.quarter
             };
         }
     }

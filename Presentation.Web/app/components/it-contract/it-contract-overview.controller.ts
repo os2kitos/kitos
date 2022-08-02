@@ -64,6 +64,7 @@
             procurements: Models.ItContract.IContractProcurementPlanDTO[]) {
             $rootScope.page.title = "IT Kontrakt";
 
+            //TODO: Odd stuff here - what is the purpose?... is it the unique types?
             $scope.procurements = procurements.map(value => {
                 return {
                     textValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`,
@@ -79,28 +80,18 @@
 
             const getRoleKey = (roleId: number | string) => `role${roleId}`;
 
-            this.criticalityOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.criticalityOptions);
-            this.contractTypeOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTypeOptions);
-            this.contractTemplateOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTemplateOptions);
-            this.purchaseFormOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.purchaseFormOptions);
-            this.procurementStrategyOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.procurementStrategyOptions);
-            this.paymentModelOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentModelOptions);
-            this.paymentFrequencyOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentFrequencyOptions);
-            this.optionExtendOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.optionExtendOptions);
-            this.terminationDeadlineOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.terminationDeadlineOptions);
+            this.criticalityOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.criticalityOptions);
+            this.contractTypeOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTypeOptions);
+            this.contractTemplateOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTemplateOptions);
+            this.purchaseFormOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.purchaseFormOptions);
+            this.procurementStrategyOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.procurementStrategyOptions);
+            this.paymentModelOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentModelOptions);
+            this.paymentFrequencyOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentFrequencyOptions);
+            this.optionExtendOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.optionExtendOptions);
+            this.terminationDeadlineOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.terminationDeadlineOptions);
 
             this.yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
             
-            // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
             const replaceRoleFilter = (filterUrl: string, roleName: string, roleId: number) => {
                 const pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
                 return filterUrl.replace(pattern,
@@ -112,6 +103,7 @@
                 return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
             }
 
+            //TODO: Consider possible reuse in other overviews?
             const replaceOptionTypeFilter = (filterUrl: string, column: string) => {
                 const pattern = new RegExp(`(${column}( eq )\'([0-9]+)\')`, "i");
                 const matchingFilterParts = pattern.exec(filterUrl);
@@ -216,9 +208,11 @@
                         if (parameterMap.$orderby) {
                             
                             //Option types orderBy fixes
+                            //TODO: extract to helper since this is the same all the way down.. we can even iterate over a collection of property names
+                            //TODO: Consider if the same fixes can be applied to other overviews
                             if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
                                 parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
-                                    `${this.criticalityPropertyName}/Name`);
+                                    `${this.criticalityPropertyName}/Name`); 
                             }
                             if (parameterMap.$orderby.includes(this.contractTypePropertyName)) {
                                 parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTypePropertyName,
@@ -265,12 +259,12 @@
                                 replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
                             const lastChangedByUserSearchedProperties = ["Name", "LastName"];
-                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter, //TODO: Consider reuse in the other overviews where we used this trick (it-system and interfaces)
                                 "LastChangedByUser/Name",
                                 "LastChangedByUser",
                                 lastChangedByUserSearchedProperties);
                             
-                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter,
+                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, //TODO: Might be ok since it is not a choice type but based on actual registrations
                                 "ProcurementPlanYear");
 
                             //Option types filter fixes

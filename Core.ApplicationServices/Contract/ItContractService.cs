@@ -51,16 +51,16 @@ namespace Core.ApplicationServices.Contract
             IDomainEvents domainEvents,
             IAuthorizationContext authorizationContext,
             ILogger logger,
-            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService, 
+            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService,
             IOrganizationalUserContext userContext,
-            IOptionsService<ItContract, CriticalityType> criticalityOptionsService, 
+            IOptionsService<ItContract, CriticalityType> criticalityOptionsService,
             IOptionsService<ItContract, ItContractType> contractTypeOptionsService,
-            IOptionsService<ItContract, ItContractTemplateType> contractTemplateOptionsService, 
-            IOptionsService<ItContract, PurchaseFormType> purchaseFormOptionsService, 
+            IOptionsService<ItContract, ItContractTemplateType> contractTemplateOptionsService,
+            IOptionsService<ItContract, PurchaseFormType> purchaseFormOptionsService,
             IOptionsService<ItContract, ProcurementStrategyType> procurementStrategyOptionsService,
             IOptionsService<ItContract, PaymentModelType> paymentModelOptionsService,
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
-            IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService, 
+            IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
             IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService)
         {
             _repository = repository;
@@ -263,11 +263,19 @@ namespace Core.ApplicationServices.Contract
                     _terminationDeadlineOptionsService.GetAllOptionsDetails(organizationId)));
         }
 
-        public IEnumerable<ItContract> GetAvailableProcurementPlans(int organizationId)
+        public IEnumerable<(int year, int quarter)> GetAvailableProcurementPlans(int organizationId)
         {
             var contracts = GetAllByOrganization(organizationId);
 
-            return contracts.Where(contract => contract.ProcurementPlanYear != null && contract.ProcurementPlanQuarter != null).ToList();
+            return contracts
+                .Where(contract => contract.ProcurementPlanYear != null && contract.ProcurementPlanQuarter != null)
+                .Select(c => new { c.ProcurementPlanYear, c.ProcurementPlanQuarter })
+                .Distinct()
+                .OrderBy(x => x.ProcurementPlanYear)
+                .ThenBy(x => x.ProcurementPlanQuarter)
+                .ToList()
+                .Select(x => (x.ProcurementPlanYear.GetValueOrDefault(), x.ProcurementPlanQuarter.GetValueOrDefault()))
+                .ToList();
         }
 
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)

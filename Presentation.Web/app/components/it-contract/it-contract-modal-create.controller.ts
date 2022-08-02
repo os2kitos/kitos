@@ -28,7 +28,7 @@
 
             var msg = this.notify.addInfoMessage('Opretter kontrakt...', false);
 
-            return this.$http.post(`api/itcontract?organizationId=${this.user.currentOrganizationId}`,
+            return this.$http.post(`api/itcontract?organizationId=${organizationId}`,
                 { organizationId: organizationId, name: name })
                 .then
                 (
@@ -39,6 +39,7 @@
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
                         //TODO: check if the error messages are valid
+                        //TODO: Not valid unless we use the api wrapper!!
                             case Models.Api.ApiResponseErrorCategory.BadInput:
                                 msg.toErrorMessage("Fejl! Navnet er ugyldigt!");
                                 break;
