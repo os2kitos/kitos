@@ -47,7 +47,7 @@
             "procurements"
         ];
 
-        private renderProcurementPlan(year: number, quarter: number) : string {
+        private renderProcurementPlan(year: number, quarter: number): string {
             return `Q${quarter} | ${year}`;
         }
 
@@ -71,7 +71,7 @@
             //TODO: Reuse the rendering here
             $scope.procurements = procurements.map(value => {
                 return {
-                    textValue: this.renderProcurementPlan(value.procurementPlanYear,value.procurementPlanQuarter),
+                    textValue: this.renderProcurementPlan(value.procurementPlanYear, value.procurementPlanQuarter),
                     remoteValue: this.renderProcurementPlan(value.procurementPlanYear, value.procurementPlanQuarter)
                 }
             });
@@ -244,7 +244,7 @@
 
                         if (parameterMap.$filter) {
                             _.forEach(itContractRoles,
-                                (role : any) => parameterMap.$filter =
+                                (role: any) => parameterMap.$filter =
                                     replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
                             parameterMap.$filter =
@@ -320,9 +320,9 @@
                                 });
 
                             //Ensure that object, where the data source is nested, are provided. Otherwise pre-render prep will fail in kendo grid's excel export function (even if we override the export)
-                            contract.Parent = contract.Parent ?? { } as any;
-                            contract.ResponsibleOrganizationUnit = contract.ResponsibleOrganizationUnit ?? { } as any;
-                            contract.Supplier = contract.Supplier ?? { } as any;
+                            contract.Parent = contract.Parent ?? {} as any;
+                            contract.ResponsibleOrganizationUnit = contract.ResponsibleOrganizationUnit ?? {} as any;
+                            contract.Supplier = contract.Supplier ?? {} as any;
                             contract.Reference = contract.Reference ?? {} as any;
                             contract.LastChangedByUser = contract.LastChangedByUser ?? { Name: "", LastName: "" } as any;
                         });
@@ -434,9 +434,7 @@
                                 this.criticalityOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => dataItem.Criticality ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id)) : "")
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => dataItem.Criticality ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id)) : ""))
+                        .withRendering(dataItem => dataItem.Criticality ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id)) : ""))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ResponsibleOrganizationUnit.Name")
@@ -454,9 +452,7 @@
                             false,
                             //TODO: Check if this rendering strategy can be reused from other views that do the same
                             dataItem => '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnit?.Name))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.ResponsibleOrganizationUnit?.Name)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnit?.Name)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Supplier.Name")
@@ -464,9 +460,7 @@
                         .withId("supplierName")
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Supplier?.Name))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Supplier?.Name)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Supplier?.Name)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ContractSigner")
@@ -484,9 +478,7 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.contractTypeOptionViewModel.options, true), false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id)))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.contractTemplatePropertyName)
@@ -495,15 +487,11 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.contractTemplateOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id)))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id))))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id))))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.purchaseFormPropertyName)
@@ -512,15 +500,11 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.purchaseFormOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id)))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id))))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id))))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.procurementStrategyPropertyName)
@@ -533,13 +517,7 @@
                                 this.procurementStrategyOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.procurementStrategyOptionViewModel.getOptionText(dataItem
-                                .ProcurementStrategy?.Id)))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.procurementStrategyOptionViewModel.getOptionText(dataItem
-                                .ProcurementStrategy?.Id))))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.procurementStrategyOptionViewModel.getOptionText(dataItem.ProcurementStrategy?.Id))))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.procurementPlanYearPropertyName)
@@ -550,12 +528,7 @@
                         .withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                             ? this.renderProcurementPlan(dataItem.ProcurementPlanYear, dataItem.ProcurementPlanQuarter)
-                            : "")
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(
-                            dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
-                                ? this.renderProcurementPlan(dataItem.ProcurementPlanYear, dataItem.ProcurementPlanQuarter)
-                                : ""))
+                            : ""))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ProcurementInitiated")
@@ -567,10 +540,6 @@
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.yesNoUndecided.options, false),
                             false)
                         .withRendering(dataItem => dataItem.ProcurementInitiated
-                            ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
-                            : "")
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => dataItem.ProcurementInitiated
                             ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
                             : ""));
 
@@ -675,13 +644,6 @@
                                 return "0";
 
                             return dataItem.AssociatedSystemRelations.length.toString();
-                        })
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => {
-                            if (dataItem.AssociatedSystemUsages === undefined)
-                                return "0";
-
-                            return dataItem.AssociatedSystemRelations.length.toString();
                         }))
                 .withColumn(builder =>
                     builder
@@ -704,48 +666,28 @@
                         .withId("referenceExternalReferenceId")
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ExternEconomyStreams.Acquisition")
                         .withTitle("Anskaffelse")
                         .withId("acquisition")
                         .withoutSorting()
-                        .withRendering(dataItem => {
-                            return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
-                        })
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => {
-                            return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
-                        }))
+                        .withRendering(dataItem => { return dataItem.Acquisition ? dataItem.Acquisition.toString() : ""; }))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ExternEconomyStreams.Operation")
                         .withTitle("Drift/år")
                         .withId("operation")
                         .withoutSorting()
-                        .withRendering(dataItem => {
-                            return dataItem.Operation ? dataItem.Operation.toString() : "";
-                        })
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => {
-                            return dataItem.Operation ? dataItem.Operation.toString() : "";
-                        }))
+                        .withRendering(dataItem => { return dataItem.Operation ? dataItem.Operation.toString() : ""; }))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ExternEconomyStreams.Other")
                         .withTitle("Andet")
                         .withId("other")
                         .withoutSorting()
-                        .withRendering(dataItem => {
-                            return dataItem.Other ? dataItem.Other.toString() : "";
-                        })
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => {
-                            return dataItem.Other ? dataItem.Other.toString() : "";
-                        }))
+                        .withRendering(dataItem => { return dataItem.Other ? dataItem.Other.toString() : ""; }))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("OperationRemunerationBegun")
@@ -753,11 +695,7 @@
                         .withId("operationRemunerationBegun")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withRendering(
-                            dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(
-                            dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.OperationRemunerationBegun)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.paymentModelPropertyName)
@@ -766,15 +704,11 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.paymentModelOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => dataItem.PaymentModel ? Helpers.RenderFieldsHelper.renderString(
-                            this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)) : "")
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => dataItem.PaymentModel ? Helpers.ExcelExportHelper.renderString(
-                            this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)) : ""))
+                        .withRendering(dataItem => dataItem.PaymentModel ? Helpers.RenderFieldsHelper.renderString(this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)) : ""))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.paymentFrequencyPropertyName)
@@ -783,15 +717,11 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.paymentFrequencyOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id)))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ExternEconomyStreams.AuditDate")
@@ -862,15 +792,11 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.optionExtendOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => dataItem.OptionExtend ? Helpers.RenderFieldsHelper.renderString(
-                            this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)) : "")
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => dataItem.OptionExtend ? Helpers.RenderFieldsHelper.renderString(
-                            this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)) : ""))
+                        .withRendering(dataItem => dataItem.OptionExtend ? Helpers.RenderFieldsHelper.renderString(this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)) : ""))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.terminationDeadlinePropertyName)
@@ -878,15 +804,11 @@
                         .withId("terminationDeadline")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.terminationDeadlineOptionViewModel.options,
                                 true),
                             false)
-                        .withRendering(dataItem => dataItem.TerminationDeadline ? Helpers.RenderFieldsHelper.renderString(
-                            this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)) : "")
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => dataItem.TerminationDeadline ? Helpers.ExcelExportHelper.renderString(
-                            this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)) : ""))
+                        .withRendering(dataItem => dataItem.TerminationDeadline ? Helpers.RenderFieldsHelper.renderString(this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)) : ""))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("IrrevocableTo")
@@ -894,9 +816,7 @@
                         .withId("irrevocableTo")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Terminated")
@@ -904,9 +824,7 @@
                         .withId("terminated")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LastChangedByUser.Name")
@@ -914,11 +832,7 @@
                         .withId("lastChangedByUser")
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(
-                            dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : "")
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(
-                            dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : ""))
+                        .withRendering(dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : ""))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LastChangedBy")
@@ -926,9 +840,7 @@
                         .withId("lastChangedDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
 
             launcher.launch();
         }
