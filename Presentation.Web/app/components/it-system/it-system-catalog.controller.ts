@@ -396,6 +396,7 @@
                     {
                         field: "Parent.Name",
                         title: "Overordnet IT System",
+                        attributes: { "class": "might-overflow" },
                         width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Parent ? Helpers.SystemNameFormat.apply(dataItem.Parent.Name, dataItem.Parent.Disabled) : "",
@@ -412,6 +413,7 @@
                     {
                         field: "PreviousName",
                         title: "Tidligere Systemnavn",
+                        attributes: { "class": "might-overflow" },
                         width: 285,
                         persistId: "previousname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.PreviousName != null ? dataItem.PreviousName : "",
@@ -433,7 +435,8 @@
                             return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.Disabled)}</a>`;
                         },
                         attributes: {
-                            "data-element-type": "catalogNameObject"
+                            "data-element-type": "catalogNameObject",
+                            "class": "might-overflow" 
                         },
                         headerAttributes: {
                             "data-element-type": "catalogNameHeader"
@@ -490,6 +493,7 @@
                         title: "Rettighedshaver",
                         width: 210,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "might-overflow" },
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
                         filterable: {
                             cell: {
@@ -577,6 +581,7 @@
                         persistId: "orgname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Organization ? dataItem.Organization.Name : "",
                         hidden: true,
+                        attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
                                 template: customFilter,
@@ -591,6 +596,7 @@
                         title: "Sidst redigeret: Bruger",
                         width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "might-overflow" },
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
                         filterable: {
@@ -629,7 +635,7 @@
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
-                        attributes: { "class": "text-left" },
+                        attributes: { "class": "text-left might-overflow" },
                         filterable: {
                             cell: {
                                 template: customFilter,
@@ -650,7 +656,7 @@
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
-                        attributes: { "class": "text-center" },
+                        attributes: { "class": "text-center might-overflow" },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -666,6 +672,7 @@
                         title: "UUID",
                         width: 150,
                         persistId: "uuid", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "might-overflow" },
                         excelTemplate: dataItem => dataItem.Uuid,
                         hidden: true
                     },
@@ -673,6 +680,7 @@
                         field: "Description",
                         title: "Beskrivelse",
                         width: 150,
+                        attributes: { "class": "might-overflow" },
                         persistId: "description",
                         template: dataItem => dataItem.Description ? dataItem.Description : "",
                         hidden: true

@@ -7,6 +7,7 @@
     }
 
     export interface IItContractOptions {
+        //TODO: Let's get the roles in here too
         criticalityOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];
         contractTypeOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];
         contractTemplateOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];

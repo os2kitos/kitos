@@ -17,7 +17,7 @@
         private readonly optionExtendPropertyName = "OptionExtend";
         private readonly terminationDeadlinePropertyName = "TerminationDeadline";
         private readonly procurementPlanYearPropertyName = "ProcurementPlanYear";
-        private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
+        private readonly orgUnitStorageKey = "it-contract-full-overview-orgunit";
 
         private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly contractTypeOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
@@ -172,7 +172,7 @@
                     .withUser(user)
                     .withEntityTypeName("IT Kontrakt")
                     .withExcelOutputName("IT Kontrakt")
-                    .withStorageKey("it-contract-overview-options")
+                    .withStorageKey("it-contract-full-overview-options")
                     .withUrlFactory(() => {
                         var urlParameters =
                             "?$expand=" +
@@ -215,64 +215,41 @@
                         if (parameterMap.$orderby) {
 
                             //Option types orderBy fixes
-                            //TODO: extract to helper since this is the same all the way down.. we can even iterate over a collection of property names
-                            //TODO: Consider if the same fixes can be applied to other overviews
-                            if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
-                                    `${this.criticalityPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.contractTypePropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTypePropertyName,
-                                    `${this.contractTypePropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.contractTemplatePropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTemplatePropertyName,
-                                    `${this.contractTemplatePropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.purchaseFormPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.purchaseFormPropertyName,
-                                    `${this.purchaseFormPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.procurementStrategyPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(
-                                    this.procurementStrategyPropertyName,
-                                    `${this.procurementStrategyPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.paymentModelPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.paymentModelPropertyName,
-                                    `${this.paymentModelPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.paymentFrequencyPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.paymentFrequencyPropertyName,
-                                    `${this.paymentFrequencyPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.optionExtendPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.optionExtendPropertyName,
-                                    `${this.optionExtendPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.terminationDeadlinePropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(
-                                    this.terminationDeadlinePropertyName,
-                                    `${this.terminationDeadlinePropertyName}/Name`);
+                            const optionTypeProperties: Array<string> = [
+                                this.criticalityPropertyName,
+                                this.contractTypePropertyName,
+                                this.contractTemplatePropertyName,
+                                this.purchaseFormPropertyName,
+                                this.procurementStrategyPropertyName,
+                                this.paymentModelPropertyName,
+                                this.paymentFrequencyPropertyName,
+                                this.optionExtendPropertyName,
+                                this.terminationDeadlinePropertyName
+                            ];
+
+                            for (let optionTypePropertyName of optionTypeProperties) {
+                                if (parameterMap.$orderby.includes(optionTypePropertyName)) {
+                                    parameterMap.$orderby = parameterMap.$orderby.replace(optionTypePropertyName,
+                                        `${optionTypePropertyName}/Name`);
+                                }
                             }
                         }
 
                         if (parameterMap.$filter) {
                             _.forEach(itContractRoles,
-                                role => parameterMap.$filter =
+                                (role : any) => parameterMap.$filter =
                                     replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
                             parameterMap.$filter =
                                 replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
                             const lastChangedByUserSearchedProperties = ["Name", "LastName"];
-                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter, //TODO: Consider reuse in the other overviews where we used this trick (it-system and interfaces)
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
                                 "LastChangedByUser/Name",
                                 "LastChangedByUser",
                                 lastChangedByUserSearchedProperties);
 
-                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, //TODO: Might be ok since it is not a choice type but based on actual registrations
-                                "ProcurementPlanYear");
+                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, "ProcurementPlanYear");
 
                             //Option types filter fixes
                             parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
@@ -323,7 +300,7 @@
                             };
 
                             contract.roles = [];
-                            // iterrate each right
+                            // Create columns lookups for all assigned rights
                             _.forEach(contract.Rights,
                                 right => {
                                     // init an role array to hold users assigned to this role
@@ -335,14 +312,12 @@
                                         .push([right.User.Name, right.User.LastName].join(" "));
                                 });
 
-                            //TODO: No need for this as long as the rendering checks it
-                            //if (!contract.Parent) { contract.Parent = { Name: "" } as any; }
-                            //if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" } as any; }
-                            //if (!contract.Supplier) { contract.Supplier = { Name: "" } as any; }
-                            //if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
-                            //if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" } as any; }
-                            //if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
-                            //if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" } as any; }
+                            //Ensure that object, where the data source is nested, are provided. Otherwise pre-render prep will fail in kendo grid's excel export function (even if we override the export)
+                            contract.Parent = contract.Parent ?? { } as any;
+                            contract.ResponsibleOrganizationUnit = contract.ResponsibleOrganizationUnit ?? { } as any;
+                            contract.Supplier = contract.Supplier ?? { } as any;
+                            contract.Reference = contract.Reference ?? {} as any;
+                            contract.LastChangedByUser = contract.LastChangedByUser ?? { Name: "", LastName: "" } as any;
                         });
 
                         return response;
@@ -392,7 +367,6 @@
 
             //TODO: Check column widths
             //TODO: Check alignments
-            //TODO: Check content overflow is set on most columns
 
             launcher = launcher
                 .withColumn(builder =>
@@ -422,12 +396,12 @@
                         .withId("parentName")
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => dataItem.Parent ? Helpers.RenderFieldsHelper.renderInternalReference(
+                        .withRendering(dataItem => dataItem.Parent.Id !== undefined ? Helpers.RenderFieldsHelper.renderInternalReference(
                             "kendo-parent-rendering",
                             "it-contract.edit.main",
                             dataItem.Parent.Id,
                             dataItem.Parent.Name) : "")
-                        .withExcelOutput(dataItem => dataItem.Parent ? Helpers.ExcelExportHelper.renderString(dataItem.Parent.Name) : ""))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Parent.Name)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Name")
@@ -511,6 +485,7 @@
                         .withDataSourceName(this.contractTemplatePropertyName)
                         .withTitle("Kontraktskabelon")
                         .withId("contractTemplate")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -527,6 +502,7 @@
                         .withDataSourceName(this.purchaseFormPropertyName)
                         .withTitle("Indkøbsform")
                         .withId("purchaseForm")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -543,6 +519,7 @@
                         .withDataSourceName(this.procurementStrategyPropertyName)
                         .withTitle("Genanskaffelsesstrategi")
                         .withId("procurementStrategy")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -561,6 +538,7 @@
                         .withDataSourceName(this.procurementPlanYearPropertyName)
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
@@ -576,6 +554,7 @@
                         .withDataSourceName("ProcurementInitiated")
                         .withTitle("Genanskaffelse igangsat")
                         .withId("procurementInitiated")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.yesNoUndecided.options, false),
@@ -591,7 +570,6 @@
             itContractRoles.forEach(role => {
                 const roleColumnId = `itContract${role.Id}`;
                 const roleKey = getRoleKey(role.Id);
-                const numberOfRolesToConcat = 5;
                 launcher = launcher
                     .withColumn(builder =>
                         builder
@@ -601,19 +579,13 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withoutSorting()
                             .withContentOverflow()
-                            .withInitialVisibility(false)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
                                 `kendo-contract-${roleKey}-rendering`,
                                 "it-contract.edit.roles",
                                 dataItem.Id,
-                                //TODO: No just add content overflow - no need for elipsis
-                                Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(dataItem.roles[role.Id],
-                                    numberOfRolesToConcat)))
+                                dataItem.roles[role.Id]?.toString() ?? ""))
                             .withExcelOutput(
-                                //TODO: No just add content overflow - no need for elipsis
-                                dataItem => Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(
-                                    dataItem.roles[role.Id],
-                                    numberOfRolesToConcat)));
+                                dataItem => dataItem.roles[role.Id]?.toString() ?? ""));
             });
 
             launcher = launcher
@@ -709,23 +681,25 @@
                         .withDataSourceName("Reference.Title")
                         .withTitle("Reference")
                         .withId("referenceTitle")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => dataItem.Reference ? Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference) : "")
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference))
                         .withExcelOutput(dataItem => {
                             if (!dataItem.Reference) {
                                 return "";
                             }
-                            return dataItem.Reference.Title;
+                            return dataItem.Reference.Title ?? dataItem.Reference.URL;
                         }))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Reference.ExternalReferenceId")
                         .withTitle("Dokument ID/Sagsnr.")
                         .withId("referenceExternalReferenceId")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => dataItem.Reference ? Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference) : "")
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference))
                         //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => dataItem.Reference ? Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference) : ""))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ExternEconomyStreams.Acquisition")
@@ -782,6 +756,7 @@
                         .withDataSourceName(this.paymentModelPropertyName)
                         .withTitle("Betalingsmodel")
                         .withId("paymentModel")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -798,6 +773,7 @@
                         .withDataSourceName(this.paymentFrequencyPropertyName)
                         .withTitle("Betalingsfrekvens")
                         .withId("paymentFrequency")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -876,6 +852,7 @@
                         .withDataSourceName(this.optionExtendPropertyName)
                         .withTitle("Option")
                         .withId("optionExtend")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -928,6 +905,7 @@
                         .withDataSourceName("LastChangedByUser.Name")
                         .withTitle("Sidst redigeret: Bruger")
                         .withId("lastChangedByUser")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(
                             dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : "")
@@ -960,13 +938,13 @@
                     controllerAs: "contractOverviewVm",
                     resolve: {
                         itContractRoles: [
-                            "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                                localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
+                            "localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
+                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) =>
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
                                 .createContractAuthorization()
                                 .getOverviewAuthorization()
@@ -978,16 +956,16 @@
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
                         ],
                         uiState: [
-                            "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
+                            "uiCustomizationStateService", (uiCustomizationStateService: Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Models.UICustomization.CustomizableKitosModule.ItContract)
                         ],
                         itContractOptions: [
                             "ItContractsService", "user",
-                            (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
+                            (ItContractsService: Services.Contract.IItContractsService, user) =>
                                 ItContractsService.getApplicableItContractOptions(user.currentOrganizationId)
                         ],
                         procurements: [
                             "ItContractsService", "user",
-                            (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
+                            (ItContractsService: Services.Contract.IItContractsService, user) =>
                                 ItContractsService.getAvailableProcurementPlans(user.currentOrganizationId)
                         ]
                     }
