@@ -33,7 +33,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Responsible = MapResponsible(contract),
                 SystemUsages = contract.AssociatedSystemUsages?.Select(x => x.ItSystemUsage?.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
                 DataProcessingRegistrations = contract.DataProcessingRegistrations?.Select(x => x.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
-                HandoverTrials = MapHandoverTrials(contract),
                 PaymentModel = MapPaymentModel(contract),
                 AgreementPeriod = MapAgreementPeriod(contract),
                 Termination = MapTermination(contract),
@@ -117,32 +116,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 PaymentModel = contract.PaymentModel?.MapIdentityNamePairDTO(),
                 PaymentFrequency = contract.PaymentFreqency?.MapIdentityNamePairDTO(),
                 PriceRegulation = contract.PriceRegulation?.MapIdentityNamePairDTO(),
-                PaymentMileStones = contract.PaymentMilestones?.Select(MapPaymentMilestones).ToList() ?? new List<PaymentMileStoneDTO>()
-            };
-        }
-
-        private static PaymentMileStoneDTO MapPaymentMilestones(PaymentMilestone paymentMilestone)
-        {
-            return new ()
-            {
-                Title = paymentMilestone.Title,
-                Approved = paymentMilestone.Approved,
-                Expected = paymentMilestone.Expected
-            };
-        }
-
-        private static List<HandoverTrialResponseDTO> MapHandoverTrials(ItContract contract)
-        {
-            return contract.HandoverTrials?.Select(MapHandoverTrial).ToList() ?? new List<HandoverTrialResponseDTO>();
-        }
-
-        private static HandoverTrialResponseDTO MapHandoverTrial(HandoverTrial handoverTrial)
-        {
-            return new ()
-            {
-                HandoverTrialType = handoverTrial.HandoverTrialType?.MapIdentityNamePairDTO(),
-                ApprovedAt = handoverTrial.Approved,
-                ExpectedAt = handoverTrial.Expected
             };
         }
 

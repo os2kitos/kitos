@@ -636,20 +636,6 @@ namespace Tests.Unit.Core.Model
         }
 
         [Fact]
-        public void Can_ResetPaymentMilestones()
-        {
-            //Arrange
-            var sut = new ItContract();
-            sut.PaymentMilestones.Add(new PaymentMilestone());
-
-            //Act
-            sut.ResetPaymentMilestones();
-
-            //Assert
-            Assert.Empty(sut.PaymentMilestones);
-        }
-
-        [Fact]
         public void Can_ResetNoticePeriod()
         {
             //Arrange

@@ -47,14 +47,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
-        private readonly Mock<IGenericRepository<HandoverTrial>> _handoverTrialRepository;
         private readonly Mock<IReferenceService> _referenceServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _roleAssignmentService;
         private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
-        private readonly Mock<IGenericRepository<PaymentMilestone>> _paymentMilestoneRepository;
 
         public ItContractWriteServiceTest()
         {
@@ -66,15 +64,13 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _databaseControlMock = new Mock<IDatabaseControl>();
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _handoverTrialRepository = new Mock<IGenericRepository<HandoverTrial>>();
             _referenceServiceMock = new Mock<IReferenceService>();
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
-            _paymentMilestoneRepository = new Mock<IGenericRepository<PaymentMilestone>>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object, _dprServiceMock.Object, _paymentMilestoneRepository.Object, Mock.Of<IGenericRepository<EconomyStream>>());
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object, _dprServiceMock.Object, Mock.Of<IGenericRepository<EconomyStream>>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -850,125 +846,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertTransactionCommitted(transaction);
         }
 
-        [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(true, true, false)]
-        [InlineData(true, false, true)]
-        [InlineData(false, true, true)]
-        [InlineData(false, false, false)]
-        public void Can_Create_With_HandoverTrials(bool oneWithBothDates, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
-        {
-            //Arrange
-            var handoverTrialUpdates = CreateHandoverTrialUpdates(oneWithBothDates, oneWithExpectedOnly, oneWithApprovedOnly);
-
-            var handoverTrialTypes = handoverTrialUpdates
-                .Select(x => new HandoverTrialType
-                {
-                    Uuid = x.HandoverTrialTypeUuid
-                }).ToDictionary(x => x.Uuid);
-
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
-            createdContract.HandoverTrials.Add(new HandoverTrial()); //Ensure existing is cleared
-
-            foreach (var handoverTrialType in handoverTrialTypes)
-                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, true));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            Assert.True(result.Ok);
-            var itContract = result.Value;
-            Assert.Equal(handoverTrialTypes.Count, itContract.HandoverTrials.Count);
-            Assert.All(itContract.HandoverTrials, trial => Assert.True(handoverTrialTypes.ContainsKey(trial.HandoverTrialType.Uuid)));
-            AssertTransactionCommitted(transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_HandoverTrials_If_Option_Is_Not_Available()
-        {
-            //Arrange
-            var handoverTrialUpdates = CreateHandoverTrialUpdates(true, true, true);
-
-            var handoverTrialTypes = handoverTrialUpdates
-                .Select(x => new HandoverTrialType
-                {
-                    Uuid = x.HandoverTrialTypeUuid
-                }).ToDictionary(x => x.Uuid);
-
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
-
-            var failingTypeUuid = handoverTrialTypes.RandomItem().Key;
-            foreach (var handoverTrialType in handoverTrialTypes)
-                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, handoverTrialType.Key != failingTypeUuid));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result, $"Cannot take new handover trial ({failingTypeUuid}) into use which is not available in the organization", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_HandoverTrials_If_Option_Cannot_Be_Resolved()
-        {
-            //Arrange
-            var handoverTrialUpdates = CreateHandoverTrialUpdates(true, true, true);
-
-            var handoverTrialTypes = handoverTrialUpdates
-                .Select(x => new HandoverTrialType
-                {
-                    Uuid = x.HandoverTrialTypeUuid
-                }).ToDictionary(x => x.Uuid);
-
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
-
-            var failingTypeUuid = handoverTrialTypes.RandomItem().Key;
-            var error = A<OperationError>();
-            foreach (var handoverTrialType in handoverTrialTypes)
-            {
-                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, handoverTrialType.Key == failingTypeUuid ? error : (handoverTrialType.Value, true));
-            }
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result, $"Failed to fetch option with uuid:{failingTypeUuid}. Message:{error.Message.GetValueOrEmptyString()}", error.FailureType, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_HandoverTrials_If_At_Least_One_Date_Is_Not_Provided()
-        {
-            //Arrange
-            var handoverTrialUpdates = new[] { new ItContractHandoverTrialUpdate() { HandoverTrialTypeUuid = A<Guid>() } };
-
-            var handoverTrialTypes = handoverTrialUpdates
-                .Select(x => new HandoverTrialType
-                {
-                    Uuid = x.HandoverTrialTypeUuid
-                }).ToDictionary(x => x.Uuid);
-
-            var (organizationUuid, parameters, createdContract, transaction) =
-                SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
-            createdContract.HandoverTrials.Add(new HandoverTrial()); //Ensure existing is cleared
-
-            foreach (var handoverTrialType in handoverTrialTypes)
-                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid,
-                    handoverTrialType.Key, (handoverTrialType.Value, true));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result,
-                "Failed adding handover trial:Error: expected and approved cannot both be null",
-                OperationFailure.BadInput, transaction);
-        }
-
         [Fact]
         public void Can_Create_With_ExternalReferences()
         {
@@ -1054,17 +931,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(true, true, false)]
-        [InlineData(true, false, true)]
-        [InlineData(false, true, true)]
-        [InlineData(true, false, false)]
-        [InlineData(false, true, false)]
-        public void Can_Create_With_PaymentModel(bool withExpected, bool withApproved, bool withValues)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_PaymentModel(bool withValues)
         {
             //Arrange
-            var milestone = CreatePaymentMilestone(withExpected, withApproved);
-            var paymentModel = CreatePaymentModel(milestone, withValues);
+            var paymentModel = CreatePaymentModel(withValues);
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(paymentModel: paymentModel);
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PaymentFreqencyType>(createdContract, paymentModel.PaymentFrequencyUuid.NewValue, Maybe<OperationError>.None);
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PaymentModelType>(createdContract, paymentModel.PaymentModelUuid.NewValue, Maybe<OperationError>.None);
@@ -1134,43 +1006,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             AssertFailureWithKnownError(result, operationError, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_PaymentModel_If_PaymentMilestones_Does_Not_Have_Either_Date_Set()
-        {
-            //Arrange
-            var milestone = CreatePaymentMilestone(false, false);
-            var paymentModel = new ItContractPaymentModelModificationParameters()
-            {
-                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }.AsEnumerable().FromNullable().AsChangedValue()
-            };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(paymentModel: paymentModel);
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "Failed adding payment milestone: Error: expected and approved cannot both be null", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_PaymentModel_If_PaymentMilestones_Has_Empty_Title()
-        {
-            //Arrange
-            var milestone = CreatePaymentMilestone(false, false);
-            milestone.Title = string.Empty;
-            var paymentModel = new ItContractPaymentModelModificationParameters()
-            {
-                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }.AsEnumerable().FromNullable().AsChangedValue()
-            };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(paymentModel: paymentModel);
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "Failed adding payment milestone: Error: title cannot be empty", OperationFailure.BadInput, transaction);
         }
 
         [Theory]
@@ -1477,20 +1312,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Data processing registration setup
             ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, parameters.DataProcessingRegistrationUuids, Maybe<OperationError>.None);
-
-            //Handover trials
-            var handoverTrialUpdates = CreateHandoverTrialUpdates(true, true, true);
-
-            var handoverTrialTypes = handoverTrialUpdates
-                .Select(x => new HandoverTrialType
-                {
-                    Uuid = x.HandoverTrialTypeUuid
-                }).ToDictionary(x => x.Uuid);
-            parameters.HandoverTrials = handoverTrialUpdates;
-
-            foreach (var handoverTrialType in handoverTrialTypes)
-                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, true));
-
+            
             //External references setup
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
             parameters.ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>();
@@ -1500,8 +1322,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectBatchUpdateRoleAssignmentsReturn(createdContract, parameters.Roles.Value.ToList(), Maybe<OperationError>.None);
             
             //Payment model setup
-            var milestone = CreatePaymentMilestone(true, true);
-            var paymentModel = CreatePaymentModel(milestone, true);
+            var paymentModel = CreatePaymentModel(true);
             parameters.PaymentModel = paymentModel;
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PaymentFreqencyType>(createdContract, paymentModel.PaymentFrequencyUuid.NewValue, Maybe<OperationError>.None);
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PaymentModelType>(createdContract, paymentModel.PaymentModelUuid.NewValue, Maybe<OperationError>.None);
@@ -1575,11 +1396,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.Equal(parameters.Supplier.Value.Signed.NewValue, contract.HasSupplierSigned);
             Assert.Equal(parameters.Supplier.Value.SignedAt.NewValue?.Date, contract.SupplierSignedDate);
             Assert.Equal(parameters.Supplier.Value.SignedBy.NewValue, contract.SupplierContractSigner);
-
-            //Handover trials
-            Assert.Equal(handoverTrialTypes.Count, contract.HandoverTrials.Count);
-            Assert.All(contract.HandoverTrials, trial => Assert.True(handoverTrialTypes.ContainsKey(trial.HandoverTrialType.Uuid)));
-
+            
             AssertPaymentModel(paymentModel, contract, true);
 
             //Agreement period
@@ -1624,42 +1441,16 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private static void AssertPaymentModel(ItContractPaymentModelModificationParameters expected, ItContract actual, bool hasValues)
         {
             Assert.Equal(expected.OperationsRemunerationStartedAt.NewValue.Match<DateTime?>(date => date.Date, () => null), actual.OperationRemunerationBegun?.Date);
-            AssertPaymentMilestones(expected.PaymentMileStones.NewValue.Value, actual.PaymentMilestones);
         }
 
-        private static void AssertPaymentMilestones(IEnumerable<ItContractPaymentMilestone> expected, IEnumerable<PaymentMilestone> actual)
-        {
-            var orderedExpected = expected.OrderBy(x => x.Title).ToList();
-            var orderedActual = actual.OrderBy(x => x.Title).ToList();
-            Assert.Equal(orderedExpected.Count, orderedActual.Count);
-
-            for (var i = 0; i < orderedExpected.Count; i++)
-            {
-                Assert.Equal(orderedExpected[i].Title, orderedActual[i].Title);
-                Assert.Equal(orderedExpected[i].Expected?.Date, orderedActual[i].Expected?.Date);
-                Assert.Equal(orderedExpected[i].Approved?.Date, orderedActual[i].Approved?.Date);
-            }
-        }
-
-        private ItContractPaymentModelModificationParameters CreatePaymentModel(ItContractPaymentMilestone milestone, bool withValues)
+        private ItContractPaymentModelModificationParameters CreatePaymentModel(bool withValues)
         {
             return new()
             {
                 OperationsRemunerationStartedAt = (withValues ? A<DateTime>().FromNullable() : Maybe<DateTime>.None).AsChangedValue(),
                 PaymentModelUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
                 PaymentFrequencyUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
-                PriceRegulationUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
-                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }.AsEnumerable().FromNullable().AsChangedValue()
-            };
-        }
-
-        private ItContractPaymentMilestone CreatePaymentMilestone(bool withExpected, bool withApproved)
-        {
-            return new()
-            {
-                Title = A<string>(),
-                Approved = withApproved ? A<DateTime>() : null,
-                Expected = withExpected ? A<DateTime>() : null
+                PriceRegulationUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue()
             };
         }
 
@@ -1751,18 +1542,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _optionResolverMock.Setup(x => x.GetOptionType<ItContract, TOption>(organizationUuid, optionTypeUuid.Value)).Returns(result);
         }
 
-        private void ExpectGetOptionTypeReturnsIfInputIdIsDefined<TReference, TOption>(Guid organizationUuid, Guid? optionTypeUuid, Result<(TOption, bool), OperationError> result) where TOption : OptionEntity<TReference>
-        {
-            if (optionTypeUuid.HasValue)
-                _optionResolverMock.Setup(x => x.GetOptionType<TReference, TOption>(organizationUuid, optionTypeUuid.Value)).Returns(result);
-        }
-
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             Guid? parentUuid = null,
             ItContractProcurementModificationParameters procurement = null,
             ItContractResponsibleDataModificationParameters responsible = null,
             ItContractSupplierModificationParameters supplier = null,
-            IEnumerable<ItContractHandoverTrialUpdate> handoverTrialUpdates = null,
             IEnumerable<UpdatedExternalReferenceProperties> externalReferences = null,
             IEnumerable<Guid> systemUsageUuids = null,
             IEnumerable<UserRolePair> roleAssignments = null,
@@ -1784,7 +1568,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 Procurement = procurement.FromNullable(),
                 Responsible = responsible.FromNullable(),
                 Supplier = supplier.FromNullable(),
-                HandoverTrials = handoverTrialUpdates.FromNullable(),
                 ExternalReferences = externalReferences.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 Roles = roleAssignments.FromNullable(),
@@ -1805,26 +1588,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organization.Uuid, createdContract.OrganizationId);
             ExpectCreateReturns(createdContract.OrganizationId, parameters.Name.NewValue, createdContract);
             return (organization.Uuid, parameters, createdContract, transaction);
-        }
-
-        private List<ItContractHandoverTrialUpdate> CreateHandoverTrialUpdates(bool withBothDates, bool withExpectedOnly, bool withApprovedOnly)
-        {
-            var handoverTrialUpdates = new List<ItContractHandoverTrialUpdate>();
-
-            if (withBothDates) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(true, true));
-            if (withExpectedOnly) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(true, false));
-            if (withApprovedOnly) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(false, true));
-            return handoverTrialUpdates;
-        }
-
-        private ItContractHandoverTrialUpdate CreateHandoverTrialUpdate(bool withExpected, bool withApproved)
-        {
-            return new ItContractHandoverTrialUpdate()
-            {
-                HandoverTrialTypeUuid = A<Guid>(),
-                ApprovedAt = withApproved ? A<DateTime>() : null,
-                ExpectedAt = withExpected ? A<DateTime>() : null
-            };
         }
 
         private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, Guid? criticalityTypeUuid, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(

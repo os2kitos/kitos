@@ -403,7 +403,6 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractProcurementStrategyV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementExtensionOptionsTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractNoticePeriodMonthTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractHandoverTrialTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPurchaseTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTemplateTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
@@ -475,7 +474,6 @@
     <Compile Include="Models\API\V2\Request\Contract\ContractWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\CreateNewContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractProcurementDataWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\Contract\HandoverTrialRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
@@ -484,12 +482,10 @@
     <Compile Include="Models\API\V2\Request\Interface\IRightsHolderWritableItInterfacePropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\RightsHolderPartialUpdateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\PaymentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Tracking\TrackingEventResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\PaymentAuditStatus.cs" />
-    <Compile Include="Models\API\V2\Types\Contract\PaymentMileStoneDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\ProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Validity\ValidityWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
@@ -879,7 +875,6 @@
     <Compile Include="Controllers\API\V1\ItInterfaceController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\V1\ItProjectStatusController.cs" />
-    <Compile Include="Controllers\API\V1\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\V1\GenericHierarchyApiController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationRightController.cs" />
     <Compile Include="Controllers\API\V1\DataRowController.cs" />
@@ -920,7 +915,6 @@
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalDataTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalFrequencyTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalGoalTypesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalHandoverTrialTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalInterfaceTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalItContractRolesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalItContractTemplateTypesController.cs" />
@@ -948,7 +942,6 @@
     <Compile Include="Controllers\API\V1\OData\OptionControllers\DataTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\FrequencyTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\GoalTypesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\OptionControllers\HandoverTrialTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\InterfaceTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\ItContractRolesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\ItContractTemplateTypesController.cs" />
@@ -1000,18 +993,15 @@
     <Compile Include="Models\API\V1\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\API\V1\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
-    <Compile Include="Models\API\V1\HandoverTrialDTO.cs" />
     <Compile Include="Models\API\V1\ItInterfaceDTO.cs" />
     <Compile Include="Models\API\V1\ItInterfaceExhibitDTO.cs" />
     <Compile Include="Models\API\V1\ItProjectPhaseDTO.cs" />
     <Compile Include="Models\API\V1\ItProjectStatusDTO.cs" />
     <Compile Include="Models\API\V1\ExcelImportErrorDTO.cs" />
     <Compile Include="Models\API\V1\PagingModel.cs" />
-    <Compile Include="Controllers\API\V1\PaymentMilestoneController.cs" />
     <Compile Include="Models\API\V1\ItContractSystemDTO.cs" />
     <Compile Include="Models\API\V1\ItProjectSimpleDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemSimpleDTO.cs" />
-    <Compile Include="Models\API\V1\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\V1\EconomyStreamController.cs" />
     <Compile Include="Models\API\V1\EconomyStreamDTO.cs" />
     <Compile Include="Controllers\API\V1\ItContractController.cs" />
@@ -1502,8 +1492,6 @@
     <TypeScriptCompile Include="app\models\config.ts" />
     <TypeScriptCompile Include="app\models\entity.ts" />
     <TypeScriptCompile Include="app\models\it-contract\advice.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\handover-trial.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\payment-milestone.ts" />
     <TypeScriptCompile Include="app\models\it-project\communication.ts" />
     <TypeScriptCompile Include="app\models\it-project\economy-year.ts" />
     <TypeScriptCompile Include="app\models\it-project\goal-status.ts" />

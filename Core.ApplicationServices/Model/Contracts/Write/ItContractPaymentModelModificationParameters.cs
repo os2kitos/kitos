@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 
@@ -11,6 +10,5 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public OptionalValueChange<Guid?> PaymentFrequencyUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<Guid?> PaymentModelUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<Guid?> PriceRegulationUuid { get; set; } = OptionalValueChange<Guid?>.None;
-        public OptionalValueChange<Maybe<IEnumerable<ItContractPaymentMilestone>>> PaymentMileStones { get; set; } = OptionalValueChange<Maybe<IEnumerable<ItContractPaymentMilestone>>>.None;
     }
 }

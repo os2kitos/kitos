@@ -28,13 +28,11 @@ namespace Core.DomainModel.ItContract
             Children = new List<ItContract>();
             AssociatedAgreementElementTypes = new List<ItContractAgreementElementTypes>();
             AssociatedSystemUsages = new List<ItContractItSystemUsage>();
-            PaymentMilestones = new List<PaymentMilestone>();
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
             UserNotifications = new List<UserNotification>();
-            HandoverTrials = new List<HandoverTrial>();
             Uuid = Guid.NewGuid();
             MarkAsDirty();
         }
@@ -427,25 +425,9 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual TerminationDeadlineType TerminationDeadline { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the payment milestones.
-        /// </summary>
-        /// <value>
-        ///     The payment milestones.
-        /// </value>
-        public virtual ICollection<PaymentMilestone> PaymentMilestones { get; set; }
-
         public int? OptionExtendId { get; set; }
         public virtual OptionExtendType OptionExtend { get; set; }
         public int ExtendMultiplier { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the handover trials.
-        /// </summary>
-        /// <value>
-        ///     The handover trials.
-        /// </value>
-        public virtual ICollection<HandoverTrial> HandoverTrials { get; set; }
 
         /// <summary>
         ///
@@ -763,29 +745,6 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
-        public void ResetHandoverTrials()
-        {
-            HandoverTrials.Clear();
-        }
-
-        public Maybe<OperationError> AddHandoverTrial(HandoverTrialType trialType, DateTime? expected, DateTime? approved)
-        {
-            if (trialType == null)
-                throw new ArgumentNullException(nameof(trialType));
-
-            if (expected.HasValue == false && approved.HasValue == false)
-                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
-
-            HandoverTrials.Add(new HandoverTrial()
-            {
-                Approved = approved?.Date,
-                Expected = expected?.Date,
-                ItContract = this,
-                HandoverTrialType = trialType
-            });
-            return Maybe<OperationError>.None;
-        }
-
         public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
         {
             if (extendMultiplier < 0)
@@ -837,30 +796,6 @@ namespace Core.DomainModel.ItContract
         {
             PriceRegulation.Track();
             PriceRegulation = null;
-        }
-
-        public void ResetPaymentMilestones()
-        {
-            PaymentMilestones.Track();
-            PaymentMilestones.Clear();
-        }
-
-        public Maybe<OperationError> AddPaymentMilestone(string title, DateTime? expected, DateTime? approved)
-        {
-            if (string.IsNullOrEmpty(title))
-                return new OperationError("Error: title cannot be empty", OperationFailure.BadInput);
-
-            if (expected.HasValue == false && approved.HasValue == false)
-                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
-
-            PaymentMilestones.Add(new PaymentMilestone()
-            {
-                Title = title,
-                Expected = expected?.Date,
-                Approved = approved?.Date
-            });
-
-            return Maybe<OperationError>.None;
         }
 
         public void ResetInternalEconomyStreams()
