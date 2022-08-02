@@ -537,15 +537,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
         private static void AssertUserCount(ItSystemUsage itSystemUsage, ExpectedUsersIntervalDTO generalNumberOfExpectedUsers)
         {
-            (int? from, int? to) expected = itSystemUsage.UserCount switch
+            if (itSystemUsage.UserCount is UserCount.UNDECIDED or null)
             {
-                UserCount.BELOWTEN => (0, 9),
-                UserCount.TENTOFIFTY => (10, 50),
-                UserCount.FIFTYTOHUNDRED => (50, 100),
-                UserCount.HUNDREDPLUS => (100, null),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-            Assert.Equal(expected, (generalNumberOfExpectedUsers.LowerBound, generalNumberOfExpectedUsers.UpperBound));
+                Assert.Null(generalNumberOfExpectedUsers);
+            }
+            else
+            {
+                (int from, int? to) expected = itSystemUsage.UserCount switch
+                {
+                    UserCount.BELOWTEN => (0, 9),
+                    UserCount.TENTOFIFTY => (10, 50),
+                    UserCount.FIFTYTOHUNDRED => (50, 100),
+                    UserCount.HUNDREDPLUS => (100, null),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                Assert.Equal(expected, (generalNumberOfExpectedUsers.LowerBound, generalNumberOfExpectedUsers.UpperBound));
+            }
         }
 
         private static void AssertYesNoExtended(YesNoDontKnowChoice? actual, DataOptions? expectedFromSource)

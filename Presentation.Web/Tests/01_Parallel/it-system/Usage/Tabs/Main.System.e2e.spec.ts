@@ -9,7 +9,8 @@ import ItSystemUsageCommon = require("../../../../PageObjects/it-system/Usage/Ta
 describe("User is able to view local it system main page information",
     () => {
         const userCountInputs = {
-            Undecided: { text: "" },
+            DefaultNull: { text: "" },
+            Undecided: { text: " " },
             TenToFifty: { text: "10-50" }
         };
 
@@ -60,7 +61,7 @@ describe("User is able to view local it system main page information",
             () => {
                 loginHelper.loginAsGlobalAdmin()
                     .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
-                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.Undecided.text))
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.DefaultNull.text))
                     .then(() => ItSystemUsageHelper.selectUserCount(userCountInputs.TenToFifty.text))
                     .then(() => browser.refresh())
                     .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.TenToFifty.text))
