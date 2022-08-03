@@ -17,6 +17,10 @@
         private readonly optionExtendPropertyName = "OptionExtend";
         private readonly terminationDeadlinePropertyName = "TerminationDeadline";
         private readonly procurementPlanYearPropertyName = "ProcurementPlanYear";
+        private readonly associatedSystemUsagesPropertyName: "AssociatedSystemUsages";
+        private readonly lastChangedByUserPropertyName: "LastChangedByUser";
+        private readonly dataProcessingRegistrationsPropertyName: "DataProcessingRegistrations";
+
         private readonly orgUnitStorageKey = "it-contract-full-overview-orgunit";
 
         private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
@@ -187,6 +191,7 @@
                         var orgUnitId = $window.sessionStorage.getItem(this.orgUnitStorageKey);
                         var query = `/odata/Organizations(${user.currentOrganizationId})/`;
 
+                        //TODO: Check if this filter is even active and if the combo box exists
                         // if orgunit is set then the org unit filter is active
                         if (orgUnitId === null) {
                             return `${query}ItContracts${urlParameters}`;
@@ -230,15 +235,15 @@
                                     replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
                             parameterMap.$filter =
-                                replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages"); //TODO: Duplicated string
+                                replaceSystemFilter(parameterMap.$filter, this.associatedSystemUsagesPropertyName);
 
-                            const lastChangedByUserSearchedProperties = ["Name", "LastName"];//TODO: Duplicated string
+                            const lastChangedByUserSearchedProperties = ["Name", "LastName"];
                             parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
-                                "LastChangedByUser/Name",
-                                "LastChangedByUser",//TODO: Duplicated string
+                                `${this.lastChangedByUserPropertyName}/Name`,
+                                this.lastChangedByUserPropertyName,
                                 lastChangedByUserSearchedProperties);
 
-                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, "ProcurementPlanYear");//TODO: Duplicated string
+                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, this.procurementPlanYearPropertyName);
 
                             //Option types filter fixes
                             parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
@@ -252,7 +257,7 @@
                             parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.terminationDeadlinePropertyName);
 
                             //DPR filter fix
-                            parameterMap.$filter = replaceDprFilter(parameterMap.$filter, "DataProcessingRegistrations");
+                            parameterMap.$filter = replaceDprFilter(parameterMap.$filter, this.dataProcessingRegistrationsPropertyName);
                         }
 
                         return parameterMap;
@@ -547,7 +552,7 @@
             launcher = launcher
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("DataProcessingRegistrations")
+                        .withDataSourceName(this.dataProcessingRegistrationsPropertyName)
                         .withTitle("Databehandleraftale")
                         .withId("dataProcessingRegistrations")
                         .withoutSorting()
@@ -588,7 +593,7 @@
                         }))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("AssociatedSystemUsages")
+                        .withDataSourceName(this.associatedSystemUsagesPropertyName)
                         .withTitle("IT Systemer")
                         .withId("associatedSystemUsages")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
@@ -807,7 +812,7 @@
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated)))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("LastChangedByUser.Name")
+                        .withDataSourceName(`${this.lastChangedByUserPropertyName}.Name`)
                         .withTitle("Sidst redigeret: Bruger")
                         .withId("lastChangedByUser")
                         .withContentOverflow()
