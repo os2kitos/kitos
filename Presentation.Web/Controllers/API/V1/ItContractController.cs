@@ -370,15 +370,15 @@ namespace Presentation.Web.Controllers.API.V1
 
         [InternalApi]
         [HttpGet]
-        [Route("available-procurements/{organizationId}")]
+        [Route("applied-procurement-plans/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableProcurements(int organizationId)
+        public HttpResponseMessage GetAppliedProcurements(int organizationId)
         {
             var result = _itContractService
-                .GetAvailableProcurementPlans(organizationId)
+                .GetAppliedProcurementPlans(organizationId)
                 .Select(ToProcurementPlanDTO)
                 .ToList();
             return Ok(result);

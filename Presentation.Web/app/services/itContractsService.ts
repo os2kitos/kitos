@@ -76,7 +76,7 @@
 
         getAvailableProcurementPlans(organizationId: number): angular.IPromise<Models.ItContract.IContractProcurementPlanDTO[]> {
             return this.$http
-                .get<API.Models.IApiWrapper<any>>(`api/itcontract/available-procurements/${organizationId}`)
+                .get<API.Models.IApiWrapper<any>>(`api/itcontract/applied-procurement-plans/${organizationId}`)
                 .then(
                     result => {
                         var response = result.data as { response: Models.ItContract.IContractProcurementPlanDTO[] }

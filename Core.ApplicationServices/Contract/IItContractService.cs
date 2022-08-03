@@ -25,6 +25,6 @@ namespace Core.ApplicationServices.Contract
         Maybe<OperationError> ValidateNewName(int contractId, string name);
         IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions);
         Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId);
-        IEnumerable<(int year, int quarter)> GetAvailableProcurementPlans(int organizationId);
+        IEnumerable<(int year, int quarter)> GetAppliedProcurementPlans(int organizationId);
     }
 }

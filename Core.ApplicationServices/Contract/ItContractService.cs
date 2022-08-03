@@ -263,7 +263,7 @@ namespace Core.ApplicationServices.Contract
                     _terminationDeadlineOptionsService.GetAllOptionsDetails(organizationId)));
         }
 
-        public IEnumerable<(int year, int quarter)> GetAvailableProcurementPlans(int organizationId)
+        public IEnumerable<(int year, int quarter)> GetAppliedProcurementPlans(int organizationId)
         {
             var contracts = GetAllByOrganization(organizationId);
 

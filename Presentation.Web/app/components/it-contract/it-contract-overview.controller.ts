@@ -35,7 +35,6 @@
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$window",
             "$state",
             "_",
             "user",
@@ -56,7 +55,6 @@
         constructor(
             $rootScope: IRootScope,
             $scope: ng.IScope,
-            $window: ng.IWindowService,
             $state: ng.ui.IStateService,
             _: ILoDashWithMixins,
             user,
@@ -458,7 +456,7 @@
                         .withContentOverflow()
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.criticalityOptionViewModel.options,
+                                this.criticalityOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => dataItem.Criticality ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id)) : ""))
@@ -506,7 +504,7 @@
                         .withId("contractType")
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.contractTypeOptionViewModel.options, true), false)
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.contractTypeOptionViewModel.enabledOptions, true), false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
                 .withColumn(builder =>
                     builder
@@ -517,7 +515,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.contractTemplateOptionViewModel.options,
+                                this.contractTemplateOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id))))
@@ -530,7 +528,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.purchaseFormOptionViewModel.options,
+                                this.purchaseFormOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id))))
@@ -544,7 +542,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.procurementStrategyOptionViewModel.options,
+                                this.procurementStrategyOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.procurementStrategyOptionViewModel.getOptionText(dataItem.ProcurementStrategy?.Id))))
@@ -745,7 +743,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.paymentModelOptionViewModel.options,
+                                this.paymentModelOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => dataItem.PaymentModel ? Helpers.RenderFieldsHelper.renderString(this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)) : ""))
@@ -758,7 +756,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.paymentFrequencyOptionViewModel.options,
+                                this.paymentFrequencyOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
@@ -828,7 +826,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.optionExtendOptionViewModel.options,
+                                this.optionExtendOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => dataItem.OptionExtend ? Helpers.RenderFieldsHelper.renderString(this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)) : ""))
@@ -842,7 +840,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.terminationDeadlineOptionViewModel.options,
+                                this.terminationDeadlineOptionViewModel.enabledOptions,
                                 true),
                             false)
                         .withRendering(dataItem => dataItem.TerminationDeadline ? Helpers.RenderFieldsHelper.renderString(this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)) : ""))
