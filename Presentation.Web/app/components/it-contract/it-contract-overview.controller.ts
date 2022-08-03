@@ -68,12 +68,11 @@
             procurements: Models.ItContract.IContractProcurementPlanDTO[]) {
             $rootScope.page.title = "IT Kontrakt";
 
-            //TODO: Reuse the rendering here
             $scope.procurements = procurements.map(value => {
                 return {
                     textValue: this.renderProcurementPlan(value.procurementPlanYear, value.procurementPlanQuarter),
-                    remoteValue: this.renderProcurementPlan(value.procurementPlanYear, value.procurementPlanQuarter)
-                }
+                    remoteValue: value.procurementPlanYear + "_" + value.procurementPlanQuarter
+                };
             });
             $scope.procurements.push({
                 textValue: " ",
@@ -137,30 +136,13 @@
             }
 
             const replaceProcurementFilter = (filterUrl: string, column: string) => {
-                const pattern = new RegExp(`${column} eq \'([a-zA-Z0-9 |-]+)\'`, "i");
+                const pattern = new RegExp(`${column} eq \'([0-9]+)_([0-9]+)\'`, "i");
                 const matchingFilterPart = pattern.exec(filterUrl);
-                if (matchingFilterPart?.length !== 2) {
+                if (matchingFilterPart?.length !== 3) {
                     return filterUrl;
                 }
-                const userFilterQueryElements = matchingFilterPart[1].replace(",'", "").replace(",", "").replace(/\)$/, "").replace(/'$/, "").replace(" |", "").replace("Q", "").split(" ");
 
-                var result = "(";
-                //TODO: there should be only two components one being the year and one being the quarter so this will give incorrect results
-                userFilterQueryElements.forEach((filterValue, i) => {
-                    var value = filterValue;
-                    if (value === "-1")
-                        value = "null";
-
-                    //TODO: Looks incorrect since it checks the same value which should not be the case
-                    result += `(ProcurementPlanYear eq ${value} or ProcurementPlanQuarter eq ${value})`;
-                    if (i < userFilterQueryElements.length - 1) {
-                        result += " and ";
-                    } else {
-                        result += ")";
-                    }
-                });
-
-                filterUrl = filterUrl.replace(pattern, result);
+                filterUrl = filterUrl.replace(pattern, `(ProcurementPlanYear eq ${matchingFilterPart[1]} and ProcurementPlanQuarter eq ${matchingFilterPart[2]})`);
                 return filterUrl;
             }
 
@@ -384,8 +366,6 @@
                         .withId("isActive")
                         .withRendering(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke Gyldig")
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        //TODO: double check if std template is used if no excel is defined! - will simplify matters
-                        .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke Gyldig")
                         .withoutSorting())
                 .withColumn(builder =>
                     builder
