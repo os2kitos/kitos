@@ -106,16 +106,16 @@
                 return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
             }
 
-            //TODO: Consider possible reuse in other overviews?
             const replaceOptionTypeFilter = (filterUrl: string, column: string) => {
-                const pattern = new RegExp(`(${column}( eq )\'([0-9]+)\')`, "i");
+                const pattern = new RegExp(`(${column}( eq )\'([0-9a-zA-Z]+)\')`, "i");
                 const matchingFilterParts = pattern.exec(filterUrl);
                 if (matchingFilterParts?.length !== 4)
                     return filterUrl;
 
                 var searchedValue = matchingFilterParts[3];
-                if (searchedValue.indexOf("0") !== -1) {
-                    searchedValue = searchedValue.replace("0", "null");
+                const emptyOptionId = Helpers.KendoOverviewHelper.emptyOptionId.toString();
+                if (searchedValue.indexOf(emptyOptionId) !== -1) {
+                    searchedValue = searchedValue.replace(emptyOptionId, "null");
                 }
                 return filterUrl.replace(pattern, `${column}/Id$2${searchedValue}`);
             }
@@ -392,7 +392,7 @@
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Name")
-                        .withTitle("It Kontrakt")
+                        .withTitle("IT Kontrakt")
                         .withId("contractName")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
