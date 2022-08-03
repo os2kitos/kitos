@@ -161,7 +161,7 @@
                     .withGridBinding(this)
                     .withUser(user)
                     .withEntityTypeName("IT Kontrakt")
-                    .withExcelOutputName("IT Kontrakt")
+                    .withExcelOutputName("IT Kontrakt Overblik")
                     .withStorageKey("it-contract-full-overview-options")
                     .withUrlFactory(() => {
                         var urlParameters =
