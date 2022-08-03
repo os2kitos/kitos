@@ -655,7 +655,7 @@
                                     `kendo-contract-system-usages-${system.ItSystemUsageId}`,
                                     "it-system.usage.main",
                                     system.ItSystemUsageId,
-                                    system.ItSystemUsage.ItSystem.Name)); //TODO: We must add the ikke aktive suffix if main system is inactive
+                                    Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Name, system.ItSystemUsage.ItSystem.Disabled)));
 
                             });
                             return activeSystemUsages.toString();
@@ -663,7 +663,7 @@
                         .withExcelOutput(dataItem => {
                             var systemUsages = [];
                             dataItem.AssociatedSystemUsages.forEach(system => {
-                                systemUsages.push(system.ItSystemUsage.ItSystem.Name);//TODO: We must add the ikke aktive suffix if main system is inactive
+                                systemUsages.push(Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Name, system.ItSystemUsage.ItSystem.Disabled));
                             });
                             return systemUsages.toString();
                         }))
