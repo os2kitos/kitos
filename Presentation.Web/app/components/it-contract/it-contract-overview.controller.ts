@@ -541,7 +541,7 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
                                 this.procurementStrategyOptionViewModel.enabledOptions,
                                 true),
                             false)
