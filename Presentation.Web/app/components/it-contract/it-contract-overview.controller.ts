@@ -555,7 +555,7 @@
                         .withFixedValueRange(
                             [
                                 Models.Api.Shared.YesNoIrrelevantOption.YES,
-                                Models.Api.Shared.YesNoIrrelevantOption.NO //TODO: Check if it is fixed in the query since it will cover multiple case
+                                Models.Api.Shared.YesNoIrrelevantOption.NO
                             ].map(value => {
                                 return {
                                     textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
