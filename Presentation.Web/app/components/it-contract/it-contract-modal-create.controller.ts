@@ -4,20 +4,23 @@
     export class CreateItContractController {
         static $inject: Array<string> = [
             "user",
-            "$http",
             "$scope",
             "notify",
             "$state",
-            "$uibModalInstance"
+            "$uibModalInstance",
+            "genericApiWrapper"
         ];
+
+        //Used to continously check that name is unique
+        checkAvailbleUrl = "api/itcontract/";
 
         constructor(
             private readonly user: Services.IUser,
-            private readonly $http: ng.IHttpService,
             private readonly $scope,
             private readonly notify,
             private readonly $state: angular.ui.IStateService,
-            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
+            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+            private readonly genericApiWrapper: Services.Generic.ApiWrapper) {
         }
 
         readonly type: string = "IT Kontrakt";
@@ -28,18 +31,14 @@
 
             var msg = this.notify.addInfoMessage('Opretter kontrakt...', false);
 
-            return this.$http.post(`api/itcontract?organizationId=${organizationId}`,
-                { organizationId: organizationId, name: name })
-                .then
-                (
+            return this.genericApiWrapper.post<any>(`api/itcontract?organizationId=${organizationId}`, { organizationId: organizationId, name: name })
+                .then(
                     (createdResponse: any) => {
                         msg.toSuccessMessage("En ny kontrakt er oprettet!");
                         return createdResponse;
                     },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
-                        //TODO: check if the error messages are valid
-                        //TODO: Not valid unless we use the api wrapper!!
                             case Models.Api.ApiResponseErrorCategory.BadInput:
                                 msg.toErrorMessage("Fejl! Navnet er ugyldigt!");
                                 break;
@@ -64,9 +63,9 @@
         private popState(reload = false) {
             const popped = this.$state.go("^");
             if (reload) {
-                popped.then(() => this.$state.reload());
+                return popped.then(() => this.$state.reload());
             }
-
+            return popped;
         }
 
         save(): void {
@@ -83,10 +82,10 @@
             this.createNew()
                 .then(result => {
                     if (result) {
+                        const contract = result;
                         this.close();
-                        this.popState();
-                        const contract = result.data.response;
-                        this.$state.go("it-contract.edit.main", { id: contract.id });
+                        this.popState(false)
+                            .then(() => this.$state.go("it-contract.edit.main", { id: contract.id }));
                     }
                 });
         }
