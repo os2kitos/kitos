@@ -17,9 +17,9 @@
         private readonly optionExtendPropertyName = "OptionExtend";
         private readonly terminationDeadlinePropertyName = "TerminationDeadline";
         private readonly procurementPlanYearPropertyName = "ProcurementPlanYear";
-        private readonly associatedSystemUsagesPropertyName: "AssociatedSystemUsages";
-        private readonly lastChangedByUserPropertyName: "LastChangedByUser";
-        private readonly dataProcessingRegistrationsPropertyName: "DataProcessingRegistrations";
+        private readonly associatedSystemUsagesPropertyName = "AssociatedSystemUsages";
+        private readonly lastChangedByUserPropertyName = "LastChangedByUser";
+        private readonly dataProcessingRegistrationsPropertyName = "DataProcessingRegistrations";
 
         private readonly orgUnitStorageKey = "it-contract-full-overview-orgunit";
 
@@ -72,16 +72,21 @@
             procurements: Models.ItContract.IContractProcurementPlanDTO[]) {
             $rootScope.page.title = "IT Kontrakt";
 
-            $scope.procurements = procurements.map(value => {
+            const procurementOptions = [{
+                textValue: " ",
+                remoteValue: Helpers.KendoOverviewHelper.emptyOptionId.toString()
+            }];
+
+            procurements.map(value => {
                 return {
                     textValue: this.renderProcurementPlan(value.procurementPlanYear, value.procurementPlanQuarter),
                     remoteValue: value.procurementPlanYear + "_" + value.procurementPlanQuarter
                 };
+            }).forEach(option => {
+                procurementOptions.push(option);
             });
-            $scope.procurements.push({
-                textValue: " ",
-                remoteValue: -1
-            });
+
+            $scope.procurements = procurementOptions;
 
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
@@ -141,12 +146,23 @@
 
             const replaceProcurementFilter = (filterUrl: string, column: string) => {
                 const pattern = new RegExp(`${column} eq \'([0-9]+)_([0-9]+)\'`, "i");
+                const emptyOptionPattern = new RegExp(`${column} eq \'(${Helpers.KendoOverviewHelper.emptyOptionId})\'`, "i");
                 const matchingFilterPart = pattern.exec(filterUrl);
+
                 if (matchingFilterPart?.length !== 3) {
-                    return filterUrl;
+                    const emptyOptionMatch = emptyOptionPattern.exec(filterUrl);
+
+                    if (emptyOptionMatch?.length === 2) {
+                        filterUrl = filterUrl.replace(emptyOptionPattern, `(ProcurementPlanYear eq null and ProcurementPlanQuarter eq null)`);
+
+                    }
+                } else {
+                    const year = matchingFilterPart[1];
+                    const quarter = matchingFilterPart[2];
+
+                    filterUrl = filterUrl.replace(pattern, `(ProcurementPlanYear eq ${year} and ProcurementPlanQuarter eq ${quarter})`);
                 }
 
-                filterUrl = filterUrl.replace(pattern, `(ProcurementPlanYear eq ${matchingFilterPart[1]} and ProcurementPlanQuarter eq ${matchingFilterPart[2]})`);
                 return filterUrl;
             }
 
@@ -225,8 +241,11 @@
                                 }
                             }
 
-                            //TODO: Missing combined ordering for procurement plan
-                            //TODO: Missing combined ordering for LastChangedByUser
+                            //Fix Ordering based on last changed by user name
+                            parameterMap.$orderby = parameterMap.$orderby.replace(`${this.lastChangedByUserPropertyName}/Name`, `${this.lastChangedByUserPropertyName}/Name,${this.lastChangedByUserPropertyName}/LastName`);
+
+                            //Fix procurement plan ordering to be by year and then by quarter
+                            parameterMap.$orderby = parameterMap.$orderby.replace(`${this.procurementPlanYearPropertyName}`, `${this.procurementPlanYearPropertyName},ProcurementPlanQuarter`);
                         }
 
                         if (parameterMap.$filter) {
