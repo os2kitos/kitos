@@ -21,8 +21,6 @@
         private readonly lastChangedByUserPropertyName = "LastChangedByUser";
         private readonly dataProcessingRegistrationsPropertyName = "DataProcessingRegistrations";
 
-        private readonly orgUnitStorageKey = "it-contract-full-overview-orgunit";
-
         private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly contractTypeOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly contractTemplateOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
@@ -178,7 +176,7 @@
                     .withEntityTypeName("IT Kontrakt")
                     .withExcelOutputName("IT Kontrakt Overblik")
                     .withStorageKey("it-contract-full-overview-options")
-                    .withUrlFactory(() => {
+                    .withUrlFactory(options => {
                         var urlParameters =
                             "?$expand=" +
                             "Reference($select=URL,Title,ExternalReferenceId)," +
@@ -203,20 +201,20 @@
                             `${this.terminationDeadlinePropertyName}($select=Id),` +
                             "AssociatedSystemRelations($select=Id)";
 
-                        var orgUnitId = $window.sessionStorage.getItem(this.orgUnitStorageKey);
+                        const selectedOrgId: number | null = options.currentOrgUnit;
                         var query = `/odata/Organizations(${user.currentOrganizationId})/`;
 
-                        //TODO: Check if this filter is even active and if the combo box exists
                         // if orgunit is set then the org unit filter is active
-                        if (orgUnitId === null) {
+                        if (selectedOrgId === null) {
                             return `${query}ItContracts${urlParameters}`;
                         } else {
-                            return `${query}OrganizationUnits(${orgUnitId})/ItContracts${urlParameters}`;
+                            return `${query}OrganizationUnits(${selectedOrgId})/ItContracts${urlParameters}`;
                         }
                     })
                     .withStandardSorting("Name")
                     .withParameterMapping((options, type) => {
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+                        var activeOrgUnit: number | null = null;
 
                         if (parameterMap.$orderby) {
 
@@ -256,19 +254,30 @@
                         }
 
                         if (parameterMap.$filter) {
+                            // Org unit is stripped from the odata query and passed on to the url factory!
+                            const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnit/Name eq '(\\d+)'`, "i");
+                            if (captureOrgUnit.test(parameterMap.$filter) === true) {
+                                activeOrgUnit = parseInt(captureOrgUnit.exec(parameterMap.$filter)[1]);
+                            }
+                            parameterMap.$filter = parameterMap.$filter.replace(captureOrgUnit, "");
+
+                            //Fix role filters
                             _.forEach(itContractRoles,
                                 (role: any) => parameterMap.$filter =
                                     replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
+                            //Fix system usage collection search
                             parameterMap.$filter =
                                 replaceSystemFilter(parameterMap.$filter, this.associatedSystemUsagesPropertyName);
 
+                            //Fix search on user to cover both name and last name
                             const lastChangedByUserSearchedProperties = ["Name", "LastName"];
                             parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
                                 `${this.lastChangedByUserPropertyName}/Name`,
                                 this.lastChangedByUserPropertyName,
                                 lastChangedByUserSearchedProperties);
 
+                            //Fix procurement plan filtering
                             parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, this.procurementPlanYearPropertyName);
 
                             //Option types filter fixes
@@ -284,7 +293,15 @@
 
                             //DPR filter fix
                             parameterMap.$filter = replaceDprFilter(parameterMap.$filter, this.dataProcessingRegistrationsPropertyName);
+
+                            //Cleanup filter if invalid ODATA Filter (can happen if we strip params)
+                            if (parameterMap.$filter === "") {
+                                delete parameterMap.$filter;
+                            }
                         }
+
+                        //Making sure orgunit is set
+                        (options as any).currentOrgUnit = activeOrgUnit;
 
                         return parameterMap;
                     })
