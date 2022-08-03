@@ -106,8 +106,7 @@
 
             const replaceRoleFilter = (filterUrl: string, roleName: string, roleId: number) => {
                 const pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
-                return filterUrl.replace(pattern,
-                    `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
+                return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
             }
 
             const replaceSystemFilter = (filterUrl: string, column: string) => {
@@ -242,10 +241,18 @@
                             }
 
                             //Fix Ordering based on last changed by user name
-                            parameterMap.$orderby = parameterMap.$orderby.replace(`${this.lastChangedByUserPropertyName}/Name`, `${this.lastChangedByUserPropertyName}/Name,${this.lastChangedByUserPropertyName}/LastName`);
+                            parameterMap.$orderby = Helpers.OdataQueryHelper.expandOrderingToMultipleProperties(
+                                parameterMap.$orderby,
+                                `${this.lastChangedByUserPropertyName}/Name`,
+                                [`${this.lastChangedByUserPropertyName}/Name`, `${this.lastChangedByUserPropertyName}/LastName`]
+                            );
 
                             //Fix procurement plan ordering to be by year and then by quarter
-                            parameterMap.$orderby = parameterMap.$orderby.replace(`${this.procurementPlanYearPropertyName}`, `${this.procurementPlanYearPropertyName},ProcurementPlanQuarter`);
+                            parameterMap.$orderby = Helpers.OdataQueryHelper.expandOrderingToMultipleProperties(
+                                parameterMap.$orderby,
+                                this.procurementPlanYearPropertyName,
+                                [this.procurementPlanYearPropertyName, "ProcurementPlanQuarter"]
+                            );
                         }
 
                         if (parameterMap.$filter) {
