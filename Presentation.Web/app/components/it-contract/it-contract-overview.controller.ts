@@ -256,7 +256,7 @@
                         if (parameterMap.$filter) {
                             // Org unit is stripped from the odata query and passed on to the url factory!
                             const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnit/Name eq '(\\d+)'`, "i");
-                            if (captureOrgUnit.test(parameterMap.$filter) === true) {
+                            if (captureOrgUnit.test(parameterMap.$filter)) {
                                 activeOrgUnit = parseInt(captureOrgUnit.exec(parameterMap.$filter)[1]);
                             }
                             parameterMap.$filter = parameterMap.$filter.replace(captureOrgUnit, "");
@@ -402,9 +402,6 @@
                 } as Utility.KendoGrid.IKendoToolbarEntry);
             }
 
-            //TODO: Check column widths
-            //TODO: Check alignments
-
             launcher = launcher
                 .withColumn(builder =>
                     builder
@@ -429,6 +426,7 @@
                         .withDataSourceName("Parent.Name")
                         .withTitle("Overordnet kontrakt")
                         .withId("parentName")
+                        .withStandardWidth(190)
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => dataItem.Parent.Id !== undefined ? Helpers.RenderFieldsHelper.renderInternalReference(
@@ -442,7 +440,8 @@
                         .withDataSourceName("Name")
                         .withTitle("IT Kontrakt")
                         .withId("contractName")
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withStandardWidth(190)
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
                             "contractNameObject",
@@ -468,6 +467,7 @@
                         .withDataSourceName("ResponsibleOrganizationUnit.Name")
                         .withTitle("Ansvarlig org. enhed")
                         .withId("responsibleOrganizationUnitName")
+                        .withStandardWidth(190)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withContentOverflow()
                         .withFixedValueRange(orgUnits.map((unit) => {
@@ -478,7 +478,6 @@
                             };
                         }),
                             false,
-                            //TODO: Check if this rendering strategy can be reused from other views that do the same
                             dataItem => '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnit?.Name)))
                 .withColumn(builder =>
@@ -486,6 +485,7 @@
                         .withDataSourceName("Supplier.Name")
                         .withTitle("Leverandør")
                         .withId("supplierName")
+                        .withStandardWidth(190)
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Supplier?.Name)))
@@ -494,6 +494,7 @@
                         .withDataSourceName("ContractSigner")
                         .withTitle("Kontraktunderskriver")
                         .withId("contractSigner")
+                        .withStandardWidth(190)
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
@@ -538,6 +539,7 @@
                         .withDataSourceName(this.procurementStrategyPropertyName)
                         .withTitle("Genanskaffelsesstrategi")
                         .withId("procurementStrategy")
+                        .withStandardWidth(180)
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
@@ -551,7 +553,9 @@
                         .withDataSourceName(this.procurementPlanYearPropertyName)
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
+                        .withStandardWidth(165)
                         .withContentOverflow()
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
@@ -562,7 +566,9 @@
                         .withDataSourceName("ProcurementInitiated")
                         .withTitle("Genanskaffelse igangsat")
                         .withId("procurementInitiated")
+                        .withStandardWidth(185)
                         .withContentOverflow()
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.yesNoUndecided.options, false),
@@ -666,6 +672,7 @@
                         .withDataSourceName("AssociatedSystemRelations")
                         .withTitle("Antal Relationer")
                         .withId("relationCount")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withoutSorting()
                         .withRendering(dataItem => {
                             if (dataItem.AssociatedSystemUsages === undefined)
@@ -692,6 +699,7 @@
                         .withDataSourceName("Reference.ExternalReferenceId")
                         .withTitle("Dokument ID/Sagsnr.")
                         .withId("referenceExternalReferenceId")
+                        .withStandardWidth(170)
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference)))
@@ -700,6 +708,7 @@
                         .withDataSourceName("ExternEconomyStreams.Acquisition")
                         .withTitle("Anskaffelse")
                         .withId("acquisition")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withoutSorting()
                         .withRendering(dataItem => { return dataItem.Acquisition ? dataItem.Acquisition.toString() : ""; }))
                 .withColumn(builder =>
@@ -707,6 +716,7 @@
                         .withDataSourceName("ExternEconomyStreams.Operation")
                         .withTitle("Drift/år")
                         .withId("operation")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withoutSorting()
                         .withRendering(dataItem => { return dataItem.Operation ? dataItem.Operation.toString() : ""; }))
                 .withColumn(builder =>
@@ -714,6 +724,7 @@
                         .withDataSourceName("ExternEconomyStreams.Other")
                         .withTitle("Andet")
                         .withId("other")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withoutSorting()
                         .withRendering(dataItem => { return dataItem.Other ? dataItem.Other.toString() : ""; }))
                 .withColumn(builder =>
@@ -721,6 +732,7 @@
                         .withDataSourceName("OperationRemunerationBegun")
                         .withTitle("Driftsvederlag begyndt")
                         .withId("operationRemunerationBegun")
+                        .withStandardWidth(170)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun)))
@@ -789,28 +801,22 @@
 
                             const years = dataItem.DurationYears || 0;
                             const months = dataItem.DurationMonths || 0;
-                            //TODO: Simplify this. it looks horrendous
-                            if (years === 0 && months === 0) {
-                                return "Ikke angivet";
+
+                            let result = "";
+                            if (years > 0) {
+                                result += `${years} år`;
+                                if (months > 0) {
+                                    result += " og ";
+                                }
+                            }
+                            if (months > 0) {
+                                result += `${months} måned`;
+                                if (months > 1) {
+                                    result += "er";
+                                }
                             }
 
-                            if (years > 0 && months > 0 && months < 2)
-                                return `${years} år og ${months} måned`;
-
-                            if (years > 0 && months > 0)
-                                return `${years} år og ${months} måneder`;
-
-                            if (years < 1 && months > 0 && months > 1)
-                                return `${months} måneder`;
-
-                            if (years < 1 && months < 2) {
-                                return `${months} måned`;
-                            }
-
-                            if (years > 0 && months < 1)
-                                return `${years} år`;
-
-                            return "Ikke angivet";
+                            return result;
                         }))
                 .withColumn(builder =>
                     builder
@@ -818,6 +824,7 @@
                         .withTitle("Option")
                         .withId("optionExtend")
                         .withContentOverflow()
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -830,6 +837,8 @@
                         .withDataSourceName(this.terminationDeadlinePropertyName)
                         .withTitle("Opsigelse (måneder)")
                         .withId("terminationDeadline")
+                        .withStandardWidth(160)
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -858,6 +867,7 @@
                         .withDataSourceName(`${this.lastChangedByUserPropertyName}.Name`)
                         .withTitle("Sidst redigeret: Bruger")
                         .withId("lastChangedByUser")
+                        .withStandardWidth(170)
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : ""))
@@ -866,6 +876,7 @@
                         .withDataSourceName("LastChangedBy")
                         .withTitle("Sidste redigeret: Dato")
                         .withId("lastChangedDate")
+                        .withStandardWidth(170)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
