@@ -439,7 +439,7 @@
                         .withTitle("IT Kontrakt")
                         .withId("contractName")
                         .withStandardWidth(190)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
                             "contractNameObject",
