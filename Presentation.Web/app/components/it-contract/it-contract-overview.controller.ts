@@ -871,7 +871,7 @@
                         .withRendering(dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : ""))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("LastChangedBy")
+                        .withDataSourceName("LastChanged")
                         .withTitle("Sidste redigeret: Dato")
                         .withId("lastChangedDate")
                         .withStandardWidth(170)
