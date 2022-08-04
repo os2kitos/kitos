@@ -51,14 +51,14 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            var contractQuery = _itContractService.GetAllByOrganization(orgId, q);
-
-            var contractDTO = Page(contractQuery, paging)
-                .AsEnumerable()
-                .MapToNamedEntityDTOs()
-                .ToList();
-
-            return Ok(contractDTO);
+            return _itContractService
+                .GetAllByOrganization(orgId, q)
+                .Select(query =>
+                    Page(query, paging)
+                        .ToList()
+                        .MapToNamedEntityDTOs()
+                        .ToList())
+                .Match(Ok, FromOperationError);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItContractDTO>))]
@@ -377,11 +377,10 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetAppliedProcurements(int organizationId)
         {
-            var result = _itContractService
+            return _itContractService
                 .GetAppliedProcurementPlans(organizationId)
-                .Select(ToProcurementPlanDTO)
-                .ToList();
-            return Ok(result);
+                .Select(plans => plans.Select(ToProcurementPlanDTO).ToList())
+                .Match(Ok, FromOperationError);
         }
 
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)

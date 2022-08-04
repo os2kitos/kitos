@@ -92,7 +92,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var contractId = A<int>();
-            ExpectGetContractReturns(contractId, default(ItContract));
+            ExpectGetContractReturns(contractId, default);
 
             //Act
             var result = _sut.Delete(contractId);
@@ -166,7 +166,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var contract = new ItContract();
             ExpectGetContractReturns(id, contract);
             ExpectAllowReadReturns(contract, true);
-            var dataProcessingRegistrations = new[] { new DataProcessingRegistration() { Id = dataProcessingRegistration1Id,  Name = $"{nameQuery}{1}" }, new DataProcessingRegistration() { Id = dataProcessingRegistration2Id, Name = $"{nameQuery}{1}" } };
+            var dataProcessingRegistrations = new[] { new DataProcessingRegistration() { Id = dataProcessingRegistration1Id, Name = $"{nameQuery}{1}" }, new DataProcessingRegistration() { Id = dataProcessingRegistration2Id, Name = $"{nameQuery}{1}" } };
             _contractDataProcessingRegistrationAssignmentService.Setup(x => x.GetApplicableDataProcessingRegistrations(contract)).Returns(dataProcessingRegistrations.AsQueryable());
 
             //Act
@@ -476,7 +476,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.HasValue);
-            Assert.Equal(OperationFailure.Conflict,result.Value.FailureType);
+            Assert.Equal(OperationFailure.Conflict, result.Value.FailureType);
         }
 
         [Fact]
@@ -516,6 +516,46 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void Can_Get_Applied_Procurement_Plans()
+        {
+            //Arrange
+            var itContracts = new (int? year, int? quarter)[]
+            {
+                (1,2),
+                (null,1),
+                (1,null),
+                (null,null),
+                (0,1),
+                (0,1), //duplicate
+                (1,1),
+                (2,0),
+                (2,0), //duplicate
+            }.Select(x => new ItContract() { ProcurementPlanYear = x.year, ProcurementPlanQuarter = x.quarter }).ToList();
+
+            //no duplicates and only valid combinations (no nulls), order by year and then by quarter
+            var expectedResult =
+                new (int year, int quarter)[]
+                {
+                    (0, 1),
+                    (1, 1),
+                    (1, 2),
+                    (2, 0),
+                };
+
+            var orgId = A<int>();
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
+            _contractRepository.Setup(x => x.GetContractsInOrganization(orgId)).Returns(itContracts.AsQueryable());
+
+            //Act
+            var result = _sut.GetAppliedProcurementPlans(orgId);
+
+            //Assert
+            Assert.True(result.Ok);
+            var activePlans = result.Value;
+            Assert.Equal(expectedResult, activePlans);
         }
 
         private void ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel crossOrganizationReadAccessLevel)
