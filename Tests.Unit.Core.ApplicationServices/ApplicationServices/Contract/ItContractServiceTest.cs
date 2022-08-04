@@ -535,7 +535,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 (2,0), //duplicate
             }.Select(x => new ItContract() { ProcurementPlanYear = x.year, ProcurementPlanQuarter = x.quarter }).ToList();
 
-            //no duplicates and only valid combinations (no nulls), order by year and then by quarter
+            //no duplicates and only valid unique combinations (no nulls), order by year and then by quarter
             var expectedResult =
                 new (int year, int quarter)[]
                 {

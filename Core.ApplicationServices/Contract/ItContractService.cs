@@ -279,7 +279,7 @@ namespace Core.ApplicationServices.Contract
                     .ToList()
                     .Select(x => (x.ProcurementPlanYear.GetValueOrDefault(), x.ProcurementPlanQuarter.GetValueOrDefault()))
                     .ToList()
-                ); unique
+                ); 
         }
 
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
