@@ -14,6 +14,10 @@
             });
     }
 
+    getPageByFullUrl(fullUrl: string): webdriver.promise.Promise<void> {
+        return this.getPage(fullUrl.substr(browser.params.baseUrl.length));
+    }
+
     refreshPage(): webdriver.promise.Promise<void> {
         return browser.refresh()
             .then(() => browser.waitForAngular());
