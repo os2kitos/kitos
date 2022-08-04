@@ -7,11 +7,11 @@
     {
         public override void Up()
         {
+            AlterColumn("dbo.ItSystemUsage", "UserCount", c => c.Int());
             Sql(@"UPDATE dbo.ItSystemUsage
                   SET UserCount = null 
                   WHERE UserCount = 0"
             );
-            AlterColumn("dbo.ItSystemUsage", "UserCount", c => c.Int());
         }
 
         public override void Down()
