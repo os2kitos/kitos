@@ -6,7 +6,7 @@
         /// Optional lower bound.
         /// If left unspecified, the interval has no lower bound.
         /// </summary>
-        public int? LowerBound { get; set; }
+        public int LowerBound { get; set; }
         /// <summary>
         /// Optional upper bound
         /// If left unspecified the interval has no upper bound.

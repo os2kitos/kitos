@@ -232,7 +232,7 @@
                 columns: [
                     {
                         field: "ItInterfaceId", title: "Snitflade ID", width: 120,
-                        persistId: "infid", // DON'T YOU DARE RENAME!
+                        persistId: "infid", 
                         excelTemplate: dataItem => dataItem && dataItem.ItInterfaceId || "",
                         filterable: {
                             cell: {
@@ -245,7 +245,7 @@
                     },
                     {
                         field: "Name", title: "Snitflade", width: 285,
-                        persistId: "name", // DON'T YOU DARE RENAME!
+                        persistId: "name", 
                         template: dataItem => {
                             return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${Helpers.InterfaceNameFormat.apply(dataItem.Name, dataItem.Disabled)}</a>`;
                         },
@@ -273,7 +273,7 @@
                     },
                     {
                         field: "Version", title: "Version", width: 150,
-                        persistId: "version", // DON'T YOU DARE RENAME!
+                        persistId: "version", 
                         excelTemplate: dataItem => dataItem && dataItem.Version || "",
                         hidden: true,
                         filterable: {
@@ -287,7 +287,7 @@
                     },
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
-                        persistId: "accessmod", // DON'T YOU DARE RENAME!
+                        persistId: "accessmod", 
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         excelTemplate: dataItem => dataItem && dataItem.AccessModifier.toString() || "",
                         filterable: {
@@ -299,7 +299,7 @@
                     },
                     {
                         field: "ExhibitedBy.ItSystem.BelongsTo.Name", title: "Rettighedshaver", width: 150,
-                        persistId: "belongs", // DON'T YOU DARE RENAME!
+                        persistId: "belongs", 
                         template: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
                         excelTemplate: dataItem => (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.BelongsTo) ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
                         hidden: true,
@@ -314,7 +314,7 @@
                     },
                     {
                         field: "Url", title: "Link til beskrivelse", width: 125,
-                        persistId: "link", // DON'T YOU DARE RENAME!
+                        persistId: "link", 
                         template: dataItem => {
                             if (Utility.Validation.validateUrl(dataItem.Url)) {
                                 return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
@@ -334,13 +334,18 @@
                     },
                     {
                         field: "ExhibitedBy.ItSystem.Name", title: "Udstillersystem", width: 230,
-                        persistId: "exhibit", // DON'T YOU DARE RENAME!
+                        persistId: "exhibit", 
                         template: dataItem => {
-                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Name)
-                                return Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Name, dataItem.ExhibitedBy.ItSystem.Disabled);
+                            if (dataItem.ExhibitedBy?.ItSystem?.Name)
+                                return Helpers.RenderFieldsHelper.renderInternalReference(
+                                    `kendo-contract-system-${dataItem.ExhibitedBy.ItSystem.Id}`,
+                                    "it-system.edit.main",
+                                    dataItem.ExhibitedBy.ItSystem.Id,
+                                    Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Name, dataItem.ExhibitedBy.ItSystem.Disabled));
                             else
                                 return "";
                         },
+                        excelTemplate: dataItem => dataItem.ExhibitedBy?.ItSystem?.Name ?? "",
                         filterable: {
                             cell: {
                                 template: customFilter,
@@ -352,13 +357,18 @@
                     },
                     {
                         field: "ExhibitedBy.ItSystem.Uuid", title: "Udstillersystem (UUID)", width: 150,
-                        persistId: "isSystemUuid", // DON'T YOU DARE RENAME!
+                        persistId: "exhibitedBySystemUuid", 
                         template: dataItem => {
-                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Uuid && dataItem.ExhibitedBy.ItSystem.Id)
-                                return `<a data-element-type='SystemUuid' data-ui-sref='it-system.usage.main({id: ${dataItem.ExhibitedBy.ItSystem.Id}})'>${dataItem.ExhibitedBy.ItSystem.Uuid}</a>`;
+                            if (dataItem.ExhibitedBy?.ItSystem?.Uuid)
+                                return Helpers.RenderFieldsHelper.renderInternalReference(
+                                    `kendo-contract-system-uuid-${dataItem.ExhibitedBy.ItSystem.Id}`,
+                                    "it-system.edit.main",
+                                    dataItem.ExhibitedBy.ItSystem.Id,
+                                    Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Uuid, dataItem.ExhibitedBy.ItSystem.Disabled));
                             else
                                 return "";
                         },
+                        excelTemplate: dataItem => dataItem.ExhibitedBy?.ItSystem?.Uuid ?? "",
                         filterable: {
                             cell: {
                                 template: customFilter,
@@ -370,7 +380,7 @@
                     },
                     {
                         field: "Interface.Name", title: "Grænseflade", width: 150,
-                        persistId: "infname", // DON'T YOU DARE RENAME!
+                        persistId: "infname", 
                         template: dataItem => dataItem.Interface ? dataItem.Interface.Name : "",
                         hidden: true,
                         filterable: {
@@ -384,7 +394,7 @@
                     },
                     {
                         field: "DataType", title: "Datatype", width: 150,
-                        persistId: "datatypes", // DON'T YOU DARE RENAME!
+                        persistId: "datatypes", 
                         template: dataItem => {
                             var value = "";
                             if (dataItem.DataRows.length > 0) {
@@ -414,7 +424,7 @@
                     },
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
-                        persistId: "orgname", // DON'T YOU DARE RENAME!
+                        persistId: "orgname", 
                         excelTemplate: dataItem => dataItem && dataItem.Organization && dataItem.Organization.Name || "",
                         hidden: true,
                         filterable: {
@@ -428,7 +438,7 @@
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
-                        persistId: "ownername", // DON'T YOU DARE RENAME!
+                        persistId: "ownername", 
                         template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
@@ -442,7 +452,7 @@
                     },
                     {
                         field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
-                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        persistId: "lastchangedname", 
                         template: dataItem => dataItem.LastChangedByUser && `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` || "",
                         hidden: true,
                         filterable: {
@@ -456,7 +466,7 @@
                     },
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
-                        persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        persistId: "lastchangeddate", 
                         excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
                         attributes: { "class": "text-center" },
                         filterable: {
@@ -468,7 +478,7 @@
                     },
                     {
                         field: "Uuid", title: "UUID", width: 150,
-                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        persistId: "uuid", 
                         excelTemplate: dataItem => dataItem.Uuid,
                         hidden: true,
                         filterable: {

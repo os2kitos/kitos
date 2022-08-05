@@ -8,7 +8,7 @@
         private getValueToTextMap() {
             var result = {};
             this.options.forEach(value => {
-                result[value.id] = { text: value.text + (value.optionalObjectContext.expired ? " (udgået)" : "")}
+                result[value.id] = { text: value.text + (value.optionalObjectContext.expired ? " (udgået)" : "") }
             });
             return result;
         }
@@ -21,11 +21,12 @@
             if (!value) {
                 return "";
             }
-            
+
             return value.text;
         }
 
         options: Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[];
+        enabledOptions: Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[];
         constructor(dataSource: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[]) {
             this.options = [];
             dataSource.forEach(option => {
@@ -35,6 +36,7 @@
             });
 
             this.valueToTextMap = this.getValueToTextMap();
+            this.enabledOptions = this.options.filter(option => !option.optionalObjectContext.expired);
         }
     }
 }

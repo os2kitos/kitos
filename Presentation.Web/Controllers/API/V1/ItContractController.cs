@@ -51,14 +51,14 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            var contractQuery = _itContractService.GetAllByOrganization(orgId, q);
-
-            var contractDTO = Page(contractQuery, paging)
-                .AsEnumerable()
-                .MapToNamedEntityDTOs()
-                .ToList();
-
-            return Ok(contractDTO);
+            return _itContractService
+                .GetAllByOrganization(orgId, q)
+                .Select(query =>
+                    Page(query, paging)
+                        .ToList()
+                        .MapToNamedEntityDTOs()
+                        .ToList())
+                .Match(Ok, FromOperationError);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItContractDTO>))]
@@ -341,7 +341,8 @@ namespace Presentation.Web.Controllers.API.V1
                 return LogError(e);
             }
         }
-        
+
+        [InternalApi]
         [HttpGet]
         [Route("available-options-in/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
@@ -366,20 +367,20 @@ namespace Presentation.Web.Controllers.API.V1
                 })
                 .Match(Ok, FromOperationError);
         }
-        
+
+        [InternalApi]
         [HttpGet]
-        [Route("available-procurements/{organizationId}")]
+        [Route("applied-procurement-plans/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableProcurements(int organizationId)
+        public HttpResponseMessage GetAppliedProcurements(int organizationId)
         {
-            var result = _itContractService
-                .GetAvailableProcurementPlans(organizationId)
-                .Select(ToProcurementPlanDTO)
-                .ToList();
-            return Ok(result);
+            return _itContractService
+                .GetAppliedProcurementPlans(organizationId)
+                .Select(plans => plans.Select(ToProcurementPlanDTO).ToList())
+                .Match(Ok, FromOperationError);
         }
 
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
@@ -443,12 +444,12 @@ namespace Presentation.Web.Controllers.API.V1
             return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available == false, optionObject.option.Description);
         }
 
-        private static ContractProcurementPlanDTO ToProcurementPlanDTO(ItContract contract)
+        private static ContractProcurementPlanDTO ToProcurementPlanDTO((int year, int quarter) plan)
         {
             return new ContractProcurementPlanDTO
             {
-                ProcurementPlanYear = contract.ProcurementPlanYear,
-                ProcurementPlanQuarter = contract.ProcurementPlanQuarter
+                ProcurementPlanYear = plan.year,
+                ProcurementPlanQuarter = plan.quarter
             };
         }
     }

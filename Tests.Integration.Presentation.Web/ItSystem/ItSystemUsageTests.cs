@@ -5,6 +5,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -24,7 +25,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act
             using var httpResponse = await HttpApi.GetWithCookieAsync(url, cookie);
-            
+
             //Assert
             Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
             var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItSystemUsage>();
@@ -67,8 +68,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task Can_Post_It_System_Usage()
+        public async Task Can_Change_User_Count()
         {
+            //Arrange
             var newSystemName = A<string>();
             var accessModifier = AccessModifier.Public;
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(newSystemName, TestEnvironment.DefaultOrganizationId, accessModifier);
@@ -79,11 +81,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             };
             var itSystemUsage = ItSystemUsageHelper.CreateItSystemUsageAsync(newSystemUsage);
 
-            var patchObject = new {UserCount = UserCount.UNDECIDED};
-            await ItSystemUsageHelper.PatchSystemUsage(itSystemUsage.Id, itSystemUsage.OrganizationId,
-                patchObject);
-            var getPatchedItSystemUsage = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(itSystemUsage.Id);
+            //Act
+            var patchObject = new { UserCount = EnumRange.All<UserCount>().RandomItem() };
+            await ItSystemUsageHelper.PatchSystemUsage(itSystemUsage.Id, itSystemUsage.OrganizationId, patchObject);
 
+            //Assert
+            var getPatchedItSystemUsage = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(itSystemUsage.Id);
             Assert.Equal(itSystemUsage.Id, getPatchedItSystemUsage.Id);
             Assert.Equal(patchObject.UserCount, getPatchedItSystemUsage.UserCount);
         }
