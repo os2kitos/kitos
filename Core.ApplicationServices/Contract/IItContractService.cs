@@ -13,7 +13,7 @@ namespace Core.ApplicationServices.Contract
     public interface IItContractService
     {
         Result<ItContract, OperationError> Create(int organizationId, string name);
-        IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null);
+        Result<IQueryable<ItContract>,OperationError> GetAllByOrganization(int orgId, string optionalNameSearch = null);
         Result<ItContract, OperationFailure> Delete(int id);
 
         Result<DataProcessingRegistration, OperationError> AssignDataProcessingRegistration(int id, int dataProcessingRegistrationId);
@@ -25,5 +25,6 @@ namespace Core.ApplicationServices.Contract
         Maybe<OperationError> ValidateNewName(int contractId, string name);
         IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions);
         Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId);
+        Result<IEnumerable<(int year, int quarter)>,OperationError> GetAppliedProcurementPlans(int organizationId);
     }
 }

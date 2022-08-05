@@ -18,12 +18,12 @@ type HeaderButtons = {
 };
 
 type InputFields =
-{
-    referenceDocTitle: protractor.ElementFinder,
-    referenceDocId: protractor.ElementFinder,
-    referenceDocUrl: protractor.ElementFinder,
-    referenceCreator: protractor.ElementFinder,
-};
+    {
+        referenceDocTitle: protractor.ElementFinder,
+        referenceDocId: protractor.ElementFinder,
+        referenceDocUrl: protractor.ElementFinder,
+        referenceCreator: protractor.ElementFinder,
+    };
 
 type ColumnHeaders = {
     referenceName: protractor.ElementFinder,
@@ -34,7 +34,7 @@ type ColumnHeaders = {
     usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
     userRightsHolderAccess: protractor.ElementFinder,
-    userStakeHolderAccess : protractor.ElementFinder,
+    userStakeHolderAccess: protractor.ElementFinder,
     userEmail: protractor.ElementFinder,
 };
 
@@ -61,7 +61,7 @@ var consts = new Constants();
 class kendoToolbarWrapper {
 
     public headerButtons(): HeaderButtons {
-     
+
         var buttons: HeaderButtons = {
             editReference: element(byDataElementType(consts.kendoReferenceEditButton)),
             editSaveReference: element(byDataElementType(consts.kendoReferenceEditSaveButton)),
@@ -139,6 +139,7 @@ class kendoToolbarWrapper {
                 if (val === textValue) {
                     return elem;
                 }
+                return null;
             });
         });
         return test;

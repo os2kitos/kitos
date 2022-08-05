@@ -104,8 +104,8 @@
             }
         }
 
-        static renderDate(date: Date) {
-            if (!!date) {
+        static renderDate(date: Date | string) {
+            if (!!date && moment(date).format(Constants.DateFormat.DanishDateFormat) !== "01-01-0001") {
                 return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return ExcelExportHelper.noValueFallback;
@@ -255,9 +255,17 @@
                 //Always show the title in the combobox selector
                 valueTemplate: (_) => this.renderExcelChoice(entry.title),
                 change: e => {
-                    var selectedId = e.sender.value();
-                    const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
-                    entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                    try {
+
+                        var selectedId = e.sender.value();
+                        const newSelection =
+                            entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+                        entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
+                            ? newSelection[0]
+                            : null);
+                    } catch (ex) {
+                        console.log(ex);
+                    }
                 }
             }
         }

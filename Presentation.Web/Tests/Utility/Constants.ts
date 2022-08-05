@@ -5,7 +5,7 @@
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoDpaButtonCreate = "createDpaButton";
     readonly kendoContractNameHeader = "contractNameHeader";
-    readonly kendoContractNameObjects = "contractNameObject";
+    readonly kendoContractNameObjects = "contractNameKendoObject";
     readonly kendoButtonResetFilter = "resetFilterButton";
     readonly kendoButtonSaveFilter = "saveFilterButton";
     readonly kendoButtonUseFilter = "useFilterButton";
@@ -37,7 +37,7 @@
     readonly kendoRemoveFilter = "removeFilterButton";
     readonly kendoUserDeleteButton = "userDeleteButton";
 
-    readonly kendoRelationCountObject = "relationCountObject";
+    readonly kendoRelationCountObject = "relationCountKendoObject";
 
     //Environmental variables
     readonly defaultSystemUsageName = "DefaultTestItSystem";

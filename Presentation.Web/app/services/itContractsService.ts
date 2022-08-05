@@ -5,6 +5,7 @@
         removeDataProcessingRegistration(contractId: number, dataProcessingRegistrationId: number): angular.IPromise<IContractPatchResult>;
         getAvailableDataProcessingRegistrations(contractId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityDTO[]>;
         getApplicableItContractOptions(organizationId: number): angular.IPromise<Models.ItContract.IItContractOptions>;
+        getAvailableProcurementPlans(organizationId: number): angular.IPromise<Models.ItContract.IContractProcurementPlanDTO[]>;
     }
 
     export interface IContractPatchResult {
@@ -14,25 +15,7 @@
     export class ItContractsService implements IItContractsService{
 
         private handleServerError(error) {
-            console.log("Request failed with:", error);
-            let errorCategory: Models.Api.ApiResponseErrorCategory;
-            switch (error.status) {
-                case 400:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
-                    break;
-                case 404:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.NotFound;
-                    break;
-                case 409:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
-                    break;
-                case 500:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.ServerError;
-                    break;
-                default:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.UnknownError;
-            }
-            throw errorCategory;
+            return new Services.Generic.ApiWrapper(this.$http).handleServerError(error);
         }
 
         //Use for contracts that take an input defined as SingleValueDTO
@@ -89,6 +72,18 @@
                         },
                 error => this.handleServerError(error)
             );
+        }
+
+        getAvailableProcurementPlans(organizationId: number): angular.IPromise<Models.ItContract.IContractProcurementPlanDTO[]> {
+            return this.$http
+                .get<API.Models.IApiWrapper<any>>(`api/itcontract/applied-procurement-plans/${organizationId}`)
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.ItContract.IContractProcurementPlanDTO[] }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
         }
 
         static $inject: string[] = ["$http"];
