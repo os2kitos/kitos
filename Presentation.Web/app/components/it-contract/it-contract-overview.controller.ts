@@ -110,6 +110,11 @@
                 return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
             }
 
+            const replaceSystemUuidFilter = (filterUrl: string, column: string) => {
+                const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+                return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: contains(cast(c/ItSystemUsage/ItSystem/Uuid, Edm.String)$2)");
+            }
+
             const replaceOptionTypeFilter = (filterUrl: string, column: string) => {
                 const pattern = new RegExp(`(${column}( eq )\'([0-9a-zA-Z]+)\')`, "i");
                 const matchingFilterParts = pattern.exec(filterUrl);
@@ -184,7 +189,7 @@
                             "PaymentFreqency($select=Name)," +
                             "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
                             "Supplier($select=Name)," +
-                            "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
+                            "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled,Uuid)))," +
                             "DataProcessingRegistrations($select=IsAgreementConcluded,Name,Id)," +
                             "LastChangedByUser($select=Name,LastName)," +
                             "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
@@ -265,8 +270,8 @@
                                     replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
                             //Fix system usage collection search
-                            parameterMap.$filter =
-                                replaceSystemFilter(parameterMap.$filter, this.associatedSystemUsagesPropertyName);
+                            parameterMap.$filter = replaceSystemFilter(parameterMap.$filter, this.associatedSystemUsagesPropertyName);
+                            parameterMap.$filter = replaceSystemUuidFilter(parameterMap.$filter, `${this.associatedSystemUsagesPropertyName}Uuids`);
 
                             //Fix search on user to cover both name and last name
                             const lastChangedByUserSearchedProperties = ["Name", "LastName"];
@@ -627,7 +632,7 @@
                                         dpr.Name));
                                 }
                             });
-                            return activeDprs.toString();
+                            return activeDprs.join(", ");
                         })
                         .withExcelOutput(dataItem => {
                             var activeDprs = [];
@@ -636,7 +641,7 @@
                                     activeDprs.push(dpr.Name);
                                 }
                             });
-                            return activeDprs.toString();
+                            return activeDprs.join(", ");
                         }))
                 .withColumn(builder =>
                     builder
@@ -656,15 +661,45 @@
                                     Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Name, system.ItSystemUsage.ItSystem.Disabled)));
 
                             });
-                            return activeSystemUsages.toString();
+                            return activeSystemUsages.join(", ");
                         })
                         .withExcelOutput(dataItem => {
                             var systemUsages = [];
                             dataItem.AssociatedSystemUsages.forEach(system => {
                                 systemUsages.push(Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Name, system.ItSystemUsage.ItSystem.Disabled));
                             });
-                            return systemUsages.toString();
+                            return systemUsages.join(", ");
                         }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(`${this.associatedSystemUsagesPropertyName}Uuids`)
+                        .withTitle("IT Systemer (UUID)")
+                        .withId("itSystemUuid")
+                        .withContentOverflow()
+                        .withoutSorting()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => {
+                        var activeSystemUsages = [];
+                        dataItem.AssociatedSystemUsages.forEach(system => {
+                            activeSystemUsages.push(Helpers.RenderFieldsHelper.renderInternalReference(
+                                `kendo-contract-system-usages-uuid-${system.ItSystemUsageId}`,
+                                "it-system.usage.main",
+                                system.ItSystemUsageId,
+                                Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Uuid, system.ItSystemUsage.ItSystem.Disabled)));
+
+                        });
+                        return activeSystemUsages.join(", ");
+                        })
+                        .withExcelOutput(dataItem => {
+                            var uuids = [];
+                            if (dataItem.AssociatedSystemUsages?.length > 0) {
+                                dataItem.AssociatedSystemUsages.forEach(value => {
+                                    uuids.push(value.ItSystemUsage.ItSystem.Uuid);
+                                });
+                            }
+                            return uuids.join(", ");
+                        })
+                )
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("AssociatedSystemRelations")
@@ -813,7 +848,6 @@
                                     result += "er";
                                 }
                             }
-
                             return result;
                         }))
                 .withColumn(builder =>
@@ -878,7 +912,6 @@
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
-
             launcher.launch();
         }
     }

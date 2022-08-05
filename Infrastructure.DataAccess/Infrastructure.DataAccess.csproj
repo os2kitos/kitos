@@ -900,6 +900,10 @@
     <Compile Include="Migrations\202207121044195_RemovedHandoverTrialsAndPaymentMilestones.designer.cs">
       <DependentUpon>202207121044195_RemovedHandoverTrialsAndPaymentMilestones.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs" />
+    <Compile Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.designer.cs">
+      <DependentUpon>202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1489,6 +1493,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202207121044195_RemovedHandoverTrialsAndPaymentMilestones.resx">
       <DependentUpon>202207121044195_RemovedHandoverTrialsAndPaymentMilestones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.resx">
+      <DependentUpon>202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

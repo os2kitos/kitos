@@ -17,8 +17,8 @@
         DataProcessorNamesAsCsv: string;
         SubDataProcessorNamesAsCsv: string;
         IsAgreementConcluded?: Models.Api.Shared.YesNoIrrelevantOption;
-        AgreementConcludedAt?: Date;
-        LatestOversightDate?: Date;
+        AgreementConcludedAt?: string;
+        LatestOversightDate?: string;
         TransferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
         BasisForTransfer?: string;
         OversightInterval?: Models.Api.Shared.YearMonthUndecidedIntervalOption;
@@ -26,7 +26,8 @@
         OversightOptionNamesAsCsv: string;
         IsOversightCompleted?: Models.Api.Shared.YesNoUndecidedOption;
         ContractNamesAsCsv: string;
-        LastChangedAt: Date;
+        LastChangedAt: string;
         LastChangedByName: string;
+        SystemUuidsAsCsv: string;
     }
 }

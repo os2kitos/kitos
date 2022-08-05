@@ -167,6 +167,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(oversightOption.Name, readModel.OversightOptionNamesAsCsv);
             Assert.Equal(contractName, readModel.ContractNamesAsCsv);
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
+            Assert.Equal(itSystemDto.Uuid.ToString(), readModel.SystemUuidsAsCsv);
             Assert.Equal(oversightDate, readModel.LatestOversightDate);
 
             Console.Out.WriteLine("Flat values asserted");

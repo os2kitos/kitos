@@ -40,7 +40,7 @@
 
             //Helper functions
             const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
-            
+
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
@@ -172,12 +172,7 @@
                             .withTitle("Dokument ID / Sagsnr.")
                             .withId("dpReferenceUserAssignedId")
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(
-                                dataItem => Helpers.RenderFieldsHelper.renderReferenceId(dataItem
-                                    .MainReferenceUserAssignedId))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderReferenceId(
-                                    dataItem.MainReferenceUserAssignedId))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceId(dataItem.MainReferenceUserAssignedId))
                             .withInitialVisibility(false))
                     .withColumn(builder =>
                         builder
@@ -186,8 +181,15 @@
                             .withId("dpSystemNamesAsCsv")
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SystemNamesAsCsv))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SystemNamesAsCsv)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SystemNamesAsCsv)))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("SystemUuidsAsCsv")
+                            .withTitle("IT Systemer (UUID)")
+                            .withId("itSystemUuid")
+                            .withContentOverflow()
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SystemUuidsAsCsv)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("ContractNamesAsCsv")
@@ -195,9 +197,7 @@
                             .withId("dpContractNamesAsCsv")
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ContractNamesAsCsv))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.ContractNamesAsCsv)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ContractNamesAsCsv)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("DataProcessorNamesAsCsv")
@@ -205,10 +205,7 @@
                             .withId("dpDataProcessorNamesAsCsv")
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(
-                                dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataProcessorNamesAsCsv))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataProcessorNamesAsCsv)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataProcessorNamesAsCsv)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("SubDataProcessorNamesAsCsv")
@@ -216,10 +213,7 @@
                             .withId("dpSubDataProcessorNamesAsCsv")
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(
-                                dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SubDataProcessorNamesAsCsv))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName(transferToInsecureThirdCountriesColumnName)
@@ -239,14 +233,9 @@
                                 }),
                                 false
                             )
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                                dataItem.TransferToInsecureThirdCountries &&
-                                Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem
-                                    .TransferToInsecureThirdCountries)))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                                dataItem.TransferToInsecureThirdCountries &&
-                                Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem
-                                    .TransferToInsecureThirdCountries))))
+                            .withRendering(dataItem =>
+                                Helpers.RenderFieldsHelper.renderString(dataItem.TransferToInsecureThirdCountries &&
+                                    Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries))))
                     .withColumn(builder => {
                         var options = dataProcessingRegistrationOptions
                             .basisForTransferOptions
@@ -271,10 +260,7 @@
                                 options,
                                 false
                             )
-                            .withRendering(
-                                dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.BasisForTransfer))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer));
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.BasisForTransfer));
                     })
                     .withColumn(builder => {
                         var options = dataProcessingRegistrationOptions
@@ -301,10 +287,7 @@
                                 options,
                                 false
                             )
-                            .withRendering(
-                                dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataResponsible))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible));
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataResponsible));
                     })
                     .withColumn(builder =>
                         builder
@@ -328,20 +311,15 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                                 dataItem.IsAgreementConcluded &&
-                                Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(dataItem.IsAgreementConcluded)))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                                dataItem.IsAgreementConcluded &&
                                 Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(dataItem.IsAgreementConcluded))))
-                    .withColumn(builder =>
+                        .withColumn(builder =>
                         builder
                             .withDataSourceName("AgreementConcludedAt")
                             .withTitle("Dato for indgåelse af databehandleraftale")
                             .withId("agreementConcludedAt")
                             .withStandardWidth(160)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AgreementConcludedAt))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AgreementConcludedAt)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName(oversightIntervalColumnName)
@@ -365,10 +343,6 @@
                                 false
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval &&
-                                Models.ViewModel.Shared.YearMonthUndecidedIntervalOption
-                                    .getText(dataItem.OversightInterval)))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                                dataItem.OversightInterval &&
                                 Models.ViewModel.Shared.YearMonthUndecidedIntervalOption
                                     .getText(dataItem.OversightInterval))))
                     .withColumn(builder => {
@@ -395,10 +369,7 @@
                                 options,
                                 true
                             )
-                            .withRendering(
-                                dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightOptionNamesAsCsv))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightOptionNamesAsCsv));
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightOptionNamesAsCsv));
                     })
                     .withColumn(builder =>
                         builder
@@ -421,9 +392,6 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                                 dataItem.IsOversightCompleted &&
-                                Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted)))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                                dataItem.IsOversightCompleted &&
                                 Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
                     .withColumn(builder =>
                         builder
@@ -432,8 +400,7 @@
                             .withId("latestOversightDate")
                             .withStandardWidth(160)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LatestOversightDate))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LatestOversightDate)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LatestOversightDate)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("LastChangedByName")
@@ -451,8 +418,7 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                             .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                             .withInitialVisibility(false)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChangedAt)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt)))
                     .withStandardSorting("Name");
 
             dataProcessingRegistrationOptions.roles.forEach(role =>

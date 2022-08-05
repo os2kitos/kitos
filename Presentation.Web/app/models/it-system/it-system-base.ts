@@ -1,7 +1,7 @@
 ﻿module Kitos.Models.ItSystem {
     export interface IItSystemBase extends IEntity {
         Name: string;
-        Uuid: any;
+        Uuid: string;
         Description: string;
         Url: string;
         AccessModifier: AccessModifier;
