@@ -336,7 +336,7 @@
                         field: "ExhibitedBy.ItSystem.Name", title: "Udstillersystem", width: 230,
                         persistId: "exhibit", 
                         template: dataItem => {
-                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Name)
+                            if (dataItem.ExhibitedBy?.ItSystem?.Name)
                                 return Helpers.RenderFieldsHelper.renderInternalReference(
                                     `kendo-contract-system-${dataItem.ExhibitedBy.ItSystem.Id}`,
                                     "it-system.edit.main",
@@ -359,9 +359,7 @@
                         field: "ExhibitedBy.ItSystem.Uuid", title: "Udstillersystem (UUID)", width: 150,
                         persistId: "exhibitedBySystemUuid", 
                         template: dataItem => {
-                            if (dataItem.ExhibitedBy &&
-                                dataItem.ExhibitedBy.ItSystem &&
-                                dataItem.ExhibitedBy.ItSystem.Uuid)
+                            if (dataItem.ExhibitedBy?.ItSystem?.Uuid)
                                 return Helpers.RenderFieldsHelper.renderInternalReference(
                                     `kendo-contract-system-uuid-${dataItem.ExhibitedBy.ItSystem.Id}`,
                                     "it-system.edit.main",
