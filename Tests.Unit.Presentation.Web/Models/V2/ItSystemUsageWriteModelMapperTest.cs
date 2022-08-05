@@ -182,7 +182,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.Validity = null;
 
             //Act
-            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
@@ -199,7 +199,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.NumberOfExpectedUsers = null;
 
             //Act
-            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
@@ -214,7 +214,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.AssociatedProjectUuids = null;
 
             //Act
-            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
@@ -228,7 +228,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<GeneralDataUpdateRequestDTO>();
 
             //Act
-            var output = _sut.FromPUT(new UpdateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPUT(new UpdateItSystemUsageRequestDTO { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);

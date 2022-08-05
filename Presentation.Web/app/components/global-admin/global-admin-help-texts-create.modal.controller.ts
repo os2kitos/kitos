@@ -1,5 +1,5 @@
 ﻿module Kitos.GlobalAdmin.HelpTexts {
-    "use strict"
+    "use strict";
 
     interface ICreateViewModel {
         title: string;

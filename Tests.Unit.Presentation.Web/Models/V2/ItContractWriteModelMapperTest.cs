@@ -118,7 +118,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedPaymentModelPropertiesInput()
         {
-            return CreateGetUndefinedSectionsInput(5);
+            return CreateGetUndefinedSectionsInput(4);
         }
 
         public static IEnumerable<object[]> GetUndefinedAgreementPeriodPropertiesInput()
@@ -509,12 +509,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noOperationsRemunerationStartedAt,
             bool noPaymentFrequencyUuid,
             bool noPaymentModelUuid,
-            bool noPriceRegulationUuid,
-            bool noPaymentMileStones)
+            bool noPriceRegulationUuid)
         {
             //Arrange
             var input = new CreateNewContractRequestDTO();
-            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid, noPaymentMileStones);
+            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid);
 
             //Act
             var output = _sut.FromPOST(input).PaymentModel.Value;
@@ -532,12 +531,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noOperationsRemunerationStartedAt,
             bool noPaymentFrequencyUuid,
             bool noPaymentModelUuid,
-            bool noPriceRegulationUuid,
-            bool noPaymentMileStones)
+            bool noPriceRegulationUuid)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid, noPaymentMileStones);
+            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid);
 
             //Act
             var output = _sut.FromPATCH(input).PaymentModel.Value;
@@ -555,12 +553,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noOperationsRemunerationStartedAt,
             bool noPaymentFrequencyUuid,
             bool noPaymentModelUuid,
-            bool noPriceRegulationUuid,
-            bool noPaymentMileStones)
+            bool noPriceRegulationUuid)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid, noPaymentMileStones);
+            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid);
 
             //Act
             var output = _sut.FromPUT(input).PaymentModel.Value;
@@ -1591,8 +1588,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noOperationsRemunerationStartedAt,
             bool noPaymentFrequencyUuid,
             bool noPaymentModelUuid,
-            bool noPriceRegulationUuid,
-            bool noPaymentMileStones)
+            bool noPriceRegulationUuid)
         {
             var sectionProperties = GetAllInputPropertyNames<ContractPaymentModelDataWriteRequestDTO>();
 

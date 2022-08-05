@@ -17,7 +17,9 @@
         private readonly optionExtendPropertyName = "OptionExtend";
         private readonly terminationDeadlinePropertyName = "TerminationDeadline";
         private readonly procurementPlanYearPropertyName = "ProcurementPlanYear";
-        private readonly orgUnitStorageKey = "it-contract-overview-orgunit";
+        private readonly associatedSystemUsagesPropertyName = "AssociatedSystemUsages";
+        private readonly lastChangedByUserPropertyName = "LastChangedByUser";
+        private readonly dataProcessingRegistrationsPropertyName = "DataProcessingRegistrations";
 
         private readonly criticalityOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
         private readonly contractTypeOptionViewModel: Models.ViewModel.Generic.OptionTypeViewModel;
@@ -33,7 +35,6 @@
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$window",
             "$state",
             "_",
             "user",
@@ -47,10 +48,13 @@
             "procurements"
         ];
 
+        private renderProcurementPlan(year: number, quarter: number): string {
+            return `Q${quarter} | ${year}`;
+        }
+
         constructor(
             $rootScope: IRootScope,
             $scope: ng.IScope,
-            $window: ng.IWindowService,
             $state: ng.ui.IStateService,
             _: ILoDashWithMixins,
             user,
@@ -64,47 +68,41 @@
             procurements: Models.ItContract.IContractProcurementPlanDTO[]) {
             $rootScope.page.title = "IT Kontrakt";
 
-            $scope.procurements = procurements.map(value => {
-                return {
-                    textValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`,
-                    remoteValue: `${value.procurementPlanYear} | Q${value.procurementPlanQuarter}`
-                }
-            });
-            $scope.procurements.push({
+            const procurementOptions = [{
                 textValue: " ",
-                remoteValue: -1
+                remoteValue: Helpers.KendoOverviewHelper.emptyOptionId.toString()
+            }];
+
+            procurements.map(value => {
+                return {
+                    textValue: this.renderProcurementPlan(value.procurementPlanYear, value.procurementPlanQuarter),
+                    remoteValue: value.procurementPlanYear + "_" + value.procurementPlanQuarter
+                };
+            }).forEach(option => {
+                procurementOptions.push(option);
             });
+
+            $scope.procurements = procurementOptions;
 
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
             const getRoleKey = (roleId: number | string) => `role${roleId}`;
 
-            this.criticalityOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.criticalityOptions);
-            this.contractTypeOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTypeOptions);
-            this.contractTemplateOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTemplateOptions);
-            this.purchaseFormOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.purchaseFormOptions);
-            this.procurementStrategyOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.procurementStrategyOptions);
-            this.paymentModelOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentModelOptions);
-            this.paymentFrequencyOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentFrequencyOptions);
-            this.optionExtendOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.optionExtendOptions);
-            this.terminationDeadlineOptionViewModel =
-                new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.terminationDeadlineOptions);
+            this.criticalityOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.criticalityOptions);
+            this.contractTypeOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTypeOptions);
+            this.contractTemplateOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.contractTemplateOptions);
+            this.purchaseFormOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.purchaseFormOptions);
+            this.procurementStrategyOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.procurementStrategyOptions);
+            this.paymentModelOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentModelOptions);
+            this.paymentFrequencyOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.paymentFrequencyOptions);
+            this.optionExtendOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.optionExtendOptions);
+            this.terminationDeadlineOptionViewModel = new Models.ViewModel.Generic.OptionTypeViewModel(itContractOptions.terminationDeadlineOptions);
 
             this.yesNoUndecided = new Models.ViewModel.Shared.YesNoUndecidedOptions();
-            
-            // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
+
             const replaceRoleFilter = (filterUrl: string, roleName: string, roleId: number) => {
                 const pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
-                return filterUrl.replace(pattern,
-                    `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
+                return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
             }
 
             const replaceSystemFilter = (filterUrl: string, column: string) => {
@@ -118,14 +116,15 @@
             }
 
             const replaceOptionTypeFilter = (filterUrl: string, column: string) => {
-                const pattern = new RegExp(`(${column}( eq )\'([0-9]+)\')`, "i");
+                const pattern = new RegExp(`(${column}( eq )\'([0-9a-zA-Z]+)\')`, "i");
                 const matchingFilterParts = pattern.exec(filterUrl);
                 if (matchingFilterParts?.length !== 4)
                     return filterUrl;
 
                 var searchedValue = matchingFilterParts[3];
-                if (searchedValue.indexOf("0") !== -1) {
-                    searchedValue = searchedValue.replace("0", "null");
+                const emptyOptionId = Helpers.KendoOverviewHelper.emptyOptionId.toString();
+                if (searchedValue.indexOf(emptyOptionId) !== -1) {
+                    searchedValue = searchedValue.replace(emptyOptionId, "null");
                 }
                 return filterUrl.replace(pattern, `${column}/Id$2${searchedValue}`);
             }
@@ -141,34 +140,34 @@
                 if (searchedValue.indexOf(yesValue) !== -1) {
                     return filterUrl.replace(pattern, `${column}/Any (c:c/IsAgreementConcluded eq '${yesValue}')`);
                 }
-                
+
                 return filterUrl.replace(pattern, `${column}/All (c:c/IsAgreementConcluded ne '${yesValue}')`);
             }
 
             const replaceProcurementFilter = (filterUrl: string, column: string) => {
-                const pattern = new RegExp(`${column} eq \'([a-zA-Z0-9 |-]+)\'`, "i");
+                const pattern = new RegExp(`${column} eq \'([0-9]+)_([0-9]+)\'`, "i");
+                const emptyOptionPattern = new RegExp(`${column} eq \'(${Helpers.KendoOverviewHelper.emptyOptionId})\'`, "i");
                 const matchingFilterPart = pattern.exec(filterUrl);
-                if (matchingFilterPart?.length !== 2) {
-                    return filterUrl;
-                }
-                const userFilterQueryElements = matchingFilterPart[1].replace(",'", "").replace(",", "").replace(/\)$/, "").replace(/'$/, "").replace(" |", "").replace("Q", "").split(" ");
 
-                var result = "(";
-                userFilterQueryElements.forEach((filterValue, i) => {
-                    var value = filterValue;
-                    if (value === "-1")
-                        value = "null";
+                if (matchingFilterPart?.length !== 3) {
+                    const emptyOptionMatch = emptyOptionPattern.exec(filterUrl);
 
-                    result += `(ProcurementPlanYear eq ${value} or ProcurementPlanQuarter eq ${value})`;
-                    if (i < userFilterQueryElements.length - 1) {
-                        result += " and ";
-                    } else {
-                        result += ")";
+                    if (emptyOptionMatch?.length === 2) {
+                        filterUrl = filterUrl.replace(emptyOptionPattern, `(ProcurementPlanYear eq null and ProcurementPlanQuarter eq null)`);
+
                     }
-                });
+                } else {
+                    const year = matchingFilterPart[1];
+                    const quarter = matchingFilterPart[2];
 
-                filterUrl = filterUrl.replace(pattern, result);
+                    filterUrl = filterUrl.replace(pattern, `(ProcurementPlanYear eq ${year} and ProcurementPlanQuarter eq ${quarter})`);
+                }
+
                 return filterUrl;
+            }
+
+            const matchDprWithConcludedAgreement = (dpr: { IsAgreementConcluded: string | null }): boolean => {
+                return dpr.IsAgreementConcluded && Models.Api.Shared.YesNoIrrelevantOption[dpr.IsAgreementConcluded] === Models.Api.Shared.YesNoIrrelevantOption.YES;
             }
 
             var launcher =
@@ -178,132 +177,134 @@
                     .withGridBinding(this)
                     .withUser(user)
                     .withEntityTypeName("IT Kontrakt")
-                    .withExcelOutputName("IT Kontrakt")
-                    .withStorageKey("it-contract-overview-options")
-                    .withUrlFactory(() => {
+                    .withExcelOutputName("IT Kontrakt Overblik")
+                    .withStorageKey("it-contract-full-overview-options")
+                    .withUrlFactory(options => {
                         var urlParameters =
                             "?$expand=" +
-                                "Reference($select=URL,Title,ExternalReferenceId)," +
-                                "Parent($select=Id,Name)," +
-                                "ResponsibleOrganizationUnit($select=Name)," +
-                                "PaymentModel($select=Name)," +
-                                "PaymentFreqency($select=Name)," +
-                                "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
-                                "Supplier($select=Name)," +
-                                "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
-                                "DataProcessingRegistrations($select=IsAgreementConcluded,Name,Id)," +
-                                "LastChangedByUser($select=Name,LastName)," +
-                                "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
-                                `${this.criticalityPropertyName}($select=Id),` +
-                                `${this.contractTypePropertyName}($select=Id),` +
-                                `${this.contractTemplatePropertyName}($select=Id),` +
-                                `${this.purchaseFormPropertyName}($select=Id),` +
-                                `${this.procurementStrategyPropertyName}($select=Id),` +
-                                `${this.paymentModelPropertyName}($select=Id),` +
-                                `${this.paymentFrequencyPropertyName}($select=Id),` +
-                                `${this.optionExtendPropertyName}($select=Id),` +
-                                `${this.terminationDeadlinePropertyName}($select=Id),` +
-                                "AssociatedSystemUsages($select=ItSystemUsage;$expand=ItSystemUsage($select=Uuid))," +
-                                "AssociatedSystemRelations($select=Id)";
+                            "Reference($select=URL,Title,ExternalReferenceId)," +
+                            "Parent($select=Id,Name)," +
+                            "ResponsibleOrganizationUnit($select=Name)," +
+                            "PaymentModel($select=Name)," +
+                            "PaymentFreqency($select=Name)," +
+                            "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
+                            "Supplier($select=Name)," +
+                            "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled,Uuid)))," +
+                            "DataProcessingRegistrations($select=IsAgreementConcluded,Name,Id)," +
+                            "LastChangedByUser($select=Name,LastName)," +
+                            "ExternEconomyStreams($select=Acquisition,Operation,Other,AuditStatus,AuditDate)," +
+                            `${this.criticalityPropertyName}($select=Id),` +
+                            `${this.contractTypePropertyName}($select=Id),` +
+                            `${this.contractTemplatePropertyName}($select=Id),` +
+                            `${this.purchaseFormPropertyName}($select=Id),` +
+                            `${this.procurementStrategyPropertyName}($select=Id),` +
+                            `${this.paymentModelPropertyName}($select=Id),` +
+                            `${this.paymentFrequencyPropertyName}($select=Id),` +
+                            `${this.optionExtendPropertyName}($select=Id),` +
+                            `${this.terminationDeadlinePropertyName}($select=Id),` +
+                            "AssociatedSystemRelations($select=Id)";
 
-                        var orgUnitId = $window.sessionStorage.getItem(this.orgUnitStorageKey);
+                        const selectedOrgId: number | null = options.currentOrgUnit;
                         var query = `/odata/Organizations(${user.currentOrganizationId})/`;
+
                         // if orgunit is set then the org unit filter is active
-                        if (orgUnitId === null) {
-                            return query + `ItContracts` + urlParameters;
+                        if (selectedOrgId === null) {
+                            return `${query}ItContracts${urlParameters}`;
                         } else {
-                            return query + `OrganizationUnits(${orgUnitId})/ItContracts` + urlParameters;
+                            return `${query}OrganizationUnits(${selectedOrgId})/ItContracts${urlParameters}`;
                         }
                     })
                     .withStandardSorting("Name")
                     .withParameterMapping((options, type) => {
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+                        var activeOrgUnit: number | null = null;
 
                         if (parameterMap.$orderby) {
-                            
+
                             //Option types orderBy fixes
-                            if (parameterMap.$orderby.includes(this.criticalityPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.criticalityPropertyName,
-                                    `${this.criticalityPropertyName}/Name`);
+                            const optionTypeProperties: Array<string> = [
+                                this.criticalityPropertyName,
+                                this.contractTypePropertyName,
+                                this.contractTemplatePropertyName,
+                                this.purchaseFormPropertyName,
+                                this.procurementStrategyPropertyName,
+                                this.paymentModelPropertyName,
+                                this.paymentFrequencyPropertyName,
+                                this.optionExtendPropertyName,
+                                this.terminationDeadlinePropertyName
+                            ];
+
+                            for (let optionTypePropertyName of optionTypeProperties) {
+                                if (parameterMap.$orderby.includes(optionTypePropertyName)) {
+                                    parameterMap.$orderby = parameterMap.$orderby.replace(optionTypePropertyName,
+                                        `${optionTypePropertyName}/Name`);
+                                }
                             }
-                            if (parameterMap.$orderby.includes(this.contractTypePropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTypePropertyName,
-                                    `${this.contractTypePropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.contractTemplatePropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.contractTemplatePropertyName,
-                                    `${this.contractTemplatePropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.purchaseFormPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.purchaseFormPropertyName,
-                                    `${this.purchaseFormPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.procurementStrategyPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(
-                                    this.procurementStrategyPropertyName,
-                                    `${this.procurementStrategyPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.paymentModelPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.paymentModelPropertyName,
-                                    `${this.paymentModelPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.paymentFrequencyPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.paymentFrequencyPropertyName,
-                                    `${this.paymentFrequencyPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.optionExtendPropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(this.optionExtendPropertyName,
-                                    `${this.optionExtendPropertyName}/Name`);
-                            }
-                            if (parameterMap.$orderby.includes(this.terminationDeadlinePropertyName)) {
-                                parameterMap.$orderby = parameterMap.$orderby.replace(
-                                    this.terminationDeadlinePropertyName,
-                                    `${this.terminationDeadlinePropertyName}/Name`);
-                            }
+
+                            //Fix Ordering based on last changed by user name
+                            parameterMap.$orderby = Helpers.OdataQueryHelper.expandOrderingToMultipleProperties(
+                                parameterMap.$orderby,
+                                `${this.lastChangedByUserPropertyName}/Name`,
+                                [`${this.lastChangedByUserPropertyName}/Name`, `${this.lastChangedByUserPropertyName}/LastName`]
+                            );
+
+                            //Fix procurement plan ordering to be by year and then by quarter
+                            parameterMap.$orderby = Helpers.OdataQueryHelper.expandOrderingToMultipleProperties(
+                                parameterMap.$orderby,
+                                this.procurementPlanYearPropertyName,
+                                [this.procurementPlanYearPropertyName, "ProcurementPlanQuarter"]
+                            );
                         }
 
                         if (parameterMap.$filter) {
+                            // Org unit is stripped from the odata query and passed on to the url factory!
+                            const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnit/Name eq '(\\d+)'`, "i");
+                            if (captureOrgUnit.test(parameterMap.$filter)) {
+                                activeOrgUnit = parseInt(captureOrgUnit.exec(parameterMap.$filter)[1]);
+                            }
+                            parameterMap.$filter = parameterMap.$filter.replace(captureOrgUnit, "");
+
+                            //Fix role filters
                             _.forEach(itContractRoles,
-                                role => parameterMap.$filter =
-                                replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
+                                (role: any) => parameterMap.$filter =
+                                    replaceRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
-                            parameterMap.$filter =
-                                replaceSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
-                            parameterMap.$filter =
-                                replaceSystemUuidFilter(parameterMap.$filter, "ExhibitedBy.ItSystem.Uuid");
+                            //Fix system usage collection search
+                            parameterMap.$filter = replaceSystemFilter(parameterMap.$filter, this.associatedSystemUsagesPropertyName);
+                            parameterMap.$filter = replaceSystemUuidFilter(parameterMap.$filter, "ExhibitedBy.ItSystem.Uuid");
 
+                            //Fix search on user to cover both name and last name
                             const lastChangedByUserSearchedProperties = ["Name", "LastName"];
                             parameterMap.$filter = Helpers.OdataQueryHelper.replaceQueryByMultiplePropertyContains(parameterMap.$filter,
-                                "LastChangedByUser/Name",
-                                "LastChangedByUser",
+                                `${this.lastChangedByUserPropertyName}/Name`,
+                                this.lastChangedByUserPropertyName,
                                 lastChangedByUserSearchedProperties);
-                            
-                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter,
-                                "ProcurementPlanYear");
+
+                            //Fix procurement plan filtering
+                            parameterMap.$filter = replaceProcurementFilter(parameterMap.$filter, this.procurementPlanYearPropertyName);
 
                             //Option types filter fixes
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.contractTypePropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.contractTemplatePropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.purchaseFormPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.procurementStrategyPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.paymentModelPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.paymentFrequencyPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.optionExtendPropertyName);
-                            parameterMap.$filter =
-                                replaceOptionTypeFilter(parameterMap.$filter, this.terminationDeadlinePropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.criticalityPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.contractTypePropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.contractTemplatePropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.purchaseFormPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.procurementStrategyPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.paymentModelPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.paymentFrequencyPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.optionExtendPropertyName);
+                            parameterMap.$filter = replaceOptionTypeFilter(parameterMap.$filter, this.terminationDeadlinePropertyName);
 
-                            parameterMap.$filter =
-                                replaceDprFilter(parameterMap.$filter, "DataProcessingRegistrations");
+                            //DPR filter fix
+                            parameterMap.$filter = replaceDprFilter(parameterMap.$filter, this.dataProcessingRegistrationsPropertyName);
+
+                            //Cleanup filter if invalid ODATA Filter (can happen if we strip params)
+                            if (parameterMap.$filter === "") {
+                                delete parameterMap.$filter;
+                            }
                         }
+
+                        //Making sure orgunit is set
+                        (options as any).currentOrgUnit = activeOrgUnit;
 
                         return parameterMap;
                     })
@@ -339,7 +340,7 @@
                             };
 
                             contract.roles = [];
-                            // iterrate each right
+                            // Create columns lookups for all assigned rights
                             _.forEach(contract.Rights,
                                 right => {
                                     // init an role array to hold users assigned to this role
@@ -351,14 +352,12 @@
                                         .push([right.User.Name, right.User.LastName].join(" "));
                                 });
 
-
-                            if (!contract.Parent) { contract.Parent = { Name: "" } as any; }
-                            if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" } as any; }
-                            if (!contract.Supplier) { contract.Supplier = { Name: "" } as any; }
-                            if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
-                            if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" } as any; }
-                            if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" } as any; }
-                            if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" } as any; }
+                            //Ensure that object, where the data source is nested, are provided. Otherwise pre-render prep will fail in kendo grid's excel export function (even if we override the export)
+                            contract.Parent = contract.Parent ?? {} as any;
+                            contract.ResponsibleOrganizationUnit = contract.ResponsibleOrganizationUnit ?? {} as any;
+                            contract.Supplier = contract.Supplier ?? {} as any;
+                            contract.Reference = contract.Reference ?? {} as any;
+                            contract.LastChangedByUser = contract.LastChangedByUser ?? { Name: "", LastName: "" } as any;
                         });
 
                         return response;
@@ -407,572 +406,499 @@
             }
 
             launcher = launcher
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("IsActive")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                        .withTitle("Gyldig/Ikke gyldig")
+                        .withTitle("Gyldig/Ikke Gyldig")
                         .withId("isActive")
-                        .withFixedValueRange([
-                                {
-                                    textValue: "Gyldig",
-                                    remoteValue: true
-                                },
-                                {
-                                    textValue: "Ikke gyldig",
-                                    remoteValue: false
-                                }
-                            ],
-                            false)
-                        .withRendering(dataItem => dataItem.IsActive
-                            ? '<span class="fa fa-file text-success" aria-hidden="true"></span>'
-                            : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
+                        .withRendering(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke Gyldig")
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig")
-                        .withoutSorting()
-                        .withInclusionCriterion(
-                            () => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
-                    .withColumn(builder =>
-                        builder
+                        .withoutSorting())
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ItContractId")
                         .withTitle("Kontrakt ID")
                         .withId("contractId")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput())
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Parent.Name")
                         .withTitle("Overordnet kontrakt")
                         .withId("parentName")
+                        .withStandardWidth(190)
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
+                        .withRendering(dataItem => dataItem.Parent.Id !== undefined ? Helpers.RenderFieldsHelper.renderInternalReference(
                             "kendo-parent-rendering",
                             "it-contract.edit.main",
                             dataItem.Parent.Id,
-                            dataItem.Parent.Name))
+                            dataItem.Parent.Name) : "")
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Parent.Name)))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Name")
-                        .withTitle("It Kontrakt")
+                        .withTitle("IT Kontrakt")
                         .withId("contractName")
+                        .withStandardWidth(190)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
                             "contractNameObject",
                             "it-contract.edit.main",
                             dataItem.Id,
                             dataItem.Name))
-                        .withExcelOutput(dataItem => dataItem.Parent?.Name))
-                    .withColumn(builder =>
-                        builder
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.criticalityPropertyName)
                         .withTitle("Kritikalitet")
                         .withId("criticality")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withContentOverflow()
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.criticalityOptionViewModel.options,
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.criticalityOptionViewModel.enabledOptions,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.criticalityOptionViewModel.getOptionText(dataItem.Criticality?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.criticalityOptionViewModel.getOptionText(dataItem.Criticality?.Id))))
-                    .withColumn(builder =>
-                        builder
+                        .withRendering(dataItem => dataItem.Criticality ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.Criticality.Id)) : ""))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ResponsibleOrganizationUnit.Name")
                         .withTitle("Ansvarlig org. enhed")
                         .withId("responsibleOrganizationUnitName")
-                        .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput()
+                        .withStandardWidth(190)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withContentOverflow()
                         .withFixedValueRange(orgUnits.map((unit) => {
-                                return {
-                                    textValue: unit.Name,
-                                    remoteValue: unit.Id,
-                                    optionalContext: unit
-                                };
-                            }),
+                            return {
+                                textValue: unit.Name,
+                                remoteValue: unit.Id,
+                                optionalContext: unit
+                            };
+                        }),
                             false,
-                            dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) +
-                            dataItem.optionalContext.Name)
-                        .withRendering(
-                            dataItem => Helpers.RenderFieldsHelper.renderString(dataItem
-                                .ResponsibleOrganizationUnit?.Name))
-                        .withExcelOutput(
-                            dataItem => Helpers.ExcelExportHelper.renderString(dataItem
-                                .ResponsibleOrganizationUnit?.Name)))
-                    .withColumn(builder =>
-                        builder
+                            dataItem => '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnit?.Name)))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Supplier.Name")
                         .withTitle("Leverandør")
                         .withId("supplierName")
+                        .withStandardWidth(190)
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Supplier?.Name))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.Supplier?.Name)))
-                    .withColumn(builder =>
-                        builder
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Supplier?.Name)))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ContractSigner")
                         .withTitle("Kontraktunderskriver")
                         .withId("contractSigner")
+                        .withStandardWidth(190)
+                        .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.contractTypePropertyName)
                         .withTitle("Kontrakttype")
                         .withId("contractType")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.contractTypeOptionViewModel.options,
-                                true),
-                            false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
-                    .withColumn(builder =>
-                        builder
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.contractTypeOptionViewModel.enabledOptions, true), false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.contractTemplatePropertyName)
                         .withTitle("Kontraktskabelon")
                         .withId("contractTemplate")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.contractTemplateOptionViewModel.options,
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.contractTemplateOptionViewModel.enabledOptions,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id))))
-                    .withColumn(builder =>
-                        builder
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplate?.Id))))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.purchaseFormPropertyName)
                         .withTitle("Indkøbsform")
                         .withId("purchaseForm")
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.purchaseFormOptionViewModel.options,
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.purchaseFormOptionViewModel.enabledOptions,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id))))
-                    .withColumn(builder =>
-                        builder
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.purchaseFormOptionViewModel.getOptionText(dataItem.PurchaseForm?.Id))))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.procurementStrategyPropertyName)
                         .withTitle("Genanskaffelsesstrategi")
                         .withId("procurementStrategy")
+                        .withStandardWidth(180)
+                        .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                                this.procurementStrategyOptionViewModel.options,
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.procurementStrategyOptionViewModel.enabledOptions,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                            this.procurementStrategyOptionViewModel.getOptionText(dataItem
-                                .ProcurementStrategy?.Id)))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                            this.procurementStrategyOptionViewModel.getOptionText(dataItem
-                                .ProcurementStrategy?.Id))))
-                    .withColumn(builder =>
-                        builder
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.procurementStrategyOptionViewModel.getOptionText(dataItem.ProcurementStrategy?.Id))))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName(this.procurementPlanYearPropertyName)
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
+                        .withStandardWidth(165)
+                        .withContentOverflow()
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange($scope.procurements, false)
                         .withRendering(dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
-                            ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
-                            : "")
-                        .withExcelOutput(
-                            dataItem => dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
-                            ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
+                            ? this.renderProcurementPlan(dataItem.ProcurementPlanYear, dataItem.ProcurementPlanQuarter)
                             : ""))
-                    .withColumn(builder =>
-                        builder
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ProcurementInitiated")
                         .withTitle("Genanskaffelse igangsat")
                         .withId("procurementInitiated")
+                        .withStandardWidth(185)
+                        .withContentOverflow()
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.yesNoUndecided.options, false),
                             false)
                         .withRendering(dataItem => dataItem.ProcurementInitiated
                             ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
-                            : "")
-                        .withExcelOutput(dataItem => dataItem.ProcurementInitiated
-                            ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
                             : ""));
 
             itContractRoles.forEach(role => {
                 const roleColumnId = `itContract${role.Id}`;
                 const roleKey = getRoleKey(role.Id);
-                const numberOfRolesToConcat = 5;
                 launcher = launcher
                     .withColumn(builder =>
                         builder
-                        .withDataSourceName(roleKey)
-                        .withTitle(role.Name)
-                        .withId(roleColumnId)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withoutSorting()
-                        .withContentOverflow()
-                        .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
-                            `kendo-contract-${roleKey}-rendering`,
-                            "it-contract.edit.roles",
-                            dataItem.Id,
-                            Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(dataItem.roles[role.Id],
-                                numberOfRolesToConcat)))
-                        .withExcelOutput(
-                            dataItem => Helpers.ArrayHelper.concatFirstNumberOfItemsAndAddElipsis(
-                                dataItem.roles[role.Id],
-                                numberOfRolesToConcat)));
+                            .withDataSourceName(roleKey)
+                            .withTitle(role.Name)
+                            .withId(roleColumnId)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withoutSorting()
+                            .withContentOverflow()
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
+                                `kendo-contract-${roleKey}-rendering`,
+                                "it-contract.edit.roles",
+                                dataItem.Id,
+                                dataItem.roles[role.Id]?.toString() ?? ""))
+                            .withExcelOutput(
+                                dataItem => dataItem.roles[role.Id]?.toString() ?? ""));
             });
 
             launcher = launcher
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName("DataProcessingRegistrations")
-                    .withTitle("Databehandleraftale")
-                    .withId("dataProcessingRegistrations")
-                    .withoutSorting()
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        [
-                            Models.Api.Shared.YesNoIrrelevantOption.YES,
-                            Models.Api.Shared.YesNoIrrelevantOption.NO
-                        ].map(value => {
-                            return {
-                                textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
-                                remoteValue: value
-                            };
-                        }),
-                        false)
-                    .withContentOverflow()
-                    .withRendering(dataItem => {
-                        var activeDprs = [];
-                        dataItem.DataProcessingRegistrations.forEach(dpr => {
-                            //TODO: Comparing with an enum value always returns false
-                            if (dpr.IsAgreementConcluded.toString() === "YES") {
-                                activeDprs.push(Helpers.RenderFieldsHelper.renderInternalReference(
-                                    `kendo-contract-dpr-${dpr.Id}`,
-                                    "data-processing.edit-registration.main",
-                                    dpr.Id,
-                                    dpr.Name));
-                            }
-                        });
-                        return activeDprs.toString();
-                    })
-                    .withExcelOutput(dataItem => {
-                        var activeDprs = [];
-                        dataItem.DataProcessingRegistrations.forEach(dpr => {
-                            //TODO: Comparing with an enum value always returns false
-                            if (dpr.IsAgreementConcluded.toString() === "YES") {
-                                activeDprs.push(dpr.Name);
-                            }
-                        });
-                        return activeDprs.toString();
-                    }))
+                        .withDataSourceName(this.dataProcessingRegistrationsPropertyName)
+                        .withTitle("Databehandleraftale")
+                        .withId("dataProcessingRegistrations")
+                        .withoutSorting()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            [
+                                Models.Api.Shared.YesNoIrrelevantOption.YES,
+                                Models.Api.Shared.YesNoIrrelevantOption.NO
+                            ].map(value => {
+                                return {
+                                    textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
+                                    remoteValue: value
+                                };
+                            }),
+                            false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => {
+                            var activeDprs = [];
+                            dataItem.DataProcessingRegistrations.forEach(dpr => {
+                                if (matchDprWithConcludedAgreement(dpr)) {
+                                    activeDprs.push(Helpers.RenderFieldsHelper.renderInternalReference(
+                                        `kendo-contract-dpr-${dpr.Id}`,
+                                        "data-processing.edit-registration.main",
+                                        dpr.Id,
+                                        dpr.Name));
+                                }
+                            });
+                            return activeDprs.toString();
+                        })
+                        .withExcelOutput(dataItem => {
+                            var activeDprs = [];
+                            dataItem.DataProcessingRegistrations.forEach(dpr => {
+                                if (matchDprWithConcludedAgreement(dpr)) {
+                                    activeDprs.push(dpr.Name);
+                                }
+                            });
+                            return activeDprs.toString();
+                        }))
                 .withColumn(builder =>
                     builder
-                    .withDataSourceName("AssociatedSystemUsages")
-                    .withTitle("IT Systemer")
-                    .withId("associatedSystemUsages")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withoutSorting()
-                    .withContentOverflow()
-                    .withRendering(dataItem => {
-                        var activeSystemUsages = [];
-                        dataItem.AssociatedSystemUsages.forEach(system => {
-                            activeSystemUsages.push(Helpers.RenderFieldsHelper.renderInternalReference(
-                                `kendo-contract-system-usages-${system.ItSystemUsageId}`,
-                                "data-processing.edit-registration.main",
-                                system.ItSystemUsageId,
-                                system.ItSystemUsage.ItSystem.Name));
+                        .withDataSourceName(this.associatedSystemUsagesPropertyName)
+                        .withTitle("IT Systemer")
+                        .withId("associatedSystemUsages")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withoutSorting()
+                        .withContentOverflow()
+                        .withRendering(dataItem => {
+                            var activeSystemUsages = [];
+                            dataItem.AssociatedSystemUsages.forEach(system => {
+                                activeSystemUsages.push(Helpers.RenderFieldsHelper.renderInternalReference(
+                                    `kendo-contract-system-usages-${system.ItSystemUsageId}`,
+                                    "it-system.usage.main",
+                                    system.ItSystemUsageId,
+                                    Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Name, system.ItSystemUsage.ItSystem.Disabled)));
 
-                        });
-                        return activeSystemUsages.toString();
-                    })
-                    .withExcelOutput(dataItem => {
-                        var activeSystemUsages = [];
-                        dataItem.AssociatedSystemUsages.forEach(system => {
-                            activeSystemUsages.push(system.ItSystemUsage.ItSystem.Name);
-                        });
-                        return activeSystemUsages.toString();
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("AssociatedSystemRelations")
-                    .withTitle("Antal Relationer")
-                    .withId("relationCount")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        if (dataItem.AssociatedSystemUsages === undefined)
-                            return "";
-
-                        return dataItem.AssociatedSystemRelations.length.toString();
-                    })
-                    .withExcelOutput(dataItem => {
-                        if (dataItem.AssociatedSystemUsages === undefined)
-                            return "";
-
-                        return dataItem.AssociatedSystemRelations.length.toString();
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("Reference.Title")
-                    .withTitle("Reference")
-                    .withId("referenceTitle")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference))
-                    .withExcelOutput(dataItem => {
-                        if (dataItem.Reference === undefined) {
-                            return "";
-                        }
-                        return dataItem.Reference.Title;
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("Reference.ExternalReferenceId")
-                    .withTitle("Dokument ID/Sagsnr.")
-                    .withId("referenceExternalReferenceId")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference))
-                    .withExcelOutput(
-                        dataItem => Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.Acquisition")
-                    .withTitle("Anskaffelse")
-                    .withId("acquisition")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
-                    })
-                    .withExcelOutput(dataItem => {
-                        return dataItem.Acquisition ? dataItem.Acquisition.toString() : "";
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.Operation")
-                    .withTitle("Drift/år")
-                    .withId("operation")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        return dataItem.Operation ? dataItem.Operation.toString() : "";
-                    })
-                    .withExcelOutput(dataItem => {
-                        return dataItem.Operation ? dataItem.Operation.toString() : "";
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.Other")
-                    .withTitle("Andet")
-                    .withId("other")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        return dataItem.Other ? dataItem.Other.toString() : "";
-                    })
-                    .withExcelOutput(dataItem => {
-                        return dataItem.Other ? dataItem.Other.toString() : "";
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("OperationRemunerationBegun")
-                    .withTitle("Driftsvederlag begyndt")
-                    .withId("operaitonRemunerationBegun")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(
-                        dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun))
-                    .withExcelOutput(
-                        dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.OperationRemunerationBegun)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName(this.paymentModelPropertyName)
-                    .withTitle("Betalingsmodel")
-                    .withId("paymentModel")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.paymentModelOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id))))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName(this.paymentFrequencyPropertyName)
-                    .withTitle("Betalingsfrekvens")
-                    .withId("paymentFrequency")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.paymentFrequencyOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.AuditDate")
-                    .withTitle("Audit dato")
-                    .withId("auditDate")
-                    .withoutSorting()
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AuditDate))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AuditDate)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("ExternEconomyStreams.AuditStatus")
-                    .withTitle("Audit status")
-                    .withId("auditStatus")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        if (dataItem.status.max > 0) {
-                            var str = JSON.stringify(dataItem.status);
-                            return `<div data-show-status='${str}'></div>`;
-                        }
-                        return "";
-                    })
-                    .withExcelOutput(dataItem => dataItem &&
-                        dataItem.status &&
-                        `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow
-                        }, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` ||
-                        ""))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("Duration")
-                    .withTitle("Verighed") //TODO: check if title is correct (possible typo): in the task documentation the title is: "Verighed", but the old field has a title "Varighed"
-                    .withId("duration")
-                    .withoutSorting()
-                    .withRendering(dataItem => {
-                        if (dataItem.DurationOngoing) {
-                            return "Løbende";
-                        }
-
-                        const years = dataItem.DurationYears || 0;
-                        const months = dataItem.DurationMonths || 0;
-
-                        if (years === 0 && months === 0) {
-                            return "Ikke angivet";
-                        }
-
-                        if (years > 0 && months > 0 && months < 2)
-                            return `${years} år og ${months} måned`;
-
-                        if (years > 0 && months > 0)
-                            return `${years} år og ${months} måneder`;
-
-                        if (years < 1 && months > 0 && months > 1)
-                            return `${months} måneder`;
-
-                        if (years < 1 && months < 2) {
-                            return `${months} måned`;
-                        }
-
-                        if (years > 0 && months < 1)
-                            return `${years} år`;
-
-                        return "Ikke angivet";
-                    }))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName(this.optionExtendPropertyName)
-                    .withTitle("Option")
-                    .withId("optionExtend")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.optionExtendOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id))))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName(this.terminationDeadlinePropertyName)
-                    .withTitle("Opsigelse (måneder)")
-                    .withId("terminationDeadline")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(
-                        Kitos.Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
-                            this.terminationDeadlineOptionViewModel.options,
-                            true),
-                        false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
-                        this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                        this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id))))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("IrrevocableTo")
-                    .withTitle("Uopsigelig til")
-                    .withId("irrevocableTo")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.IrrevocableTo)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("Terminated")
-                    .withTitle("Opsagt")
-                    .withId("terminated")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated))
-                    .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Terminated)))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("LastChangedByUser.Name")
-                    .withTitle("Sidst redigeret: Bruger")
-                    .withId("lastChangedByUser")
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    .withRendering(
-                        dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`)
-                    .withExcelOutput(
-                        dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`))
-                .withColumn(builder =>
-                    builder
-                    .withDataSourceName("LastChangedBy")
-                    .withTitle("Sidste redigeret: Dato")
-                    .withId("lastChangedDate")
-                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
-                    .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)))
+                            });
+                            return activeSystemUsages.toString();
+                        })
+                        .withExcelOutput(dataItem => {
+                            var systemUsages = [];
+                            dataItem.AssociatedSystemUsages.forEach(system => {
+                                systemUsages.push(Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Name, system.ItSystemUsage.ItSystem.Disabled));
+                            });
+                            return systemUsages.toString();
+                        }))
                 .withColumn(builder =>
                     builder
                     .withDataSourceName("ExhibitedBy.ItSystem.Uuid")
-                    .withTitle("Udstillersystem (UUID)")
-                    .withId("isSystemUuid")
+                    .withTitle("IT Systemer (UUID)")
+                    .withId("itSystemUuid")
                     .withoutSorting()
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                     .withRendering(dataItem => {
-                        if (dataItem.AssociatedSystemUsages?.length > 0) {
-                            var uuids = [];
+                        var uuids = [];
+						if (dataItem.AssociatedSystemUsages?.length > 0) {
                             dataItem.AssociatedSystemUsages.forEach(value => {
-                                uuids.push(value.ItSystemUsage.Uuid);
+                                uuids.push(value.ItSystemUsage.ItSystem.Uuid);
                             });
-                            return uuids.toString();
-                        } else
-                            return "";
-                    }));
+						}
+                        return uuids.toString();
+				    )
+				);						
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("AssociatedSystemRelations")
+                        .withTitle("Antal Relationer")
+                        .withId("relationCount")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            if (dataItem.AssociatedSystemUsages === undefined)
+                                return "0";
 
+                            return dataItem.AssociatedSystemRelations.length.toString();
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Reference.Title")
+                        .withTitle("Reference")
+                        .withId("referenceTitle")
+                        .withContentOverflow()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference))
+                        .withExcelOutput(dataItem => {
+                            if (!dataItem.Reference) {
+                                return "";
+                            }
+                            return dataItem.Reference.Title ?? dataItem.Reference.URL;
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Reference.ExternalReferenceId")
+                        .withTitle("Dokument ID/Sagsnr.")
+                        .withId("referenceExternalReferenceId")
+                        .withStandardWidth(170)
+                        .withContentOverflow()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.Acquisition")
+                        .withTitle("Anskaffelse")
+                        .withId("acquisition")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withoutSorting()
+                        .withRendering(dataItem => { return dataItem.Acquisition ? dataItem.Acquisition.toString() : ""; }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.Operation")
+                        .withTitle("Drift/år")
+                        .withId("operation")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withoutSorting()
+                        .withRendering(dataItem => { return dataItem.Operation ? dataItem.Operation.toString() : ""; }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.Other")
+                        .withTitle("Andet")
+                        .withId("other")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withoutSorting()
+                        .withRendering(dataItem => { return dataItem.Other ? dataItem.Other.toString() : ""; }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("OperationRemunerationBegun")
+                        .withTitle("Driftsvederlag begyndt")
+                        .withId("operationRemunerationBegun")
+                        .withStandardWidth(170)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.OperationRemunerationBegun)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(this.paymentModelPropertyName)
+                        .withTitle("Betalingsmodel")
+                        .withId("paymentModel")
+                        .withContentOverflow()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.paymentModelOptionViewModel.enabledOptions,
+                                true),
+                            false)
+                        .withRendering(dataItem => dataItem.PaymentModel ? Helpers.RenderFieldsHelper.renderString(this.paymentModelOptionViewModel.getOptionText(dataItem.PaymentModel?.Id)) : ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(this.paymentFrequencyPropertyName)
+                        .withTitle("Betalingsfrekvens")
+                        .withId("paymentFrequency")
+                        .withContentOverflow()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.paymentFrequencyOptionViewModel.enabledOptions,
+                                true),
+                            false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.paymentFrequencyOptionViewModel.getOptionText(dataItem.PaymentFreqency?.Id))))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.AuditDate")
+                        .withTitle("Audit dato")
+                        .withId("auditDate")
+                        .withoutSorting()
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AuditDate))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AuditDate)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExternEconomyStreams.AuditStatus")
+                        .withTitle("Audit status")
+                        .withId("auditStatus")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            if (dataItem.status.max > 0) {
+                                const str = JSON.stringify(dataItem.status);
+                                return `<div data-show-status='${str}'></div>`;
+                            }
+                            return "";
+                        })
+                        .withExcelOutput(dataItem => dataItem &&
+                            dataItem.status &&
+                            `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow
+                            }, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` ||
+                            ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Duration")
+                        .withTitle("Varighed")
+                        .withId("duration")
+                        .withoutSorting()
+                        .withRendering(dataItem => {
+                            if (dataItem.DurationOngoing) {
+                                return "Løbende";
+                            }
+
+                            const years = dataItem.DurationYears || 0;
+                            const months = dataItem.DurationMonths || 0;
+
+                            let result = "";
+                            if (years > 0) {
+                                result += `${years} år`;
+                                if (months > 0) {
+                                    result += " og ";
+                                }
+                            }
+                            if (months > 0) {
+                                result += `${months} måned`;
+                                if (months > 1) {
+                                    result += "er";
+                                }
+                            }
+                            return result;
+                        }))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(this.optionExtendPropertyName)
+                        .withTitle("Option")
+                        .withId("optionExtend")
+                        .withContentOverflow()
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.optionExtendOptionViewModel.enabledOptions,
+                                true),
+                            false)
+                        .withRendering(dataItem => dataItem.OptionExtend ? Helpers.RenderFieldsHelper.renderString(this.optionExtendOptionViewModel.getOptionText(dataItem.OptionExtend?.Id)) : ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(this.terminationDeadlinePropertyName)
+                        .withTitle("Opsigelse (måneder)")
+                        .withId("terminationDeadline")
+                        .withStandardWidth(160)
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
+                                this.terminationDeadlineOptionViewModel.enabledOptions,
+                                true),
+                            false)
+                        .withRendering(dataItem => dataItem.TerminationDeadline ? Helpers.RenderFieldsHelper.renderString(this.terminationDeadlineOptionViewModel.getOptionText(dataItem.TerminationDeadline?.Id)) : ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("IrrevocableTo")
+                        .withTitle("Uopsigelig til")
+                        .withId("irrevocableTo")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Terminated")
+                        .withTitle("Opsagt")
+                        .withId("terminated")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName(`${this.lastChangedByUserPropertyName}.Name`)
+                        .withTitle("Sidst redigeret: Bruger")
+                        .withId("lastChangedByUser")
+                        .withStandardWidth(170)
+                        .withContentOverflow()
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : ""))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LastChanged")
+                        .withTitle("Sidste redigeret: Dato")
+                        .withId("lastChangedDate")
+                        .withStandardWidth(170)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged)));
             launcher.launch();
         }
     }
@@ -988,13 +914,13 @@
                     controllerAs: "contractOverviewVm",
                     resolve: {
                         itContractRoles: [
-                            "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                                localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
+                            "localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
+                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) =>
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
                                 .createContractAuthorization()
                                 .getOverviewAuthorization()
@@ -1006,16 +932,16 @@
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
                         ],
                         uiState: [
-                            "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
+                            "uiCustomizationStateService", (uiCustomizationStateService: Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Models.UICustomization.CustomizableKitosModule.ItContract)
                         ],
                         itContractOptions: [
                             "ItContractsService", "user",
-                            (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
+                            (ItContractsService: Services.Contract.IItContractsService, user) =>
                                 ItContractsService.getApplicableItContractOptions(user.currentOrganizationId)
                         ],
                         procurements: [
                             "ItContractsService", "user",
-                            (ItContractsService: Kitos.Services.Contract.IItContractsService, user) =>
+                            (ItContractsService: Services.Contract.IItContractsService, user) =>
                                 ItContractsService.getAvailableProcurementPlans(user.currentOrganizationId)
                         ]
                     }

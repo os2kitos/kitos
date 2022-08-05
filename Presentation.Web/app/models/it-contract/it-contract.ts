@@ -112,7 +112,11 @@
         Reference: IReference;
         AssociatedAgreementElementTypes: Array<IAssociatedAgreementElementTypes>;
 
-        DataProcessingRegistrations: Models.DataProcessing.IDataProcessingRegistration[];
+        DataProcessingRegistrations: Array<{
+            Id: number,
+            Name: string,
+            IsAgreementConcluded: string | null
+        }>;
         ProcurementInitiated: Models.Api.Shared.YesNoUndecidedOption | null;
         Rights: Array<Models.IRightEntity<IItContract>>;
         ExternEconomyStreams: Array<IEconomyStream>;
