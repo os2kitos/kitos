@@ -361,7 +361,7 @@
                         field: "Usages",
                         title: "Anvendes",
                         width: 40,
-                        persistId: "command", // DON'T YOU DARE RENAME!
+                        persistId: "command", 
                         template: dataItem => {
                             // true if system is being used by system within current context, else false
                             var systemHasUsages = this._.find(dataItem.Usages,
@@ -398,7 +398,7 @@
                         title: "Overordnet IT System",
                         attributes: { "class": "might-overflow" },
                         width: 150,
-                        persistId: "parentname", // DON'T YOU DARE RENAME!
+                        persistId: "parentname", 
                         template: dataItem => dataItem.Parent ? Helpers.SystemNameFormat.apply(dataItem.Parent.Name, dataItem.Parent.Disabled) : "",
                         hidden: true,
                         filterable: {
@@ -415,7 +415,7 @@
                         title: "Tidligere Systemnavn",
                         attributes: { "class": "might-overflow" },
                         width: 285,
-                        persistId: "previousname", // DON'T YOU DARE RENAME!
+                        persistId: "previousname", 
                         template: dataItem => dataItem.PreviousName != null ? dataItem.PreviousName : "",
                         filterable: {
                             cell: {
@@ -430,7 +430,7 @@
                         field: "Name",
                         title: "It System",
                         width: 285,
-                        persistId: "name", // DON'T YOU DARE RENAME!
+                        persistId: "name", 
                         template: dataItem => {
                             return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.Disabled)}</a>`;
                         },
@@ -461,7 +461,7 @@
                         field: "AccessModifier",
                         title: "Synlighed",
                         width: 120,
-                        persistId: "accessmod", // DON'T YOU DARE RENAME!
+                        persistId: "accessmod", 
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         excelTemplate: dataItem => dataItem && dataItem.AccessModifier.toString() || "",
                         hidden: true,
@@ -476,7 +476,7 @@
                         field: "BusinessType.Name",
                         title: "Forretningstype",
                         width: 150,
-                        persistId: "busitype", // DON'T YOU DARE RENAME!
+                        persistId: "busitype", 
                         template: dataItem => dataItem.BusinessType ? dataItem.BusinessType.Name : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
@@ -492,7 +492,7 @@
                         field: "BelongsTo.Name",
                         title: "Rettighedshaver",
                         width: 210,
-                        persistId: "belongsto", // DON'T YOU DARE RENAME!
+                        persistId: "belongsto", 
                         attributes: { "class": "might-overflow" },
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
                         filterable: {
@@ -508,7 +508,7 @@
                         field: "TaskKey",
                         title: "KLE ID",
                         width: 150,
-                        persistId: "taskkey", // DON'T YOU DARE RENAME!
+                        persistId: "taskkey", 
                         template: dataItem => dataItem.TaskRefs.length > 0
                             ? this._.map(dataItem.TaskRefs, "TaskKey").join(", ")
                             : "",
@@ -528,7 +528,7 @@
                         field: "TaskName",
                         title: "KLE Navn",
                         width: 155,
-                        persistId: "taskname", // DON'T YOU DARE RENAME!
+                        persistId: "taskname", 
                         template: dataItem => dataItem.TaskRefs.length > 0
                             ? this._.map(dataItem.TaskRefs, "Description").join(", ")
                             : "",
@@ -547,7 +547,7 @@
                         field: "Usages.length",
                         title: "IT System: Anvendes af",
                         width: 95,
-                        persistId: "usages", // DON'T YOU DARE RENAME!
+                        persistId: "usages", 
                         template: dataItem => this.showUsagesAsNumberOrNothing(dataItem),
                         excelTemplate: dataItem => {
                             var sorted = this._.orderBy(dataItem.Usages, ['Organization.Name'], ['asc']);
@@ -578,7 +578,7 @@
                         field: "Organization.Name",
                         title: "Oprettet af: Organisation",
                         width: 150,
-                        persistId: "orgname", // DON'T YOU DARE RENAME!
+                        persistId: "orgname", 
                         template: dataItem => dataItem.Organization ? dataItem.Organization.Name : "",
                         hidden: true,
                         attributes: { "class": "might-overflow" },
@@ -595,7 +595,7 @@
                         field: "LastChangedByUser.Name",
                         title: "Sidst redigeret: Bruger",
                         width: 150,
-                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        persistId: "lastchangedname", 
                         attributes: { "class": "might-overflow" },
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
@@ -613,7 +613,7 @@
                         title: "Sidst redigeret: Dato",
                         format: "{0:dd-MM-yyyy}",
                         width: 130,
-                        persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        persistId: "lastchangeddate", 
                         template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
                         excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
                         attributes: { "class": "text-center" },
@@ -628,7 +628,7 @@
                         field: "Reference.Title",
                         title: "Reference",
                         width: 150,
-                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        persistId: "ReferenceId", 
                         template: dataItem => {
                             return Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference);
                         },
@@ -649,7 +649,7 @@
                         field: "Reference.ExternalReferenceId",
                         title: "Dokument ID / Sagsnr.",
                         width: 150,
-                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        persistId: "folderref", 
                         template: dataItem => {
                             return Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference);
                         },
@@ -671,7 +671,7 @@
                         field: "Uuid",
                         title: "UUID",
                         width: 150,
-                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        persistId: "uuid", 
                         attributes: { "class": "might-overflow" },
                         excelTemplate: dataItem => dataItem.Uuid,
                         hidden: true

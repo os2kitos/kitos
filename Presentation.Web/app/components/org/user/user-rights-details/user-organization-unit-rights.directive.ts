@@ -47,7 +47,7 @@
                 columns: [
                     {
                         field: "Object.Name", title: "Organisationsenhed", width: 150,
-                        persistId: "orgunitname", // DON'T YOU DARE RENAME!
+                        persistId: "orgunitname", 
                         template: (dataItem) => dataItem.Object.Name,
                         excelTemplate: (dataItem) => dataItem.Object.Name,
                         hidden: false,
@@ -61,7 +61,7 @@
                     },
                     {
                         field: "Role.Name", title: "Rolle", width: 150,
-                        persistId: "orgunitrole", // DON'T YOU DARE RENAME!
+                        persistId: "orgunitrole", 
                         template: (dataItem) => dataItem.Role.Name,
                         excelTemplate: (dataItem) => dataItem.Role.Name,
                         hidden: false,
@@ -75,7 +75,7 @@
                     },
                     {
                         field: "Role.HasWriteAccess", title: "Skrive", width: 150,
-                        persistId: "orgunitroleaccess", // DON'T YOU DARE RENAME!
+                        persistId: "orgunitroleaccess", 
                         template: (dataItem) => dataItem.Role.HasWriteAccess ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
                         hidden: false,
                         filterable: {

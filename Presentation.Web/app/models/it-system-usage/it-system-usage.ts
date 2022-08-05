@@ -60,6 +60,6 @@
 
         AssociatedDataProcessingRegistrations: Models.OData.DataProcessing.IDataProcessingRegistration[];
 
-        Uuid: any;
+        Uuid: string;
     }
 }
