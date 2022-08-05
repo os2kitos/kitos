@@ -10,12 +10,6 @@
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab,
                 children: {
-                    procurementStrategy: {
-                        text: "Genanskaffelsesstrategi"
-                    },
-                    procurementPlan: {
-                        text: "Genanskaffelsesplan"
-                    },
                     contractId: {
                         text: "KontraktID"
                     },
@@ -25,29 +19,22 @@
                     purchaseForm: {
                         text: "Indkøbsform"
                     },
-                    extSigner: {
-                        text: "Leverandørs kontraktunderskriver"
+                    procurementStrategy: {
+                        text: "Genanskaffelsesstrategi"
                     },
-                    extSigned: {
-                        text: "Leverandørs underskrevet"
+                    procurementPlan: {
+                        text: "Genanskaffelsesplan"
                     },
-                    extDate: {
-                        text: "Leverandørs dato"
+                    externalSigner: {
+                        text: "Leverandørs underskrift",
+                        helpText: "Herunder: 'Underskriver', 'Underskrevet' og 'Dato'"
                     },
-                    intSigner: {
-                        text: "Kontraktunderskriver"
+                    internalSigner: {
+                        text: "Kontraktunderskriver",
+                        helpText: "Herunder: 'Underskriver', 'Underskrevet' og 'Dato'"
                     },
-                    intSigned: {
-                        text: "Underskrevet"
-                    },
-                    intDate: {
-                        text: "Dato"
-                    },
-                    agreementConcluded: {
-                        text: "Gyldig fra"
-                    },
-                    agreementExpiration: {
-                        text: "Gyldig til"
+                    agreementPeriod: {
+                        text: "Gyldig fra/til"
                     },
                     isActive: {
                         text: "Gyldig"
@@ -66,70 +53,25 @@
             },
             deadlines: {
                 text: "Aftalefrister",
-                helpText: Configs.helpTexts.cannotChangeTab,
-                readOnly: true,
+                readOnly: false,
                 children: {
                     agreementDeadlines: {
                         text: "Aftalefrister",
-                        children:
-                        {
-                            duration: {
-                                text: "Varighed"
-                            },
-                            ongoing: {
-                                text: "Løbende"
-                            },
-                            optionExtend: {
-                                text: "Option forlæng"
-                            },
-                            optionExtendMultiplier: {
-                                text: "Antal brugte optioner"
-                            },
-                            irrevocable: {
-                                text: "Uopsigelig til"
-                            }
-                        }
+                        helpText: "Herunder: 'Varighed', 'Løbende', 'Option' forlæng', 'Antal brugte optioner' og 'Uopsigelig til' "
                     },
                     termination: {
                         text: "Opsigelse",
-                        children: {
-                            terminated: {
-                                text: "Kontrakten opsagt"
-                            },
-                            notice: {
-                                text: "Opsigelsesfrist"
-                            },
-                            ongoing: {
-                                text: "Løbende"
-                            },
-                            byEndingOf: {
-                                text: "Inden udgangen af"
-                            }
-                        }
+                        helpText: "Herunder: 'Kontrakten opsagt', 'Opsigelsesfrist', 'Løbende' og 'Inden udgangen af' "
                     }
                 }
             },
             economy: {
                 text: "Økonomi",
-                helpText: Configs.helpTexts.cannotChangeTab,
-                readOnly: true,
+                readOnly: false,
                 children: {
                     paymentModel: {
                         text: "Betalingsmodel",
-                        children: {
-                            operation: {
-                                text: "Driftsvederlag påbegyndt"
-                            },
-                            frequency: {
-                                text: "Betalingsfrekvens"
-                            },
-                            paymentModel: {
-                                text: "Betalingsmodel"
-                            },
-                            price: {
-                                text: "Prisregulering"
-                            }
-                        }
+                        helpText: "Herunder: 'Driftsvederlag påbegyndt', 'Betalingsfrekvens', 'Betalingsmodel' og 'Prisregulering' "
                     },
                     extPayment: {
                         text: "Ekstern betaling"
