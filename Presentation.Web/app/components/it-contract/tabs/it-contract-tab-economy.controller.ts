@@ -46,8 +46,8 @@
         });
     }]);
 
-    app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess", "paymentFrequencies", "paymentModels", "priceRegulations",
-        ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess, paymentFrequencies: Kitos.Models.IOptionEntity[], paymentModels: Kitos.Models.IOptionEntity[], priceRegulations: Kitos.Models.IOptionEntity[]) => {
+    app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess", "paymentFrequencies", "paymentModels", "priceRegulations", "uiState",
+        ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess, paymentFrequencies: Kitos.Models.IOptionEntity[], paymentModels: Kitos.Models.IOptionEntity[], priceRegulations: Kitos.Models.IOptionEntity[], uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             $scope.orgUnits = orgUnits;
             $scope.allowClear = true;
             $scope.hasWriteAccess = hasWriteAccess;
@@ -56,6 +56,12 @@
             $scope.paymentModels = paymentModels;
             $scope.priceRegulations = priceRegulations;
             $scope.patchPaymentModelUrl = `api/itcontract/${contract.id}`;
+
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
+
+            $scope.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel);
+            $scope.isExtPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.extPayment);
+            $scope.isIntPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.intPayment);
 
             function convertDate(value: string): moment.Moment {
                 return moment(value, Kitos.Constants.DateFormat.DanishDateFormat);

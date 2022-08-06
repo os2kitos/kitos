@@ -10,11 +10,34 @@
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab,
                 children: {
+                    contractId: {
+                        text: "KontraktID"
+                    },
+                    contractType: {
+                        text: "Kontrakttype"
+                    },
+                    purchaseForm: {
+                        text: "Indkøbsform"
+                    },
                     procurementStrategy: {
                         text: "Genanskaffelsesstrategi"
                     },
                     procurementPlan: {
                         text: "Genanskaffelsesplan"
+                    },
+                    externalSigner: {
+                        text: "Leverandørs underskrift",
+                        helpText: "Herunder: 'Underskriver', 'Underskrevet' og 'Dato'"
+                    },
+                    internalSigner: {
+                        text: "Kontraktunderskriver",
+                        helpText: "Herunder: 'Underskriver', 'Underskrevet' og 'Dato'"
+                    },
+                    agreementPeriod: {
+                        text: "Gyldig fra/til"
+                    },
+                    isActive: {
+                        text: "Gyldig"
                     }
                 }
             },
@@ -30,13 +53,33 @@
             },
             deadlines: {
                 text: "Aftalefrister",
-                helpText: Configs.helpTexts.cannotChangeTab,
-                readOnly: true
+                readOnly: false,
+                children: {
+                    agreementDeadlines: {
+                        text: "Aftalefrister",
+                        helpText: "Herunder: 'Varighed', 'Løbende', 'Option' forlæng', 'Antal brugte optioner' og 'Uopsigelig til' "
+                    },
+                    termination: {
+                        text: "Opsigelse",
+                        helpText: "Herunder: 'Kontrakten opsagt', 'Opsigelsesfrist', 'Løbende' og 'Inden udgangen af' "
+                    }
+                }
             },
             economy: {
                 text: "Økonomi",
-                helpText: Configs.helpTexts.cannotChangeTab,
-                readOnly: true
+                readOnly: false,
+                children: {
+                    paymentModel: {
+                        text: "Betalingsmodel",
+                        helpText: "Herunder: 'Driftsvederlag påbegyndt', 'Betalingsfrekvens', 'Betalingsmodel' og 'Prisregulering' "
+                    },
+                    extPayment: {
+                        text: "Ekstern betaling"
+                    },
+                    intPayment: {
+                        text: "Intern betaling"
+                    }
+                }
             },
             contractRoles: {
                 text: "Kontraktroller",

@@ -72,9 +72,6 @@
                                 return results;
                             });
                         }
-                    ],
-                    uiState: [
-                        "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
                     ]
                 }
             });
@@ -110,8 +107,17 @@
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
                 $scope.allowClear = true;
+
                 $scope.showprocurementPlanSelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementPlan);
                 $scope.showProcurementStrategySelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementStrategy);
+                $scope.isContractIdEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractId);
+                $scope.isContractTypeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractType);
+                $scope.isPurchaseFormEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.purchaseForm);
+                $scope.isExternalSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.externalSigner);
+                $scope.isInternalSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.internalSigner);
+                $scope.isagreementPeriodEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementPeriod);
+                $scope.isActiveEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.isActive);
+
                 bindProcurementInitiated();
                 var today = new Date();
 

@@ -313,44 +313,50 @@
                         response.forEach(contract => {
                             var ecoData = contract.ExternEconomyStreams ?? [];
 
-                            contract.Acquisition = _.sumBy(ecoData, "Acquisition");
-                            contract.Operation = _.sumBy(ecoData, "Operation");
-                            contract.Other = _.sumBy(ecoData, "Other");
+                            //Only compute payment related stuff if needed
+                            if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.extPayment)) {
+                                contract.Acquisition = _.sumBy(ecoData, "Acquisition");
+                                contract.Operation = _.sumBy(ecoData, "Operation");
+                                contract.Other = _.sumBy(ecoData, "Other");
 
-                            const streamsSortedByAuditDate = _.sortBy(ecoData, ["AuditDate"]);
-                            var streamWithEarliestAuditDate = _.last(streamsSortedByAuditDate);
-                            if (streamWithEarliestAuditDate && streamWithEarliestAuditDate.AuditDate) {
-                                contract.AuditDate = streamWithEarliestAuditDate.AuditDate;
+                                const streamsSortedByAuditDate = _.sortBy(ecoData, ["AuditDate"]);
+                                const streamWithEarliestAuditDate = _.last(streamsSortedByAuditDate);
+                                if (streamWithEarliestAuditDate && streamWithEarliestAuditDate.AuditDate) {
+                                    contract.AuditDate = streamWithEarliestAuditDate.AuditDate;
+                                }
+
+                                const totalWhiteStatuses = _.filter(ecoData, { AuditStatus: "White" }).length;
+                                const totalRedStatuses = _.filter(ecoData, { AuditStatus: "Red" }).length;
+                                const totalYellowStatuses = _.filter(ecoData, { AuditStatus: "Yellow" }).length;
+                                const totalGreenStatuses = _.filter(ecoData, { AuditStatus: "Green" }).length;
+
+                                contract.status = {
+                                    max: totalWhiteStatuses +
+                                        totalRedStatuses +
+                                        totalYellowStatuses +
+                                        totalGreenStatuses,
+                                    white: totalWhiteStatuses,
+                                    red: totalRedStatuses,
+                                    yellow: totalYellowStatuses,
+                                    green: totalGreenStatuses
+                                };
                             }
 
-                            var totalWhiteStatuses = _.filter(ecoData, { AuditStatus: "White" }).length;
-                            var totalRedStatuses = _.filter(ecoData, { AuditStatus: "Red" }).length;
-                            var totalYellowStatuses = _.filter(ecoData, { AuditStatus: "Yellow" }).length;
-                            var totalGreenStatuses = _.filter(ecoData, { AuditStatus: "Green" }).length;
-
-                            contract.status = {
-                                max: totalWhiteStatuses +
-                                    totalRedStatuses +
-                                    totalYellowStatuses +
-                                    totalGreenStatuses,
-                                white: totalWhiteStatuses,
-                                red: totalRedStatuses,
-                                yellow: totalYellowStatuses,
-                                green: totalGreenStatuses
-                            };
-
                             contract.roles = [];
-                            // Create columns lookups for all assigned rights
-                            _.forEach(contract.Rights,
-                                right => {
-                                    // init an role array to hold users assigned to this role
-                                    if (!contract.roles[right.RoleId])
-                                        contract.roles[right.RoleId] = [];
 
-                                    // push username to the role array
-                                    contract.roles[right.RoleId]
-                                        .push([right.User.Name, right.User.LastName].join(" "));
-                                });
+                            //Only compute roles related stuff if needed
+                            if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.contractRoles)) {
+                                // Create columns lookups for all assigned rights
+                                _.forEach(contract.Rights,
+                                    right => {
+                                        // init an role array to hold users assigned to this role
+                                        if (!contract.roles[right.RoleId])
+                                            contract.roles[right.RoleId] = [];
+
+                                        // push username to the role array
+                                        contract.roles[right.RoleId].push(`${right.User.Name} ${right.User.LastName}`);
+                                    });
+                            }
 
                             //Ensure that object, where the data source is nested, are provided. Otherwise pre-render prep will fail in kendo grid's excel export function (even if we override the export)
                             contract.Parent = contract.Parent ?? {} as any;
@@ -423,6 +429,7 @@
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.contractId))
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
@@ -498,6 +505,7 @@
                         .withTitle("Kontraktunderskriver")
                         .withId("contractSigner")
                         .withStandardWidth(190)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.internalSigner))
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
@@ -508,6 +516,7 @@
                         .withTitle("Kontrakttype")
                         .withId("contractType")
                         .withContentOverflow()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.contractType))
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(Helpers.KendoOverviewHelper.mapDataForKendoDropdown(this.contractTypeOptionViewModel.enabledOptions, true), false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTypeOptionViewModel.getOptionText(dataItem.ContractType?.Id))))
@@ -530,6 +539,7 @@
                         .withTitle("Indkøbsform")
                         .withId("purchaseForm")
                         .withContentOverflow()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.purchaseForm))
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             Helpers.KendoOverviewHelper.mapDataForKendoDropdown(
@@ -543,6 +553,7 @@
                         .withTitle("Genanskaffelsesstrategi")
                         .withId("procurementStrategy")
                         .withStandardWidth(180)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.procurementStrategy))
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
@@ -557,6 +568,7 @@
                         .withTitle("Genanskaffelsesplan")
                         .withId("procurementPlanYear")
                         .withStandardWidth(165)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.procurementPlan))
                         .withContentOverflow()
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
@@ -580,12 +592,13 @@
                             ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated)
                             : ""));
 
-            itContractRoles.forEach(role => {
-                const roleColumnId = `itContract${role.Id}`;
-                const roleKey = getRoleKey(role.Id);
-                launcher = launcher
-                    .withColumn(builder =>
-                        builder
+            if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.contractRoles)) {
+                itContractRoles.forEach(role => {
+                    const roleColumnId = `itContract${role.Id}`;
+                    const roleKey = getRoleKey(role.Id);
+                    launcher = launcher
+                        .withColumn(builder =>
+                            builder
                             .withDataSourceName(roleKey)
                             .withTitle(role.Name)
                             .withId(roleColumnId)
@@ -599,7 +612,8 @@
                                 dataItem.roles[role.Id]?.toString() ?? ""))
                             .withExcelOutput(
                                 dataItem => dataItem.roles[role.Id]?.toString() ?? ""));
-            });
+                });
+            }
 
             launcher = launcher
                 .withColumn(builder =>
@@ -679,16 +693,16 @@
                         .withoutSorting()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => {
-                        var activeSystemUsages = [];
-                        dataItem.AssociatedSystemUsages.forEach(system => {
-                            activeSystemUsages.push(Helpers.RenderFieldsHelper.renderInternalReference(
-                                `kendo-contract-system-usages-uuid-${system.ItSystemUsageId}`,
-                                "it-system.usage.main",
-                                system.ItSystemUsageId,
-                                Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Uuid, system.ItSystemUsage.ItSystem.Disabled)));
+                            var activeSystemUsages = [];
+                            dataItem.AssociatedSystemUsages.forEach(system => {
+                                activeSystemUsages.push(Helpers.RenderFieldsHelper.renderInternalReference(
+                                    `kendo-contract-system-usages-uuid-${system.ItSystemUsageId}`,
+                                    "it-system.usage.main",
+                                    system.ItSystemUsageId,
+                                    Helpers.SystemNameFormat.apply(system.ItSystemUsage.ItSystem.Uuid, system.ItSystemUsage.ItSystem.Disabled)));
 
-                        });
-                        return activeSystemUsages.join(", ");
+                            });
+                            return activeSystemUsages.join(", ");
                         })
                         .withExcelOutput(dataItem => {
                             var uuids = [];
@@ -741,6 +755,7 @@
                         .withDataSourceName("ExternEconomyStreams.Acquisition")
                         .withTitle("Anskaffelse")
                         .withId("acquisition")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.extPayment))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withoutSorting()
                         .withRendering(dataItem => { return dataItem.Acquisition ? dataItem.Acquisition.toString() : ""; }))
@@ -749,6 +764,7 @@
                         .withDataSourceName("ExternEconomyStreams.Operation")
                         .withTitle("Drift/år")
                         .withId("operation")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.extPayment))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withoutSorting()
                         .withRendering(dataItem => { return dataItem.Operation ? dataItem.Operation.toString() : ""; }))
@@ -757,6 +773,7 @@
                         .withDataSourceName("ExternEconomyStreams.Other")
                         .withTitle("Andet")
                         .withId("other")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.extPayment))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withoutSorting()
                         .withRendering(dataItem => { return dataItem.Other ? dataItem.Other.toString() : ""; }))
@@ -765,6 +782,7 @@
                         .withDataSourceName("OperationRemunerationBegun")
                         .withTitle("Driftsvederlag begyndt")
                         .withId("operationRemunerationBegun")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.paymentModel))
                         .withStandardWidth(170)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
@@ -774,6 +792,7 @@
                         .withDataSourceName(this.paymentModelPropertyName)
                         .withTitle("Betalingsmodel")
                         .withId("paymentModel")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.paymentModel))
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
@@ -787,6 +806,7 @@
                         .withDataSourceName(this.paymentFrequencyPropertyName)
                         .withTitle("Betalingsfrekvens")
                         .withId("paymentFrequency")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.paymentModel))
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
@@ -800,6 +820,7 @@
                         .withDataSourceName("ExternEconomyStreams.AuditDate")
                         .withTitle("Audit dato")
                         .withId("auditDate")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.extPayment))
                         .withoutSorting()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AuditDate))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AuditDate)))
@@ -808,6 +829,7 @@
                         .withDataSourceName("ExternEconomyStreams.AuditStatus")
                         .withTitle("Audit status")
                         .withId("auditStatus")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.extPayment))
                         .withoutSorting()
                         .withRendering(dataItem => {
                             if (dataItem.status.max > 0) {
@@ -826,6 +848,7 @@
                         .withDataSourceName("Duration")
                         .withTitle("Varighed")
                         .withId("duration")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementDeadlines))
                         .withoutSorting()
                         .withRendering(dataItem => {
                             if (dataItem.DurationOngoing) {
@@ -856,6 +879,7 @@
                         .withTitle("Option")
                         .withId("optionExtend")
                         .withContentOverflow()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementDeadlines))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
@@ -870,6 +894,7 @@
                         .withTitle("Opsigelse (måneder)")
                         .withId("terminationDeadline")
                         .withStandardWidth(160)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.termination))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
@@ -883,6 +908,7 @@
                         .withDataSourceName("IrrevocableTo")
                         .withTitle("Uopsigelig til")
                         .withId("irrevocableTo")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.agreementDeadlines))
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.IrrevocableTo)))
@@ -891,6 +917,7 @@
                         .withDataSourceName("Terminated")
                         .withTitle("Opsagt")
                         .withId("terminated")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.deadlines.children.termination))
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Terminated)))

@@ -15,8 +15,8 @@
         });
     }]);
 
-    app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "user", "moment", "$q", "contract",
-        ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, user, moment, $q, contract) => {
+    app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "user", "moment", "$q", "contract", "uiState",
+        ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, user, moment, $q, contract, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             $scope.contract = contract;
             $scope.autosaveUrl = "api/itcontract/" + contract.id;
             $scope.optionExtensions = optionExtensions;
@@ -25,6 +25,10 @@
             $scope.durationMonths = contract.durationMonths;
             $scope.durationOngoing = contract.durationOngoing;
 
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
+
+            $scope.isAgreementDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines);
+            $scope.isTerminationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination);
 
             $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.running);
             $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.byEnding);
