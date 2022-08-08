@@ -61,7 +61,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItSystemCategoriesId);
 
             HasOptional(t => t.ArchiveSupplier)
-                .WithMany(t => t.SuppliedArchives)
+                .WithMany(t => t.ArchiveSupplierForItSystems)
                 .HasForeignKey(d => d.ArchiveSupplierId);
 
             HasMany(t => t.SensitiveDataLevels)

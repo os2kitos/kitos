@@ -93,6 +93,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<ItSystemUsageSensitiveDataLevelDTO> SetArchiveSupplierAsync(int systemUsageId, int orgId, int? archiveSupplierId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var body = new
+            {
+                ArchiveSupplierId = archiveSupplierId
+            };
+            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationId={orgId}"), cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
+            }
+        }
+
 
         public static async Task<ItSystemUsageDTO> PatchSystemUsage(int usageSystemId, int orgId, object body)
         {

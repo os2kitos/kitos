@@ -784,7 +784,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveSupplierOrganization()
         {
-            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
             ArchiveSupplier.Track();
             ArchiveSupplier = null;
         }

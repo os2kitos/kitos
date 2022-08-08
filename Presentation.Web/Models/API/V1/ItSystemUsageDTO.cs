@@ -27,7 +27,6 @@ namespace Presentation.Web.Models.API.V1
         public string ArchiveTestLocationName { get; set; }
         public int? ArchiveSupplierId { get; set; }
         public string ArchiveSupplierName { get; set; } 
-        public int SupplierId { get; set; }
         public string ResponsibleOrgUnitName { get; set; }
         public int OrganizationId { get; set; }
         public OrganizationDTO Organization { get; set; }

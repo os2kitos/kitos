@@ -147,8 +147,8 @@ namespace Presentation.Web.Controllers.API.V1
         private static IEnumerable<EntityWithOrganizationRelationshipDTO> MapSystemsWhereOrgIsArchiveSupplier(OrganizationRemovalConflicts result)
         {
             return result
-                .SystemsWhereOrgIsArchiveSupplier
-                .Select(system => new EntityWithOrganizationRelationshipDTO(system.Id, system.ItSystem.Name, system.ArchiveSupplier.MapToShallowOrganizationDTO()))
+                .SystemUsagesWhereOrgIsArchiveSupplier
+                .Select(itSystemUsage => new EntityWithOrganizationRelationshipDTO(itSystemUsage.Id, itSystemUsage.ItSystem.Name, itSystemUsage.Organization.MapToShallowOrganizationDTO()))
                 .ToList();
         }
     }
