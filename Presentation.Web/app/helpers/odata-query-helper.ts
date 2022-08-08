@@ -37,6 +37,31 @@
             return filterUrl;
         }
 
+        /**
+             * Changes ordering from one properties to multiple properties while maintaining direction on each property
+             * @param initialOrderBy
+             * @param initialProperty
+             * @param propertiesToExtendTo
+             */
+        static expandOrderingToMultipleProperties(initialOrderBy: string, initialProperty: string, propertiesToExtendTo: Array<string>): string {
+            const pattern = new RegExp(`^${initialProperty}( desc| asc)?$`, "i");
+            const matches = pattern.exec(initialOrderBy);
+            let result = initialOrderBy;
+            if (matches?.length === 2) {
+                let properties = propertiesToExtendTo;
+                const direction = matches[1];
+
+                //Append the direction to each property if defined
+                if (direction !== undefined) {
+                    properties = properties.map(p => { return `${p}${direction}`; });
+                }
+
+                //Create the updated ordering
+                result = result.replace(pattern, properties.join(","));
+            }
+            return result;
+        }
+
         private static createContainsQueryForProperties(columnName: string, propertyNames: string[], searchValue: string, addSlashBeforeProperty: boolean): string {
             var result = "(";
             propertyNames.forEach((name, i) => {

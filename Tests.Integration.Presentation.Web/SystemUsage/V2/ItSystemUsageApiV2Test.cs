@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -23,6 +24,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -1716,7 +1718,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
 
-        private void AssertGeneralData(GeneralDataWriteRequestDTO expected, GeneralDataResponseDTO actual, bool hasData = true)
+        private static void AssertGeneralData(GeneralDataWriteRequestDTO expected, GeneralDataResponseDTO actual, bool hasData = true)
         {
             Assert.Equal(expected.LocalCallName, actual.LocalCallName);
             Assert.Equal(expected.LocalSystemId, actual.LocalSystemId);
@@ -1790,6 +1792,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
         }
 
+        private static IEnumerable<Maybe<(int lower, int? upper)>> GetValidIntervals()
+        {
+            yield return (0, 9);
+            yield return (10, 50);
+            yield return (50, 100);
+            yield return (100, null);
+        }
+
         private GeneralDataWriteRequestDTO CreateGeneralDataWriteRequestDTO(Guid dataClassificationUuid, Guid[] projectUuids)
         {
             return new GeneralDataWriteRequestDTO
@@ -1800,7 +1810,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Notes = A<string>(),
                 AssociatedProjectUuids = projectUuids,
                 DataClassificationUuid = dataClassificationUuid,
-                NumberOfExpectedUsers = new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
+                NumberOfExpectedUsers = GetValidIntervals()
+                    .RandomItem()
+                    .Select(interval => new ExpectedUsersIntervalDTO
+                    {
+                        LowerBound = interval.lower,
+                        UpperBound = interval.upper
+                    })
+                    .GetValueOrDefault(),
                 Validity = new ValidityWriteRequestDTO
                 {
                     EnforcedValid = A<bool>(),

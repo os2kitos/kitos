@@ -12,15 +12,21 @@ describe("Local admin is able customize the IT-Contract UI", () => {
     var testFixture = new TestFixtureWrapper();
     var navigation = new NavigationHelper();
 
-    var contractName = createName("contractName");
-    var orgName = createName("orgName");
+    var contractName = "";
+    var orgName = "";
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
-        loginHelper.loginAsGlobalAdmin()
-            .then(() => OrgHelper.createOrg(orgName))
-            .then(() => OrgHelper.changeOrg(orgName))
-            .then(() => ContractHelper.createContract(contractName));
+    });
+
+    beforeEach(() => {
+        contractName = createName("contract");
+        orgName = createName("org");
+        console.log("Created contract name ", contractName, " and org name ", orgName);
+    });
+
+    afterEach(() => {
+        testFixture.cleanupState();
     });
 
     afterAll(() => {
@@ -32,62 +38,46 @@ describe("Local admin is able customize the IT-Contract UI", () => {
 
     it("Disabling tabs will hide the tabs on the IT-Contract details page", () => {
 
-        return setupUser()
+        return setupUserAndOrg()
             .then(() => testTabCustomization(contractName, "ItContracts.contractRoles", ContractNavigationSrefs.contractRolesSref))
-            .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref));
+            .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref))
+            .then(() => testTabCustomization(contractName, "ItContracts.economy", ContractNavigationSrefs.economyPageSref))
+            .then(() => testTabCustomization(contractName, "ItContracts.deadlines", ContractNavigationSrefs.deadlinesPageSref));
     });
 
-    it("Disabling fields will hide the fields on the IT-Contract front page", () => {
+    it("Disabling fields will hide the fields on the IT-Contract page contents", () => {
 
-        return setupUser()
+        return setupUserAndOrg()
+            // Front page
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementPlan", ContractNavigationSrefs.frontPageSref, "selectProcurementPlan"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementStrategy", ContractNavigationSrefs.frontPageSref, "selectProcurementStrategy"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractId", ContractNavigationSrefs.frontPageSref, "contract-id"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractType", ContractNavigationSrefs.frontPageSref, "s2id_contract-type"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.purchaseForm", ContractNavigationSrefs.frontPageSref, "s2id_contract-purchaseform"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.extSigner", ContractNavigationSrefs.frontPageSref, "contract-ext-signer"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.extSigned", ContractNavigationSrefs.frontPageSref, "contract-ext-signed"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.extDate", ContractNavigationSrefs.frontPageSref, "contract-ext-date"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.intSigner", ContractNavigationSrefs.frontPageSref, "contract-int-signer"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.intSigned", ContractNavigationSrefs.frontPageSref, "contract-int-signed"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.intDate", ContractNavigationSrefs.frontPageSref, "contract-int-date"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.agreementConcluded", ContractNavigationSrefs.frontPageSref, "agreement-concluded"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.agreementExpiration", ContractNavigationSrefs.frontPageSref, "agreement-expiration"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.isActive", ContractNavigationSrefs.frontPageSref, "contractIsActive"));
-    });
+            .then(() => testFieldGroupCustomization(contractName, "ItContracts.frontPage.externalSigner", ContractNavigationSrefs.frontPageSref, ["contract-ext-signer", "contract-ext-signed", "contract-ext-date"]))
+            .then(() => testFieldGroupCustomization(contractName, "ItContracts.frontPage.internalSigner", ContractNavigationSrefs.frontPageSref, ["contract-int-signer", "contract-int-signed", "contract-int-date"]))
+            .then(() => testFieldGroupCustomization(contractName, "ItContracts.frontPage.agreementPeriod", ContractNavigationSrefs.frontPageSref, ["agreement-concluded", "agreement-expiration"]))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.isActive", ContractNavigationSrefs.frontPageSref, "contractIsActive"))
 
-    it("Disabling fields will hide the fields on the IT-Contract deadlines page", () => {
-
-        return setupUser()
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.duration", ContractNavigationSrefs.deadlinesPageSref, "deadlines-duration"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.ongoing", ContractNavigationSrefs.deadlinesPageSref, "idl"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.optionExtend", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-option-extend"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.optionExtendMultiplier", ContractNavigationSrefs.deadlinesPageSref, "agreement-option-extend-multiplier"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines.irrevocable", ContractNavigationSrefs.deadlinesPageSref, "agreement-irrevocable"))
+            // Deadlines tab
             .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines", ContractNavigationSrefs.deadlinesPageSref, "agreement-deadlines"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination.terminated", ContractNavigationSrefs.deadlinesPageSref, "agreement-terminated"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination.notice", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-notice"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination.ongoing", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-running"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination.byEndingOf", ContractNavigationSrefs.deadlinesPageSref, "s2id_agreement-by-ending"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination", ContractNavigationSrefs.deadlinesPageSref, "termination"));
-    });
+            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination", ContractNavigationSrefs.deadlinesPageSref, "termination"))
 
-    it("Disabling fields will hide the fields on the IT-Contract economy page", () => {
 
-        return setupUser()
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.operation", ContractNavigationSrefs.economyPageSref, "agreement-operation"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.frequency", ContractNavigationSrefs.economyPageSref, "agreement-freq"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.paymentModel", ContractNavigationSrefs.economyPageSref, "agreement-payment"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel.price", ContractNavigationSrefs.economyPageSref, "agreement-price"))
+            // Economy tab
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel", ContractNavigationSrefs.economyPageSref, "payment-model"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.extPayment", ContractNavigationSrefs.economyPageSref, "ext-payment"))
             .then(() => testFieldCustomization(contractName, "ItContracts.economy.intPayment", ContractNavigationSrefs.economyPageSref, "int-payment"));
     });
 
-    function setupUser() {
-        return navigation.getPage("/#/global-admin/local-admins")
+    function setupUserAndOrg() {
+        return loginHelper.loginAsGlobalAdmin()
+            .then(() => OrgHelper.createOrg(orgName))
+            .then(() => OrgHelper.changeOrg(orgName))
+            .then(() => ContractHelper.createContract(contractName))
+            .then(() => navigation.getPage("/#/global-admin/local-admins"))
             .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
-            .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
+            .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"));
     }
 
     function testTabCustomization(name: string, settingId: string, tabSref: string) {
@@ -98,10 +88,14 @@ describe("Local admin is able customize the IT-Contract UI", () => {
     }
 
     function testFieldCustomization(contractName: string, settingId: string, tabSref: string, settingElementId: string) {
-        console.log("testFieldCustomization for ", contractName, " and tabSref:", tabSref, " settingId:", settingId);
-        return verifySettingVisibility(contractName, tabSref, settingElementId, true)                //Check that the setting is visible before the change
+        return testFieldGroupCustomization(contractName, settingId, tabSref, [settingElementId]);
+    }
+
+    function testFieldGroupCustomization(contractName: string, settingId: string, tabSref: string, settingElementIds: Array<string>) {
+        console.log("testFieldCustomization for ", contractName, " and tabSref:", tabSref, " affecting settings with ids:", settingElementIds.join(", "));
+        return verifySettingVisibility(contractName, tabSref, settingElementIds, true)                //Check that the setting is visible before the change
             .then(() => toggleSetting(settingId))                                                   //Toggle the setting
-            .then(() => verifySettingVisibility(contractName, tabSref, settingElementId, false));     //Verify that the setting has now been hidden
+            .then(() => verifySettingVisibility(contractName, tabSref, settingElementIds, false));     //Verify that the setting has now been hidden
     }
 
     function navigateToContract(contractName: string) {
@@ -126,14 +120,18 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => expect(navigation.findSubMenuElement(tabSref).isPresent()).toBe(expectedToBePresent, `Failed to validate tab:${tabSref} to be ${expectedToBePresent ? "_present_" : "_removed_"}`));
     }
 
-    function verifySettingVisibility(contractName: string, tabSref: string, settingElementId: string, expectedToBePresent: boolean) {
-        console.log("verifySettingVisibility for ", contractName, " and field", settingElementId, " located on tabSref:", tabSref, " expectedPresence:", expectedToBePresent);
+    function verifySettingVisibility(contractName: string, tabSref: string, settingElementIds: Array<string>, expectedToBePresent: boolean) {
+        console.log("verifySettingVisibility for ", contractName, " and fields ", settingElementIds.join(", "), " located on tabSref:", tabSref, " expectedPresence:", expectedToBePresent);
 
         return navigateToContract(contractName)
-            .then(() => expect(navigation.findSubMenuElement(tabSref).isPresent()).toBe(true, `Tab ${tabSref} containing setting ${settingElementId} is not present`))
+            .then(() => expect(navigation.findSubMenuElement(tabSref).isPresent()).toBe(true, `Tab ${tabSref} is not present`))
             .then(() => navigation.findSubMenuElement(tabSref).click())
             .then(() => browser.waitForAngular())
-            .then(() => expect(element(by.id(settingElementId)).isPresent()).toBe(expectedToBePresent, `Setting: ${settingElementId} failed to meet expected visibility of ${expectedToBePresent}`));
+            .then(() => {
+                for (let settingElementId of settingElementIds) {
+                    expect(element(by.id(settingElementId)).isPresent()).toBe(expectedToBePresent, `Setting: ${settingElementId} failed to meet expected visibility of ${expectedToBePresent}`);
+                }
+            });
     }
 
     function toggleSetting(settingId: string) {

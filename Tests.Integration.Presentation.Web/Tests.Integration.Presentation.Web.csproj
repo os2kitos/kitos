@@ -114,6 +114,7 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Authorization\GetOrganizationsTests.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
+    <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
+    <Compile Include="Tools\LocalOptionHelper.cs" />
     <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />
     <Compile Include="Tools\External\ApiV2HelperPatchPayloadExtensions.cs" />
     <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />

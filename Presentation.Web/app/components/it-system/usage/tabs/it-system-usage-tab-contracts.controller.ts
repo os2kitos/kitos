@@ -45,8 +45,7 @@
 
             $scope.showContractIsActive = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.isActive);
             $scope.showContractType = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.contractType);
-            $scope.showContractAgreementConcluded = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.agreementConcluded);
-            $scope.showContractAgreementExpiration = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.agreementExpiration);
+            $scope.showContractAgreementPeriod = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.frontPage.children.agreementPeriod);
             $scope.showContractAgreementTermination = contractUiState.isBluePrintNodeAvailable(contractBlueprint.children.deadlines.children.termination);
         }]);
 })(angular, app);

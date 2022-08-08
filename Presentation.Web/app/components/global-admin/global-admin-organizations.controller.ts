@@ -84,7 +84,7 @@
                         field: "Name",
                         title: "Navn",
                         width: 230,
-                        persistId: "name", // DON'T YOU DARE RENAME!,
+                        persistId: "name",
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Name,
                         filterable: {
@@ -100,7 +100,7 @@
                         field: "Cvr",
                         title: "CVR",
                         width: 230,
-                        persistId: "cvr", // DON'T YOU DARE RENAME!
+                        persistId: "cvr", 
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Cvr,
                         filterable: {
@@ -116,7 +116,7 @@
                         field: "Type.Name",
                         title: "Type",
                         width: 230,
-                        persistId: "type", // DON'T YOU DARE RENAME!
+                        persistId: "type", 
                         hidden: false,
                         template: (dataItem) => dataItem.Type.Name,
                         excelTemplate: (dataItem) => dataItem.Type.Name,
@@ -143,7 +143,7 @@
                         field: "AccessModifier",
                         title: "Synlighed",
                         width: 230,
-                        persistId: "synlighed", // DON'T YOU DARE RENAME!
+                        persistId: "synlighed", 
                         hidden: false,
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         excelTemplate: (dataItem) => dataItem.AccessModifier.toString(),

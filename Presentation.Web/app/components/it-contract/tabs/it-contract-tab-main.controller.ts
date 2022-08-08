@@ -113,14 +113,9 @@
                 $scope.isContractIdEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractId);
                 $scope.isContractTypeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractType);
                 $scope.isPurchaseFormEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.purchaseForm);
-                $scope.isExtSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extSigner);
-                $scope.isExtSignedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extSigned);
-                $scope.isExtDateEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extDate);
-                $scope.isIntSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intSigner);
-                $scope.isIntSignedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intSigned);
-                $scope.isIntDateEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intDate);
-                $scope.isAgreementConcludedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementConcluded);
-                $scope.isAgreementExpirationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementExpiration);
+                $scope.isExternalSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.externalSigner);
+                $scope.isInternalSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.internalSigner);
+                $scope.isagreementPeriodEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementPeriod);
                 $scope.isActiveEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.isActive);
 
                 bindProcurementInitiated();

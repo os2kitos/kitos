@@ -94,7 +94,7 @@
                 columns: [
                     {
                         field: "IsLocallyAvailable", title: "Aktiv", width: 112,
-                        persistId: "isLocallyAvailable", // DON'T YOU DARE RENAME!
+                        persistId: "isLocallyAvailable", 
                         attributes: { "class": "text-center" },
                         template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${localOptionUrlResolver.resolveAutosaveUrl(parseInt(this.optionType.toString()))}" data-field="OptionId"> # } #`,
                         hidden: false,
@@ -103,7 +103,7 @@
                     },
                     {
                         field: "Name", title: "Navn", width: 230,
-                        persistId: "name", // DON'T YOU DARE RENAME!
+                        persistId: "name", 
                         template: (dataItem) => dataItem.Name,
                         hidden: false,
                         filterable: {
@@ -117,7 +117,7 @@
                     },
                     {
                         field: "HasWriteAccess", title: "Skriv", width: 112,
-                        persistId: "hasWriteAccess", // DON'T YOU DARE RENAME!
+                        persistId: "hasWriteAccess", 
                         attributes: { "class": "text-center" },
                         template: `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked text-grey" aria-hidden="true"></span> # } #`,
                         hidden: false,
@@ -126,7 +126,7 @@
                     },
                     {
                         field: "Description", title: "Beskrivelse", width: 230,
-                        persistId: "description", // DON'T YOU DARE RENAME!
+                        persistId: "description", 
                         template: (dataItem) => dataItem.Description,
                         hidden: false,
                         filterable: {
