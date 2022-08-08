@@ -286,7 +286,7 @@
                 columns: [
                     {
                         field: "ItProjectId", title: "ProjektID", width: 115,
-                        persistId: "projid", // DON'T YOU DARE RENAME!
+                        persistId: "projid", 
                         excelTemplate: dataItem => dataItem && dataItem.ItProjectId ? dataItem.ItProjectId : "",
                         hidden: true,
                         filterable: {
@@ -300,7 +300,7 @@
                     },
                     {
                         field: "Parent.Name", title: "Overordnet IT Projekt", width: 150,
-                        persistId: "parentname", // DON'T YOU DARE RENAME!
+                        persistId: "parentname", 
                         template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.main({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
@@ -315,7 +315,7 @@
                     },
                     {
                         field: "Name", title: "IT Projekt", width: 370,
-                        persistId: "projname", // DON'T YOU DARE RENAME!
+                        persistId: "projname", 
                         template: dataItem => `<a data-ui-sref="it-project.edit.main({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name ? dataItem.Name : "",
                         filterable: {
@@ -329,7 +329,7 @@
                     },
                     {
                         field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,
-                        persistId: "orgunit", // DON'T YOU DARE RENAME!
+                        persistId: "orgunit", 
                         template: dataItem => dataItem.ResponsibleUsage && dataItem.ResponsibleUsage.OrganizationUnit.Name || "",
                         filterable: {
                             cell: {
@@ -340,7 +340,7 @@
                     },
                     {
                         field: "Reference.Title", title: "Reference", width: 150,
-                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        persistId: "ReferenceId", 
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             return Helpers.RenderFieldsHelper.renderReferenceUrl(reference);
@@ -360,7 +360,7 @@
                     },
                     {
                         field: "Reference.ExternalReferenceId", title: "Dokument ID / Sagsnr.", width: 150,
-                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        persistId: "folderref", 
                         template: dataItem => {
                             return Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference);
                         },
@@ -380,7 +380,7 @@
                     },
                     {
                         field: "ItProjectType.Name", title: "Projekttype", width: 135,
-                        persistId: "projtype", // DON'T YOU DARE RENAME!
+                        persistId: "projtype", 
                         template: dataItem => dataItem.ItProjectType && dataItem.ItProjectType.Name || "",
                         filterable: {
                             cell: {
@@ -393,7 +393,7 @@
                     },
                     {
                         field: "CurrentPhaseObj", title: "Fase", width: 100,
-                        persistId: "phasename", // DON'T YOU DARE RENAME!
+                        persistId: "phasename", 
                         template: dataItem =>
                             dataItem.CurrentPhaseObj ? `<a data-ui-sref="it-project.edit.phases({id:${dataItem.Id}})">${dataItem.CurrentPhaseObj.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.CurrentPhaseObj && dataItem.CurrentPhaseObj.Name || "",
@@ -402,7 +402,7 @@
                     },
                     {
                         field: "CurrentPhaseObj.StartDate", title: "Fase: Startdato", format: "{0:dd-MM-yyyy}", width: 85,
-                        persistId: "phasestartdate", // DON'T YOU DARE RENAME!
+                        persistId: "phasestartdate", 
                         template: dataItem => {
                             // handles null cases
                             if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
@@ -423,7 +423,7 @@
                     },
                     {
                         field: "CurrentPhaseObj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
-                        persistId: "phaseenddate", // DON'T YOU DARE RENAME!
+                        persistId: "phaseenddate", 
                         hidden: true,
                         template: dataItem => {
                             // handles null cases
@@ -445,7 +445,7 @@
                     },
                     {
                         field: "ItProjectStatus", title: "Status: Samlet", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusproj", 
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -481,7 +481,7 @@
                     },
                     {
                         field: "ItProjectTimeStatus", title: "Status: Tid", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusproj", 
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -503,7 +503,7 @@
                     },
                     {
                         field: "ItProjectQualityStatus", title: "Status: Kvalitet", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusproj", 
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -525,7 +525,7 @@
                     },
                     {
                         field: "ItProjectResourcesStatus", title: "Status: Ressourcer", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusproj", 
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -547,7 +547,7 @@
                     },
                     {
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
-                        persistId: "statusdateproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusdateproj", 
                         excelTemplate: dataItem => {
                             if (!dataItem || !dataItem.StatusDate) {
                                 return "";
@@ -565,7 +565,7 @@
                     },
                     {
                         field: "Assignments", title: "Opgaver", width: 150,
-                        persistId: "assignments", // DON'T YOU DARE RENAME!
+                        persistId: "assignments", 
                         hidden: true,
                         template: dataItem => this._.filter(dataItem.ItProjectStatuses, n => this._.includes(n["@odata.type"], "Assignment")).length.toString(),
                         filterable: false,
@@ -573,7 +573,7 @@
                     },
                     {
                         field: "GoalStatus.Status", title: "Status Mål", width: 150,
-                        persistId: "goalstatus", // DON'T YOU DARE RENAME!
+                        persistId: "goalstatus", 
                         template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
                         excelTemplate: dataItem => {
                             if (!dataItem.GoalStatus) {
@@ -598,21 +598,21 @@
                     },
                     {
                         field: "IsTransversal", title: "Tværgående", width: 150,
-                        persistId: "trans", // DON'T YOU DARE RENAME!
+                        persistId: "trans", 
                         hidden: true,
                         template: dataItem => dataItem.IsTransversal ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
                         excelTemplate: dataItem => dataItem && dataItem.IsTransversal.toString() || ""
                     },
                     {
                         field: "IsStrategy", title: "Strategisk", width: 150,
-                        persistId: "strat", // DON'T YOU DARE RENAME!
+                        persistId: "strat", 
                         hidden: true,
                         template: dataItem => dataItem.IsStrategy ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
                         excelTemplate: dataItem => dataItem && dataItem.IsStrategy.toString() || ""
                     },
                     {
                         field: "EconomyYears", title: "Økonomi", width: 150,
-                        persistId: "eco", // DON'T YOU DARE RENAME!
+                        persistId: "eco", 
                         hidden: true,
                         template: dataItem => {
                             var total = 0;

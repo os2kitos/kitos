@@ -2,6 +2,7 @@
 using Core.Abstractions.Types;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 
@@ -110,7 +111,7 @@ namespace Tests.Unit.Core.Model
 
 
             //Act
-            var result = _sut.AddUsageRelationTo(destination, new ItInterface(){Id = interfaceId}, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
+            var result = _sut.AddUsageRelationTo(destination, new ItInterface() { Id = interfaceId }, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
             AssertErrorResult(result, "Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
@@ -297,6 +298,25 @@ namespace Tests.Unit.Core.Model
 
             //Assert
             AssertErrorResult(result, "Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+        }
+
+        [Theory]
+        [InlineData(0, 9, UserCount.BELOWTEN)]
+        [InlineData(10, 50, UserCount.TENTOFIFTY)]
+        [InlineData(50, 100, UserCount.FIFTYTOHUNDRED)]
+        [InlineData(100, null, UserCount.HUNDREDPLUS)]
+        [InlineData(100, int.MaxValue, UserCount.HUNDREDPLUS)]
+        public void Can_Change_UserCount(int lower, int? upper, UserCount expectedResult)
+        {
+            //Arrange
+            var newIntervalValue = (lower, upper);
+
+            //Act
+            var error = _sut.SetExpectedUsersInterval(newIntervalValue);
+
+            //Assert
+            Assert.True(error.IsNone);
+            Assert.Equal(expectedResult, _sut.UserCount);
         }
 
         private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)

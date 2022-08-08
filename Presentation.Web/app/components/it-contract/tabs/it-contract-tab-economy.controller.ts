@@ -60,10 +60,6 @@
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
             $scope.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel);
-            $scope.isOperationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel.children.operation);
-            $scope.isFrequencyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel.children.frequency);
-            $scope.isFieldPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel.children.paymentModel);
-            $scope.isPriceEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel.children.price);
             $scope.isExtPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.extPayment);
             $scope.isIntPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.intPayment);
 

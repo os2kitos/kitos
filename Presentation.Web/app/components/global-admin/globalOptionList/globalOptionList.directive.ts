@@ -116,7 +116,7 @@
                     field: "IsEnabled",
                     title: "Tilgængelig",
                     width: 112,
-                    persistId: "isEnabled", // DON'T YOU DARE RENAME!
+                    persistId: "isEnabled", 
                     attributes: { "class": "text-center" },
                     template: `# if(IsEnabled) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
                     hidden: false,
@@ -127,7 +127,7 @@
                     field: "IsObligatory",
                     title: "Obligatorisk",
                     width: 112,
-                    persistId: "IsObligatory", // DON'T YOU DARE RENAME!
+                    persistId: "IsObligatory", 
                     attributes: { "class": "text-center" },
                     template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
                     hidden: false,
@@ -147,7 +147,7 @@
                     field: "Name",
                     title: "Navn",
                     width: 230,
-                    persistId: "name", // DON'T YOU DARE RENAME!
+                    persistId: "name", 
                     template: (dataItem) => dataItem.Name,
                     hidden: false,
                     filterable: {
@@ -163,7 +163,7 @@
                     field: "Description",
                     title: "Beskrivelse",
                     width: 230,
-                    persistId: "description", // DON'T YOU DARE RENAME!
+                    persistId: "description", 
                     template: (dataItem) => dataItem.Description,
                     hidden: false,
                     filterable: {

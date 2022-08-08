@@ -28,17 +28,7 @@
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
             $scope.isAgreementDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines);
-            $scope.isDeadlinesDurationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines.children.duration);
-            $scope.isDeadlinesOngoingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines.children.ongoing);
-            $scope.isDeadlinesOptionExtendEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines.children.optionExtend);
-            $scope.isDeadlinesOptionExtendMultiplierEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines.children.optionExtendMultiplier);
-            $scope.isDeadlinesIrrevocableEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines.children.irrevocable);
-
             $scope.isTerminationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination);
-            $scope.isTerminationTerminatedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination.children.terminated);
-            $scope.isTerminationNoticeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination.children.notice);
-            $scope.isTerminationOngoingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination.children.ongoing);
-            $scope.isTerminationByEndingOfEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination.children.byEndingOf);
 
             $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.running);
             $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.byEnding);

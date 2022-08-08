@@ -44,7 +44,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 var httpClient = new HttpClient(httpClientHandler);
                 httpClient.DefaultRequestHeaders.ExpectContinue = false;
                 httpClient.DefaultRequestHeaders.ConnectionClose = true;
-				httpClientHandler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, errors) => true;
+                httpClientHandler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, errors) => true;
                 return (httpClient, httpClientHandler, cookieContainer);
             }
 
@@ -154,49 +154,64 @@ namespace Tests.Integration.Presentation.Web.Tools
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body)
+        public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body, bool acceptUnAuthorized = false)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
+            return WithRetryPolicy(async () =>
             {
-                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
-            };
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+                };
 
-            return SendWithCookieAsync(cookie, requestMessage);
+                return await SendWithCookieAsync(cookie, requestMessage);
+            }, acceptUnAuthorized == false);
         }
 
-        public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object body = null)
+        public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object body = null, bool acceptUnAuthorized = false)
         {
-            var requestMessage = CreatePutMessage(url, body);
-
-            return SendWithCookieAsync(cookie, requestMessage);
-        }
-
-        public static Task<HttpResponseMessage> GetWithCookieAsync(Uri url, Cookie cookie)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-
-            return SendWithCookieAsync(cookie, requestMessage);
-        }
-
-        public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie, object body = null)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, url);
-            if (body != null)
+            return WithRetryPolicy(async () =>
             {
-                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-            }
+                var requestMessage = CreatePutMessage(url, body);
 
-            return SendWithCookieAsync(cookie, requestMessage);
+                return await SendWithCookieAsync(cookie, requestMessage);
+            }, acceptUnAuthorized == false);
         }
 
-        public static Task<HttpResponseMessage> PatchWithCookieAsync(Uri url, Cookie cookie, object body)
+        public static Task<HttpResponseMessage> GetWithCookieAsync(Uri url, Cookie cookie, bool acceptUnAuthorized = false)
         {
-            var requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+            return WithRetryPolicy(async () =>
             {
-                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
-            };
+                var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
 
-            return SendWithCookieAsync(cookie, requestMessage);
+                return await SendWithCookieAsync(cookie, requestMessage);
+            }, acceptUnAuthorized == false);
+        }
+
+        public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie, object body = null, bool acceptUnAuthorized = false)
+        {
+            return WithRetryPolicy(async () =>
+            {
+                var requestMessage = new HttpRequestMessage(HttpMethod.Delete, url);
+                if (body != null)
+                {
+                    requestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+                }
+
+                return await SendWithCookieAsync(cookie, requestMessage);
+            }, acceptUnAuthorized == false);
+        }
+
+        public static Task<HttpResponseMessage> PatchWithCookieAsync(Uri url, Cookie cookie, object body, bool acceptUnAuthorized = false)
+        {
+            return WithRetryPolicy(async () =>
+            {
+                var requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+                };
+
+                return await SendWithCookieAsync(cookie, requestMessage);
+            }, acceptUnAuthorized == false);
         }
 
         private static async Task<HttpResponseMessage> SendWithCookieAsync(Cookie cookie, HttpRequestMessage requestMessage)
@@ -319,18 +334,28 @@ namespace Tests.Integration.Presentation.Web.Tools
             return apiReturnFormat.Response;
         }
 
+        private static async Task<HttpResponseMessage> WithRetryPolicy(Func<Task<HttpResponseMessage>> callApi, bool retryOnUnAuthorized = true)
+        {
+            if (retryOnUnAuthorized)
+            {
+                return await Policy
+                    .Handle<Exception>(e => true) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
+                    .WaitAndRetryAsync(BackOffDurations)
+                    .ExecuteAsync(() =>
+                    {
+                        return Policy
+                            .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized) //Inner policy deals with response related errors
+                            .WaitAndRetryAsync(BackOffDurations, (result, _, _, _) => result.Result.Dispose())
+                            .ExecuteAsync(callApi);
+                    });
+            }
+
+            return await callApi();
+        }
+
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
-            return await Policy
-                .Handle<Exception>(e => true) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
-                .WaitAndRetryAsync(BackOffDurations)
-                .ExecuteAsync(() =>
-                {
-                    return Policy
-                        .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized) //Inner policy deals with response related errors
-                        .WaitAndRetryAsync(BackOffDurations, (result, _, _, _) => result.Result.Dispose())
-                        .ExecuteAsync(() => StatelessHttpClient.SendAsync(CreatePostMessage(url, loginDto)));
-                });
+            return await WithRetryPolicy(() => StatelessHttpClient.SendAsync(CreatePostMessage(url, loginDto)));
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
@@ -384,21 +409,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl("api/authorize");
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            using var cookieResponse = await Policy
-                .Handle<Exception>(e => true) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
-                .WaitAndRetryAsync(BackOffDurations)
-                .ExecuteAsync(async () =>
-                {
-                    return await Policy
-                        .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized && !acceptUnAuthorized) //Inner policy deals with response related errors
-                        .WaitAndRetryAsync(BackOffDurations, (result, _, _, _) => result.Result.Dispose())
-                        .ExecuteAsync(async () =>
-                        {
-                            var request = CreatePostMessage(url, loginDto);
+            using var cookieResponse = await WithRetryPolicy(async () =>
+            {
+                var request = CreatePostMessage(url, loginDto);
 
-                            return await SendWithCSRFToken(request);
-                        });
-                });
+                return await SendWithCSRFToken(request);
+            });
 
             Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
             var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
@@ -412,7 +428,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             CookiesCache.TryAdd(userCredentials.Username, cookie);
             return cookie;
         }
-
 
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role, bool acceptUnAuthorized = false)
         {

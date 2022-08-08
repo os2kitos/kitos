@@ -5,6 +5,7 @@ import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
 import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
+import NavigationHelper = require("../Utility/NavigationHelper");
 
 class SystemCatalogHelper {
     private static consts = new Constants();
@@ -15,6 +16,7 @@ class SystemCatalogHelper {
     private static readonly visibilitySelect2 = "s2id_system-access";
     private static ec = protractor.ExpectedConditions;
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
+    private static navigationHelper = new NavigationHelper();
 
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
@@ -76,7 +78,12 @@ class SystemCatalogHelper {
         console.log(`open details for system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click())
+            .then(() => {
+                const results = SystemCatalogHelper.findCatalogColumnsFor(name);
+                return results.first()
+                    .getAttribute("href")
+                    .then(href => this.navigationHelper.getPageByFullUrl(href));
+            })
             .then(() => browser.waitForAngular());
     }
 
@@ -89,20 +96,8 @@ class SystemCatalogHelper {
             .then(() => console.log("System created"));
     }
 
-    public static openAnySystem() {
-        console.log(`open details for any system`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findAnyCatalogColumns().first().click())
-            .then(() => browser.waitForAngular());
-    }
-
     public static findCatalogColumnsFor(name: string) {
         return SystemCatalogHelper.pageObject.kendoToolbarWrapper.getFilteredColumnElement(SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
-    }
-
-    public static findAnyCatalogColumns() {
-        return SystemCatalogHelper.pageObject.kendoToolbarWrapper.getAnyColumnElement(SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName);
     }
 
     public static getActivationToggleButton(name: string) {
@@ -154,7 +149,7 @@ class SystemCatalogHelper {
             .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogVisible(),
                 SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => element(
-                    SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput))
+                SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput))
                 .sendKeys(name))
             .then(() => browser.waitForAngular());
     }
