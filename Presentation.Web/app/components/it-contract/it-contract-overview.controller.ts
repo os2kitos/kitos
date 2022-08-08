@@ -173,6 +173,7 @@
             var launcher =
                 kendoGridLauncherFactory
                     .create<Models.ViewModel.ItContract.IItContractOverviewViewModel>()
+                    .withOverviewType(Models.Generic.OverviewType.ItContract)
                     .withScope($scope)
                     .withGridBinding(this)
                     .withUser(user)

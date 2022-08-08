@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -13,11 +14,17 @@ namespace Tests.Integration.Presentation.Web.Kendo
 {
     public class KendoOverviewConfigurationTest : WithAutoFixture
     {
-        [Fact]
-        public async Task Can_Save_Configuration()
+        private const int IdOfNonExistingOrg = int.MaxValue;
+
+        public static IEnumerable<object[]> GetOverviewTypes()
+        {
+            return EnumRange.All<OverviewType>().Select(x => new object[] { x });
+        }
+
+        [Theory, MemberData(nameof(GetOverviewTypes))]
+        public async Task Can_Save_Configuration(OverviewType overviewType)
         {
             //Arrange
-            var overviewType = A<OverviewType>();
             var columns = CreateColumnConfigurations();
 
             //Act
@@ -34,11 +41,10 @@ namespace Tests.Integration.Presentation.Web.Kendo
             });
         }
 
-        [Fact]
-        public async Task Can_Update_Configuration()
+        [Theory, MemberData(nameof(GetOverviewTypes))]
+        public async Task Can_Update_Configuration(OverviewType overviewType)
         {
             //Arrange
-            var overviewType = A<OverviewType>();
             var columns = CreateColumnConfigurations();
             using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -67,11 +73,10 @@ namespace Tests.Integration.Presentation.Web.Kendo
 
         }
 
-        [Fact]
-        public async Task Can_Get_Configuration()
+        [Theory, MemberData(nameof(GetOverviewTypes))]
+        public async Task Can_Get_Configuration(OverviewType overviewType)
         {
             //Arrange
-            var overviewType = A<OverviewType>();
             var columns = CreateColumnConfigurations();
 
             using var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns);
@@ -91,12 +96,10 @@ namespace Tests.Integration.Presentation.Web.Kendo
             });
         }
 
-        [Fact]
-        public async Task Can_Delete_Configuration()
+        [Theory, MemberData(nameof(GetOverviewTypes))]
+        public async Task Can_Delete_Configuration(OverviewType overviewType)
         {
             //Arrange
-            var overviewType = A<OverviewType>();
-
             using var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, CreateColumnConfigurations());
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
@@ -107,12 +110,11 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        [Fact]
-        public async Task Can_Not_Get_Configuration_If_None_Exists()
+        [Theory, MemberData(nameof(GetOverviewTypes))]
+        public async Task Can_Not_Get_Configuration_If_None_Exists(OverviewType overviewType)
         {
             //Arrange
-            var orgId = int.MaxValue;
-            var overviewType = A<OverviewType>();
+            var orgId = IdOfNonExistingOrg;
 
             //Act
             using var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(orgId, overviewType);
@@ -137,12 +139,11 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
-        [Fact]
-        public async Task Can_Not_Delete_Configuration_If_None_Exists()
+        [Theory, MemberData(nameof(GetOverviewTypes))]
+        public async Task Can_Not_Delete_Configuration_If_None_Exists(OverviewType overviewType)
         {
             //Arrange
-            var orgId = int.MaxValue;
-            var overviewType = A<OverviewType>();
+            var orgId = IdOfNonExistingOrg;
 
             //Act
             using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(orgId, overviewType);
@@ -171,13 +172,13 @@ namespace Tests.Integration.Presentation.Web.Kendo
 
         public List<KendoColumnConfigurationDTO> CreateColumnConfigurations()
         {
-            return new List<KendoColumnConfigurationDTO>()
+            return new List<KendoColumnConfigurationDTO>
             {
-                new KendoColumnConfigurationDTO()
+                new()
                 {
                     PersistId = A<string>()
                 },
-                new KendoColumnConfigurationDTO()
+                new()
                 {
                     PersistId = A<string>()
                 }
