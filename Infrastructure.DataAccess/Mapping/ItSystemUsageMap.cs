@@ -8,7 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Properties
             // Table & Column Mappings
-            this.ToTable("ItSystemUsage");
+            ToTable("ItSystemUsage");
 
             // Relationships
             HasOptional(t => t.Reference);
@@ -17,48 +17,52 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItSystemUsage_Id)
                 .WillCascadeOnDelete(true);
 
-            this.HasRequired(t => t.Organization)
+            HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsages);
 
-            this.HasOptional(t => t.ResponsibleUsage)
+            HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItSystemUsage);
 
-            this.HasRequired(t => t.ItSystem)
+            HasRequired(t => t.ItSystem)
                 .WithMany(t => t.Usages);
 
-            this.HasOptional(t => t.ArchiveType)
+            HasOptional(t => t.ArchiveType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ArchiveTypeId);
 
-            this.HasOptional(t => t.SensitiveDataType)
+            HasOptional(t => t.SensitiveDataType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.SensitiveDataTypeId);
 
-            this.HasMany(t => t.UsedBy)
+            HasMany(t => t.UsedBy)
                 .WithRequired(t => t.ItSystemUsage)
                 .HasForeignKey(d => d.ItSystemUsageId)
                 .WillCascadeOnDelete(false);
 
-            this.HasOptional(t => t.MainContract)
+            HasOptional(t => t.MainContract)
                 .WithOptionalPrincipal()
                 .WillCascadeOnDelete(false);
 
-            this.HasMany(t => t.Contracts)
+            HasMany(t => t.Contracts)
                 .WithRequired(t => t.ItSystemUsage)
                 .HasForeignKey(d => d.ItSystemUsageId)
                 .WillCascadeOnDelete(false);
 
-            this.HasOptional(t => t.ArchiveLocation)
+            HasOptional(t => t.ArchiveLocation)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ArchiveLocationId);
 
-            this.HasOptional(t => t.ArchiveTestLocation)
+            HasOptional(t => t.ArchiveTestLocation)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ArchiveTestLocationId);
 
-            this.HasOptional(t => t.ItSystemCategories)
+            HasOptional(t => t.ItSystemCategories)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ItSystemCategoriesId);
+
+            HasOptional(t => t.ArchiveSupplier)
+                .WithMany(t => t.ArchiveSupplierForItSystems)
+                .HasForeignKey(d => d.ArchiveSupplierId);
 
             HasMany(t => t.SensitiveDataLevels)
                 .WithRequired(t => t.ItSystemUsage)

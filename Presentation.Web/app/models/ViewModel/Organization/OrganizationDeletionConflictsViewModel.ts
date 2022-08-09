@@ -32,6 +32,7 @@
             systemsUsedOutsideTheOrganization: Array<ItSystemUsageConflicts>,
             systemsExposingInterfacesOutsideTheOrganization: Array<ItSystemInterfaceExposureConflicts>;
             systemsSetAsParentsToSystemsOutsideTheOrganization: Array<ItSystemChildrenInOtherOrgConflicts>;
+            systemsWhereOrgIsArchiveSupplier: Array<EntityFromOrganization>;
         },
         contractsWhereSupplierWillBeRemoved: Array<EntityFromOrganization>;
         dprWhereOrganizationIsRemovedFromListOfDataProcessors: Array<EntityFromOrganization>;

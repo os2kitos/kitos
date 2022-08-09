@@ -123,8 +123,13 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //UI Customization in org
             var module = A<string>();
-            var (userId, user, cookie)= await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
+            var (userId, user, cookie) = await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
             await UIConfigurationHelper.CreateUIModuleAndSaveAsync(organization.Id, module, cookie);
+
+            //System usage where the organization is set as archive supplier
+            var systemInAnotherOrg3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
+            var usageInAnotherOrg3 = await ItSystemHelper.TakeIntoUseAsync(systemInAnotherOrg3.Id, anotherOrg1.Id);
+            await ItSystemUsageHelper.SetArchiveSupplierAsync(usageInAnotherOrg3.Id, anotherOrg1.Id, organization.Id);
 
             //Act
             var conflicts = await OrganizationHelper.GetOrganizationRemovalConflictsAsync(organization.Uuid);
@@ -166,6 +171,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var rightsHolderConflict = Assert.Single(conflicts.SystemsInOtherOrganizationsWhereOrgIsRightsHolder);
             AssertNamedEntityWithOrganizationalRelationship(systemInAnotherOrgWithRightsHolderConflict.Id, systemInAnotherOrgWithRightsHolderConflict.Name, anotherOrg1.Id, anotherOrg1.Name, rightsHolderConflict);
 
+            //System usage where the organization is set as archive supplier
+            var archiveSupplierConflicts = Assert.Single(conflicts.SystemsWhereOrgIsArchiveSupplier);
+            AssertNamedEntityWithOrganizationalRelationship(usageInAnotherOrg3.Id, systemInAnotherOrg3.Name, anotherOrg1.Id, anotherOrg1.Name, archiveSupplierConflicts);
+
+
             // ACT - DELETE The organization
             await OrganizationHelper.SendDeleteOrganizationRequestAsync(organization.Uuid, true).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
@@ -201,6 +211,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             dprConflictOnSubDataProcessor = await DataProcessingRegistrationHelper.GetAsync(dprConflictOnSubDataProcessor.Id);
             Assert.DoesNotContain(dprConflictOnSubDataProcessor.SubDataProcessors, x => x.Id == organization.Id);
+
+            //Check 6: System usage where the organization is set as archive supplier has been cleared
+            usageInAnotherOrg3 = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(usageInAnotherOrg3.Id);
+            Assert.Null(usageInAnotherOrg3.ArchiveSupplierId);
         }
 
         private static void AssertNamedEntity(int expectedId, string expectedName, NamedEntityDTO dto)

@@ -246,11 +246,11 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int? ArchiveFreq { get; set; }
 
-        public string ArchiveSupplier { get; set; }
-
         public bool? Registertype { get; set; }
 
-        public int? SupplierId { get; set; }
+        public int? ArchiveSupplierId { get; set; }
+        public virtual Organization.Organization ArchiveSupplier { get; set; }
+
         /// <summary>
         ///     Gets or sets the organization marked as supplier for this contract.
         /// </summary>
@@ -784,22 +784,18 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveSupplierOrganization()
         {
-            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
-            ArchiveSupplier = "";
-            SupplierId = null;
+            ArchiveSupplier.Track();
+            ArchiveSupplier = null;
         }
 
         public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
         {
-            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
             if (newValue == null)
                 throw new ArgumentNullException(nameof(newValue));
 
-            ArchiveSupplier = newValue.Name;
-
-            if (SupplierId != newValue.Id)
+            if (ArchiveSupplier == null || ArchiveSupplier.Id != newValue.Id)
             {
-                SupplierId = newValue.Id;
+                ArchiveSupplier = newValue;
             }
 
             return Maybe<OperationError>.None;

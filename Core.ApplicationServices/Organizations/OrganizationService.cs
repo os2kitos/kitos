@@ -288,7 +288,11 @@ namespace Core.ApplicationServices.Organizations
                         .BelongingSystems
                         .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
-
+                    var systemsWhereOrgIsArchiveSupplier = organizationWhichCanBeDeleted
+                        .ArchiveSupplierForItSystems
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
+                        .ToList();
+                    
                     return new OrganizationRemovalConflicts(
                         systemsWithUsagesOutsideTheOrganization,
                         interfacesExposedOnSystemsOutsideTheOrganization,
@@ -297,7 +301,8 @@ namespace Core.ApplicationServices.Organizations
                         dprInOtherOrganizationsWhereOrgIsDataProcessor,
                         dprInOtherOrganizationsWhereOrgIsSubDataProcessor,
                         contractsInOtherOrganizationsWhereOrgIsSupplier,
-                        systemsInOtherOrgsWhereOrgIsRightsHolder);
+                        systemsInOtherOrgsWhereOrgIsRightsHolder,
+                        systemsWhereOrgIsArchiveSupplier);
                 });
         }
 
