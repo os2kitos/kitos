@@ -669,7 +669,7 @@
                     },
                     {
                         field: "Uuid",
-                        title: "UUID",
+                        title: "IT-System (UUID)",
                         width: 150,
                         persistId: "uuid", 
                         attributes: { "class": "might-overflow" },

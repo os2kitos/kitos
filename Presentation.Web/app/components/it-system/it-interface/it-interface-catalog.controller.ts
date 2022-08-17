@@ -477,7 +477,7 @@
                         }
                     },
                     {
-                        field: "Uuid", title: "UUID", width: 150,
+                        field: "Uuid", title: "Snitflade (UUID)", width: 150,
                         persistId: "uuid", 
                         excelTemplate: dataItem => dataItem.Uuid,
                         hidden: true,
