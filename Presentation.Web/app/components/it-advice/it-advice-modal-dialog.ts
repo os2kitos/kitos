@@ -12,7 +12,7 @@
                 ($scope,
                     roles: Models.IRoleEntity[],
                     $window,
-                    type,
+                    type: Models.Advice.AdviceType,
                     action,
                     object,
                     currentUser: Services.IUser,
@@ -26,6 +26,8 @@
                     $scope.adviceTypeOptions = Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Models.ViewModel.Advice.AdviceRepetitionOptions.options;
                     $scope.startDateInfoMessage = null;
+
+                    const roleIdProperty = Models.Advice.getAdviceTypeUserRelationRoleIdProperty(type);
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
                     const emailMatchRegex = "([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
@@ -71,13 +73,13 @@
                                 let recpientType = adviceData.Reciepients[i].RecpientType;
                                 let recieverType = adviceData.Reciepients[i].RecieverType;
                                 if (recpientType === "ROLE" && recieverType === "RECIEVER") {
-                                    var roleReceiverId = adviceData.Reciepients[i].RoleId;
+                                    var roleReceiverId = adviceData.Reciepients[i][roleIdProperty];
                                     var selectedReceiver = _.find(select2Roles, x => x.id === roleReceiverId);
                                     if (selectedReceiver) {
                                         $scope.preSelectedReceivers.push(selectedReceiver);
                                     }
                                 } else if (recpientType === "ROLE" && recieverType === "CC") {
-                                    var roleReceiverCcId = adviceData.Reciepients[i].RoleId;
+                                    var roleReceiverCcId = adviceData.Reciepients[i][roleIdProperty];
                                     var selectedCc = _.find(select2Roles, x => x.id === roleReceiverCcId);
                                     if (selectedCc) {
                                         $scope.preSelectedCCs.push(selectedCc);
@@ -366,23 +368,21 @@
                         const writtenCCEmail = $scope.externalCC;
 
                         for (let i = 0; i < $scope.selectedReceivers.length; i++) {
-                            payload.Reciepients.push(
-                                {
-                                    RoleId: $scope.selectedReceivers[i].id,
-                                    RecpientType: "ROLE",
-                                    RecieverType: "RECIEVER"
-                                }
-                            );
+                            const receiver = {
+                                RecpientType: "ROLE",
+                                RecieverType: "RECIEVER"
+                            };
+                            receiver[roleIdProperty] = $scope.selectedReceivers[i].id;
+                            payload.Reciepients.push(receiver);
                         }
 
                         for (let i = 0; i < $scope.selectedCCs.length; i++) {
-                            payload.Reciepients.push(
-                                {
-                                    RoleId: $scope.selectedCCs[i].id,
-                                    RecieverType: "CC",
-                                    RecpientType: "ROLE"
-                                }
-                            );
+                            const receiver = {
+                                RecpientType: "ROLE",
+                                RecieverType: "CC"
+                            };
+                            receiver[roleIdProperty] = $scope.selectedCCs[i].id;
+                            payload.Reciepients.push(receiver);
                         }
 
                         if (writtenEmail != null) {
@@ -426,24 +426,24 @@
             resolve: {
                 Roles: [
                     "localOptionServiceFactory",
-                    (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
-                        if (type === "itSystemUsage") {
+                    (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) => {
+                        if (type === Models.Advice.AdviceType.ItSystemUsage) {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles)
+                                .create(Services.LocalOptions.LocalOptionType.ItSystemRoles)
                                 .getAll();
                         }
-                        if (type === "itContract") {
+                        if (type === Models.Advice.AdviceType.ItContract) {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles)
+                                .create(Services.LocalOptions.LocalOptionType.ItContractRoles)
                                 .getAll();
                         }
-                        if (type === "itProject") {
+                        if (type === Models.Advice.AdviceType.ItProject) {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles)
+                                .create(Services.LocalOptions.LocalOptionType.ItProjectRoles)
                                 .getAll();
                         }
-                        if (type === "dataProcessingRegistration") {
-                            return localOptionServiceFactory.create(Kitos.Services.LocalOptions
+                        if (type === Models.Advice.AdviceType.DataProcessingRegistration) {
+                            return localOptionServiceFactory.create(Services.LocalOptions
                                 .LocalOptionType.DataProcessingRegistrationRoles)
                                 .getAll();
                         }
@@ -455,7 +455,7 @@
                 object: [() => $scope.object],
                 currentUser: [
                     "userService",
-                    (userService: Kitos.Services.IUserService) => userService.getUser()
+                    (userService: Services.IUserService) => userService.getUser()
                 ],
                 advicename: [
                     () => {

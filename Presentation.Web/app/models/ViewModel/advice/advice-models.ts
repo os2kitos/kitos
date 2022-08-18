@@ -73,6 +73,20 @@ module Kitos.Models.ViewModel.Advice {
         }
     }
 
+    export function renderReceivers(dataItem: any, adviceType: Models.Advice.AdviceType, recieverType: string) {
+        const roleProperty = Kitos.Models.Advice.getAdviceTypeUserRelationRoleProperty(adviceType);
+        const receivers: Array<any> = dataItem
+            .Reciepients
+            .filter(r => r.RecieverType === recieverType)
+            .map(r => {
+                if (r.RecpientType === "ROLE") {
+                    return r[roleProperty]?.Name;
+                }
+                return r.Email;
+            }).filter(r => !!r && r !== "");
+
+        return receivers.join(", ");
+    }
 
 
 }

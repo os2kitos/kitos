@@ -63,6 +63,7 @@
     <Compile Include="GenericRepository.cs" />
     <Compile Include="Interceptors\EFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\AdviceUserRelationMap.cs" />
     <Compile Include="Mapping\AttachedOptionMap.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
     <Compile Include="Mapping\CriticalityTypeMap.cs" />
@@ -908,9 +909,9 @@
     <Compile Include="Migrations\202207270956038_fixArchiveSupplier.designer.cs">
       <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202207281043469_Updated_AdviceUserRelation.cs" />
-    <Compile Include="Migrations\202207281043469_Updated_AdviceUserRelation.designer.cs">
-      <DependentUpon>202207281043469_Updated_AdviceUserRelation.cs</DependentUpon>
+    <Compile Include="Migrations\202208181047566_Update_Advice_User_Relation_To_Be_Robust.cs" />
+    <Compile Include="Migrations\202208181047566_Update_Advice_User_Relation_To_Be_Robust.designer.cs">
+      <DependentUpon>202208181047566_Update_Advice_User_Relation_To_Be_Robust.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1508,8 +1509,8 @@
     <EmbeddedResource Include="Migrations\202207270956038_fixArchiveSupplier.resx">
       <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202207281043469_Updated_AdviceUserRelation.resx">
-      <DependentUpon>202207281043469_Updated_AdviceUserRelation.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202208181047566_Update_Advice_User_Relation_To_Be_Robust.resx">
+      <DependentUpon>202208181047566_Update_Advice_User_Relation_To_Be_Robust.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

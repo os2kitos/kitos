@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Updated_AdviceUserRelation : IMigrationMetadata
+    public sealed partial class Update_Advice_User_Relation_To_Be_Robust : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Updated_AdviceUserRelation));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Update_Advice_User_Relation_To_Be_Robust));
         
         string IMigrationMetadata.Id
         {
-            get { return "202207281043469_Updated_AdviceUserRelation"; }
+            get { return "202208181047566_Update_Advice_User_Relation_To_Be_Robust"; }
         }
         
         string IMigrationMetadata.Source

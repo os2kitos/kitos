@@ -38,6 +38,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<Core.DomainModel.Advice.Advice> Advices { get; set; }
+        public DbSet<Core.DomainModel.Advice.AdviceUserRelation> AdviceUserRelations { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
@@ -280,6 +281,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new LifeCycleTrackingEventMap());
             modelBuilder.Configurations.Add(new UIModuleCustomizationMap());
             modelBuilder.Configurations.Add(new CustomizedUINodeMap());
+            modelBuilder.Configurations.Add(new AdviceUserRelationMap());
         }
     }
 }

@@ -3,11 +3,14 @@
     app.controller("object.EditAdviceCtrl",
         [
             "$", "$scope", "$http", "notify", "$uibModal", "object", "type", "advicename", "hasWriteAccess",
-            ($, $scope, $http, notify, $modal, object, type, advicename, hasWriteAccess) => {
+            ($, $scope, $http, notify, $modal, object, type: Kitos.Models.Advice.AdviceType, advicename, hasWriteAccess) => {
                 $scope.type = type;
                 $scope.object = object;
                 $scope.advicename = advicename;
                 $scope.hasWriteAccess = hasWriteAccess;
+                //TODO: Also need the local role names and a lookup for this to work.. also with fallback to "ikke anvendt"
+
+                const roleProperty = Kitos.Models.Advice.getAdviceTypeUserRelationRoleProperty(type);
 
                 $scope.mainGridOptions = {
                     dataSource: {
@@ -15,7 +18,7 @@
                         transport: {
                             read: {
                                 url: `/Odata/advice?$filter=type eq '${type}' and RelationId eq ${object.id
-                                    }&$expand=Reciepients, Advicesent`,
+                                    }&$expand=Reciepients($expand=${roleProperty}), Advicesent`,
                                 dataType: "json"
                             },
                         },
@@ -85,18 +88,16 @@
                             attributes: { "class": "might-overflow" }
                         },
                         {
-                            field: "Reciepients.Name",
+                            field: "Reciepients",
                             title: "Modtager",
-                            template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                            template: (dataItem) => Kitos.Models.ViewModel.Advice.renderReceivers(dataItem,type,"RECIEVER"),
                             attributes: { "class": "might-overflow" },
                             sortable: false //Not possible on collection field
                         },
                         {
-                            field: "Reciepients.Name",
+                            field: "Reciepients",
                             title: "CC",
-                            template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                            template: (dataItem) => Kitos.Models.ViewModel.Advice.renderReceivers(dataItem, type, "CC"),
                             attributes: { "class": "might-overflow" },
                             sortable: false //Not possible on collection field
                         },

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.Advice;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -11,5 +12,6 @@ namespace Core.DomainModel.ItSystem
 
         public bool HasWriteAccess { get; set; }
         public virtual ICollection<ItSystemRight> References { get; set; } = new HashSet<ItSystemRight>();
+        public virtual ICollection<AdviceUserRelation> AdviceUserRelations { get; set; }
     }
 }

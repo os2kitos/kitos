@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.Advice;
 
 namespace Core.DomainModel.ItProject
 {
@@ -14,5 +15,6 @@ namespace Core.DomainModel.ItProject
         public bool HasReadAccess { get; set; }
         public bool HasWriteAccess { get; set; }
         public virtual ICollection<ItProjectRight> References { get; set; } = new HashSet<ItProjectRight>();
+        public virtual ICollection<AdviceUserRelation> AdviceUserRelations { get; set; } = new List<AdviceUserRelation>();
     }
 }

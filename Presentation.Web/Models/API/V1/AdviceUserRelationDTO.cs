@@ -4,9 +4,13 @@ namespace Presentation.Web.Models.API.V1
 {
     public class AdviceUserRelationDTO
     {
-        public string Name { get; set; }
+        public string Email { get; set; }
         public RecieverType RecieverType { get; set; }
-        public RecieverType RecpientType { get; set; }
+        public RecipientType RecpientType { get; set; }
         public int? AdviceId { get; set; }
+        public int? ItContractRoleRoleId { get; set; }
+        public int? ItProjectRoleRoleId { get; set; }
+        public int? ItSystemRoleId { get; set; }
+        public int? DataProcessingRegistrationRoleId { get; set; }
     }
 }

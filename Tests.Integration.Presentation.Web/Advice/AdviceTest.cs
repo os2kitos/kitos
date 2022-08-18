@@ -344,7 +344,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             {
                 Email = name,
                 RecieverType = RecieverType.RECIEVER,
-                RecpientType = RecieverType.USER
+                RecpientType = RecipientType.USER
             };
         }
 

@@ -15,7 +15,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             var recipients = advice.Reciepients.Select(x => new
             {
                 Email = x.Email,
-                RoleId = x.RoleId,
                 RecpientType = x.RecpientType.ToString(), 
                 RecieverType = x.RecieverType.ToString()
             }).ToList();

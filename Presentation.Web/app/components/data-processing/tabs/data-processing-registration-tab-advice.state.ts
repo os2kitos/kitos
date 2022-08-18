@@ -9,7 +9,7 @@
                 Roles: ["dataProcessingRegistrationOptions", (dataProcessingRegistrationOptions: Kitos.Models.DataProcessing.IDataProcessingRegistrationOptions) =>
                     dataProcessingRegistrationOptions.roles],
                 object: ["dataProcessingRegistration", agreement => agreement],
-                type: [() => "dataProcessingRegistration"],
+                type: [() => Kitos.Models.Advice.AdviceType.DataProcessingRegistration],
                 advicename: ["dataProcessingRegistration",
                     (dataProcessingRegistration: Kitos.Models.DataProcessing.IDataProcessingRegistrationDTO) => <any>{ name: dataProcessingRegistration.name }
                 ]
