@@ -82,7 +82,7 @@ namespace Tools.SSOWithKombitSts
           var entityIdAttr = patchedCertificateSamlXml.SelectSingleNode("//md:EntityDescriptor/@entityID", xmlNamespaceManager);
           entityIdAttr.Value = entityId;
           var acsLocation = patchedCertificateSamlXml.SelectSingleNode("//md:AssertionConsumerService/@Location", xmlNamespaceManager);
-          acsLocation.Value = callbackUrl + "/Login.ashx";
+          acsLocation.Value = callbackUrl.TrimEnd('/') + "/Login.ashx";
           return patchedCertificateSamlXml;
         }
 
