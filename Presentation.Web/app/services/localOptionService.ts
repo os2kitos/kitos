@@ -13,7 +13,7 @@
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly userService: IUserService,
-        private readonly routePrefix: string) {
+            private readonly routePrefix: string) {
         }
 
         private getBasePath() {
@@ -196,7 +196,7 @@
         create(type: LocalOptionType): ILocalOptionService;
     }
 
-    export class LocalOptionServiceFactory implements ILocalOptionServiceFactory{
+    export class LocalOptionServiceFactory implements ILocalOptionServiceFactory {
         static $inject = ["$http", "userService", "localOptionTypeMapper"];
         constructor(
             private readonly $http: ng.IHttpService,
@@ -207,6 +207,17 @@
         create(type: LocalOptionType): ILocalOptionService {
             return new LocalOptionService(this.$http, this.userService, this.localOptionTypeMapper.getOdataController(type));
         }
+    }
+
+    const adviceTypeToUsedLocalRoleOptionTypeMap: Record<Models.Advice.AdviceType, LocalOptionType> = {
+        dataProcessingRegistration: LocalOptionType.DataProcessingRegistrationRoles,
+        itSystemUsage: LocalOptionType.ItSystemRoles,
+        itContract: LocalOptionType.ItContractTypes,
+        itProject: LocalOptionType.ItProjectRoles,
+    };
+
+    export function getLocalOptionTypeFromAdvisType(advisType: Models.Advice.AdviceType): LocalOptionType {
+        return adviceTypeToUsedLocalRoleOptionTypeMap[advisType];
     }
 
     app.service("localOptionServiceFactory", LocalOptionServiceFactory);
