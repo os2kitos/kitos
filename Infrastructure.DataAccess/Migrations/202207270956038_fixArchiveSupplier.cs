@@ -7,13 +7,9 @@
     {
         public override void Up()
         {
-            Sql(@"UPDATE ItSystemUsage
-                  SET SupplierId = NULL
-                  WHERE SupplierId IN (SELECT SupplierId 
-	                 FROM ItSystemUsage T0 
-	                 LEFT JOIN Organization T1
-	                 ON T0.SupplierId = T1.Id
-	                 WHERE T1.Id IS NULL);"
+            Sql(@"UPDATE ItSystemUsage 
+                  SET SupplierId = NULL 
+                  WHERE SupplierId not in (SELECT Id from Organization);"
             );
 
             RenameColumn("dbo.ItSystemUsage", "SupplierId", "ArchiveSupplierId");

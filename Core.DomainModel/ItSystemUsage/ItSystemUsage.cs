@@ -550,17 +550,13 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetUserCount()
         {
-            UserCount = null;
+            UserCount = DomainModel.ItSystem.DataTypes.UserCount.UNDECIDED;
         }
 
-        public Maybe<OperationError> SetExpectedUsersInterval((int? lower, int? upperBound) newIntervalValue)
+        public Maybe<OperationError> SetExpectedUsersInterval((int lower, int? upperBound) newIntervalValue)
         {
             switch (newIntervalValue)
             {
-                case (null, 100):
-                case (null, null):
-                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.UNDECIDED;
-                    break;
                 case (0, 9):
                     UserCount = DomainModel.ItSystem.DataTypes.UserCount.BELOWTEN;
                     break;
@@ -788,7 +784,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveSupplierOrganization()
         {
-            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
             ArchiveSupplier.Track();
             ArchiveSupplier = null;
         }

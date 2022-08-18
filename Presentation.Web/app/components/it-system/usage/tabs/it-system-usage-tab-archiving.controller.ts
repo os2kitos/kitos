@@ -5,6 +5,10 @@
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-archiving.view.html",
             controller: "system.EditArchiving",
             resolve: {
+                itSystemUsage: [
+                    "$http", "$stateParams", ($http, $stateParams) => $http.get("api/itSystemUsage/" + $stateParams.id)
+                    .then(result => result.data.response)
+                ],
                 archiveTypes: [
                     "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveTypes).getAll()
@@ -110,13 +114,6 @@
                 }
             }
 
-            if ($scope.usage.archiveSupplierId && $scope.usage.supplier === undefined) {
-                $scope.usage.supplier = {
-                    id: $scope.usage.archiveSupplierId,
-                    text: $scope.usage.archiveSupplierName
-                };
-            }
-
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
 
@@ -159,12 +156,19 @@
                 notify.addSuccessMessage("Slettet!");
             };
 
+            if (!!$scope.usage.archiveSupplierId) {
+                $scope.archiveSupplier = {
+                    id: $scope.usage.archiveSupplierId,
+                    text: $scope.usage.archiveSupplierName
+                };
+            }
+
             $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['take=25', 'orgId=' + user.currentOrganizationId], (item,
                 items) => {
                 items.push({
                     id: item.id,
                     text: item.name ? item.name : 'Unavngiven',
-                    cvr: item.cvr
+                    cvr: item.cvrNumber
                 });
             }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
 

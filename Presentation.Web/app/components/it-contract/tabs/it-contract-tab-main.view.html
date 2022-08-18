@@ -148,11 +148,12 @@
                             <input type="hidden" id="contract-supplier" class="form-control input-sm"
                                    data-ui-select2="suppliersSelectOptions"
                                    data-ng-model="contract.supplier"
+                                   data-placeholder="Vælg leverandør"
                                    data-autosave="{{ autoSaveUrl }}" data-field="supplierId"
                                    data-ng-disabled="!hasWriteAccess">
                         </div>
                         <!-- Extern contract signer -->
-                        <div class="form-group" ng-if="isExtSignerEnabled">
+                        <div class="form-group" ng-if="isExternalSignerEnabled">
                             <label for="contract-ext-signer" class="control-label small">Leverandørs kontraktunderskriver</label>
                             <input type="text" id="contract-ext-signer" class="form-control input-sm"
                                    data-ng-disabled="!hasWriteAccess"
@@ -162,7 +163,7 @@
                         </div>
 
                         <!-- Extern contract is signed -->
-                        <div class="checkbox" ng-if="isExtSignedEnabled">
+                        <div class="checkbox" ng-if="isExternalSignerEnabled">
                             <label>
                                 <input type="checkbox" id="contract-ext-signed"
                                        data-ng-model="contract.hasSupplierSigned"
@@ -174,7 +175,7 @@
                         </div>
 
                         <!-- Extern contract signed date -->
-                        <div class="form-group" ng-if="isExtDateEnabled">
+                        <div class="form-group" ng-if="isExternalSignerEnabled">
                             <label for="contract-ext-date" class="control-label small">Dato</label>
                             <input type="text" id="contract-ext-date" class="form-control"
                                    data-kendo-date-picker
@@ -185,7 +186,7 @@
                                    data-field="supplierSignedDate">
                         </div>
 
-                        <div class="form-group" ng-if="isAgreementConcludedEnabled">
+                        <div class="form-group" ng-if="isagreementPeriodEnabled">
                             <label for="agreement-concluded" class="control-label small">
                                 Gyldig fra
                             </label>
@@ -217,7 +218,7 @@
                             </select2-org-unit>
                         </div>
 
-                        <div class="form-group" ng-if="isIntSignerEnabled">
+                        <div class="form-group" ng-if="isInternalSignerEnabled">
                             <!-- Intern contract signer -->
                             <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
                             <typeahead id="contract-int-signer"
@@ -230,7 +231,7 @@
                         </div>
 
                         <!-- Intern contract is signed -->
-                        <div class="checkbox" ng-if="isIntSignedEnabled">
+                        <div class="checkbox" ng-if="isInternalSignerEnabled">
                             <label>
                                 <input type="checkbox" id="contract-int-signed"
                                        data-ng-model="contract.isSigned"
@@ -242,7 +243,7 @@
                         </div>
 
                         <!-- Intern contract signed date -->
-                        <div class="form-group" ng-if="isIntDateEnabled">
+                        <div class="form-group" ng-if="isInternalSignerEnabled">
                             <label for="contract-int-date" class="control-label small">Dato</label>
                             <input type="text" id="contract-int-date" class="form-control"
                                    data-kendo-date-picker
@@ -253,7 +254,7 @@
                                    data-field="signedDate">
                         </div>
 
-                        <div class="form-group" ng-if="isAgreementExpirationEnabled">
+                        <div class="form-group" ng-if="isagreementPeriodEnabled">
                             <label for="agreement-expiration" class="control-label small">Gyldig til</label>
                             <input type="text" class="form-control" id="agreement-expiration"
                                    data-kendo-date-picker

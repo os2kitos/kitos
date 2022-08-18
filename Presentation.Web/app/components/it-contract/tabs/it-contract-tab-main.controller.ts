@@ -9,26 +9,26 @@
                     contractTypes: [
                         'localOptionServiceFactory',
                         (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTypes)
-                        .getAll()
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTypes)
+                                .getAll()
                     ],
                     contractTemplates: [
                         'localOptionServiceFactory',
                         (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                        localOptionServiceFactory
-                        .create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTemplateTypes).getAll()
+                            localOptionServiceFactory
+                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTemplateTypes).getAll()
                     ],
                     purchaseForms: [
                         "localOptionServiceFactory",
                         (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PurchaseFormTypes)
-                        .getAll()
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PurchaseFormTypes)
+                                .getAll()
                     ],
                     procurementStrategies: [
                         "localOptionServiceFactory",
                         (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                        localOptionServiceFactory
-                        .create(Kitos.Services.LocalOptions.LocalOptionType.ProcurementStrategyTypes).getAll()
+                            localOptionServiceFactory
+                                .create(Kitos.Services.LocalOptions.LocalOptionType.ProcurementStrategyTypes).getAll()
                     ],
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
@@ -113,14 +113,9 @@
                 $scope.isContractIdEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractId);
                 $scope.isContractTypeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractType);
                 $scope.isPurchaseFormEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.purchaseForm);
-                $scope.isExtSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extSigner);
-                $scope.isExtSignedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extSigned);
-                $scope.isExtDateEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.extDate);
-                $scope.isIntSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intSigner);
-                $scope.isIntSignedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intSigned);
-                $scope.isIntDateEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.intDate);
-                $scope.isAgreementConcludedEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementConcluded);
-                $scope.isAgreementExpirationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementExpiration);
+                $scope.isExternalSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.externalSigner);
+                $scope.isInternalSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.internalSigner);
+                $scope.isagreementPeriodEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.agreementPeriod);
                 $scope.isActiveEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.isActive);
 
                 bindProcurementInitiated();
@@ -171,7 +166,7 @@
 
                 $scope.patchDate = (field, value) => {
                     var date = moment(moment(value, Kitos.Constants.DateFormat.DanishDateFormat, true).format());
-                    if(value === "") {
+                    if (value === "") {
                         var payload = {};
                         payload[field] = null;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
@@ -231,66 +226,22 @@
                     };
                 }
 
-                $scope.itContractsSelectOptions = selectLazyLoading('api/itcontract', true, formatContract, ['orgId=' + user.currentOrganizationId]);
-
-                function formatContract(supplier) {
-                    return '<div>' + supplier.text + '</div>';
-                }
-
-                if (contract.supplierId) {
+                if (!!contract.supplierId) {
                     $scope.contract.supplier = {
                         id: contract.supplierId,
                         text: contract.supplierName
                     };
                 }
 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr, ['take=100','orgId=' + user.currentOrganizationId]);
+                $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100", "orgId=" + user.currentOrganizationId], (item, items) => {
+                    items.push({
+                        id: item.id,
+                        text: item.name ? item.name : 'Unavngiven',
+                        cvr: item.cvrNumber
+                    });
+                }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
 
-                function selectLazyLoading(url, excludeSelf, format, paramAry) {
-                    return {
-                        minimumInputLength: 1,
-                        allowClear: true,
-                        placeholder: ' ',
-                        formatResult: format,
-                        initSelection: function (elem, callback) {
-                        },
-                        ajax: {
-                            data: function (term, page) {
-                                return { query: term };
-                            },
-                            quietMillis: 500,
-                            transport: function (queryParams) {
-                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                                var res = $http.get(url + '?q=' + encodeURIComponent(queryParams.data.query) + extraParams).then(queryParams.success);
-                                res.abort = function () {
-                                    return null;
-                                };
-
-                                return res;
-                            },
-
-                            results: function (data, page) {
-                                var results = [];
-
-                                _.each(data.data.response, function (obj: { id; name; cvrNumber; }) {
-                                    if (excludeSelf && obj.id == contract.id)
-                                        return; // don't add self to result
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name ? obj.name : 'Unavngiven',
-                                        cvr: obj.cvrNumber
-                                    });
-                                });
-
-                                return { results: results };
-                            }
-                        }
-                    };
-                }
-
-                $scope.override = () =>
-                {
+                $scope.override = () => {
                     isActive();
                 }
 
@@ -340,7 +291,7 @@
                 }
 
                 function bindCriticalities(contract: any) {
-                    
+
                     const optionMap = Kitos.Helpers.OptionEntityHelper.createDictionaryFromOptionList(criticalityOptions);
 
                     //If selected state is expired, add it for presentation reasons

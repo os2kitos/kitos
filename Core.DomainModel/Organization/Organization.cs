@@ -52,7 +52,7 @@ namespace Core.DomainModel.Organization
             SubDataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
             BelongingSystems = new List<ItSystem.ItSystem>();
             UIModuleCustomizations = new List<UIModuleCustomization>();
-            SuppliedArchives = new List<ItSystemUsage.ItSystemUsage>();
+            ArchiveSupplierForItSystems = new List<ItSystemUsage.ItSystemUsage>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
@@ -133,7 +133,7 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
 
         public virtual ICollection<UIModuleCustomization> UIModuleCustomizations { get; set; }
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> SuppliedArchives { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> ArchiveSupplierForItSystems { get; set; }
 
 
         /// <summary>

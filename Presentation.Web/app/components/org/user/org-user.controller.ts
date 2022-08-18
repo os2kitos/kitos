@@ -253,7 +253,7 @@
                 columns: [
                     {
                         field: "Name", title: "Navn", width: 230,
-                        persistId: "fullname", // DON'T YOU DARE RENAME!
+                        persistId: "fullname", 
                         template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         hidden: false,
@@ -268,7 +268,7 @@
                     },
                     {
                         field: "Email", title: "Email", width: 230,
-                        persistId: "email", // DON'T YOU DARE RENAME!
+                        persistId: "email", 
                         template: (dataItem) => `${dataItem.Email}`,
                         excelTemplate: (dataItem) => dataItem.Email,
                         headerAttributes: {
@@ -289,7 +289,7 @@
                     },
                     {
                         field: "LastAdvisDate", title: "Advis", width: 110,
-                        persistId: "advisdate", // DON'T YOU DARE RENAME!
+                        persistId: "advisdate", 
                         template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
                         excelTemplate: (dataItem) => dataItem.LastAdvisDate ? dataItem.LastAdvisDate.toDateString() : "",
                         hidden: false,
@@ -297,7 +297,7 @@
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
-                        persistId: "createdby", // DON'T YOU DARE RENAME!
+                        persistId: "createdby", 
                         template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                         excelTemplate: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                         hidden: false,
@@ -312,7 +312,7 @@
                     },
                     {
                         field: "OrganizationUnitRights.Role", title: "Roller", width: 150,
-                        persistId: "role", // DON'T YOU DARE RENAME!
+                        persistId: "role", 
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
                             if (dataItem.OrganizationUnitRights.length == 0) {
@@ -333,7 +333,7 @@
                     {
 
                         field: "hasApi", title: "API adgang", width: 96,
-                        persistId: "apiaccess", // DON'T YOU DARE RENAME!
+                        persistId: "apiaccess", 
                         attributes: { "class": "text-center", "data-element-type": "userObject" },
                         headerAttributes: {
                             "data-element-type": "userHeader"
@@ -346,7 +346,7 @@
                     },
                     {
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,
-                        persistId: "localadminrole", // DON'T YOU DARE RENAME!
+                        persistId: "localadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
                         hidden: false,
@@ -355,7 +355,7 @@
                     },
                     {
                         field: "isOrgAdmin", title: "Organisations Admin", width: 104,
-                        persistId: "orgadminrole", // DON'T YOU DARE RENAME!
+                        persistId: "orgadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
                         hidden: false,
@@ -364,7 +364,7 @@
                     },
                     {
                         field: "isProjectAdmin", title: "Projekt Admin", width: 109,
-                        persistId: "projectadminrole", // DON'T YOU DARE RENAME!
+                        persistId: "projectadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isProjectAdmin),
                         hidden: false,
@@ -373,7 +373,7 @@
                     },
                     {
                         field: "isSystemAdmin", title: "System Admin", width: 104,
-                        persistId: "systemadminrole", // DON'T YOU DARE RENAME!
+                        persistId: "systemadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
                         hidden: false,
@@ -382,7 +382,7 @@
                     },
                     {
                         field: "isContractAdmin", title: "Kontrakt Admin", width: 112,
-                        persistId: "contractadminrole", // DON'T YOU DARE RENAME!
+                        persistId: "contractadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
                         hidden: false,
@@ -392,7 +392,7 @@
                     {
 
                         field: "rightsHolder", title: "Rettighedshaveradgang", width: 160,
-                        persistId: "rightsHolder", // DON'T YOU DARE RENAME!
+                        persistId: "rightsHolder", 
                         attributes: { "class": "text-center", "data-element-type": "rightsHolderObject" },
                         headerAttributes: {
                             "data-element-type": "rightsHolderHeader"
@@ -406,7 +406,7 @@
                     {
 
                         field: "stakeHolder", title: "Interessentadgang", width: 160,
-                        persistId: "stakeHolder", // DON'T YOU DARE RENAME!
+                        persistId: "stakeHolder", 
                         attributes: { "class": "text-center", "data-element-type": "stakeHolderObject" },
                         headerAttributes: {
                             "data-element-type": "stakeHolderHeader"

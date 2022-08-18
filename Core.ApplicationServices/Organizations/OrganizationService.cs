@@ -289,7 +289,7 @@ namespace Core.ApplicationServices.Organizations
                         .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
                     var systemsWhereOrgIsArchiveSupplier = organizationWhichCanBeDeleted
-                        .SuppliedArchives
+                        .ArchiveSupplierForItSystems
                         .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
                     

@@ -91,7 +91,7 @@
                 columns: [
                     {
                         field: "Title", title: "Titel", width: 150,
-                        persistId: "title", // DON'T YOU DARE RENAME!
+                        persistId: "title", 
                         template: dataItem => `<a ui-sref="global-admin.help-texts-edit({id:${dataItem.Id}})">${dataItem.Title}</a>`,
                         filterable: {
                             cell: {
@@ -104,7 +104,7 @@
                     },
                     {
                         field: "Key", title: "Key", width: 150,
-                        persistId: "key", // DON'T YOU DARE RENAME!
+                        persistId: "key", 
                         filterable: {
                             cell: {
                                 template: customFilter,

@@ -213,7 +213,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private void ResolveArchiveSupplierConflicts(OrganizationRemovalConflicts conflicts, Organization organization)
         {
             //Clearing organization on systems where it is set as supplier
-            var organizationSupplier = conflicts.SystemsWhereOrgIsArchiveSupplier.ToList();
+            var organizationSupplier = conflicts.SystemUsagesWhereOrgIsArchiveSupplier.ToList();
             organizationSupplier.ForEach(x => _itSystemUsageService.Update(x.Uuid,
                 new SystemUsageUpdateParameters
                 {
@@ -222,7 +222,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
                         ArchiveSupplierOrganizationUuid = Maybe<Guid>.None.AsChangedValue()
                     }
                 }).ThrowOnFailure()); 
-            organization.Supplier.Clear();
         }
     }
 }

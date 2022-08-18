@@ -11,7 +11,7 @@
                                data-options="archiveDutyOptions"
                                data-ng-model="usage.archiveDuty"
                                data-ng-disabled="!hasWriteAccess"
-                               data-auto-save-url="{{autoSaveUrl}}"
+                               data-auto-save-url="{{::autoSaveUrl}}"
                                data-field="ArchiveDuty">
                 </select-simple>
 
@@ -27,38 +27,39 @@
             <!-- ArchivedType -->
             <div class="form-group">
                 <select2-option data-id="archive"
-                               data-label="Arkivtype"
-                               data-placeholder="Vælg arkivering"
-                               data-selected-text="{{ usage.archiveTypeName }}"
-                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
-                               data-ng-model="usage.archiveTypeId"
-                               data-options="archiveTypes"
-                               data-auto-save-url="{{autoSaveUrl}}"
-                               data-field="archiveTypeId">
+                                data-label="Arkivtype"
+                                data-placeholder="Vælg arkivering"
+                                data-selected-text="{{ usage.archiveTypeName }}"
+                                data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
+                                data-ng-model="usage.archiveTypeId"
+                                data-options="archiveTypes"
+                                data-auto-save-url="{{::autoSaveUrl}}"
+                                data-field="archiveTypeId">
                 </select2-option>
             </div>
             <!-- ArchiveLocation -->
             <div class="form-group">
                 <select2-option data-id="archiveLocation"
-                               data-label="Arkiveringssted"
-                               data-placeholder="Vælg arkiveringssted"
-                               data-selected-text="{{ usage.archiveLocationName }}"
-                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
-                               data-ng-model="usage.archiveLocationId"
-                               data-options="archiveLocations"
-                               data-auto-save-url="{{autoSaveUrl}}"
-                               data-field="archiveLocationId">
+                                data-label="Arkiveringssted"
+                                data-placeholder="Vælg arkiveringssted"
+                                data-selected-text="{{ usage.archiveLocationName }}"
+                                data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
+                                data-ng-model="usage.archiveLocationId"
+                                data-options="archiveLocations"
+                                data-auto-save-url="{{::autoSaveUrl}}"
+                                data-field="archiveLocationId">
                 </select2-option>
             </div>
             <!-- Supplier -->
             <div class="form-group">
                 <label for="archiveSupplier" class="control-label small">Arkiveringsleverandør</label>
-                <input type="hidden" id="archiveSupplier" class="form-control input-sm"
-                       data-ui-select2="suppliersSelectOptions"
-                       data-ng-model="usage.supplier"
-                       data-autosave="{{autoSaveUrl}}"
-                       data-field="archiveSupplierId"
-                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">
+                <input type="hidden" id="archiveSupplier" class="form-control input-sm" 
+                       data-ui-select2="suppliersSelectOptions" 
+                       data-ng-model="archiveSupplier" 
+                       data-autosave="{{::autoSaveUrl}}" 
+                       data-field="archiveSupplierId" 
+                       data-placeholder="Vælg arkiveringsleverandør" 
+                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1" />
             </div>
         </div>
         <!-- 2nd column -->
@@ -72,7 +73,7 @@
                                data-ng-model="usage.archiveTestLocationId"
                                data-options="archiveTestLocations"
                                data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
-                               data-auto-save-url="{{autoSaveUrl}}"
+                               data-auto-save-url="{{::autoSaveUrl}}"
                                data-field="archiveTestLocationId">
                 </select2-option>
             </div>

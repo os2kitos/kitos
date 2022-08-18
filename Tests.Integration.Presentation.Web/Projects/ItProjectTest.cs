@@ -305,7 +305,7 @@ namespace Tests.Integration.Presentation.Web.Projects
         }
 
         [Fact, Description("KITOSUDV - 452")]
-        public async Task Can_Delete_Project_With_HandoverTrial()
+        public async Task Can_Delete_Project_With_Handover()
         {
             //Arrange
             var handoverId = _project.Id; //NOTE: handoverId == project id

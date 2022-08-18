@@ -38,32 +38,14 @@
                 </td>
                 <td ng-if="tabConfig.children.length > 0">
                     <div ng-repeat="fieldConfig in tabConfig.children">
-                        <table class="full-width">
-                            <tr>
-                                <td width="50%" style="vertical-align: top;">
-                                    <label class="local-ui-customization-option">
-                                        <input id="{{::fieldConfig.key}}" type="checkbox" ng-checked="fieldConfig.available" ng-disabled="!fieldConfig.editable" ng-click="ctrl.toggleSetting(fieldConfig.key)"/>
-                                        {{:: fieldConfig.text}}
-                                        <span ng-if="fieldConfig.helpText" class="help-block small">
-                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                            {{:: fieldConfig.helpText}}
-                                        </span>
-                                    </label>
-                                </td>
-                                <td width="50%" ng-if="fieldConfig.children.length > 0">
-                                    <div ng-repeat="groupConfig in fieldConfig.children">
-                                        <label class="local-ui-customization-option">
-                                            <input id="{{::groupConfig.key}}" type="checkbox" ng-checked="groupConfig.available" ng-disabled="!groupConfig.editable" ng-click="ctrl.toggleSetting(groupConfig.key)"/>
-                                            {{:: groupConfig.text}}
-                                            <span ng-if="groupConfig.helpText" class="help-block small">
-                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                                {{:: groupConfig.helpText}}
-                                            </span>
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+                        <label class="local-ui-customization-option">
+                            <input id="{{::fieldConfig.key}}" type="checkbox" ng-checked="fieldConfig.available" ng-disabled="!fieldConfig.editable" ng-click="ctrl.toggleSetting(fieldConfig.key)" />
+                            {{:: fieldConfig.text}}
+                            <span ng-if="fieldConfig.helpText" class="help-block small">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                {{:: fieldConfig.helpText}}
+                            </span>
+                        </label>
                     </div>
                 </td>
             </tr>

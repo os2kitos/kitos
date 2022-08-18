@@ -11,19 +11,24 @@
     }]);
 
     app.controller("contract.EditHierarchyCtrl",
-        ["$scope", "_", "$state", "$timeout", "hierarchyFlat", "$stateParams", "notify", "contract", "hasWriteAccess", "$http", "user",
-            ($scope, _, $state, $timeout, hierarchyFlat, $stateParams, notify, contract, hasWriteAccess, $http, user) => {
+        ["$scope", "_", "$state", "$timeout", "hierarchyFlat", "$stateParams", "notify", "contract", "hasWriteAccess", "$http", "user", "select2LoadingService",
+            ($scope, _, $state, $timeout, hierarchyFlat, $stateParams, notify, contract, hasWriteAccess, $http, user, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
                 $scope.hierarchy = _.toHierarchy(hierarchyFlat, "id", "parentId", "children");
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
-                $scope.itContractsSelectOptions = selectLazyLoading('api/itcontract', true, formatContract, ['orgId=' + user.currentOrganizationId]);
 
-                function formatContract(supplier) {
-                    return '<div>' + supplier.text + '</div>';
-                }
+                $scope.itContractsSelectOptions = select2LoadingService.loadSelect2WithDataHandler('api/itcontract',
+                    true,
+                    ['orgId=' + user.currentOrganizationId],
+                    (c, results) => {
+                        if (c.id !== contract.id) {
+                            results.push({ id: c.id, text: c.name });
+                        }
+                    },
+                    "q");
 
-                if (contract.parentId) {
+                if (!!contract.parentId) {
                     $scope.contract.parent = {
                         id: contract.parentId,
                         text: contract.parentName
@@ -53,48 +58,6 @@
                         return $timeout(() => $scope.hideContent = false, 1);
                     });
                 };
-                function selectLazyLoading(url, excludeSelf, format, paramAry) {
-                    return {
-                        minimumInputLength: 1,
-                        allowClear: true,
-                        placeholder: ' ',
-                        formatResult: format,
-                        initSelection: function (elem, callback) {
-                        },
-                        ajax: {
-                            data: function (term, page) {
-                                return { query: term };
-                            },
-                            quietMillis: 500,
-                            transport: function (queryParams) {
-                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                                res.abort = function () {
-                                    return null;
-                                };
-
-                                return res;
-                            },
-
-                            results: function (data, page) {
-                                var results = [];
-
-                                _.each(data.data.response, function (obj: { id; name; cvr; }) {
-                                    if (excludeSelf && obj.id == contract.id)
-                                        return; // don't add self to result
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name ? obj.name : 'Unavngiven',
-                                        cvr: obj.cvr
-                                    });
-                                });
-                                results = _.orderBy(results, x => x.text, 'asc');
-                                return { results: results };
-                            }
-                        }
-                    };
-                }
             }
         ]
     );

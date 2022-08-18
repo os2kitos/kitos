@@ -29,7 +29,7 @@
                 config = {
                     data: payload,
                     headers: {
-                        "content-type":"application/json"
+                        "content-type": "application/json"
                     }
                 }
             }
@@ -44,6 +44,19 @@
                         console.log("Error deleting ", url, error);
                         return false;
                     }
+                );
+        }
+
+        post<TResponse>(url: string, payload?: any): ng.IPromise<TResponse> {
+            return this
+                .$http
+                .post(url, payload ?? {})
+                .then(
+                    result => {
+                        var response = result.data as { response: TResponse }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
                 );
         }
 

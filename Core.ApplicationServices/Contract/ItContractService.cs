@@ -51,16 +51,16 @@ namespace Core.ApplicationServices.Contract
             IDomainEvents domainEvents,
             IAuthorizationContext authorizationContext,
             ILogger logger,
-            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService, 
+            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService,
             IOrganizationalUserContext userContext,
-            IOptionsService<ItContract, CriticalityType> criticalityOptionsService, 
+            IOptionsService<ItContract, CriticalityType> criticalityOptionsService,
             IOptionsService<ItContract, ItContractType> contractTypeOptionsService,
-            IOptionsService<ItContract, ItContractTemplateType> contractTemplateOptionsService, 
-            IOptionsService<ItContract, PurchaseFormType> purchaseFormOptionsService, 
+            IOptionsService<ItContract, ItContractTemplateType> contractTemplateOptionsService,
+            IOptionsService<ItContract, PurchaseFormType> purchaseFormOptionsService,
             IOptionsService<ItContract, ProcurementStrategyType> procurementStrategyOptionsService,
             IOptionsService<ItContract, PaymentModelType> paymentModelOptionsService,
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
-            IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService, 
+            IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
             IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService)
         {
             _repository = repository;
@@ -105,8 +105,12 @@ namespace Core.ApplicationServices.Contract
             return itContract;
         }
 
-        public IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null)
+        public Result<IQueryable<ItContract>, OperationError> GetAllByOrganization(int orgId, string optionalNameSearch = null)
         {
+            if (_authorizationContext.GetOrganizationReadAccessLevel(orgId) != OrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
             var contracts = _repository.GetContractsInOrganization(orgId);
 
             if (!string.IsNullOrWhiteSpace(optionalNameSearch))
@@ -114,7 +118,7 @@ namespace Core.ApplicationServices.Contract
                 contracts = contracts.ByPartOfName(optionalNameSearch);
             }
 
-            return contracts;
+            return Result<IQueryable<ItContract>, OperationError>.Success(contracts);
         }
 
         public Result<ItContract, OperationFailure> Delete(int id)
@@ -263,11 +267,19 @@ namespace Core.ApplicationServices.Contract
                     _terminationDeadlineOptionsService.GetAllOptionsDetails(organizationId)));
         }
 
-        public IEnumerable<ItContract> GetAvailableProcurementPlans(int organizationId)
+        public Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlans(int organizationId)
         {
-            var contracts = GetAllByOrganization(organizationId);
-
-            return contracts.Where(contract => contract.ProcurementPlanYear != null && contract.ProcurementPlanQuarter != null).ToList();
+            return GetAllByOrganization(organizationId)
+                .Select<IEnumerable<(int year, int quarter)>>(contracts => contracts
+                    .Where(contract => contract.ProcurementPlanYear != null && contract.ProcurementPlanQuarter != null)
+                    .Select(c => new { c.ProcurementPlanYear, c.ProcurementPlanQuarter })
+                    .Distinct()
+                    .OrderBy(x => x.ProcurementPlanYear)
+                    .ThenBy(x => x.ProcurementPlanQuarter)
+                    .ToList()
+                    .Select(x => (x.ProcurementPlanYear.GetValueOrDefault(), x.ProcurementPlanQuarter.GetValueOrDefault()))
+                    .ToList()
+                ); 
         }
 
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)

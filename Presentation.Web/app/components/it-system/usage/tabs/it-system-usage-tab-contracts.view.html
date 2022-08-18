@@ -17,10 +17,10 @@
                     <th>
                         Drift
                     </th>
-                    <th ng-if="showContractAgreementConcluded">
+                    <th ng-if="showContractAgreementPeriod">
                         Indgået
                     </th>
-                    <th ng-if="showContractAgreementExpiration">
+                    <th ng-if="showContractAgreementPeriod">
                         Udløber
                     </th>
                     <th ng-if="showContractAgreementTermination">
@@ -55,11 +55,11 @@
                     </td>
 
                     <!-- concluded ("indgået") -->
-                    <td ng-if="showContractAgreementConcluded">
+                    <td ng-if="showContractAgreementPeriod">
                         <span data-ng-model="contract.concluded" data-datereader=""></span>
                     </td>
                     <!-- expiration -->
-                    <td ng-if="showContractAgreementExpiration">
+                    <td ng-if="showContractAgreementPeriod">
                         <span data-ng-model="contract.expirationDate" data-datereader=""></span>
                     </td>
                     <!-- terminated -->

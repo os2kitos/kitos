@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Model.Organizations
         public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; }
         public IReadOnlyList<ItContract> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; }
         public IReadOnlyList<ItSystem> SystemsInOtherOrganizationsWhereOrgIsRightsHolder { get; }
-        public IReadOnlyList<ItSystemUsage> SystemsWhereOrgIsArchiveSupplier { get; }
+        public IReadOnlyList<ItSystemUsage> SystemUsagesWhereOrgIsArchiveSupplier { get; }
 
         public OrganizationRemovalConflicts(
             IReadOnlyList<ItSystem> systemsWithUsagesOutsideTheOrganization,
@@ -28,7 +28,7 @@ namespace Core.ApplicationServices.Model.Organizations
             IReadOnlyList<DataProcessingRegistration> dprInOtherOrganizationsWhereOrgIsSubDataProcessor,
             IReadOnlyList<ItContract> contractsInOtherOrganizationsWhereOrgIsSupplier,
             IReadOnlyList<ItSystem> systemsInOtherOrganizationsWhereOrgIsRightsHolder, 
-            IReadOnlyList<ItSystemUsage> systemsWhereOrgIsArchiveSupplier)
+            IReadOnlyList<ItSystemUsage> systemUsagesWhereOrgIsArchiveSupplier)
         {
             SystemsWithUsagesOutsideTheOrganization = systemsWithUsagesOutsideTheOrganization;
             InterfacesExposedOnSystemsOutsideTheOrganization = interfacesExposedOnSystemsOutsideTheOrganization;
@@ -38,7 +38,7 @@ namespace Core.ApplicationServices.Model.Organizations
             DprInOtherOrganizationsWhereOrgIsSubDataProcessor = dprInOtherOrganizationsWhereOrgIsSubDataProcessor;
             ContractsInOtherOrganizationsWhereOrgIsSupplier = contractsInOtherOrganizationsWhereOrgIsSupplier;
             SystemsInOtherOrganizationsWhereOrgIsRightsHolder = systemsInOtherOrganizationsWhereOrgIsRightsHolder;
-            SystemsWhereOrgIsArchiveSupplier = systemsWhereOrgIsArchiveSupplier;
+            SystemUsagesWhereOrgIsArchiveSupplier = systemUsagesWhereOrgIsArchiveSupplier;
         }
 
 
@@ -50,6 +50,6 @@ namespace Core.ApplicationServices.Model.Organizations
                            DprInOtherOrganizationsWhereOrgIsSubDataProcessor.Any() ||
                            ContractsInOtherOrganizationsWhereOrgIsSupplier.Any() ||
                            SystemsInOtherOrganizationsWhereOrgIsRightsHolder.Any() ||
-                           SystemsWhereOrgIsArchiveSupplier.Any();
+                           SystemUsagesWhereOrgIsArchiveSupplier.Any();
     }
 }
