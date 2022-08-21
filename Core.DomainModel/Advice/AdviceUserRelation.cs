@@ -21,10 +21,10 @@ namespace Core.DomainModel.Advice
     {
         public int? AdviceId { get; set; }
 
-        public int? ItContractRoleRoleId { get; set; }
-        public virtual ItContractRole ItContractRoleRole { get; set; }
-        public int? ItProjectRoleRoleId { get; set; }
-        public virtual ItProjectRole ItProjectRoleRole { get; set; }
+        public int? ItContractRoleId { get; set; }
+        public virtual ItContractRole ItContractRole { get; set; }
+        public int? ItProjectRoleId { get; set; }
+        public virtual ItProjectRole ItProjectRole { get; set; }
         public int? ItSystemRoleId { get; set; }
         public virtual ItSystemRole ItSystemRole { get; set; }
         public int? DataProcessingRegistrationRoleId { get; set; }

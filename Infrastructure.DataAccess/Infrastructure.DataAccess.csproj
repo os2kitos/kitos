@@ -909,9 +909,9 @@
     <Compile Include="Migrations\202207270956038_fixArchiveSupplier.designer.cs">
       <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202208181047566_Update_Advice_User_Relation_To_Be_Robust.cs" />
-    <Compile Include="Migrations\202208181047566_Update_Advice_User_Relation_To_Be_Robust.designer.cs">
-      <DependentUpon>202208181047566_Update_Advice_User_Relation_To_Be_Robust.cs</DependentUpon>
+    <Compile Include="Migrations\202208211025538_fix_advice_role_relations.cs" />
+    <Compile Include="Migrations\202208211025538_fix_advice_role_relations.designer.cs">
+      <DependentUpon>202208211025538_fix_advice_role_relations.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1509,8 +1509,8 @@
     <EmbeddedResource Include="Migrations\202207270956038_fixArchiveSupplier.resx">
       <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202208181047566_Update_Advice_User_Relation_To_Be_Robust.resx">
-      <DependentUpon>202208181047566_Update_Advice_User_Relation_To_Be_Robust.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202208211025538_fix_advice_role_relations.resx">
+      <DependentUpon>202208211025538_fix_advice_role_relations.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
@@ -1590,6 +1590,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Set_OwnerOrgUnitOnAllTaskRefs.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_AdviceUserRelations_Role_Relationships.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

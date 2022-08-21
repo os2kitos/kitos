@@ -8,8 +8,8 @@ namespace Presentation.Web.Models.API.V1
         public RecieverType RecieverType { get; set; }
         public RecipientType RecpientType { get; set; }
         public int? AdviceId { get; set; }
-        public int? ItContractRoleRoleId { get; set; }
-        public int? ItProjectRoleRoleId { get; set; }
+        public int? ItContractRoleId { get; set; }
+        public int? ItProjectRoleId { get; set; }
         public int? ItSystemRoleId { get; set; }
         public int? DataProcessingRegistrationRoleId { get; set; }
     }

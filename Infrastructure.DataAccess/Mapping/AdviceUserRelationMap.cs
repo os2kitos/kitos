@@ -7,11 +7,11 @@ namespace Infrastructure.DataAccess.Mapping
         public AdviceUserRelationMap()
         {
             this.ToTable("AdviceUserRelations");
-            HasOptional(x => x.ItContractRoleRole)
+            HasOptional(x => x.ItContractRole)
                 .WithMany(x => x.AdviceUserRelations)
                 .WillCascadeOnDelete(false);
 
-            HasOptional(x => x.ItProjectRoleRole)
+            HasOptional(x => x.ItProjectRole)
                 .WithMany(x => x.AdviceUserRelations)
                 .WillCascadeOnDelete(false);
 

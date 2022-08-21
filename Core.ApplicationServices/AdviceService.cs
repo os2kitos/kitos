@@ -235,7 +235,7 @@ namespace Core.ApplicationServices
             {
                 case RelatedEntityType.itContract:
                     var itContractRoles = _itContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                        && I.RoleId == r.ItContractRoleRoleId);
+                        && I.RoleId == r.ItContractRoleId);
                     foreach (var t in itContractRoles)
                     {
                         if(t.User.Deleted) continue;
@@ -245,7 +245,7 @@ namespace Core.ApplicationServices
                     break;
                 case RelatedEntityType.itProject:
                     var projectRoles = _itProjectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                        && I.RoleId == r.ItProjectRoleRoleId);
+                        && I.RoleId == r.ItProjectRoleId);
                     foreach (var t in projectRoles)
                     {
                         if(t.User.Deleted) continue;

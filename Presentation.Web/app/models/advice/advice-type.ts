@@ -9,16 +9,16 @@
 
     const adviceTypeToRoleIdPropertyUsingOdataNaming: Record<AdviceType, string> = {
         dataProcessingRegistration: "DataProcessingRegistrationRoleId",
-        itContract: "ItContractRoleRoleId",
+        itContract: "ItContractRoleId",
         itSystemUsage: "ItSystemRoleId",
-        itProject: "ItProjectRoleRoleId"
+        itProject: "ItProjectRoleId"
     };
 
     const adviceTypeToRolePropertyUsingOdataNaming: Record<AdviceType, string> = {
         dataProcessingRegistration: "DataProcessingRegistrationRole",
-        itContract: "ItContractRoleRole",
+        itContract: "ItContractRole",
         itSystemUsage: "ItSystemRole",
-        itProject: "ItProjectRoleRole"
+        itProject: "ItProjectRole"
     };
 
     export function getAdviceTypeUserRelationRoleIdProperty(adviceType: AdviceType, regularApiProperty?: boolean) {
