@@ -352,6 +352,7 @@
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
+    <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
@@ -1225,7 +1226,6 @@
     <Content Include="app\shared\globalAdvis\it-advice-global.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.modal.view.html" />
     <Content Include="app\components\it-advice\it-advice-modal-view.html" />
-    <Content Include="app\components\it-contract\it-contract-tab-advice.view.html" />
     <Content Include="app\components\it-advice\it-advice.view.html" />
     <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
@@ -1243,7 +1243,7 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
-    <TypeScriptCompile Include="app\components\it-advice\It-advice.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-advice\it-advice.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference.ts" />

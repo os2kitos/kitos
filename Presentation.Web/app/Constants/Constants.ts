@@ -3,7 +3,6 @@
     export class SRef {
         static readonly SystemUsageOverview = "it-system.overview";
         static readonly ContractOverview = "it-contract.overview";
-        static readonly ContractPlanOverview = "it-contract.plan";
         static readonly ProjectOverview = "it-project.overview";
         static readonly DataProcessingRegistrationOverview = "data-processing.overview";
     }

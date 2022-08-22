@@ -12,7 +12,7 @@
                     return contract;
                 }],
                 type: [function () {
-                    return "itContract";
+                    return Kitos.Models.Advice.AdviceType.ItContract;
                 }],
                 advicename: [
                     '$http', '$stateParams', function ($http, $stateParams) {
