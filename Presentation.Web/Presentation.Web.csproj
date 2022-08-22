@@ -1243,7 +1243,7 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
-    <TypeScriptCompile Include="app\components\it-advice\It-advice.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-advice\it-advice.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference.ts" />
