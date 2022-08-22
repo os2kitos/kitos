@@ -31,47 +31,49 @@
     </div>
 
     <!-- Table containing organization data -->
-    <org-user-roles-table ng-model="ctrl.vmOrgRights"
+    <org-user-roles-table ng-model="ctrl.vmOrgRoot"
                           data-role-type-name="Organisation"
                           data-callbacks="ctrl.roleViewModelCallbacks"
-                          data-selected-user="ctrl.selectedUser" />
+                          data-selected-user="ctrl.selectedUser"/>
 
     <!-- Table containing project data -->
-    <org-user-roles-table ng-model="ctrl.vmProjectRights"
+    <org-user-roles-table ng-model="ctrl.vmProjectRoot"
                           data-role-type-name="Projektnavn"
                           data-callbacks="ctrl.roleViewModelCallbacks"
-                          data-selected-user="ctrl.selectedUser" />
+                          data-selected-user="ctrl.selectedUser"/>
 
     <!-- Table containing ItSystem data -->
-    <org-user-roles-table ng-model="ctrl.vmSystemRights"
+    <org-user-roles-table ng-model="ctrl.vmSystemRoot"
                           data-role-type-name="Systemnavn"
                           data-callbacks="ctrl.roleViewModelCallbacks"
-                          data-selected-user="ctrl.selectedUser" />
+                          data-selected-user="ctrl.selectedUser"/>
 
     <!-- Table containing ItContract data -->
-    <org-user-roles-table ng-model="ctrl.vmContractRights"
+    <org-user-roles-table ng-model="ctrl.vmContractRoot"
                           data-role-type-name="Kontraktnavn"
                           data-callbacks="ctrl.roleViewModelCallbacks"
-                          data-selected-user="ctrl.selectedUser" />
+                          data-selected-user="ctrl.selectedUser"/>
 
     <!-- Table containing DPR data -->
-    <org-user-roles-table ng-model="ctrl.vmDprRights"
+    <org-user-roles-table ng-model="ctrl.vmDprRoot"
                           data-role-type-name="Databehandling"
                           data-callbacks="ctrl.roleViewModelCallbacks"
-                          data-selected-user="ctrl.selectedUser" />
+                          data-selected-user="ctrl.selectedUser"/>
 
     <!-- Table containing administrative roller data -->
     <table class="table table-hover" ng-if="ctrl.vmAdminRights.length > 0">
         <thead>
             <tr>
-                <th class="col-xs-1">Vælg</th>
+                <th class="col-xs-1">
+                    <input type="checkbox" ng-model="ctrl.vmAdminRoot.selected" ng-checked="ctrl.vmAdminRoot.selected" ng-change="ctrl.selectOrDeselectGroup(ctrl.vmAdminRoot.rights)"/>
+                </th>
                 <th class="col-xs-6">Adminstrative rettigheder</th>
                 <th class="col-xs-4">Tildel til</th>
                 <th class="col-xs-1">Slet</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="admin in ctrl.vmAdminRights | orderBy: 'role'">
+            <tr ng-repeat="admin in ctrl.vmAdminRoot.rights | orderBy: 'role'">
                 <td><input type="checkbox" ng-model="admin.selected" ng-change="ctrl.updateAnySelections()" /></td>
                 <td>
                     <div ng-if="admin.role === 'LocalAdmin'">
@@ -104,6 +106,7 @@
     </table>
 </div>
 <div class="modal-footer">
+    <button type="button" class="btn btn-default left" data-disabled-on-busy>Select/Deselect all</button>
     <button type="submit" ng-disabled="!ctrl.anySelections" class="btn btn-danger" data-ng-click="ctrl.deleteSelectedRoles()" data-disabled-on-busy>Slet valgte roller</button>
     <button type="submit" class="btn btn-danger" data-element-type="userDeleteButton" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
     <button type="submit" ng-disabled="!ctrl.anySelections || !ctrl.selectedUser" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>

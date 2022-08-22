@@ -1,7 +1,8 @@
 ﻿module Kitos.Organization.Users {
     export interface IOrgUserRolesTableCallbacks<T> {
         selectionChanged(): void;
-        delete(right : T);
+        delete(right: T);
+        selectOrDeselectGroup(rights: Models.IHasSelection[], areAllSelected: boolean): void;
     }
 
     ((ng, app) => {
@@ -17,7 +18,7 @@
                         roleTypeName: "@",
                         disabled: "=ngDisabled",
                         callbacks: "=callbacks",
-                        selectedUser: "=",
+                        selectedUser: "="
                     }
                 })
             ]);
