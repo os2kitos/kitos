@@ -204,30 +204,28 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         [Theory]
         //Checks not bound to context condition
-        [InlineData(true, false, false, false, false, false, true)]
-        [InlineData(false, true, false, false, false, false, true)]
-        [InlineData(false, false, true, true, false, false, true)]
+        [InlineData(true, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, true)]
 
         //Same organization - positive matches
-        [InlineData(false, false, false, true, true, false, true)]
+        [InlineData(false, false, true, true, false, true)]
 
         //Same organization - negative matches
-        [InlineData(false, false, false, true, false, false, false)]
-        [InlineData(false, false, false, true, false, true, false)]
+        [InlineData(false, false, true, false, false, false)]
+        [InlineData(false, false, true, false, true, false)]
 
         //Different organization for context bound object
-        [InlineData(false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false)]
         public void AllowUpdates_For_Context_Dependent_Object_Returns(
             bool isGlobalAdmin,
             bool inputIsActiveUser,
-            bool hasAssignedWriteAccess,
             bool isInSameOrganization,
             bool hasModuleLevelAccess,
             bool inputIsAUser,
             bool expectedResult)
         {
             //Arrange
-            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateTestItSystem(AccessModifier.Public, hasAssignedWriteAccess);
+            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateTestItSystem(AccessModifier.Public);
 
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
             ExpectHasRoleInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
@@ -704,13 +702,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _moduleLevelAccessPolicy.Setup(x => x.AllowModification(inputEntity)).Returns(hasModuleLevelAccess);
         }
 
-        private ItSystem CreateTestItSystem(AccessModifier accessModifier, bool hasAssignedWriteAccess = false)
+        private ItSystem CreateTestItSystem(AccessModifier accessModifier)
         {
             var testItSystem = new ItSystem { AccessModifier = accessModifier };
-            if (hasAssignedWriteAccess)
-            {
-                testItSystem.ObjectOwnerId = _userId;
-            }
             return testItSystem;
         }
 

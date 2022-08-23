@@ -23,7 +23,7 @@ namespace Core.DomainModel
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the object owner <see cref="User"/> identifier.
+        /// Gets or sets the object author <see cref="User"/> identifier.
         /// </summary>
         /// <value>
         /// The object owner <see cref="User"/> identifier.
@@ -34,7 +34,7 @@ namespace Core.DomainModel
         /// </remarks>
         public int? ObjectOwnerId { get; set; }
         /// <summary>
-        /// Gets or sets the <see cref="User"/> that owns this instance.
+        /// Gets or sets the <see cref="User"/> that authored this instance.
         /// </summary>
         /// <value>
         /// The object owner.
@@ -50,7 +50,7 @@ namespace Core.DomainModel
         /// </returns>
         public virtual bool HasUserWriteAccess(User user)
         {
-            return false;
+            return false; // By default no one has assigned write access
         }
 
         /// <summary>
