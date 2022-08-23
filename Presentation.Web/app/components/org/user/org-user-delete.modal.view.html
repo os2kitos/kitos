@@ -61,7 +61,7 @@
                           data-selected-user="ctrl.selectedUser"/>
 
     <!-- Table containing administrative roller data -->
-    <table class="table table-hover" ng-if="ctrl.vmAdminRights.length > 0">
+    <table class="table table-hover" ng-if="ctrl.vmAdminRoot.rights.length > 0">
         <thead>
             <tr>
                 <th class="col-xs-1">
@@ -106,7 +106,10 @@
     </table>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-default left" data-disabled-on-busy>Select/Deselect all</button>
+    <button type="button" class="btn btn-default pull-left" data-ng-click="ctrl.selectOrDeselectAll()" data-disabled-on-busy>
+        <ng-container ng-if="!ctrl.allSelections">Vælg alle</ng-container>
+        <ng-container ng-if="ctrl.allSelections">Fravælg alle</ng-container>
+    </button>
     <button type="submit" ng-disabled="!ctrl.anySelections" class="btn btn-danger" data-ng-click="ctrl.deleteSelectedRoles()" data-disabled-on-busy>Slet valgte roller</button>
     <button type="submit" class="btn btn-danger" data-element-type="userDeleteButton" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
     <button type="submit" ng-disabled="!ctrl.anySelections || !ctrl.selectedUser" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>

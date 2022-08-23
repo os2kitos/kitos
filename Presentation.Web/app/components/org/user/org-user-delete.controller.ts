@@ -29,13 +29,6 @@
         vmSystemRoot: IRootAssignedRightsWithGroupSelectionViewModel;
         vmAdminRoot: IRootAssignedAdminRolesWithGroupSelectionViewModel;
 
-        vmOrgRights = new Array<IAssignedRightViewModel>();
-        vmProjectRights = new Array<IAssignedRightViewModel>();
-        vmSystemRights = new Array<IAssignedRightViewModel>();
-        vmContractRights = new Array<IAssignedRightViewModel>();
-        vmDprRights = new Array<IAssignedRightViewModel>();
-        vmAdminRights = new Array<IAssignedAdminRoleViewModel>();
-
         areAllOrgRightsSelected: boolean;
         areAllProjectRightsSelected: boolean;
         areAllAdminRightsSelected: boolean;
@@ -51,6 +44,7 @@
         disabled: boolean;
         noRights: boolean;
         anySelections = false;
+        allSelections = false;
         roleViewModelCallbacks: Users.IOrgUserRolesTableCallbacks<IAssignedRightViewModel>;
 
         readonly firstName: string;
@@ -83,40 +77,40 @@
             this.lastName = userToModify.LastName;
             this.email = userToModify.Email;
 
-            this.vmAdminRights = allRoles.administrativeAccessRoles.map(role => {
+            const vmAdminRights = allRoles.administrativeAccessRoles.map(role => {
                 return {
                     selected: false,
                     role: role
                 }
             });
-            this.vmOrgRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.OrganizationUnit);
-            this.vmContractRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItContract);
-            this.vmDprRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.DataProcessingRegistration);
-            this.vmProjectRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItProject);
-            this.vmSystemRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItSystemUsage);
+            const vmOrgRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.OrganizationUnit);
+            const vmContractRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItContract);
+            const vmDprRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.DataProcessingRegistration);
+            const vmProjectRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItProject);
+            const vmSystemRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItSystemUsage);
 
             this.vmOrgRoot = {
-                rights: this.vmOrgRights,
+                rights: vmOrgRights,
                 selected: false
             }
             this.vmContractRoot = {
-                rights: this.vmContractRights,
+                rights: vmContractRights,
                 selected: false
             }
             this.vmDprRoot = {
-                rights: this.vmDprRights,
+                rights: vmDprRights,
                 selected: false
             }
             this.vmProjectRoot = {
-                rights: this.vmProjectRights,
+                rights: vmProjectRights,
                 selected: false
             }
             this.vmSystemRoot = {
-                rights: this.vmSystemRights,
+                rights: vmSystemRights,
                 selected: false
             }
             this.vmAdminRoot = {
-                rights: this.vmAdminRights,
+                rights: vmAdminRights,
                 selected: false
             }
             
@@ -134,12 +128,12 @@
 
         private updateNoRights() {
             this.noRights =
-                this.vmOrgRights.length === 0 &&
-                this.vmContractRights.length === 0 &&
-                this.vmDprRights.length === 0 &&
-                this.vmProjectRights.length === 0 &&
-                this.vmSystemRights.length === 0 &&
-                this.vmAdminRights.length === 0;
+                this.vmOrgRoot.rights.length === 0 &&
+                this.vmContractRoot.rights.length === 0 &&
+                this.vmDprRoot.rights.length === 0 &&
+                this.vmProjectRoot.rights.length === 0 &&
+                this.vmSystemRoot.rights.length === 0 &&
+                this.vmAdminRoot.rights.length === 0;
         }
 
         createViewModel = (fullCollection: Array<Models.Users.IAssignedRightDTO>, roleScope: Models.Users.BusinessRoleScope) => {
@@ -155,13 +149,34 @@
 
         updateAnySelections() {
             let anySelectionsFound = false;
-            if (this.collectSelectedAdminRoles().length > 0) {
+            let allSelectionsFound = false;
+
+            const numberOfSelectedAdminRoles = this.collectSelectedAdminRoles().length;
+            const selectedRoles = this.collectSelectedRoles();
+
+            let numberOfSelectedRoles = 0;
+            selectedRoles.forEach(role => {
+                numberOfSelectedRoles += role.selectedModels.length;
+            });
+
+            const totalRoles = this.vmAdminRoot.rights.length +
+                this.vmDprRoot.rights.length +
+                this.vmOrgRoot.rights.length +
+                this.vmProjectRoot.rights.length +
+                this.vmSystemRoot.rights.length +
+                this.vmContractRoot.rights.length;
+            const totalSelectedRoles = numberOfSelectedAdminRoles + numberOfSelectedRoles;
+
+            if (totalSelectedRoles > 0) {
                 anySelectionsFound = true;
             }
-            else if (this.collectSelectedRoles().filter(x => x.selectedModels.length > 0).length > 0) {
-                anySelectionsFound = true;
+            if (totalSelectedRoles === totalRoles) {
+                allSelectionsFound = true;
             }
+
+            this.updateGroupSelections();
             this.anySelections = anySelectionsFound;
+            this.allSelections = allSelectionsFound;
         }
 
         deleteRight(viewModel: IAssignedRightViewModel) {
@@ -169,37 +184,37 @@
             switch (viewModel.right.scope) {
                 case Models.Users.BusinessRoleScope.ItProject:
                     snapshot = {
-                        selectedModels: this.vmProjectRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmProjectRights,
-                        updateSourceCollection: (newValues) => this.vmProjectRights = newValues
+                        selectedModels: this.vmProjectRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmProjectRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmProjectRoot.rights = newValues
                     };
                     break;
                 case Models.Users.BusinessRoleScope.ItContract:
                     snapshot = {
-                        selectedModels: this.vmContractRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmContractRights,
-                        updateSourceCollection: (newValues) => this.vmContractRights = newValues
+                        selectedModels: this.vmContractRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmContractRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmContractRoot.rights = newValues
                     };
                     break;
                 case Models.Users.BusinessRoleScope.DataProcessingRegistration:
                     snapshot = {
-                        selectedModels: this.vmDprRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmDprRights,
-                        updateSourceCollection: (newValues) => this.vmDprRights = newValues
+                        selectedModels: this.vmDprRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmDprRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmDprRoot.rights = newValues
                     };
                     break;
                 case Models.Users.BusinessRoleScope.ItSystemUsage:
                     snapshot = {
-                        selectedModels: this.vmSystemRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmSystemRights,
-                        updateSourceCollection: (newValues) => this.vmSystemRights = newValues
+                        selectedModels: this.vmSystemRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmSystemRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmSystemRoot.rights = newValues
                     };
                     break;
                 case Models.Users.BusinessRoleScope.OrganizationUnit:
                     snapshot = {
-                        selectedModels: this.vmOrgRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmOrgRights,
-                        updateSourceCollection: (newValues) => this.vmOrgRights = newValues
+                        selectedModels: this.vmOrgRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmOrgRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmOrgRoot.rights = newValues
                     };
                     break;
             }
@@ -213,7 +228,7 @@
         }
 
         deleteAdminRole(role: Models.OrganizationRole) {
-            const selectedAdminRoles = this.vmAdminRights.filter(x => x.role === role);
+            const selectedAdminRoles = this.vmAdminRoot.rights.filter(x => x.role === role);
             if (selectedAdminRoles.length != 0) {
                 if (!confirm('Er du sikker på, at du vil slette rollen?')) {
                     return;
@@ -275,7 +290,7 @@
         }
 
         updateViewModels(removedRoles: Array<RoleSelectionSnapshot>, removedAdminRoles: Array<IAssignedAdminRoleViewModel>) {
-            this.vmAdminRights = this.vmAdminRights.filter(vm => removedAdminRoles.indexOf(vm) === -1);
+            this.vmAdminRoot.rights = this.vmAdminRoot.rights.filter(vm => removedAdminRoles.indexOf(vm) === -1);
             for (var roles of removedRoles) {
                 roles.updateSourceCollection(
                     roles.sourceCollection.filter(vm => roles.selectedModels.indexOf(vm) === -1));
@@ -304,22 +319,11 @@
 
         selectOrDeselectGroup(rights: Models.IHasSelection[]) {
             const areAllSelected = rights.filter(vm => !vm.selected).length < 1;
-            rights.forEach(vm => {
-                if (areAllSelected) {
-                    vm.selected = false;
-                    return;
-                }
-                vm.selected = true;
-            });
+            const targetSelectValue = !areAllSelected;
+            this.setSelectGroupToValue(rights, targetSelectValue);
+            this.updateAnySelections();
         }
-/*
-        vmOrgRoot: IRootAssignedRightsWithGroupSelectionViewModel;
-        vmContractRoot: IRootAssignedRightsWithGroupSelectionViewModel;
-        vmDprRoot: IRootAssignedRightsWithGroupSelectionViewModel;
-        vmProjectRoot: IRootAssignedRightsWithGroupSelectionViewModel;
-        vmSystemRoot: IRootAssignedRightsWithGroupSelectionViewModel;
-        vmAdminRoot: IRootAssignedAdminRolesWithGroupSelectionViewModel;
-*/
+
         selectOrDeselectAll() {
             if (this.vmOrgRoot.selected &&
                 this.vmContractRoot.selected &&
@@ -328,18 +332,39 @@
                 this.vmSystemRoot.selected &&
                 this.vmAdminRoot.selected) {
                 this.changeAllSelections(false);
+                this.updateAnySelections();
+                return;
             }
 
             this.changeAllSelections(true);
+            this.updateAnySelections();
+        }
+        
+        private setSelectGroupToValue(rights: Models.IHasSelection[], targetValue: boolean) {
+            rights.forEach(vm => {
+                vm.selected = targetValue;
+            });
         }
 
-        changeAllSelections(targetValue: boolean) {
+        private changeAllSelections(targetValue: boolean) {
+            this.setSelectGroupToValue(this.vmOrgRoot.rights, targetValue);
             this.vmOrgRoot.selected = targetValue;
+
+            this.setSelectGroupToValue(this.vmContractRoot.rights, targetValue);
             this.vmContractRoot.selected = targetValue;
+
+            this.setSelectGroupToValue(this.vmDprRoot.rights, targetValue);
             this.vmDprRoot.selected = targetValue;
+
+            this.setSelectGroupToValue(this.vmProjectRoot.rights, targetValue);
             this.vmProjectRoot.selected = targetValue;
+
+            this.setSelectGroupToValue(this.vmSystemRoot.rights, targetValue);
             this.vmSystemRoot.selected = targetValue;
+
+            this.setSelectGroupToValue(this.vmAdminRoot.rights, targetValue);
             this.vmAdminRoot.selected = targetValue;
+
         }
 
         private collectSelectedRolesFromSource(sourceCollection: Array<IAssignedRightViewModel>, updateSourceCollection: UpdateSourceCollection): RoleSelectionSnapshot {
@@ -351,59 +376,62 @@
             };
         }
 
-        private collectSelectedRoles(): Array<RoleSelectionSnapshot> {
+        private updateGroupSelections() {
+            const selectedContractRights = this.vmContractRoot.rights.filter(x => x.selected);
+            const selectedProjectRights = this.vmProjectRoot.rights.filter(x => x.selected);
+            const selectedSystemRights = this.vmSystemRoot.rights.filter(x => x.selected);
+            const selectedDprRights = this.vmDprRoot.rights.filter(x => x.selected);
+            const selectedOrgRights = this.vmOrgRoot.rights.filter(x => x.selected);
+            const selectedAdminRights = this.vmAdminRoot.rights.filter(x => x.selected);
 
-            const result = new Array<RoleSelectionSnapshot>();
-
-            const selectedContractRights = this.collectSelectedRolesFromSource(this.vmContractRights, (newRights) => this.vmContractRights = newRights);
-            const selectedProjectRights = this.collectSelectedRolesFromSource(this.vmProjectRights, (newRights) => this.vmProjectRights = newRights);
-            const selectedSystemRights = this.collectSelectedRolesFromSource(this.vmSystemRights, (newRights) => this.vmSystemRights = newRights);
-            const selectedDprRights = this.collectSelectedRolesFromSource(this.vmDprRights, (newRights) => this.vmDprRights = newRights);
-            const selectedOrgRights = this.collectSelectedRolesFromSource(this.vmOrgRights, (newRights) => this.vmOrgRights = newRights);
-
-            if (selectedContractRights.sourceCollection.length > selectedContractRights.updateSourceCollection.length) {
+            if (selectedContractRights.length < this.vmContractRoot.rights.length) {
                 this.vmContractRoot.selected = false;
             } else {
                 this.vmContractRoot.selected = true;
             }
-            if (selectedProjectRights.sourceCollection.length > selectedProjectRights.updateSourceCollection.length) {
+            if (selectedProjectRights.length < this.vmProjectRoot.rights.length) {
                 this.vmProjectRoot.selected = false;
             } else {
                 this.vmProjectRoot.selected = true;
             }
-            if (selectedSystemRights.sourceCollection.length > selectedSystemRights.updateSourceCollection.length) {
+            if (selectedSystemRights.length < this.vmSystemRoot.rights.length) {
                 this.vmSystemRoot.selected = false;
             } else {
                 this.vmSystemRoot.selected = true;
             }
-            if (selectedDprRights.sourceCollection.length > selectedDprRights.updateSourceCollection.length) {
+            if (selectedDprRights.length < this.vmDprRoot.rights.length) {
                 this.vmDprRoot.selected = false;
             } else {
                 this.vmDprRoot.selected = true;
             }
-            if (selectedOrgRights.sourceCollection.length > selectedOrgRights.updateSourceCollection.length) {
+            if (selectedOrgRights.length < this.vmOrgRoot.rights.length) {
                 this.vmOrgRoot.selected = false;
             } else {
-                this.vmOrgRoot.selected = false;
+                this.vmOrgRoot.selected = true;
             }
+            if (selectedAdminRights.length < this.vmAdminRoot.rights.length) {
+                this.vmAdminRoot.selected = false;
+            } else {
+                this.vmAdminRoot.selected = true;
+            }
+        }
 
-            result.push(selectedContractRights);
-            result.push(selectedProjectRights);
-            result.push(selectedSystemRights);
-            result.push(selectedDprRights);
-            result.push(selectedOrgRights);
+        private collectSelectedRoles(): Array<RoleSelectionSnapshot> {
+
+            const result = new Array<RoleSelectionSnapshot>();
+            
+            result.push(this.collectSelectedRolesFromSource(this.vmContractRoot.rights, (newRights) => this.vmContractRoot.rights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmProjectRoot.rights, (newRights) => this.vmProjectRoot.rights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmSystemRoot.rights, (newRights) => this.vmSystemRoot.rights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmDprRoot.rights, (newRights) => this.vmDprRoot.rights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmOrgRoot.rights, (newRights) => this.vmOrgRoot.rights = newRights));
 
             return result;
         }
 
         private collectSelectedAdminRoles(): Array<IAssignedAdminRoleViewModel> {
-            const selectedAdminRoles = this.vmAdminRights.filter(r => r.selected);
-            if (selectedAdminRoles.length < this.vmAdminRights.length) {
-                this.vmAdminRoot.selected = false;
-                return selectedAdminRoles;
-            }
-
-            this.vmAdminRoot.selected = true;
+            const selectedAdminRoles = this.vmAdminRoot.rights.filter(r => r.selected);
+            
             return selectedAdminRoles;
         }
     }
