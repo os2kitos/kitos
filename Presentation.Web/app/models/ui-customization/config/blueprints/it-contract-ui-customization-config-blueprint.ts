@@ -25,6 +25,9 @@
                     procurementPlan: {
                         text: "Genanskaffelsesplan"
                     },
+                    procurementInitiated: {
+                        text: "Genanskaffelse igangsat"
+                    },
                     externalSigner: {
                         text: "Leverandørs underskrift",
                         helpText: "Herunder: 'Underskriver', 'Underskrevet' og 'Dato'"

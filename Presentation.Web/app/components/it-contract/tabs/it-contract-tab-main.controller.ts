@@ -110,6 +110,7 @@
 
                 $scope.showprocurementPlanSelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementPlan);
                 $scope.showProcurementStrategySelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementStrategy);
+                $scope.showProcurementInitiated = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementInitiated);
                 $scope.isContractIdEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractId);
                 $scope.isContractTypeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractType);
                 $scope.isPurchaseFormEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.purchaseForm);
