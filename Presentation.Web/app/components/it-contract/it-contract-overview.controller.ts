@@ -583,6 +583,7 @@
                         .withTitle("Genanskaffelse igangsat")
                         .withId("procurementInitiated")
                         .withStandardWidth(185)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.procurementInitiated))
                         .withContentOverflow()
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)

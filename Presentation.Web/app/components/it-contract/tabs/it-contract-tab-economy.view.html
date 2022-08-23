@@ -1,7 +1,7 @@
 ﻿<div class="object-section-container">
-    <h4>{{contract.name}}</h4>
+    <h4>{{contractEconomyVm.contract.name}}</h4>
 
-    <form role="form" ng-if="isPaymentModelEnabled" id="payment-model">
+    <form role="form" ng-if="contractEconomyVm.isPaymentModelEnabled" id="payment-model">
         <div class="panel panel-default">
             <div class="panel-heading">Betalingsmodel</div>
             <div class="panel-body">
@@ -9,21 +9,21 @@
                     <label for="agreement-operation" class="control-label small">Driftsvederlag påbegyndt</label>
                     <input type="text" class="form-control" id="agreement-operation"
                            data-kendo-date-picker
-                           data-k-options="datepickerOptions"
+                           data-k-options="contractEconomyVm.datepickerOptions"
                            data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="contract.operationRemunerationBegun"
-                           ng-blur="patchPaymentModelDate('operationRemunerationBegun', contract.operationRemunerationBegun)"
+                           data-ng-model="contractEconomyVm.contract.operationRemunerationBegun"
+                           ng-blur="contractEconomyVm.patchPaymentModelDate('operationRemunerationBegun', contractEconomyVm.contract.operationRemunerationBegun)"
                            data-field="operationRemunerationBegun">
                 </div>
                 <div class="form-group col-xs-6">
                     <select2-option data-id="agreement-freq"
                                     data-label="Betalingsfrekvens"
                                     data-placeholder="Vælg betalingsfrekvens"
-                                    data-selected-text="{{ contract.paymentFreqencyName }}"
+                                    data-selected-text="{{ contractEconomyVm.contract.paymentFreqencyName }}"
                                     data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.paymentFreqencyId"
-                                    data-options="paymentFrequencies"
-                                    data-auto-save-url="{{ patchPaymentModelUrl }}"
+                                    data-ng-model="contractEconomyVm.contract.paymentFreqencyId"
+                                    data-options="contractEconomyVm.paymentFrequencies"
+                                    data-auto-save-url="{{ contractEconomyVm.patchPaymentModelUrl }}"
                                     data-field="paymentFreqencyId">
                     </select2-option>
                 </div>
@@ -31,11 +31,11 @@
                     <select2-option data-id="agreement-payment"
                                     data-label="Betalingsmodel"
                                     data-placeholder="Vælg betalingsmodel"
-                                    data-selected-text="{{ contract.paymentModelName }}"
+                                    data-selected-text="{{ contractEconomyVm.contract.paymentModelName }}"
                                     data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.paymentModelId"
-                                    data-options="paymentModels"
-                                    data-auto-save-url="{{ patchPaymentModelUrl }}"
+                                    data-ng-model="contractEconomyVm.contract.paymentModelId"
+                                    data-options="contractEconomyVm.paymentModels"
+                                    data-auto-save-url="{{ contractEconomyVm.patchPaymentModelUrl }}"
                                     data-field="paymentModelId">
                     </select2-option>
                 </div>
@@ -43,18 +43,18 @@
                     <select2-option data-id="agreement-price"
                                     data-label="Prisregulering"
                                     data-placeholder="Vælg prisregulering"
-                                    data-selected-text="{{ contract.priceRegulationName }}"
+                                    data-selected-text="{{ contractEconomyVm.contract.priceRegulationName }}"
                                     data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.priceRegulationId"
-                                    data-options="priceRegulations"
-                                    data-auto-save-url="{{ patchPaymentModelUrl }}"
+                                    data-ng-model="contractEconomyVm.contract.priceRegulationId"
+                                    data-options="contractEconomyVm.priceRegulations"
+                                    data-auto-save-url="{{ contractEconomyVm.patchPaymentModelUrl }}"
                                     data-field="priceRegulationId">
                     </select2-option>
                 </div>
             </div>
         </div>
     </form>
-    <div class="panel panel-default" ng-if="isExtPaymentEnabled" id="ext-payment">
+    <div class="panel panel-default" ng-if="contractEconomyVm.isExtPaymentEnabled" id="ext-payment">
 
         <div class="panel-heading">Ekstern betaling</div>
         <table class="table table-condensed small">
@@ -73,18 +73,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="stream in externEconomyStreams | filter:{'show':true}">
+                <tr data-ng-repeat="stream in contractEconomyVm.externEconomyStreams | filter:{'show':true}">
                     <!-- ORG UNIT -->
                     <td>
                         <select2-org-unit data-id="stream.id"
                                           data-placeholder="Vælg ansvarlig enhed"
-                                          data-options="orgUnits"
+                                          data-options="contractEconomyVm.orgUnits"
                                           data-ng-model="stream.organizationUnitId"
                                           data-function="stream.updateEan"
                                           data-auto-save-url="{{ stream.updateUrl }}"
                                           data-field="organizationUnitId"
                                           data-ng-disabled="!hasWriteAccess"
-                                          data-allow-clear="allowClear">
+                                          data-allow-clear="contractEconomyVm.allowClear">
                         </select2-org-unit>
                     </td>
 
@@ -148,10 +148,10 @@
                         <input type="text"
                                class="form-control extern-audit-date"
                                data-kendo-date-picker
-                               data-k-options="datepickerOptions"
+                               data-k-options="contractEconomyVm.datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="stream.auditDate"
-                               ng-blur="patchDate('auditDate', stream.auditDate, stream.id)"
+                               ng-blur="contractEconomyVm.patchDate('auditDate', stream.auditDate, stream.id)"
                                data-field="auditDate">
                     </td>
 
@@ -181,7 +181,7 @@
                 <tr>
                     <td colspan="10">
                         <div class="pull-right">
-                            <button class="btn btn-success btn-sm new-extern" data-ng-click="newExtern()">
+                            <button class="btn btn-success btn-sm new-extern" data-ng-click="contractEconomyVm.newExtern()">
                                 <i class="glyphicon glyphicon-plus small"></i> Ny
                             </button>
                         </div>
@@ -191,7 +191,7 @@
         </table>
     </div>
 
-    <div class="panel panel-default" ng-if="isIntPaymentEnabled" id="int-payment">
+    <div class="panel panel-default" ng-if="contractEconomyVm.isIntPaymentEnabled" id="int-payment">
         <div class="panel-heading">Intern betaling</div>
         <table class="table table-condensed small">
             <thead>
@@ -209,18 +209,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="stream in internEconomyStreams | filter:{'show':true}">
+                <tr data-ng-repeat="stream in contractEconomyVm.internEconomyStreams | filter:{'show':true}">
                     <!-- ORG UNIT -->
                     <td>
                         <select2-org-unit data-id="stream.id"
                                           data-placeholder="Vælg ansvarlig enhed"
-                                          data-options="orgUnits"
+                                          data-options="contractEconomyVm.orgUnits"
                                           data-ng-model="stream.organizationUnitId"
                                           data-function="stream.updateEan"
                                           data-auto-save-url="{{ stream.updateUrl }}"
                                           data-field="organizationUnitId"
                                           data-ng-disabled="!hasWriteAccess"
-                                          data-allow-clear="allowClear">
+                                          data-allow-clear="contractEconomyVm.allowClear">
                         </select2-org-unit>
                     </td>
 
@@ -284,10 +284,10 @@
                         <input type="text"
                                class="form-control intern-audit-date"
                                data-kendo-date-picker
-                               data-k-options="datepickerOptions"
+                               data-k-options="contractEconomyVm.datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="stream.auditDate"
-                               ng-blur="patchDate('auditDate', stream.auditDate, stream.id)"
+                               ng-blur="contractEconomyVm.patchDate('auditDate', stream.auditDate, stream.id)"
                                data-field="auditDate">
                     </td>
 
@@ -317,7 +317,7 @@
                 <tr>
                     <td colspan="10">
                         <div class="pull-right">
-                            <button class="btn btn-success btn-sm new-intern" data-ng-click="newIntern()">
+                            <button class="btn btn-success btn-sm new-intern" data-ng-click="contractEconomyVm.newIntern()">
                                 <i class="glyphicon glyphicon-plus small"></i> Ny
                             </button>
                         </div>
