@@ -50,7 +50,7 @@ namespace Core.DomainModel
         /// </returns>
         public virtual bool HasUserWriteAccess(User user)
         {
-            return ObjectOwnerId == user.Id;
+            return false;
         }
 
         /// <summary>

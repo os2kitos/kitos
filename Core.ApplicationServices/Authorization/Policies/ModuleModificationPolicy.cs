@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Globalization;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -118,6 +119,11 @@ namespace Core.ApplicationServices.Authorization.Policies
             if (IsLocalAdmin(organizationId))
             {
                 return true;
+            }
+
+            if (MatchType<KendoColumnConfiguration>(target))
+            {
+                return IsLocalAdmin(organizationId);
             }
 
             if (MatchType<ItSystemUsage>(target))
