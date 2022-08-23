@@ -37,6 +37,16 @@ namespace Tests.Unit.Core.Model
         public bool HasWriteAccess { get; set; }
         public int Id { get; set; }
         public Guid Uuid { get; set; }
+        public string Name { get; set; }
+        public DateTime LastChanged { get; set; }
+        public User LastChangedByUser { get; set; }
+        public int? LastChangedByUserId { get; set; }
+        public User ObjectOwner { get; set; }
+        public int? ObjectOwnerId { get; set; }
+        public bool HasUserWriteAccess(User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 

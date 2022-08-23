@@ -1,67 +1,90 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.directive("globalAdvis", [
-        function () {
-            return {
-                templateUrl: "app/shared/globalAdvis/it-advice-global.view.html",
-                scope: {
-                    stateName: "@",
-                    user : "="
-                },
-                controller: [
-                    '$scope',
-                    '$http',
-                    '$uibModal',
-                    '$state',
-                    '$window',
-                    (
-                        $scope,
-                        $http,
-                        $uibModal,
-                        $state,
-                        $window) => {
-                        $scope.$watch("stateName", function (newValue, oldValue) {
-                            if ($scope.stateName === "it-project.overview" || $scope.stateName === "it-system.overview" || $scope.stateName === "it-contract.overview" || $scope.stateName === "it-contract.plan" || $scope.stateName === "data-processing.overview" )
-                                $scope.disableAdvisLink = false;
-                            else
-                                $scope.disableAdvisLink = true;
-                        });
-                        var parent = $scope;
-                        
-                        $scope.showAdviceModal = () => {
-                            var modalInstance = $uibModal.open({
-                                windowClass: "modal fade in",
-                                templateUrl: "app/shared/globalAdvis/it-advice-global.modal.view.html",
-                                size: 'lg',
-                                controller: ["$scope", "$uibModalInstance", "notify", function ($scope, $modalInstance, nofity) {
-                                    var today = moment().format('YYYY-MM-DD');
-                                    var stateUrl = "";
-                                    var moduleTypeFilter = "";
-                                    if (parent.stateName === "it-project.overview") {
-                                        $scope.title = "IT advis - IT Projekter";
-                                        moduleTypeFilter = "Type eq 'itProject'";
-                                        stateUrl = $window.location.href.replace("overview", "edit");
-                                    }
-                                    if (parent.stateName === "it-contract.overview" || parent.stateName === "it-contract.plan") {
-                                        $scope.title = "IT advis - IT Kontrakter";
-                                        moduleTypeFilter = "Type eq 'itContract'";
-                                        stateUrl = $window.location.href.replace("overview", "edit");
-                                    }
-                                    if (parent.stateName === "it-system.overview") {
-                                        $scope.title = "IT advis - IT Systemer";
-                                        moduleTypeFilter = "Type eq 'itSystemUsage'";
-                                        stateUrl = $window.location.href.replace("overview", "usage");
-                                    }
-                                    if (parent.stateName === "data-processing.overview") {
-                                        $scope.title = "IT advis - Databehandleraftaler";
-                                        moduleTypeFilter = "Type eq 'dataProcessingRegistration'";
-                                        stateUrl = $window.location.href.replace("overview", "edit");
-                                    }
+        () => ({
+            templateUrl: "app/shared/globalAdvis/it-advice-global.view.html",
+            scope: {
+                stateName: "@",
+                user: "="
+            },
+            controller: [
+                "$scope",
+                "$uibModal",
+                "$window",
+                "localOptionServiceFactory",
+                (
+                    $scope,
+                    $uibModal,
+                    $window,
+                    localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
+
+                    const stateNames = {
+                        itProjects: Kitos.Constants.SRef.ProjectOverview,
+                        itSystemUsages: Kitos.Constants.SRef.SystemUsageOverview,
+                        itContracts: Kitos.Constants.SRef.ContractOverview,
+                        dataProcessingRegistrations: Kitos.Constants.SRef.DataProcessingRegistrationOverview
+                    };
+
+                    $scope.$watch("stateName", (newValue, oldValue) => {
+                        if ($scope.stateName === stateNames.itProjects || $scope.stateName === stateNames.dataProcessingRegistrations || $scope.stateName === stateNames.itContracts || $scope.stateName === stateNames.itSystemUsages)
+                            $scope.disableAdvisLink = false;
+                        else
+                            $scope.disableAdvisLink = true;
+                    });
+                    var parent = $scope;
+                    $scope.showAdviceModal = () => {
+                        $uibModal.open({
+                            windowClass: "modal fade in",
+                            templateUrl: "app/shared/globalAdvis/it-advice-global.modal.view.html",
+                            size: "lg",
+                            controller: ["$scope", "$uibModalInstance", "notify", ($scope, $modalInstance, nofity) => {
+                                var stateUrl = "";
+                                var moduleTypeFilter = "";
+                                let adviceType: Kitos.Models.Advice.AdviceType | null = null;
+                                if (parent.stateName === stateNames.itProjects) {
+                                    $scope.title = "IT advis - IT Projekter";
+                                    moduleTypeFilter = "Type eq 'itProject'";
+                                    stateUrl = $window.location.href.replace("overview", "edit");
+                                    adviceType = Kitos.Models.Advice.AdviceType.ItProject;
+                                }
+                                if (parent.stateName === stateNames.itContracts) {
+                                    $scope.title = "IT advis - IT Kontrakter";
+                                    moduleTypeFilter = "Type eq 'itContract'";
+                                    stateUrl = $window.location.href.replace("overview", "edit");
+                                    adviceType = Kitos.Models.Advice.AdviceType.ItContract;
+                                }
+                                if (parent.stateName === stateNames.itSystemUsages) {
+                                    $scope.title = "IT advis - IT Systemer";
+                                    moduleTypeFilter = "Type eq 'itSystemUsage'";
+                                    stateUrl = $window.location.href.replace("overview", "usage");
+                                    adviceType = Kitos.Models.Advice.AdviceType.ItSystemUsage;
+                                }
+                                if (parent.stateName === stateNames.dataProcessingRegistrations) {
+                                    $scope.title = "IT advis - Databehandleraftaler";
+                                    moduleTypeFilter = "Type eq 'dataProcessingRegistration'";
+                                    stateUrl = $window.location.href.replace("overview", "edit");
+                                    adviceType = Kitos.Models.Advice.AdviceType.DataProcessingRegistration;
+                                }
+                                if (adviceType === null) {
+                                    throw `Unable to map advice type based on state:${parent.stateName}`;
+                                }
+                                const localRoleType: Kitos.Services.LocalOptions.LocalOptionType = Kitos.Services.LocalOptions.getLocalOptionTypeFromAdvisType(adviceType);
+                                const roleProperty = Kitos.Models.Advice.getAdviceTypeUserRelationRoleProperty(adviceType);
+
+                                const localOptionsService = localOptionServiceFactory.create(localRoleType);
+                                localOptionsService.getAll().then(options => {
+                                    const localOptionLookup = options.reduce<{ [key: number]: Kitos.Models.IOptionEntity }>(
+                                        (acc, option) => {
+                                            acc[option.Id] = option;
+                                            return acc;
+                                        },
+                                        {});
+
                                     $scope.mainGridOptions = {
-                                        dataSource: {                                            
+                                        dataSource: {
                                             type: "odata-v4",
                                             transport: {
                                                 read: {
-                                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${$scope.user.currentOrganizationId})?$filter=${moduleTypeFilter} AND IsActive eq true&$expand=Reciepients, Advicesent`,
+                                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${$scope.user.currentOrganizationId})?$filter=${moduleTypeFilter} AND IsActive eq true&$expand=Reciepients($expand=${roleProperty}), Advicesent`,
                                                     dataType: "json"
                                                 },
                                             },
@@ -127,17 +150,15 @@
                                             sortable: true
                                         },
                                         {
-                                            field: "Reciepients.Name", title: "Modtager",
-                                            template: () =>
-                                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                                            field: "Reciepients.Email", title: "Modtager",
+                                            template: (dataItem) => Kitos.Models.ViewModel.Advice.renderReceivers(dataItem, adviceType, "RECIEVER", localOptionLookup),
                                             attributes: { "class": "might-overflow" },
                                             sortable: false //Not possible on collection field
                                         },
                                         {
-                                            field: "Reciepients.Name",
+                                            field: "Reciepients.Email",
                                             title: "CC",
-                                            template: () =>
-                                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                                            template: (dataItem) => Kitos.Models.ViewModel.Advice.renderReceivers(dataItem, adviceType, "CC", localOptionLookup),
                                             attributes: { "class": "might-overflow" },
                                             sortable: false //Not possible on collection field
                                         },
@@ -145,7 +166,7 @@
                                             field: "Subject",
                                             title: "Emne",
                                             sortable: true
-                                        }                                        
+                                        }
                                         ],
                                         sortable: {
                                             mode: "single"
@@ -155,12 +176,12 @@
                                             pageSizes: [10, 25, 50, 100, 200],
                                             buttonCount: 5
                                         },
-                                    }                                                                      
-                                }]
-                            });
-                        }
-                    }]
-            };
-        }
+                                    }
+                                });
+                            }]
+                        });
+                    }
+                }]
+        })
     ]);
 })(angular, app);
