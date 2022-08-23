@@ -4,6 +4,7 @@
             url: "/deadlines",
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-deadlines.view.html",
             controller: "contract.DeadlinesCtrl",
+            controllerAs: "deadlinesVm",
             resolve: {
                 optionExtensions: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OptionExtendTypes).getAll()
@@ -11,52 +12,53 @@
                 terminationDeadlines: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.TerminationDeadlineTypes).getAll()
                 ]
-            }
+            },
         });
     }]);
 
-    app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "user", "moment", "$q", "contract", "uiState",
-        ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, user, moment, $q, contract, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
-            $scope.contract = contract;
-            $scope.autosaveUrl = "api/itcontract/" + contract.id;
-            $scope.optionExtensions = optionExtensions;
-            $scope.terminationDeadlines = terminationDeadlines;
-            $scope.durationYears = contract.durationYears;
-            $scope.durationMonths = contract.durationMonths;
-            $scope.durationOngoing = contract.durationOngoing;
+    app.controller("contract.DeadlinesCtrl", ["$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "user", "moment", "$q", "contract", "uiState",
+        ($http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, user, moment, $q, contract, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
+            const vm = this; //using controllerAs, so we capture "this" and bind all properties to it
+            vm.contract = contract;
+            vm.autosaveUrl = "api/itcontract/" + contract.id;
+            vm.optionExtensions = optionExtensions;
+            vm.terminationDeadlines = terminationDeadlines;
+            vm.durationYears = contract.durationYears ?? "";
+            vm.durationMonths = contract.durationMonths ?? "";
+            vm.durationOngoing = contract.durationOngoing === true;
 
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
-            $scope.isAgreementDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines);
-            $scope.isTerminationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination);
+            vm.isAgreementDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.agreementDeadlines);
+            vm.isTerminationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines.children.termination);
 
-            $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.running);
-            $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.byEnding);
+            vm.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.running);
+            vm.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.byEnding);
 
-            $scope.updateRunning = () => {
-                contract.running = $scope.running?.id || null;
+            vm.updateRunning = () => {
+                contract.running = vm.running?.id || null;
             }
 
-            $scope.updateByEnding = () => {
-                contract.byEnding = $scope.byEnding?.id || null;
+            vm.updateByEnding = () => {
+                contract.byEnding = vm.byEnding?.id || null;
             }
 
-            $scope.deadlineOptions = Kitos.Models.ItContract.YearSegmentOptions.options;
+            vm.deadlineOptions = Kitos.Models.ItContract.YearSegmentOptions.options;
 
-            $scope.saveDurationYears = () => {
-                if ($scope.durationYears === "") {
+            vm.saveDurationYears = () => {
+                if (vm.durationYears == null || vm.durationYears === "") {
                     return;
                 }
-                const years = parseInt($scope.durationYears);
+                const years = parseInt(vm.durationYears);
                 if (years > -1) {
                     const payload = {
                         "DurationYears": years || 0
                     }
 
                     saveDuration(payload).then(() => {
-                        contract.durationYears = $scope.durationYears;
+                        contract.durationYears = vm.durationYears;
                     }, () => {
-                        $scope.durationYears = contract.durationYears;
+                        vm.durationYears = contract.durationYears;
                     });
 
                 } else {
@@ -66,20 +68,20 @@
                 cleanUp();
             };
 
-            $scope.saveDurationMonths = () => {
-                if ($scope.durationMonths === "") {
+            vm.saveDurationMonths = () => {
+                if (vm.durationMonths == null || vm.durationMonths === "") {
                     return;
                 }
-                const months = parseInt($scope.durationMonths);
+                const months = parseInt(vm.durationMonths);
                 if (months > -1 && months < 12) {
                     const payload = {
                         "DurationMonths": months || 0
                     }
 
                     saveDuration(payload).then(() => {
-                        contract.durationMonths = $scope.durationMonths;
+                        contract.durationMonths = vm.durationMonths;
                     }, () => {
-                        $scope.durationMonths = contract.durationMonths;
+                        vm.durationMonths = contract.durationMonths;
                     });
 
                 } else {
@@ -89,23 +91,23 @@
                 cleanUp();
             };
 
-            $scope.saveOngoingStatus = () => {
+            vm.saveOngoingStatus = () => {
                 const payload = {
                     "DurationYears": 0,
                     "DurationMonths": 0,
-                    "DurationOngoing": $scope.durationOngoing
+                    "DurationOngoing": vm.durationOngoing
                 };
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http.patch(`odata/itcontracts(${contract.id})`, payload)
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Varigheden blev gemt.");
-                        $scope.durationYears = "";
-                        $scope.durationMonths = "";
+                        vm.durationYears = "";
+                        vm.durationMonths = "";
 
                         //it is done this way so '0' doesnt appear in input
-                        contract.durationOngoing = $scope.durationOngoing;
-                        contract.durationYears = $scope.durationYears;
-                        contract.durationMonths = $scope.durationMonths;
+                        contract.durationOngoing = vm.durationOngoing;
+                        contract.durationYears = vm.durationYears;
+                        contract.durationMonths = vm.durationMonths;
 
                     }, function onError(result) {
                         msg.toErrorMessage("Varigheden blev ikke gemt.");
@@ -132,29 +134,29 @@
             }
 
             function cleanUp() {
-                const years = parseInt($scope.durationYears);
-                const months = parseInt($scope.durationMonths);
+                const years = parseInt(vm.durationYears);
+                const months = parseInt(vm.durationMonths);
 
                 if (years === 0 || years < 0) {
-                    $scope.durationYears = "";
+                    vm.durationYears = "";
                 }
 
                 if (months === 0 || months < 0 || months > 11) {
-                    $scope.durationMonths = "";
+                    vm.durationMonths = "";
                 }
             }
 
-            $scope.datepickerOptions = {
+            vm.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            $scope.patchDate = (field, value) => {
+            vm.patchDate = (field, value) => {
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 if (value === "") {
                     var payload = {};
                     payload[field] = null;
-                    patch(payload, $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
+                    patch(payload, vm.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
                 } else if (value == null) {
 
                 } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
@@ -164,10 +166,10 @@
                     const dateString = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = dateString;
-                    patch(payload, $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
+                    patch(payload, vm.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
                 }
             }
-            $scope.patchDateProcurement = (field, value, id, url) => {
+            vm.patchDateProcurement = (field, value, id, url) => {
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
 
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
@@ -195,12 +197,14 @@
                 return $state.transitionTo($state.current, $stateParams, {
                     reload: true
                 }).then(() => {
-                    $scope.hideContent = true;
-                    return $timeout(() => $scope.hideContent = false, 1);
+                    vm.hideContent = true;
+                    return $timeout(() => vm.hideContent = false, 1);
                 });
             };
 
             cleanUp();
+
+            return vm; //Return the captured vm context
 
         }]);
 })(angular, app);
