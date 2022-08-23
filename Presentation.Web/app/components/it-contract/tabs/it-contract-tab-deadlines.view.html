@@ -1,8 +1,8 @@
 ﻿<div class="object-section-container">
-    <h4>{{contract.name}}</h4>
+    <h4>{{deadlinesVm.contract.name}}</h4>
     <div class="panel panel-default">
         <div class="row">
-            <div class="col-xs-3" ng-if="isAgreementDeadlinesEnabled" id="agreement-deadlines">
+            <div class="col-xs-3" ng-if="deadlinesVm.isAgreementDeadlinesEnabled" id="agreement-deadlines">
                 <div class="panel panel-default">
                     <div class="panel-heading">Aftalefrister</div>
                     <div class="panel-body">
@@ -15,9 +15,9 @@
                             <div class="row form-group">
                                 <div class="col-xs-6 col-lg-4">
                                     <input type="text" id="year" class="form-control input-sm"
-                                           data-ng-model="durationYears"
-                                           data-ng-disabled="!hasWriteAccess || durationOngoing"
-                                           data-ng-blur="saveDurationYears()"/>
+                                           data-ng-model="deadlinesVm.durationYears"
+                                           data-ng-disabled="!hasWriteAccess || deadlinesVm.durationOngoing"
+                                           data-ng-blur="deadlinesVm.saveDurationYears()"/>
                                 </div>
                                 <div class="col-xs-6 contractDurationLabelContainer">
                                     <label class="control-label small contractDurationLabel" for="year">År</label>
@@ -26,9 +26,9 @@
                             <div class="row form-group">
                                 <div class="col-xs-6 col-lg-4">
                                     <input type="text" id="month" class="form-control input-sm"
-                                           data-ng-model="durationMonths"
-                                           data-ng-disabled="!hasWriteAccess || durationOngoing"
-                                           data-ng-blur="saveDurationMonths()"/>
+                                           data-ng-model="deadlinesVm.durationMonths"
+                                           data-ng-disabled="!hasWriteAccess || deadlinesVm.durationOngoing"
+                                           data-ng-blur="deadlinesVm.saveDurationMonths()"/>
                                 </div>
                                 <div class="col-xs-6 contractDurationLabelContainer">
                                     <label class="control-label small contractDurationLabel" for="month">Måneder</label>
@@ -38,9 +38,9 @@
                         <div class="row form-group">
                             <div class="col-xs-1">
                                 <input type="checkbox" id="idl" class=""
-                                       data-ng-checked="durationOngoing"
-                                       data-ng-change="saveOngoingStatus()"
-                                       data-ng-model="durationOngoing"
+                                       data-ng-checked="deadlinesVm.durationOngoing"
+                                       data-ng-change="deadlinesVm.saveOngoingStatus()"
+                                       data-ng-model="deadlinesVm.durationOngoing"
                                        data-ng-disabled="!hasWriteAccess"/>
                             </div>
                             <div class="col-xs-9">
@@ -52,11 +52,11 @@
                             <select2-option data-id="agreement-option-extend"
                                             data-label="Option forlæng"
                                             data-placeholder="Vælg forlængelse"
-                                            data-selected-text="{{ contract.optionExtendName }}"
+                                            data-selected-text="{{ deadlinesVm.contract.optionExtendName }}"
                                             data-ng-disabled="!hasWriteAccess"
-                                            data-ng-model="contract.optionExtendId"
-                                            data-options="optionExtensions"
-                                            data-auto-save-url="{{ autosaveUrl }}"
+                                            data-ng-model="deadlinesVm.contract.optionExtendId"
+                                            data-options="deadlinesVm.optionExtensions"
+                                            data-auto-save-url="{{ deadlinesVm.autosaveUrl }}"
                                             data-field="optionExtendId">
                             </select2-option>
                         </div>
@@ -67,18 +67,18 @@
                                    min="0"
                                    class="form-control input-sm"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="contract.extendMultiplier"
-                                   data-autosave="{{autosaveUrl}}"
+                                   data-ng-model="deadlinesVm.contract.extendMultiplier"
+                                   data-autosave="{{deadlinesVm.autosaveUrl}}"
                                    data-field="extendMultiplier">
                         </div>
                         <div class="form-group">
                             <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
                             <input type="text" class="form-control" id="agreement-irrevocable"
                                    data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
+                                   data-k-options="deadlinesVm.datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="contract.irrevocableTo"
-                                   ng-blur="patchDate('irrevocableTo', contract.irrevocableTo)"
+                                   data-ng-model="deadlinesVm.contract.irrevocableTo"
+                                   ng-blur="deadlinesVm.patchDate('irrevocableTo', contract.irrevocableTo)"
                                    data-field="irrevocableTo">
                         </div>
                     </div>
@@ -86,7 +86,7 @@
             </div>
 
 
-            <div class="col-xs-3" ng-if="isTerminationEnabled" id="termination">
+            <div class="col-xs-3" ng-if="deadlinesVm.isTerminationEnabled" id="termination">
                 <div class="panel panel-default">
                     <div class="panel-heading">Opsigelse</div>
                     <div class="panel-body">
@@ -94,10 +94,10 @@
                             <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
                             <input type="text" class="form-control" id="agreement-terminated"
                                    data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
+                                   data-k-options="deadlinesVm.datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="contract.terminated"
-                                   ng-blur="patchDate('terminated', contract.terminated)"
+                                   data-ng-model="deadlinesVm.contract.terminated"
+                                   ng-blur="deadlinesVm.patchDate('terminated', contract.terminated)"
                                    data-field="terminated">
                         </div>
 
@@ -105,11 +105,11 @@
                             <select2-option data-id="agreement-notice"
                                            data-label="Opsigelsesfrist (måneder)"
                                            data-placeholder="Vælg opsigelsesfrist"
-                                           data-selected-text="{{ contract.terminationDeadlineName }}"
+                                           data-selected-text="{{ deadlinesVm.contract.terminationDeadlineName }}"
                                            data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.terminationDeadlineId"
-                                           data-options="terminationDeadlines"
-                                           data-auto-save-url="{{ autosaveUrl }}"
+                                           data-ng-model="deadlinesVm.contract.terminationDeadlineId"
+                                           data-options="deadlinesVm.terminationDeadlines"
+                                           data-auto-save-url="{{ deadlinesVm.autosaveUrl }}"
                                            data-field="terminationDeadlineId">
                             </select2-option>
                         </div>
@@ -117,26 +117,26 @@
                         <div class="form-group">
                             <select-simple data-id="agreement-running"
                                            data-label="Løbende"
-                                           data-options="deadlineOptions"
+                                           data-options="deadlinesVm.deadlineOptions"
                                            data-placeholder="Vælg varighed"
-                                           data-ng-model="running"
+                                           data-ng-model="deadlinesVm.running"
                                            data-ng-disabled="!hasWriteAccess"
-                                           data-auto-save-url="{{ autosaveUrl }}"
+                                           data-auto-save-url="{{ deadlinesVm.autosaveUrl }}"
                                            data-field="running"
-                                           data-ng-changed="updateRunning()">
+                                           data-ng-changed="deadlinesVm.updateRunning()">
                             </select-simple>
                         </div>
 
                         <div class="form-group">
                             <select-simple data-id="agreement-by-ending"
                                            data-label="Inden udgangen af"
-                                           data-options="deadlineOptions"
+                                           data-options="deadlinesVm.deadlineOptions"
                                            data-placeholder="Vælg varighed"
-                                           data-ng-model="byEnding"
+                                           data-ng-model="deadlinesVm.byEnding"
                                            data-ng-disabled="!hasWriteAccess"
-                                           data-auto-save-url="{{ autosaveUrl }}"
+                                           data-auto-save-url="{{ deadlinesVm.autosaveUrl }}"
                                            data-field="byEnding"
-                                           data-ng-changed="updateByEnding()">
+                                           data-ng-changed="deadlinesVm.updateByEnding()">
                             </select-simple>
                         </div>
                     </div>
