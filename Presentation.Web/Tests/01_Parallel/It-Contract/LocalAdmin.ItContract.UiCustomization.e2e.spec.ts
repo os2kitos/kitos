@@ -51,6 +51,7 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             // Front page
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementPlan", ContractNavigationSrefs.frontPageSref, "selectProcurementPlan"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementStrategy", ContractNavigationSrefs.frontPageSref, "selectProcurementStrategy"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementInitiated", ContractNavigationSrefs.frontPageSref, "selectProcurementInitiated"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractId", ContractNavigationSrefs.frontPageSref, "contract-id"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.contractType", ContractNavigationSrefs.frontPageSref, "s2id_contract-type"))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.purchaseForm", ContractNavigationSrefs.frontPageSref, "s2id_contract-purchaseform"))
