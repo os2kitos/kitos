@@ -4,6 +4,7 @@
             url: "/economy",
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-economy.view.html",
             controller: "contract.EditEconomyCtrl",
+            controllerAs: "contractEconomyVm",
             resolve: {
                 orgUnits: [
                     "$http", "contract", ($http, contract) => $http.get("api/organizationUnit?organization=" + contract.organizationId).then(result => {
@@ -46,22 +47,24 @@
         });
     }]);
 
-    app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess", "paymentFrequencies", "paymentModels", "priceRegulations", "uiState",
-        ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess, paymentFrequencies: Kitos.Models.IOptionEntity[], paymentModels: Kitos.Models.IOptionEntity[], priceRegulations: Kitos.Models.IOptionEntity[], uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
-            $scope.orgUnits = orgUnits;
-            $scope.allowClear = true;
-            $scope.hasWriteAccess = hasWriteAccess;
-            $scope.contract = contract;
-            $scope.paymentFrequencies = paymentFrequencies;
-            $scope.paymentModels = paymentModels;
-            $scope.priceRegulations = priceRegulations;
-            $scope.patchPaymentModelUrl = `api/itcontract/${contract.id}`;
+    app.controller("contract.EditEconomyCtrl", ["$http", "$timeout", "$state", "$stateParams", "notify", "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess", "paymentFrequencies", "paymentModels", "priceRegulations", "uiState",
+        ($http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess, paymentFrequencies: Kitos.Models.IOptionEntity[], paymentModels: Kitos.Models.IOptionEntity[], priceRegulations: Kitos.Models.IOptionEntity[], uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
+            const vm = this; //capture this to bind properties to it
+
+            vm.orgUnits = orgUnits;
+            vm.allowClear = true;
+            vm.hasWriteAccess = hasWriteAccess;
+            vm.contract = contract;
+            vm.paymentFrequencies = paymentFrequencies;
+            vm.paymentModels = paymentModels;
+            vm.priceRegulations = priceRegulations;
+            vm.patchPaymentModelUrl = `api/itcontract/${contract.id}`;
 
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
-            $scope.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel);
-            $scope.isExtPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.extPayment);
-            $scope.isIntPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.intPayment);
+            vm.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel);
+            vm.isExtPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.extPayment);
+            vm.isIntPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.intPayment);
 
             function convertDate(value: string): moment.Moment {
                 return moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
@@ -71,7 +74,7 @@
                 return !date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099;
             }
 
-            $scope.patchPaymentModelDate = (field, value) => {
+            vm.patchPaymentModelDate = (field, value) => {
                 function patchContract(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
                     $http({ method: "PATCH", url: url, data: payload })
@@ -86,7 +89,7 @@
                 if (value === "") {
                     var payload = {};
                     payload[field] = null;
-                    patchContract(payload, $scope.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
+                    patchContract(payload, vm.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
                 } else if (value == null) {
 
                 } else if (isDateInvalid(date)) {
@@ -97,12 +100,12 @@
                     const dateString = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = dateString;
-                    patchContract(payload, $scope.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
+                    patchContract(payload, vm.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
                 }
             }
 
             var baseUrl = "api/economyStream";
-            $scope.datepickerOptions = {
+            vm.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
@@ -118,13 +121,13 @@
             });
 
             var externEconomyStreams = [];
-            $scope.externEconomyStreams = externEconomyStreams;
+            vm.externEconomyStreams = externEconomyStreams;
             _.each(externalEconomyStreams, stream => {
                 pushStream(stream, externEconomyStreams);
             });
 
             var internEconomyStreams = [];
-            $scope.internEconomyStreams = internEconomyStreams;
+            vm.internEconomyStreams = internEconomyStreams;
             _.each(internalEconomyStreams, stream => {
                 pushStream(stream, internEconomyStreams);
             });
@@ -173,13 +176,13 @@
                     }).finally(reload);
             }
 
-            $scope.newExtern = () => {
+            vm.newExtern = () => {
                 postStream("ExternPaymentForId", "OrganizationId");
             };
-            $scope.newIntern = () => {
+            vm.newIntern = () => {
                 postStream("InternPaymentForId", "OrganizationId");
             };
-            $scope.patchDate = (field, value, id) => {
+            vm.patchDate = (field, value, id) => {
                 const date = convertDate(value);
                 if (value === "") {
                     var payload = {};
@@ -211,10 +214,12 @@
                 return $state.transitionTo($state.current, $stateParams, {
                     reload: true
                 }).then(() => {
-                    $scope.hideContent = true;
-                    return $timeout(() => $scope.hideContent = false, 1);
+                    vm.hideContent = true;
+                    return $timeout(() => vm.hideContent = false, 1);
                 });
             };
+
+            return vm; //Return the vm
         }]);
 
 })(angular, app);

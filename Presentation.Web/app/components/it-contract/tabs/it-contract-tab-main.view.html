@@ -117,7 +117,7 @@
                         </div>
                         
                         <!-- Procurement initiated-->
-                        <div class="form-group">
+                        <div id="selectProcurementInitiated" class="form-group" ng-if="showProcurementInitiated">
                             <label for="procurement-initiated" class="control-label small">Genanskaffelse igangsat</label>
                             <single-select-select2 id="procurement-initiated" ng-model="procurementInitiated" ng-disabled="!hasWriteAccess"/>
                         </div>
