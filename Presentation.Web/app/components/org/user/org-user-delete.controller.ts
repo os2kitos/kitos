@@ -367,11 +367,10 @@
 
         private updateGroupSelections() {
 
-            this.checkAndChangeGroupSelectionStatus(this.vmContractRoot);
-            this.checkAndChangeGroupSelectionStatus(this.vmProjectRoot);
-            this.checkAndChangeGroupSelectionStatus(this.vmSystemRoot);
-            this.checkAndChangeGroupSelectionStatus(this.vmDprRoot);
-            this.checkAndChangeGroupSelectionStatus(this.vmOrgRoot);
+            const roleGroups = [
+                this.vmContractRoot, this.vmProjectRoot, this.vmSystemRoot, this.vmDprRoot, this.vmOrgRoot
+            ];
+            this.initiateGroupSelectionCheck(roleGroups);
 
             const selectedAdminRights = this.collectSelectedAdminRoles();
             if (selectedAdminRights.length < this.vmAdminRoot.rights.length) {
@@ -382,11 +381,15 @@
             this.vmAdminRoot.selected = true;
         }
 
+        private initiateGroupSelectionCheck(groups: IRootAssignedRightsWithGroupSelectionViewModel[]) {
+            groups.forEach(group => this.checkAndChangeGroupSelectionStatus(group));
+        }
+
         private checkAndChangeGroupSelectionStatus(groupRoot: IRootAssignedRightsWithGroupSelectionViewModel) {
-            const selectedContractRights =
-                this.collectSelectedRolesFromSource(groupRoot.rights, (newRights) => this.vmContractRoot.rights = newRights);
+            const rights =
+                this.collectSelectedRolesFromSource(groupRoot.rights, () => {/*lambda not used in this instance*/}); 
             
-            if (selectedContractRights.selectedModels.length < groupRoot.rights.length) {
+            if (rights.selectedModels.length < groupRoot.rights.length) {
                 groupRoot.selected = false;
                 return;
             }
