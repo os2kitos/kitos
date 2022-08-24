@@ -19,7 +19,6 @@
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
         vmOrgRights = new Array<IAssignedRightViewModel>();
-        vmProjectRights = new Array<IAssignedRightViewModel>();
         vmAdminRights = new Array<IAssignedAdminRoleViewModel>();
         vmSystemRights = new Array<IAssignedRightViewModel>();
         vmContractRights = new Array<IAssignedRightViewModel>();
@@ -75,7 +74,6 @@
             this.vmOrgRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.OrganizationUnit);
             this.vmContractRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItContract);
             this.vmDprRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.DataProcessingRegistration);
-            this.vmProjectRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItProject);
             this.vmSystemRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItSystemUsage);
 
             this.vmUsersInOrganization = usersInOrganization.filter(x => x.Id !== userToModify.Id);
@@ -94,7 +92,6 @@
                 this.vmOrgRights.length === 0 &&
                 this.vmContractRights.length === 0 &&
                 this.vmDprRights.length === 0 &&
-                this.vmProjectRights.length === 0 &&
                 this.vmSystemRights.length === 0 &&
                 this.vmAdminRights.length === 0;
         }
@@ -124,13 +121,6 @@
         deleteRight(viewModel: IAssignedRightViewModel) {
             let snapshot: RoleSelectionSnapshot | null = null;
             switch (viewModel.right.scope) {
-                case Models.Users.BusinessRoleScope.ItProject:
-                    snapshot = {
-                        selectedModels: this.vmProjectRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmProjectRights,
-                        updateSourceCollection: (newValues) => this.vmProjectRights = newValues
-                    };
-                    break;
                 case Models.Users.BusinessRoleScope.ItContract:
                     snapshot = {
                         selectedModels: this.vmContractRights.filter(r => r.right.rightId === viewModel.right.rightId),
@@ -274,7 +264,6 @@
             const result = new Array<RoleSelectionSnapshot>();
 
             result.push(this.collectSelectedRolesFromSource(this.vmContractRights, (newRights) => this.vmContractRights = newRights));
-            result.push(this.collectSelectedRolesFromSource(this.vmProjectRights, (newRights) => this.vmProjectRights = newRights));
             result.push(this.collectSelectedRolesFromSource(this.vmSystemRights, (newRights) => this.vmSystemRights = newRights));
             result.push(this.collectSelectedRolesFromSource(this.vmDprRights, (newRights) => this.vmDprRights = newRights));
             result.push(this.collectSelectedRolesFromSource(this.vmOrgRights, (newRights) => this.vmOrgRights = newRights));

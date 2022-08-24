@@ -1186,7 +1186,6 @@
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractDpr.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ContractTimeOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractItSystem.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-project\ItProjectOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Tabs\ItSystemAdvice.po.ts" />
@@ -1198,7 +1197,6 @@
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Local-admin\LocalDataProcessing.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Local-admin\LocalProject.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
@@ -1276,8 +1274,6 @@
     <TypeScriptCompile Include="app\models\general-role-entity.ts" />
     <TypeScriptCompile Include="app\models\help-text.ts" />
     <TypeScriptCompile Include="app\models\IReference.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-status-update.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
     <TypeScriptCompile Include="app\models\role-entity.ts" />
     <TypeScriptCompile Include="app\models\option-entity.ts" />
@@ -1409,7 +1405,6 @@
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.view.html" />
     <Content Include="app\components\it-system\it-system-catalog.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.view.html" />
-    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-proj.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-kle.view.html" />
     <Content Include="app\components\it-system\edit\it-system-edit.view.html" />
     <Content Include="app\components\it-system\it-system-overview.view.html" />
@@ -1447,7 +1442,6 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-org.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-forgot-password.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-reset-password.controller.ts" />
-    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
     <TypeScriptCompile Include="app\index.d.ts" />
@@ -1459,17 +1453,6 @@
     <TypeScriptCompile Include="app\models\config.ts" />
     <TypeScriptCompile Include="app\models\entity.ts" />
     <TypeScriptCompile Include="app\models\it-contract\advice.ts" />
-    <TypeScriptCompile Include="app\models\it-project\communication.ts" />
-    <TypeScriptCompile Include="app\models\it-project\economy-year.ts" />
-    <TypeScriptCompile Include="app\models\it-project\goal-status.ts" />
-    <TypeScriptCompile Include="app\models\it-project\goal-type.ts" />
-    <TypeScriptCompile Include="app\models\it-project\goal.ts" />
-    <TypeScriptCompile Include="app\models\it-project\handover.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-org-unit-usage.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-priority.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-status.ts" />
-    <TypeScriptCompile Include="app\models\it-project\risk.ts" />
-    <TypeScriptCompile Include="app\models\it-project\stakeholder.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-org-unit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-row.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit.ts" />
@@ -1483,7 +1466,6 @@
     <TypeScriptCompile Include="app\models\it-system\it-system.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-it-system-usage.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage.ts" />
     <TypeScriptCompile Include="app\models\organization\organization.ts" />
     <TypeScriptCompile Include="app\models\password-reset-request.ts" />
@@ -1492,7 +1474,6 @@
     <TypeScriptCompile Include="app\models\traffic-light.ts" />
     <TypeScriptCompile Include="app\models\Api\api-wrapper.ts" />
     <TypeScriptCompile Include="app\models\user.ts" />
-    <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
@@ -1529,7 +1510,6 @@
     <TypeScriptCompile Include="app\components\it-system\edit\it-system-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-system-catalog.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-system-overview.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-proj.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-kle.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-org.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-hierarchy.controller.ts" />
@@ -1556,7 +1536,6 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
     <Content Include="app\components\org\user\org-user-delete.modal.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.view.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-edit-tab-main.view.html" />

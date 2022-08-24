@@ -36,12 +36,6 @@
                           data-callbacks="ctrl.roleViewModelCallbacks"
                           data-selected-user="ctrl.selectedUser" />
 
-    <!-- Table containing project data -->
-    <org-user-roles-table ng-model="ctrl.vmProjectRights"
-                          data-role-type-name="Projektnavn"
-                          data-callbacks="ctrl.roleViewModelCallbacks"
-                          data-selected-user="ctrl.selectedUser" />
-
     <!-- Table containing ItSystem data -->
     <org-user-roles-table ng-model="ctrl.vmSystemRights"
                           data-role-type-name="Systemnavn"
@@ -79,9 +73,6 @@
                     </div>
                     <div ng-if="admin.role === 'OrganizationModuleAdmin'">
                         Organisations admin
-                    </div>
-                    <div ng-if="admin.role === 'ProjectModuleAdmin'">
-                        Projekt admin
                     </div>
                     <div ng-if="admin.role === 'SystemModuleAdmin'">
                         System admin

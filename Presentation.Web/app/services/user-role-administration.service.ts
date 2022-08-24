@@ -28,9 +28,6 @@
                                 case 2:
                                     mappedRole = Models.OrganizationRole.OrganizationModuleAdmin;
                                     break;
-                                case 3:
-                                    mappedRole = Models.OrganizationRole.ProjectModuleAdmin;
-                                    break;
                                 case 4:
                                     mappedRole = Models.OrganizationRole.SystemModuleAdmin;
                                     break;

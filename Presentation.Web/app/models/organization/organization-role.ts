@@ -9,8 +9,6 @@
         LocalAdmin = "LocalAdmin" as any,
         /** Has write access to everything within the organization module */
         OrganizationModuleAdmin = "OrganizationModuleAdmin" as any,
-        /** Has write access to everything within the project module */
-        ProjectModuleAdmin = "ProjectModuleAdmin" as any,
         /** Has write access to everything within the system module */
         SystemModuleAdmin = "SystemModuleAdmin" as any,
         /** Has write access to everything within the contract module */

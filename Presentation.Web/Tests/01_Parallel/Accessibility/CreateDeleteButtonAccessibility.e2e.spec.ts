@@ -1,7 +1,6 @@
 ﻿import Login = require("../../Helpers/LoginHelper");
 import ItContractOverview = require("../../PageObjects/it-contract/ItContractOverview.po");
 import SystemOverview = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po");
-import ItProjectOverview = require("../../PageObjects/It-project/ItProjectOverview.po");
 import ItSystemInterfaceCatalog = require("../../PageObjects/it-system/Interfaces/itSystemInterface.po");
 import SystemUsageHelper = require("../../Helpers/SystemUsageHelper");
 import Constants = require("../../Utility/Constants");
@@ -13,7 +12,6 @@ var loginHelper = new Login();
 var itContractPage = new ItContractOverview();
 var systemPage = new SystemOverview();
 var systemUsagePage = new ItSystemUsageCommon();
-var projectPage = new ItProjectOverview();
 var interfacePage = new ItSystemInterfaceCatalog();
 var usersPage = new UsersPage();
 var consts = new Constants();
@@ -45,10 +43,6 @@ describe("For user without additional roles", () => {
 
     it("Create IT interface is disabled", () => {
         checkInterfaceAccessibility(false, true);
-    });
-
-    it("Create IT project is disabled", () => {
-        checkProjectAccessibility(false, true);
     });
 
     it("Create User is disabled", () => {
@@ -84,10 +78,6 @@ describe("For Local Administrator", () => {
         checkInterfaceAccessibility(true, true);
     });
 
-    it("Create IT project is enabled", () => {
-        checkProjectAccessibility(true, true);
-    });
-
     it("Create User is enabled", () => {
         checkUsersAccessibility(true, true);
     });
@@ -121,10 +111,6 @@ describe("For Global Administrator", () => {
         checkInterfaceAccessibility(true, true);
     });
 
-    it("Create IT project is enabled", () => {
-        checkProjectAccessibility(true, true);
-    });
-
     it("Create User is enabled", () => {
         checkUsersAccessibility(true, true);
     });
@@ -155,10 +141,6 @@ function checkUsersAccessibility(enabled: boolean, visible: boolean) {
 
 function checkInterfaceAccessibility(enabled: boolean, visible: boolean) {
     return performAccessibilityCheck(() => interfacePage.getPage(), () => interfacePage.getCreateInterfaceButton(), visible, enabled);
-}
-
-function checkProjectAccessibility(enabled: boolean, visible: boolean) {
-    return performAccessibilityCheck(() => projectPage.getPage(), () => projectPage.getCreateProjectButton(), visible, enabled);
 }
 
 function checkSystemAccessibility(enabled: boolean, visible: boolean) {

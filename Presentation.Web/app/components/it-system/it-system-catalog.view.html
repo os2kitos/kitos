@@ -116,20 +116,6 @@
                     </table>
                 </div>
 
-                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">Følgende projekter, hvor IT-systemet anvendes, berøres:</h4>
-                <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">
-                    <table class="table">
-                        <tr>
-                            <th>Id</th>
-                            <th>Navn</th>
-                        </tr>
-                        <tr ng-repeat="ItProjects in systemCatalogVm.migrationReportDTO.affectedItProjects">
-                            <td class="idTableDataCellFormat">{{ItProjects.id}}</td>
-                            <td>{{ItProjects.name}}</td>
-                        </tr>
-                    </table>
-                </div>
-
                 <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedDataProcessingRegistrations.length > 0">Følgende registreringer i modulet "Databehandling" berøres:</h4>
                 <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedDataProcessingRegistrations.length > 0">
                     <table class="table">

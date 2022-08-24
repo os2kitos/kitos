@@ -59,7 +59,6 @@
         MainContractIsActive: boolean | null;
         HasMainContract: boolean;
         SensitiveDataLevelsAsCsv: string | null;
-        ItProjectNamesAsCsv: string | null;
         ArchiveDuty: string | null;
         IsHoldingDocument: boolean;
         ActiveArchivePeriodEndDate: Date | null;

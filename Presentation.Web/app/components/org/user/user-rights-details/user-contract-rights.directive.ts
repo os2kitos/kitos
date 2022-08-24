@@ -8,7 +8,7 @@
         mainGridOptions: IKendoGridOptions<IGridModel>;
     }
 
-    interface IGridModel extends Models.ItProject.IItProjectRight {
+    interface IGridModel extends Models.IRightEntity<Models.ItContract.IItContract>{
 
     }
 

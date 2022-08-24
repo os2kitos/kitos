@@ -4,7 +4,7 @@
         ItSystemUsage = 0,
         ItContract = 1,
         DataProcessingRegistration = 2,
-        ItProject = 3,
+        //NOTE: 3 used to be ItProject
         OrganizationUnit = 4
     }
 

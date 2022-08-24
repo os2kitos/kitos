@@ -8,7 +8,6 @@
         mainGrid: IKendoGrid<Models.DataProcessing.IDataProcessingRegistration>;
         mainGridOptions: IKendoGridOptions<Models.DataProcessing.IDataProcessingRegistration>;
         canCreate: boolean;
-        projectIdToAccessLookup = {};
 
         static $inject: Array<string> = [
             "$rootScope",

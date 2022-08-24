@@ -437,11 +437,6 @@
                                 .create(Services.LocalOptions.LocalOptionType.ItContractRoles)
                                 .getAll();
                         }
-                        if (type === Models.Advice.AdviceType.ItProject) {
-                            return localOptionServiceFactory
-                                .create(Services.LocalOptions.LocalOptionType.ItProjectRoles)
-                                .getAll();
-                        }
                         if (type === Models.Advice.AdviceType.DataProcessingRegistration) {
                             return localOptionServiceFactory.create(Services.LocalOptions
                                 .LocalOptionType.DataProcessingRegistrationRoles)
