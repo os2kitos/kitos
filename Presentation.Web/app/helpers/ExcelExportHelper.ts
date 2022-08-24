@@ -1,6 +1,4 @@
 ﻿module Kitos.Helpers {
-    import IItProjectInactiveOverview = ItProject.OverviewInactive.IItProjectInactiveOverview;
-
     interface IStatusColor {
         danish: string;
         english: string;
@@ -109,12 +107,6 @@
                 return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return ExcelExportHelper.noValueFallback;
-        }
-
-        static renderStatusColorWithStatus(dataItem: IItProjectInactiveOverview, status) {
-            const latestStatus = dataItem.ItProjectStatusUpdates[0];
-            const statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : status;
-            return ExcelExportHelper.convertColorsToDanish(statusToShow);
         }
 
         static convertColorsToDanish(color: string) {

@@ -4,7 +4,6 @@ var app = angular.module("app", [
     "ui.select2",
     "ngAnimate",
     "notify",
-    "angularjs-dropdown-multiselect",
     "ngSanitize",
     "kendo.directives",
     "angular-loading-bar",
