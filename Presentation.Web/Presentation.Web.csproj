@@ -1409,7 +1409,6 @@
     <Content Include="app\components\global-admin\global-admin-system.view.html" />
     <Content Include="app\components\global-admin\global-admin-contract.view.html" />
     <Content Include="app\components\global-admin\global-admin-org.view.html" />
-    <Content Include="app\components\global-admin\global-admin-project.view.html" />
     <Content Include="app\components\global-admin\global-admin-organization-modal.view.html" />
     <Content Include="app\components\home\choose-organization.html" />
     <Content Include="app\components\home\home-edit-user.view.html" />
@@ -1459,7 +1458,6 @@
     <Content Include="app\components\local-config\local-config-contract.view.html" />
     <Content Include="app\components\local-config\import\local-config-import.view.html" />
     <Content Include="app\components\local-config\local-config-system.view.html" />
-    <Content Include="app\components\local-config\local-config-project.view.html" />
     <Content Include="app\components\local-config\local-config-org.view.html" />
     <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
     <Content Include="app\components\org\overview\org-overview.view.html" />
@@ -1480,7 +1478,6 @@
     <Content Include="app\shared\navigation\navigation-top.view.html" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-global-admins.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins.controller.ts" />
-    <TypeScriptCompile Include="app\components\global-admin\global-admin-project.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-system.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-contract.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-org.controller.ts" />
@@ -1560,7 +1557,6 @@
     <TypeScriptCompile Include="app\components\local-config\import\local-config-import.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-system.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-contract.controller.ts" />
-    <TypeScriptCompile Include="app\components\local-config\local-config-project.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-subnav.controller.ts" />
     <TypeScriptCompile Include="app\services\taskService.ts" />
