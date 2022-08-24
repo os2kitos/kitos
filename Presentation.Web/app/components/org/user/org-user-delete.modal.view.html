@@ -106,10 +106,8 @@
     </table>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-default pull-left" data-ng-click="ctrl.selectOrDeselectAll()" data-disabled-on-busy>
-        <ng-container ng-if="!ctrl.allSelections">Vælg alle</ng-container>
-        <ng-container ng-if="ctrl.allSelections">Fravælg alle</ng-container>
-    </button>
+    <button type="button" class="btn btn-default pull-left" ng-if="!ctrl.allSelections" data-ng-click="ctrl.selectAll()" data-disabled-on-busy>Vælg alle</button>
+    <button type="button" class="btn btn-default pull-left" ng-if="ctrl.allSelections" data-ng-click="ctrl.deselectAll()" data-disabled-on-busy>Fravælg alle</button>
     <button type="submit" ng-disabled="!ctrl.anySelections" class="btn btn-danger" data-ng-click="ctrl.deleteSelectedRoles()" data-disabled-on-busy>Slet valgte roller</button>
     <button type="submit" class="btn btn-danger" data-element-type="userDeleteButton" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
     <button type="submit" ng-disabled="!ctrl.anySelections || !ctrl.selectedUser" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>

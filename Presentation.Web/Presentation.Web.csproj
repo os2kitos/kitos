@@ -356,7 +356,7 @@
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
-    <TypeScriptCompile Include="app\models\organization\organization-has-selection.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
     <TypeScriptCompile Include="app\models\right-entity.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />

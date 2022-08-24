@@ -2,7 +2,7 @@
     export interface IOrgUserRolesTableCallbacks<T> {
         selectionChanged(): void;
         delete(right: T);
-        selectOrDeselectGroup(rights: Models.IHasSelection[], areAllSelected: boolean): void;
+        selectOrDeselectGroup(rights: Models.ViewModel.Organization.IHasSelection[], areAllSelected: boolean): void;
     }
 
     ((ng, app) => {
