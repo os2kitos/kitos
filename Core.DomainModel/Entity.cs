@@ -42,18 +42,6 @@ namespace Core.DomainModel
         public virtual User ObjectOwner { get; set; }
 
         /// <summary>
-        /// Determines whether a user has write access to this instance.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <returns>
-        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
-        /// </returns>
-        public virtual bool HasUserWriteAccess(User user)
-        {
-            return false; // By default no one has assigned write access
-        }
-
-        /// <summary>
         /// Gets or sets the DateTime of when the last change occurred to this instance.
         /// </summary>
         /// <value>

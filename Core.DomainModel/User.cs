@@ -16,7 +16,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IIsPartOfOrganization, IHasName, IHasUuid
+    public class User : Entity, IIsPartOfOrganization, IHasName, IHasUuid, ISupportsUserSpecificAccessControl
     {
         public string GetFullName()
         {
@@ -194,9 +194,10 @@ namespace Core.DomainModel
         public Guid Uuid { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
 
-        public override bool HasUserWriteAccess(User user)
+        public bool HasUserWriteAccess(User user)
         {
-            return (Id == user.Id) || base.HasUserWriteAccess(user);
+            //User can edit themselves
+            return Id == user.Id;
         }
 
         #endregion

@@ -14,7 +14,7 @@ namespace Core.DomainModel
     /// <typeparam name="TModel">The type of the model.</typeparam>
     /// <typeparam name="TRight">The type of the right.</typeparam>
     /// <typeparam name="TRole">The type of the role.</typeparam>
-    public abstract class HasRightsEntity<TModel, TRight, TRole> : Entity
+    public abstract class HasRightsEntity<TModel, TRight, TRole> : Entity, ISupportsUserSpecificAccessControl
         where TModel : HasRightsEntity<TModel, TRight, TRole>
         where TRight : IRight<TModel, TRight, TRole>
         where TRole : IRoleEntity, IHasId
@@ -26,19 +26,12 @@ namespace Core.DomainModel
 
         public virtual ICollection<TRight> Rights { get; set; }
 
-        /// <summary>
-        /// Determines whether a user has write access to this instance.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <returns>
-        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
-        /// </returns>
-        public override bool HasUserWriteAccess(User user)
+        
+        public virtual bool HasUserWriteAccess(User user)
         {
             // check if the user has a write role on this instance
-            return Rights.Any(right => right.UserId == user.Id && right.Role.HasWriteAccess) || base.HasUserWriteAccess(user);
+            return Rights.Any(right => right.UserId == user.Id && right.Role.HasWriteAccess);
         }
-        
 
         public IEnumerable<TRight> GetRights(int roleId)
         {

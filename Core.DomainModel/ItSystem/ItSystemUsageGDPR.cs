@@ -4,7 +4,7 @@ namespace Core.DomainModel.ItSystem
 {
     using System.ComponentModel.DataAnnotations.Schema;
 
-    public class ItSystemUsageGDPR : Entity, ISystemModule
+    public class ItSystemUsageGDPR : Entity, ISystemModule, ISupportsUserSpecificAccessControl
     {
         public int? systemCategoriesId;
 
@@ -20,12 +20,9 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
 
-        public override bool HasUserWriteAccess(User user)
+        public bool HasUserWriteAccess(User user)
         {
-            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user))
-                return true;
-
-            return base.HasUserWriteAccess(user);
+            return ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user);
         }
     }
 }

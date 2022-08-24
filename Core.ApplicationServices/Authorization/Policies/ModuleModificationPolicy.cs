@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Globalization;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -33,16 +32,6 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowModification(IEntity target)
         {
-            if (target is IHasRightsHolder withRightsHolder)
-            {
-                var rightsHolderOrganizationId = withRightsHolder.GetRightsHolderOrganizationId();
-                if (rightsHolderOrganizationId.Select(IsRightsHolder).GetValueOrFallback(false))
-                {
-                    // Rights holders bypass the regular rules
-                    return true;
-                }
-            }
-
             var possibleConditions = GetPossibleModificationConditions(target).ToList();
 
             if (possibleConditions.Any() == false)

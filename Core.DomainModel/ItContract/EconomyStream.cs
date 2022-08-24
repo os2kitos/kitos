@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract economy stream.
     /// </summary>
-    public class EconomyStream : Entity, IIsPartOfOrganization, IContractModule
+    public class EconomyStream : Entity, IIsPartOfOrganization, IContractModule, ISupportsUserSpecificAccessControl
     {
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract.
@@ -142,7 +142,7 @@ namespace Core.DomainModel.ItContract
         /// <returns>
         ///   <c>true</c> if user has write access, otherwise <c>false</c>.
         /// </returns>
-        public override bool HasUserWriteAccess(User user)
+        public bool HasUserWriteAccess(User user)
         {
             if (ExternPaymentFor != null && ExternPaymentFor.HasUserWriteAccess(user))
                 return true;
@@ -150,7 +150,7 @@ namespace Core.DomainModel.ItContract
             if (InternPaymentFor != null && InternPaymentFor.HasUserWriteAccess(user))
                 return true;
 
-            return base.HasUserWriteAccess(user);
+            return false;
         }
 
         public IEnumerable<int> GetOrganizationIds()

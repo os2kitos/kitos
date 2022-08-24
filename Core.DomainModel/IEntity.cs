@@ -9,7 +9,5 @@ namespace Core.DomainModel
         int? LastChangedByUserId { get; set; }
         User ObjectOwner { get; set; }
         int? ObjectOwnerId { get; set; }
-
-        bool HasUserWriteAccess(User user);
     }
 }
