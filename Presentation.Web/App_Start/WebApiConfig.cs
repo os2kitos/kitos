@@ -101,24 +101,14 @@ namespace Presentation.Web
 
             BindEntitySet<RelationFrequencyType, FrequencyTypesController>(builder);
 
-            BindEntitySet<GoalType, GoalTypesController>(builder);
-
             BindEntitySet<ItContractRight, ItContractRightsController>(builder);
 
             BindEntitySet<ItContractRole, ItContractRolesController>(builder);
-
-            BindEntitySet<ItProjectRight, ItProjectRightsController>(builder);
-
-            BindEntitySet<ItProjectRole, ItProjectRolesController>(builder);
 
             BindEntitySet<AttachedOption, AttachedOptionsController>(builder);
 
             var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
             itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
-
-            var itProject = builder.EntitySet<ItProject>(nameof(ItProjectsController).Replace(ControllerSuffix, string.Empty));
-            itProject.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
-            itProject.EntityType.HasKey(x => x.Id);
 
             BindEntitySet<DataType, DataTypesController>(builder);
 
@@ -231,8 +221,6 @@ namespace Presentation.Web
 
             BindEntitySet<ProcurementStrategyType, ProcurementStrategyTypesController>(builder);
 
-            BindEntitySet<ItProjectType, ItProjectTypesController>(builder);
-
             BindEntitySet<PurchaseFormType, PurchaseFormTypesController>(builder);
 
             BindEntitySet<CriticalityType, CriticalityTypesController>(builder);
@@ -264,9 +252,6 @@ namespace Presentation.Web
             var localFrequencyType = BindEntitySet<LocalRelationFrequencyType, LocalFrequencyTypesController>(builder);
             localFrequencyType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localGoalType = BindEntitySet<LocalGoalType, LocalGoalTypesController>(builder);
-            localGoalType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
             var localInterfaceType = BindEntitySet<LocalInterfaceType, LocalInterfaceTypesController>(builder);
             localInterfaceType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
@@ -278,12 +263,6 @@ namespace Presentation.Web
 
             var localItContractType = BindEntitySet<LocalItContractType, LocalItContractTypesController>(builder);
             localItContractType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localItProjectRole = BindEntitySet<LocalItProjectRole, LocalItProjectRolesController>(builder);
-            localItProjectRole.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localItProjectType = BindEntitySet<LocalItProjectType, LocalItProjectTypesController>(builder);
-            localItProjectType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localItSystemRole = BindEntitySet<LocalItSystemRole, LocalItSystemRolesController>(builder);
             localItSystemRole.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
@@ -367,9 +346,6 @@ namespace Presentation.Web
             references.HasRequiredBinding(a => a.ItSystem, entitySetItSystems);
 
             BindEntitySet<HelpText, HelpTextsController>(builder);
-
-            var itProjectStatusUpdates = BindEntitySet<ItProjectStatusUpdate, ItProjectStatusUpdatesController>(builder);
-            itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
 
             BindDataProcessingRegistrationModule(builder);
 
