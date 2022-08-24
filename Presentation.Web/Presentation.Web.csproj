@@ -1301,7 +1301,6 @@
     <TypeScriptCompile Include="app\services\userGetService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
-    <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />
     <TypeScriptCompile Include="app\shared\confirmClick.directive.ts" />
     <TypeScriptCompile Include="app\shared\disabledOnBusy.directive.ts" />
@@ -1319,7 +1318,6 @@
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
-    <TypeScriptCompile Include="app\shared\searchBox\searchBox.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectUser\selectUser.directive.ts" />
     <TypeScriptCompile Include="app\shared\showErrors.directive.ts" />
@@ -1398,7 +1396,6 @@
     <Content Include="app\shared\kleFilter\kleFilter.view.html" />
     <Content Include="app\shared\orderBy\orderBy.view.html" />
     <Content Include="app\shared\paginationButtons\paginationButtons.view.html" />
-    <Content Include="app\shared\searchBox\searchBox.view.html" />
     <Content Include="app\shared\selectStatus2\selectStatus2.view.html" />
     <Content Include="app\shared\selectUser\selectUser.view.html" />
     <Content Include="app\shared\showStatus\showStatus.view.html" />

@@ -4,9 +4,6 @@
             <a data-ui-sref="organization.overview" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="user.currentConfig.showTabOverview" data-element-type="organizationButton">Organisation </a>
             <a data-ui-sref="organization.structure" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="!user.currentConfig.showTabOverview" data-element-type="organizationButton">Organisation</a>
         </li>
-        <li data-ng-if="user.currentConfig.showItProjectModule">
-            <a data-ui-sref="it-project.overview" data-ng-class="{'active': $state.includes('it-project')}" data-element-type="projectButton"><span ng-if="user.currentConfig.showItProjectPrefix">IT </span>Projekter</a>
-        </li>
         <li data-ng-if="user.currentConfig.showItSystemModule">
             <a data-ui-sref="it-system.overview" data-ng-class="{'active': $state.includes('it-system')}" data-element-type="systemButton"><span ng-if="user.currentConfig.showItSystemPrefix">IT </span>Systemer</a>
         </li>
