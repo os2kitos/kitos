@@ -27,23 +27,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
         }
 
         [Fact]
-        public async Task Cannot_Set_If_Casing_Is_Wrong()
-        {
-            //Arrange
-            var body = new
-            {
-                showColumnUsage = true
-            };
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
-
-            //Act - perform the action with the actual role
-            using var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
-
-        [Fact]
         public async Task Can_Set_Column_Usage()
         {
             //Arrange

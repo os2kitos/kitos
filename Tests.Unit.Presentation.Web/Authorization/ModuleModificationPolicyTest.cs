@@ -1,5 +1,4 @@
 ﻿using System;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
@@ -81,34 +80,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Act
             var allow = _sut.AllowModification(entity);
-
-            //Assert
-            Assert.Equal(expectedResult, allow);
-        }
-
-        [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(false, true, false)]
-        [InlineData(false, false, false)]
-        [InlineData(true, false, false)]
-        public void Allow_Modify_With_RightsHolder_Type_Returns(bool hasRightsholderSet, bool isRightsholder, bool expectedResult)
-        {
-            //Arrange
-            var orgId = A<int>();
-            _userContext.Setup(x => x.OrganizationIds).Returns(new[] { orgId });
-
-            var entity = new Mock<IRightsHolderElement>();
-            var rightsHolderOrg = A<int>();
-            entity
-                .Setup(x => x.GetRightsHolderOrganizationId())
-                .Returns(hasRightsholderSet ? Maybe<int>.Some(rightsHolderOrg) : Maybe<int>.None);
-            _userContext
-                .Setup(x => x.HasRole(rightsHolderOrg, OrganizationRole.RightsHolderAccess))
-                .Returns(isRightsholder);
-
-
-            //Act
-            var allow = _sut.AllowModification(entity.Object);
 
             //Assert
             Assert.Equal(expectedResult, allow);

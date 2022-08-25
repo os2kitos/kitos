@@ -4,7 +4,7 @@
     /// Base class of Milestone and Assignment.
     /// Called status for lack of a better word.
     /// </summary>
-    public abstract class ItProjectStatus : Entity, IProjectModule
+    public abstract class ItProjectStatus : Entity, IProjectModule, ISupportsUserSpecificAccessControl
     {
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
@@ -50,12 +50,9 @@
         /// </remarks>
         public int? AssociatedPhaseNum { get; set; }
 
-        public override bool HasUserWriteAccess(User user)
+        public bool HasUserWriteAccess(User user)
         {
-            if (AssociatedItProject != null && AssociatedItProject.HasUserWriteAccess(user))
-                return true;
-
-            return base.HasUserWriteAccess(user);
+            return AssociatedItProject != null && AssociatedItProject.HasUserWriteAccess(user);
         }
     }
 }

@@ -54,6 +54,7 @@
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
+    <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />

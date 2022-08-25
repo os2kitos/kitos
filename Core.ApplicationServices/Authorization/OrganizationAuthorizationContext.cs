@@ -113,15 +113,27 @@ namespace Core.ApplicationServices.Authorization
 
         private bool IsRightsHolderFor(IEntity entity)
         {
+            var result = false;
+
             if (entity is IHasRightsHolder withRightsHolder)
             {
-                return withRightsHolder
+                //Check 1: By registered rights holder (allows access in other organizations than the one where the user has access by normal rules)
+                result = withRightsHolder
                     .GetRightsHolderOrganizationId()
                     .Select(HasRightsHolderAccessIn)
                     .GetValueOrFallback(false);
+
+                //Check 2: If the object is created in the rightsholder's own organization - in that case rights holder access will provide access to that object the rights holders own organization
+                if (!result)
+                {
+                    if (entity is IOwnedByOrganization withOrganization)
+                    {
+                        result = HasRightsHolderAccessIn(withOrganization.OrganizationId);
+                    }
+                }
             }
 
-            return false;
+            return result;
         }
 
         public bool AllowCreate<T>(int organizationId)
@@ -301,11 +313,17 @@ namespace Core.ApplicationServices.Authorization
 
         private bool HasAssignedWriteAccess(IEntity entity)
         {
-            return _userRepository
+            if (entity is ISupportsUserSpecificAccessControl withUserAccessControl)
+            {
+                return _userRepository
                 .GetById(_activeUserContext.UserId)
                 .FromNullable()
-                .Select(entity.HasUserWriteAccess)
+                .Select(withUserAccessControl.HasUserWriteAccess)
                 .GetValueOrFallback(false);
+
+            }
+
+            return false;
         }
 
         private bool IsOrganizationSpecificData(IEntity entity)

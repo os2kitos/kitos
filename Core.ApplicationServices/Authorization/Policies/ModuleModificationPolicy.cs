@@ -32,16 +32,6 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowModification(IEntity target)
         {
-            if (target is IHasRightsHolder withRightsHolder)
-            {
-                var rightsHolderOrganizationId = withRightsHolder.GetRightsHolderOrganizationId();
-                if (rightsHolderOrganizationId.Select(IsRightsHolder).GetValueOrFallback(false))
-                {
-                    // Rights holders bypass the regular rules
-                    return true;
-                }
-            }
-
             var possibleConditions = GetPossibleModificationConditions(target).ToList();
 
             if (possibleConditions.Any() == false)
@@ -118,6 +108,11 @@ namespace Core.ApplicationServices.Authorization.Policies
             if (IsLocalAdmin(organizationId))
             {
                 return true;
+            }
+
+            if (MatchType<KendoColumnConfiguration>(target))
+            {
+                return IsLocalAdmin(organizationId);
             }
 
             if (MatchType<ItSystemUsage>(target))
