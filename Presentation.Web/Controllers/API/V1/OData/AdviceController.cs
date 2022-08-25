@@ -151,7 +151,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             if (response.GetType() == typeof(CreatedODataResult<Advice>))
             {
                 var createdResponse = (CreatedODataResult<Advice>)response;
-                var name = "Advice: " + createdResponse.Entity.Id;
+                var name = Advice.CreateJobId(createdResponse.Entity.Id);
 
                 advice = createdResponse.Entity;
                 advice.JobId = name;

@@ -36,6 +36,11 @@ namespace Core.DomainModel.Advice
             Reciepients = new List<AdviceUserRelation>();
         }
 
+        public static string CreateJobId(int adviceId)
+        {
+            return $"Advice: {adviceId}";
+        }
+
         public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }

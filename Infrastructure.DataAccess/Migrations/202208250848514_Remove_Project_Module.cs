@@ -7,8 +7,6 @@
     {
         public override void Up()
         {
-            //TODO: Check all of the changes
-            //TODO: Add the custom migrations
             DropForeignKey("dbo.ItProject", "CommonPublicProjectId", "dbo.ItProject");
             DropForeignKey("dbo.Communication", "ItProjectId", "dbo.ItProject");
             DropForeignKey("dbo.Communication", "LastChangedByUserId", "dbo.User");
@@ -191,6 +189,27 @@
             DropTable("dbo.HandoverUsers");
             DropTable("dbo.ItProjectItSystemUsages");
             DropTable("dbo.ItProjectTaskRefs");
+
+            // Reset default user start preference for users who used to prefer it-projects
+            Sql(@"UPDATE [dbo].[User] 
+                    SET DefaultUserStartPreference = NULL 
+                    WHERE DefaultUserStartPreference = 'it-project.overview';");
+
+            // Delete all project advices
+            Sql(@"DELETE dbo.Advice 
+                    WHERE Type = 2;"); //2 = project
+
+            // Delete delta entries for life cycle tracking events
+            Sql(@"DELETE dbo.LifeCycleTrackingEvents 
+                    WHERE EntityType = 5;"); // 5 = Project
+
+            // Delete ProjectAdmin role assignments
+            Sql(@"DELETE dbo.OrganizationRights 
+                    WHERE Role = 3;"); // 3 = ItProjectModuleAdmin
+
+            // Delete ProjectAdmin role assignments
+            Sql(@"DELETE dbo.PendingReadModelUpdates 
+                    WHERE Category = 16;"); //16 = ItSystemUsage_Project
         }
         
         public override void Down()

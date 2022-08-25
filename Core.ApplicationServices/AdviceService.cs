@@ -41,18 +41,18 @@ namespace Core.ApplicationServices
         private readonly IAdviceRootResolution _adviceRootResolution;
 
         public AdviceService(
-            IMailClient mailClient, 
-            IGenericRepository<Advice> adviceRepository, 
-            IGenericRepository<AdviceSent> adviceSentRepository, 
-            IGenericRepository<ItContractRight> itContractRights, 
-            IGenericRepository<ItSystemRight> itSystemRights, 
-            IGenericRepository<DataProcessingRegistrationRight> dataProcessingRegistrationRights, 
-            ILogger logger, 
-            ITransactionManager transactionManager, 
-            IOrganizationalUserContext organizationalUserContext, 
-            IHangfireApi hangfireApi, 
-            IOperationClock operationClock, 
-            IUserNotificationService userNotificationService, 
+            IMailClient mailClient,
+            IGenericRepository<Advice> adviceRepository,
+            IGenericRepository<AdviceSent> adviceSentRepository,
+            IGenericRepository<ItContractRight> itContractRights,
+            IGenericRepository<ItSystemRight> itSystemRights,
+            IGenericRepository<DataProcessingRegistrationRight> dataProcessingRegistrationRights,
+            ILogger logger,
+            ITransactionManager transactionManager,
+            IOrganizationalUserContext organizationalUserContext,
+            IHangfireApi hangfireApi,
+            IOperationClock operationClock,
+            IUserNotificationService userNotificationService,
             IAdviceRootResolution adviceRootResolution)
         {
             _mailClient = mailClient;
@@ -129,6 +129,11 @@ namespace Core.ApplicationServices
                     _adviceSentRepository.Save();
                     transaction.Commit();
                 }
+                else
+                {
+                    _logger.Warning("Unable to locate advice with id {id}. Removing it from HangFire", id);
+                    DeleteJobFromHangfire(id, Advice.CreateJobId(id));
+                }
                 return true;
             }
             catch (Exception e)
@@ -197,7 +202,7 @@ namespace Core.ApplicationServices
             else
             {
                 var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
-                if(organizationIdOfRelatedEntityId.IsNone)
+                if (organizationIdOfRelatedEntityId.IsNone)
                 {
                     _logger?.Error($"Advis doesn't have valid/correct related entity (RelationId and Type mismatch). Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}");
                 }
@@ -234,7 +239,7 @@ namespace Core.ApplicationServices
                         && I.RoleId == r.ItContractRoleId);
                     foreach (var t in itContractRoles)
                     {
-                        if(t.User.Deleted) continue;
+                        if (t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -245,7 +250,7 @@ namespace Core.ApplicationServices
                                                                               && I.RoleId == r.ItSystemRoleId);
                     foreach (var t in systemRoles)
                     {
-                        if(t.User.Deleted) continue;
+                        if (t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -257,7 +262,7 @@ namespace Core.ApplicationServices
                         && I.RoleId == r.DataProcessingRegistrationRoleId);
                     foreach (var t in dpaRoles)
                     {
-                        if(t.User.Deleted) continue;
+                        if (t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -279,6 +284,14 @@ namespace Core.ApplicationServices
 
         private void DeleteJobFromHangfire(Advice advice)
         {
+            var adviceEntityId = advice.Id;
+            var adviceJobId = advice.JobId;
+
+            DeleteJobFromHangfire(adviceEntityId, adviceJobId);
+        }
+
+        private void DeleteJobFromHangfire(int adviceEntityId, string adviceJobId)
+        {
             //Remove pending shcedules if any
             var allScheduledJobs = _hangfireApi
                 .GetScheduledJobs(0, int.MaxValue)
@@ -293,7 +306,7 @@ namespace Core.ApplicationServices
             foreach (var j in allScheduledCreateOrUpdate)
             {
                 var adviceIdAsString = j.Value.Job.Args[0].ToString();
-                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
+                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == adviceEntityId)
                 {
                     _hangfireApi.DeleteScheduledJob(j.Key);
                     break;
@@ -308,7 +321,7 @@ namespace Core.ApplicationServices
             foreach (var j in allScheduledDeactivations)
             {
                 var adviceIdAsString = j.Value.Job.Args[0].ToString();
-                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
+                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == adviceEntityId)
                 {
                     _hangfireApi.DeleteScheduledJob(j.Key);
                     break;
@@ -316,10 +329,10 @@ namespace Core.ApplicationServices
             }
 
             //Remove the job by main job id + any partitions (max 12 - one pr. month)
-            _hangfireApi.RemoveRecurringJobIfExists(advice.JobId);
+            _hangfireApi.RemoveRecurringJobIfExists(adviceJobId);
             for (var i = 0; i < 12; i++)
             {
-                _hangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(advice.JobId, i));
+                _hangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(adviceJobId, i));
             }
         }
 
@@ -408,7 +421,7 @@ namespace Core.ApplicationServices
                 var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
                 _hangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
             }
-            
+
             if (advice.StopDate.HasValue)
             {
                 //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
@@ -427,8 +440,8 @@ namespace Core.ApplicationServices
                     case Scheduling.Year:
                     case Scheduling.Quarter:
                     case Scheduling.Semiannual:
-                        var mustScheduleAdviceToday = 
-                            advice.AdviceSent.Where(x=>x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false && 
+                        var mustScheduleAdviceToday =
+                            advice.AdviceSent.Where(x => x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false &&
                             WillTriggerInvokeToday() == false;
                         if (mustScheduleAdviceToday)
                         {
@@ -448,8 +461,8 @@ namespace Core.ApplicationServices
         private bool WillTriggerInvokeToday()
         {
             var utcNow = _operationClock.Now.ToUniversalTime();
-            return 
-                utcNow.Hour < CronPatternDefaults.TriggerHourUTC || 
+            return
+                utcNow.Hour < CronPatternDefaults.TriggerHourUTC ||
                 (utcNow.Minute < CronPatternDefaults.TriggerMinute && utcNow.Hour == CronPatternDefaults.TriggerHourUTC);
         }
 
