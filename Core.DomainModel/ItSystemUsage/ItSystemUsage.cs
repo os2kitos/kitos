@@ -43,7 +43,6 @@ namespace Core.DomainModel.ItSystemUsage
             TaskRefs = new List<TaskRef>();
             TaskRefsOptOut = new List<TaskRef>();
             UsedBy = new List<ItSystemUsageOrgUnitUsage>();
-            ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
@@ -200,17 +199,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// Gets or sets the tasks that has been opted out from by an organization.
         /// </summary>
         public virtual ICollection<TaskRef> TaskRefsOptOut { get; set; }
-        /// <summary>
-        /// Gets or sets the associated it projects.
-        /// </summary>
-        /// <remarks>
-        /// <see cref="ItProject.ItProject"/> have a corresponding property linking back.
-        /// </remarks>
-        /// <value>
-        /// Associated it projects.
-        /// </value>
-        public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
-
 
         public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
@@ -600,26 +588,6 @@ namespace Core.DomainModel.ItSystemUsage
                 ResetMainContract();
                 MainContract = contractAssociation;
             }
-
-            return Maybe<OperationError>.None;
-        }
-
-        public void ResetProjectAssociations()
-        {
-            ItProjects.Clear();
-        }
-
-        public Maybe<OperationError> SetProjectAssociations(IEnumerable<ItProject.ItProject> projects)
-        {
-            var itProjects = projects.ToList();
-
-            if (itProjects.Select(x => x.Uuid).Distinct().Count() != itProjects.Count)
-                return new OperationError("projects must not contain duplicates", OperationFailure.BadInput);
-
-            if (itProjects.Any(project => project.OrganizationId != OrganizationId))
-                return new OperationError("All projects must belong to same organization as this system usage", OperationFailure.BadInput);
-
-            itProjects.MirrorTo(ItProjects, p => p.Uuid);
 
             return Maybe<OperationError>.None;
         }

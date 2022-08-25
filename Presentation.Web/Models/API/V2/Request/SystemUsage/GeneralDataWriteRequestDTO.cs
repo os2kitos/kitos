@@ -48,10 +48,5 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// Validity of the system usage
         /// </summary>
         public ValidityWriteRequestDTO Validity { get; set; }
-        /// <summary>
-        /// IT-Projects associated with this system usage
-        /// Constraint: Duplicates are not allowed
-        /// </summary>
-        public IEnumerable<Guid> AssociatedProjectUuids { get; set; }
     }
 }

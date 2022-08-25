@@ -2,17 +2,14 @@
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainServices.Notifications;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Notification;
-using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
 
 using Moq;
-using System.Data;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.GDPR;
@@ -30,7 +27,6 @@ namespace Tests.Unit.Core.DomainServices.Notification
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
         private readonly Mock<IItContractRepository> _contractRepository;
-        private readonly Mock<IItProjectRepository> _projectRepository;
         private readonly Mock<IDataProcessingRegistrationRepository> _dataProcessingRepository;
         private readonly Mock<IOperationClock> _operationClock;
         private readonly Mock<ILogger> _logger;
@@ -41,7 +37,6 @@ namespace Tests.Unit.Core.DomainServices.Notification
             _transactionManager = new Mock<ITransactionManager>();
             _systemUsageRepository = new Mock<IItSystemUsageRepository>();
             _contractRepository = new Mock<IItContractRepository>();
-            _projectRepository = new Mock<IItProjectRepository>();
             _dataProcessingRepository = new Mock<IDataProcessingRegistrationRepository>();
             _operationClock = new Mock<IOperationClock>();
             _logger = new Mock<ILogger>();
@@ -50,7 +45,6 @@ namespace Tests.Unit.Core.DomainServices.Notification
                 _transactionManager.Object,
                 _systemUsageRepository.Object,
                 _contractRepository.Object,
-                _projectRepository.Object,
                 _dataProcessingRepository.Object,
                 _operationClock.Object,
                 _logger.Object);
@@ -140,10 +134,6 @@ namespace Tests.Unit.Core.DomainServices.Notification
                 case RelatedEntityType.itContract:
                     notification.Itcontract_Id = relatedEntityId;
                     _contractRepository.Setup(x => x.GetById(relatedEntityId)).Returns(new ItContract());
-                    break;
-                case RelatedEntityType.itProject:
-                    notification.ItProject_Id = relatedEntityId;
-                    _projectRepository.Setup(x => x.GetById(relatedEntityId)).Returns(new ItProject());
                     break;
                 case RelatedEntityType.itSystemUsage:
                     notification.ItSystemUsage_Id = relatedEntityId;

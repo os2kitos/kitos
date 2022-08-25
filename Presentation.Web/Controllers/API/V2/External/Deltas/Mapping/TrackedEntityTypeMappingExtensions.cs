@@ -18,7 +18,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas.Mapping
             {
                 { TrackedEntityTypeChoice.DataProcessingRegistration,TrackedEntityType.DataProcessingRegistration },
                 { TrackedEntityTypeChoice.ItContract,TrackedEntityType.ItContract },
-                { TrackedEntityTypeChoice.ItProject,TrackedEntityType.ItProject },
                 { TrackedEntityTypeChoice.ItSystemUsage,TrackedEntityType.ItSystemUsage },
                 { TrackedEntityTypeChoice.ItSystem,TrackedEntityType.ItSystem },
                 { TrackedEntityTypeChoice.ItInterface,TrackedEntityType.ItInterface }

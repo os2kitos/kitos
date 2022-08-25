@@ -181,7 +181,6 @@
     <Compile Include="Tools\DisposableExtensions.cs" />
     <Compile Include="Tools\EntityOptionHelper.cs" />
     <Compile Include="Tools\External\ItContractV2Helper.cs" />
-    <Compile Include="Tools\External\ItProjectV2Helper.cs" />
     <Compile Include="Tools\External\ItSystemUsageV2Helper.cs" />
     <Compile Include="Tools\External\KleOptionV2Helper.cs" />
     <Compile Include="Tools\External\OptionV2ApiHelper.cs" />

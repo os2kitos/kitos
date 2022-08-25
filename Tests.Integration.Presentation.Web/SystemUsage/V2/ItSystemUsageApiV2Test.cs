@@ -2051,7 +2051,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var generalUpdateRequest = new GeneralDataUpdateRequestDTO()
             {
-                AssociatedProjectUuids = generalSection.AssociatedProjectUuids,
                 DataClassificationUuid = generalSection.DataClassificationUuid,
                 LocalCallName = generalSection.LocalCallName,
                 LocalSystemId = generalSection.LocalSystemId,

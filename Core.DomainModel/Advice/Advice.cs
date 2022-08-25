@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Shared;
 
@@ -30,7 +29,7 @@ namespace Core.DomainModel.Advice
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, IProjectModule, ISystemModule, IContractModule
+    public class Advice : Entity, ISystemModule, IContractModule
     {
         public Advice() {
             AdviceSent = new List<AdviceSent>();

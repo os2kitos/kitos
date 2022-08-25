@@ -9,7 +9,6 @@ using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Notification;
@@ -53,7 +52,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 _adviceRepositoryMock.Object,
                 Mock.Of<IGenericRepository<AdviceSent>>(),
                 Mock.Of<IGenericRepository<ItContractRight>>(),
-                Mock.Of<IGenericRepository<ItProjectRight>>(),
                 Mock.Of<IGenericRepository<ItSystemRight>>(),
                 Mock.Of<IGenericRepository<DataProcessingRegistrationRight>>(),
                 Mock.Of<ILogger>(),

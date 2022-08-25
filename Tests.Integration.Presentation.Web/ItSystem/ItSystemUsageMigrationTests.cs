@@ -246,7 +246,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedRelations);
                 Assert.Empty(result.AffectedContracts);
-                Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedDataProcessingRegistrations);
                 AssertFromToSystemInfo(usage, result, _oldSystemInUse, newSystem);
             }
@@ -265,7 +264,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedRelations);
-                Assert.Empty(result.AffectedItProjects);
                 var resultContract = Assert.Single(result.AffectedContracts);
                 Assert.Equal(contract.Id, resultContract.Id);
             }
@@ -308,7 +306,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
                 Assert.Empty(result.AffectedRelations);
             }
@@ -334,7 +331,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
                 var dto = Assert.Single(result.AffectedRelations);
                 AssertEqualNamedEntities(relation.FromUsage, dto.FromSystemUsage);
@@ -363,7 +359,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
                 Assert.Empty(result.AffectedRelations);
             }
@@ -388,7 +383,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
                 Assert.Empty(result.AffectedRelations);
             }

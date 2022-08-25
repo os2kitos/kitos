@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -9,13 +8,11 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
-using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -32,7 +29,6 @@ namespace Core.ApplicationServices.References
         private readonly IItSystemRepository _itSystemRepository;
         private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItContractRepository _contractRepository;
-        private readonly IItProjectRepository _projectRepository;
         private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
@@ -45,7 +41,6 @@ namespace Core.ApplicationServices.References
             IItSystemRepository itSystemRepository,
             IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
-            IItProjectRepository projectRepository,
             IDataProcessingRegistrationRepository dataProcessingRegistrationRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
@@ -56,7 +51,6 @@ namespace Core.ApplicationServices.References
             _itSystemRepository = itSystemRepository;
             _systemUsageRepository = systemUsageRepository;
             _contractRepository = contractRepository;
-            _projectRepository = projectRepository;
             _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
@@ -142,9 +136,6 @@ namespace Core.ApplicationServices.References
                 case ItContract itContract:
                     _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(itContract));
                     break;
-                case ItProject itProject:
-                    _domainEvents.Raise(new EntityUpdatedEvent<ItProject>(itProject));
-                    break;
                 case ItSystem itSystem:
                     _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
                     break;
@@ -170,12 +161,6 @@ namespace Core.ApplicationServices.References
         {
             var contract = _contractRepository.GetById(contractId);
             return DeleteExternalReferences(contract);
-        }
-
-        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByProjectId(int projectId)
-        {
-            var project = _projectRepository.GetById(projectId);
-            return DeleteExternalReferences(project);
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByDataProcessingRegistrationId(int id)

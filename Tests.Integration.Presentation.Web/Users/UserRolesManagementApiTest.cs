@@ -197,7 +197,6 @@ namespace Tests.Integration.Presentation.Web.Users
             {
                 OrganizationRole.ContractModuleAdmin,
                 OrganizationRole.OrganizationModuleAdmin,
-                OrganizationRole.ProjectModuleAdmin,
                 OrganizationRole.RightsHolderAccess,
                 OrganizationRole.SystemModuleAdmin,
                 OrganizationRole.LocalAdmin

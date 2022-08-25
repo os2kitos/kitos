@@ -108,19 +108,6 @@ namespace Presentation.Web.Controllers.API.V1
                     .Concat
                     (
                         arg
-                            .ProjectRights
-                            .Select(x => new AssignedRightDTO
-                            {
-                                RoleName = x.Role.Name,
-                                BusinessObjectName = x.Object.Name,
-                                RightId = x.Id,
-                                Scope = BusinessRoleScope.ItProject
-
-                            })
-                    )
-                    .Concat
-                    (
-                        arg
                             .DataProcessingRegistrationRights
                             .Select(x => new AssignedRightDTO
                             {
@@ -176,7 +163,6 @@ namespace Presentation.Web.Controllers.API.V1
                 GetIdsByScope(rightIds, BusinessRoleScope.DataProcessingRegistration),
                 GetIdsByScope(rightIds, BusinessRoleScope.ItSystemUsage),
                 GetIdsByScope(rightIds, BusinessRoleScope.ItContract),
-                GetIdsByScope(rightIds, BusinessRoleScope.ItProject),
                 GetIdsByScope(rightIds, BusinessRoleScope.OrganizationUnit)
             );
         }

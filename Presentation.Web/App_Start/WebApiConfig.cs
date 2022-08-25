@@ -3,7 +3,6 @@ using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -107,9 +106,6 @@ namespace Presentation.Web
 
             BindEntitySet<AttachedOption, AttachedOptionsController>(builder);
 
-            var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
-            itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
-
             BindEntitySet<DataType, DataTypesController>(builder);
 
             var dataRow = builder.EntitySet<DataRow>("DataRows"); // no controller yet
@@ -156,7 +152,6 @@ namespace Presentation.Web
             orgUnits.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             orgUnits.EntityType.HasKey(x => x.Id);
             orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
-            orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
             //Add isActive to result form odata
             builder.StructuralTypes.First(t => t.ClrType == typeof(ItContract)).AddProperty(typeof(ItContract).GetProperty(nameof(ItContract.IsActive)));
 

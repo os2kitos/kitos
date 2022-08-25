@@ -4,23 +4,12 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
-using Core.DomainModel.Shared;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Notifications;
-using Core.DomainServices.Repositories.Contract;
-using Core.DomainServices.Repositories.GDPR;
-using Core.DomainServices.Repositories.Project;
-using Core.DomainServices.Repositories.SystemUsage;
 using Hangfire.Common;
 using Hangfire.States;
-
 using Microsoft.Extensions.DependencyInjection;
 using Ninject;
-using Presentation;
-using Presentation.Web;
-using Presentation.Web.Infrastructure;
-using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Filters;
 using Presentation.Web.Ninject;
 using Serilog;
 

@@ -59,8 +59,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                         objectId = contract.Id;
                     }
                     return $"api/itcontractright/{objectId.Value}?organizationId={orgId}";
-                case RightsType.ItProjectRights:
-                    return $"api/itprojectright/{objectId.GetValueOrDefault()}?organizationId={orgId}";
                 case RightsType.ItSystemRights:
                     if (objectId == null)
                     {

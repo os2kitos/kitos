@@ -4,7 +4,7 @@
     {
         itContract = 0,
         itSystemUsage = 1,
-        itProject = 2,
+        // 2 used to be itproject
         itInterface = 3,
         dataProcessingRegistration = 4
     }

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Core.DomainModel.Events;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
@@ -151,26 +149,6 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             Assert.Equal(Guid.Parse("f0820080-181a-4ea4-9587-02b86aa13898"), sampleTaskRef.Uuid);
             Assert.Equal(DateTime.Today, sampleTaskRef.LastChanged.Date);
 
-        }
-        
-        [Fact]
-        public void UpdateKLE_Given_Summary_Updates_ItProject()
-        {
-            //Arrange
-            var updateObjects = SetupUpdateObjects();
-            const int itProjectKey = 1;
-            var itProject = new ItProject
-            {
-                Id = itProjectKey,
-                TaskRefs = new List<TaskRef> {updateObjects.removedTaskRef}
-            };
-            updateObjects.removedTaskRef.ItProjects = new List<ItProject> { itProject };
-
-            //Act
-            _sut.UpdateKLE( 0);
-
-            //Assert
-            Assert.False(itProject.TaskRefs.Contains(updateObjects.removedTaskRef));
         }
 
         [Fact]

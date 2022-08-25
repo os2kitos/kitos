@@ -173,9 +173,6 @@ namespace Tests.Integration.Presentation.Web.Users
                 Assert.Empty(user.ItSystemRights);
                 Assert.Empty(user.OrganizationUnitRights);
                 Assert.Empty(user.SsoIdentities);
-                Assert.Empty(user.ResponsibleForCommunications);
-                Assert.Empty(user.HandoverParticipants);
-                Assert.Empty(user.ResponsibleForRisks);
 
                 return user;
             });

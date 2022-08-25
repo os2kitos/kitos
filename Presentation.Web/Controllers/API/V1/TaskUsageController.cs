@@ -247,7 +247,6 @@ namespace Presentation.Web.Controllers.API.V1
                 header.Add("Teknologi", "Teknologi");
                 header.Add("Anvendelse", "Anvendelse");
                 header.Add("Kommentar", "Kommentar");
-                header.Add("Projekt", "IT Projekt");
                 header.Add("System", "IT System");
                 list.Add(header);
 

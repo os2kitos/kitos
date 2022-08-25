@@ -9,7 +9,6 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
@@ -90,9 +89,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     break;
                 case ItSystemUsage root:
                     DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
-                    break;
-                case ItProject root:
-                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(root));
                     break;
                 case DataProcessingRegistration root:
                     DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));

@@ -25,19 +25,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(o => o.OrganizationId)
                 .WillCascadeOnDelete(true);
 
-            this.HasMany(t => t.UsingItProjects)
-                .WithRequired(t => t.OrganizationUnit)
-                .HasForeignKey(d => d.OrganizationUnitId)
-                .WillCascadeOnDelete(false);
-
             this.HasMany(t => t.Using)
                 .WithRequired(t => t.OrganizationUnit)
                 .HasForeignKey(d => d.OrganizationUnitId)
                 .WillCascadeOnDelete(false);
-
-            HasMany(o => o.UsingItProjects)
-                .WithRequired(o => o.OrganizationUnit)
-                .WillCascadeOnDelete(true);
 
             Property(x => x.Uuid)
                 .IsRequired()

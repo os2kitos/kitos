@@ -1,6 +1,5 @@
 ﻿using Core.DomainModel.Advice;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System;
@@ -31,7 +30,6 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IGenericRepository<AdviceSent> _adviceSentRepository;
         private readonly IGenericRepository<ItContractRight> _itContractRights;
-        private readonly IGenericRepository<ItProjectRight> _itProjectRights;
         private readonly IGenericRepository<ItSystemRight> _itSystemRights;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _dataProcessingRegistrationRights;
         private readonly ILogger _logger;
@@ -47,7 +45,6 @@ namespace Core.ApplicationServices
             IGenericRepository<Advice> adviceRepository, 
             IGenericRepository<AdviceSent> adviceSentRepository, 
             IGenericRepository<ItContractRight> itContractRights, 
-            IGenericRepository<ItProjectRight> itProjectRights, 
             IGenericRepository<ItSystemRight> itSystemRights, 
             IGenericRepository<DataProcessingRegistrationRight> dataProcessingRegistrationRights, 
             ILogger logger, 
@@ -62,7 +59,6 @@ namespace Core.ApplicationServices
             _adviceRepository = adviceRepository;
             _adviceSentRepository = adviceSentRepository;
             _itContractRights = itContractRights;
-            _itProjectRights = itProjectRights;
             _itSystemRights = itSystemRights;
             _dataProcessingRegistrationRights = dataProcessingRegistrationRights;
             _logger = logger;
@@ -83,7 +79,7 @@ namespace Core.ApplicationServices
 
         public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
         {
-            var result = _adviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
+            var result = _adviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
             return result.AsQueryable();
         }
 
@@ -237,16 +233,6 @@ namespace Core.ApplicationServices
                     var itContractRoles = _itContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                         && I.RoleId == r.ItContractRoleId);
                     foreach (var t in itContractRoles)
-                    {
-                        if(t.User.Deleted) continue;
-                        mailAddressCollection.Add(t.User.Email);
-                    }
-
-                    break;
-                case RelatedEntityType.itProject:
-                    var projectRoles = _itProjectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                        && I.RoleId == r.ItProjectRoleId);
-                    foreach (var t in projectRoles)
                     {
                         if(t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);

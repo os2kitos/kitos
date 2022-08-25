@@ -7,7 +7,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
 using Core.DomainModel;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
@@ -501,12 +500,6 @@ namespace Tests.Integration.Presentation.Web.KLE
             kleRepo.RemoveRange(all);
             kleRepo.Save();
         }
-
-        private static IReadOnlyList<string> GetProjectTaskRefKeys(int projectId)
-        {
-            return MapFromEntitySet<ItProject, IReadOnlyList<string>>(projects => projects.GetByKey(projectId).TaskRefs.Select(x => x.TaskKey).OrderBy(x => x).ToList());
-        }
-
         private static IReadOnlyList<string> GetSystemTaskKeys(int id)
         {
             return MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, IReadOnlyList<string>>(systems => systems.GetByKey(id).TaskRefs.Select(x => x.TaskKey).OrderBy(x => x).ToList());

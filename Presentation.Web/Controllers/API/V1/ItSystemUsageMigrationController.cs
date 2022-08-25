@@ -108,7 +108,6 @@ namespace Presentation.Web.Controllers.API.V1
                 TargetUsage = input.SystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
                 FromSystem = input.FromItSystem.MapToNamedEntityWithEnabledStatusDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityWithEnabledStatusDTO(),
-                AffectedItProjects = input.AffectedProjects.MapToNamedEntityDTOs().ToList(),
                 AffectedContracts = input.AffectedContracts.MapToNamedEntityDTOs().ToList(),
                 AffectedRelations = input.AffectedSystemRelations.Select(Map).ToList(),
                 AffectedDataProcessingRegistrations = input.AffectedDataProcessingRegistrations.MapToNamedEntityDTOs().ToList()

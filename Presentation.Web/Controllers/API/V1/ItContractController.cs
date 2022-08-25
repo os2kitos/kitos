@@ -327,7 +327,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict, Description = "It Contract names must be unique within the organization")]
-        public HttpResponseMessage GetCanCreateNewProjectWithName(string checkname, int orgId)
+        public HttpResponseMessage GetCanCreateNewContractWithName(string checkname, int orgId)
         {
             try
             {

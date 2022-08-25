@@ -66,32 +66,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
         }
 
         [Fact]
-        public async Task Can_Set_It_Project_Prefix()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowItProjectPrefix = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-
-        [Fact]
-        public async Task Can_Set_It_Project_Module()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowItProjectModule = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-
-        [Fact]
         public async Task Can_Set_It_System_Module()
         {
             //Arrange
@@ -152,8 +126,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
                 ShowColumnUsage = A<bool>(),
                 ShowTabOverview = A<bool>(),
                 ShowColumnTechnology = A<bool>(),
-                ShowItProjectModule = A<bool>(),
-                ShowItProjectPrefix = A<bool>(),
                 ShowItSystemModule = A<bool>(),
                 ShowItSystemPrefix = A<bool>(),
                 ShowItContractModule = A<bool>(),
@@ -172,8 +144,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             Assert.Equal(body.ShowColumnUsage, config.ShowColumnUsage);
             Assert.Equal(body.ShowTabOverview, config.ShowTabOverview);
             Assert.Equal(body.ShowColumnTechnology, config.ShowColumnTechnology);
-            Assert.Equal(body.ShowItProjectModule, config.ShowItProjectModule);
-            Assert.Equal(body.ShowItProjectPrefix, config.ShowItProjectPrefix);
             Assert.Equal(body.ShowItSystemModule, config.ShowItSystemModule);
             Assert.Equal(body.ShowItSystemPrefix, config.ShowItSystemPrefix);
             Assert.Equal(body.ShowItContractModule, config.ShowItContractModule);

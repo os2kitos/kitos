@@ -14,7 +14,6 @@ namespace Core.DomainModel.ItSystemUsage.Read
             RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
             ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
             SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
-            ItProjects = new List<ItSystemUsageOverviewItProjectReadModel>();
             ArchivePeriods = new List<ItSystemUsageOverviewArchivePeriodReadModel>();
             DataProcessingRegistrations = new List<ItSystemUsageOverviewDataProcessingRegistrationReadModel>();
             DependsOnInterfaces = new List<ItSystemUsageOverviewInterfaceReadModel>();
@@ -91,10 +90,6 @@ namespace Core.DomainModel.ItSystemUsage.Read
 
         public string SensitiveDataLevelsAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; }
-
-        public string ItProjectNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewItProjectReadModel> ItProjects { get; set; } // Adding ItProjects as collection to enable indexed search
-
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool IsHoldingDocument { get; set; }
 

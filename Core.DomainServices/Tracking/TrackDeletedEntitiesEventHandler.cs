@@ -4,7 +4,6 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Tracking;
@@ -17,8 +16,7 @@ namespace Core.DomainServices.Tracking
         IDomainEventHandler<EntityBeingDeletedEvent<ItSystemUsage>>,
         IDomainEventHandler<EntityBeingDeletedEvent<DataProcessingRegistration>>,
         IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>,
-        IDomainEventHandler<EntityBeingDeletedEvent<ItInterface>>,
-        IDomainEventHandler<EntityBeingDeletedEvent<ItProject>>
+        IDomainEventHandler<EntityBeingDeletedEvent<ItInterface>>
     {
         private readonly IGenericRepository<LifeCycleTrackingEvent> _trackingEventsRepository;
         private readonly Maybe<ActiveUserIdContext> _userContext;
@@ -39,8 +37,6 @@ namespace Core.DomainServices.Tracking
 
         public void Handle(EntityBeingDeletedEvent<ItInterface> domainEvent) => TrackDeleted(domainEvent.Entity);
 
-        public void Handle(EntityBeingDeletedEvent<ItProject> domainEvent) => TrackDeleted(domainEvent.Entity);
-
         private void TrackDeleted<T>(T entity) where T : IHasUuid
         {
             var newEvent = CreateEvent(entity);
@@ -54,7 +50,6 @@ namespace Core.DomainServices.Tracking
             return trackedEntity switch
             {
                 ItContract contract => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, contract.Uuid, TrackedEntityType.ItContract, contract.Organization),
-                ItProject project => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, project.Uuid, TrackedEntityType.ItProject, project.Organization),
                 ItSystem system => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, system.Uuid, TrackedEntityType.ItSystem, system.Organization, system.AccessModifier, system.BelongsTo),
                 ItSystemUsage systemUsage => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, systemUsage.Uuid, TrackedEntityType.ItSystemUsage, systemUsage.Organization),
                 DataProcessingRegistration dpr => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, dpr.Uuid, TrackedEntityType.DataProcessingRegistration, dpr.Organization),
