@@ -135,18 +135,10 @@ namespace Tests.Integration.Presentation.Web.Users
             var (_, userId, organization, originalEmail) = await CreatePrerequisitesAsync(userRole);
             var name = A<string>();
 
-            var project = await ItProjectHelper.CreateProject(name, organization.Id);
-
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
-            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name, project.Id);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
             await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
-
-            await ItProjectHelper.AddAssignmentAsync(organization.Id, userId, project.Id);
-            await ItProjectHelper.AddCommunicationAsync(organization.Id, userId, project.Id);
-            await ItProjectHelper.AddRiskAsync(organization.Id, userId, project.Id);
-            await ItProjectHelper.AddHandoverResponsibleAsync(project.Id, userId);
 
             SsoIdentityHelper.AddSsoIdentityToUser(userId);
             
@@ -179,10 +171,8 @@ namespace Tests.Integration.Presentation.Web.Users
                 Assert.Empty(user.OrganizationRights);
                 Assert.Empty(user.ItContractRights);
                 Assert.Empty(user.ItSystemRights);
-                Assert.Empty(user.ItProjectRights);
                 Assert.Empty(user.OrganizationUnitRights);
                 Assert.Empty(user.SsoIdentities);
-                Assert.Empty(user.ItProjectStatuses);
                 Assert.Empty(user.ResponsibleForCommunications);
                 Assert.Empty(user.HandoverParticipants);
                 Assert.Empty(user.ResponsibleForRisks);

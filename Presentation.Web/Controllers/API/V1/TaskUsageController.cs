@@ -9,7 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -17,7 +16,6 @@ using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
@@ -69,7 +67,6 @@ namespace Presentation.Web.Controllers.API.V1
                     var dto = Map<TaskUsage, TaskUsageNestedDTO>(taskUsage);
                     dto.HasWriteAccess = AllowModify(taskUsage);
                     dto.SystemUsages = AssociatedSystemUsages(taskUsage);
-                    dto.Projects = AssociatedProjects(taskUsage);
                     dtos.Add(dto);
                 }
 
@@ -239,7 +236,6 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     var dto = Map<TaskUsage, TaskUsageNestedDTO>(taskUsage);
                     dto.SystemUsages = AssociatedSystemUsages(taskUsage);
-                    dto.Projects = AssociatedProjects(taskUsage);
                     dtos.Add(dto);
                 }
 
@@ -267,7 +263,6 @@ namespace Presentation.Web.Controllers.API.V1
                     obj.Add("Teknologi", elem.TechnologyStatus);
                     obj.Add("Anvendelse", elem.UsageStatus);
                     obj.Add("Kommentar", elem.Comment);
-                    obj.Add("Projekt", String.Join(",", elem.Projects.Select(x => x.Name)));
                     obj.Add("System", String.Join(",", elem.SystemUsages.Select(x => x.ItSystemName)));
                     list.Add(obj);
                     foreach (var child in elem.Children)
@@ -329,12 +324,6 @@ namespace Presentation.Web.Controllers.API.V1
             var allUsages = indirectUsages.Union(directUsages);
 
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(allUsages);
-        }
-
-        private IEnumerable<ItProjectSimpleDTO> AssociatedProjects(TaskUsage taskUsage)
-        {
-            var theProjects = taskUsage.TaskRef.ItProjects.Where(p => p.OrganizationId == taskUsage.OrgUnit.OrganizationId);
-            return Map<IEnumerable<ItProject>, IEnumerable<ItProjectSimpleDTO>>(theProjects);
         }
     }
 }

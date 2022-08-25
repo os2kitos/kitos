@@ -107,9 +107,8 @@ namespace Presentation.Web.Controllers.API.V1
             return GetOwnerTypeAndIdOrFallback(ReferenceRootType.Contract, dto.ItContract_Id,
                 fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.System, dto.ItSystem_Id,
                     fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.SystemUsage, dto.ItSystemUsage_Id,
-                        fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.Project, dto.ItProject_Id,
                             fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.DataProcessingRegistration, dto.DataProcessingRegistration_Id,
-                                fallback: () => Maybe<KeyValuePair<ReferenceRootType, int>>.None)))));
+                                fallback: () => Maybe<KeyValuePair<ReferenceRootType, int>>.None))));
         }
 
         private static Maybe<KeyValuePair<ReferenceRootType, int>> GetOwnerTypeAndIdOrFallback(ReferenceRootType ownerType, int? ownerId, Func<Maybe<KeyValuePair<ReferenceRootType, int>>> fallback)

@@ -995,12 +995,9 @@
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\API\V1\ItInterfaceDTO.cs" />
     <Compile Include="Models\API\V1\ItInterfaceExhibitDTO.cs" />
-    <Compile Include="Models\API\V1\ItProjectPhaseDTO.cs" />
-    <Compile Include="Models\API\V1\ItProjectStatusDTO.cs" />
     <Compile Include="Models\API\V1\ExcelImportErrorDTO.cs" />
     <Compile Include="Models\API\V1\PagingModel.cs" />
     <Compile Include="Models\API\V1\ItContractSystemDTO.cs" />
-    <Compile Include="Models\API\V1\ItProjectSimpleDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemSimpleDTO.cs" />
     <Compile Include="Controllers\API\V1\EconomyStreamController.cs" />
     <Compile Include="Models\API\V1\EconomyStreamDTO.cs" />
@@ -1017,15 +1014,7 @@
     <Compile Include="Controllers\API\V1\GenericRightsController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageController.cs" />
-    <Compile Include="Models\API\V1\CommunicationDTO.cs" />
-    <Compile Include="Models\API\V1\GoalDTO.cs" />
-    <Compile Include="Models\API\V1\GoalStatusDTO.cs" />
-    <Compile Include="Models\API\V1\HandoverDTO.cs" />
-    <Compile Include="Models\API\V1\RiskDTO.cs" />
-    <Compile Include="Models\API\V1\AssignmentDTO.cs" />
     <Compile Include="Models\API\V1\DataRowDTO.cs" />
-    <Compile Include="Models\API\V1\EconomyYearDTO.cs" />
-    <Compile Include="Models\API\V1\ItProjectDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\V1\TaskUsageController.cs" />
     <Compile Include="Models\API\V1\CreateGlobalAdminDTO.cs" />
@@ -1063,8 +1052,6 @@
     <Compile Include="Models\API\V1\RightOutputDTO.cs" />
     <Compile Include="Models\API\V1\RightInputDTO.cs" />
     <Compile Include="Models\API\V1\RoleDTO.cs" />
-    <Compile Include="Models\API\V1\StakeholderDTO.cs" />
-    <Compile Include="Models\API\V1\MilestoneDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefSelectedDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefUsageDTO.cs" />
     <Compile Include="Models\API\V1\TaskUsageDTO.cs" />

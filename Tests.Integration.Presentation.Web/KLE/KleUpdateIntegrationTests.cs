@@ -14,8 +14,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using ExpectedObjects;
 using Infrastructure.DataAccess;
-
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
@@ -178,47 +176,6 @@ namespace Tests.Integration.Presentation.Web.KLE
             });
             #endregion organization
 
-            #region projects
-            var project = await ItProjectHelper.CreateProject(A<string>(), TestEnvironment.DefaultOrganizationId);
-
-            //Add some task refs to a project and save the expected keys (keys not removed)
-            MutateDatabase(context =>
-            {
-                using (var taskRefs = new GenericRepository<TaskRef>(context))
-                using (var projects = new GenericRepository<ItProject>(context))
-                {
-                    var itProject = projects.GetByKey(project.Id);
-                    var toKeep = taskRefs.AsQueryable().Take(2).ToList();
-                    toKeep.ForEach(itProject.TaskRefs.Add);
-                    projects.Save();
-                }
-            });
-
-            var expectedProjectTaskRefs = GetProjectTaskRefKeys(project.Id);
-            Assert.Equal(2, expectedProjectTaskRefs.Count);
-
-            //Add the task refs subject to removal
-            MutateDatabase(db =>
-            {
-                using (var projects = new GenericRepository<ItProject>(db))
-                using (var taskRefs = new GenericRepository<TaskRef>(db))
-                {
-                    var other = taskRefs.AsQueryable().First();
-                    var objectOwnerId = other.ObjectOwnerId;
-                    var organizationUnitId = other.OwnedByOrganizationUnitId;
-                    var taskRef1 = taskRefs.Insert(CreateTaskRef(objectOwnerId, organizationUnitId));
-                    var taskRef2 = taskRefs.Insert(CreateTaskRef(objectOwnerId, organizationUnitId));
-                    taskRefs.Save();
-
-                    //Add usages which we expect to be removed
-                    var itProject = projects.GetByKey(project.Id);
-                    itProject.TaskRefs.Add(taskRef1);
-                    itProject.TaskRefs.Add(taskRef2);
-                    projects.Save();
-                }
-            });
-            #endregion projects
-
             #region systems
             var system1Dto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
@@ -348,8 +305,6 @@ namespace Tests.Integration.Presentation.Web.KLE
 
             //Assert - make sure the removed task refs were re-added
             VerifyTaskRefIntegrity(expectedTaskRefs);
-            var actualTaskRefs = GetProjectTaskRefKeys(project.Id);
-            VerifyTaskRefUsageKeys(expectedProjectTaskRefs, actualTaskRefs);
             var actualSystemTaskRefs = GetSystemTaskKeys(system1Dto.Id);
             VerifyTaskRefUsageKeys(expectedSystemTaskRefs, actualSystemTaskRefs);
             var (actualTaskRefKeys, actualInheritedKeys, actualOptOutKeys) = GetSystemUsageTasks(usage.Id);

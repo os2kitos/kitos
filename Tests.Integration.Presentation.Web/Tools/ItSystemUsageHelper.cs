@@ -215,7 +215,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return response;
         }
 
-        public static async Task<ArchivePeriod> SendAddArchivePeriodRequestAsync(int systemUsageId, DateTime startDate, DateTime endDate, int organizationId, Cookie optionalLogin = null)
+        public static async Task<ArchivePeriod> AddArchivePeriodAsync(int systemUsageId, DateTime startDate, DateTime endDate, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/ArchivePeriods?organizationId={organizationId}");

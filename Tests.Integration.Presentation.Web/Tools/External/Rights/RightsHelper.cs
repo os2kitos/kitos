@@ -92,14 +92,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     Assert.NotNull(singleContractRole);
 
                     return singleContractRole.Id;
-                case RightsType.ItProjectRights:
-                    var projectRoles = await ItProjectHelper.GetRolesAsync(cookie);
-                    Assert.NotEmpty(projectRoles);
-
-                    var singleProjectRole = projectRoles.FirstOrDefault();
-                    Assert.NotNull(singleProjectRole);
-
-                    return singleProjectRole.Id;
                 case RightsType.ItSystemRights:
                     var systemRoles = await ItSystemHelper.GetRolesAsync(cookie);
                     Assert.NotEmpty(systemRoles);
