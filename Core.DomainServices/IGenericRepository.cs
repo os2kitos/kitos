@@ -57,8 +57,6 @@ namespace Core.DomainServices
 
         IQueryable<TModel> AsQueryable();
 
-        IEnumerable<TModel> SQL(string sql);
-
         TModel Create();
 
         int Count { get; }

@@ -61,7 +61,10 @@ namespace Tests.Unit.Core.ApplicationServices
                 _hangfireApiMock.Object,
                 _operationClockMock.Object,
                 _userNotificationService.Object,
-                _adviceRootResolution.Object
+                _adviceRootResolution.Object,
+                null,
+                null,
+                null
             );
 
         }

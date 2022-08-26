@@ -5,7 +5,7 @@
         itContract = 0,
         itSystemUsage = 1,
         // 2 used to be itproject
-        itInterface = 3,
+        //3 used to be tInterface
         dataProcessingRegistration = 4
     }
 }

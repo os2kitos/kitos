@@ -12,7 +12,9 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.ScheduledJobs;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
@@ -28,6 +30,9 @@ namespace Core.ApplicationServices
     public class AdviceService : IAdviceService
     {
         private readonly IMailClient _mailClient;
+        private readonly IGenericRepository<DataProcessingRegistration> _dataProcessingRegistrationRepository;
+        private readonly IGenericRepository<ItContract> _contractRepository;
+        private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IGenericRepository<AdviceSent> _adviceSentRepository;
         private readonly IGenericRepository<ItContractRight> _itContractRights;
@@ -54,7 +59,10 @@ namespace Core.ApplicationServices
             IHangfireApi hangfireApi,
             IOperationClock operationClock,
             IUserNotificationService userNotificationService,
-            IAdviceRootResolution adviceRootResolution)
+            IAdviceRootResolution adviceRootResolution,
+            IGenericRepository<DataProcessingRegistration> dataProcessingRegistrationRepository,
+            IGenericRepository<ItContract> contractRepository,
+            IGenericRepository<ItSystemUsage> systemUsageRepository)
         {
             _mailClient = mailClient;
             _adviceRepository = adviceRepository;
@@ -69,6 +77,9 @@ namespace Core.ApplicationServices
             _operationClock = operationClock;
             _userNotificationService = userNotificationService;
             _adviceRootResolution = adviceRootResolution;
+            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
+            _contractRepository = contractRepository;
+            _systemUsageRepository = systemUsageRepository;
         }
 
         public void CreateAdvice(Advice advice)
@@ -80,8 +91,25 @@ namespace Core.ApplicationServices
 
         public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
         {
-            var result = _adviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
-            return result.AsQueryable();
+            var dprAdvices = GetAdvices(orgKey, RelatedEntityType.dataProcessingRegistration, _dataProcessingRegistrationRepository);
+            var contractAdvices = GetAdvices(orgKey, RelatedEntityType.itContract, _contractRepository);
+            var systemAdvices = GetAdvices(orgKey, RelatedEntityType.itSystemUsage, _systemUsageRepository);
+
+            return dprAdvices
+                .Union(contractAdvices)
+                .Union(systemAdvices);
+        }
+
+        private IQueryable<Advice> GetAdvices<T>(int orgKey, RelatedEntityType relatedEntityType, IGenericRepository<T> _entityRepository) where T : class, IHasId, IOwnedByOrganization
+        {
+            return _adviceRepository
+                .AsQueryable()
+                .Where(x => x.Type == relatedEntityType)
+                .Join(_entityRepository.AsQueryable().ByOrganizationId(orgKey),
+                    advice => advice.RelationId,
+                    entity => entity.Id,
+                    (advice, _) => advice
+                );
         }
 
         public IQueryable<Advice> GetAdvicesAccessibleToCurrentUser()

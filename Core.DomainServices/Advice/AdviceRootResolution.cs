@@ -40,7 +40,6 @@ namespace Core.DomainServices.Advice
                         return _itSystemUsageRepository.GetSystemUsage(adviceRelationId);
                     case RelatedEntityType.dataProcessingRegistration:
                         return _dataProcessingRegistrationRepository.GetById(adviceRelationId).GetValueOrDefault();
-                    case RelatedEntityType.itInterface: //Intended fallthrough
                     default:
                         throw new NotSupportedException("Unsupported object type:" + advice.Type);
                 }
