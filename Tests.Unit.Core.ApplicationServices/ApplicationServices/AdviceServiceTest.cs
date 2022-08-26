@@ -62,9 +62,9 @@ namespace Tests.Unit.Core.ApplicationServices
                 _operationClockMock.Object,
                 _userNotificationService.Object,
                 _adviceRootResolution.Object,
-                null,
-                null,
-                null
+                Mock.Of<IGenericRepository<DataProcessingRegistration>>(),
+                Mock.Of<IGenericRepository<ItContract>>(),
+                Mock.Of<IGenericRepository<ItSystemUsage>>()
             );
 
         }
@@ -222,17 +222,6 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result);
-
-            //No email sent for expired advice
-            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
-
-            //Removed by main job id
-            _hangfireApiMock.Verify(x => x.RemoveRecurringJobIfExists(recurringAdvice.JobId), Times.Once);
-            for (int i = 0; i < 12; i++)
-            {
-                //Possible partitions are also removed
-                _hangfireApiMock.Verify(x => x.RemoveRecurringJobIfExists($"{recurringAdvice.JobId}_part_{i}"), Times.Once);
-            }
         }
 
         [Fact]
