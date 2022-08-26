@@ -145,5 +145,10 @@ namespace Core.DomainModel.Advice
         {
             return ObjectOwnerId == null || RelationId == null || Type == null;
         }
+
+        public static string CreatePartitionJobId(int adviceId,int partition)
+        {
+            return $"{CreateJobId(adviceId)}_part_{partition}";
+        }
     }
 }

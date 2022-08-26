@@ -109,6 +109,7 @@ using Core.ApplicationServices.Organizations.Handlers;
 using Core.ApplicationServices.Tracking;
 using Core.ApplicationServices.UIConfiguration;
 using Core.ApplicationServices.UIConfiguration.Handlers;
+using Core.BackgroundJobs.Model.Maintenance;
 using Core.DomainServices.Repositories.UICustomization;
 using Core.DomainServices.Tracking;
 using Infrastructure.STS.Company.DomainServices;
@@ -620,6 +621,9 @@ namespace Presentation.Web.Ninject
 
             //Rebuilder
             kernel.Bind<IRebuildReadModelsJobFactory>().To<RebuildReadModelsJobFactory>().InCommandScope(Mode);
+
+            //Maintenance
+            kernel.Bind<PurgeOrphanedHangfireJobs>().ToSelf().InCommandScope(Mode);
         }
     }
 }

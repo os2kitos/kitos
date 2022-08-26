@@ -9,6 +9,7 @@ using System.Net.Mail;
 using System.Text;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
@@ -132,7 +133,7 @@ namespace Core.ApplicationServices
                 else
                 {
                     _logger.Warning("Unable to locate advice with id {id}. Removing it from HangFire", id);
-                    DeleteJobFromHangfire(id, Advice.CreateJobId(id));
+                    DeleteJobFromHangfire(id);
                 }
                 return true;
             }
@@ -285,55 +286,13 @@ namespace Core.ApplicationServices
         private void DeleteJobFromHangfire(Advice advice)
         {
             var adviceEntityId = advice.Id;
-            var adviceJobId = advice.JobId;
 
-            DeleteJobFromHangfire(adviceEntityId, adviceJobId);
+            DeleteJobFromHangfire(adviceEntityId);
         }
 
-        private void DeleteJobFromHangfire(int adviceEntityId, string adviceJobId)
+        private void DeleteJobFromHangfire(int adviceEntityId)
         {
-            //Remove pending shcedules if any
-            var allScheduledJobs = _hangfireApi
-                .GetScheduledJobs(0, int.MaxValue)
-                .ToList();
-
-            //Remove all pending calls to CreateOrUpdateJob
-            var allScheduledCreateOrUpdate =
-                allScheduledJobs
-                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob))
-                    .ToList();
-
-            foreach (var j in allScheduledCreateOrUpdate)
-            {
-                var adviceIdAsString = j.Value.Job.Args[0].ToString();
-                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == adviceEntityId)
-                {
-                    _hangfireApi.DeleteScheduledJob(j.Key);
-                    break;
-                }
-            }
-
-            //Remove all pending calls to CreateOrUpdateJob
-            var allScheduledDeactivations =
-                allScheduledJobs
-                    .Where(x => x.Value.Job.Method.Name == nameof(DeactivateById));
-
-            foreach (var j in allScheduledDeactivations)
-            {
-                var adviceIdAsString = j.Value.Job.Args[0].ToString();
-                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == adviceEntityId)
-                {
-                    _hangfireApi.DeleteScheduledJob(j.Key);
-                    break;
-                }
-            }
-
-            //Remove the job by main job id + any partitions (max 12 - one pr. month)
-            _hangfireApi.RemoveRecurringJobIfExists(adviceJobId);
-            for (var i = 0; i < 12; i++)
-            {
-                _hangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(adviceJobId, i));
-            }
+            _hangfireApi.DeleteAdviceFromHangfire(adviceEntityId);
         }
 
         public void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted)
@@ -417,8 +376,7 @@ namespace Core.ApplicationServices
 
             foreach (var adviceTrigger in adviceTriggers)
             {
-                var prefix = advice.JobId;
-                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
+                var jobId = adviceTrigger.PartitionId.Match(partitionId => Advice.CreatePartitionJobId(adviceId, partitionId), () => advice.JobId);
                 _hangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
             }
 
@@ -464,11 +422,6 @@ namespace Core.ApplicationServices
             return
                 utcNow.Hour < CronPatternDefaults.TriggerHourUTC ||
                 (utcNow.Minute < CronPatternDefaults.TriggerMinute && utcNow.Hour == CronPatternDefaults.TriggerHourUTC);
-        }
-
-        private static string CreatePartitionJobId(string prefix, int partitionIndex)
-        {
-            return $"{prefix}_part_{partitionIndex}";
         }
 
         public Maybe<Advice> GetAdviceById(int id)

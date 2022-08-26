@@ -17,6 +17,7 @@ using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Notifications;
 using Core.DomainServices.Time;
+using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -211,6 +212,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
             _hangfireApiMock.Setup(x => x.GetScheduledJobs(0, int.MaxValue)).Returns(new JobList<ScheduledJobDto>(new KeyValuePair<string, ScheduledJobDto>[0]));
+            _hangfireApiMock.Setup(x => x.GetRecurringJobs()).Returns(new List<RecurringJobDto>());
 
             //Act
             var result = _sut.SendAdvice(recurringAdvice.Id);

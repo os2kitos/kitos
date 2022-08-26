@@ -106,6 +106,7 @@
     <Compile Include="Contract\Write\IItContractWriteService.cs" />
     <Compile Include="Contract\Write\ItContractWriteService.cs" />
     <Compile Include="Extensions\ChangedValueExtensions.cs" />
+    <Compile Include="Extensions\HangfireApiExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="Extensions\OptionalValueChangeExtensions.cs" />

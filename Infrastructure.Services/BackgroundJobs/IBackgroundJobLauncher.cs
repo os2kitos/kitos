@@ -13,5 +13,7 @@ namespace Infrastructure.Services.BackgroundJobs
         Task LaunchFullReadModelRebuild(ReadModelRebuildScope scope, CancellationToken token);
         Task LaunchPurgeDuplicatedReadModelUpdates(CancellationToken token);
         Task LaunchUpdateStaleSystemUsageRmAsync(CancellationToken token = default);
+        Task LaunchPurgeOrphanedHangfireJobs(CancellationToken token);
+
     }
 }

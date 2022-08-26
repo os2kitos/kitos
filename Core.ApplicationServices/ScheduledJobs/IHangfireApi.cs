@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Hangfire.Annotations;
+using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
 
 namespace Core.ApplicationServices.ScheduledJobs
@@ -11,6 +13,7 @@ namespace Core.ApplicationServices.ScheduledJobs
     public interface IHangfireApi
     {
         JobList<ScheduledJobDto> GetScheduledJobs(int fromIndex, int maxResponseLength);
+        List<RecurringJobDto> GetRecurringJobs();
         void DeleteScheduledJob(string jobId);
         void RemoveRecurringJobIfExists(string jobId);
         void Schedule([InstantHandle, NotNull] Expression<Action> action, DateTimeOffset? runAt = null);

@@ -1520,9 +1520,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
   </ItemGroup>
@@ -1585,6 +1583,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_AdviceUserRelations_Role_Relationships.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\External references restore.sql" />
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\Orphan delete SQL.sql" />
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\ProdHangfireAdviceUpdate.sql" />
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\UpdateHangfireWithNewJobs.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
