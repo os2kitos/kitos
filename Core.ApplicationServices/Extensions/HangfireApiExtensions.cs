@@ -30,7 +30,6 @@ namespace Core.ApplicationServices.Extensions
         {
             var jobList = api.GetRecurringJobs();
 
-            //All pending creations (future advices) as well as pending deactivations
             var allRecurringJobs =
                 jobList
                     .Where(jobs => jobs.Job.Method.Name is nameof(AdviceService.SendAdvice))
