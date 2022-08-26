@@ -140,6 +140,7 @@
             <div class="col-xs-6">
 
                 <div class="row">
+                    
                     <!-- 3rd column -->
                     <div class="col-xs-6">
                         <!-- Supplier -->
@@ -185,21 +186,6 @@
                                    ng-blur="patchDate('supplierSignedDate', contract.supplierSignedDate)"
                                    data-field="supplierSignedDate">
                         </div>
-
-                        <div class="form-group" ng-if="isagreementPeriodEnabled">
-                            <label for="agreement-concluded" class="control-label small">
-                                Gyldig fra
-                            </label>
-                            <input id="agreement-concluded"
-                                   type="text"
-                                   class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="contract.concluded"
-                                   data-ng-blur="checkContractValidity('concluded', contract.concluded)"
-                                   data-field="concluded">
-                        </div>
                     </div>
 
                     <!-- 4th column -->
@@ -227,7 +213,7 @@
                                        data-items="kitosUsers"
                                        data-ng-model="contract.contractSigner"
                                        data-field="contractSigner"
-                                       data-user-has-write-access="hasWriteAccess" />
+                                       data-user-has-write-access="hasWriteAccess"/>
                         </div>
 
                         <!-- Intern contract is signed -->
@@ -253,9 +239,28 @@
                                    ng-blur="patchDate('signedDate', contract.signedDate)"
                                    data-field="signedDate">
                         </div>
+                    </div>
+                    
+                    <div class="col-xs-12 no-padding">
+                        <div class="col-xs-6 form-group" ng-if="isagreementPeriodEnabled">
+                            <label for="agreement-concluded" class="control-label small">
+                                Gyldig fra
+                            </label>
+                            <input id="agreement-concluded"
+                                   type="text"
+                                   class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.concluded"
+                                   data-ng-blur="checkContractValidity('concluded', contract.concluded)"
+                                   data-field="concluded">
+                        </div>
 
-                        <div class="form-group" ng-if="isagreementPeriodEnabled">
-                            <label for="agreement-expiration" class="control-label small">Gyldig til</label>
+                        <div class="col-xs-6 form-group" ng-if="isagreementPeriodEnabled">
+                            <label for="agreement-expiration" class="control-label small">
+                                Gyldig til
+                            </label>
                             <input type="text" class="form-control" id="agreement-expiration"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
@@ -274,7 +279,7 @@
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{ autoSaveUrl }}"
                                data-field="active"
-                               data-ng-change="override()" />
+                               data-ng-change="override()"/>
                         <label for="contractIsActive">
                             <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
                             <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>
