@@ -9,7 +9,6 @@
         hasApi: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
-        isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isRightsHolder: boolean;
@@ -21,7 +20,6 @@
         public isUserGlobalAdmin = false;
         public isUserLocalAdmin = false;
         public isUserOrgAdmin = false;
-        public isUserProjectAdmin = false;
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public hasApi = false;
@@ -52,7 +50,6 @@
                 phoneNumber: user.PhoneNumber,
                 isLocalAdmin: hasRole(Models.OrganizationRole.LocalAdmin),
                 isOrgAdmin: hasRole(Models.OrganizationRole.OrganizationModuleAdmin),
-                isProjectAdmin: hasRole(Models.OrganizationRole.ProjectModuleAdmin),
                 isSystemAdmin: hasRole(Models.OrganizationRole.SystemModuleAdmin),
                 isContractAdmin: hasRole(Models.OrganizationRole.ContractModuleAdmin),
                 isRightsHolder: hasRole(Models.OrganizationRole.RightsHolderAccess),
@@ -65,7 +62,6 @@
             this.isUserGlobalAdmin = currentUser.isGlobalAdmin;
             this.isUserLocalAdmin = currentUser.isLocalAdmin;
             this.isUserOrgAdmin = currentUser.isOrgAdmin;
-            this.isUserProjectAdmin = currentUser.isProjectAdmin;
             this.isUserSystemAdmin = currentUser.isSystemAdmin;
             this.isUserContractAdmin = currentUser.isContractAdmin;
         }
@@ -96,7 +92,6 @@
             var promises: ng.IHttpPromise<any>[] = [];
             promises.push(this.changeRight(diffRights, "isLocalAdmin", Models.OrganizationRole.LocalAdmin));
             promises.push(this.changeRight(diffRights, "isOrgAdmin", Models.OrganizationRole.OrganizationModuleAdmin));
-            promises.push(this.changeRight(diffRights, "isProjectAdmin", Models.OrganizationRole.ProjectModuleAdmin));
             promises.push(this.changeRight(diffRights, "isSystemAdmin", Models.OrganizationRole.SystemModuleAdmin));
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
             promises.push(this.changeRight(diffRights, "isRightsHolder", Models.OrganizationRole.RightsHolderAccess));

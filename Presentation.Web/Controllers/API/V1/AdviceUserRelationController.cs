@@ -1,6 +1,5 @@
 ﻿using Core.DomainModel.Advice;
 using Core.DomainServices;
-using Presentation.Web.Models;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -9,7 +8,6 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Advice;
 using Newtonsoft.Json.Linq;
@@ -94,9 +92,6 @@ namespace Presentation.Web.Controllers.API.V1
                     break;
                 case ItSystemUsage root:
                     DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
-                    break;
-                case ItProject root:
-                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(root));
                     break;
                 case DataProcessingRegistration root:
                     DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));

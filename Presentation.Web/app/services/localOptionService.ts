@@ -58,7 +58,6 @@
     export enum LocalOptionType {
         ItSystemRoles,
         ItContractRoles,
-        ItProjectRoles,
         AgreementElementTypes,
         ArchiveLocations,
         ArchiveTestLocations,
@@ -66,11 +65,9 @@
         BusinessTypes,
         DataTypes,
         FrequencyTypes,
-        GoalTypes,
         InterfaceTypes,
         ItContractTemplateTypes,
         ItContractTypes,
-        ItProjectTypes,
         ItSystemCategories,
         OptionExtendTypes,
         OrganizationUnitRoles,
@@ -123,8 +120,6 @@
                     return "LocalItSystemRoles";
                 case LocalOptionType.ItContractRoles:
                     return "LocalItContractRoles";
-                case LocalOptionType.ItProjectRoles:
-                    return "LocalItProjectRoles";
                 case LocalOptionType.AgreementElementTypes:
                     return "LocalAgreementElementTypes";
                 case LocalOptionType.ArchiveLocations:
@@ -139,16 +134,12 @@
                     return "LocalDataTypes";
                 case LocalOptionType.FrequencyTypes:
                     return "LocalFrequencyTypes";
-                case LocalOptionType.GoalTypes:
-                    return "LocalGoalTypes";
                 case LocalOptionType.InterfaceTypes:
                     return "LocalInterfaceTypes";
                 case LocalOptionType.ItContractTemplateTypes:
                     return "LocalItContractTemplateTypes";
                 case LocalOptionType.ItContractTypes:
                     return "LocalItContractTypes";
-                case LocalOptionType.ItProjectTypes:
-                    return "LocalItProjectTypes";
                 case LocalOptionType.ItSystemCategories:
                     return "LocalItSystemCategories";
                 case LocalOptionType.OptionExtendTypes:
@@ -212,8 +203,7 @@
     const adviceTypeToUsedLocalRoleOptionTypeMap: Record<Models.Advice.AdviceType, LocalOptionType> = {
         dataProcessingRegistration: LocalOptionType.DataProcessingRegistrationRoles,
         itSystemUsage: LocalOptionType.ItSystemRoles,
-        itContract: LocalOptionType.ItContractTypes,
-        itProject: LocalOptionType.ItProjectRoles,
+        itContract: LocalOptionType.ItContractTypes
     };
 
     export function getLocalOptionTypeFromAdvisType(advisType: Models.Advice.AdviceType): LocalOptionType {

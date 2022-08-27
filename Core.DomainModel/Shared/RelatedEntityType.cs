@@ -4,8 +4,8 @@
     {
         itContract = 0,
         itSystemUsage = 1,
-        itProject = 2,
-        itInterface = 3,
+        // 2 used to be itproject
+        //3 used to be tInterface
         dataProcessingRegistration = 4
     }
 }

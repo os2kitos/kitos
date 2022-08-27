@@ -5,7 +5,7 @@ namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents a task (such as KLE), which can be associated
-    /// with Systems, Projects or Organization Units.
+    /// with Systems or Organization Units.
     /// </summary>
     public class TaskRef : Entity, IHierarchy<TaskRef>, IHasUuid
     {
@@ -18,7 +18,6 @@ namespace Core.DomainModel.Organization
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.ItSystemUsagesOptOut = new List<ItSystemUsage.ItSystemUsage>();
-            this.ItProjects = new List<ItProject.ItProject>();
             this.Usages = new List<TaskUsage>();
         }
 
@@ -55,11 +54,6 @@ namespace Core.DomainModel.Organization
 
         public virtual TaskRef Parent { get; set; }
         public virtual ICollection<TaskRef> Children { get; set; }
-
-        /// <summary>
-        /// ItProjects which have been marked with this task
-        /// </summary>
-        public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
 
         /// <summary>
         /// Usages of this task

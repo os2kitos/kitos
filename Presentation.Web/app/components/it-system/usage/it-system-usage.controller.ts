@@ -62,7 +62,6 @@
             $scope.isLocalReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localReferences);
             $scope.isArchivingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.archiving);
             $scope.isGdprEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.gdpr);
-            $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule && uiState.isBluePrintNodeAvailable(blueprint.children.projects);
         }
     ]);
 })(angular, app);

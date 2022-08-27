@@ -14,14 +14,6 @@
         OrganizationUnitRights?: IOrganizationUnitRight[];
         /** Passwords reset request issued for the user */
         PasswordResetRequests?: IPasswordResetRequest[];
-        /** Gets or sets the  or  associated with this user */
-        ItProjectStatuses?: ItProject.IItProjectStatus[];
-        /** Risks associated with this user */
-        ResponsibleForRisks?: ItProject.IRisk[];
-        /** Communications associated with this user */
-        ResponsibleForCommunications?: ItProject.ICommunication[];
-        /** Handovers associated with this user */
-        HandoverParticipants?: ItProject.IHandover[];
         /** The contracts that the user has been marked as contract signer for */
         SignerForContracts?: ItContract.IItContract[];
         /** Stakeholder access */

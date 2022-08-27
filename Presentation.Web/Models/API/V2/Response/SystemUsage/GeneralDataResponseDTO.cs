@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+﻿using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
@@ -39,9 +38,5 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// Defines the master contract for this system (many contracts can point to a system usage but only one can be the master contract)
         /// </summary>
         public IdentityNamePairResponseDTO MainContract { get; set; }
-        /// <summary>
-        /// IT-Projects associated with this system usage
-        /// </summary>
-        public IEnumerable<IdentityNamePairResponseDTO> AssociatedProjects { get; set; }
     }
 }

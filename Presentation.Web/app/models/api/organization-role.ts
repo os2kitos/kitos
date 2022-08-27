@@ -9,8 +9,7 @@
         LocalAdmin = 1,
         /** Has write access to everything within the organization module */
         OrganizationModuleAdmin = 2,
-        /** Has write access to everything within the project module */
-        ProjectModuleAdmin = 3,
+        //NOTE: There is a jump from 2-4 here since 3 used to be "ProjectModuleAdmin"
         /** Has write access to everything within the system module */
         SystemModuleAdmin = 4,
         /** Has write access to everything within the contract module */

@@ -132,7 +132,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 systemUsage: itSystemUsage,
                 fromItSystem: itSystemUsage.ItSystem,
                 toItSystem: toItSystem,
-                affectedProjects: itSystemUsage.ItProjects,
                 affectedContracts: contracts,
                 affectedRelations: relationMigrations,
                 affectedDataProcessingRegistrations: dprs);

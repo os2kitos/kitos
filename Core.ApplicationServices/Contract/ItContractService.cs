@@ -243,7 +243,7 @@ namespace Core.ApplicationServices.Contract
                     .GetById(contractId)
                     .FromNullable()
                     .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound))
-                    .Select(project => SearchByName(project.OrganizationId, name).ExceptEntitiesWithIds(contractId).Any())
+                    .Select(contract => SearchByName(contract.OrganizationId, name).ExceptEntitiesWithIds(contractId).Any())
                     .Match
                     (
                         overlapsFound =>

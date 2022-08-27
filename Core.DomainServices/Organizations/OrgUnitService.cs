@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
@@ -16,16 +15,12 @@ namespace Core.DomainServices.Organizations
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _itSystemUsageOrgUnitUsageRepository;
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
-        private readonly IGenericRepository<ItProject> _itProjectRepository;
-        private readonly IGenericRepository<ItProjectOrgUnitUsage> _itProjectOrgUnitUsageRepository;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskUsage> taskUsageRepository, IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository, IGenericRepository<ItProject> itProjectRepository, IGenericRepository<ItProjectOrgUnitUsage> itProjectOrgUnitUsageRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskUsage> taskUsageRepository, IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskUsageRepository = taskUsageRepository;
             _itSystemUsageOrgUnitUsageRepository = itSystemUsageOrgUnitUsageRepository;
-            _itProjectRepository = itProjectRepository;
-            _itProjectOrgUnitUsageRepository = itProjectOrgUnitUsageRepository;
         }
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
@@ -118,19 +113,6 @@ namespace Core.DomainServices.Organizations
 
             }
             _itSystemUsageOrgUnitUsageRepository.Save();
-
-            // Remove OrgUnit from ItProjects
-            var itProjects = _itProjectRepository.Get(project => project.UsedByOrgUnits.Any(x => x.OrganizationUnitId == id));
-            foreach (var itproject in itProjects)
-            {
-                if (itproject.ResponsibleUsage != null && itproject.ResponsibleUsage.OrganizationUnitId == id)
-                {
-                    throw new ArgumentException($"OrganizationUnit is ResponsibleOrgUnit for ItProject: {itproject.Id}");
-                }
-                var itprojectOrgUnitUsage = itproject.UsedByOrgUnits.Single(x => x.OrganizationUnitId == id);
-                _itProjectOrgUnitUsageRepository.Delete(itprojectOrgUnitUsage);
-            }
-            _itProjectOrgUnitUsageRepository.Save();
 
             var orgUnit = _orgUnitRepository.GetByKey(id);
 

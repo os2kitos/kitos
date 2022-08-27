@@ -155,10 +155,6 @@ namespace Tests.Integration.Presentation.Web.Users
                         var dprDto = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, CreateName());
                         await RightsHelper.AddDprRoleToUser(userId, organization.Id, objectId: dprDto.Id);
                         break;
-                    case BusinessRoleScope.ItProject:
-                        var projectDto = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
-                        await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, objectId: projectDto.Id);
-                        break;
                     case BusinessRoleScope.OrganizationUnit:
                         await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights);
                         break;
@@ -201,7 +197,6 @@ namespace Tests.Integration.Presentation.Web.Users
             {
                 OrganizationRole.ContractModuleAdmin,
                 OrganizationRole.OrganizationModuleAdmin,
-                OrganizationRole.ProjectModuleAdmin,
                 OrganizationRole.RightsHolderAccess,
                 OrganizationRole.SystemModuleAdmin,
                 OrganizationRole.LocalAdmin

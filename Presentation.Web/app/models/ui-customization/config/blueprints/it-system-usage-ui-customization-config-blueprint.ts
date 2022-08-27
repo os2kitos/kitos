@@ -20,11 +20,6 @@
                     }
                 }
             },
-            projects: {
-                text: "Projekter",
-                readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
-            },
             dataProcessing: {
                 text: "Databehandling",
                 readOnly: true,

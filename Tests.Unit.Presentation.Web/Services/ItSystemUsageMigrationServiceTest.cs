@@ -4,14 +4,12 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
-using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
@@ -253,7 +251,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Empty(migration.AffectedContracts);
-            Assert.Empty(migration.AffectedProjects);
             Assert.Empty(migration.AffectedSystemRelations);
             Assert.Empty(migration.AffectedDataProcessingRegistrations);
             Assert.Equal(systemUsage, migration.SystemUsage);
@@ -277,26 +274,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(2, migration.AffectedDataProcessingRegistrations.Count);
-            Assert.True(systemUsage.ItProjects.SequenceEqual(migration.AffectedProjects));
-        }
-
-        [Fact]
-        public void GetSystemUsageMigration_Returns_Ok_With_Affected_Projects()
-        {
-            //Arrange
-            var systemUsage = CreateSystemUsage();
-            var system = CreateSystem();
-            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, system);
-            systemUsage.ItProjects = new List<ItProject> { CreateProject(), CreateProject() };
-
-            //Act
-            var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
-
-            //Assert
-            Assert.True(result.Ok);
-            var migration = result.Value;
-            Assert.Equal(2, migration.AffectedProjects.Count);
-            Assert.True(systemUsage.ItProjects.SequenceEqual(migration.AffectedProjects));
         }
 
         [Fact]
@@ -836,7 +813,6 @@ namespace Tests.Unit.Presentation.Web.Services
             return new ItSystemUsage
             {
                 Id = A<int>(),
-                ItProjects = new List<ItProject>(),
                 ItSystem = itSystem,
                 ItSystemId = itSystem.Id
             };
@@ -845,11 +821,6 @@ namespace Tests.Unit.Presentation.Web.Services
         private ItSystem CreateSystem()
         {
             return new ItSystem { Id = A<int>() };
-        }
-
-        private ItProject CreateProject()
-        {
-            return new ItProject() { Id = A<int>() };
         }
 
         private ItInterface CreateInterface()

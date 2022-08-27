@@ -34,7 +34,6 @@
         deep(obj, key, value?);
         pluckDeep(obj, key);
         unpick(obj);
-        resursivePluck(obj, key, childPropertyName?);
         addHierarchyLevelOnNested(objAry, level?, childPropertyName?);
         addHierarchyLevelOnFlatAndSort(objAry, idPropertyName?, parentIdPropertyName?);
         removeFiltersForField(filterObj, field);

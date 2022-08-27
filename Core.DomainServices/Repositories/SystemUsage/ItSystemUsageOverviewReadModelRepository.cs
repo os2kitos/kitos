@@ -102,13 +102,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .Where(x => x.MainContractId == contractId);
         }
 
-        public IQueryable<ItSystemUsageOverviewReadModel> GetByProjectId(int projectId)
-        {
-            return _repository
-                .AsQueryable()
-                .Where(x => x.ItProjects.Select(y => y.ItProjectId).Contains(projectId));
-        }
-
         public IQueryable<ItSystemUsageOverviewReadModel> GetByDataProcessingRegistrationId(int dataProcessingRegistrationId)
         {
             return _repository

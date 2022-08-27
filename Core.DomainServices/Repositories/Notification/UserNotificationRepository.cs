@@ -45,19 +45,16 @@ namespace Core.DomainServices.Repositories.Notification
 
         public IQueryable<UserNotification> GetByRelatedEntityIdAndType(int relatedEntityId, RelatedEntityType relatedEntityType)
         {
-            switch (relatedEntityType)
+            return relatedEntityType switch
             {
-                case RelatedEntityType.itContract:
-                    return _repository.AsQueryable().Where(x => x.Itcontract_Id == relatedEntityId);
-                case RelatedEntityType.itProject:
-                    return _repository.AsQueryable().Where(x => x.ItProject_Id == relatedEntityId);
-                case RelatedEntityType.itSystemUsage:
-                    return _repository.AsQueryable().Where(x => x.ItSystemUsage_Id == relatedEntityId);
-                case RelatedEntityType.dataProcessingRegistration:
-                    return _repository.AsQueryable().Where(x => x.DataProcessingRegistration_Id == relatedEntityId);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(relatedEntityType));
-            }
+                RelatedEntityType.itContract => _repository.AsQueryable()
+                    .Where(x => x.Itcontract_Id == relatedEntityId),
+                RelatedEntityType.itSystemUsage => _repository.AsQueryable()
+                    .Where(x => x.ItSystemUsage_Id == relatedEntityId),
+                RelatedEntityType.dataProcessingRegistration => _repository.AsQueryable()
+                    .Where(x => x.DataProcessingRegistration_Id == relatedEntityId),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType))
+            };
         }
 
         public IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId, RelatedEntityType relatedEntityType)
@@ -66,19 +63,15 @@ namespace Core.DomainServices.Repositories.Notification
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
                 .Where(x => x.NotificationRecipientId == userId);
-            switch (relatedEntityType)
+            
+            return relatedEntityType switch
             {
-                case RelatedEntityType.itContract:
-                    return query.Where(x => x.Itcontract_Id != null);
-                case RelatedEntityType.itProject:
-                    return query.Where(x => x.ItProject_Id != null);
-                case RelatedEntityType.itSystemUsage:
-                    return query.Where(x => x.ItSystemUsage_Id != null);
-                case RelatedEntityType.dataProcessingRegistration:
-                    return query.Where(x => x.DataProcessingRegistration_Id != null);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(relatedEntityType));
-            }
+                RelatedEntityType.itContract => query.Where(x => x.Itcontract_Id != null),
+                RelatedEntityType.itSystemUsage => query.Where(x => x.ItSystemUsage_Id != null),
+                RelatedEntityType.dataProcessingRegistration => query.Where(
+                    x => x.DataProcessingRegistration_Id != null),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType))
+            };
         }
     }
 }

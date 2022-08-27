@@ -217,17 +217,10 @@ angular-ui-tree@^2.22.1:
   resolved "https://registry.yarnpkg.com/angular-ui-tree/-/angular-ui-tree-2.22.6.tgz#849727fdd1d13d84c1a590bb08934cc224e5a407"
   integrity sha512-VzuXM6NdYeQD0Y1RF5oTYc3o8yoW9mtxhnJs5Fvwu40V1Alzq7ybJj+kvApXZ69M0mvRd8LLM+3Q4pI26md+fA==
 
-angular@1.8.3, "angular@>= 1.0.8", angular@^1.0.8, angular@~1:
+angular@1.8.3, "angular@>= 1.0.8", angular@^1.0.8:
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.3.tgz#851ad75d5163c105a7e329555ef70c90aa706894"
   integrity sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw==
-
-angularjs-dropdown-multiselect@^1.11.8:
-  version "1.11.8"
-  resolved "https://registry.yarnpkg.com/angularjs-dropdown-multiselect/-/angularjs-dropdown-multiselect-1.11.8.tgz#4b6709d916ba47e0d8ab61c6cbade387863375a7"
-  integrity sha512-JekPdnHvgJ3FxzVeRb4j+f2TDZjvWp/Db+onyw4Ck9ipQkMjn2dFwbEnan4VwWqiC74GTI7B8YikRqv4iR3sIA==
-  dependencies:
-    angular "~1"
 
 ansi-colors@^1.0.1:
   version "1.1.0"

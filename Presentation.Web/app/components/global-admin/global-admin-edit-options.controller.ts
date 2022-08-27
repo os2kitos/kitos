@@ -103,11 +103,6 @@
                 isRole: true
             },
             {
-                id: "global-admin.project.edit-project-roles",
-                urlSuffix: "edit-project-roles",
-                isRole: true
-            },
-            {
                 id: "global-admin.system.edit-system-roles",
                 urlSuffix: "edit-system-roles",
                 isRole: true
@@ -116,11 +111,6 @@
                 id: "global-admin.contract.edit-contract-roles",
                 urlSuffix: "edit-contract-roles",
                 isRole: true
-            },
-            {
-                id: "global-admin.project.edit-project-types",
-                urlSuffix: "edit-project-types",
-                isRole: false
             },
             {
                 id: "global-admin.system.edit-system-types",

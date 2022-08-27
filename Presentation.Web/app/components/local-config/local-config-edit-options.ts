@@ -81,20 +81,12 @@
                 urlSuffix: "edit-organisation-roles"
             },
             {
-                id: "local-config.project.edit-project-roles",
-                urlSuffix: "edit-project-roles"
-            },
-            {
                 id: "local-config.system.edit-system-roles",
                 urlSuffix: "edit-system-roles"
             },
             {
                 id: "local-config.contract.edit-contract-roles",
                 urlSuffix: "edit-contract-roles"
-            },
-            {
-                id: "local-config.project.edit-project-types",
-                urlSuffix: "edit-project-types"
             },
             {
                 id: "local-config.system.edit-system-types",

@@ -6,7 +6,6 @@
         canEdit: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
-        isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isRightsHolder: boolean;
@@ -26,33 +25,23 @@
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
         public static $inject: Array<string> = [
-            "$rootScope",
             "$scope",
-            "$http",
-            "$timeout",
             "$state",
             "_",
-            "$",
             "user",
             "hasWriteAccess",
             "notify",
             "gridStateService",
-            "exportGridToExcelService"
         ];
 
         constructor(
-            private $rootScope: IRootScope,
-            private $scope: ng.IScope,
-            private $http: ng.IHttpService,
-            private $timeout: ng.ITimeoutService,
+            $scope: ng.IScope,
             private $state: ng.ui.IStateService,
             private _: ILoDashWithMixins,
-            private $: JQueryStatic,
             private user,
             private hasWriteAccess,
             private notify,
-            private gridStateService: Services.IGridStateFactory,
-            private exportGridToExcelService) {
+            private gridStateService: Services.IGridStateFactory) {
             this.hasWriteAccess = hasWriteAccess;
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
@@ -184,7 +173,6 @@
 
                                 usr.isLocalAdmin = this.hasRole(usr, Models.OrganizationRole.LocalAdmin);
                                 usr.isOrgAdmin = this.hasRole(usr, Models.OrganizationRole.OrganizationModuleAdmin);
-                                usr.isProjectAdmin = this.hasRole(usr, Models.OrganizationRole.ProjectModuleAdmin);
                                 usr.isSystemAdmin = this.hasRole(usr, Models.OrganizationRole.SystemModuleAdmin);
                                 usr.isContractAdmin = this.hasRole(usr, Models.OrganizationRole.ContractModuleAdmin);
                                 usr.isRightsHolder = this.hasRole(usr, Models.OrganizationRole.RightsHolderAccess);
@@ -239,7 +227,6 @@
                 height: window.innerHeight - 200,
                 detailTemplate: (dataItem) => `<uib-tabset active="0">
                     <uib-tab index="0" heading="Organisation roller"><user-organization-unit-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-organization-unit-roles></uib-tab>
-                    <uib-tab index="1" heading="Projekt roller"><user-project-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-project-roles></uib-tab>
                     <uib-tab index="2" heading="System roller"><user-system-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-system-roles></uib-tab>
                     <uib-tab index="3" heading="Kontrakt roller"><user-contract-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-contract-roles></uib-tab>
                     <uib-tab index="4" heading="Databehandlingsroller"><user-data-processing-registration-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-data-processing-registration-roles></uib-tab>
@@ -318,7 +305,7 @@
                             if (dataItem.OrganizationUnitRights.length == 0) {
                                 return "";
                             }
-                            return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
+                            return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
                         },
                         hidden: true,
                         filterable: {
@@ -358,15 +345,6 @@
                         persistId: "orgadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "isProjectAdmin", title: "Projekt Admin", width: 109,
-                        persistId: "projectadminrole", 
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => setBooleanValue(dataItem.isProjectAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false

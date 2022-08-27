@@ -22,10 +22,6 @@ namespace Infrastructure.DataAccess.Mapping
 
             HasIndex(x => x.NotificationRecipientId);
 
-            HasOptional(x => x.ItProject)
-                .WithMany(x => x.UserNotifications)
-                .HasForeignKey(x => x.ItProject_Id);
-
             HasOptional(x => x.ItContract)
                 .WithMany(x => x.UserNotifications)
                 .HasForeignKey(x => x.Itcontract_Id);

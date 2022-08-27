@@ -3,7 +3,6 @@ using AutoMapper;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -83,11 +82,6 @@ namespace Presentation.Web
                   .ForMember(dest => dest.References, opt => opt.Ignore())
                   .IgnoreDestinationEntityFields();
 
-            CreateMap<ItProjectType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore())
-                  .IgnoreDestinationEntityFields();
-
             CreateMap<PurchaseFormType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore())
@@ -104,11 +98,6 @@ namespace Presentation.Web
                   .IgnoreDestinationEntityFields();
 
             CreateMap<SensitiveDataType, OptionDTO>()
-                .ReverseMap()
-                .ForMember(dest => dest.References, opt => opt.Ignore())
-                .IgnoreDestinationEntityFields();
-
-            CreateMap<GoalType, OptionDTO>()
                 .ReverseMap()
                 .ForMember(dest => dest.References, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
@@ -147,11 +136,6 @@ namespace Presentation.Web
                 .ReverseMap()
                 .ForMember(dest => dest.References, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
-
-            CreateMap<ItProjectRole, RoleDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore())
-                  .IgnoreDestinationEntityFields();
 
             CreateMap<ItSystemRole, RoleDTO>()
                   .ReverseMap()
@@ -241,9 +225,6 @@ namespace Presentation.Web
                 .ForMember(dto => dto.ObjectName, opt => opt.MapFrom(src => src.Object.ItSystem.Name));
             CreateMap<RightInputDTO, ItSystemRight>();
 
-            CreateMap<ItProjectRight, RightOutputDTO>();
-            CreateMap<RightInputDTO, ItProjectRight>();
-
             CreateMap<ItContractRight, RightOutputDTO>();
             CreateMap<RightInputDTO, ItContractRight>();
 
@@ -283,73 +264,11 @@ namespace Presentation.Web
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
                 .ReverseMap()
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                .ForMember(dest => dest.ItProjects, opt => opt.Ignore())
                 .ForMember(dest => dest.Contracts, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
 
             //Simplere mapping than the one above, only one way
             CreateMap<ItSystemUsage, ItSystemUsageSimpleDTO>();
-
-            CreateMap<EconomyYear, EconomyYearDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<Risk, RiskDTO>()
-                .ReverseMap()
-                .IgnoreDestinationEntityFields();
-
-            CreateMap<ItProjectStatus, ItProjectStatusDTO>()
-                  .Include<Assignment, AssignmentDTO>()
-                  .Include<Milestone, MilestoneDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<Assignment, AssignmentDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<Milestone, MilestoneDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<GoalStatus, GoalStatusDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItProject, opt => opt.Ignore())
-                  .ForMember(dest => dest.Goals, opt => opt.Ignore())
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<Goal, GoalDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<Stakeholder, StakeholderDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<ItProject, ItProjectDTO>()
-                .ForMember(dest => dest.ChildrenIds,
-                    opt => opt.MapFrom(x => x.Children.Select(y => y.Id)))
-                .ReverseMap()
-                .ForMember(dest => dest.Children, opt => opt.Ignore())
-                .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore())
-                .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                .ForMember(dest => dest.UsedByOrgUnits, opt => opt.Ignore())
-                .ForMember(dest => dest.Stakeholders, opt => opt.Ignore())
-                .IgnoreDestinationEntityFields();
-
-            CreateMap<ItProjectPhase, ItProjectPhaseDTO>()
-                .ReverseMap();
-
-            //Output only - this mapping should not be reversed
-            CreateMap<ItProject, ItProjectSimpleDTO>();
-
-            CreateMap<Handover, HandoverDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
-            CreateMap<Communication, CommunicationDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
 
             //AssociatedAgreementElementTypes
             CreateMap<ItContract, ItContractDTO>()

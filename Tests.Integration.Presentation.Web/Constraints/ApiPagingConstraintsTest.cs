@@ -72,8 +72,7 @@ namespace Tests.Integration.Presentation.Web.Constraints
             {
                 "itsystem",
                 "itsystemusage",
-                "itcontract",
-                "itproject",
+                "itcontract"
             };
 
             return CreateInputs(resourceNames, false);
@@ -122,8 +121,7 @@ namespace Tests.Integration.Presentation.Web.Constraints
             {
                 "itsystems",
                 "itsystemusages",
-                "itcontracts",
-                "itprojects",
+                "itcontracts"
             };
             return resourceNames;
         }

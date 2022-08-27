@@ -14,7 +14,6 @@ namespace Core.ApplicationServices.References
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemUsageId(int usageId);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByContractId(int contractId);
-        Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByProjectId(int projectId);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByDataProcessingRegistrationId(int id);
         Maybe<OperationError> BatchUpdateExternalReferences(ReferenceRootType rootType, int rootId, IEnumerable<UpdatedExternalReferenceProperties> externalReferences);
     }

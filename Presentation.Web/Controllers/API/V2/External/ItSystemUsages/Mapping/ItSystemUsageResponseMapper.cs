@@ -170,7 +170,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Notes = systemUsage.Note,
                 MainContract = systemUsage.MainContract?.ItContract?.MapIdentityNamePairDTO(),
                 DataClassification = systemUsage.ItSystemCategories?.MapIdentityNamePairDTO(),
-                AssociatedProjects = systemUsage.ItProjects.Select(project => project.MapIdentityNamePairDTO()).ToList(),
                 NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
                 SystemVersion = systemUsage.Version,
                 Validity = new ValidityResponseDTO

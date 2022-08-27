@@ -106,6 +106,7 @@
     <Compile Include="Contract\Write\IItContractWriteService.cs" />
     <Compile Include="Contract\Write\ItContractWriteService.cs" />
     <Compile Include="Extensions\ChangedValueExtensions.cs" />
+    <Compile Include="Extensions\HangfireApiExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="Extensions\OptionalValueChangeExtensions.cs" />
@@ -172,7 +173,6 @@
     <Compile Include="OptionTypes\IOptionsApplicationService.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedUserNotificationsHandler.cs" />
     <Compile Include="Model\EventHandler\SystemUsageDeletedUserNotificationsHandler.cs" />
-    <Compile Include="Model\EventHandler\ProjectDeletedUserNotificationsHandler.cs" />
     <Compile Include="Model\EventHandler\ContractDeletedUserNotificationsHandler.cs" />
     <Compile Include="Notification\IUserNotificationApplicationService.cs" />
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
@@ -194,7 +194,6 @@
     <Compile Include="Model\EventHandler\ClearCacheOnAdministrativeAccessRightsChangedHandler.cs" />
     <Compile Include="Model\EventHandler\ContractDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
-    <Compile Include="Model\EventHandler\ProjectDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\SystemUsageDeletedAdvicesHandler.cs" />
     <Compile Include="Model\GDPR\DataProcessingRegistrationOptions.cs" />
     <Compile Include="Model\Shared\ChangedValue.cs" />
@@ -209,7 +208,6 @@
     <Compile Include="Organizations\IOrganizationRightsService.cs" />
     <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
-    <Compile Include="Project\IItProjectService.cs" />
     <Compile Include="ScheduledJobs\AdviceTrigger.cs" />
     <Compile Include="ScheduledJobs\AdviceTriggerFactory.cs" />
     <Compile Include="Shared\PagingContraints.cs" />
@@ -252,7 +250,6 @@
     <Compile Include="Contract\IItContractService.cs" />
     <Compile Include="Interface\IItInterfaceService.cs" />
     <Compile Include="Contract\ItContractService.cs" />
-    <Compile Include="Project\ItProjectService.cs" />
     <Compile Include="Interface\ItInterfaceService.cs" />
     <Compile Include="SystemUsage\Write\IItSystemUsageWriteService.cs" />
     <Compile Include="SystemUsage\Write\ItSystemUsageWriteService.cs" />

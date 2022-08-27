@@ -11,13 +11,11 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
-using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -41,7 +39,6 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IDatabaseTransaction> _dbTransaction;
         private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
         private readonly Mock<IItContractRepository> _contractRepository;
-        private readonly Mock<IItProjectRepository> _projectRepository;
         private readonly Mock<IDataProcessingRegistrationRepository> _dataProcessingRegistrationRepositoryMock;
 
         public ReferenceServiceTest()
@@ -53,14 +50,12 @@ namespace Tests.Unit.Presentation.Web.Services
             _dbTransaction = new Mock<IDatabaseTransaction>();
             _systemUsageRepository = new Mock<IItSystemUsageRepository>();
             _contractRepository = new Mock<IItContractRepository>();
-            _projectRepository = new Mock<IItProjectRepository>();
             _dataProcessingRegistrationRepositoryMock = new Mock<IDataProcessingRegistrationRepository>();
             _sut = new ReferenceService(
                 _referenceRepository.Object,
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
                 _contractRepository.Object,
-                _projectRepository.Object,
                 _dataProcessingRegistrationRepositoryMock.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
@@ -278,77 +273,6 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Act
             var result = _sut.DeleteByContractId(contract.Id);
-
-            //Assert
-            Assert.True(result.Ok);
-            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
-            _dbTransaction.Verify(x => x.Commit(), Times.Once);
-        }
-
-        [Fact]
-        public void DeleteByProjectId_Returns_NotFound()
-        {
-            //Arrange
-            var id = A<int>();
-            ExpectGetProjectReturns(id, null);
-
-            //Act
-            var result = _sut.DeleteByProjectId(id);
-
-            //Assert
-            Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.NotFound, result.Error);
-            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void DeleteByProjectId_Returns_Forbidden_If_Not_Allowed_To_Modify_System()
-        {
-            //Arrange
-            var project = CreateProject();
-            ExpectGetProjectReturns(project.Id, project);
-            ExpectAllowModifyReturns(project, false);
-
-            //Act
-            var result = _sut.DeleteByProjectId(project.Id);
-
-            //Assert
-            Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
-            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void DeleteByProjectId_Returns_Ok_If_No_References()
-        {
-            var project = CreateProject();
-            ExpectGetProjectReturns(project.Id, project);
-            ExpectAllowModifyReturns(project, true);
-
-            //Act
-            var result = _sut.DeleteByProjectId(project.Id);
-
-            //Assert
-            Assert.True(result.Ok);
-            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void DeleteByProjectId_Returns_Ok_If_References()
-        {
-            //Arrange
-            var project = CreateProject();
-            var reference = CreateReference();
-            project = AddExternalReference(project, reference);
-            ExpectGetProjectReturns(project.Id, project);
-            ExpectAllowModifyReturns(project, true);
-            ExpectTransactionToBeSet();
-
-            //Act
-            var result = _sut.DeleteByProjectId(project.Id);
 
             //Assert
             Assert.True(result.Ok);
@@ -781,11 +705,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _contractRepository.Setup(x => x.GetById(id)).Returns(contract);
         }
 
-        private void ExpectGetProjectReturns(int id, ItProject project)
-        {
-            _projectRepository.Setup(x => x.GetById(id)).Returns(project);
-        }
-
         private void ExpectGetDataProcessingRegistrationReturns(int id, DataProcessingRegistration dpr)
         {
             _dataProcessingRegistrationRepositoryMock.Setup(x => x.GetById(id)).Returns(dpr);
@@ -805,12 +724,6 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             return new ItContract { Id = A<int>() };
         }
-
-        private ItProject CreateProject()
-        {
-            return new ItProject { Id = A<int>() };
-        }
-
         private ItSystemUsage CreateSystemUsage()
         {
             return new ItSystemUsage { Id = A<int>(), ItSystem = CreateSystem() };

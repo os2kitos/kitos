@@ -344,10 +344,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 ValidTo = rule.MustUpdate(x => x.General.Validity.ValidTo)
                     ? (source.Validity?.ValidTo?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,
-
-                AssociatedProjectUuids = rule.MustUpdate(x => x.General.AssociatedProjectUuids)
-                    ? (source.AssociatedProjectUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
             };
         }
 

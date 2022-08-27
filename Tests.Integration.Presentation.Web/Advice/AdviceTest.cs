@@ -18,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.Advice
 {
     public class AdviceTest : WithAutoFixture, IAsyncLifetime
     {
-        private ItProjectDTO _root;
+        private ItContractDTO _root;
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
 
         [Fact]
@@ -323,7 +323,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             return new Core.DomainModel.Advice.Advice
             {
                 RelationId = _root.Id,
-                Type = RelatedEntityType.itProject,
+                Type = RelatedEntityType.itContract,
                 Body = A<string>(),
                 Subject = A<string>(),
                 Scheduling = schedule,
@@ -361,7 +361,7 @@ namespace Tests.Integration.Presentation.Web.Advice
 
         public async Task InitializeAsync()
         {
-            _root = await ItProjectHelper.CreateProject(A<string>(), OrganizationId);
+            _root = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
         }
 
         public Task DisposeAsync()

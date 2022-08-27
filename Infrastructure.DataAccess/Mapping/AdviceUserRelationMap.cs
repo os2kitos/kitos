@@ -11,10 +11,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(x => x.AdviceUserRelations)
                 .WillCascadeOnDelete(false);
 
-            HasOptional(x => x.ItProjectRole)
-                .WithMany(x => x.AdviceUserRelations)
-                .WillCascadeOnDelete(false);
-
             HasOptional(x => x.DataProcessingRegistrationRole)
                 .WithMany(x => x.AdviceUserRelations)
                 .WillCascadeOnDelete(false);

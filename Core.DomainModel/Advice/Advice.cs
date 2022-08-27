@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Shared;
 
@@ -30,11 +29,16 @@ namespace Core.DomainModel.Advice
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, IProjectModule, ISystemModule, IContractModule
+    public class Advice : Entity, ISystemModule, IContractModule
     {
         public Advice() {
             AdviceSent = new List<AdviceSent>();
             Reciepients = new List<AdviceUserRelation>();
+        }
+
+        public static string CreateJobId(int adviceId)
+        {
+            return $"Advice: {adviceId}";
         }
 
         public virtual ICollection<AdviceSent> AdviceSent { get; set; }
@@ -140,6 +144,11 @@ namespace Core.DomainModel.Advice
         public bool HasInvalidState()
         {
             return ObjectOwnerId == null || RelationId == null || Type == null;
+        }
+
+        public static string CreatePartitionJobId(int adviceId,int partition)
+        {
+            return $"{CreateJobId(adviceId)}_part_{partition}";
         }
     }
 }

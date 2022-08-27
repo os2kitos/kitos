@@ -3,7 +3,6 @@ import ItSystemHelper = require("../../../../Helpers/SystemCatalogHelper");
 import ItSystemUsageHelper = require("../../../../Helpers/SystemUsageHelper");
 import ItSystemUsageMainPage = require("../../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageMain.po");
 import TestFixtureWrapper = require("../../../../Utility/TestFixtureWrapper");
-import LocalItProjectConfigPage = require("../../../../PageObjects/Local-admin/LocalProject.po");
 import ItSystemUsageCommon = require("../../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageCommon.po");
 
 describe("User is able to view local it system main page information",
@@ -16,7 +15,6 @@ describe("User is able to view local it system main page information",
 
         var loginHelper = new login();
         var testFixture = new TestFixtureWrapper();
-        var localItProjectPage = new LocalItProjectConfigPage();
 
         var mainSystemName = createName("SystemUsageMain$");
 
@@ -45,18 +43,6 @@ describe("User is able to view local it system main page information",
                     .then(() => checkDefaultValues(mainSystemName));
             });
 
-        it("User cannot see 'IT Projekt' if disabled by local admin",
-            () => {
-                loginHelper.loginAsLocalAdmin()
-                    .then(() => localItProjectPage.getPage())
-                    .then(() => LocalItProjectConfigPage.getIncludeModuleInputElement().click())
-                    .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
-                    .then(() => checkItProjectHidden())
-                    // Re-enable It-projekt
-                    .then(() => localItProjectPage.getPage())
-                    .then(() => LocalItProjectConfigPage.getIncludeModuleInputElement().click());
-            });
-
         it("Change UserCount from null to 10-50, then change to undecided",
             () => {
                 loginHelper.loginAsGlobalAdmin()
@@ -77,10 +63,6 @@ var itSystemUsageCommonPage = new ItSystemUsageCommon();
 
 function createName(prefix: string) {
     return `${prefix}_${new Date().getTime()}`;
-}
-
-function checkItProjectHidden() {
-    expect(itSystemUsageCommonPage.getSideNavigationItProject().isPresent()).toBeFalse();
 }
 
 function checkDefaultValues(mainSystemName: string) {

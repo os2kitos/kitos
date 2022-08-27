@@ -13,7 +13,7 @@
     export enum RelatedEntityType {
         itContract = 0,
         itSystemUsage = 1,
-        itProject = 2,
+        //NOTE: 2 used to be ItProject
         itInterface = 3,
         dataProcessingRegistration = 4
     }

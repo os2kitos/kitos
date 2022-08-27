@@ -3,7 +3,6 @@ using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Notification;
-using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
@@ -11,7 +10,6 @@ using Infrastructure.Services.DataAccess;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 
@@ -21,7 +19,6 @@ namespace Core.DomainServices.Notifications
     {
         private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItContractRepository _contractRepository; 
-        private readonly IItProjectRepository _projectRepository; 
         private readonly IDataProcessingRegistrationRepository _dataProcessingRepository;
 
         private readonly IUserNotificationRepository _userNotificationRepository;
@@ -34,7 +31,6 @@ namespace Core.DomainServices.Notifications
             ITransactionManager transactionManager,
             IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
-            IItProjectRepository projectRepository,
             IDataProcessingRegistrationRepository dataProcessingRepository,
             IOperationClock operationClock, 
             ILogger logger)
@@ -43,7 +39,6 @@ namespace Core.DomainServices.Notifications
             _transactionManager = transactionManager;
             _systemUsageRepository = systemUsageRepository;
             _contractRepository = contractRepository;
-            _projectRepository = projectRepository;
             _dataProcessingRepository = dataProcessingRepository;
             _operationClock = operationClock;
             _logger = logger;
@@ -73,9 +68,6 @@ namespace Core.DomainServices.Notifications
             {
                 case RelatedEntityType.itContract:
                     notification.Itcontract_Id = relatedEntityId;
-                    break;
-                case RelatedEntityType.itProject:
-                    notification.ItProject_Id = relatedEntityId;
                     break;
                 case RelatedEntityType.itSystemUsage:
                     notification.ItSystemUsage_Id = relatedEntityId;
@@ -119,9 +111,6 @@ namespace Core.DomainServices.Notifications
                 case RelatedEntityType.itContract:
                     var contractExists = _contractRepository.GetById(relatedEntityId);
                     return contractExists != null;
-                case RelatedEntityType.itProject:
-                    var projectExists = _projectRepository.GetById(relatedEntityId);
-                    return projectExists != null;
                 case RelatedEntityType.itSystemUsage:
                     var systemUsageExists = _systemUsageRepository.GetSystemUsage(relatedEntityId);
                     return systemUsageExists != null;

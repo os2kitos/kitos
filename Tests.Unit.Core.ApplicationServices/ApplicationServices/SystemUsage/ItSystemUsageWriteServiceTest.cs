@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using AutoFixture;
 using Core.Abstractions.Extensions;
@@ -13,7 +12,6 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
-using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
@@ -22,7 +20,6 @@ using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
@@ -37,7 +34,6 @@ using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 
 using Moq;
-using Moq.Language.Flow;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -56,7 +52,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IOptionsService<ItSystemUsage, ArchiveLocation>> _archiveLocationOptionsServiceMock;
         private readonly Mock<IOptionsService<ItSystemUsage, ArchiveTestLocation>> _archiveTestLocationOptionsServiceMock;
         private readonly Mock<IItContractService> _contractServiceMock;
-        private readonly Mock<IItProjectService> _projectServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>> _roleAssignmentService;
         private readonly ItSystemUsageWriteService _sut;
@@ -80,7 +75,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _archiveLocationOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ArchiveLocation>>();
             _archiveTestLocationOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ArchiveTestLocation>>();
             _contractServiceMock = new Mock<IItContractService>();
-            _projectServiceMock = new Mock<IItProjectService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _kleServiceMock = new Mock<IKLEApplicationService>();
             _referenceServiceMock = new Mock<IReferenceService>();
@@ -92,7 +86,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _systemUsageRelationServiceMock = new Mock<IItsystemUsageRelationsService>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
-                _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
+                _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object,
                 _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object,
                 _sensitiveDataOptionsService.Object,
                 _registerTypeOptionsService.Object,
@@ -208,7 +202,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var newContract = CreateItContract(organization, newContractId);
             itSystemUsage.Contracts.Add(CreateContractAssociation(organization));
             itSystemUsage.Contracts.Add(CreateContractAssociation(organization, newContract));
-            var projectUuids = Many<Guid>().ToList();
             var dataClassificationId = A<Guid>();
             var itSystemCategories = new ItSystemCategories { Id = A<int>(), Uuid = dataClassificationId };
             var input = new SystemUsageUpdateParameters
@@ -224,7 +217,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     ValidFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue(),
                     ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue(),
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue(),
-                    AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
                     NumberOfExpectedUsersInterval = minimumNumberOfUsers == null && maxNumberOfUsers == null ? 
                         Maybe<(int lower, int? upperBound)>.None.AsChangedValue() : 
                         Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers.GetValueOrDefault(), maxNumberOfUsers)).AsChangedValue(),
@@ -234,8 +226,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
             ExpectGetItSystemCategoryReturns(itSystemUsage.OrganizationId, dataClassificationId, (itSystemCategories, true));
             ExpectGetContractReturns(newContractId, newContract);
-            foreach (var projectUuid in projectUuids)
-                ExpectGetProjectReturns(projectUuid, CreateItProject(organization, projectUuid));
 
             //Act
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
@@ -255,7 +245,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, itSystemUsage.Concluded);
             Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, itSystemUsage.ExpirationDate);
             Assert.Equal(generalProperties.MainContractUuid.NewValue.Value, itSystemUsage.MainContract.ItContract.Uuid);
-            Assert.Equal(projectUuids.OrderBy(x => x).ToList(), itSystemUsage.ItProjects.OrderBy(x => x.Uuid).Select(x => x.Uuid).ToList());
         }
 
         [Fact]
@@ -387,60 +376,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void Cannot_Create_If_Projects_Are_Not_Unique()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            var projectUuids = Many<Guid>().ToList();
-            projectUuids.Add(projectUuids.Last()); //add a duplicatge
-            var input = new SystemUsageUpdateParameters
-            {
-                GeneralProperties = new UpdatedSystemUsageGeneralProperties
-                {
-                    AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
-                }
-            };
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            foreach (var projectUuid in projectUuids)
-                ExpectGetProjectReturns(projectUuid, CreateItProject(organization, projectUuid));
-
-            //Act
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
-        }
-
-        [Fact]
-        public void Cannot_Create_If_Project_Is_In_Wrong_Organization()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            var wrongOrganization = CreateOrganization();
-            var projectUuids = Many<Guid>().ToList();
-            var badProjectUuid = A<Guid>();
-            projectUuids.Add(badProjectUuid); //Add a project which is in the wrong org (not the same as itsystem usage)
-            var input = new SystemUsageUpdateParameters
-            {
-                GeneralProperties = new UpdatedSystemUsageGeneralProperties
-                {
-                    AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
-                }
-            };
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            foreach (var projectUuid in projectUuids)
-                ExpectGetProjectReturns(projectUuid, CreateItProject(projectUuid == badProjectUuid ? wrongOrganization : organization, projectUuid));
-
-            //Act
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
-        }
-
-        [Fact]
         public void Cannot_Create_If_ValidFrom_Is_After_ValidTo()
         {
             //Arrange
@@ -508,7 +443,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var userCount = A<UserCount>();
             var itSystemCategories = new ItSystemCategories();
             var itContractItSystemUsage = new ItContractItSystemUsage();
-            var itProjects = Many<Guid>().Select(x => CreateItProject(organization, x)).ToList();
 
             itSystemUsage.LocalCallName = localCallName;
             itSystemUsage.LocalSystemId = localSystemId;
@@ -520,7 +454,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             itSystemUsage.UserCount = userCount;
             itSystemUsage.ItSystemCategories = itSystemCategories;
             itSystemUsage.MainContract = itContractItSystemUsage;
-            itSystemUsage.ItProjects = itProjects;
 
             var input = new SystemUsageUpdateParameters
             {
@@ -548,7 +481,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(userCount, itSystemUsage.UserCount);
             Assert.Equal(itSystemCategories, itSystemUsage.ItSystemCategories);
             Assert.Equal(itContractItSystemUsage, itSystemUsage.MainContract);
-            Assert.Equal(itProjects, itSystemUsage.ItProjects);
         }
 
         [Theory]
@@ -2621,22 +2553,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowModifyReturns(itSystemUsage, true);
         }
 
-        private void ExpectGetProjectReturns(Guid projectUuid, Result<ItProject, OperationError> result)
-        {
-            _projectServiceMock.Setup(x => x.GetProject(projectUuid))
-                .Returns(result);
-        }
-
         private Organization CreateOrganization()
         {
             return new Organization { Id = A<int>() };
         }
-
-        private static ItProject CreateItProject(Organization organization, Guid projectUuid)
-        {
-            return new ItProject { OrganizationId = organization.Id, Organization = organization, Uuid = projectUuid };
-        }
-
         private void ExpectGetContractReturns(Guid newContractId, Result<ItContract, OperationError> result)
         {
             _contractServiceMock.Setup(x => x.GetContract(newContractId)).Returns(result);
