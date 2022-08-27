@@ -23,25 +23,29 @@ namespace Core.BackgroundJobs.Model.Maintenance
 
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
-            var adviceIds = _adviceRepository.GetAllIds();
-            var adviceIdsTargetedByHangFire = GetAdviceIdsTargetedByHangFire();
-            var orphanedIds = adviceIdsTargetedByHangFire.Except(adviceIds).ToList();
+            var currentAdviceIdsFromDb = _adviceRepository.GetAllIds();
+            var recurringJobsIdInfo = _hangfireApi.GetRecurringJobsIdInfo().ToList();
+            var scheduledJobsIdInfo = _hangfireApi.GetScheduledJobsIdInfo().ToList();
+
+            var adviceIdsTargetedByHangFire = GetAdviceIdsTargetedByHangFire(recurringJobsIdInfo, scheduledJobsIdInfo);
+
+            var orphanedIds = adviceIdsTargetedByHangFire.Except(currentAdviceIdsFromDb).ToList();
 
             foreach (var adviceId in orphanedIds)
             {
-                _hangfireApi.DeleteAdviceFromHangfire(adviceId);
+                _hangfireApi.DeleteAdviceFromHangfire(adviceId, scheduledJobsIdInfo, recurringJobsIdInfo);
             }
 
             return Task.FromResult(Result<string, OperationError>.Success($"Purged jobs for {orphanedIds.Count} advices"));
         }
 
-        private ISet<int> GetAdviceIdsTargetedByHangFire()
+        private static IEnumerable<int> GetAdviceIdsTargetedByHangFire(IEnumerable<(int adviceId, string jobId)> recurringJobsIdInfo, IEnumerable<(int adviceId, string jobId)> scheduledJobsIdInfo)
         {
-            return _hangfireApi
-                .GetRecurringJobsIdInfo()
-                .Concat(_hangfireApi.GetScheduledJobsIdInfo())
-                .Select(x => x.adviceId)
-                .ToHashSet();
+            return recurringJobsIdInfo
+                .Concat(scheduledJobsIdInfo)
+                .Select(ids => ids.adviceId)
+                .Distinct()
+                .ToList();
         }
     }
 }
