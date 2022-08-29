@@ -36,7 +36,8 @@
                     autoSaveUrl: "@",
                     field: "@",
                     disabled: "=ngDisabled",
-                    required: "@"
+                    required: "@",
+                    helpTextKey: "@"
                 },
                 controller: "select2OptionController",
                 link: function (scope, element, attr, ctrl) {

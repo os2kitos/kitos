@@ -625,7 +625,7 @@
     <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\helpText\inlineHelpText.view.html" />
-    <Content Include="app\shared\inputHelpText\input-help-text.html" />
+    <Content Include="app\shared\inputHelpText\input-help-text.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="app\shared\select2Option\select2MultipleOption.view.html" />
