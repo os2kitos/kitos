@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItContract.Read;
 
 namespace Core.DomainServices.Repositories.Contract
@@ -9,5 +10,6 @@ namespace Core.DomainServices.Repositories.Contract
         IQueryable<ItContractOverviewReadModel> GetByOrganizationAndResponsibleOrganizationUnitId(int organizationId, int responsibleOrganizationUnit);
         ItContractOverviewReadModel Add(ItContractOverviewReadModel model);
         void DeleteBySourceId(int sourceEntityId);
+        Maybe<ItContractOverviewReadModel> GetBySourceId(int sourceId);
     }
 }

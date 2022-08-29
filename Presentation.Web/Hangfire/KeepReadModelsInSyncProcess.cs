@@ -35,6 +35,7 @@ namespace Presentation.Web.Hangfire
         {
             backgroundJobLauncher.LaunchUpdateDataProcessingRegistrationReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
             backgroundJobLauncher.LaunchUpdateItSystemUsageOverviewReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
+            backgroundJobLauncher.LaunchUpdateItContractOverviewReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
         private static void PurgeDuplicateUpdates(IBackgroundJobLauncher backgroundJobLauncher, CancellationTokenSource combinedTokenSource)

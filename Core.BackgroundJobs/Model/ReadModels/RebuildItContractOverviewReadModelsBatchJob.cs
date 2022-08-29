@@ -5,40 +5,40 @@ using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainServices;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
-using Core.DomainServices.Repositories.SystemUsage;
+using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 
 using Serilog;
 
 namespace Core.BackgroundJobs.Model.ReadModels
 {
-    public class RebuildItSystemUsageOverviewReadModelsBatchJob : IAsyncBackgroundJob
+    public class RebuildItContractOverviewReadModelsBatchJob : IAsyncBackgroundJob
     {
         private readonly ILogger _logger;
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
-        private readonly IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel> _updater;
-        private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
-        private readonly IItSystemUsageRepository _sourceRepository;
+        private readonly IReadModelUpdate<ItContract, ItContractOverviewReadModel> _updater;
+        private readonly IItContractOverviewReadModelRepository _readModelRepository;
+        private readonly IItContractRepository _sourceRepository;
         private readonly ITransactionManager _transactionManager;
-        private readonly IGenericRepository<ItSystemUsageOverviewReadModel> _lowLevelReadModelRepository;
+        private readonly IGenericRepository<ItContractOverviewReadModel> _lowLevelReadModelRepository;
         private readonly IGenericRepository<PendingReadModelUpdate> _lowLevelPendingReadModelRepository;
         private readonly IDatabaseControl _databaseControl;
         private const int BatchSize = 25;
-        public string Id => StandardJobIds.UpdateItSystemUsageOverviewReadModels;
+        public string Id => StandardJobIds.UpdateItContractOverviewReadModels;
 
-        public RebuildItSystemUsageOverviewReadModelsBatchJob(
+        public RebuildItContractOverviewReadModelsBatchJob(
             ILogger logger,
             IPendingReadModelUpdateRepository pendingReadModelUpdateRepository,
-            IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel> updater,
-            IItSystemUsageOverviewReadModelRepository readModelRepository,
-            IItSystemUsageRepository sourceRepository,
+            IReadModelUpdate<ItContract, ItContractOverviewReadModel> updater,
+            IItContractOverviewReadModelRepository readModelRepository,
+            IItContractRepository sourceRepository,
             ITransactionManager transactionManager,
-            IGenericRepository<ItSystemUsageOverviewReadModel> lowLevelReadModelRepository, //NOTE: Using the primitive repositories on purpose since we want to reduce the amount of calls to SaveChanges as much as possible
+            IGenericRepository<ItContractOverviewReadModel> lowLevelReadModelRepository, //NOTE: Using the primitive repositories on purpose since we want to reduce the amount of calls to SaveChanges as much as possible
             IGenericRepository<PendingReadModelUpdate> lowLevelPendingReadModelRepository,
             IDatabaseControl databaseControl)
         {
@@ -58,14 +58,14 @@ namespace Core.BackgroundJobs.Model.ReadModels
             var completedUpdates = 0;
             try
             {
-                var pendingReadModelUpdates = _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, BatchSize).ToList();
+                var pendingReadModelUpdates = _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItContract, BatchSize).ToList();
                 foreach (var pendingReadModelUpdate in pendingReadModelUpdates)
                 {
                     if (token.IsCancellationRequested)
                         break;
                     using var transaction = _transactionManager.Begin();
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
-                    var source = _sourceRepository.GetSystemUsage(pendingReadModelUpdate.SourceId).FromNullable();
+                    var source = _sourceRepository.GetById(pendingReadModelUpdate.SourceId).FromNullable();
                     var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
                     if (source.HasValue)
                     {
@@ -98,9 +98,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {completedUpdates} updates"));
         }
 
-        private void ApplyUpdate(Maybe<ItSystemUsageOverviewReadModel> readModelResult, ItSystemUsage sourceValue)
+        private void ApplyUpdate(Maybe<ItContractOverviewReadModel> readModelResult, ItContract sourceValue)
         {
-            var readModel = readModelResult.GetValueOrFallback(new ItSystemUsageOverviewReadModel());
+            var readModel = readModelResult.GetValueOrFallback(new ItContractOverviewReadModel());
             _updater.Apply(sourceValue, readModel);
             if (readModelResult.HasValue == false) //Add it to the tracking graph
             {

@@ -98,6 +98,12 @@ namespace Presentation.Web
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.RebuildItContractReadModels,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.ItContract, CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
+
+            recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.PurgeOrphanedHangfireJobs,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchPurgeOrphanedHangfireJobs(CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
