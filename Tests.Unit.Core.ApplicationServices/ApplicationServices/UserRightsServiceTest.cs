@@ -13,7 +13,6 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Users;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
@@ -42,9 +41,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>>
             _systemRightsServiceMock;
 
-        private readonly Mock<IRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject>>
-            _projectRightsServiceMock;
-
         private readonly Mock<IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>>
             _organizationUnitRightsServiceMock;
 
@@ -65,7 +61,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _contractRightsServiceMock =
                 new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _systemRightsServiceMock = new Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>>();
-            _projectRightsServiceMock = new Mock<IRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject>>();
             _organizationUnitRightsServiceMock =
                 new Mock<IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>>();
             _dprRightsServiceMock =
@@ -82,7 +77,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 _orgRightsServiceMock.Object,
                 _contractRightsServiceMock.Object,
                 _systemRightsServiceMock.Object,
-                _projectRightsServiceMock.Object,
                 _organizationUnitRightsServiceMock.Object,
                 _dprRightsServiceMock.Object,
                 _transactionMgrMock.Object,
@@ -305,7 +299,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(Enumerable.Empty<OrganizationRole>(), userRightsAssignments.LocalAdministrativeAccessRoles);
             Assert.Equal(Enumerable.Empty<OrganizationUnitRight>(), userRightsAssignments.OrganizationUnitRights);
             Assert.Equal(Enumerable.Empty<ItContractRight>(), userRightsAssignments.ContractRights);
-            Assert.Equal(Enumerable.Empty<ItProjectRight>(), userRightsAssignments.ProjectRights);
             Assert.Equal(Enumerable.Empty<ItSystemRight>(), userRightsAssignments.SystemRights);
             Assert.Equal(Enumerable.Empty<DataProcessingRegistrationRight>(),
                 userRightsAssignments.DataProcessingRegistrationRights);
@@ -322,7 +315,6 @@ namespace Tests.Unit.Core.ApplicationServices
             var user = new User();
             var dprRightIds = Many<int>().ToArray();
             var contractRightIds = Many<int>().ToArray();
-            var projectRightIds = Many<int>().ToArray();
             var systemRightIds = Many<int>().ToArray();
             var orgUnitRightIds = Many<int>().ToArray();
 
@@ -350,10 +342,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 .Concat(CreateContractRights(A<Guid>(), Many<int>().ToArray()))
                 .ToList();
 
-            user.ItProjectRights = CreateProjectRights(orgUuid, projectRightIds)
-                .Concat(CreateProjectRights(A<Guid>(), Many<int>().ToArray()))
-                .ToList();
-
             user.OrganizationUnitRights = CreateOrgUnitRights(orgUuid, orgUnitRightIds)
                 .Concat(CreateOrgUnitRights(A<Guid>(), Many<int>().ToArray()))
                 .ToList();
@@ -372,7 +360,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(dprRightIds, userRightsAssignments.DataProcessingRegistrationRights.Select(x => x.Id));
             Assert.Equal(systemRightIds, userRightsAssignments.SystemRights.Select(x => x.Id));
             Assert.Equal(contractRightIds, userRightsAssignments.ContractRights.Select(x => x.Id));
-            Assert.Equal(projectRightIds, userRightsAssignments.ProjectRights.Select(x => x.Id));
             Assert.Equal(orgUnitRightIds, userRightsAssignments.OrganizationUnitRights.Select(x => x.Id));
         }
 
@@ -507,13 +494,11 @@ namespace Tests.Unit.Core.ApplicationServices
             var dprRights = CreateDprRights(orgUuid, Many<int>().ToArray()).ToList();
             var itSystemRights = CreateSystemRights(orgUuid, Many<int>().ToArray()).ToList();
             var organizationUnitRights = CreateOrgUnitRights(orgUuid, Many<int>().ToArray()).ToList();
-            var itProjectRights = CreateProjectRights(orgUuid, Many<int>().ToArray()).ToList();
             var itContractRights = CreateContractRights(orgUuid, Many<int>().ToArray()).ToList();
 
             user.DataProcessingRegistrationRights = dprRights.Concat(CreateDprRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.ItSystemRights = itSystemRights.Concat(CreateSystemRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.OrganizationUnitRights = organizationUnitRights.Concat(CreateOrgUnitRights(A<Guid>(), Many<int>().ToArray())).ToList();
-            user.ItProjectRights = itProjectRights.Concat(CreateProjectRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.ItContractRights = itContractRights.Concat(CreateContractRights(A<Guid>(), Many<int>().ToArray())).ToList();
 
             var organization = new Organization() { Id = organizationId, Uuid = orgUuid };
@@ -525,7 +510,6 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectRemoveOrgRoleReturns(organizationId, user.Id, organizationRole, Result<OrganizationRight, OperationFailure>.Success(new OrganizationRight()));
             ExpectSuccessfulRemovalOf(dprRights, user, _dprRightsServiceMock);
             ExpectSuccessfulRemovalOf(itSystemRights, user, _systemRightsServiceMock);
-            ExpectSuccessfulRemovalOf(itProjectRights, user, _projectRightsServiceMock);
             ExpectSuccessfulRemovalOf(itContractRights, user, _contractRightsServiceMock);
             ExpectSuccessfulRemovalOf(organizationUnitRights, user, _organizationUnitRightsServiceMock);
 
@@ -537,7 +521,6 @@ namespace Tests.Unit.Core.ApplicationServices
             VerifyTransactionSucceeded(transaction);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.DataProcessingRegistrationRights.ToList(), dprRights, user, _dprRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItSystemRights.ToList(), itSystemRights, user, _systemRightsServiceMock);
-            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItProjectRights.ToList(), itProjectRights, user, _projectRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItContractRights.ToList(), itContractRights, user, _contractRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.OrganizationUnitRights.ToList(), organizationUnitRights, user, _organizationUnitRightsServiceMock);
         }
@@ -656,7 +639,7 @@ namespace Tests.Unit.Core.ApplicationServices
             //Act
             var error = _sut.RemoveRights(user.Id, organizationId,
                 new UserRightsChangeParameters(organizationRole.WrapAsEnumerable(), Enumerable.Empty<int>(),
-                    Enumerable.Empty<int>(), Enumerable.Empty<int>(), Enumerable.Empty<int>(),
+                    Enumerable.Empty<int>(), Enumerable.Empty<int>(),
                     Enumerable.Empty<int>()));
 
             //Assert
@@ -678,19 +661,16 @@ namespace Tests.Unit.Core.ApplicationServices
             var dprRights = CreateDprRights(orgUuid, Many<int>().ToArray()).ToList();
             var itSystemRights = CreateSystemRights(orgUuid, Many<int>().ToArray()).ToList();
             var organizationUnitRights = CreateOrgUnitRights(orgUuid, Many<int>().ToArray()).ToList();
-            var itProjectRights = CreateProjectRights(orgUuid, Many<int>().ToArray()).ToList();
             var itContractRights = CreateContractRights(orgUuid, Many<int>().ToArray()).ToList();
 
             user.DataProcessingRegistrationRights = dprRights.Concat(CreateDprRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.ItSystemRights = itSystemRights.Concat(CreateSystemRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.OrganizationUnitRights = organizationUnitRights.Concat(CreateOrgUnitRights(A<Guid>(), Many<int>().ToArray())).ToList();
-            user.ItProjectRights = itProjectRights.Concat(CreateProjectRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.ItContractRights = itContractRights.Concat(CreateContractRights(A<Guid>(), Many<int>().ToArray())).ToList();
 
             var dprRightsWhichAreRemoved = dprRights.RandomItems(2).ToList();
             var systemRightsWhichAreRemoved = itSystemRights.RandomItems(2).ToList();
             var contractRightsWhichAreRemoved = itContractRights.RandomItems(2).ToList();
-            var projectRightsWhichAreRemoved = itProjectRights.RandomItems(2).ToList();
             var orgUnitRightsWhichAreRemoved = organizationUnitRights.RandomItems(2).ToList();
             var parameters = new UserRightsChangeParameters
             (
@@ -698,7 +678,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 dprRightsWhichAreRemoved.Select(x => x.Id).ToList(),
                 systemRightsWhichAreRemoved.Select(x => x.Id).ToList(),
                 contractRightsWhichAreRemoved.Select(x => x.Id).ToList(),
-                projectRightsWhichAreRemoved.Select(x => x.Id).ToList(),
                 orgUnitRightsWhichAreRemoved.Select(x => x.Id).ToList()
             );
 
@@ -711,7 +690,6 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectRemoveOrgRoleReturns(organizationId, user.Id, organizationRole, Result<OrganizationRight, OperationFailure>.Success(new OrganizationRight()));
             ExpectSuccessfulRemovalOf(dprRightsWhichAreRemoved, user, _dprRightsServiceMock);
             ExpectSuccessfulRemovalOf(systemRightsWhichAreRemoved, user, _systemRightsServiceMock);
-            ExpectSuccessfulRemovalOf(projectRightsWhichAreRemoved, user, _projectRightsServiceMock);
             ExpectSuccessfulRemovalOf(contractRightsWhichAreRemoved, user, _contractRightsServiceMock);
             ExpectSuccessfulRemovalOf(orgUnitRightsWhichAreRemoved, user, _organizationUnitRightsServiceMock);
 
@@ -723,7 +701,6 @@ namespace Tests.Unit.Core.ApplicationServices
             VerifyTransactionSucceeded(transaction);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.DataProcessingRegistrationRights.ToList(), dprRightsWhichAreRemoved, user, _dprRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItSystemRights.ToList(), systemRightsWhichAreRemoved, user, _systemRightsServiceMock);
-            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItProjectRights.ToList(), projectRightsWhichAreRemoved, user, _projectRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItContractRights.ToList(), contractRightsWhichAreRemoved, user, _contractRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.OrganizationUnitRights.ToList(), orgUnitRightsWhichAreRemoved, user, _organizationUnitRightsServiceMock);
         }
@@ -741,19 +718,16 @@ namespace Tests.Unit.Core.ApplicationServices
             var dprRights = CreateDprRights(orgUuid, Many<int>().ToArray()).ToList();
             var itSystemRights = CreateSystemRights(orgUuid, Many<int>().ToArray()).ToList();
             var organizationUnitRights = CreateOrgUnitRights(orgUuid, Many<int>().ToArray()).ToList();
-            var itProjectRights = CreateProjectRights(orgUuid, Many<int>().ToArray()).ToList();
             var itContractRights = CreateContractRights(orgUuid, Many<int>().ToArray()).ToList();
 
             user.DataProcessingRegistrationRights = dprRights.Concat(CreateDprRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.ItSystemRights = itSystemRights.Concat(CreateSystemRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.OrganizationUnitRights = organizationUnitRights.Concat(CreateOrgUnitRights(A<Guid>(), Many<int>().ToArray())).ToList();
-            user.ItProjectRights = itProjectRights.Concat(CreateProjectRights(A<Guid>(), Many<int>().ToArray())).ToList();
             user.ItContractRights = itContractRights.Concat(CreateContractRights(A<Guid>(), Many<int>().ToArray())).ToList();
 
             var dprRightsWhichAreTransferred = dprRights.RandomItems(2).ToList();
             var systemRightsWhichAreTransferred = itSystemRights.RandomItems(2).ToList();
             var contractRightsWhichAreTransferred = itContractRights.RandomItems(2).ToList();
-            var projectRightsWhichAreTransferred = itProjectRights.RandomItems(2).ToList();
             var orgUnitRightsWhichAreTransferred = organizationUnitRights.RandomItems(2).ToList();
             var parameters = new UserRightsChangeParameters
             (
@@ -761,7 +735,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 dprRightsWhichAreTransferred.Select(x => x.Id).ToList(),
                 systemRightsWhichAreTransferred.Select(x => x.Id).ToList(),
                 contractRightsWhichAreTransferred.Select(x => x.Id).ToList(),
-                projectRightsWhichAreTransferred.Select(x => x.Id).ToList(),
                 orgUnitRightsWhichAreTransferred.Select(x => x.Id).ToList()
             );
 
@@ -775,29 +748,25 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAssignOrgRoleReturns(organizationId, toUserId, organizationRole, Result<OrganizationRight, OperationFailure>.Success(new OrganizationRight()));
             ExpectSuccessfulRemovalOf(dprRightsWhichAreTransferred, user, _dprRightsServiceMock);
             ExpectSuccessfulRemovalOf(systemRightsWhichAreTransferred, user, _systemRightsServiceMock);
-            ExpectSuccessfulRemovalOf(projectRightsWhichAreTransferred, user, _projectRightsServiceMock);
             ExpectSuccessfulRemovalOf(contractRightsWhichAreTransferred, user, _contractRightsServiceMock);
             ExpectSuccessfulRemovalOf(orgUnitRightsWhichAreTransferred, user, _organizationUnitRightsServiceMock);
             ExpectSuccessfulAssignmentOf(dprRightsWhichAreTransferred, toUserId, _dprRightsServiceMock);
             ExpectSuccessfulAssignmentOf(systemRightsWhichAreTransferred, toUserId, _systemRightsServiceMock);
-            ExpectSuccessfulAssignmentOf(projectRightsWhichAreTransferred, toUserId, _projectRightsServiceMock);
             ExpectSuccessfulAssignmentOf(contractRightsWhichAreTransferred, toUserId, _contractRightsServiceMock);
             ExpectSuccessfulAssignmentOf(orgUnitRightsWhichAreTransferred, toUserId, _organizationUnitRightsServiceMock);
 
             //Act
-            var error = _sut.TransferRights(user.Id, toUserId,organizationId, parameters);
+            var error = _sut.TransferRights(user.Id, toUserId, organizationId, parameters);
 
             //Assert
             Assert.True(error.IsNone);
             VerifyTransactionSucceeded(transaction);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.DataProcessingRegistrationRights.ToList(), dprRightsWhichAreTransferred, user, _dprRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItSystemRights.ToList(), systemRightsWhichAreTransferred, user, _systemRightsServiceMock);
-            VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItProjectRights.ToList(), projectRightsWhichAreTransferred, user, _projectRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.ItContractRights.ToList(), contractRightsWhichAreTransferred, user, _contractRightsServiceMock);
             VerifyThatRemovalWasOnlyCalledForExpectedRights(user.OrganizationUnitRights.ToList(), orgUnitRightsWhichAreTransferred, user, _organizationUnitRightsServiceMock);
             VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.DataProcessingRegistrationRights.ToList(), dprRightsWhichAreTransferred, toUserId, _dprRightsServiceMock);
             VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.ItSystemRights.ToList(), systemRightsWhichAreTransferred, toUserId, _systemRightsServiceMock);
-            VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.ItProjectRights.ToList(), projectRightsWhichAreTransferred, toUserId, _projectRightsServiceMock);
             VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.ItContractRights.ToList(), contractRightsWhichAreTransferred, toUserId, _contractRightsServiceMock);
             VerifyThatAssignmentWasOnlyCalledForExpectedRights(user.OrganizationUnitRights.ToList(), orgUnitRightsWhichAreTransferred, toUserId, _organizationUnitRightsServiceMock);
         }
@@ -808,8 +777,7 @@ namespace Tests.Unit.Core.ApplicationServices
             OrganizationRole.LocalAdmin,
             OrganizationRole.OrganizationModuleAdmin,
             OrganizationRole.RightsHolderAccess,
-            OrganizationRole.SystemModuleAdmin,
-            OrganizationRole.ProjectModuleAdmin
+            OrganizationRole.SystemModuleAdmin
         };
 
         private IEnumerable<OrganizationRight> CreateUserOrganizationRights(Guid organizationId,
@@ -850,17 +818,6 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             return rightIds.Select(id =>
                 new ItContractRight
-                {
-                    Id = id,
-                    Object = new() { Organization = new() { Uuid = organizationId } },
-                    RoleId = A<int>()
-                }).ToList();
-        }
-
-        private IEnumerable<ItProjectRight> CreateProjectRights(Guid organizationId, params int[] rightIds)
-        {
-            return rightIds.Select(id =>
-                new ItProjectRight
                 {
                     Id = id,
                     Object = new() { Organization = new() { Uuid = organizationId } },

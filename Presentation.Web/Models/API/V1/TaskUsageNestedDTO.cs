@@ -8,7 +8,6 @@ namespace Presentation.Web.Models.API.V1
         {
             // initializing selfmade properites to avoid null exceptions
             SystemUsages = new List<ItSystemUsageSimpleDTO>();
-            Projects = new List<ItProjectSimpleDTO>();
         }
         public int Id { get; set; }
 
@@ -28,7 +27,6 @@ namespace Presentation.Web.Models.API.V1
         public bool HasDelegations { get; set; }
 
         public IEnumerable<ItSystemUsageSimpleDTO> SystemUsages { get; set; }
-        public IEnumerable<ItProjectSimpleDTO> Projects { get; set; }
         public bool HasWriteAccess { get; set; }
     }
 }

@@ -64,7 +64,6 @@
     <Compile Include="Contract\IContractDataProcessingRegistrationAssignmentService.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
-    <Compile Include="Factories\ItProjectFactory.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationBasisForTransferAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationDataProcessorAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
@@ -233,8 +232,6 @@
     <Compile Include="Repositories\KLE\KLEStatus.cs" />
     <Compile Include="Repositories\KLE\KLEUpdateStatus.cs" />
     <Compile Include="Time\OperationClock.cs" />
-    <Compile Include="Repositories\Project\IItProjectRepository.cs" />
-    <Compile Include="Repositories\Project\ItProjectRepository.cs" />
     <Compile Include="Repositories\Reference\IReferenceRepository.cs" />
     <Compile Include="Repositories\Reference\ReferenceRepository.cs" />
     <Compile Include="Repositories\SystemUsage\IItSystemUsageRepository.cs" />

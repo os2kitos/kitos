@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -58,8 +57,6 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/itsystemusage", typeof(ItSystemUsage))]
         [InlineData("odata/itcontracts", typeof(ItContract))]
         [InlineData("api/itcontract", typeof(ItContract))]
-        [InlineData("odata/itprojects", typeof(ItProject))]
-        [InlineData("api/itproject", typeof(ItProject))]
         public async Task Api_V1_Is_Read_Only(string path, Type inputType)
         {
             //Arrange
@@ -84,7 +81,7 @@ namespace Tests.Integration.Presentation.Web.Security
             {
                 Title = A<string>(),
                 ExternalReferenceId = A<string>(),
-                URL = "https://strongminds.dk/",
+                URL = "https://kitos.dk/",
                 Itcontract_Id = contract.Id
             };
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);

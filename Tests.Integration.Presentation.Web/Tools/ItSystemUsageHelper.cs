@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,7 +13,6 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Tests.Integration.Presentation.Web.ItSystem;
@@ -27,7 +25,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<IEnumerable<ItSystemUsageOverviewReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,ItSystemTaskRefs,SensitiveDataLevels,ItProjects,ArchivePeriods,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages,OutgoingRelatedItSystemUsages&$filter=contains(SystemName,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=SystemName"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,ItSystemTaskRefs,SensitiveDataLevels,ArchivePeriods,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages,OutgoingRelatedItSystemUsages&$filter=contains(SystemName,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=SystemName"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItSystemUsageOverviewReadModel>();
         }
@@ -215,7 +213,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return response;
         }
 
-        public static async Task<ArchivePeriod> SendAddArchivePeriodRequestAsync(int systemUsageId, DateTime startDate, DateTime endDate, int organizationId, Cookie optionalLogin = null)
+        public static async Task<ArchivePeriod> AddArchivePeriodAsync(int systemUsageId, DateTime startDate, DateTime endDate, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/ArchivePeriods?organizationId={organizationId}");

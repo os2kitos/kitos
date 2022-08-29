@@ -6,7 +6,6 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.SSO;
@@ -66,7 +65,6 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
                 OrganizationRights = new List<OrganizationRight>(),
                 ItContractRights = new List<ItContractRight>(),
                 ItSystemRights = new List<ItSystemRight>(),
-                ItProjectStatuses = new List<ItProjectStatus>(),
                 OrganizationUnitRights = new List<OrganizationUnitRight>(),
                 SsoIdentities = new List<SsoUserIdentity>()
             };

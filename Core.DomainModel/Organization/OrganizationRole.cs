@@ -15,10 +15,9 @@
         /// Has write access to everything within the organization module
         /// </summary>
         OrganizationModuleAdmin = 2,
-        /// <summary>
-        /// Has write access to everything within the project module
-        /// </summary>
-        ProjectModuleAdmin = 3,
+        
+        //NOTE:  3 used to be ProjectModuleAdmin
+
         /// <summary>
         /// Has write access to everything within the system module
         /// </summary>

@@ -59,8 +59,6 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         public TaskRef Create() { throw new NotImplementedException(); }
         public TaskRef GetByKey(params object[] key) { throw new NotImplementedException(); }
         public TProperty GetMax<TProperty>(Expression<Func<TaskRef, TProperty>> propertyExpression) { throw new NotImplementedException(); }
-        public IEnumerable<TaskRef> SQL(string sql) { throw new NotImplementedException(); }
-
         public void Dispose() { }
         public void DeleteWithReferencePreload(TaskRef entity) { }
         public void DeleteByKeyWithReferencePreload(params object[] key) { }

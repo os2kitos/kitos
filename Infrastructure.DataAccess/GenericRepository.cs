@@ -135,11 +135,6 @@ namespace Infrastructure.DataAccess
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public IEnumerable<T> SQL(string sql)
-        {
-            return _dbSet.SqlQuery(sql);
-        }
-
         public void Save()
         {
             try

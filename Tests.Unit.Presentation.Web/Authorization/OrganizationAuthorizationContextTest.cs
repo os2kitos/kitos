@@ -8,7 +8,6 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -357,7 +356,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.LocalAdmin, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.User, false)]
         public void HasPermission_With_VisibilityControlPermission_Returns_For_SimpleEntityWithAccessModifier(OrganizationRole userRole, bool expectedResult)
@@ -370,7 +368,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, true)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.User, false)]
         public void HasPermission_With_VisibilityControlPermission_Returns_For_IContractElement(OrganizationRole userRole, bool expectedResult)
@@ -383,7 +380,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.User, false)]
         public void HasPermission_With_VisibilityControlPermission_Returns_For_IOrganizationElement(OrganizationRole userRole, bool expectedResult)
@@ -417,49 +413,36 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [Theory]
         [InlineData(OrganizationRole.User, OrganizationRole.User, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.User, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.OrganizationModuleAdmin, true)]
         [InlineData(OrganizationRole.User, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.User, OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.User, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.GlobalAdmin, true)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.User, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ProjectModuleAdmin, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.SystemModuleAdmin, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.LocalAdmin, true)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.User, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.User, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.User, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.User, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, false)]
@@ -505,14 +488,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void Allow_Create_ItSystemUsage_Returns(bool expectedResult)
         {
             Allow_Create_Returns<ItSystemUsage>(expectedResult);
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Allow_Create_ItProject_Returns(bool expectedResult)
-        {
-            Allow_Create_Returns<ItProject>(expectedResult);
         }
 
         [Theory]
@@ -564,7 +539,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
            bool expectedResult)
         {
             //Arrange
-            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateItProject(hasAssignedWriteAccess);
+            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateContract(hasAssignedWriteAccess);
 
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
             ExpectHasRoleInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
@@ -708,18 +683,18 @@ namespace Tests.Unit.Presentation.Web.Authorization
             return testItSystem;
         }
 
-        private ItProject CreateItProject(bool hasAssignedWriteAccess)
+        private ItContract CreateContract(bool hasAssignedWriteAccess)
         {
-            var itProject = new ItProject();
+            var contract = new ItContract();
             if (hasAssignedWriteAccess)
             {
-                itProject.Rights = new List<ItProjectRight>()
+                contract.Rights = new List<ItContractRight>()
                 {
-                    new() {UserId = _userId,Role = new ItProjectRole {HasWriteAccess = true}},
+                    new() {UserId = _userId,Role = new ItContractRole {HasWriteAccess = true}},
 
                 };
             }
-            return itProject;
+            return contract;
         }
 
         private void ExpectHasRoleInSameOrganizationAsReturns(IEntity entity, bool value)

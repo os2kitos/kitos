@@ -5,7 +5,6 @@ using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Moq;
@@ -242,9 +241,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             yield return new object[] { new ItSystem(), true };
             yield return new object[] { new ItSystem(), false };
-
-            yield return new object[] { new ItProject(), true };
-            yield return new object[] { new ItProject(), false };
         }
 
         #endregion helpers

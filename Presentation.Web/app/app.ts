@@ -4,7 +4,6 @@ var app = angular.module("app", [
     "ui.select2",
     "ngAnimate",
     "notify",
-    "angularjs-dropdown-multiselect",
     "ngSanitize",
     "kendo.directives",
     "angular-loading-bar",
@@ -185,7 +184,7 @@ app.run([
         });
 
         // Fixes the blank spaces problem when deselecting columns (OS2KITOS-607)
-        // When implemented here fixWidthOnClick is shared by IT Project, IT System and IT Contract
+        // When implemented here fixWidthOnClick is shared by IT System and IT Contract
         needsWidthFixService.fixWidthOnClick();
     }
 ]);

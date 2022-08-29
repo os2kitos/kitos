@@ -16,7 +16,6 @@ using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
 using Core.ApplicationServices.Organizations;
-using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.ScheduledJobs;
@@ -53,7 +52,6 @@ using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Organization;
-using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Qa;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.SSO;
@@ -85,7 +83,6 @@ using Core.DomainServices.Contract;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.SystemUsage;
-using Core.DomainModel.ItProject;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 using Core.ApplicationServices.Notification;
@@ -112,6 +109,7 @@ using Core.ApplicationServices.Organizations.Handlers;
 using Core.ApplicationServices.Tracking;
 using Core.ApplicationServices.UIConfiguration;
 using Core.ApplicationServices.UIConfiguration.Handlers;
+using Core.BackgroundJobs.Model.Maintenance;
 using Core.DomainServices.Repositories.UICustomization;
 using Core.DomainServices.Tracking;
 using Infrastructure.STS.Company.DomainServices;
@@ -204,7 +202,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<AdviceService>().ToSelf().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
-            kernel.Bind<IItProjectService>().To<ItProjectService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
             kernel.Bind<IItsystemUsageRelationsService>().To<ItsystemUsageRelationsService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
@@ -254,7 +251,6 @@ namespace Presentation.Web.Ninject
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
             RegisterRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>(kernel);
             RegisterRoleAssignmentService<ItContractRight, ItContractRole, ItContract>(kernel);
-            RegisterRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject>(kernel);
             RegisterRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>(kernel);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -351,12 +347,10 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, ContractDeletedSystemRelationsHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, ContractDeletedAdvicesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItProject>, ProjectDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
 
             RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, ContractDeletedUserNotificationsHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItProject>, ProjectDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, SystemUsageDeletedUserNotificationsHandler>(kernel);
 
@@ -380,8 +374,6 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityBeingDeletedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
@@ -395,7 +387,6 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
 
             //Deletion tracking
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItProject>, TrackDeletedEntitiesEventHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, TrackDeletedEntitiesEventHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, TrackDeletedEntitiesEventHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystem>, TrackDeletedEntitiesEventHandler>(kernel);
@@ -472,9 +463,6 @@ namespace Presentation.Web.Ninject
 
             RegisterOptionsService<ItContract, CriticalityType, LocalCriticalityType>(kernel);
 
-            //IT-Project
-            RegisterOptionsService<ItProjectRight, ItProjectRole, LocalItProjectRole>(kernel);
-
             //OrganizationUnit
             RegisterOptionsService<OrganizationUnitRight, OrganizationUnitRole, LocalOrganizationUnitRole>(kernel);
 
@@ -534,7 +522,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InCommandScope(Mode);
             kernel.Bind<IDatabaseControl>().To<EntityFrameworkContextDatabaseControl>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InCommandScope(Mode);
-            kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InCommandScope(Mode);
             kernel.Bind<IInterfaceRepository>().To<InterfaceRepository>().InCommandScope(Mode);
             kernel.Bind<IReferenceRepository>().To<ReferenceRepository>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportRepository>().To<BrokenExternalReferencesReportRepository>().InCommandScope(Mode);
@@ -634,6 +621,9 @@ namespace Presentation.Web.Ninject
 
             //Rebuilder
             kernel.Bind<IRebuildReadModelsJobFactory>().To<RebuildReadModelsJobFactory>().InCommandScope(Mode);
+
+            //Maintenance
+            kernel.Bind<PurgeOrphanedHangfireJobs>().ToSelf().InCommandScope(Mode);
         }
     }
 }

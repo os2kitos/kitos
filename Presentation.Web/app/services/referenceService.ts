@@ -84,7 +84,6 @@
         createSystemReference(): IReferenceService;
         createSystemUsageReference(): IReferenceService;
         createContractReference(): IReferenceService;
-        createProjectReference(): IReferenceService;
         createDpaReference(): IReferenceService;
     }
 
@@ -119,13 +118,6 @@
                 reference.ItContract_Id = id;
                 return reference;
             }); }
-
-        createProjectReference(): IReferenceService {
-            return this.createFor("itProject", (reference, id) => {
-                reference.ItProject_Id = id;
-                return reference;
-            });
-        }
 
         createDpaReference(): IReferenceService {
             return this.createFor("v1/data-processing-registration", (reference, id) => {

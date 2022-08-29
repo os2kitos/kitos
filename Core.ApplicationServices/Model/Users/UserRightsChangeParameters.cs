@@ -10,7 +10,6 @@ namespace Core.ApplicationServices.Model.Users
         public ISet<int> DataProcessingRegistrationRightIds { get; }
         public ISet<int> SystemRightIds { get; }
         public ISet<int> ContractRightIds { get; }
-        public ISet<int> ProjectRightIds { get; }
         public ISet<int> OrganizationUnitRightsIds { get; }
 
         public UserRightsChangeParameters(
@@ -18,14 +17,12 @@ namespace Core.ApplicationServices.Model.Users
             IEnumerable<int> dataProcessingRegistrationRightIds,
             IEnumerable<int> systemRightIds,
             IEnumerable<int> contractRightIds,
-            IEnumerable<int> projectRightIds,
             IEnumerable<int> organizationUnitRightIds)
         {
             AdministrativeAccessRoles = organizationRoles.ToHashSet();
             DataProcessingRegistrationRightIds = dataProcessingRegistrationRightIds.ToHashSet();
             SystemRightIds = systemRightIds.ToHashSet();
             ContractRightIds = contractRightIds.ToHashSet();
-            ProjectRightIds = projectRightIds.ToHashSet();
             OrganizationUnitRightsIds = organizationUnitRightIds.ToHashSet();
         }
     }

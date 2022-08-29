@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.SSO;
@@ -27,13 +26,8 @@ namespace Core.DomainModel
             PasswordResetRequests = new List<PasswordResetRequest>();
             OrganizationRights = new List<OrganizationRight>();
             OrganizationUnitRights = new List<OrganizationUnitRight>();
-            ItProjectRights = new List<ItProjectRight>();
             ItSystemRights = new List<ItSystemRight>();
             ItContractRights = new List<ItContractRight>();
-            ItProjectStatuses = new List<ItProjectStatus>();
-            ResponsibleForRisks = new List<Risk>();
-            ResponsibleForCommunications = new List<Communication>();
-            HandoverParticipants = new List<Handover>();
             LockedOutDate = null;
             FailedAttempts = 0;
             Uuid = Guid.NewGuid();
@@ -82,16 +76,6 @@ namespace Core.DomainModel
         }
 
         /// <summary>
-        ///     The project rights for the user
-        /// </summary>
-        public virtual ICollection<ItProjectRight> ItProjectRights { get; set; }
-
-        public IEnumerable<ItProjectRight> GetItProjectRights(Guid organizationId)
-        {
-            return ItProjectRights.Where(x => x.Object.Organization.Uuid == organizationId);
-        }
-
-        /// <summary>
         ///     The system rights for the user
         /// </summary>
         public virtual ICollection<ItSystemRight> ItSystemRights { get; set; }
@@ -115,26 +99,6 @@ namespace Core.DomainModel
         ///     Passwords reset request issued for the user
         /// </summary>
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the <see cref="Assignment" /> or <see cref="Milestone" /> associated with this user
-        /// </summary>
-        public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
-
-        /// <summary>
-        ///     Risks associated with this user
-        /// </summary>
-        public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
-
-        /// <summary>
-        ///     Communications associated with this user
-        /// </summary>
-        public virtual ICollection<Communication> ResponsibleForCommunications { get; set; }
-
-        /// <summary>
-        ///     Handovers associated with this user
-        /// </summary>
-        public virtual ICollection<Handover> HandoverParticipants { get; set; }
 
         public virtual ICollection<SsoUserIdentity> SsoIdentities { get; set; }
 

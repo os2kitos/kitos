@@ -207,21 +207,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
-        public void Map_General_Data_Properties_Resets_AssociatedProjects_If_SourceValue_Not_Defined()
-        {
-            //Arrange
-            var input = A<GeneralDataUpdateRequestDTO>();
-            input.AssociatedProjectUuids = null;
-
-            //Act
-            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO { General = input });
-
-            //Assert
-            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
-            AssertPropertyContainsResetDataChange(mappedGeneralSection.AssociatedProjectUuids);
-        }
-
-        [Fact]
         public void Can_Map_General_Data_Update_Properties()
         {
             //Arrange
@@ -633,7 +618,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceActive,
             bool noValidFrom,
             bool noValidTo,
-            bool noAssociatedProjectUuids,
             bool noMainContractUuid)
         {
             //Arrange
@@ -648,7 +632,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noEnforceActive,
                 noValidFrom,
                 noValidTo,
-                noAssociatedProjectUuids,
                 noMainContractUuid);
 
             //Act
@@ -665,7 +648,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noEnforceActive, generalSection.EnforceActive.IsUnchanged);
             Assert.Equal(noValidFrom, generalSection.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, generalSection.ValidTo.IsUnchanged);
-            Assert.Equal(noAssociatedProjectUuids, generalSection.AssociatedProjectUuids.IsUnchanged);
             Assert.Equal(noMainContractUuid, generalSection.MainContractUuid.IsUnchanged);
         }
 
@@ -682,7 +664,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceActive,
             bool noValidFrom,
             bool noValidTo,
-            bool noAssociatedProjectUuids,
             bool noMainContractUuid)
         {
             //Arrange
@@ -697,7 +678,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noEnforceActive,
                 noValidFrom,
                 noValidTo,
-                noAssociatedProjectUuids,
                 noMainContractUuid);
 
             //Act
@@ -714,7 +694,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(generalSection.EnforceActive.HasChange);
             Assert.True(generalSection.ValidFrom.HasChange);
             Assert.True(generalSection.ValidTo.HasChange);
-            Assert.True(generalSection.AssociatedProjectUuids.HasChange);
             Assert.True(generalSection.MainContractUuid.HasChange);
         }
 
@@ -1073,7 +1052,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedGeneralSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(11);
+            return CreateGetUndefinedSectionsInput(10);
         }
 
         public static IEnumerable<object[]> GetUndefinedOrganizationUsageSectionsInput()
@@ -1210,7 +1189,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceActive,
             bool noValidFrom,
             bool noValidTo,
-            bool noAssociatedProjectUuids,
             bool noMainContractUuid)
         {
             var generalProperties = GetAllInputPropertyNames<GeneralDataUpdateRequestDTO>();
@@ -1220,7 +1198,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noNotes) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.Notes));
             if (noSystemVersion) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.SystemVersion));
             if (noNumberOfExpectedUsers) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.NumberOfExpectedUsers));
-            if (noAssociatedProjectUuids) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.AssociatedProjectUuids));
             if (noMainContractUuid) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.MainContractUuid));
 
             var validityProperties = GetAllInputPropertyNames<ValidityWriteRequestDTO>();
@@ -1263,7 +1240,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.LocalCallName, AssertPropertyContainsDataChange(output.LocalCallName));
             Assert.Equal(input.LocalSystemId, AssertPropertyContainsDataChange(output.LocalSystemId));
             Assert.Equal(input.SystemVersion, AssertPropertyContainsDataChange(output.SystemVersion));
-            Assert.Equal(input.AssociatedProjectUuids, AssertPropertyContainsDataChange(output.AssociatedProjectUuids));
             Assert.Equal(input.DataClassificationUuid, AssertPropertyContainsDataChange(output.DataClassificationUuid));
             Assert.Equal(input.Validity?.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceActive));
             Assert.Equal(input.Validity?.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));

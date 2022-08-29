@@ -7,7 +7,6 @@ type HeaderButtons = {
     useFilter: protractor.ElementFinder,
     deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
-    createProject: protractor.ElementFinder,
     systemCatalogCreate: protractor.ElementFinder,
     createDpa: protractor.ElementFinder,
     editReference: protractor.ElementFinder,
@@ -39,7 +38,6 @@ type ColumnHeaders = {
 };
 
 type ColumnObjects = {
-    projectName: protractor.ElementArrayFinder,
     systemName: protractor.ElementArrayFinder,
     referenceName: protractor.ElementArrayFinder,
     referenceId: protractor.ElementArrayFinder,
@@ -70,7 +68,6 @@ class kendoToolbarWrapper {
             useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
             deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
             createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
-            createProject: element(byDataElementType(consts.kendoProjectButtonCreateProject)),
             systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
             createDpa: element(byDataElementType(consts.kendoDpaButtonCreate)),
             createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
@@ -115,7 +112,6 @@ class kendoToolbarWrapper {
         var kendo = new kendoHelper();
 
         var columns: ColumnObjects = {
-            projectName: kendo.getColumnItemLinks(consts.kendoProjectNameObjects),
             systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
             contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
             catalogName: kendo.getColumnItemLinks(consts.kendoCatalogNameObjects),

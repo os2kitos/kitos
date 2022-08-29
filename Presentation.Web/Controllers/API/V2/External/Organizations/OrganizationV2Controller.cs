@@ -281,7 +281,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                     {OrganizationRole.User, OrganizationUserRole.User},
                     {OrganizationRole.LocalAdmin, OrganizationUserRole.LocalAdmin},
                     {OrganizationRole.OrganizationModuleAdmin, OrganizationUserRole.OrganizationModuleAdmin},
-                    {OrganizationRole.ProjectModuleAdmin, OrganizationUserRole.ProjectModuleAdmin},
                     {OrganizationRole.SystemModuleAdmin, OrganizationUserRole.SystemModuleAdmin},
                     {OrganizationRole.ContractModuleAdmin, OrganizationUserRole.ContractModuleAdmin},
                     {OrganizationRole.RightsHolderAccess, OrganizationUserRole.RightsHolderAccess}

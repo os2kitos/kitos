@@ -81,7 +81,6 @@
     <Compile Include="Mapping\ItSystemUsageOverviewArchivePeriodReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
-    <Compile Include="Mapping\ItSystemUsageOverviewItProjectReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewUsingSystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewUsedBySystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
@@ -103,7 +102,6 @@
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveLocationMap.cs" />
     <Compile Include="Mapping\ArchiveTypeMap.cs" />
-    <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ExternalReferenceMap.cs" />
     <Compile Include="Mapping\ItContractAgreementElementTypeMap.cs" />
@@ -118,8 +116,6 @@
     <Compile Include="Mapping\ItContractItSystemUsageMap.cs" />
     <Compile Include="Mapping\ItInterfaceMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOrgUnitUsageMap.cs" />
-    <Compile Include="Mapping\ItProjectOrgUnitUsageMap.cs" />
-    <Compile Include="Mapping\ItProjectStatusMap.cs" />
     <Compile Include="Mapping\EntityMap.cs" />
     <Compile Include="Mapping\EconomyStreamMap.cs" />
     <Compile Include="Mapping\OptionEntityMap.cs" />
@@ -127,9 +123,7 @@
     <Compile Include="Mapping\PaymentModelTypeMap.cs" />
     <Compile Include="Mapping\PriceRegulationTypeMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyTypeMap.cs" />
-    <Compile Include="Mapping\GoalTypeMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
-    <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
@@ -139,27 +133,18 @@
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRoleMap.cs" />
-    <Compile Include="Mapping\GoalMap.cs" />
-    <Compile Include="Mapping\GoalStatusMap.cs" />
-    <Compile Include="Mapping\HandoverMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
     <Compile Include="Mapping\ItContractRightMap.cs" />
     <Compile Include="Mapping\ItContractRoleMap.cs" />
-    <Compile Include="Mapping\ItProjectMap.cs" />
-    <Compile Include="Mapping\ItProjectRightMap.cs" />
-    <Compile Include="Mapping\ItProjectRoleMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
     <Compile Include="Mapping\ItSystemRightMap.cs" />
     <Compile Include="Mapping\ItSystemRoleMap.cs" />
     <Compile Include="Mapping\TaskRefMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
-    <Compile Include="Mapping\ItProjectTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormTypeMap.cs" />
-    <Compile Include="Mapping\RiskMap.cs" />
     <Compile Include="Mapping\AdviceMap.cs" />
-    <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UIModuleCustomizationMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
@@ -913,6 +898,10 @@
     <Compile Include="Migrations\202208211025538_fix_advice_role_relations.designer.cs">
       <DependentUpon>202208211025538_fix_advice_role_relations.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202208250848514_Remove_Project_Module.cs" />
+    <Compile Include="Migrations\202208250848514_Remove_Project_Module.designer.cs">
+      <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1512,6 +1501,9 @@
     <EmbeddedResource Include="Migrations\202208211025538_fix_advice_role_relations.resx">
       <DependentUpon>202208211025538_fix_advice_role_relations.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202208250848514_Remove_Project_Module.resx">
+      <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1528,9 +1520,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
   </ItemGroup>
@@ -1593,6 +1583,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_AdviceUserRelations_Role_Relationships.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\External references restore.sql" />
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\Orphan delete SQL.sql" />
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\ProdHangfireAdviceUpdate.sql" />
+    <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\UpdateHangfireWithNewJobs.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

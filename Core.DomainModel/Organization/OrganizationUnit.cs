@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -19,7 +18,6 @@ namespace Core.DomainModel.Organization
             OwnedTasks = new List<TaskRef>();
             DefaultUsers = new List<OrganizationRight>();
             Using = new List<ItSystemUsageOrgUnitUsage>();
-            UsingItProjects = new List<ItProjectOrgUnitUsage>();
             Uuid = Guid.NewGuid();
         }
 
@@ -76,11 +74,6 @@ namespace Core.DomainModel.Organization
         /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
         /// </summary>
         public virtual ICollection<ItSystemUsageOrgUnitUsage> Using { get; set; }
-
-        /// <summary>
-        /// This Organization Unit is using these IT projects
-        /// </summary>
-        public virtual ICollection<ItProjectOrgUnitUsage> UsingItProjects { get; set; }
 
         /// <summary>
         /// This Organization Unit is responsible for these IT ItContracts

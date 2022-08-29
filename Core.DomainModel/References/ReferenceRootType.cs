@@ -2,10 +2,10 @@
 {
     public enum ReferenceRootType
     {
-        System,
-        SystemUsage,
-        Contract,
-        Project,
-        DataProcessingRegistration
+        System = 0,
+        SystemUsage = 1,
+        Contract = 2,
+        //3 used to be project
+        DataProcessingRegistration = 4
     }
 }

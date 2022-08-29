@@ -104,8 +104,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces
         [Theory, Description("Global admin can create with any access, system/local admin with local access only and the rest are not allowed")]
         [InlineData(OrganizationRole.ContractModuleAdmin, AccessModifier.Public, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, AccessModifier.Local, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, AccessModifier.Public, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, AccessModifier.Local, false)]
         [InlineData(OrganizationRole.User, AccessModifier.Public, false)]
         [InlineData(OrganizationRole.User, AccessModifier.Local, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, AccessModifier.Public, false)]

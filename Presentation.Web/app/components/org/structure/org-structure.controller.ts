@@ -515,7 +515,7 @@
                                         $modalScope.submitting = false;
 
                                         notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
-                                                            Organisationsenheden bliver brugt som reference i en eller flere IT Projekter, IT Systemer og/eller IT Kontrakter.<br /><br />
+                                                            Organisationsenheden bliver brugt som reference i en eller flere IT Systemer og/eller IT Kontrakter.<br /><br />
                                                             Fjern referencen for at kunne slette denne enhed.`);
                                     });
 

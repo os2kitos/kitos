@@ -8,13 +8,11 @@ namespace Core.DomainModel
     public class Config : Entity, IIsPartOfOrganization
     {
         /* SHOW/HIDE MODULES */
-        public bool ShowItProjectModule { get; set; }
         public bool ShowItSystemModule { get; set; }
         public bool ShowItContractModule { get; set; }
         public bool ShowDataProcessing { get; set; }
 
         /* SHOW/HIDE 'IT' PREFIX */
-        public bool ShowItProjectPrefix { get; set; }
         public bool ShowItSystemPrefix { get; set; }
         public bool ShowItContractPrefix { get; set; }
 
@@ -32,10 +30,8 @@ namespace Core.DomainModel
             return new Config
             {
                     ShowItContractModule = true,
-                    ShowItProjectModule = true,
                     ShowItSystemModule = true,
                     ShowItContractPrefix = true,
-                    ShowItProjectPrefix = true,
                     ShowItSystemPrefix = true,
                     ShowColumnTechnology = true,
                     ShowColumnUsage = true,

@@ -1,5 +1,4 @@
 ﻿module Kitos.Models {
-    import IItProject = Models.ItProject.IItProject;
     import IItSystem = Models.ItSystem.IItSystem;
     import IItSystemUsage = Models.ItSystemUsage.IItSystemUsage;
 
@@ -22,8 +21,6 @@
         OwnedByOrganizationUnit: IOrganizationUnit;
         Parent: ITaskRef;
         Children: Array<ITaskRef>;
-        /** ItProjects which have been marked with this task */
-        ItProjects: Array<IItProject>;
         /** Usages of this task */
         Usages: Array<ITaskUsage>;
         /** ItSystems which have been marked with this task */

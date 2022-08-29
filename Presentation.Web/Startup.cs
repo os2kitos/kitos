@@ -96,6 +96,12 @@ namespace Presentation.Web
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.ItSystemUsage, CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
                 timeZone: TimeZoneInfo.Local);
+
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.PurgeOrphanedHangfireJobs,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchPurgeOrphanedHangfireJobs(CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
         }
     }
 }

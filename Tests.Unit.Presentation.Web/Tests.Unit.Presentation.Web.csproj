@@ -291,7 +291,6 @@
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />
-    <Compile Include="Services\ItProjectServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />
     <Compile Include="Services\OrganizationRightsServiceTest.cs" />

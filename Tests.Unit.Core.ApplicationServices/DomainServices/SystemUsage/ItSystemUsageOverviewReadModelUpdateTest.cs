@@ -5,7 +5,6 @@ using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
@@ -31,7 +30,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>> _sensitiveDataLevelRepository;
-        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>> _itProjectReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>> _archivePeriodReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>> _dataProcessingReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>> _interfacesReadModelRepository;
@@ -44,7 +42,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _taskRefRepository = new Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>>();
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
-            _itProjectReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>>();
             _archivePeriodReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>>();
             _dataProcessingReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>>();
             _interfacesReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>>();
@@ -53,7 +50,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
                 _sensitiveDataLevelRepository.Object,
-                _itProjectReadModelRepository.Object,
                 _archivePeriodReadModelRepository.Object,
                 _dataProcessingReadModelRepository.Object,
                 _interfacesReadModelRepository.Object,
@@ -138,11 +134,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 Supplier = supplier
             };
-            var project = new ItProject
-            {
-                Id = A<int>(),
-                Name = A<string>()
-            };
             var dataProcessingRegistration = new DataProcessingRegistration()
             {
                 Id = A<int>(),
@@ -210,10 +201,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
                 Concluded = A<DateTime>(),
-                ItProjects = new List<ItProject>
-                {
-                    project
-                },
                 ArchiveDuty = A<ArchiveDutyTypes>(),
                 Registertype = A<bool>(),
                 riskAssessment = DataOptions.YES,
@@ -362,12 +349,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
             Assert.Equal(contract.IsActive, readModel.MainContractIsActive.GetValueOrDefault(false));
             Assert.True(readModel.HasMainContract);
-
-            //Projects
-            Assert.Equal(project.Name, readModel.ItProjectNamesAsCsv);
-            var rmProject = Assert.Single(readModel.ItProjects);
-            Assert.Equal(project.Id, rmProject.ItProjectId);
-            Assert.Equal(project.Name, rmProject.ItProjectName);
 
             //ArchivePeriods
             var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);

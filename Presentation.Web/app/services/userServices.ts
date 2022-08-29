@@ -12,7 +12,6 @@
         isGlobalAdmin: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
-        isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         hasApi: boolean;
@@ -74,10 +73,6 @@
                 return userRight.role == Kitos.API.Models.OrganizationRole.OrganizationModuleAdmin && userRight.organizationId == currOrg.id;
             });
 
-            var isProjectAdmin = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
-                return userRight.role == Kitos.API.Models.OrganizationRole.ProjectModuleAdmin && userRight.organizationId == currOrg.id;
-            });
-
             var isSystemAdmin = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
                 return userRight.role == Kitos.API.Models.OrganizationRole.SystemModuleAdmin && userRight.organizationId == currOrg.id;
             });
@@ -119,7 +114,6 @@
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
                 isOrgAdmin: isOrgAdmin,
-                isProjectAdmin: isProjectAdmin,
                 isSystemAdmin: isSystemAdmin,
                 isContractAdmin: isContractAdmin,
                 orgAndDefaultUnit: orgAndDefaultUnit,

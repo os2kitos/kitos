@@ -13,7 +13,6 @@ using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Model.SystemUsage.Write;
-using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.Events;
@@ -30,7 +29,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IItSystemUsageWriteService _itSystemUsageService;
         private readonly IItSystemService _itSystemService;
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
-        private readonly IItProjectService _projectService;
         private readonly IItInterfaceService _interfaceService;
         private readonly IOrganizationService _organizationService;
         private readonly IDefaultOrganizationResolver _defaultOrganizationResolver;
@@ -42,7 +40,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             IItSystemUsageWriteService itSystemUsageService,
             IItSystemService itSystemService,
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationService,
-            IItProjectService projectService,
             IItInterfaceService interfaceService,
             IOrganizationService organizationService,
             IDefaultOrganizationResolver defaultOrganizationResolver,
@@ -53,7 +50,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _itSystemUsageService = itSystemUsageService;
             _itSystemService = itSystemService;
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
-            _projectService = projectService;
             _interfaceService = interfaceService;
             _organizationService = organizationService;
             _defaultOrganizationResolver = defaultOrganizationResolver;
@@ -160,11 +156,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             var dprs = organization.DataProcessingRegistrations.ToList();
             dprs.ForEach(x => _dataProcessingRegistrationService.Delete(x.Id).ThrowOnFailure());
             organization.DataProcessingRegistrations.Clear();
-
-            //Removing Projects created in the organization
-            var itProjects = organization.ItProjects.ToList();
-            itProjects.ForEach(x => _projectService.DeleteProject(x.Id).ThrowOnFailure());
-            organization.ItProjects.Clear();
 
             //Strip all task usages in the organization
             foreach (var organizationUnit in organization.OrgUnits.ToList())

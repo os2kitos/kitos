@@ -226,7 +226,6 @@
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationOversightOptionsAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Role\DataProcessingRegistrationRoleAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Role\ItContractRoleAssignmentServiceTest.cs" />
-    <Compile Include="DomainServices\Role\ItProjectRoleAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Role\ItSystemUsageRoleAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Role\RoleAssignmentsServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationSystemAssignmentServiceTest.cs" />

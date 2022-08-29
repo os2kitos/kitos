@@ -114,7 +114,6 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
         [Theory]
         [InlineData(TrackedEntityTypeChoice.DataProcessingRegistration)]
         [InlineData(TrackedEntityTypeChoice.ItContract)]
-        [InlineData(TrackedEntityTypeChoice.ItProject)]
         [InlineData(TrackedEntityTypeChoice.ItSystem)]
         [InlineData(TrackedEntityTypeChoice.ItSystemUsage)]
         [InlineData(TrackedEntityTypeChoice.ItInterface)]
@@ -125,13 +124,11 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             var dpr = await CreateDprAsync(token, organization);
             var system = await CreateItItSystemAsync(organization);
             var systemUsage = await CreateItItSystemUsageAsync(token, organization);
-            var project = await CreateItProjectAsync(organization);
             var contract = await CreateItContractAsync(token, organization);
             var itInterface = await CreateItItInterfaceAsync(token, organization);
 
             await DeleteDprAsync(token, dpr);
             await ItContractV2Helper.DeleteContractAsync(token, contract.Uuid);
-            await ItProjectHelper.DeleteProjectAsync(project.Id);
             await ItSystemHelper.DeleteItSystemAsync(system.Id, system.OrganizationId);
             await ItSystemUsageV2Helper.DeleteAsync(token, systemUsage.Uuid);
             await InterfaceHelper.DeleteInterfaceAsync(itInterface.Id);
@@ -156,11 +153,6 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName()
             });
-        }
-
-        private async Task<ItProjectDTO> CreateItProjectAsync(OrganizationDTO organization)
-        {
-            return await ItProjectHelper.CreateProject(CreateName(), organization.Id);
         }
 
         private async Task<ItContractResponseDTO> CreateItContractAsync(string token, OrganizationDTO organization)

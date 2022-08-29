@@ -386,8 +386,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
-            var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
-            var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
             var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
             var request = CreatePostRequest(organization.Uuid, system.Uuid, new GeneralDataWriteRequestDTO
             {
@@ -395,7 +393,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 LocalSystemId = A<string>(),
                 SystemVersion = A<string>(),
                 Notes = A<string>(),
-                AssociatedProjectUuids = new[] { project1.Uuid, project2.Uuid },
                 DataClassificationUuid = dataClassification.Uuid,
                 NumberOfExpectedUsers = new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
                 Validity = new ValidityWriteRequestDTO
@@ -422,9 +419,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(request.General.Validity.ValidTo.GetValueOrDefault().Date, freshReadDTO.General.Validity.ValidTo.GetValueOrDefault().Date);
             Assert.Equal(dataClassification.Uuid, freshReadDTO.General.DataClassification.Uuid);
             Assert.Equal(dataClassification.Name, freshReadDTO.General.DataClassification.Name);
-            var expectedProjects = new[] { new { Uuid = project1.Uuid, Name = project1.Name }, new { Uuid = project2.Uuid, Name = project2.Name } }.OrderBy(x => x.Uuid);
-            var actualProjects = freshReadDTO.General.AssociatedProjects.Select(x => new { Uuid = x.Uuid, Name = x.Name }).OrderBy(x => x.Uuid);
-            Assert.Equal(expectedProjects, actualProjects);
         }
 
         [Fact]
@@ -473,32 +467,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             Assert.Null(freshReadDTO.General.MainContract);
-        }
-
-        [Fact]
-        public async Task Can_PATCH_Modify_Projects()
-        {
-            //Arrange
-            var (token, user, organization, system) = await CreatePrerequisitesAsync();
-            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
-            var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
-            var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
-
-            //Act
-            using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid, project2.Uuid } }).WithExpectedResponseCode(HttpStatusCode.OK);
-            using var modifyResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid } }).WithExpectedResponseCode(HttpStatusCode.OK); //Remove one project
-
-            //Assert
-            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            var project = Assert.Single(freshReadDTO.General.AssociatedProjects);
-            Assert.Equal(project1.Uuid, project.Uuid);
-
-            //Act - reset
-            using var resetResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK);
-
-            //Assert
-            freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            Assert.Empty(freshReadDTO.General.AssociatedProjects);
         }
 
         [Theory]
@@ -1680,10 +1648,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
         private async Task<(GeneralDataWriteRequestDTO, OrgUnitDTO, OrganizationUsageWriteRequestDTO, Guid[], Guid[], LocalKLEDeviationsRequestDTO, IEnumerable<ExternalReferenceDataDTO>, IEnumerable<RoleAssignmentRequestDTO>, GDPRWriteRequestDTO, ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
         {
-            var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
-            var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
             var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
-            var generalData = CreateGeneralDataWriteRequestDTO(dataClassification.Uuid, new Guid[] { project1.Uuid, project2.Uuid });
+            var generalData = CreateGeneralDataWriteRequestDTO(dataClassification.Uuid);
 
             var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
             var organizationUsageData = CreateOrganizationUsageWriteRequestDTO(new Guid[] { unit1.Uuid }, unit1.Uuid);
@@ -1732,7 +1698,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Assert.Equal(expected.Validity.ValidFrom.GetValueOrDefault().Date, actual.Validity.ValidFrom.GetValueOrDefault().Date);
                 Assert.Equal(expected.Validity.ValidTo.GetValueOrDefault().Date, actual.Validity.ValidTo.GetValueOrDefault().Date);
                 Assert.Equal(expected.DataClassificationUuid, actual.DataClassification.Uuid);
-                Assert.Equal(expected.AssociatedProjectUuids.OrderBy(x => x), actual.AssociatedProjects.Select(x => x.Uuid).OrderBy(x => x));
             }
             else
             {
@@ -1743,7 +1708,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Assert.Null(actual.Validity.ValidTo);
 
                 Assert.Null(actual.DataClassification);
-                Assert.Empty(actual.AssociatedProjects);
             }
         }
 
@@ -1800,7 +1764,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             yield return (100, null);
         }
 
-        private GeneralDataWriteRequestDTO CreateGeneralDataWriteRequestDTO(Guid dataClassificationUuid, Guid[] projectUuids)
+        private GeneralDataWriteRequestDTO CreateGeneralDataWriteRequestDTO(Guid dataClassificationUuid)
         {
             return new GeneralDataWriteRequestDTO
             {
@@ -1808,7 +1772,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 LocalSystemId = A<string>(),
                 SystemVersion = A<string>(),
                 Notes = A<string>(),
-                AssociatedProjectUuids = projectUuids,
                 DataClassificationUuid = dataClassificationUuid,
                 NumberOfExpectedUsers = GetValidIntervals()
                     .RandomItem()
@@ -2088,7 +2051,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var generalUpdateRequest = new GeneralDataUpdateRequestDTO()
             {
-                AssociatedProjectUuids = generalSection.AssociatedProjectUuids,
                 DataClassificationUuid = generalSection.DataClassificationUuid,
                 LocalCallName = generalSection.LocalCallName,
                 LocalSystemId = generalSection.LocalSystemId,
