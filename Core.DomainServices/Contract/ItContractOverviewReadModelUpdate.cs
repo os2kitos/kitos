@@ -8,10 +8,12 @@ namespace Core.DomainServices.Contract
     {
         public void Apply(ItContract source, ItContractOverviewReadModel destination)
         {
-            PatchBasicInformation(source, destination);
+            destination.Name = source.Name;
+
+            PatchSourceRelationshipInformation(source, destination);
         }
 
-        private static void PatchBasicInformation(ItContract source, ItContractOverviewReadModel destination)
+        private static void PatchSourceRelationshipInformation(ItContract source, ItContractOverviewReadModel destination)
         {
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;

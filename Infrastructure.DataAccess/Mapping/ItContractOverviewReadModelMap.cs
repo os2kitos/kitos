@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -16,6 +17,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(x => x.OverviewReadModels)
                 .HasForeignKey(x => x.SourceEntityId)
                 .WillCascadeOnDelete(true);
+
+            Property(x => x.Name)
+                .HasMaxLength(ItContractConstraints.MaxNameLength)
+                .HasIndexAnnotation("IX_Contract_Name", 0);
         }
     }
 }
