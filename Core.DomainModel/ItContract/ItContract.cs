@@ -8,7 +8,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
-
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
 
@@ -350,6 +350,10 @@ namespace Core.DomainModel.ItContract
         ///     The criticality.
         /// </value>
         public virtual CriticalityType Criticality { get; set; }
+        /// <summary>
+        /// Read models
+        /// </summary>
+        public virtual ICollection<ItContractOverviewReadModel> OverviewReadModels { get; set; }
 
         #endregion
 

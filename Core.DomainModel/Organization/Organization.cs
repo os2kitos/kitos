@@ -5,6 +5,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
@@ -131,6 +132,8 @@ namespace Core.DomainModel.Organization
         /// Determines if this is the "Default" organization in KITOS
         /// </summary>
         public bool? IsDefaultOrganization { get; set; }
+
+        public virtual ICollection<ItContractOverviewReadModel> ItContractOverviewReadModels { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

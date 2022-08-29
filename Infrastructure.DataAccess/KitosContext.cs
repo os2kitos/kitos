@@ -12,6 +12,7 @@ using Core.DomainModel.LocalOptions;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.KendoConfig;
@@ -26,6 +27,7 @@ namespace Infrastructure.DataAccess
 {
     public class KitosContext : DbContext
     {
+        //TODO: Check if we can just remove all of the properties or if it has a consequence because we don't need them when we use generic repo
         public KitosContext() : this("KitosContext") { }
 
         public KitosContext(string nameOrConnectionString)
@@ -154,6 +156,8 @@ namespace Infrastructure.DataAccess
         public DbSet<UIModuleCustomization> UIModuleCustomizations { get; set; }
         public DbSet<CustomizedUINode> CustomizedUiNodes{ get; set; }
 
+        public DbSet<ItContractOverviewReadModel> ItContractOverviewReadModels { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             // it's not possible to remove individual cascading deletes pr M:M relation
@@ -245,6 +249,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new UIModuleCustomizationMap());
             modelBuilder.Configurations.Add(new CustomizedUINodeMap());
             modelBuilder.Configurations.Add(new AdviceUserRelationMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewReadModelMap());
         }
     }
 }
