@@ -1,8 +1,6 @@
-﻿<div class="row">
-    <label data-ng-if="label" for="{{ id }}" class="control-label small">{{ label }}</label>
-    <input-help-text key="{{helpTextKey}}" cssClass="small"></input-help-text>
-</div>
-<input type="hidden" 
+﻿<label data-ng-if="label" for="{{ id }}" class="control-label small">{{ label }} <field-help-text ng-if="isKeyDefined" key="{{helpTextKey}}"></field-help-text></label>
+
+<input type="hidden"
        id="{{ id }}"
        class="form-control input-sm"
        data-ui-select2="select2Config"
@@ -12,4 +10,5 @@
        data-field="{{ field }}"
        ng-disabled="disabled"
        data-ng-required="required">
+
 <span ng-if="optionDescription" class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> {{ optionDescription }}</span>
