@@ -5,6 +5,7 @@ using Infrastructure.Services.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
 using Ninject;
 using Presentation.Web.Ninject;
+using Serilog;
 
 namespace Presentation.Web.Hangfire
 {
@@ -22,10 +23,18 @@ namespace Presentation.Web.Hangfire
             using var combinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.ShutdownToken, context.StoppingToken);
             using (new HangfireNinjectResolutionScope(_kernel))
             {
-                var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
-                PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource);
-                ScheduleUpdatesCausedByDependencyChanges(backgroundJobLauncher, combinedTokenSource);
-                ProcessPendingUpdates(backgroundJobLauncher, combinedTokenSource);
+                var logger = _kernel.GetRequiredService<ILogger>();
+                try
+                {
+                    var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
+                    PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource);
+                    ScheduleUpdatesCausedByDependencyChanges(backgroundJobLauncher, combinedTokenSource);
+                    ProcessPendingUpdates(backgroundJobLauncher, combinedTokenSource);
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e, "Failed during read model update process.");
+                }
             }
 
             CoolDown();
