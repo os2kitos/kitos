@@ -27,7 +27,6 @@ namespace Infrastructure.DataAccess
 {
     public class KitosContext : DbContext
     {
-        //TODO: Check if we can just remove all of the properties or if it has a consequence because we don't need them when we use generic repo
         public KitosContext() : this("KitosContext") { }
 
         public KitosContext(string nameOrConnectionString)
@@ -155,7 +154,6 @@ namespace Infrastructure.DataAccess
         public DbSet<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
         public DbSet<UIModuleCustomization> UIModuleCustomizations { get; set; }
         public DbSet<CustomizedUINode> CustomizedUiNodes{ get; set; }
-
         public DbSet<ItContractOverviewReadModel> ItContractOverviewReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
