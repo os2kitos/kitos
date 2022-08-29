@@ -11,10 +11,9 @@
                 },
                 controller: [
                     "$scope", "$uibModal", "helpTextService", "userService", ($scope, $uibModal, helpTextService: Kitos.Services.IHelpTextService, userService) => {
-
                         $scope.showHelpTextModal = () =>
                             Kitos.Helpers.HelpTextModalHelper.openHelpTextModal($uibModal,
-                                $scope,
+                                $scope.key,
                                 helpTextService,
                                 userService);
                     }]

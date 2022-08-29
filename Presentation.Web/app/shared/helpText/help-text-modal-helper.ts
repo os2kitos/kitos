@@ -1,12 +1,10 @@
 ﻿module Kitos.Helpers {
-
     export class HelpTextModalHelper {
-        static openHelpTextModal($uibModal: any, parent: any, helpTextService: Kitos.Services.IHelpTextService, userService: any) {
+        static openHelpTextModal($uibModal: any, helpTextKey: string, helpTextService: Kitos.Services.IHelpTextService, userService: Kitos.Services.IUserService) {
             return $uibModal.open({
                 windowClass: "modal fade in",
                 templateUrl: "app/shared/helpText/helpTextModal.view.html",
                 controller: ["$scope", "$uibModalInstance", ($scope, $uibModalInstance) => {
-                    const helpTextKey = parent.key;
 
                     userService.getUser()
                         .then(user => {
