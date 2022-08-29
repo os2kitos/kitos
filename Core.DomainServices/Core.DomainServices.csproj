@@ -134,6 +134,8 @@
     <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
+    <Compile Include="Repositories\Contract\IItContractOverviewReadModelRepository.cs" />
+    <Compile Include="Repositories\Contract\ItContractOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Notification\IUserNotificationRepository.cs" />

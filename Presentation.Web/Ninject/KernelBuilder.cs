@@ -544,6 +544,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationRepository>().To<UserNotificationRepository>().InCommandScope(Mode);
             kernel.Bind<ITaskRefRepository>().To<TaskRefRepository>().InCommandScope(Mode);
+
+            kernel.Bind<IItContractOverviewReadModelRepository>().To<ItContractOverviewReadModelRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
