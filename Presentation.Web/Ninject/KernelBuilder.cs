@@ -9,6 +9,7 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Contract.ReadModels;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.GDPR.Write;
@@ -110,6 +111,7 @@ using Core.ApplicationServices.Tracking;
 using Core.ApplicationServices.UIConfiguration;
 using Core.ApplicationServices.UIConfiguration.Handlers;
 using Core.BackgroundJobs.Model.Maintenance;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainServices.Repositories.UICustomization;
 using Core.DomainServices.Tracking;
 using Infrastructure.STS.Company.DomainServices;
@@ -208,6 +210,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
             kernel.Bind<IItContractService>().To<ItContractService>().InCommandScope(Mode);
             kernel.Bind<IItContractWriteService>().To<ItContractWriteService>().InCommandScope(Mode);
+            kernel.Bind<IItContractOverviewReadModelsService>().To<ItContractOverviewReadModelsService>().InCommandScope(Mode);
+            kernel.Bind<IReadModelUpdate<ItContract, ItContractOverviewReadModel>>().To<ItContractOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InCommandScope(Mode);
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InCommandScope(Mode).Intercept().With(new LogInterceptor());
@@ -378,6 +382,12 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+
+            //TODO: Create helper to register all IHandlesDomaniEvent implementations on the object!
+            //ItContract overview updates
+            RegisterDomainEvent<EntityCreatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
 
             //Dirty marking
             RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);

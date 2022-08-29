@@ -60,8 +60,10 @@
     <Compile Include="Context\FallbackUserResolver.cs" />
     <Compile Include="Context\IDefaultOrganizationResolver.cs" />
     <Compile Include="Context\IFallbackUserResolver.cs" />
+    <Compile Include="Contract\BuildItContractOverviewReadModelOnChangesHandler.cs" />
     <Compile Include="Contract\ContractDataProcessingRegistrationAssignmentService.cs" />
     <Compile Include="Contract\IContractDataProcessingRegistrationAssignmentService.cs" />
+    <Compile Include="Contract\ItContractOverviewReadModelUpdate.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationBasisForTransferAssignmentService.cs" />

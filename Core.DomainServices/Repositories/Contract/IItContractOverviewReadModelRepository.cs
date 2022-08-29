@@ -7,5 +7,7 @@ namespace Core.DomainServices.Repositories.Contract
     {
         IQueryable<ItContractOverviewReadModel> GetByOrganizationId(int organizationId);
         IQueryable<ItContractOverviewReadModel> GetByOrganizationAndResponsibleOrganizationUnitId(int organizationId, int responsibleOrganizationUnit);
+        ItContractOverviewReadModel Add(ItContractOverviewReadModel model);
+        void DeleteBySourceId(int sourceEntityId);
     }
 }

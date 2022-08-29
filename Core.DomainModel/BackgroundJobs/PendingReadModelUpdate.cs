@@ -4,6 +4,7 @@ namespace Core.DomainModel.BackgroundJobs
 {
     public enum PendingReadModelUpdateSourceCategory
     {
+        //DPR
         DataProcessingRegistration = 0,
         DataProcessingRegistration_User = 1,
         DataProcessingRegistration_ItSystem = 2,
@@ -12,6 +13,8 @@ namespace Core.DomainModel.BackgroundJobs
         DataProcessingRegistration_DataResponsible = 5,
         DataProcessingRegistration_OversightOption = 6,
         DataProcessingRegistration_ItContract = 7,
+        
+        //IT-System usage
         ItSystemUsage = 8,
         ItSystemUsage_ItSystem = 9,
         ItSystemUsage_User = 10,
@@ -22,7 +25,10 @@ namespace Core.DomainModel.BackgroundJobs
         ItSystemUsage_Contract = 15,
         //16 used to be ItSystemUsage_Project
         ItSystemUsage_DataProcessingRegistration = 17,
-        ItSystemUsage_ItInterface = 18
+        ItSystemUsage_ItInterface = 18,
+        
+        //IT-Contract
+        ItContract = 50
     }
 
     public class PendingReadModelUpdate : IHasId

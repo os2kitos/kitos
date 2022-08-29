@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Organization;
@@ -27,6 +29,34 @@ namespace Core.DomainServices.Repositories.Contract
             //return GetByOrganizationId(organizationId)
             //    .Where(model => model.ResponsibleOrganizationUnitId != null && orgUnitTreeIds.Contains(model.ResponsibleOrganizationUnitId.Value));
             return Enumerable.Empty<ItContractOverviewReadModel>().AsQueryable(); //TODO: Implement once we have the responsible org unit
+        }
+
+        public ItContractOverviewReadModel Add(ItContractOverviewReadModel model)
+        {
+            var existing = GetBySourceId(model.SourceEntityId);
+
+            if (existing.HasValue)
+                throw new InvalidOperationException("Only one read model per contract entity is allowed");
+
+            var inserted = _repository.Insert(model);
+            _repository.Save();
+            return inserted;
+        }
+
+        public void DeleteBySourceId(int sourceId)
+        {
+            var readModel = GetBySourceId(sourceId);
+            if (readModel.HasValue)
+            {
+                //Delete read models - if any found
+                _repository.DeleteWithReferencePreload(readModel.Value);
+                _repository.Save();
+            }
+        }
+
+        public Maybe<ItContractOverviewReadModel> GetBySourceId(int sourceId)
+        {
+            return _repository.AsQueryable().FirstOrDefault(x => x.SourceEntityId == sourceId);
         }
     }
 }
