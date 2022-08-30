@@ -1,4 +1,7 @@
-﻿using Core.DomainModel.ItContract;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainServices.Model;
 
@@ -88,24 +91,77 @@ namespace Core.DomainServices.Contract
             destination.TerminationDeadlineName = source.TerminationDeadline?.Name;
         }
 
-        private void MapDuration(ItContract source, ItContractOverviewReadModel destination)
+        private static void MapDuration(ItContract source, ItContractOverviewReadModel destination)
         {
+            var result = "";
+
             //public string Duration { get; set; }
-            //TODO
+            if (source.DurationOngoing)
+            {
+                result = "Løbende";
+            }
+            else
+            {
+                var years = source.DurationYears;
+                var months = source.DurationMonths;
+
+                if (years.GetValueOrDefault(0) > 0)
+                {
+                    result += $"{years} år";
+                    if (months > 0)
+                    {
+                        result += " og ";
+                    }
+                }
+                if (months.GetValueOrDefault(0) > 0)
+                {
+                    result += $"{months} måned";
+                    if (months > 1)
+                    {
+                        result += "er";
+                    }
+                }
+            }
+
+            destination.Duration = result;
         }
 
         private void MapEconomyStreams(ItContract source, ItContractOverviewReadModel destination)
         {
-            //public int? AccumulatedAcquisitionCost { get; set; }
-            //public int? AccumulatedOperationCost { get; set; }
-            //public int? AccumulatedOtherCost { get; set; }
-            //public DateTime? LatestAuditDate { get; set; }
-            //public int? AuditStatusWhite { get; set; }
-            //public int? AuditStatusRed { get; set; }
-            //public int? AuditStatusYellow { get; set; }
-            //public int? AuditStatusGreen { get; set; }
-            //public int? AuditStatusMax { get; set; }
-            //TODO
+            var statuses = new Dictionary<TrafficLight, int>()
+            {
+                {TrafficLight.Green,0},
+                {TrafficLight.Red,0},
+                {TrafficLight.Yellow,0},
+                {TrafficLight.White,0}
+            };
+            if (source.ExternEconomyStreams.Any())
+            {
+                foreach (var economyStream in source.ExternEconomyStreams)
+                {
+                    destination.AccumulatedAcquisitionCost += economyStream.Acquisition;
+                    destination.AccumulatedOperationCost += economyStream.Operation;
+                    destination.AccumulatedOtherCost += economyStream.Other;
+                    statuses[economyStream.AuditStatus]++;
+
+                    var latestAuditDateBeforeUpdate = destination.LatestAuditDate;
+                    var currentStreamAuditDate = economyStream.AuditDate;
+                    if (latestAuditDateBeforeUpdate == null)
+                    {
+                        destination.LatestAuditDate = currentStreamAuditDate;
+                    }
+                    else if (currentStreamAuditDate != null && latestAuditDateBeforeUpdate.Value < currentStreamAuditDate.Value)
+                    {
+                        destination.LatestAuditDate = currentStreamAuditDate;
+                    }
+                }
+
+                destination.AuditStatusGreen = statuses[TrafficLight.Green];
+                destination.AuditStatusWhite = statuses[TrafficLight.White];
+                destination.AuditStatusRed = statuses[TrafficLight.Red];
+                destination.AuditStatusYellow = statuses[TrafficLight.Yellow];
+                destination.AuditStatusMax = statuses.Sum(x => x.Value);
+            }
         }
 
         private void MapSystemUsages(ItContract source, ItContractOverviewReadModel destination)
