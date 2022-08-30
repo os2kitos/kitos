@@ -78,6 +78,9 @@
     <Compile Include="Mapping\DataProcessingDataResponsibleOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewReadModelDataProcessingAgreementMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewReadModelItSystemUsageMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewArchivePeriodReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
@@ -903,13 +906,9 @@
     <Compile Include="Migrations\202208250848514_Remove_Project_Module.designer.cs">
       <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202208290606417_Add_ItContractOverviewReadModel.cs" />
-    <Compile Include="Migrations\202208290606417_Add_ItContractOverviewReadModel.designer.cs">
-      <DependentUpon>202208290606417_Add_ItContractOverviewReadModel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202208291252113_Extend_ItContractOverviewReadModel_With_Name.cs" />
-    <Compile Include="Migrations\202208291252113_Extend_ItContractOverviewReadModel_With_Name.designer.cs">
-      <DependentUpon>202208291252113_Extend_ItContractOverviewReadModel_With_Name.cs</DependentUpon>
+    <Compile Include="Migrations\202208300834231_Add_ItContractOverviewReadModel.cs" />
+    <Compile Include="Migrations\202208300834231_Add_ItContractOverviewReadModel.designer.cs">
+      <DependentUpon>202208300834231_Add_ItContractOverviewReadModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1513,11 +1512,8 @@
     <EmbeddedResource Include="Migrations\202208250848514_Remove_Project_Module.resx">
       <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202208290606417_Add_ItContractOverviewReadModel.resx">
-      <DependentUpon>202208290606417_Add_ItContractOverviewReadModel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202208291252113_Extend_ItContractOverviewReadModel_With_Name.resx">
-      <DependentUpon>202208291252113_Extend_ItContractOverviewReadModel_With_Name.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202208300834231_Add_ItContractOverviewReadModel.resx">
+      <DependentUpon>202208300834231_Add_ItContractOverviewReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

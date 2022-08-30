@@ -153,8 +153,11 @@ namespace Infrastructure.DataAccess
         public DbSet<ItInterface> ItInterfaces { get; set; }
         public DbSet<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
         public DbSet<UIModuleCustomization> UIModuleCustomizations { get; set; }
-        public DbSet<CustomizedUINode> CustomizedUiNodes{ get; set; }
+        public DbSet<CustomizedUINode> CustomizedUiNodes { get; set; }
         public DbSet<ItContractOverviewReadModel> ItContractOverviewReadModels { get; set; }
+        public DbSet<ItContractOverviewReadModelDataProcessingAgreement> ItContractOverviewReadModelDataProcessingAgreements { get; set; }
+        public DbSet<ItContractOverviewReadModelItSystemUsage> ItContractOverviewReadModelItSystemUsages { get; set; }
+        public DbSet<ItContractOverviewRoleAssignmentReadModel> ItContractOverviewRoleAssignmentReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -248,6 +251,9 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new CustomizedUINodeMap());
             modelBuilder.Configurations.Add(new AdviceUserRelationMap());
             modelBuilder.Configurations.Add(new ItContractOverviewReadModelMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewReadModelDataProcessingAgreementMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewReadModelItSystemUsageMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewRoleAssignmentReadModelMap());
         }
     }
 }

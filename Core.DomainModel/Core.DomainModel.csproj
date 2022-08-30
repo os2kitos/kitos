@@ -57,6 +57,9 @@
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
     <Compile Include="ItContract\Read\ItContractOverviewReadModel.cs" />
+    <Compile Include="ItContract\Read\ItContractOverviewReadModelItSystemUsage.cs" />
+    <Compile Include="ItContract\Read\ItContractOverviewReadModelDataProcessingAgreement.cs" />
+    <Compile Include="ItContract\Read\ItContractOverviewRoleAssignmentReadModel.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />
     <Compile Include="Events\EntityBeingDeletedEvent.cs" />
