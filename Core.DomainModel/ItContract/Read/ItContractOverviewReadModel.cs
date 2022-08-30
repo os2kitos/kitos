@@ -42,6 +42,7 @@ namespace Core.DomainModel.ItContract.Read
         public string ItSystemUsagesSystemUuidCsv { get; set; } //Used for sorting AND excel output 
         public int NumberOfAssociatedSystemRelations { get; set; }
         public string ActiveReferenceTitle { get; set; }
+        public string ActiveReferenceUrl { get; set; }
         public string ActiveReferenceExternalReferenceId { get; set; }
         public int? AccumulatedAcquisitionCost { get; set; }
         public int? AccumulatedOperationCost { get; set; }

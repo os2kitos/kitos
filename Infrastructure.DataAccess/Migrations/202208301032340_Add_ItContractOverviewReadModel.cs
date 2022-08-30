@@ -40,6 +40,7 @@
                         ItSystemUsagesSystemUuidCsv = c.String(),
                         NumberOfAssociatedSystemRelations = c.Int(nullable: false),
                         ActiveReferenceTitle = c.String(),
+                        ActiveReferenceUrl = c.String(),
                         ActiveReferenceExternalReferenceId = c.String(),
                         AccumulatedAcquisitionCost = c.Int(),
                         AccumulatedOperationCost = c.Int(),

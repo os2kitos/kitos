@@ -35,6 +35,7 @@ namespace Core.DomainModel.ItContract
             UserNotifications = new List<UserNotification>();
             Uuid = Guid.NewGuid();
             MarkAsDirty();
+            AssociatedSystemRelations = new List<SystemRelation>();
         }
 
         public Guid Uuid { get; set; }

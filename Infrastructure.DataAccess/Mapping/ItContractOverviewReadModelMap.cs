@@ -101,6 +101,9 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ActiveReferenceTitle)
                 .IsOptional();
 
+            Property(x => x.ActiveReferenceUrl)
+                .IsOptional();
+
             Property(x => x.ActiveReferenceExternalReferenceId)
                 .IsOptional();
 
