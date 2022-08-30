@@ -5,6 +5,7 @@ using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
 using Core.DomainServices.Model;
@@ -14,10 +15,17 @@ namespace Core.DomainServices.Contract
     public class ItContractOverviewReadModelUpdate : IReadModelUpdate<ItContract, ItContractOverviewReadModel>
     {
         private readonly IGenericRepository<ItContractOverviewRoleAssignmentReadModel> _contractRoleAssignmentRepository;
+        private readonly IGenericRepository<ItContractOverviewReadModelDataProcessingAgreement> _contractDataProcessingAgreementRepository;
+        private readonly IGenericRepository<ItContractOverviewReadModelItSystemUsage> _contractSystemUsageReadModelRepository;
 
-        public ItContractOverviewReadModelUpdate(IGenericRepository<ItContractOverviewRoleAssignmentReadModel> contractRoleAssignmentRepository)
+        public ItContractOverviewReadModelUpdate(
+            IGenericRepository<ItContractOverviewRoleAssignmentReadModel> contractRoleAssignmentRepository,
+            IGenericRepository<ItContractOverviewReadModelDataProcessingAgreement> contractDataProcessingAgreementRepository,
+            IGenericRepository<ItContractOverviewReadModelItSystemUsage> contractSystemUsageReadModelRepository)
         {
             _contractRoleAssignmentRepository = contractRoleAssignmentRepository;
+            _contractDataProcessingAgreementRepository = contractDataProcessingAgreementRepository;
+            _contractSystemUsageReadModelRepository = contractSystemUsageReadModelRepository;
         }
 
         public void Apply(ItContract source, ItContractOverviewReadModel destination)
@@ -197,25 +205,33 @@ namespace Core.DomainServices.Contract
 
         private void MapSystemUsages(ItContract source, ItContractOverviewReadModel destination)
         {
-            //TODO
-            //public ICollection<ItContractOverviewReadModelItSystemUsage> ItSystemUsages { get; set; } //used for generating links and filtering IN collection (we can add index since the name can be constrained)
+            var itSystemUsages = source
+                .AssociatedSystemUsages
+                .Select(x => x.ItSystemUsage)
+                .GroupBy(x => x.Id)
+                .Select(x => x.First()) //guard against any duplicates
+                .ToList();
 
             //TODO: Extract rendering - this is a duplicate of the dpr rendering
-            destination.ItSystemUsagesCsv = string.Join(", ", source.AssociatedSystemUsages.Select(x => (x.ItSystemUsage.ItSystem.Name, x.ItSystemUsage.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
-            destination.ItSystemUsagesSystemUuidCsv = string.Join(", ", source.AssociatedSystemUsages.Select(x => x.ItSystemUsage.ItSystem.Uuid.ToString("D")));
+            destination.ItSystemUsagesCsv = string.Join(", ", itSystemUsages.Select(x => (x.ItSystem.Name, x.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
+            destination.ItSystemUsagesSystemUuidCsv = string.Join(", ", itSystemUsages.Select(x => x.ItSystem.Uuid.ToString("D")));
+
+            //TODO: The collection - remember both id,systemName, and disabld state should be in the comparison key and then also in the read model state
         }
 
         private void MapDataProcessingAgreements(ItContract source, ItContractOverviewReadModel destination)
         {
-            //return dpr.IsAgreementConcluded && Models.Api.Shared.YesNoIrrelevantOption[dpr.IsAgreementConcluded] === Models.Api.Shared.YesNoIrrelevantOption.YES;
             var dataProcessingAgreements = source
                 .DataProcessingRegistrations
                 .Where(x => x.IsAgreementConcluded == YesNoIrrelevantOption.YES)
+                .GroupBy(x => x.Id)
+                .Select(x => x.First()) //guard against any duplicates
                 .ToList();
 
+            //CSV field
             destination.DataProcessingAgreementsCsv = string.Join(", ", dataProcessingAgreements.Select(x => x.Name));
-            //TODO
-            //public ICollection<ItContractOverviewReadModelDataProcessingAgreement> DataProcessingAgreements { get; set; } //used for generating links and filtering IN collection (we can add index since the name can be constrained)
+
+            //TODO: The collection - remember both id and name should be in the key generation for comparision
         }
 
         private void MapRoleAssignments(ItContract source, ItContractOverviewReadModel destination)

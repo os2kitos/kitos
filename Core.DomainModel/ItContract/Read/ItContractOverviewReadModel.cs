@@ -6,6 +6,13 @@ namespace Core.DomainModel.ItContract.Read
 {
     public class ItContractOverviewReadModel : IOwnedByOrganization, IReadModel<ItContract>, IHasName
     {
+        public ItContractOverviewReadModel()
+        {
+            ItSystemUsages = new List<ItContractOverviewReadModelItSystemUsage>();
+            DataProcessingAgreements = new List<ItContractOverviewReadModelDataProcessingAgreement>();
+            RoleAssignments = new List<ItContractOverviewRoleAssignmentReadModel>();
+        }
+
         public int OrganizationId { get; set; }
         public virtual Organization.Organization Organization { get; set; }
         public int Id { get; set; }
