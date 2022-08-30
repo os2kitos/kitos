@@ -14,11 +14,10 @@ namespace Core.DomainModel.ItContract.Read
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public string ContractId { get; set; }
-        public string ParentContractName { get; set; }
-
+        public int? ParentContractId { get; set; } //for linking
+        public string ParentContractName { get; set; } //for presentation
         public int? CriticalityId { get; set; }     // For filtering
         public string CriticalityName { get; set; } // For sorting
-
         public int? ResponsibleOrgUnitId { get; set; }     // For filtering
         public string ResponsibleOrgUnitName { get; set; } // For sorting
         public string SupplierName { get; set; }
