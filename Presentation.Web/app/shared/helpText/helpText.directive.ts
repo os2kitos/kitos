@@ -35,8 +35,7 @@
                 scope: {
                     key: "@",
                     defaultTitle: "@",
-                    noButtonLayout: "@",
-                    test: "@"
+                    noButtonLayout: "@"
                 },
                 controller: HelpTextController,
                 controllerAs: "helpTextVm"
