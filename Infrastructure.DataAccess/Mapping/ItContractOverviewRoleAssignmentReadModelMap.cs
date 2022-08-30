@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItContract.Read;
+using Core.DomainModel.Users;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -13,6 +14,10 @@ namespace Infrastructure.DataAccess.Mapping
 
         Property(x => x.UserId)
             .HasIndexAnnotation("IX_ItContract_Read_User_Id");
+
+        Property(x => x.UserFullName)
+            .HasMaxLength(UserConstraints.MaxNameLength)
+            .HasIndexAnnotation("IX_ItContract_Read_User_Name");
     }
 }
 }

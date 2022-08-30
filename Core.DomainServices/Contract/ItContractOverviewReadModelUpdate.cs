@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Shared;
+using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 
 namespace Core.DomainServices.Contract
@@ -32,7 +35,7 @@ namespace Core.DomainServices.Contract
             destination.IrrevocableTo = source.IrrevocableTo;
             destination.TerminatedAt = source.Terminated;
             destination.LastEditedAtDate = source.LastChanged;
-            destination.LastEditedByUserName = source.LastChangedByUser?.GetFullName();
+            destination.LastEditedByUserName = source.LastChangedByUser?.Transform(GetUserFullName);
 
             //Parent contract
             destination.ParentContractName = source.Parent?.Name;
@@ -251,9 +254,15 @@ namespace Core.DomainServices.Contract
                     destination.RoleAssignments.Add(assignment);
                 }
 
-                assignment.UserFullName = incomingRight.User.GetFullName(); //TODO: Consider adding the same constraint to the size as in the system overview, making it searchable
+                assignment.UserFullName = GetUserFullName(incomingRight.User);
                 assignment.Email = incomingRight.User.Email;
             }
+        }
+
+        private static string GetUserFullName(User user)
+        {
+            var fullName = user?.GetFullName()?.TrimEnd();
+            return fullName?.Substring(0, Math.Min(fullName.Length, UserConstraints.MaxNameLength));
         }
 
         private void RemoveAssignments(ItContractOverviewReadModel destination, List<ItContractOverviewRoleAssignmentReadModel> assignmentsToBeRemoved)

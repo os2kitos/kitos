@@ -5,6 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Users;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -124,7 +125,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_OperationRemunerationBegunDate");
 
             MapOptionTypeReference<PaymentModelType>(p => p.PaymentModelId, p => p.PaymentModelName);
-            
+
             MapOptionTypeReference<PaymentFreqencyType>(p => p.PaymentFrequencyId, p => p.PaymentFrequencyName);
 
             Property(x => x.LatestAuditDate)
@@ -169,7 +170,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_TerminatedAt");
 
             Property(x => x.LastEditedByUserName)
-                .IsOptional();
+                .HasMaxLength(UserConstraints.MaxNameLength)
+                .IsOptional()
+                .HasIndexAnnotation("IX_LastEditedByUserName");
 
             Property(x => x.LastEditedAtDate)
                 .IsOptional()
