@@ -25,10 +25,9 @@ namespace Core.DomainServices.Repositories.Contract
 
         public IQueryable<ItContractOverviewReadModel> GetByOrganizationAndResponsibleOrganizationUnitId(int organizationId, int responsibleOrganizationUnit)
         {
-            //var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(organizationId, responsibleOrganizationUnit).ToList();
-            //return GetByOrganizationId(organizationId)
-            //    .Where(model => model.ResponsibleOrganizationUnitId != null && orgUnitTreeIds.Contains(model.ResponsibleOrganizationUnitId.Value));
-            return Enumerable.Empty<ItContractOverviewReadModel>().AsQueryable(); //TODO: Implement once we have the responsible org unit
+            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(organizationId, responsibleOrganizationUnit).ToList();
+            return GetByOrganizationId(organizationId)
+                .Where(model => model.ResponsibleOrgUnitId != null && orgUnitTreeIds.Contains(model.ResponsibleOrgUnitId.Value));
         }
 
         public ItContractOverviewReadModel Add(ItContractOverviewReadModel model)
