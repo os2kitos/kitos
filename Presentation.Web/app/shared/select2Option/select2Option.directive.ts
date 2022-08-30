@@ -4,7 +4,7 @@
     app.controller("select2OptionController", ["$scope", "entityMapper", "select2LoadingService", function ($scope, entityMapper, select2LoadingService) {
         var options = entityMapper.mapOptionToSelect2ViewModel($scope.options);
 
-        var foundSelectedInOptions = _.find(options, function (option: any) {
+        const foundSelectedInOptions = _.find(options, function (option: any) {
             if ($scope.selectedId === undefined || $scope.selectedId === null) {
                 return false;
             }
