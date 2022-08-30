@@ -1,28 +1,47 @@
-﻿((ng, app) => {
+﻿module Kitos.Shared.Directives.HelpText {
     "use strict";
+    
+    export class FieldHelpTextController {
+        static $inject: Array<string> = [
+            "$scope",
+            "$uibModal",
+            "helpTextService",
+            "userService"
+        ];
+        extraCssClass: string;
+        isKeyDefined: boolean;
+        private readonly key: string;
 
-    app.controller("fieldHelpTextController", ["$scope", "$uibModal", "helpTextService", "userService", function ($scope, $uibModal, helpTextService: Kitos.Services.IHelpTextService, userService) {
-        const vm = this;
-        const key = $scope.key;
-        vm.extraCssClass = $scope.extraCssClass;
+        constructor(
+            private readonly $scope,
+            private readonly $uibModal,
+            private readonly helpTextService: Services.IHelpTextService,
+            private readonly userService) {
 
-        vm.showHelpTextModal = () =>
-            Kitos.Helpers.HelpTextModalHelper.openHelpTextModal($uibModal,
-                key,
-                helpTextService,
-                userService);
-        return vm;
-    }]);
+            this.key = $scope.key;
+            this.isKeyDefined = $scope.key != undefined;
+            this.extraCssClass = $scope.extraCssClass;
+        }
 
-    app.directive("fieldHelpText", [
-        () => ({
-            templateUrl: "app/shared/helpText/fieldHelpText.view.html",
-            scope: {
-                key: "@",
-                extraCssClass: "@"
-            },
-            controller: "fieldHelpTextController",
-            controllerAs: "helpTextVm"
-        })
-    ]);
-})(angular, app);
+        showHelpTextModal = () =>
+            Helpers.HelpTextModalHelper.openHelpTextModal(this.$uibModal,
+                this.key,
+                this.helpTextService,
+                this.userService);
+    }
+
+    angular
+        .module("app")
+        .directive("fieldHelpText",
+            [
+                () => ({
+                    templateUrl: "app/shared/helpText/fieldHelpText.view.html",
+                    scope: {
+                        key: "@",
+                        extraCssClass: "@"
+                    },
+                    controller: FieldHelpTextController,
+                    controllerAs: "fieldHelpTextVm"
+                })
+            ]);
+}

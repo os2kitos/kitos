@@ -1,29 +1,45 @@
-﻿((ng, app) => {
+﻿module Kitos.Shared.Directives.HelpText {
     "use strict";
 
-    app.controller("helpTextController", ["$scope", "$uibModal", "helpTextService", "userService", function ($scope, $uibModal, helpTextService: Kitos.Services.IHelpTextService, userService) {
-        const vm = this;
-        const key = $scope.key;
-        vm.noButtonLayout = $scope.noButtonLayout;
+    export class HelpTextController {
+        static $inject: Array<string> = [
+            "$scope",
+            "$uibModal",
+            "helpTextService",
+            "userService"
+        ];
 
-        vm.showHelpTextModal = () =>
-            Kitos.Helpers.HelpTextModalHelper.openHelpTextModal($uibModal,
-                key,
-                helpTextService,
-                userService);
-        return vm;
-    }]);
+        noButtonLayout: string;
 
-    app.directive("helpText", [
+        constructor(
+            private readonly $scope,
+            private readonly $uibModal,
+            private readonly helpTextService: Services.IHelpTextService,
+            private readonly userService) {
+            
+            this.noButtonLayout = $scope.noButtonLayout;
+        }
+
+        showHelpTextModal = () =>
+            Helpers.HelpTextModalHelper.openHelpTextModal(this.$uibModal,
+                this.$scope.key,
+                this.helpTextService,
+                this.userService);
+    }
+
+    angular
+        .module("app")
+        .directive("helpText",
             () => ({
                 templateUrl: "app/shared/helpText/helpText.view.html",
                 scope: {
                     key: "@",
                     defaultTitle: "@",
-                    noButtonLayout: "@"
+                    noButtonLayout: "@",
+                    test: "@"
                 },
-            controller: "helpTextController",
+                controller: HelpTextController,
                 controllerAs: "helpTextVm"
             })
-        ]);
-})(angular, app);
+        );
+}

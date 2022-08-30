@@ -1,4 +1,4 @@
-﻿<label data-ng-if="label" for="{{ id }}" class="control-label small">{{ label }} <field-help-text ng-if="isKeyDefined" key="{{helpTextKey}}"></field-help-text></label>
+﻿<label ng-if="label" for="{{ id }}" class="control-label small">{{ label }} <field-help-text ng-if="isKeyDefined" key="{{::helpTextKey}}"></field-help-text></label>
 
 <input type="hidden"
        id="{{ id }}"

@@ -1,1 +1,3 @@
-﻿<a ng-click="helpTextVm.showHelpTextModal()"><i class="fa fa-question-circle {{helpTextVm.extraCssClass}}"></i></a>
+﻿<span ng-if="fieldHelpTextVm.isKeyDefined" class="{{::fieldHelpTextVm.extraCssClass}}">
+    <a ng-click="fieldHelpTextVm.showHelpTextModal()"><i class="fa fa-question-circle"></i></a>
+</span>
