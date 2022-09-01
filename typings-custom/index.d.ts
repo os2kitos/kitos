@@ -1,6 +1,5 @@
 /// <reference path="JSONfn/index.d.ts" />
 /// <reference path="kendo/index.d.ts"/>
-/// <reference path="protractor-http-mock/index.d.ts"/>
 /// <reference path="jquery/index.d.ts"/>
 /// <reference path="angular-animate/index.d.ts" />
 /// <reference path="angular-cookies/index.d.ts" />
