@@ -9,8 +9,7 @@
     "sourceMap": true,
     "types": [],
     "typeRoots": [
-      "./typings-custom",
-      "./node_modules/@types"
+      "./typings-custom"
     ]
   },
   "exclude": [
