@@ -230,7 +230,7 @@ namespace Core.DomainServices.Contract
                 {
                     case EnumerableMirrorExtensions.MirrorAction.AddToDestination:
                         var newItem = actionContext.SourceValue.Value;
-                        var itSystemUsage = new ItContractOverviewReadModelItSystemUsage()
+                        var itSystemUsage = new ItContractOverviewReadModelItSystemUsage
                         {
                             ItSystemUsageId = newItem.Id,
                             Parent = destination
