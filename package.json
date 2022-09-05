@@ -43,14 +43,12 @@
         "typescript": "4.6.4"
     },
     "dependencies": {
-        "@types/angular": "^1.8.4",
         "@types/angular-animate": "^1.5.11",
         "@types/angular-cookies": "^1.8.1",
         "@types/angular-mocks": "^1.7.1",
         "@types/angular-resource": "^1.5.17",
         "@types/angular-ui-bootstrap": "^1.0.1",
         "@types/angular-ui-router": "^1.1.41",
-        "@types/jasmine": "^4.3.0",
         "@types/jquery": "^3.5.14",
         "@types/protractor-http-mock": "^0.10.2",
         "@types/ui-select": "^0.19.1",

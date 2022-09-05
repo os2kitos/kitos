@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/8ea257c7078cf1c9c0e4149f9abe1cb2c11470d7/protractor-http-mock/protractor-http-mock.d.ts",
+    "raw": "registry:dt/protractor-http-mock#0.0.0+20160521154145",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/8ea257c7078cf1c9c0e4149f9abe1cb2c11470d7/protractor-http-mock/protractor-http-mock.d.ts"
+  }
+}

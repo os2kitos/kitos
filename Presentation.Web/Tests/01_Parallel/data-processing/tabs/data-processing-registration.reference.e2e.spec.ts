@@ -44,7 +44,7 @@ describe("Data Processing registration reference test ",
                 .then(() => expect(refHelper.getUrlFromReference(referenceName).isPresent()).toBeFalsy())
                 // deleting reference
                 .then(() => deleteReferenceFromDpa(referenceName))
-                .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeFalse());
+                .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeFalsy());
         });
 
         function editReferenceUrl(reference: string, url: string) {

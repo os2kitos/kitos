@@ -1084,104 +1084,6 @@
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\view-data-state.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\data-processing-registration.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.it-systems.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.main.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.oversight.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.reference.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.roles.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\it-contract\contract.main.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\it-contract\LocalAdmin.ItContract.UiCustomization.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\Migration.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\System.Main.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\Organization\CreateUser.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\02_Sequential\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Usage\LocalAdmin.ItSystemUsage.UiCustomization.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\AdviceHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\DataProcessingRegistrationHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\GetDateHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\OrgHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\RelationHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SelectHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigation.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigationSrefs.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ItSystemNavigation.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigationSrefs.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigation.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\DataProcessingRegistrationNavigation.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\ReferenceHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SystemUsageHelper.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\it-contract\contract.data-processing-registration.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\it-contract\RegularUser.Contract.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\02_Sequential\it-system\catalog\Migration.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\LocalAdmin.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Usage\Tabs\Advice.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Tabs\Main.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Usage\Tabs\Main.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Usage\Tabs\Relation.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\02_Sequential\Local-admin\LocalAdmin.DataProcessing.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\02_Sequential\Organization\CreateUser.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\Organization\UserOverview.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\Tabs\Reference.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\data-processing-registration.overview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.contract.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.main.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.oversight.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.reference.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalOrg.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractDpr.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-contract\ContractTimeOverview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractItSystem.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Tabs\ItSystemAdvice.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageDataProcessing.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageGDPR.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Local-admin\LocalDataProcessing.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemReference.po.ts" />
-    <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\It-System\RegularUser.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\CSSLocatorHelper.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\IPageObject.po.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\KendoToolbarWrapper.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\NavigationBarWrapper.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\RepeaterWrapper.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\Select2TagWrapper.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\Select2Wrapper.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\SelectStatus2Wrapper.ts" />
-    <TypeScriptCompile Include="Tests\Object-wrappers\SubNavigationBarWrapper.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-contract\ItContractOverview.po.ts" />
-    <TypeScriptCompile Include="Tests\Utility\NavigationHelper.ts" />
-    <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
-    <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
@@ -1443,7 +1345,6 @@
     <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\HomePage\Login.e2e.spec.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-create.controller.ts" />
@@ -1516,7 +1417,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <TypeScriptCompile Include="Tests\01_Parallel\HomePage\Home.e2e.spec.ts" />
     <None Include="Parameters.xml">
       <SubType>Designer</SubType>
     </None>
@@ -1530,7 +1430,6 @@
     <Content Include="Scripts\skins\content\default\content.min.css" />
     <Content Include="Scripts\skins\ui\oxide\content.min.css" />
     <Content Include="Scripts\skins\ui\oxide\skin.min.css" />
-    <Content Include="Tests\PARALLEL_VS_SEQUENTIAL.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1567,7 +1466,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="Tests\Models\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
