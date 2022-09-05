@@ -21,10 +21,7 @@
 
         $scope.select2Config = select2LoadingService.select2LocalDataNoSearch(() => options, true);
 
-        $scope.isKeyDefined = true;
-        if ($scope.helpTextKey === undefined) {
-            $scope.isKeyDefined = false;
-        }
+        $scope.isKeyDefined = !!$scope.key;
     }]);
 
     app.directive("select2Option", [

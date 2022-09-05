@@ -13,13 +13,13 @@
         private readonly key: string;
 
         constructor(
-            private readonly $scope,
+            $scope,
             private readonly $uibModal,
             private readonly helpTextService: Services.IHelpTextService,
             private readonly userService) {
 
             this.key = $scope.key;
-            this.isKeyDefined = $scope.key != undefined;
+            this.isKeyDefined = !!$scope.key;
             this.extraCssClass = $scope.extraCssClass;
         }
 
@@ -35,7 +35,7 @@
         .directive("fieldHelpText",
             [
                 () => ({
-                    templateUrl: "app/shared/helpText/fieldHelpText.view.html",
+                    templateUrl: "app/shared/helpText/field-help-text.view.html",
                     scope: {
                         key: "@",
                         extraCssClass: "@"
