@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
+using Core.DomainServices.Mapping;
 using Core.DomainServices.Model;
 
 namespace Core.DomainServices.Contract
@@ -111,8 +113,6 @@ namespace Core.DomainServices.Contract
             //Termination deadline
             destination.TerminationDeadlineId = source.TerminationDeadline?.Id;
             destination.TerminationDeadlineName = source.TerminationDeadline?.Name;
-
-            //TODO: Option names must contain the "udgået" text or state!....
         }
 
         private static void MapDuration(ItContract source, ItContractOverviewReadModel destination)
@@ -212,11 +212,57 @@ namespace Core.DomainServices.Contract
                 .Select(x => x.First()) //guard against any duplicates
                 .ToList();
 
-            //TODO: Extract rendering - this is a duplicate of the dpr rendering
-            destination.ItSystemUsagesCsv = string.Join(", ", itSystemUsages.Select(x => (x.ItSystem.Name, x.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
+            destination.ItSystemUsagesCsv = string.Join(", ", itSystemUsages.Select(MapSystemName));
             destination.ItSystemUsagesSystemUuidCsv = string.Join(", ", itSystemUsages.Select(x => x.ItSystem.Uuid.ToString("D")));
 
-            //TODO: The collection - remember both id,systemName, and disabld state should be in the comparison key and then also in the read model state
+            var actionContexts = itSystemUsages
+                .ComputeMirrorActions
+                (
+                    destination:destination.ItSystemUsages,
+                    computeSourceItemId:s=>s.Id.ToString(),
+                    computeDestinationItemId:d=>d.ItSystemUsageId.ToString()
+                )
+                .ToList();
+
+            foreach (var actionContext in actionContexts)
+            {
+                switch (actionContext.Action)
+                {
+                    case EnumerableMirrorExtensions.MirrorAction.AddToDestination:
+                        var newItem = actionContext.SourceValue.Value;
+                        var itSystemUsage = new ItContractOverviewReadModelItSystemUsage()
+                        {
+                            ItSystemUsageId = newItem.Id,
+                            Parent = destination
+                        };
+                        PatchItSystemUsage(itSystemUsage, newItem);
+                        destination.ItSystemUsages.Add(itSystemUsage);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.RemoveFromDestination:
+                        var itemToRemove = actionContext.DestinationValue.Value;
+                        destination.ItSystemUsages.Remove(itemToRemove);
+                        _contractSystemUsageReadModelRepository.Delete(itemToRemove);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.MergeToDestination:
+                        var destinationItem = actionContext.DestinationValue.Value;
+                        var sourceItem = actionContext.SourceValue.Value;
+                        PatchItSystemUsage(destinationItem, sourceItem);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        private static string MapSystemName(ItSystemUsage system)
+        {
+            return system.MapItSystemName();
+        }
+
+        private static void PatchItSystemUsage(ItContractOverviewReadModelItSystemUsage itSystemUsage, ItSystemUsage newItem)
+        {
+            itSystemUsage.ItSystemUsageName = newItem.ItSystem.Name;
+            itSystemUsage.ItSystemUsageSystemUuid = newItem.ItSystem.Uuid;
         }
 
         private void MapDataProcessingAgreements(ItContract source, ItContractOverviewReadModel destination)
@@ -231,7 +277,48 @@ namespace Core.DomainServices.Contract
             //CSV field
             destination.DataProcessingAgreementsCsv = string.Join(", ", dataProcessingAgreements.Select(x => x.Name));
 
-            //TODO: The collection - remember both id and name should be in the key generation for comparision
+            var mirrorActionContexts = dataProcessingAgreements
+                .ComputeMirrorActions
+                (
+                    destination: destination.DataProcessingAgreements,
+                    computeSourceItemId: dpr => dpr.Id.ToString(),
+                    computeDestinationItemId: dpr => dpr.DataProcessingRegistrationId.ToString()
+                )
+                .ToList();
+
+            foreach (var actionContext in mirrorActionContexts)
+            {
+                switch (actionContext.Action)
+                {
+                    case EnumerableMirrorExtensions.MirrorAction.AddToDestination:
+                        var dataProcessingRegistration = actionContext.SourceValue.Value;
+                        var dataProcessingAgreement = new ItContractOverviewReadModelDataProcessingAgreement
+                        {
+                            DataProcessingRegistrationId = dataProcessingRegistration.Id,
+                            Parent = destination
+                        };
+                        PatchDataProcessingRegistration(dataProcessingAgreement, dataProcessingRegistration);
+                        destination.DataProcessingAgreements.Add(dataProcessingAgreement);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.RemoveFromDestination:
+                        var itemToRemove = actionContext.DestinationValue.Value;
+                        destination.DataProcessingAgreements.Remove(itemToRemove);
+                        _contractDataProcessingAgreementRepository.Delete(itemToRemove);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.MergeToDestination:
+                        var destinationItem = actionContext.DestinationValue.Value;
+                        var sourceItem = actionContext.SourceValue.Value;
+                        PatchDataProcessingRegistration(destinationItem, sourceItem);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        private static void PatchDataProcessingRegistration(ItContractOverviewReadModelDataProcessingAgreement destinationItem, DataProcessingRegistration sourceItem)
+        {
+            destinationItem.DataProcessingRegistrationName = sourceItem.Name; //Update the name
         }
 
         private void MapRoleAssignments(ItContract source, ItContractOverviewReadModel destination)
