@@ -2,6 +2,7 @@
 // Source: https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/f9c44651705f574f6d4258fe5e1c335462bdcc19/angular-protractor/angular-protractor.d.ts
 /// <reference path="../selenium-webdriver/index.d.ts"/>
 /// <reference path="../jasmine/index.d.ts"/>
+/// <reference path="../jasmine-expect/index.d.ts"/>
 
 declare namespace protractor {
     //region Wrapped webdriver Items
