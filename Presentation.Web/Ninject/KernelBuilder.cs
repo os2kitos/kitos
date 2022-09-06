@@ -383,7 +383,6 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
 
-            //TODO: Create helper to register all IHandlesDomaniEvent implementations on the object!
             //ItContract overview updates
             RegisterDomainEvent<EntityCreatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
@@ -408,11 +407,17 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityBeingDeletedEvent<User>, HandleUserBeingDeleted>(kernel);
         }
 
+        //TODO: change this to just take the implementation and then register for each of the implemented types...
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
             where TDomainEvent : IDomainEvent
             where THandler : IDomainEventHandler<TDomainEvent>
         {
             kernel.Bind<IDomainEventHandler<TDomainEvent>>().To<THandler>().InCommandScope(Mode);
+        }
+
+        private void RegisterDomainEvents<THandler>(IKernel kernel)
+        {
+            //TODO
         }
 
         private void RegisterOptions(IKernel kernel)
