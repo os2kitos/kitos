@@ -35,11 +35,9 @@ using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.GDPR;
@@ -119,6 +117,8 @@ using Infrastructure.STS.Organization.DomainServices;
 using Infrastructure.STS.OrganizationUnit.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
+using System.Linq;
+using Infrastructure.Services.Types;
 
 namespace Presentation.Web.Ninject
 {
@@ -324,100 +324,61 @@ namespace Presentation.Web.Ninject
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
             kernel.Bind<IDomainEvents>().To<NinjectDomainEventsAdapter>().InCommandScope(Mode);
-            RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-            RegisterDomainEvent<AdministrativeAccessRightsChanged, ClearCacheOnAdministrativeAccessRightsChangedHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityCreatedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, ContractDeletedSystemRelationsHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, ContractDeletedAdvicesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
+            
+            //Auth cache
+            RegisterDomainEvents<ClearCacheOnAdministrativeAccessRightsChangedHandler>(kernel);
 
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, ContractDeletedUserNotificationsHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, SystemUsageDeletedUserNotificationsHandler>(kernel);
+            // Bindings to broken refernce reports
+            RegisterDomainEvents<UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+
+            //DPR bindings to system usage
+            RegisterDomainEvents<CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent>(kernel);
+
+            //DPR overview updates
+            RegisterDomainEvents<BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+
+            //Relations
+            RegisterDomainEvents<ContractDeletedSystemRelationsHandler>(kernel);
+            RegisterDomainEvents<RelationSpecificInterfaceEventsHandler>(kernel);
+            RegisterDomainEvents<UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
+
+            //Advices cleanup
+            RegisterDomainEvents<ContractDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvents<DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvents<SystemUsageDeletedAdvicesHandler>(kernel);
+
+            //User notifications
+            RegisterDomainEvents<ContractDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvents<DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvents<SystemUsageDeletedUserNotificationsHandler>(kernel);
 
             //Itsystem overview updates
-            RegisterDomainEvent<EntityCreatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<BusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityCreatedEvent<LocalBusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<LocalBusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<TaskRef>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvents<BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
 
             //ItContract overview updates
-            RegisterDomainEvent<EntityCreatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItContractOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvents<BuildItContractOverviewReadModelOnChangesHandler>(kernel);
 
             //Dirty marking
-            RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItSystemUsage>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvents<MarkEntityAsDirtyOnChangeEventHandler>(kernel);
 
             //Deletion tracking
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItInterface>, TrackDeletedEntitiesEventHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, TrackDeletedEntitiesEventHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItSystem>, TrackDeletedEntitiesEventHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<ItContract>, TrackDeletedEntitiesEventHandler>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvents<TrackDeletedEntitiesEventHandler>(kernel);
 
             //Organization
-            RegisterDomainEvent<EntityBeingDeletedEvent<Organization>, HandleOrganizationBeingDeleted>(kernel);
-            RegisterDomainEvent<EntityBeingDeletedEvent<User>, HandleUserBeingDeleted>(kernel);
-        }
-
-        //TODO: change this to just take the implementation and then register for each of the implemented types...
-        private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
-            where TDomainEvent : IDomainEvent
-            where THandler : IDomainEventHandler<TDomainEvent>
-        {
-            kernel.Bind<IDomainEventHandler<TDomainEvent>>().To<THandler>().InCommandScope(Mode);
+            RegisterDomainEvents<HandleOrganizationBeingDeleted>(kernel);
+            RegisterDomainEvents<HandleUserBeingDeleted>(kernel);
         }
 
         private void RegisterDomainEvents<THandler>(IKernel kernel)
         {
-            //TODO
+            //Register all exposed handlers
+            typeof(THandler)
+                .Assembly
+                .GetTypes()
+                .Where(tType => tType.IsImplementationOfGenericType(typeof(IDomainEventHandler<>)))
+                .Where(tType => tType.IsInterface)
+                .ToList()
+                .ForEach(tHandlerInterface => kernel.Bind(tHandlerInterface).To<THandler>().InCommandScope(Mode));
         }
 
         private void RegisterOptions(IKernel kernel)
