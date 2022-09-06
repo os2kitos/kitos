@@ -38,7 +38,6 @@ namespace Core.DomainServices.Contract
             destination.Name = source.Name;
             destination.IsActive = source.IsActive;
             destination.ContractId = source.ItContractId;
-            destination.SupplierName = source.Supplier?.Name;
             destination.ContractSigner = source.ContractSigner;
             destination.ProcurementInitiated = source.ProcurementInitiated;
             destination.OperationRemunerationBegunDate = source.OperationRemunerationBegun;
@@ -46,6 +45,10 @@ namespace Core.DomainServices.Contract
             destination.TerminatedAt = source.Terminated;
             destination.LastEditedAtDate = source.LastChanged;
             destination.LastEditedByUserName = source.LastChangedByUser?.Transform(GetUserFullName);
+
+            //Supplier
+            destination.SupplierId = source.Supplier?.Id;
+            destination.SupplierName = source.Supplier?.Name;
 
             //Parent contract
             destination.ParentContractName = source.Parent?.Name;

@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Add_ItContractOverviewReadModel : DbMigration
+    public partial class add_contract_overview_readmodels : DbMigration
     {
         public override void Up()
         {
@@ -23,6 +23,7 @@
                         CriticalityName = c.String(maxLength: 150),
                         ResponsibleOrgUnitId = c.Int(),
                         ResponsibleOrgUnitName = c.String(),
+                        SupplierId = c.Int(),
                         SupplierName = c.String(maxLength: 100),
                         ContractSigner = c.String(),
                         ContractTypeId = c.Int(),
@@ -74,10 +75,12 @@
                 .Index(t => t.SourceEntityId)
                 .Index(t => t.Name, name: "IX_Contract_Name")
                 .Index(t => t.IsActive, name: "IX_Contract_Active")
+                .Index(t => t.ParentContractId, name: "IX_ParentContract_Id")
                 .Index(t => t.ParentContractName, name: "IX_ParentContract_Name")
                 .Index(t => t.CriticalityId, name: "IX_CriticalityType_Id")
                 .Index(t => t.CriticalityName, name: "IX_CriticalityType_Name")
                 .Index(t => t.ResponsibleOrgUnitId)
+                .Index(t => t.SupplierId)
                 .Index(t => t.SupplierName)
                 .Index(t => t.ContractTypeId, name: "IX_ItContractType_Id")
                 .Index(t => t.ContractTypeName, name: "IX_ItContractType_Name")
@@ -217,10 +220,12 @@
             DropIndex("dbo.ItContractOverviewReadModels", "IX_ItContractType_Name");
             DropIndex("dbo.ItContractOverviewReadModels", "IX_ItContractType_Id");
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "SupplierName" });
+            DropIndex("dbo.ItContractOverviewReadModels", new[] { "SupplierId" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "ResponsibleOrgUnitId" });
             DropIndex("dbo.ItContractOverviewReadModels", "IX_CriticalityType_Name");
             DropIndex("dbo.ItContractOverviewReadModels", "IX_CriticalityType_Id");
             DropIndex("dbo.ItContractOverviewReadModels", "IX_ParentContract_Name");
+            DropIndex("dbo.ItContractOverviewReadModels", "IX_ParentContract_Id");
             DropIndex("dbo.ItContractOverviewReadModels", "IX_Contract_Active");
             DropIndex("dbo.ItContractOverviewReadModels", "IX_Contract_Name");
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "SourceEntityId" });

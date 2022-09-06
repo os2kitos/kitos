@@ -27,6 +27,7 @@ namespace Core.DomainModel.ItContract.Read
         public string CriticalityName { get; set; } // For sorting
         public int? ResponsibleOrgUnitId { get; set; }     // For filtering
         public string ResponsibleOrgUnitName { get; set; } // For sorting
+        public int? SupplierId { get; set; }
         public string SupplierName { get; set; }
         public string ContractSigner { get; set; }
         public int? ContractTypeId { get; set; }     // For filtering

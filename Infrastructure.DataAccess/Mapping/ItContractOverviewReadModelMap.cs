@@ -30,6 +30,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.IsActive)
                 .HasIndexAnnotation("IX_Contract_Active");
 
+            Property(x => x.ParentContractId)
+                .IsOptional()
+                .HasIndexAnnotation("IX_ParentContract_Id");
+
             Property(x => x.ParentContractName)
                 .IsOptional()
                 .HasMaxLength(ItContractConstraints.MaxNameLength)
@@ -43,6 +47,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.ResponsibleOrgUnitName)
                 .IsOptional();
+
+            Property(x => x.SupplierId)
+                .IsOptional()
+                .HasIndexAnnotation("IX_SupplierId");
 
             Property(x => x.SupplierName)
                 .HasMaxLength(Organization.MaxNameLength)
