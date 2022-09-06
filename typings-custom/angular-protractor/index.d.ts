@@ -7,7 +7,7 @@
 declare namespace protractor {
     //region Wrapped webdriver Items
 
-    class ActionSequence extends webdriver.ActionSequence {}
+    class ActionSequence extends webdriver.ActionSequence { }
     class Builder extends webdriver.Builder {}
     class Capabilities extends webdriver.Capabilities {}
     class Command extends webdriver.Command {}
@@ -1840,7 +1840,7 @@ declare var browser: protractor.IBrowser;
 declare var by: protractor.IProtractorLocatorStrategy;
 declare var By: protractor.IProtractorLocatorStrategy;
 declare var element: protractor.Element;
-declare var $: cssSelectorHelper;
+declare var $cssSelector: cssSelectorHelper;
 declare var $$: cssArraySelectorHelper;
 
 declare module 'protractor' {

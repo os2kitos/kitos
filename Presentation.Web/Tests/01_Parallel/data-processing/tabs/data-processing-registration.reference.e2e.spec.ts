@@ -41,10 +41,10 @@ describe("Data Processing registration reference test ",
                 .then(() => expect(refHelper.getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
                 // changing to invalid URL
                 .then(() => editReferenceUrl(referenceName, invalidUrl))
-                .then(() => expect(refHelper.getUrlFromReference(referenceName).isPresent()).toBeFalsy())
+                .then(() => expect(refHelper.getUrlFromReference(referenceName).isPresent()).toBeTrue())
                 // deleting reference
                 .then(() => deleteReferenceFromDpa(referenceName))
-                .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeFalsy());
+                .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeTrue());
         });
 
         function editReferenceUrl(reference: string, url: string) {

@@ -20,9 +20,9 @@ describe("Only Global Admins can create user with special permissions, Parallel"
             pageObject.getPage();
             browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
             pageObject.createUserButton.click();
-            expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTruthy();
-            expect(pageObject.hasRightsHolderAccessCheckBox.isDisplayed()).toBeTruthy();
-            expect(pageObject.hasStakeHolderAccessCheckBox.isPresent()).toBeTruthy();
+            expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
+            expect(pageObject.hasRightsHolderAccessCheckBox.isDisplayed()).toBeTrue();
+            expect(pageObject.hasStakeHolderAccessCheckBox.isPresent()).toBeTrue();
         });
 
         it("Local Admin cannot enable special permissions on new user", () => {
@@ -30,9 +30,9 @@ describe("Only Global Admins can create user with special permissions, Parallel"
             pageObject.getPage();
             browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
             pageObject.createUserButton.click();
-            expect(pageObject.hasAPiCheckBox.isPresent()).toBeFalsy();
-            expect(pageObject.hasRightsHolderAccessCheckBox.isPresent()).toBeFalsy();
-            expect(pageObject.hasStakeHolderAccessCheckBox.isPresent()).toBeFalsy();
+            expect(pageObject.hasAPiCheckBox.isPresent()).toBeFalse();
+            expect(pageObject.hasRightsHolderAccessCheckBox.isPresent()).toBeFalse();
+            expect(pageObject.hasStakeHolderAccessCheckBox.isPresent()).toBeFalse();
         });
     });
 

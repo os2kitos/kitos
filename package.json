@@ -50,6 +50,7 @@
         "@types/angular-ui-bootstrap": "^1.0.1",
         "@types/angular-ui-router": "^1.1.41",
         "@types/jquery": "^3.5.14",
+        "@types/protractor": "^4.0.0",
         "@types/protractor-http-mock": "^0.10.2",
         "@types/ui-select": "^0.19.1",
         "angular": "1.8.3",
