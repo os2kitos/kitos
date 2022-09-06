@@ -143,7 +143,7 @@ namespace Presentation.Web
                 .ForMember(dest => dest.References, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
 
-            CreateMap<HandoverTrialType, OptionDTO>()
+            CreateMap<CriticalityType, OptionDTO>()
                 .ReverseMap()
                 .ForMember(dest => dest.References, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
@@ -355,6 +355,8 @@ namespace Presentation.Web
             CreateMap<ItContract, ItContractDTO>()
                   .ForMember(dest => dest.AssociatedSystemUsages, opt => opt.MapFrom(src => src.AssociatedSystemUsages.Select(x => x.ItSystemUsage)))
                   .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)))
+                  .ForMember(dest => dest.LastChangedByName, opt => opt.MapFrom(src => src.LastChangedByUser.GetFullName()))
+                  .ForMember(dest => dest.ObjectOwnerFullName, opt => opt.MapFrom(src => src.ObjectOwner.GetFullName()))
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore())
@@ -363,11 +365,7 @@ namespace Presentation.Web
             //Output only - this mapping should not be reversed
             CreateMap<ItContract, ItContractSystemDTO>()
                 .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)));
-
-            CreateMap<PaymentMilestone, PaymentMilestoneDTO>()
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
+            
             CreateMap<EconomyStream, EconomyStreamDTO>()
                 .ReverseMap()
                 .IgnoreDestinationEntityFields();
@@ -379,10 +377,6 @@ namespace Presentation.Web
             CreateMap<AdviceUserRelation, AdviceUserRelationDTO>()
                   .ReverseMap()
                   .IgnoreDestinationEntityFields();
-
-            CreateMap<HandoverTrial, HandoverTrialDTO>()
-                .ReverseMap()
-                .IgnoreDestinationEntityFields();
 
             //Output only - this mapping should not be reversed
             CreateMap<ExcelImportError, ExcelImportErrorDTO>();

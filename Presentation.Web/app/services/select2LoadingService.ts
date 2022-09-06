@@ -5,7 +5,7 @@
     export interface ISelect2LoadingService {
         loadSelect2(url: string, allowClear: boolean, paramArray: any, removeDisabledItems: boolean, nameContentQueryParamName?: string);
         loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean, formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string);
-        loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
+        loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string);
         select2LocalData(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[]);
         select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
         select2MultipleLocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
@@ -106,7 +106,8 @@
             nameContentQueryParamName = "q",
             formatResult = null) {
             var self = this;
-            let config = <any>{
+            const config = <any>{
+                placeholder: " ", //Must be present for "clear" to work (not displaying "x" if no placeholder text is defined. Can be overridden in markup using data-placeholder )
                 minimumInputLength: 1,
                 initSelection(elem, callback) {
                 },
@@ -131,7 +132,7 @@
                     }
                 }
             };
-            if (formatResult != null) {
+            if (formatResult) {
                 config.formatResult = formatResult;
             }
             return config;
@@ -143,7 +144,7 @@
             }
         }
 
-        private handleResults(list: any, obj: { id; name; disabled; itSystemDisabled }) {
+        private handleResults(list: any[], obj: { id; name; disabled; itSystemDisabled }) {
             list.push({
                 id: obj.id,
                 text: Helpers.SystemNameFormat.apply(obj.name, obj.disabled || obj.itSystemDisabled)

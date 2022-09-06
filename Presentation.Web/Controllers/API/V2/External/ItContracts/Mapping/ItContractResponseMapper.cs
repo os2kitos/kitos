@@ -10,6 +10,7 @@ using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -17,7 +18,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
     {
         public ItContractResponseDTO MapContractDTO(ItContract contract)
         {
-            return new ItContractResponseDTO()
+            return new ItContractResponseDTO
             {
                 Uuid = contract.Uuid,
                 Name = contract.Name,
@@ -32,7 +33,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Responsible = MapResponsible(contract),
                 SystemUsages = contract.AssociatedSystemUsages?.Select(x => x.ItSystemUsage?.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
                 DataProcessingRegistrations = contract.DataProcessingRegistrations?.Select(x => x.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
-                HandoverTrials = MapHandoverTrials(contract),
                 PaymentModel = MapPaymentModel(contract),
                 AgreementPeriod = MapAgreementPeriod(contract),
                 Termination = MapTermination(contract),
@@ -116,32 +116,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 PaymentModel = contract.PaymentModel?.MapIdentityNamePairDTO(),
                 PaymentFrequency = contract.PaymentFreqency?.MapIdentityNamePairDTO(),
                 PriceRegulation = contract.PriceRegulation?.MapIdentityNamePairDTO(),
-                PaymentMileStones = contract.PaymentMilestones?.Select(MapPaymentMilestones).ToList() ?? new List<PaymentMileStoneDTO>()
-            };
-        }
-
-        private static PaymentMileStoneDTO MapPaymentMilestones(PaymentMilestone paymentMilestone)
-        {
-            return new ()
-            {
-                Title = paymentMilestone.Title,
-                Approved = paymentMilestone.Approved,
-                Expected = paymentMilestone.Expected
-            };
-        }
-
-        private static List<HandoverTrialResponseDTO> MapHandoverTrials(ItContract contract)
-        {
-            return contract.HandoverTrials?.Select(MapHandoverTrial).ToList() ?? new List<HandoverTrialResponseDTO>();
-        }
-
-        private static HandoverTrialResponseDTO MapHandoverTrial(HandoverTrial handoverTrial)
-        {
-            return new ()
-            {
-                HandoverTrialType = handoverTrial.HandoverTrialType?.MapIdentityNamePairDTO(),
-                ApprovedAt = handoverTrial.Approved,
-                ExpectedAt = handoverTrial.Expected
             };
         }
 
@@ -173,21 +147,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             {
                 ProcurementStrategy = contract.ProcurementStrategy?.MapIdentityNamePairDTO(),
                 PurchaseType = contract.PurchaseForm?.MapIdentityNamePairDTO(),
-                ProcurementPlan = MapProcurementPlan(contract)
+                ProcurementPlan = MapProcurementPlan(contract),
+                ProcurementInitiated = contract.ProcurementInitiated?.ToYesNoUndecidedChoice(),
             };
         }
 
         private static ProcurementPlanDTO MapProcurementPlan(ItContract contract)
         {
-            if (!contract.ProcurementPlanHalf.HasValue)
+            if (!contract.ProcurementPlanQuarter.HasValue)
                 return null;
 
             if (!contract.ProcurementPlanYear.HasValue)
                 return null;
 
-            return new ProcurementPlanDTO()
+            return new ProcurementPlanDTO
             {
-                HalfOfYear = Convert.ToByte(contract.ProcurementPlanHalf.Value),
+                QuarterOfYear = Convert.ToByte(contract.ProcurementPlanQuarter.Value),
                 Year = contract.ProcurementPlanYear.Value
             };
         }
@@ -201,6 +176,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ContractTemplate = contract.ContractTemplate?.MapIdentityNamePairDTO(),
                 ContractType = contract.ContractType?.MapIdentityNamePairDTO(),
                 AgreementElements = contract.AssociatedAgreementElementTypes?.Select(x => x.AgreementElementType?.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
+                Criticality = contract.Criticality?.MapIdentityNamePairDTO(),
                 Validity = new ValidityResponseDTO
                 {
                     EnforcedValid = contract.Active,

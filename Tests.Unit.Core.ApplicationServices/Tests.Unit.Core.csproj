@@ -89,8 +89,8 @@
     <Reference Include="Neleus.LambdaCompare, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Neleus.LambdaCompare.1.0.3\lib\net461\Neleus.LambdaCompare.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
@@ -177,7 +177,9 @@
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
+    <Compile Include="ApplicationServices\Handlers\HandleUserBeingDeletedTests.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
+    <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
@@ -197,6 +199,7 @@
     <Compile Include="ApplicationServices\UIModuleCustomizationTest\UIModuleCustomizationTests.cs" />
     <Compile Include="ApplicationServices\UserRightsServiceTest.cs" />
     <Compile Include="ApplicationServices\UserServiceTest.cs" />
+    <Compile Include="BackgroundJobs\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveStateTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
     <Compile Include="DomainServices\Contract\ContractDataProcessingRegistrationAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
@@ -219,7 +222,7 @@
     <Compile Include="DomainServices\Repositories\UserNotificationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityParserTest.cs" />
-    <Compile Include="DomainServices\SSO\SsoOrganizationIdentityRepositoryTest.cs" />
+    <Compile Include="DomainServices\Organizations\StsOrganizationIdentityRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\SsoUserIdentityRepositoryTest.cs" />
     <Compile Include="BackgroundJobs\CheckExternalLinksBackgroundJobTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />

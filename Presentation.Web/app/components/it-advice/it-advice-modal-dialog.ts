@@ -12,7 +12,7 @@
                 ($scope,
                     roles: Models.IRoleEntity[],
                     $window,
-                    type,
+                    type: Models.Advice.AdviceType,
                     action,
                     object,
                     currentUser: Services.IUser,
@@ -26,6 +26,8 @@
                     $scope.adviceTypeOptions = Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Models.ViewModel.Advice.AdviceRepetitionOptions.options;
                     $scope.startDateInfoMessage = null;
+
+                    const roleIdProperty = Models.Advice.getAdviceTypeUserRelationRoleIdProperty(type);
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
                     const emailMatchRegex = "([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
@@ -71,31 +73,23 @@
                                 let recpientType = adviceData.Reciepients[i].RecpientType;
                                 let recieverType = adviceData.Reciepients[i].RecieverType;
                                 if (recpientType === "ROLE" && recieverType === "RECIEVER") {
-                                    var nameOfRoleReceiver = adviceData.Reciepients[i].Name;
-                                    var selectedReceiver = _.find(select2Roles, x => x.text === nameOfRoleReceiver);
+                                    var roleReceiverId = adviceData.Reciepients[i][roleIdProperty];
+                                    var selectedReceiver = _.find(select2Roles, x => x.id === roleReceiverId);
                                     if (selectedReceiver) {
                                         $scope.preSelectedReceivers.push(selectedReceiver);
-                                    } else {
-                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
-                                        $scope.preSelectedReceivers.push({
-                                            text: nameOfRoleReceiver
-                                        });
                                     }
                                 } else if (recpientType === "ROLE" && recieverType === "CC") {
-                                    var nameOfRoleCC = adviceData.Reciepients[i].Name;
-                                    var selectedCC = _.find(select2Roles, x => x.text === nameOfRoleCC);
-                                    if (selectedCC) {
-                                        $scope.preSelectedCCs.push(selectedCC);
-                                    } else {
-                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
-                                        $scope.preSelectedCCs.push({
-                                            text: nameOfRoleCC
-                                        });
+                                    var roleReceiverCcId = adviceData.Reciepients[i][roleIdProperty];
+                                    var selectedCc = _.find(select2Roles, x => x.id === roleReceiverCcId);
+                                    if (selectedCc) {
+                                        $scope.preSelectedCCs.push(selectedCc);
                                     }
                                 } else if (recpientType === "USER" && recieverType === "RECIEVER") {
-                                    receivers.push(adviceData.Reciepients[i].Name);
+                                    const emailReceiver = adviceData.Reciepients[i].Email;
+                                    receivers.push(emailReceiver);
                                 } else if (recpientType === "USER" && recieverType === "CC") {
-                                    ccs.push(adviceData.Reciepients[i].Name);
+                                    const emailCc = adviceData.Reciepients[i].Email;
+                                    ccs.push(emailCc);
                                 }
                             }
                             $scope.externalTo = receivers.length === 0 ? null : receivers.join(", ");
@@ -286,8 +280,7 @@
 
                     $scope.tinymceOptions = {
                         plugins: "link image code",
-                        skin: "lightgray",
-                        theme: "modern",
+                        theme: "silver",
                         toolbar: "bold italic | example | code | preview | link | searchreplace",
                         convert_urls: false
                     };
@@ -375,23 +368,21 @@
                         const writtenCCEmail = $scope.externalCC;
 
                         for (let i = 0; i < $scope.selectedReceivers.length; i++) {
-                            payload.Reciepients.push(
-                                {
-                                    Name: $scope.selectedReceivers[i].text,
-                                    RecpientType: "ROLE",
-                                    RecieverType: "RECIEVER"
-                                }
-                            );
+                            const receiver = {
+                                RecpientType: "ROLE",
+                                RecieverType: "RECIEVER"
+                            };
+                            receiver[roleIdProperty] = $scope.selectedReceivers[i].id;
+                            payload.Reciepients.push(receiver);
                         }
 
                         for (let i = 0; i < $scope.selectedCCs.length; i++) {
-                            payload.Reciepients.push(
-                                {
-                                    Name: $scope.selectedCCs[i].text,
-                                    RecieverType: "CC",
-                                    RecpientType: "ROLE"
-                                }
-                            );
+                            const receiver = {
+                                RecpientType: "ROLE",
+                                RecieverType: "CC"
+                            };
+                            receiver[roleIdProperty] = $scope.selectedCCs[i].id;
+                            payload.Reciepients.push(receiver);
                         }
 
                         if (writtenEmail != null) {
@@ -401,7 +392,7 @@
                                 if (toEmail && toEmail.length > 0) {
                                     payload.Reciepients.push(
                                         {
-                                            Name: toEmail,
+                                            Email: toEmail,
                                             RecpientType: "USER",
                                             RecieverType: "RECIEVER"
                                         }
@@ -416,7 +407,7 @@
                                 if (ccEmail && ccEmail.length > 0) {
                                     payload.Reciepients.push(
                                         {
-                                            Name: ccEmail,
+                                            Email: ccEmail,
                                             RecieverType: "CC",
                                             RecpientType: "USER"
                                         }
@@ -435,24 +426,24 @@
             resolve: {
                 Roles: [
                     "localOptionServiceFactory",
-                    (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
-                        if (type === "itSystemUsage") {
+                    (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) => {
+                        if (type === Models.Advice.AdviceType.ItSystemUsage) {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles)
+                                .create(Services.LocalOptions.LocalOptionType.ItSystemRoles)
                                 .getAll();
                         }
-                        if (type === "itContract") {
+                        if (type === Models.Advice.AdviceType.ItContract) {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles)
+                                .create(Services.LocalOptions.LocalOptionType.ItContractRoles)
                                 .getAll();
                         }
-                        if (type === "itProject") {
+                        if (type === Models.Advice.AdviceType.ItProject) {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles)
+                                .create(Services.LocalOptions.LocalOptionType.ItProjectRoles)
                                 .getAll();
                         }
-                        if (type === "dataProcessingRegistration") {
-                            return localOptionServiceFactory.create(Kitos.Services.LocalOptions
+                        if (type === Models.Advice.AdviceType.DataProcessingRegistration) {
+                            return localOptionServiceFactory.create(Services.LocalOptions
                                 .LocalOptionType.DataProcessingRegistrationRoles)
                                 .getAll();
                         }
@@ -464,7 +455,7 @@
                 object: [() => $scope.object],
                 currentUser: [
                     "userService",
-                    (userService: Kitos.Services.IUserService) => userService.getUser()
+                    (userService: Services.IUserService) => userService.getUser()
                 ],
                 advicename: [
                     () => {

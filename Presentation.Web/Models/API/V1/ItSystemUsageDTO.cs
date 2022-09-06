@@ -11,6 +11,8 @@ namespace Presentation.Web.Models.API.V1
         public Guid Uuid { get; set; }
         public int Id { get; set; }
         public DateTime LastChanged { get; set; }
+        public string LastChangedByUserName { get; set; }
+        public string LastChangedByUserLastName { get; set; }
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
         public string Version { get; set; }
@@ -23,8 +25,8 @@ namespace Presentation.Web.Models.API.V1
         public string ArchiveLocationName { get; set; }
         public int? ArchiveTestLocationId { get; set; }
         public string ArchiveTestLocationName { get; set; }
-        public string ArchiveSupplier { get; set; } //TODO: Remove once https://os2web.atlassian.net/browse/KITOSUDV-2118 is fixed
-        public int SupplierId { get; set; }
+        public int? ArchiveSupplierId { get; set; }
+        public string ArchiveSupplierName { get; set; } 
         public string ResponsibleOrgUnitName { get; set; }
         public int OrganizationId { get; set; }
         public OrganizationDTO Organization { get; set; }
@@ -62,7 +64,7 @@ namespace Presentation.Web.Models.API.V1
 
         public int? ItSystemCategoriesId { get; set; }
 
-        public UserCount UserCount { get; set; }
+        public UserCount? UserCount { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public string ArchiveNotes { get; set; }

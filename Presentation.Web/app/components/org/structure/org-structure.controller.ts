@@ -33,8 +33,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) {
+        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService",
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -341,14 +341,14 @@
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
+                        "$scope", "$uibModalInstance", "autofocus", function($modalScope, $modalInstance, autofocus) {
                             autofocus();
 
                             // edit or create-new mode
                             $modalScope.isNew = false;
 
                             // holds a list of org units, which the user can select as the parent
-                            $modalScope.orgUnits = [];
+                            const orgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[] = [];
 
                             // filter out those orgunits, that are outside the organisation
                             // or is currently a subdepartment of the unit
@@ -358,7 +358,15 @@
                                 // this avoid every subdepartment
                                 if (node.id === unit.id) return;
 
-                                $modalScope.orgUnits.push(node);
+                                orgUnits.push(
+                                    {
+                                        id: node.id,
+                                        name: node.name,
+                                        ean: node.ean,
+                                        localId: node.localId,
+                                        parentId: node.parentId,
+                                        organizationId: node.organizationId
+                                    });
 
                                 _.each(node.children, filter);
                             }
@@ -367,21 +375,35 @@
 
                             // format the selected unit for editing
                             $modalScope.orgUnit = {
-                                'id': unit.id,
-                                'oldName': unit.name,
-                                'newName': unit.name,
-                                'newEan': unit.ean,
-                                'localId': unit.localId,
-                                'newParent': unit.parentId,
-                                'orgId': unit.organizationId,
-                                'isRoot': unit.parentId == undefined
-                            };
+                                id: unit.id,
+                                oldName: unit.name,
+                                newName: unit.name,
+                                newEan: unit.ean,
+                                localId: unit.localId,
+                                newParent: unit.parentId,
+                                orgId: unit.organizationId,
+                                isRoot: unit.parentId == undefined
+                            } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
+
+                            if ($modalScope.orgUnit.isRoot) {
+                                orgUnits.push(
+                                    {
+                                        id: unit.id,
+                                        name: unit.name,
+                                        ean: unit.ean,
+                                        localId: unit.localId,
+                                        parentId: unit.parentId,
+                                        organizationId: unit.organizationId
+                                    });
+                            }
+
+                            bindParentSelect($modalScope.orgUnit, orgUnits);
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
                             $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
-                            $modalScope.patch = function () {
+                            $modalScope.patch = function() {
                                 // don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
@@ -405,21 +427,26 @@
 
                                 var id = unit.id;
 
-                                $http<Kitos.API.Models.IApiWrapper<any>>({ method: "PATCH", url: "api/organizationUnit/" + id + "?organizationId=" + user.currentOrganizationId, data: data }).then((result) => {
-                                    notify.addSuccessMessage(name + " er ændret.");
+                                $http<Kitos.API.Models.IApiWrapper<any>>({
+                                    method: "PATCH",
+                                    url: "api/organizationUnit/" + id + "?organizationId=" + user.currentOrganizationId,
+                                    data: data
+                                }).then((result) => {
+                                        notify.addSuccessMessage(name + " er ændret.");
 
-                                    $modalInstance.close(result.data.response);
-                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
-                                    $modalScope.submitting = false;
-                                    if (error.data.msg.indexOf("Duplicate entry") > -1) {
-                                        notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
-                                    } else {
-                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
-                                    }
-                                });
+                                        $modalInstance.close(result.data.response);
+                                    },
+                                    (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
+                                        $modalScope.submitting = false;
+                                        if (error.data.msg.indexOf("Duplicate entry") > -1) {
+                                            notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
+                                        } else {
+                                            notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                                        }
+                                    });
                             };
 
-                            $modalScope.post = function () {
+                            $modalScope.post = function() {
                                 // don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
@@ -441,21 +468,26 @@
 
                                 $modalScope.submitting = true;
 
-                                $http<Kitos.API.Models.IApiWrapper<any>>({ method: "POST", url: "api/organizationUnit/", data: data }).then((result) => {
-                                    notify.addSuccessMessage(name + " er gemt.");
+                                $http<Kitos.API.Models.IApiWrapper<any>>({
+                                    method: "POST",
+                                    url: "api/organizationUnit/",
+                                    data: data
+                                }).then((result) => {
+                                        notify.addSuccessMessage(name + " er gemt.");
 
-                                    $modalInstance.close(result.data.response);
-                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
-                                    $modalScope.submitting = false;
-                                    if (error.data.msg.indexOf("Duplicate entry") > -1) {
-                                        notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
-                                    } else {
-                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke oprettes!");
-                                    }
-                                });
+                                        $modalInstance.close(result.data.response);
+                                    },
+                                    (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
+                                        $modalScope.submitting = false;
+                                        if (error.data.msg.indexOf("Duplicate entry") > -1) {
+                                            notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
+                                        } else {
+                                            notify.addErrorMessage("Fejl! " + name + " kunne ikke oprettes!");
+                                        }
+                                    });
                             };
 
-                            $modalScope.new = function () {
+                            $modalScope.new = function() {
                                 autofocus();
 
                                 $modalScope.createNew = true;
@@ -466,28 +498,65 @@
                                 };
                             };
 
-                            $modalScope.delete = function () {
+                            $modalScope.delete = function() {
                                 //don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
                                 $modalScope.submitting = true;
 
-                                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" + unit.id + "?organizationId=" + user.currentOrganizationId).then((result) => {
-                                    $modalInstance.close();
-                                    notify.addSuccessMessage(unit.name + " er slettet!");
-                                }, (error) => {
-                                    $modalScope.submitting = false;
+                                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" +
+                                    unit.id +
+                                    "?organizationId=" +
+                                    user.currentOrganizationId).then((result) => {
+                                        $modalInstance.close();
+                                        notify.addSuccessMessage(unit.name + " er slettet!");
+                                    },
+                                    (error) => {
+                                        $modalScope.submitting = false;
 
-                                    notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
+                                        notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
                                                             Organisationsenheden bliver brugt som reference i en eller flere IT Projekter, IT Systemer og/eller IT Kontrakter.<br /><br />
                                                             Fjern referencen for at kunne slette denne enhed.`);
-                                });
+                                    });
 
                             };
 
-                            $modalScope.cancel = function () {
+                            $modalScope.cancel = function() {
                                 $modalInstance.dismiss("cancel");
                             };
+                            
+                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {
+
+                                let existingChoice: { id: number; text: string };
+                                if (currentUnit.isRoot) {
+                                    existingChoice = { id: currentUnit.id, text: currentUnit.newName };
+                                } else {
+                                    const parentNodes = otherOrgUnits.filter(x => x.id === currentUnit.newParent);
+                                    if (parentNodes.length < 1) {
+                                        return;
+                                    }
+                                    const parentNode = parentNodes[0];
+                                    existingChoice = { id: parentNode.id, text: parentNode.name };
+                                }
+
+                                const options = otherOrgUnits.map(value => {
+                                    return {
+                                        id: value.id,
+                                        text: value.name,
+                                        optionalObjectContext: value
+                                    }
+                                });
+
+                                $modalScope.parentSelect = {
+                                    selectedElement: existingChoice,
+                                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, false),
+                                    elementSelected: (newElement) => {
+                                        if (!!newElement) {
+                                            $modalScope.orgUnit.newParent = newElement.id;
+                                        }
+                                }
+                            };
+                            }
                         }
                     ]
                 });

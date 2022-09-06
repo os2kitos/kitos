@@ -23,10 +23,19 @@
                 );
         }
 
-        delete(url: string): ng.IPromise<boolean> {
+        delete(url: string, payload?: any): ng.IPromise<boolean> {
+            let config: ng.IRequestShortcutConfig;
+            if (payload) {
+                config = {
+                    data: payload,
+                    headers: {
+                        "content-type": "application/json"
+                    }
+                }
+            }
             return this
                 .$http
-                .delete(url)
+                .delete(url, config)
                 .then(
                     result => {
                         return true;
@@ -38,10 +47,30 @@
                 );
         }
 
+        post<TResponse>(url: string, payload?: any): ng.IPromise<TResponse> {
+            return this
+                .$http
+                .post(url, payload ?? {})
+                .then(
+                    result => {
+                        var response = result.data as { response: TResponse }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
+        }
+
         put(url: string, payload?: any): ng.IPromise<void> {
             return this
                 .$http
                 .put(url, payload ?? {})
+                .then(_ => { }, error => this.handleServerError(error));
+        }
+
+        patch(url: string, payload?: any): ng.IPromise<void> {
+            return this
+                .$http
+                .patch(url, payload ?? {})
                 .then(_ => { }, error => this.handleServerError(error));
         }
 

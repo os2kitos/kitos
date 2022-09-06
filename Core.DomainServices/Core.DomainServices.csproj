@@ -88,9 +88,15 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="Model\StsOrganization\ResolveOrganizationTreeError.cs" />
+    <Compile Include="Model\StsOrganization\StsOrganizationUnit.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
     <Compile Include="Notifications\UserNotificationService.cs" />
+    <Compile Include="Organizations\IStsOrganizationCompanyLookupService.cs" />
+    <Compile Include="Organizations\IStsOrganizationService.cs" />
+    <Compile Include="Organizations\IStsOrganizationUnitService.cs" />
     <Compile Include="Organizations\OrgUnitService.cs" />
+    <Compile Include="Model\StsOrganization\ResolveOrganizationUuidError.cs" />
     <Compile Include="Queries\Contract\QueryBySupplierUuid.cs" />
     <Compile Include="Queries\Contract\QueryByResponsibleOrganizationUnitUuid.cs" />
     <Compile Include="Queries\Contract\QueryByDataProcessingRegistrationUuid.cs" />
@@ -125,6 +131,8 @@
     <Compile Include="Queries\SystemUsage\QueryByRelationToSystemUsage.cs" />
     <Compile Include="Queries\SystemUsage\QueryBySystemNameContent.cs" />
     <Compile Include="Queries\SystemUsage\QueryBySystemUuid.cs" />
+    <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldBecomeActive.cs" />
+    <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
@@ -194,8 +202,8 @@
     <Compile Include="Repositories\Organization\OrganizationRepository.cs" />
     <Compile Include="Repositories\Organization\OrganizationUnitRepository.cs" />
     <Compile Include="Repositories\SSO\ISsoUserIdentityRepository.cs" />
-    <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
-    <Compile Include="Repositories\SSO\SsoOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\Organization\IStsOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\Organization\StsOrganizationIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\SsoUserIdentityRepository.cs" />
     <Compile Include="Repositories\SystemUsage\IItSystemUsageOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\SystemUsage\ItSystemUsageOverviewReadModelRepository.cs" />
@@ -260,6 +268,10 @@
     <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
       <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
       <Name>Infrastructure.Soap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
+      <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>
+      <Name>Infrastructure.STS.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

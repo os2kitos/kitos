@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Exceptions;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Contract.Write;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Write;
@@ -69,6 +72,8 @@ namespace Core.ApplicationServices.Organizations.Handlers
             ResolveDprConflicts(conflicts, organization);
 
             ResolveRightsHolderConflicts(conflicts, organization);
+
+            ResolveArchiveSupplierConflicts(conflicts, organization);
 
             ClearLocalRegistrations(organization);
 
@@ -203,6 +208,20 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     { OrganizationUuid = OptionalValueChange<Guid?>.With(null) }
                 }).ThrowOnFailure()); 
             organization.Supplier.Clear();
+        }
+
+        private void ResolveArchiveSupplierConflicts(OrganizationRemovalConflicts conflicts, Organization organization)
+        {
+            //Clearing organization on systems where it is set as supplier
+            var organizationSupplier = conflicts.SystemUsagesWhereOrgIsArchiveSupplier.ToList();
+            organizationSupplier.ForEach(x => _itSystemUsageService.Update(x.Uuid,
+                new SystemUsageUpdateParameters
+                {
+                    Archiving = new UpdatedSystemUsageArchivingParameters
+                    {
+                        ArchiveSupplierOrganizationUuid = Maybe<Guid>.None.AsChangedValue()
+                    }
+                }).ThrowOnFailure()); 
         }
     }
 }

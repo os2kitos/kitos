@@ -11,6 +11,11 @@ namespace Core.Abstractions.Extensions
             return src == null ? Maybe<T>.None : Maybe<T>.Some(src);
         }
 
+        public static Maybe<T> FromNullableValueType<T>(this T? src) where T:struct
+        {
+            return src == null ? Maybe<T>.None : Maybe<T>.Some(src.Value);
+        }
+
         public static Maybe<string> FromString(this string src)
         {
             return string.IsNullOrEmpty(src) ? Maybe<string>.None : src;

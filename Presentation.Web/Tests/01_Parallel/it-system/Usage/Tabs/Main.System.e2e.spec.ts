@@ -8,6 +8,12 @@ import ItSystemUsageCommon = require("../../../../PageObjects/it-system/Usage/Ta
 
 describe("User is able to view local it system main page information",
     () => {
+        const userCountInputs = {
+            DefaultNull: { text: "" },
+            Undecided: { text: " " },
+            TenToFifty: { text: "10-50" }
+        };
+
         var loginHelper = new login();
         var testFixture = new TestFixtureWrapper();
         var localItProjectPage = new LocalItProjectConfigPage();
@@ -30,6 +36,8 @@ describe("User is able to view local it system main page information",
             testFixture.cleanupState();
         });
 
+        
+
         it("User can view main page",
             () => {
                 loginHelper.loginAsGlobalAdmin()
@@ -47,6 +55,19 @@ describe("User is able to view local it system main page information",
                     // Re-enable It-projekt
                     .then(() => localItProjectPage.getPage())
                     .then(() => LocalItProjectConfigPage.getIncludeModuleInputElement().click());
+            });
+
+        it("Change UserCount from null to 10-50, then change to undecided",
+            () => {
+                loginHelper.loginAsGlobalAdmin()
+                    .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.DefaultNull.text))
+                    .then(() => ItSystemUsageHelper.selectUserCount(userCountInputs.TenToFifty.text))
+                    .then(() => browser.refresh())
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.TenToFifty.text))
+                    .then(() => ItSystemUsageHelper.selectUserCount(userCountInputs.Undecided.text))
+                    .then(() => browser.refresh())
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.Undecided.text));
             });
     }
 );

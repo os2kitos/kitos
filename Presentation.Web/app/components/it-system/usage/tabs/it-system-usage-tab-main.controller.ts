@@ -22,15 +22,18 @@
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
             $scope.system = itSystemUsage.itSystem;
+            $scope.lastChangedBy = itSystemUsage.lastChangedBy;
+            $scope.lastChanged = itSystemUsage.lastChanged;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
             $scope.numberOfUsersOptions = [
+                { id: "4", text: Kitos.Constants.Select2.EmptyField },
                 { id: "0", text: "<10" },
                 { id: "1", text: "10-50" },
                 { id: "2", text: "50-100" },
-                { id: "3", text: ">100" },
-            ]
+                { id: "3", text: ">100" }
+            ];
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",

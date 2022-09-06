@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Contracts;
 using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
@@ -12,6 +13,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
@@ -31,6 +33,15 @@ namespace Core.ApplicationServices.Contract
         private readonly ILogger _logger;
         private readonly IContractDataProcessingRegistrationAssignmentService _contractDataProcessingRegistrationAssignmentService;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IOptionsService<ItContract, CriticalityType> _criticalityOptionsService;
+        private readonly IOptionsService<ItContract, ItContractType> _contractTypeOptionsService;
+        private readonly IOptionsService<ItContract, ItContractTemplateType> _contractTemplateOptionsService;
+        private readonly IOptionsService<ItContract, PurchaseFormType> _purchaseFormOptionsService;
+        private readonly IOptionsService<ItContract, ProcurementStrategyType> _procurementStrategyOptionsService;
+        private readonly IOptionsService<ItContract, PaymentModelType> _paymentModelOptionsService;
+        private readonly IOptionsService<ItContract, PaymentFreqencyType> _paymentFrequencyOptionsService;
+        private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
+        private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
 
         public ItContractService(
             IItContractRepository repository,
@@ -40,8 +51,17 @@ namespace Core.ApplicationServices.Contract
             IDomainEvents domainEvents,
             IAuthorizationContext authorizationContext,
             ILogger logger,
-            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService, 
-            IOrganizationalUserContext userContext)
+            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService,
+            IOrganizationalUserContext userContext,
+            IOptionsService<ItContract, CriticalityType> criticalityOptionsService,
+            IOptionsService<ItContract, ItContractType> contractTypeOptionsService,
+            IOptionsService<ItContract, ItContractTemplateType> contractTemplateOptionsService,
+            IOptionsService<ItContract, PurchaseFormType> purchaseFormOptionsService,
+            IOptionsService<ItContract, ProcurementStrategyType> procurementStrategyOptionsService,
+            IOptionsService<ItContract, PaymentModelType> paymentModelOptionsService,
+            IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
+            IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
+            IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
@@ -52,6 +72,15 @@ namespace Core.ApplicationServices.Contract
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
             _userContext = userContext;
+            _criticalityOptionsService = criticalityOptionsService;
+            _contractTypeOptionsService = contractTypeOptionsService;
+            _contractTemplateOptionsService = contractTemplateOptionsService;
+            _purchaseFormOptionsService = purchaseFormOptionsService;
+            _procurementStrategyOptionsService = procurementStrategyOptionsService;
+            _paymentModelOptionsService = paymentModelOptionsService;
+            _paymentFrequencyOptionsService = paymentFrequencyOptionsService;
+            _optionExtendOptionsService = optionExtendOptionsService;
+            _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -76,8 +105,12 @@ namespace Core.ApplicationServices.Contract
             return itContract;
         }
 
-        public IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null)
+        public Result<IQueryable<ItContract>, OperationError> GetAllByOrganization(int orgId, string optionalNameSearch = null)
         {
+            if (_authorizationContext.GetOrganizationReadAccessLevel(orgId) != OrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
             var contracts = _repository.GetContractsInOrganization(orgId);
 
             if (!string.IsNullOrWhiteSpace(optionalNameSearch))
@@ -85,7 +118,7 @@ namespace Core.ApplicationServices.Contract
                 contracts = contracts.ByPartOfName(optionalNameSearch);
             }
 
-            return contracts;
+            return Result<IQueryable<ItContract>, OperationError>.Success(contracts);
         }
 
         public Result<ItContract, OperationFailure> Delete(int id)
@@ -217,6 +250,45 @@ namespace Core.ApplicationServices.Contract
                             overlapsFound ? new OperationError(OperationFailure.Conflict) : Maybe<OperationError>.None,
                         error => error
                     );
+        }
+
+        public Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId)
+        {
+            return WithOrganizationReadAccess(organizationId,
+                () => new ContractOptions(
+                    _criticalityOptionsService.GetAllOptionsDetails(organizationId),
+                    _contractTypeOptionsService.GetAllOptionsDetails(organizationId),
+                    _contractTemplateOptionsService.GetAllOptionsDetails(organizationId),
+                    _purchaseFormOptionsService.GetAllOptionsDetails(organizationId),
+                    _procurementStrategyOptionsService.GetAllOptionsDetails(organizationId),
+                    _paymentModelOptionsService.GetAllOptionsDetails(organizationId),
+                    _paymentFrequencyOptionsService.GetAllOptionsDetails(organizationId),
+                    _optionExtendOptionsService.GetAllOptionsDetails(organizationId),
+                    _terminationDeadlineOptionsService.GetAllOptionsDetails(organizationId)));
+        }
+
+        public Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlans(int organizationId)
+        {
+            return GetAllByOrganization(organizationId)
+                .Select<IEnumerable<(int year, int quarter)>>(contracts => contracts
+                    .Where(contract => contract.ProcurementPlanYear != null && contract.ProcurementPlanQuarter != null)
+                    .Select(c => new { c.ProcurementPlanYear, c.ProcurementPlanQuarter })
+                    .Distinct()
+                    .OrderBy(x => x.ProcurementPlanYear)
+                    .ThenBy(x => x.ProcurementPlanQuarter)
+                    .ToList()
+                    .Select(x => (x.ProcurementPlanYear.GetValueOrDefault(), x.ProcurementPlanQuarter.GetValueOrDefault()))
+                    .ToList()
+                ); 
+        }
+
+        private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
+        {
+            var readAccessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
+
+            return readAccessLevel < OrganizationDataReadAccessLevel.All
+                ? new OperationError(OperationFailure.Forbidden)
+                : authorizedAction();
         }
 
         private IQueryable<ItContract> SearchByName(int organizationId, string name)

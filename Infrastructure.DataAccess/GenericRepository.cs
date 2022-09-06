@@ -5,8 +5,8 @@ using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using Core.DomainServices;
+using Infrastructure.DataAccess.Extensions;
 
 namespace Infrastructure.DataAccess
 {
@@ -17,17 +17,7 @@ namespace Infrastructure.DataAccess
         private readonly DbSet<T> _dbSet;
         private bool _disposed;
 
-        private readonly Lazy<IReadOnlyList<MethodInfo>> _entityTypeVirtualGetters =
-            new Lazy<IReadOnlyList<MethodInfo>>(
-                () =>
-                    typeof(T)
-                        .GetProperties()
-                        .Where(property => property.CanRead)
-                        .Select(property => property.GetMethod)
-                        .Where(getMethod => getMethod.IsVirtual && getMethod.IsPublic)
-                        .ToList()
-                        .AsReadOnly()
-            );
+        private readonly Lazy<EntityPropertyProxyValueLoader<T>> _proxyValueLoader = new(() => new EntityPropertyProxyValueLoader<T>());
 
         public GenericRepository(KitosContext context)
         {
@@ -136,11 +126,7 @@ namespace Infrastructure.DataAccess
 
         private void LoadReferencedEntities(T entity)
         {
-            //Invoke getters of all reference properties. This solves the issue of EF not cascading on optional foreign keys in reference objects which may reference either one or many of the different root elements. Example: TaskRef
-            _entityTypeVirtualGetters
-                .Value
-                .Select(methodInfo => methodInfo.Invoke(entity, new object[0]))
-                .ToList();
+            _proxyValueLoader.Value.LoadReferencedEntities(entity);
         }
 
         public void Update(T entity)

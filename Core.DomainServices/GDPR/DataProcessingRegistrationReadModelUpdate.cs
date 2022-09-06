@@ -47,6 +47,7 @@ namespace Core.DomainServices.GDPR
             PatchIsOversightCompleted(source, destination);
             PatchContracts(source, destination);
             PatchLatestOversightDate(source, destination);
+            PatchLastUpdateBy(source, destination);
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,
@@ -92,6 +93,7 @@ namespace Core.DomainServices.GDPR
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(x => (x.ItSystem.Name, x.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
+            destination.SystemUuidsAsCsv = string.Join(", ", source.SystemUsages.Select(x => x.ItSystem.Uuid));
         }
 
         private static void PatchContracts(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -201,6 +203,13 @@ namespace Core.DomainServices.GDPR
             {
                 destination.LatestOversightDate = null;
             }
+        }
+
+        private static void PatchLastUpdateBy(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.LastChangedById = source.LastChangedByUserId;
+            destination.LastChangedByName = source.LastChangedByUser != null ? source.LastChangedByUser.GetFullName() : "";
+            destination.LastChangedAt = source.LastChanged;
         }
     }
 }

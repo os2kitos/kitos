@@ -179,6 +179,11 @@ namespace Presentation.Web.Infrastructure
                     return isValid;
                 }
 
+                if (user.Deleted)
+                {
+                    Logger.Warn("Attempt to authenticate deleted user with id:{id}",user.Id);
+                    return false;
+                }
                 // having a LockedOutDate means that the user is locked out
                 if (user.LockedOutDate != null)
                 {

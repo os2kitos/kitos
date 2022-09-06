@@ -30,6 +30,7 @@
         dprInOtherOrganizationsWhereOrgIsSubDataProcessor: Models.Generic.NamedEntity.EntityWithOrganizationRelationshipDTO[];
         contractsInOtherOrganizationsWhereOrgIsSupplier: Models.Generic.NamedEntity.EntityWithOrganizationRelationshipDTO[];
         systemsInOtherOrganizationsWhereOrgIsRightsHolder: Models.Generic.NamedEntity.EntityWithOrganizationRelationshipDTO[];
+        systemsWhereOrgIsArchiveSupplier: Models.Generic.NamedEntity.EntityWithOrganizationRelationshipDTO[];
     }
 
     export function detectConflicts(conflicts: OrganizationDeleteConflicts): boolean {
@@ -40,6 +41,7 @@
             conflicts.dprInOtherOrganizationsWhereOrgIsDataProcessor.length > 0 ||
             conflicts.dprInOtherOrganizationsWhereOrgIsSubDataProcessor.length > 0 ||
             conflicts.contractsInOtherOrganizationsWhereOrgIsSupplier.length > 0 ||
-            conflicts.systemsInOtherOrganizationsWhereOrgIsRightsHolder.length > 0;
+            conflicts.systemsInOtherOrganizationsWhereOrgIsRightsHolder.length > 0 ||
+            conflicts.systemsWhereOrgIsArchiveSupplier.length > 0;
     }
 }

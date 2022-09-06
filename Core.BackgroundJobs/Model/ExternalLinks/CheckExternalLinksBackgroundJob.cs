@@ -124,6 +124,8 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
                     return BrokenLinkCause.CommunicationError;
                 case EndpointValidationErrorType.ErrorResponseCode:
                     return BrokenLinkCause.ErrorResponse;
+                case EndpointValidationErrorType.TlsError:
+                    return BrokenLinkCause.TlsError;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(errorErrorType), errorErrorType, null);
             }

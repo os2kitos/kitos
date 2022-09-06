@@ -815,7 +815,7 @@ declare namespace protractor {
         * @alias element(locator).getWebElement()
         * @return {webdriver.WebElement}
         */
-        getWebElement(): webdriver.WebElement;
+        getWebElement(): webdriver.promise.Promise<webdriver.WebElement>;
 
         /**
         * Evaluates the input as if it were on the scope of the current element.

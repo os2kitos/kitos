@@ -31,6 +31,7 @@ namespace Core.DomainModel.GDPR.Read
         public string MainReferenceTitle { get; set; }
 
         public string SystemNamesAsCsv { get; set; }
+        public string SystemUuidsAsCsv { get; set; }
         
         public string DataProcessorNamesAsCsv { get; set; }
         
@@ -59,5 +60,8 @@ namespace Core.DomainModel.GDPR.Read
         public YesNoUndecidedOption? IsOversightCompleted { get; set; }
 
         public string ContractNamesAsCsv { get; set; }
+        public int? LastChangedById { get; set; }
+        public string LastChangedByName { get; set; }
+        public DateTime LastChangedAt { get; set; }
     }
 }

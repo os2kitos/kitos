@@ -14,9 +14,10 @@ module.exports = {
         npm("/tinymce/plugins/image/plugin.min.js"),
         npm("/tinymce/plugins/code/plugin.min.js"),
         npm("/tinymce/plugins/link/plugin.min.js"),
-        npm("/tinymce/themes/modern/theme.min.js"),
+        npm("/tinymce/themes/silver/theme.min.js"),
+        npm("/tinymce/icons/default/icons.min.js"),
         npm("/js-sha256/src/sha256.js")
-    ],
+],
     libraryBundle: "library-bundle.min.js",
 
     libraryStylesSrc: [
@@ -24,8 +25,10 @@ module.exports = {
         npm("/select2-bootstrap-css/select2-bootstrap.min.css"),
         npm("/angular-loading-bar/build/loading-bar.min.css"),
         npm("/angular-ui-tree/dist/angular-ui-tree.min.css"),
-        npm("/tinymce/skins/lightgray/skin.min.css"),
-        npm("/tinymce/skins/lightgray/content.min.css")
+        npm("/tinymce/skins/ui/oxide/skin.min.css"),
+        npm("/tinymce/skins/ui/oxide/content.min.css"),
+        npm("/tinymce/skins/content/default/content.css"),
+        npm("/tinymce/skins/content/default/content.min.css")
     ],
 
     // angular script bundle
@@ -61,10 +64,6 @@ module.exports = {
         npm("/font-awesome/fonts/*.*")
     ],
 
-    tinyMCEFontSrc: [
-        npm("/tinymce/skins/lightgray/fonts/*.*")
-    ],
-
     // assets
     assetsSrc: [
         npm("/select2/*.png"),
@@ -79,7 +78,6 @@ module.exports = {
     cssBundleMin: "app.min.css",
 
     fontDest: content("/fonts"),
-    tinyMCEFontDest: content("/css/fonts"),
     cssDest: content("/css"),
     maps: "maps",
 

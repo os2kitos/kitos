@@ -9,7 +9,7 @@
                 Roles: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()],
                 object: ["itSystemUsage", itSystemUsage => itSystemUsage],
-                type: [() => "itSystemUsage"],
+                type: [() => Kitos.Models.Advice.AdviceType.ItSystemUsage],
                 advicename: ["$http", "$stateParams",
                     ($http, $stateParams) => $http.get(`api/itSystemUsage/${$stateParams.id}`).then(result => {
                         var itSystemUsage = result.data.response;

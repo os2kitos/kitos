@@ -64,11 +64,8 @@
             return RenderFieldsHelper.noValueFallback;
         }
 
-        static renderDate(date: Date | undefined | null) {
-            if (!!date) {
-                return moment(date).format(Constants.DateFormat.DanishDateFormat);
-            }
-            return RenderFieldsHelper.noValueFallback;
+        static renderDate(date: Date | string | undefined | null) {
+            return ExcelExportHelper.renderDate(date);
         }
     }
 }

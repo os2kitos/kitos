@@ -59,11 +59,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\EntityPropertyProxyValueLoader.cs" />
     <Compile Include="GenericRepository.cs" />
     <Compile Include="Interceptors\EFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\AdviceUserRelationMap.cs" />
     <Compile Include="Mapping\AttachedOptionMap.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\CriticalityTypeMap.cs" />
     <Compile Include="Mapping\CustomizedUINodeMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationOversightDateMap.cs" />
@@ -88,8 +91,8 @@
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
+    <Compile Include="Mapping\StsOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
-    <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
     <Compile Include="Mapping\BrokenLinkInInterfaceMap.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
@@ -117,8 +120,6 @@
     <Compile Include="Mapping\ItSystemUsageOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectStatusMap.cs" />
-    <Compile Include="Mapping\HandoverTrialMap.cs" />
-    <Compile Include="Mapping\HandoverTrialTypeMap.cs" />
     <Compile Include="Mapping\EntityMap.cs" />
     <Compile Include="Mapping\EconomyStreamMap.cs" />
     <Compile Include="Mapping\OptionEntityMap.cs" />
@@ -860,6 +861,58 @@
     <Compile Include="Migrations\202205181142292_Added_UIModuleCustomization.designer.cs">
       <DependentUpon>202205181142292_Added_UIModuleCustomization.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202205190801320_UserDelete.cs" />
+    <Compile Include="Migrations\202205190801320_UserDelete.designer.cs">
+      <DependentUpon>202205190801320_UserDelete.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206010716273_ChangedProcurementPlanHalfToQuarter.cs" />
+    <Compile Include="Migrations\202206010716273_ChangedProcurementPlanHalfToQuarter.designer.cs">
+      <DependentUpon>202206010716273_ChangedProcurementPlanHalfToQuarter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206081008542_Rename_SsoOrgIdentity.cs" />
+    <Compile Include="Migrations\202206081008542_Rename_SsoOrgIdentity.designer.cs">
+      <DependentUpon>202206081008542_Rename_SsoOrgIdentity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.cs" />
+    <Compile Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.designer.cs">
+      <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.cs" />
+    <Compile Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.designer.cs">
+      <DependentUpon>202206221441060_AddProcurmentInitiatedToItContract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206240625598_AddCriticalityType.cs" />
+    <Compile Include="Migrations\202206240625598_AddCriticalityType.designer.cs">
+      <DependentUpon>202206240625598_AddCriticalityType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207060929536_Rename_Criticality_fields_on_contract.cs" />
+    <Compile Include="Migrations\202207060929536_Rename_Criticality_fields_on_contract.designer.cs">
+      <DependentUpon>202207060929536_Rename_Criticality_fields_on_contract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.cs" />
+    <Compile Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.designer.cs">
+      <DependentUpon>202207080532355_Remove_AccessModifier_From_Economystream.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207120737229_AddedUserCountUndecided.cs" />
+    <Compile Include="Migrations\202207120737229_AddedUserCountUndecided.designer.cs">
+      <DependentUpon>202207120737229_AddedUserCountUndecided.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207121044195_RemovedHandoverTrialsAndPaymentMilestones.cs" />
+    <Compile Include="Migrations\202207121044195_RemovedHandoverTrialsAndPaymentMilestones.designer.cs">
+      <DependentUpon>202207121044195_RemovedHandoverTrialsAndPaymentMilestones.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs" />
+    <Compile Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.designer.cs">
+      <DependentUpon>202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207270956038_fixArchiveSupplier.cs" />
+    <Compile Include="Migrations\202207270956038_fixArchiveSupplier.designer.cs">
+      <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202208211025538_fix_advice_role_relations.cs" />
+    <Compile Include="Migrations\202208211025538_fix_advice_role_relations.designer.cs">
+      <DependentUpon>202208211025538_fix_advice_role_relations.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1420,6 +1473,45 @@
     <EmbeddedResource Include="Migrations\202205181142292_Added_UIModuleCustomization.resx">
       <DependentUpon>202205181142292_Added_UIModuleCustomization.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202205190801320_UserDelete.resx">
+      <DependentUpon>202205190801320_UserDelete.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206010716273_ChangedProcurementPlanHalfToQuarter.resx">
+      <DependentUpon>202206010716273_ChangedProcurementPlanHalfToQuarter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206081008542_Rename_SsoOrgIdentity.resx">
+      <DependentUpon>202206081008542_Rename_SsoOrgIdentity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.resx">
+      <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206221441060_AddProcurmentInitiatedToItContract.resx">
+      <DependentUpon>202206221441060_AddProcurmentInitiatedToItContract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206240625598_AddCriticalityType.resx">
+      <DependentUpon>202206240625598_AddCriticalityType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207060929536_Rename_Criticality_fields_on_contract.resx">
+      <DependentUpon>202207060929536_Rename_Criticality_fields_on_contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207080532355_Remove_AccessModifier_From_Economystream.resx">
+      <DependentUpon>202207080532355_Remove_AccessModifier_From_Economystream.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207120737229_AddedUserCountUndecided.resx">
+      <DependentUpon>202207120737229_AddedUserCountUndecided.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207121044195_RemovedHandoverTrialsAndPaymentMilestones.resx">
+      <DependentUpon>202207121044195_RemovedHandoverTrialsAndPaymentMilestones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.resx">
+      <DependentUpon>202207130738458_AddedSystemUuidsAsCsvToDPRReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207270956038_fixArchiveSupplier.resx">
+      <DependentUpon>202207270956038_fixArchiveSupplier.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202208211025538_fix_advice_role_relations.resx">
+      <DependentUpon>202208211025538_fix_advice_role_relations.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1498,6 +1590,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Set_OwnerOrgUnitOnAllTaskRefs.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_AdviceUserRelations_Role_Relationships.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

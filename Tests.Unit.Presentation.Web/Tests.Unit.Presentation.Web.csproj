@@ -97,8 +97,8 @@
     <Reference Include="Moq, Version=4.14.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.14.5\lib\net45\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
@@ -215,6 +215,7 @@
     <Compile Include="DomainServices\DPR\QueryBySystemUuidTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelRepositoryTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByDescriptionContentTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByKeyPrefixTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByParentKeyTest.cs" />
@@ -234,6 +235,8 @@
     <Compile Include="DomainServices\SystemUsage\QueryByRelationToSystemUsageTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryBySystemNameContentTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryBySystemUuidTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\QueryReadModelsWhichShouldBecomeActiveTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\QueryReadModelsWhichShouldExpireTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderIdOrOwnOrganizationIdsTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByRightsHolderTest.cs" />
@@ -256,6 +259,7 @@
     <Compile Include="Extensions\ItSystemExtensions.cs" />
     <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
+    <Compile Include="Helpers\ItSystemUsageOverviewReadModelTestData.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
@@ -272,7 +276,6 @@
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />
-    <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="Services\ItProjectServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />

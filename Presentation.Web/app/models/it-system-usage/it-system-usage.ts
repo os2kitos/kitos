@@ -19,16 +19,16 @@
         /** Gets or sets the it system this instance is using. */
         ItSystem: ItSystem;
         ArchiveTypeId: number;
-        ArchiveType: ItSystem.IArchiveType;
+        ArchiveType: Models.OData.Generic.IOptionDTO<IItSystemUsage>;
 
         ArchiveLocationId: number;
-        ArchiveLocation: ItSystem.IArchiveLocation;
+        ArchiveLocation: Models.OData.Generic.IOptionDTO<IItSystemUsage>;
 
         ArchiveTestLocationId: number;
-        ArchiveTestLocation: ItSystem.IArchiveTestLocation;
+        ArchiveTestLocation: Models.OData.Generic.IOptionDTO<IItSystemUsage>;
 
         SensitiveDataTypeId: number;
-        SensitiveDataType: ItSystem.ISensitiveDataType;
+        SensitiveDataType: Models.OData.Generic.IOptionDTO<IItSystemUsage>;
         /** Gets or sets the main it contract for this instance.The it contract is used to determine whether this instanceis marked as active/inactive. */
         MainContract: ItContract.IItContractItSystemUsage;
         /** Gets or sets it contracts associated with this instance. */
@@ -59,5 +59,7 @@
         SensitiveDataLevels: Models.Odata.ItSystemUsage.IItSystemUsageSensitiveDataLevelDTO[];
 
         AssociatedDataProcessingRegistrations: Models.OData.DataProcessing.IDataProcessingRegistration[];
+
+        Uuid: string;
     }
 }

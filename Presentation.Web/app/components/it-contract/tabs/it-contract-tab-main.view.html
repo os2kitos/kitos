@@ -19,7 +19,7 @@
                         </div>
 
                         <!-- Id -->
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isContractIdEnabled">
                             <label for="contract-id" class="control-label small">KontraktID</label>
                             <input type="text" id="contract-id" class="form-control input-sm"
                                    data-ng-disabled="!hasWriteAccess"
@@ -29,31 +29,40 @@
                         </div>
 
                         <!-- Type -->
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isContractTypeEnabled">
                             <select2-option data-id="contract-type"
-                                           data-label="Kontrakttype"
-                                           data-placeholder="Vælg kontrakttype"
-                                           data-selected-text="{{ contract.contractTypeName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.contractTypeId"
-                                           data-options="contractTypes"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="contractTypeId">
+                                            data-label="Kontrakttype"
+                                            data-placeholder="Vælg kontrakttype"
+                                            data-selected-text="{{ contract.contractTypeName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.contractTypeId"
+                                            data-options="contractTypes"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="contractTypeId">
                             </select2-option>
                         </div>
 
                         <!-- Contract template -->
                         <div class="form-group">
                             <select2-option data-id="contract-template"
-                                           data-label="Kontraktskabelon"
-                                           data-placeholder="Vælg kontraktskabelon"
-                                           data-selected-text="{{ contract.contractTemplateName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.contractTemplateId"
-                                           data-options="contractTemplates"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="contractTemplateId">
+                                            data-label="Kontraktskabelon"
+                                            data-placeholder="Vælg kontraktskabelon"
+                                            data-selected-text="{{ contract.contractTemplateName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.contractTemplateId"
+                                            data-options="contractTemplates"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="contractTemplateId">
                             </select2-option>
+                        </div>
+                        
+                        <!--Criticality type-->
+                        <div class="form-group">
+                            <label for="criticality" class="control-label small">Kritikalitet</label>
+                            <single-select-select2 id="criticality"
+                                                   data-placeholder="Vælg kritikalitet"
+                                                   ng-model="criticality"
+                                                   ng-disabled="!hasWriteAccess" />
                         </div>
                     </div>
 
@@ -68,47 +77,52 @@
                         </div>
 
                         <!-- Purchase form -->
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isPurchaseFormEnabled">
                             <select2-option data-id="contract-purchaseform"
-                                           data-label="Indkøbsform"
-                                           data-placeholder="Vælg indkøbsform"
-                                           data-selected-text="{{ contract.purchaseFormName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.purchaseFormId"
-                                           data-options="purchaseForms"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="purchaseFormId">
+                                            data-label="Indkøbsform"
+                                            data-placeholder="Vælg indkøbsform"
+                                            data-selected-text="{{ contract.purchaseFormName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.purchaseFormId"
+                                            data-options="purchaseForms"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="purchaseFormId">
                             </select2-option>
                         </div>
 
                         <!-- Procurement strategy -->
-                        <div class="form-group">
+                        <div id="selectProcurementStrategy" class="form-group" ng-if="showProcurementStrategySelection">
                             <select2-option data-id="contract-strat"
-                                           data-label="Udbudsstrategi"
-                                           data-placeholder="Vælg udbudsstrategi"
-                                           data-selected-text="{{ contract.procurementStrategyName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="contract.procurementStrategyId"
-                                           data-options="procurementStrategies"
-                                           data-auto-save-url="{{ autoSaveUrl }}"
-                                           data-field="procurementStrategyId">
+                                            data-label="Genanskaffelsesstrategi"
+                                            data-placeholder="Vælg genanskaffelsesstrategi"
+                                            data-selected-text="{{ contract.procurementStrategyName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="contract.procurementStrategyId"
+                                            data-options="procurementStrategies"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="procurementStrategyId">
                             </select2-option>
                         </div>
 
                         <!-- Procurement plan -->
-                        <div class="form-group">
+                        <div id="selectProcurementPlan" class="form-group" ng-if="showprocurementPlanSelection">
                             <select-simple data-id="contract-plan"
-                                           data-label="Udbudsplan"
-                                           data-placeholder="Vælg udbudsplan"
+                                           data-label="Genanskaffelsesplan"
+                                           data-placeholder="Vælg genanskaffelsesplan"
                                            data-options="procurementPlans"
                                            data-ng-model="procurementPlanId"
                                            data-function="saveProcurement"
                                            data-ng-disabled="!hasWriteAccess">
                             </select-simple>
                         </div>
-
+                        
+                        <!-- Procurement initiated-->
+                        <div id="selectProcurementInitiated" class="form-group" ng-if="showProcurementInitiated">
+                            <label for="procurement-initiated" class="control-label small">Genanskaffelse igangsat</label>
+                            <single-select-select2 id="procurement-initiated" ng-model="procurementInitiated" ng-disabled="!hasWriteAccess"/>
+                        </div>
                     </div>
-                    <div class="col-xs-12"  data-ng-hide="!hasViewAccess">
+                    <div class="col-xs-12">
                         <div class="form-group">
                             <label for="contract-note" class="control-label small">Bemærkning</label>
                             <textarea id="contract-note" class="form-control input-sm" rows="4"
@@ -134,11 +148,12 @@
                             <input type="hidden" id="contract-supplier" class="form-control input-sm"
                                    data-ui-select2="suppliersSelectOptions"
                                    data-ng-model="contract.supplier"
+                                   data-placeholder="Vælg leverandør"
                                    data-autosave="{{ autoSaveUrl }}" data-field="supplierId"
                                    data-ng-disabled="!hasWriteAccess">
                         </div>
                         <!-- Extern contract signer -->
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isExternalSignerEnabled">
                             <label for="contract-ext-signer" class="control-label small">Leverandørs kontraktunderskriver</label>
                             <input type="text" id="contract-ext-signer" class="form-control input-sm"
                                    data-ng-disabled="!hasWriteAccess"
@@ -148,7 +163,7 @@
                         </div>
 
                         <!-- Extern contract is signed -->
-                        <div class="checkbox">
+                        <div class="checkbox" ng-if="isExternalSignerEnabled">
                             <label>
                                 <input type="checkbox" id="contract-ext-signed"
                                        data-ng-model="contract.hasSupplierSigned"
@@ -160,7 +175,7 @@
                         </div>
 
                         <!-- Extern contract signed date -->
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isExternalSignerEnabled">
                             <label for="contract-ext-date" class="control-label small">Dato</label>
                             <input type="text" id="contract-ext-date" class="form-control"
                                    data-kendo-date-picker
@@ -170,62 +185,8 @@
                                    ng-blur="patchDate('supplierSignedDate', contract.supplierSignedDate)"
                                    data-field="supplierSignedDate">
                         </div>
-                    </div>
 
-                    <!-- 4th column -->
-                    <div class="col-xs-6">
-                        <!-- Responsible org unit -->
-                        <div class="form-group">
-                            <select2-org-unit  data-id="contract-orgunit"
-                                               data-label="Ansvarlig enhed"
-                                               data-placeholder="Vælg ansvarlig enhed"
-                                               data-options="orgUnits"
-                                               data-ng-model="contract.responsibleOrganizationUnitId"
-                                               data-auto-save-url="{{ autoSaveUrl }}"
-                                               data-field="responsibleOrganizationUnitId"
-                                               data-ng-disabled="!hasWriteAccess"
-                                               data-allow-clear="allowClear">
-                            </select2-org-unit>
-                        </div>
-
-                        <div class="form-group">
-                            <!-- Intern contract signer -->
-                            <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
-                            <typeahead id="contract-int-signer"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-autosave-url="{{ autoSaveUrl }}"
-                                       data-items="kitosUsers"
-                                       data-ng-model="contract.contractSigner"
-                                       data-field="contractSigner"
-                                       data-user-has-write-access="hasWriteAccess" />
-                        </div>
-
-                        <!-- Intern contract is signed -->
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" id="contract-int-signed"
-                                       data-ng-model="contract.isSigned"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-autosave="{{ autoSaveUrl }}"
-                                       data-field="isSigned">
-                                Underskrevet
-                            </label>
-                        </div>
-
-                        <!-- Intern contract signed date -->
-                        <div class="form-group">
-                            <label for="contract-int-date" class="control-label small">Dato</label>
-                            <input type="text" id="contract-int-date" class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="contract.signedDate"
-                                   ng-blur="patchDate('signedDate', contract.signedDate)"
-                                   data-field="signedDate">
-                        </div>
-                    </div>
-                    <div class="col-xs-12">
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isagreementPeriodEnabled">
                             <label for="agreement-concluded" class="control-label small">
                                 Gyldig fra
                             </label>
@@ -238,6 +199,62 @@
                                    data-ng-model="contract.concluded"
                                    data-ng-blur="checkContractValidity('concluded', contract.concluded)"
                                    data-field="concluded">
+                        </div>
+                    </div>
+
+                    <!-- 4th column -->
+                    <div class="col-xs-6">
+                        <!-- Responsible org unit -->
+                        <div class="form-group">
+                            <select2-org-unit data-id="contract-orgunit"
+                                              data-label="Ansvarlig enhed"
+                                              data-placeholder="Vælg ansvarlig enhed"
+                                              data-options="orgUnits"
+                                              data-ng-model="contract.responsibleOrganizationUnitId"
+                                              data-auto-save-url="{{ autoSaveUrl }}"
+                                              data-field="responsibleOrganizationUnitId"
+                                              data-ng-disabled="!hasWriteAccess"
+                                              data-allow-clear="allowClear">
+                            </select2-org-unit>
+                        </div>
+
+                        <div class="form-group" ng-if="isInternalSignerEnabled">
+                            <!-- Intern contract signer -->
+                            <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
+                            <typeahead id="contract-int-signer"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-autosave-url="{{ autoSaveUrl }}"
+                                       data-items="kitosUsers"
+                                       data-ng-model="contract.contractSigner"
+                                       data-field="contractSigner"
+                                       data-user-has-write-access="hasWriteAccess" />
+                        </div>
+
+                        <!-- Intern contract is signed -->
+                        <div class="checkbox" ng-if="isInternalSignerEnabled">
+                            <label>
+                                <input type="checkbox" id="contract-int-signed"
+                                       data-ng-model="contract.isSigned"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-autosave="{{ autoSaveUrl }}"
+                                       data-field="isSigned">
+                                Underskrevet
+                            </label>
+                        </div>
+
+                        <!-- Intern contract signed date -->
+                        <div class="form-group" ng-if="isInternalSignerEnabled">
+                            <label for="contract-int-date" class="control-label small">Dato</label>
+                            <input type="text" id="contract-int-date" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.signedDate"
+                                   ng-blur="patchDate('signedDate', contract.signedDate)"
+                                   data-field="signedDate">
+                        </div>
+
+                        <div class="form-group" ng-if="isagreementPeriodEnabled">
                             <label for="agreement-expiration" class="control-label small">Gyldig til</label>
                             <input type="text" class="form-control" id="agreement-expiration"
                                    data-kendo-date-picker
@@ -250,7 +267,7 @@
                     </div>
 
                     <!-- Intern contract is Active regardless of concluded and expirationdate -->
-                    <div class="col-xs-12">
+                    <div class="col-xs-12" ng-if="isActiveEnabled">
                         <input type="checkbox" id="contractIsActive"
                                class="tags-checkbox sr-only"
                                data-ng-model="contract.active"
@@ -264,6 +281,25 @@
                             <span class='label-content'>Gyldig: </span>
                         </label>
                         <i ng-show="contract.isActive" class="fa fa-check" aria-hidden="true"></i>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="last-changed-by-name" class="control-label small">Sidst redigeret: Bruger</label>
+                            <input type="text"
+                                   id="last-changed-by-name"
+                                   value="{{contract.lastChangedByName}}"
+                                   class="form-control input-sm"
+                                   disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-changed" class="control-label small">Sidst redigeret: Dato</label>
+                            <input type="text"
+                                   id="last-changed"
+                                   value="{{ ::lastChanged }}"
+                                   class="form-control input-sm"
+                                   disabled>
+                        </div>
                     </div>
                 </div>
             </div>

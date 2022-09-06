@@ -27,6 +27,5 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// </summary>
         [NonEmptyGuid]
         public IdentityNamePairResponseDTO PriceRegulation { get; set; }
-        public IEnumerable<PaymentMileStoneDTO> PaymentMileStones { get; set; }
     }
 }

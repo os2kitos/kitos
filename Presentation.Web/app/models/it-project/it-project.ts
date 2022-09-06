@@ -15,7 +15,7 @@
         Children: IItProject[];
 
         ItProjectTypeId: number;
-        ItProjectType: IItProjectType;
+        ItProjectType: Models.OData.Generic.IOptionDTO<IItProject>;
 
         /** Gets or sets the organization identifier in which this project was created. */
         OrganizationId: number;

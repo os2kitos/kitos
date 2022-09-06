@@ -14,7 +14,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public Maybe<ItContractProcurementModificationParameters> Procurement { get; set; } = Maybe<ItContractProcurementModificationParameters>.None;
         public Maybe<ItContractResponsibleDataModificationParameters> Responsible { get; set; } = Maybe<ItContractResponsibleDataModificationParameters>.None;
         public Maybe<ItContractSupplierModificationParameters> Supplier { get; set; } = Maybe<ItContractSupplierModificationParameters>.None;
-        public Maybe<IEnumerable<ItContractHandoverTrialUpdate>> HandoverTrials { get; set; } = Maybe<IEnumerable<ItContractHandoverTrialUpdate>>.None;
         public Maybe<IEnumerable<UpdatedExternalReferenceProperties>> ExternalReferences { get; set; } = Maybe<IEnumerable<UpdatedExternalReferenceProperties>>.None;
         public Maybe<IEnumerable<Guid>> SystemUsageUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
         public Maybe<IEnumerable<UserRolePair>> Roles { get; set; } = Maybe<IEnumerable<UserRolePair>>.None;

@@ -13,6 +13,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
+using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
@@ -35,6 +36,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private readonly Mock<IOptionsService<ItContract, CriticalityType>> _criticalityOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, ItContractType>> _contractTypeOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, ItContractTemplateType>> _contractTemplateOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PurchaseFormType>> _purchaseFromOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, ProcurementStrategyType>> _procurementStrategyOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PaymentModelType>> _paymentModelOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, PaymentFreqencyType>> _paymentFreqencyOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, OptionExtendType>> _optionExtendOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItContract, TerminationDeadlineType>> _terminationDeadlineOptionsServiceMock;
 
         public ItContractServiceTest()
         {
@@ -47,6 +57,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
+            _criticalityOptionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
+            _contractTypeOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractType>>();
+            _contractTemplateOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractTemplateType>>();
+            _purchaseFromOptionsServiceMock = new Mock<IOptionsService<ItContract, PurchaseFormType>>();
+            _procurementStrategyOptionsServiceMock = new Mock<IOptionsService<ItContract, ProcurementStrategyType>>();
+            _paymentModelOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentModelType>>();
+            _paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
+            _optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
+            _terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
@@ -56,7 +75,16 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _authorizationContext.Object,
                 _logger.Object,
                 _contractDataProcessingRegistrationAssignmentService.Object,
-                _userContextMock.Object);
+                _userContextMock.Object,
+                _criticalityOptionsServiceMock.Object,
+                _contractTypeOptionsServiceMock.Object,
+                _contractTemplateOptionsServiceMock.Object,
+                _purchaseFromOptionsServiceMock.Object,
+                _procurementStrategyOptionsServiceMock.Object,
+                _paymentModelOptionsServiceMock.Object,
+                _paymentFreqencyOptionsServiceMock.Object,
+                _optionExtendOptionsServiceMock.Object,
+                _terminationDeadlineOptionsServiceMock.Object);
         }
 
         [Fact]
@@ -64,7 +92,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var contractId = A<int>();
-            ExpectGetContractReturns(contractId, default(ItContract));
+            ExpectGetContractReturns(contractId, default);
 
             //Act
             var result = _sut.Delete(contractId);
@@ -138,7 +166,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var contract = new ItContract();
             ExpectGetContractReturns(id, contract);
             ExpectAllowReadReturns(contract, true);
-            var dataProcessingRegistrations = new[] { new DataProcessingRegistration() { Id = dataProcessingRegistration1Id,  Name = $"{nameQuery}{1}" }, new DataProcessingRegistration() { Id = dataProcessingRegistration2Id, Name = $"{nameQuery}{1}" } };
+            var dataProcessingRegistrations = new[] { new DataProcessingRegistration() { Id = dataProcessingRegistration1Id, Name = $"{nameQuery}{1}" }, new DataProcessingRegistration() { Id = dataProcessingRegistration2Id, Name = $"{nameQuery}{1}" } };
             _contractDataProcessingRegistrationAssignmentService.Setup(x => x.GetApplicableDataProcessingRegistrations(contract)).Returns(dataProcessingRegistrations.AsQueryable());
 
             //Act
@@ -448,7 +476,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.HasValue);
-            Assert.Equal(OperationFailure.Conflict,result.Value.FailureType);
+            Assert.Equal(OperationFailure.Conflict, result.Value.FailureType);
         }
 
         [Fact]
@@ -488,6 +516,46 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void Can_Get_Applied_Procurement_Plans()
+        {
+            //Arrange
+            var itContracts = new (int? year, int? quarter)[]
+            {
+                (1,2),
+                (null,1),
+                (1,null),
+                (null,null),
+                (0,1),
+                (0,1), //duplicate
+                (1,1),
+                (2,0),
+                (2,0), //duplicate
+            }.Select(x => new ItContract() { ProcurementPlanYear = x.year, ProcurementPlanQuarter = x.quarter }).ToList();
+
+            //no duplicates and only valid unique combinations (no nulls), order by year and then by quarter
+            var expectedResult =
+                new (int year, int quarter)[]
+                {
+                    (0, 1),
+                    (1, 1),
+                    (1, 2),
+                    (2, 0),
+                };
+
+            var orgId = A<int>();
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
+            _contractRepository.Setup(x => x.GetContractsInOrganization(orgId)).Returns(itContracts.AsQueryable());
+
+            //Act
+            var result = _sut.GetAppliedProcurementPlans(orgId);
+
+            //Assert
+            Assert.True(result.Ok);
+            var activePlans = result.Value;
+            Assert.Equal(expectedResult, activePlans);
         }
 
         private void ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel crossOrganizationReadAccessLevel)

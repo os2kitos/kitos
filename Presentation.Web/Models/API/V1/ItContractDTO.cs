@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web.Models.API.V1
 {
@@ -44,7 +45,7 @@ namespace Presentation.Web.Models.API.V1
         public Guid? SupplierUuid { get; set; }
         public int? ProcurementStrategyId { get; set; }
         public string ProcurementStrategyName { get; set; }
-        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanQuarter { get; set; }
         public int? ProcurementPlanYear { get; set; }
         public int? ContractTemplateId { get; set; }
         public string ContractTemplateName { get; set; }
@@ -61,14 +62,11 @@ namespace Presentation.Web.Models.API.V1
 
         public IEnumerable<AdviceDTO> Advices { get; set; }
         public DateTime LastChanged { get; set; }
+        public string LastChangedByName { get; set; }
         public int LastChangedByUserId { get; set; }
+        
+        public string ObjectOwnerFullName { get; set; }
 
-        public string ObjectOwnerName { get; set; }
-        public string ObjectOwnerLastName { get; set; }
-        public string ObjectOwnerFullName
-        {
-            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
-        }
         public int? ObjectOwnerId { get; set; }
 
         public YearSegmentOption? Running { get; set; }
@@ -82,5 +80,9 @@ namespace Presentation.Web.Models.API.V1
         public IEnumerable<NamedEntityDTO> DataProcessingRegistrations { get; set; }
 
         public Guid Uuid { get; set; }
+        public int? CriticalityId { get; set; }
+        public string CriticalityName { get; set; }
+
+        public YesNoUndecidedOption? ProcurementInitiated { get; set; }
     }
 }

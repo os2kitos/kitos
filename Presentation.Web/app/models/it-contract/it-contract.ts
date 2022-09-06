@@ -1,4 +1,5 @@
 ﻿module Kitos.Models.ItContract {
+
     /** Contains info about an it contract */
     export interface IItContract extends IEntity {
         /** Gets or sets the name. */
@@ -31,26 +32,26 @@
         SupplierId: number;
         /** Gets or sets the organization marked as supplier for this contract. */
         Supplier: IOrganization;
-        /** Gets or sets the chosen procurement strategy option identifier. (udbudsstrategi) */
+        /** Gets or sets the chosen procurement strategy option identifier. (Genanskaffelsesstrategi) */
         ProcurementStrategyId: number;
-        /** Gets or sets the chosen procurement strategy option. (udbudsstrategi) */
-        ProcurementStrategy: IProcurementStrategy;
-        /** Gets or sets the procurement plan half. (udbudsplan) */
-        ProcurementPlanHalf: number;
-        /** Gets or sets the procurement plan year. (udbudsplan) */
+        /** Gets or sets the chosen procurement strategy option. (Genanskaffelsesstrategi) */
+        ProcurementStrategy: Models.OData.Generic.IOptionDTO<IItContract>;
+        /** Gets or sets the procurement plan quarter. (genanskaffelsesplan) */
+        ProcurementPlanQuarter: number;
+        /** Gets or sets the procurement plan year. (genanskaffelsesplan) */
         ProcurementPlanYear: number;
         /** Gets or sets the chosen contract template identifier. */
         ContractTemplateId: number;
         /** Gets or sets the chosen contract template option. */
-        ContractTemplate: IContractTemplate;
+        ContractTemplate: Models.OData.Generic.IOptionDTO<IItContract>;
         /** Gets or sets the chosen contract type option identifier. */
         ContractTypeId: number;
         /** Gets or sets the chosen type of the contract. */
-        ContractType: IContractType;
+        ContractType: Models.OData.Generic.IOptionDTO<IItContract>;
         /** Gets or sets the chosen purchase form option identifier. */
         PurchaseFormId: number;
         /** Gets or sets the chosen purchase form option. */
-        PurchaseForm: IPurchaseForm;
+        PurchaseForm: Models.OData.Generic.IOptionDTO<IItContract>;
         /** Id of parent ItContract */
         ParentId: number;
         /** The parent ItContract */
@@ -58,7 +59,9 @@
         /** Gets or sets the contract children. */
         Children: Array<IItContract>;
         /** Gets or sets the chosen agreement elements. */
-        AgreementElements: Array<IAgreementElement>;
+        AgreementElements: Array<Models.OData.Generic.IOptionDTO<IItContract>>;
+        /** Gets or sets the chosen criticality. */
+        Criticality: Models.OData.Generic.IOptionDTO<IItContract>,
 
         /** When the contract began. (indgået) */
         Concluded: Date;
@@ -76,37 +79,28 @@
         Terminated: Date;
         TerminationDeadlineId: number;
         /** Gets or sets the termination deadline option. (opsigelsesfrist) */
-        TerminationDeadline: ITerminationDeadline;
-        /** Gets or sets the payment milestones. */
-        PaymentMilestones: Array<IPaymentMilestone>;
+        TerminationDeadline: Models.OData.Generic.IOptionDTO<IItContract>;
         OptionExtendId: number;
-        OptionExtend: IOptionExtend;
+        OptionExtend: Models.OData.Generic.IOptionDTO<IItContract>;
         ExtendMultiplier: number;
         /** (løbende) */
         Running: YearSegmentOption;
         /** (indtil udgangen af) */
         ByEnding: YearSegmentOption;
-        /** Gets or sets the handover trials. */
-        HandoverTrials: Array<IHandoverTrial>;
 
         /** Gets or sets the operation remuneration begun. */
         OperationRemunerationBegun: Date;
         PaymentFreqencyId: number;
-        PaymentFreqency: IPaymentFrequency;
+        PaymentFreqency: Models.OData.Generic.IOptionDTO<IItContract>;
         PaymentModelId: number;
-        PaymentModel: IPaymentModel;
+        PaymentModel: Models.OData.Generic.IOptionDTO<IItContract>;
         PriceRegulationId: number;
-        PriceRegulation: IPriceRegulation;
+        PriceRegulation: Models.OData.Generic.IOptionDTO<IItContract>;
 
         /** The (local usages of) it systems, that this contract is associated to. */
         AssociatedSystemUsages: Array<IItContractItSystemUsage>;
         /** Number of system relations. */
         AssociatedSystemRelations: Models.Odata.ItSystemUsage.ISystemRelationDTO[];
-
-        /** Gets or sets the intern economy streams. */
-        InternEconomyStreams: Array<IEconomyStream>;
-        /** Gets or sets the extern economy streams. */
-        ExternEconomyStreams: Array<IEconomyStream>;
 
         /** Gets or sets the advices. */
         Advices: Array<IAdvice>;
@@ -118,6 +112,13 @@
         Reference: IReference;
         AssociatedAgreementElementTypes: Array<IAssociatedAgreementElementTypes>;
 
-        DataProcessingRegistrations: Models.DataProcessing.IDataProcessingRegistration[];
+        DataProcessingRegistrations: Array<{
+            Id: number,
+            Name: string,
+            IsAgreementConcluded: string | null
+        }>;
+        ProcurementInitiated: Models.Api.Shared.YesNoUndecidedOption | null;
+        Rights: Array<Models.IRightEntity<IItContract>>;
+        ExternEconomyStreams: Array<IEconomyStream>;
     }
 }

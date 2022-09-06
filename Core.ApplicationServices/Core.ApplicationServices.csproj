@@ -46,8 +46,8 @@
     <Reference Include="Microsoft.Owin, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.4.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -83,6 +83,7 @@
     <Compile Include="Authorization\IUserContextFactory.cs" />
     <Compile Include="Authorization\Permissions\AdministerGlobalPermission.cs" />
     <Compile Include="Authorization\Permissions\GlobalPermission.cs" />
+    <Compile Include="Authorization\Permissions\ImportHierarchyFromStsOrganizationPermission.cs" />
     <Compile Include="Authorization\Permissions\TriggerBrokenReferencesReportPermission.cs" />
     <Compile Include="Authorization\Permissions\ViewBrokenExternalReferencesReportPermission.cs" />
     <Compile Include="Authorization\Policies\IGlobalReadAccessPolicy.cs" />
@@ -120,15 +121,15 @@
     <Compile Include="Generic\Write\AssignmentUpdateService.cs" />
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
+    <Compile Include="Helpers\NamedEntityMappingHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\Contracts\ContractOptions.cs" />
     <Compile Include="Model\Contracts\Write\ItContractAgreementPeriodModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
-    <Compile Include="Model\Contracts\Write\ItContractHandoverTrialUpdate.cs" />
     <Compile Include="Model\Contracts\Write\ItContractModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractPayment.cs" />
     <Compile Include="Model\Contracts\Write\ItContractPaymentDataModificationParameters.cs" />
-    <Compile Include="Model\Contracts\Write\ItContractPaymentMilestone.cs" />
     <Compile Include="Model\Contracts\Write\ItContractPaymentModelModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractResponsibleDataModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractProcurementModificationParameters.cs" />
@@ -162,6 +163,8 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
+    <Compile Include="Model\Users\UserRightsAssignments.cs" />
+    <Compile Include="Model\Users\UserRightsChangeParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="OptionTypes\IOptionResolver.cs" />
@@ -174,6 +177,8 @@
     <Compile Include="Notification\IUserNotificationApplicationService.cs" />
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
     <Compile Include="Organizations\Handlers\HandleOrganizationBeingDeleted.cs" />
+    <Compile Include="Organizations\IStsOrganizationSynchronizationService.cs" />
+    <Compile Include="Organizations\StsOrganizationSynchronizationService.cs" />
     <Compile Include="RightsHolders\BaseRightsHolderService.cs" />
     <Compile Include="RightsHolders\IItInterfaceRightsHolderService.cs" />
     <Compile Include="RightsHolders\IRightsHolderSystemService.cs" />
@@ -186,7 +191,7 @@
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
     <Compile Include="KendoOrganizationalConfigurationService.cs" />
-    <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
+    <Compile Include="Model\EventHandler\ClearCacheOnAdministrativeAccessRightsChangedHandler.cs" />
     <Compile Include="Model\EventHandler\ContractDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\ProjectDeletedAdvicesHandler.cs" />
@@ -264,6 +269,7 @@
     <Compile Include="References\ReferenceService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
+    <Compile Include="UIConfiguration\Handlers\HandleUserBeingDeleted.cs" />
     <Compile Include="UIConfiguration\IUIModuleCustomizationService.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
     <Compile Include="UserService.cs" />

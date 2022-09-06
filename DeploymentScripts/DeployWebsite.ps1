@@ -3,14 +3,14 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
     $fullCommand=$(("`"{0}`" " +  
                     "-verb:sync " +
-                    "-source:package=`"{1}\Presentation.Web.csproj.zip`" " +
+                    "-source:package=`"{1}\Presentation.Web.zip`" " +
                     "-dest:auto,computerName=`"{2}`",userName=`"{3}`",password=`"{4}`",authtype=`"Basic`",includeAcls=`"False`" " +
                     "-disableLink:AppPoolExtension " +
                     "-disableLink:ContentExtension " + 
                     "-disableLink:CertificateExtension " + 
                     "-skip:objectname=`"dirPath`",absolutepath=`"C:\\kitos_tmp\\app\\App_Data$`" " + 
                     "-skip:objectname=`"dirPath`",absolutepath=`"Default Web \Site\\App_Data$`" " + 
-                    "-setParamFile:`"{1}\Presentation.Web.csproj.SetParameters.xml`" -allowUntrusted " + 
+                    "-setParamFile:`"{1}\Presentation.Web.SetParameters.xml`" -allowUntrusted " + 
                     "-setParam:name=`"serilog:minimum-level`",value=`"{5}`" " + 
                     "-setParam:name=`"serilog:write-to:Elasticsearch.nodeUris`",value=`"{6}`" " + 
                     "-setParam:name=`"SecurityKeyString`",value=`"{7}`" " + 

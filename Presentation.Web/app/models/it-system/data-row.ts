@@ -5,7 +5,7 @@
         ItInterface: IItInterface;
         DataTypeId: number;
         /** The type of the data */
-        DataType: IDataType;
+        DataType: Models.OData.Generic.IOptionDTO<IDataRow>;
         /** Description/name of the data */
         Data: string;
     }

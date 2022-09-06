@@ -274,7 +274,7 @@
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ItSystemUuid")
-                        .withTitle("UUID")
+                        .withTitle("IT-System (UUID)")
                         .withId("uuid")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()

@@ -69,7 +69,6 @@ namespace Presentation.Web
             const string kitosNamespace = "Kitos";
             const string entitySetOrganizations = "Organizations";
             const string entitySetItSystems = "ItSystems";
-            const string entitySetEconomyStreams = "EconomyStreams";
 
             var builder = new ODataConventionModelBuilder();
 
@@ -100,18 +99,9 @@ namespace Presentation.Web
 
             BindEntitySet<ItContractType, ItContractTypesController>(builder);
 
-            var economyStream = builder.EntitySet<EconomyStream>(entitySetEconomyStreams);
-            economyStream.EntityType.HasKey(x => x.Id);
-
-            var economyFunc = builder.Function("ExternEconomyStreams");
-            economyFunc.Parameter<int>("Organization");
-            economyFunc.ReturnsCollectionFromEntitySet<EconomyStream>(entitySetEconomyStreams);
-
             BindEntitySet<RelationFrequencyType, FrequencyTypesController>(builder);
 
             BindEntitySet<GoalType, GoalTypesController>(builder);
-
-            BindEntitySet<HandoverTrialType, HandoverTrialTypesController>(builder);
 
             BindEntitySet<ItContractRight, ItContractRightsController>(builder);
 
@@ -210,8 +200,6 @@ namespace Presentation.Web
             var contracts = BindEntitySet<ItContract, ItContractsController>(builder);
             contracts.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             contracts.HasRequiredBinding(o => o.Supplier, entitySetOrganizations);
-            contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
-            contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
 
             BindEntitySet<InterfaceType, InterfaceTypesController>(builder);
 
@@ -241,18 +229,13 @@ namespace Presentation.Web
 
             BindEntitySet<PriceRegulationType, PriceRegulationTypesController>(builder);
 
-            // These two lines causes an 404 error when requesting odata/ProcurementStrategyTypes at https://localhost:44300/#/global-config/contract
-            // Requesting api/ProcurementStrategy works but not odata/ProcurementStrategyTypes
-            //var procurementStrategy = builder.EntitySet<ProcurementStrategyType>(nameof(ProcurementStrategyController).Replace("Controller", string.Empty));
-            //procurementStrategy.EntityType.HasKey(x => x.Id);
-
-            // There two lines fixes the 404 error at https://localhost:44300/#/global-config/contract
-            // Requesting api/ProcurementStrategy and odata/ProcurementStrategyTypes both work
             BindEntitySet<ProcurementStrategyType, ProcurementStrategyTypesController>(builder);
 
             BindEntitySet<ItProjectType, ItProjectTypesController>(builder);
 
             BindEntitySet<PurchaseFormType, PurchaseFormTypesController>(builder);
+
+            BindEntitySet<CriticalityType, CriticalityTypesController>(builder);
 
             //Local options
 
@@ -283,9 +266,6 @@ namespace Presentation.Web
 
             var localGoalType = BindEntitySet<LocalGoalType, LocalGoalTypesController>(builder);
             localGoalType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localHandoverTrialType = BindEntitySet<LocalHandoverTrialType, LocalHandoverTrialTypesController>(builder);
-            localHandoverTrialType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localInterfaceType = BindEntitySet<LocalInterfaceType, LocalInterfaceTypesController>(builder);
             localInterfaceType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
@@ -325,6 +305,9 @@ namespace Presentation.Web
 
             var localPurchaseFormType = BindEntitySet<LocalPurchaseFormType, LocalPurchaseFormTypesController>(builder);
             localPurchaseFormType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
+
+            var localCriticalityType = BindEntitySet<LocalCriticalityType, LocalCriticalityTypesController>(builder);
+            localCriticalityType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var removeOption = builder.Function("RemoveOption");
             removeOption.Parameter<int>("id");

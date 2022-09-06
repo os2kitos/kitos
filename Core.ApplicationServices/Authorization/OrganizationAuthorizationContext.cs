@@ -236,7 +236,7 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = entity switch
                 {
-                    Organization _ => IsGlobalAdmin(),
+                    User user => IsGlobalAdmin() && EntityEqualsActiveUser(user) == false,
                     ItInterface itInterface =>
                         //Even rightsholders are not allowed to delete interfaces
                         IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId),
@@ -369,10 +369,10 @@ namespace Core.ApplicationServices.Authorization
 
                 return target switch
                 {
-                    IContractModule _ => IsGlobalAdmin() || 
+                    IContractModule _ => IsGlobalAdmin() ||
                                          IsLocalAdmin(ownedByOrganization.OrganizationId) ||
                                          IsContractModuleAdmin(ownedByOrganization.OrganizationId),
-                    IOrganizationModule _ => IsGlobalAdmin() || 
+                    IOrganizationModule _ => IsGlobalAdmin() ||
                                              IsLocalAdmin(ownedByOrganization.OrganizationId),
                     _ => IsGlobalAdmin()
                 };
@@ -456,6 +456,14 @@ namespace Core.ApplicationServices.Authorization
                 GlobalPermission.StakeHolderAccess => IsGlobalAdmin(),
                 _ => false
             };
+        }
+
+        public bool Visit(ImportHierarchyFromStsOrganizationPermission permission)
+        {
+            var organizationId = permission.Organization.Id;
+            return IsGlobalAdmin() ||
+                   IsLocalAdmin(organizationId) ||
+                   IsOrganizationModuleAdmin(organizationId);
         }
 
         #endregion PERMISSIONS

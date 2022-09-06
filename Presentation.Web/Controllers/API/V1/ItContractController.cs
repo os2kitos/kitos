@@ -8,14 +8,18 @@ using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Contract;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Options;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItContract;
+using Presentation.Web.Models.API.V1.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
@@ -47,14 +51,14 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            var contractQuery = _itContractService.GetAllByOrganization(orgId, q);
-
-            var contractDTO = Page(contractQuery, paging)
-                .AsEnumerable()
-                .MapToNamedEntityDTOs()
-                .ToList();
-
-            return Ok(contractDTO);
+            return _itContractService
+                .GetAllByOrganization(orgId, q)
+                .Select(query =>
+                    Page(query, paging)
+                        .ToList()
+                        .MapToNamedEntityDTOs()
+                        .ToList())
+                .Match(Ok, FromOperationError);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItContractDTO>))]
@@ -338,6 +342,47 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
+        [InternalApi]
+        [HttpGet]
+        [Route("available-options-in/{organizationId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetContractOptions(int organizationId)
+        {
+            return _itContractService
+                .GetAssignableContractOptions(organizationId)
+                .Select(result => new ContractOptionsDTO
+                {
+                    CriticalityOptions = ToDTOs(result.CriticalityOptions).ToList(),
+                    ContractTypeOptions = ToDTOs(result.ContractTypeOptions).ToList(),
+                    ContractTemplateOptions = ToDTOs(result.ContractTemplateOptions).ToList(),
+                    PurchaseFormOptions = ToDTOs(result.PurchaseFormOptions).ToList(),
+                    ProcurementStrategyOptions = ToDTOs(result.ProcurementStrategyOptions).ToList(),
+                    PaymentModelOptions = ToDTOs(result.PaymentModelOptions).ToList(),
+                    PaymentFrequencyOptions = ToDTOs(result.PaymentFrequencyOptions).ToList(),
+                    OptionExtendOptions = ToDTOs(result.OptionExtendOptions).ToList(),
+                    TerminationDeadlineOptions = ToDTOs(result.TerminationDeadlineOptions).ToList()
+                })
+                .Match(Ok, FromOperationError);
+        }
+
+        [InternalApi]
+        [HttpGet]
+        [Route("applied-procurement-plans/{organizationId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAppliedProcurements(int organizationId)
+        {
+            return _itContractService
+                .GetAppliedProcurementPlans(organizationId)
+                .Select(plans => plans.Select(ToProcurementPlanDTO).ToList())
+                .Match(Ok, FromOperationError);
+        }
+
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages.Select(x => x.ItSystemUsage));
@@ -387,6 +432,25 @@ namespace Presentation.Web.Controllers.API.V1
             return _itContractService
                 .Create(organizationId, dto.Name)
                 .Match(NewObjectCreated, FromOperationError);
+        }
+
+        private static IEnumerable<OptionWithDescriptionAndExpirationDTO> ToDTOs<T>(IEnumerable<(OptionDescriptor<T> option, bool available)> options) where T : OptionEntity<ItContract>
+        {
+            return options.Select(ToDTO);
+        }
+
+        private static OptionWithDescriptionAndExpirationDTO ToDTO<T>((OptionDescriptor<T> option, bool available) optionObject) where T : OptionEntity<ItContract>
+        {
+            return new OptionWithDescriptionAndExpirationDTO(optionObject.option.Option.Id, optionObject.option.Option.Name, optionObject.available == false, optionObject.option.Description);
+        }
+
+        private static ContractProcurementPlanDTO ToProcurementPlanDTO((int year, int quarter) plan)
+        {
+            return new ContractProcurementPlanDTO
+            {
+                ProcurementPlanYear = plan.year,
+                ProcurementPlanQuarter = plan.quarter
+            };
         }
     }
 }

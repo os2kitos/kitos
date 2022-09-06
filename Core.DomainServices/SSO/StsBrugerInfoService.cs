@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.ServiceModel;
 using Core.Abstractions.Types;
 
 using Infrastructure.Soap.STSBruger;
+using Infrastructure.STS.Common.Factories;
+using Infrastructure.STS.Common.Model;
 using Serilog;
 
 namespace Core.DomainServices.SSO
@@ -14,7 +14,6 @@ namespace Core.DomainServices.SSO
     {
         private readonly ILogger _logger;
         private const string EmailTypeIdentifier = StsOrganisationConstants.UserProperties.Email;
-        private const string StsStandardNotFoundResultCode = "44";
 
         private readonly string _urlServicePlatformBrugerService;
         private readonly string _urlServicePlatformAdresseService;
@@ -65,9 +64,9 @@ namespace Core.DomainServices.SSO
 
         private Result<(string emailAdresseUuid, string organisationUuid, string personUuid), string> CollectStsBrugerInformationFromUuid(Guid uuid, string cvrNumber)
         {
-            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
+            using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                var client = StsBrugerHelpers.CreateBrugerPortTypeClient(CreateHttpBinding(),
+                using var client = StsBrugerHelpers.CreateBrugerPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
                     _urlServicePlatformBrugerService, clientCertificate);
                 var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(cvrNumber, uuid);
                 var brugerPortType = client.ChannelFactory.CreateChannel();
@@ -79,8 +78,8 @@ namespace Core.DomainServices.SSO
                 var stdOutput = laesResponseResult.LaesResponse1?.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
-
-                if (returnCode == StsStandardNotFoundResultCode)
+                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested user '{uuid}' from cvr '{cvrNumber}' was not found. STS Bruger endpoint returned '{returnCode}:{errorCode}'";
 
                 var registrations =
@@ -166,9 +165,9 @@ namespace Core.DomainServices.SSO
 
         private Result<IEnumerable<string>, string> GetStsAdresseEmailFromUuid(string emailAdresseUuid, string cvrNumber)
         {
-            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
+            using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                var client = StsAdresseHelpers.CreateAdressePortTypeClient(CreateHttpBinding(),
+                using var client = StsAdresseHelpers.CreateAdressePortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
                     _urlServicePlatformAdresseService, clientCertificate);
                 var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(cvrNumber, emailAdresseUuid);
                 var adressePortType = client.ChannelFactory.CreateChannel();
@@ -180,8 +179,8 @@ namespace Core.DomainServices.SSO
                 var stdOutput = laesResponse.LaesResponse1?.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
-
-                if (returnCode == StsStandardNotFoundResultCode)
+                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested email address '{emailAdresseUuid}' from cvr '{cvrNumber}' was not found. STS Adresse endpoint returned '{returnCode}:{errorCode}'";
 
                 var registreringType1s =
@@ -223,9 +222,9 @@ namespace Core.DomainServices.SSO
 
         private Result<StsPersonData, string> GetStsPersonFromUuid(string personUuid, string cvrNumber)
         {
-            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
+            using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                var client = StsPersonHelpers.CreatePersonPortTypeClient(CreateHttpBinding(),
+                using var client = StsPersonHelpers.CreatePersonPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
                     _urlServicePlatformPersonService, clientCertificate);
                 var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(cvrNumber, personUuid);
                 var virksomhedPortType = client.ChannelFactory.CreateChannel();
@@ -238,7 +237,8 @@ namespace Core.DomainServices.SSO
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
 
-                if (returnCode == StsStandardNotFoundResultCode)
+                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested person '{personUuid}' from cvr '{cvrNumber}' was not found. STS Person endpoint returned '{returnCode}:{errorCode}'";
 
                 var registreringType1s =
@@ -272,46 +272,6 @@ namespace Core.DomainServices.SSO
                     return Result<StsPersonData, string>.Success(new StsPersonData(latest));
                 }
                 return Result<StsPersonData, string>.Failure($"Unable to resolve person from personuuid:{personUuid}");
-            }
-        }
-
-        private static BasicHttpBinding CreateHttpBinding()
-        {
-            return new BasicHttpBinding
-            {
-                Security =
-                {
-                    Mode = BasicHttpSecurityMode.Transport,
-                    Transport = {ClientCredentialType = HttpClientCredentialType.Certificate}
-                },
-                MaxReceivedMessageSize = int.MaxValue,
-                OpenTimeout = new TimeSpan(0, 3, 0),
-                CloseTimeout = new TimeSpan(0, 3, 0),
-                ReceiveTimeout = new TimeSpan(0, 3, 0),
-                SendTimeout = new TimeSpan(0, 3, 0)
-            };
-        }
-
-        private static X509Certificate2 GetClientCertificate(string thumbprint)
-        {
-            using (var store = new X509Store(StoreName.My, StoreLocation.LocalMachine))
-            {
-                store.Open(OpenFlags.ReadOnly);
-                X509Certificate2 result;
-                try
-                {
-                    var results = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-                    if (results.Count == 0)
-                    {
-                        throw new Exception("Unable to find certificate!");
-                    }
-                    result = results[0];
-                }
-                finally
-                {
-                    store.Close();
-                }
-                return result;
             }
         }
     }

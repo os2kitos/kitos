@@ -5,6 +5,10 @@
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-archiving.view.html",
             controller: "system.EditArchiving",
             resolve: {
+                itSystemUsage: [
+                    "$http", "$stateParams", ($http, $stateParams) => $http.get("api/itSystemUsage/" + $stateParams.id)
+                    .then(result => result.data.response)
+                ],
                 archiveTypes: [
                     "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveTypes).getAll()
@@ -41,17 +45,19 @@
             $scope.systemUsage = systemUsage;
             $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
-            $scope.ArchiveDuty = systemUsage.ArchiveDuty;
+            $scope.ArchiveDuty = $scope.usage.archiveDuty;
             $scope.archiveReadMoreLink = Kitos.Constants.Archiving.ReadMoreUri;
             $scope.translateArchiveDutyRecommendation = (value: number) => Kitos.Models.ItSystem.ArchiveDutyRecommendationFactory.mapFromNumeric(value).text;
             $scope.archiveDutyOptions = Kitos.Models.ItSystemUsage.ArchiveDutyOptions.getAll();
+
+            $scope.autoSaveUrl = 'api/itSystemUsage/' + $stateParams.id;
 
             if (!systemUsage.Archived) {
                 $scope.systemUsage.Archived = false;
             }
 
-            if (!systemUsage.ArchiveDuty) {
-                $scope.ArchiveDuty = itSystemUsage.itSystem.archiveDuty;
+            if (!$scope.ArchiveDuty) {
+                $scope.ArchiveDuty = $scope.usage.itSystem.archiveDuty;
             }
 
             if ($scope.archivePeriods) {
@@ -107,19 +113,6 @@
                     itSystemUsageService.patchSystem($scope.usageId, payload);
                 }
             }
-            $scope.patchSupplier = (field, value) => {
-                var payload = {};
-                payload[field] = value.id;
-                payload["ArchiveSupplier"] = value.text;
-                itSystemUsageService.patchSystem($scope.usageId, payload);
-            }
-
-            if (systemUsage.SupplierId) {
-                $scope.systemUsage.supplier = {
-                    id: systemUsage.SupplierId,
-                    text: systemUsage.ArchiveSupplier
-                };
-            }
 
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
@@ -163,22 +156,21 @@
                 notify.addSuccessMessage("Slettet!");
             };
 
+            if (!!$scope.usage.archiveSupplierId) {
+                $scope.archiveSupplier = {
+                    id: $scope.usage.archiveSupplierId,
+                    text: $scope.usage.archiveSupplierName
+                };
+            }
+
             $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['take=25', 'orgId=' + user.currentOrganizationId], (item,
                 items) => {
                 items.push({
                     id: item.id,
                     text: item.name ? item.name : 'Unavngiven',
-                    cvr: item.cvr
+                    cvr: item.cvrNumber
                 });
-            }, "q", formatSupplier);
-
-            function formatSupplier(supplier) {
-                var result = '<div>' + supplier.text + '</div>';
-                if (supplier.cvr) {
-                    result += '<div class="small">' + supplier.cvr + '</div>';
-                }
-                return result;
-            }
+            }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
 
             $scope.patchDatePeriode = (field, value, id) => {
                 var formatDateString = "YYYY-MM-DD";

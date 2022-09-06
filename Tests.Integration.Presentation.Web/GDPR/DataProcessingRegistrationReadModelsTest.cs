@@ -167,6 +167,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(oversightOption.Name, readModel.OversightOptionNamesAsCsv);
             Assert.Equal(contractName, readModel.ContractNamesAsCsv);
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
+            Assert.Equal(itSystemDto.Uuid.ToString(), readModel.SystemUuidsAsCsv);
             Assert.Equal(oversightDate, readModel.LatestOversightDate);
 
             Console.Out.WriteLine("Flat values asserted");
@@ -265,6 +266,33 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(name, readModel.Name);
             Assert.Equal(registration.Id, readModel.SourceEntityId);
             Assert.Empty(readModel.RoleAssignments);
+        }
+
+        [Fact]
+        public async Task ReadModels_LastChangedBy_Updates_OnChange()
+        {
+            //Arrange
+            var name = A<string>();
+            var newName = A<string>();
+            var email = A<string>();
+            var orgRole = OrganizationRole.GlobalAdmin;
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+            var (userId, _, cookie)= await HttpApi.CreateUserAndLogin(email, orgRole);
+            using var response = await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(registration.Id, newName, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            await WaitForReadModelQueueDepletion();
+
+            //Act
+            var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, newName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(result);
+            Assert.Equal(newName, readModel.Name);
+            Assert.Equal(registration.Id, readModel.SourceEntityId);
+            Assert.Equal(userId, readModel.LastChangedById);
         }
 
         private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)

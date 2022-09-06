@@ -89,48 +89,7 @@ namespace Core.DomainModel.Advice
         /// The sent date.
         /// </value>
         public DateTime? SentDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the receiver contract role identifier.
-        /// </summary>
-        /// <remarks>
-        /// Contract role id of which to send email.
-        /// </remarks>
-        /// <value>
-        /// The receiver identifier.
-        /// </value>
-        public int? ReceiverId { get; set; }
-        /// <summary>
-        /// Gets or sets the receiver contract role.
-        /// </summary>
-        /// <remarks>
-        /// Contract role of which to send email.
-        /// </remarks>
-        /// <value>
-        /// The receiver.
-        /// </value>
-        public IRoleEntity Receiver { get; set; }
-
-        /// <summary>
-        /// Gets or sets the carbon copy receiver contract role identifier.
-        /// </summary>
-        /// <remarks>
-        /// Contract role of which to send email.
-        /// </remarks>
-        /// <value>
-        /// The carbon copy receiver identifier.
-        /// </value>
-        public int? CarbonCopyReceiverId { get; set; }
-        /// <summary>
-        /// Gets or sets the carbon copy contract role receiver.
-        /// </summary>
-        /// <remarks>
-        /// Contract role of which to send email.
-        /// </remarks>
-        /// <value>
-        /// The carbon copy receiver.
-        /// </value>
-        public IRoleEntity CarbonCopyReceiver { get; set; }
+        
         /// <summary>
         /// Gets or sets the body of the email.
         /// </summary>

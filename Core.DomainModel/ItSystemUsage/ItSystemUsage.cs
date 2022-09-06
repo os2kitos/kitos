@@ -246,11 +246,11 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int? ArchiveFreq { get; set; }
 
-        public string ArchiveSupplier { get; set; }
-
         public bool? Registertype { get; set; }
 
-        public int? SupplierId { get; set; }
+        public int? ArchiveSupplierId { get; set; }
+        public virtual Organization.Organization ArchiveSupplier { get; set; }
+
         /// <summary>
         ///     Gets or sets the organization marked as supplier for this contract.
         /// </summary>
@@ -269,7 +269,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-        public UserCount UserCount { get; set; }
+        public UserCount? UserCount { get; set; }
 
         #region GDPR
         public string GeneralPurpose { get; set; }
@@ -550,7 +550,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetUserCount()
         {
-            UserCount = UserCount.BELOWTEN;
+            UserCount = DomainModel.ItSystem.DataTypes.UserCount.UNDECIDED;
         }
 
         public Maybe<OperationError> SetExpectedUsersInterval((int lower, int? upperBound) newIntervalValue)
@@ -558,17 +558,17 @@ namespace Core.DomainModel.ItSystemUsage
             switch (newIntervalValue)
             {
                 case (0, 9):
-                    UserCount = UserCount.BELOWTEN;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.BELOWTEN;
                     break;
                 case (10, 50):
-                    UserCount = UserCount.TENTOFIFTY;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.TENTOFIFTY;
                     break;
                 case (50, 100):
-                    UserCount = UserCount.FIFTYTOHUNDRED;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.FIFTYTOHUNDRED;
                     break;
                 case (100, null):
                 case (100, int.MaxValue):
-                    UserCount = UserCount.HUNDREDPLUS;
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.HUNDREDPLUS;
                     break;
                 default:
                     return new OperationError("Invalid user count. Please refer to input documentation", OperationFailure.BadInput);
@@ -784,22 +784,18 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveSupplierOrganization()
         {
-            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
-            ArchiveSupplier = "";
-            SupplierId = null;
+            ArchiveSupplier.Track();
+            ArchiveSupplier = null;
         }
 
         public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
         {
-            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
             if (newValue == null)
                 throw new ArgumentNullException(nameof(newValue));
 
-            ArchiveSupplier = newValue.Name;
-
-            if (SupplierId != newValue.Id)
+            if (ArchiveSupplier == null || ArchiveSupplier.Id != newValue.Id)
             {
-                SupplierId = newValue.Id;
+                ArchiveSupplier = newValue;
             }
 
             return Maybe<OperationError>.None;

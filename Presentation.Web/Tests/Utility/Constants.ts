@@ -5,7 +5,7 @@
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoDpaButtonCreate = "createDpaButton";
     readonly kendoContractNameHeader = "contractNameHeader";
-    readonly kendoContractNameObjects = "contractNameObject";
+    readonly kendoContractNameObjects = "contractNameKendoObject";
     readonly kendoButtonResetFilter = "resetFilterButton";
     readonly kendoButtonSaveFilter = "saveFilterButton";
     readonly kendoButtonUseFilter = "useFilterButton";
@@ -37,7 +37,7 @@
     readonly kendoRemoveFilter = "removeFilterButton";
     readonly kendoUserDeleteButton = "userDeleteButton";
 
-    readonly kendoRelationCountObject = "relationCountObject";
+    readonly kendoRelationCountObject = "relationCountKendoObject";
 
     //Environmental variables
     readonly defaultSystemUsageName = "DefaultTestItSystem";
@@ -153,6 +153,7 @@
     readonly mainBusinessType = "system-business-type";
     readonly mainArchive = "archiveDuty";
     readonly mainUUID = "system-uuid";
+    readonly mainUserCount = "s2id_numberOfUsers";
 
     readonly relationDescriptionField = "relationDescription";
     readonly relationReferenceField = "relationReference";
@@ -210,6 +211,8 @@
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
     readonly gdprDataProcessingRegistrationView = "gdprDataProcessingRegistrationView";
+
+    readonly dataProcessingRegistrationView = "dataProcessingRegistrationView";
 
     readonly filterOrgButton = "filterOrgButton";
 

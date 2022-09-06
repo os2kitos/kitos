@@ -15,5 +15,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public OptionalValueChange<Maybe<bool>> EnforceValid { get; set; } = OptionalValueChange<Maybe<bool>>.None;
         public OptionalValueChange<Maybe<DateTime>> ValidFrom { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
         public OptionalValueChange<Maybe<DateTime>> ValidTo { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
+        public OptionalValueChange<Guid?> CriticalityUuid { get; set; } = OptionalValueChange<Guid?>.None;
     }
 }

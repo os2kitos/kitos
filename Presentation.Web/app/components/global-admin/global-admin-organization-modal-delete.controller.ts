@@ -59,7 +59,8 @@
                                 name: conflict.system.name,
                                 organizations: conflict.otherOrganizationsWhichUseTheSystem.map(org => org.name)
                             };
-                        })
+                        }),
+                        systemsWhereOrgIsArchiveSupplier: conflicts.systemsWhereOrgIsArchiveSupplier.map(mapEntityFromOrg)
                     },
                     systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved: conflicts.systemsInOtherOrganizationsWhereOrgIsRightsHolder.map(mapEntityFromOrg)
                 };

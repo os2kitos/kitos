@@ -329,7 +329,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
                 NumberOfExpectedUsersInterval = rule.MustUpdate(x => x.General.NumberOfExpectedUsers)
                     ? source.NumberOfExpectedUsers?.FromNullable().Select(interval =>
-                          (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)) ??
+                          (interval.LowerBound, interval.UpperBound)) ??
                       Maybe<(int, int?)>.None.AsChangedValue()
                     : OptionalValueChange<Maybe<(int, int?)>>.None,
 

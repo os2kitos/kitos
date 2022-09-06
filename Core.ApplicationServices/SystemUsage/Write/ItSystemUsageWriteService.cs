@@ -337,6 +337,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (orgByUuid.Failed)
                 return new OperationError($"Failed to get organization for ArchiveSupplierOrganization. Original error message: {orgByUuid.Error.Message.GetValueOrEmptyString()}", orgByUuid.Error.FailureType);
+            
+            //Not a change from current state so do not apply availability constraint
+            if (systemUsage.ArchiveSupplierId != null && systemUsage.ArchiveSupplierId == orgByUuid.Value.Id)
+                return Maybe<OperationError>.None;
 
             return systemUsage.UpdateArchiveSupplierOrganization(orgByUuid.Value);
         }

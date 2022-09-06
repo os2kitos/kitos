@@ -728,12 +728,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
-            return users.Select(ToDTO);
-        }
-
-        private static UserWithEmailDTO ToDTO(User arg)
-        {
-            return new UserWithEmailDTO(arg.Id, $"{arg.Name} {arg.LastName}", arg.Email);
+            return users.Select(x => x.MapToUserWithEmailDTO());
         }
 
         private IEnumerable<BusinessRoleDTO> ToDTOs(IEnumerable<DataProcessingRegistrationRole> roles, int organizationId)
@@ -845,7 +840,7 @@ namespace Presentation.Web.Controllers.API.V1
                 AssignedRoles = value.Rights.Select(dataProcessingRegistrationRight => new AssignedRoleDTO
                 {
                     Role = ToDTO(dataProcessingRegistrationRight.Role, localDescriptionOverrides, idsOfAvailableRoles),
-                    User = ToDTO(dataProcessingRegistrationRight.User)
+                    User = dataProcessingRegistrationRight.User.MapToUserWithEmailDTO()
 
                 }).ToArray(),
                 References = value

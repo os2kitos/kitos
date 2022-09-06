@@ -1,51 +1,45 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.config([
-        '$stateProvider', function ($stateProvider) {
-            $stateProvider.state('global-admin.local-users', {
-                url: '/local-admins',
-                templateUrl: 'app/components/global-admin/global-admin-local-admins.view.html',
-                controller: 'globalAdmin.localAdminsCtrl',
-                authRoles: ['GlobalAdmin'],
+        "$stateProvider", $stateProvider => {
+            $stateProvider.state("global-admin.local-users", {
+                url: "/local-admins",
+                templateUrl: "app/components/global-admin/global-admin-local-admins.view.html",
+                controller: "globalAdmin.localAdminsCtrl",
+                authRoles: ["GlobalAdmin"],
                 resolve: {
                     adminRights: [
-                        '$http', function ($http) {
-                            return $http.get('api/OrganizationRight/?roleName=LocalAdmin&roleWithName').then(function (result) {
-                                return result.data.response;
-                            });
-                        }
+                        "$http", $http => $http.get("api/OrganizationRight/?roleName=LocalAdmin&roleWithName").then(result => result.data.response)
                     ],
                     user: [
-                        'userService', function (userService) {
-                            return userService.getUser();
-                        }
+                        "userService", userService => userService.getUser()
                     ]
                 }
             });
         }
     ]);
 
-    app.controller('globalAdmin.localAdminsCtrl', [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'adminRights', 'user', 'userService',
-        function ($rootScope, $scope, $http, $state, notify, adminRights, user: Kitos.Services.IUser, userService: Kitos.Services.IUserService) {
-            $rootScope.page.title = 'Lokal administratorer';
+    app.controller("globalAdmin.localAdminsCtrl", [
+        "$rootScope", "$scope", "$http", "$state", "notify", "adminRights", "user", "userService","select2LoadingService",
+        ($rootScope, $scope, $http, $state, notify, adminRights, user: Kitos.Services.IUser, userService: Kitos.Services.IUserService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
+            $rootScope.page.title = "Lokal administratorer";
             $scope.adminRights = adminRights;
 
             function newLocalAdmin() {
                 // select2 changes the value twice, first with invalid values
                 // so ignore invalid values
-                if (typeof $scope.newUser !== 'object') return;
+                if (typeof $scope.newUser !== "object") return;
                 if (!($scope.newOrg && $scope.newUser)) return;
 
                 var user = $scope.newUser;
                 var uId = user.id;
-                var oId = $scope.newOrg.id;
+                const oId = $scope.newOrg.id;
                 var orgName = $scope.newOrg.text;
 
-                var rId = Kitos.API.Models.OrganizationRole.LocalAdmin;
+                const rId = Kitos.API.Models.OrganizationRole.LocalAdmin;
 
                 if (!(uId && oId && rId)) return;
 
-                var data = {
+                const data = {
                     userId: uId,
                     role: rId,
                     organizationId: oId
@@ -65,87 +59,47 @@
             }
 
             function reload() {
-                $state.go('.', null, { reload: true });
+                $state.go(".", null, { reload: true });
             }
 
-            $scope.$watch("newUser", function (newVal, oldVal) {
+            $scope.$watch("newUser", (newVal, oldVal) => {
                 if (newVal === oldVal || !newVal) return;
 
                 newLocalAdmin();
             });
 
-            $scope.$watch("newOrg", function (newVal, oldVal) {
+            $scope.$watch("newOrg", (newVal, oldVal) => {
                 if (newVal === oldVal || !newVal) return;
 
                 newLocalAdmin();
             });
 
-            $scope.deleteLocalAdmin = function (right) {
+            $scope.deleteLocalAdmin = right => {
                 var oId = right.organizationId;
                 var rId = right.role;
                 var uId = right.userId;
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.delete("api/OrganizationRight/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId)
+                $http.delete("api/OrganizationRight/" + oId + "?rId=" + rId + "&uId=" + uId + "&organizationId=" + user.currentOrganizationId)
                     .then(function onSuccess(result) {
-                    msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
-                    if (uId == user.id) {
-                        // Reload user
-                        userService.reAuthorize();
-                    }
-                    reload();
+                        msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
+                        if (uId == user.id) {
+                            // Reload user
+                            userService.reAuthorize();
+                        }
+                        reload();
                     }, function onError(result) {
 
-                    msg.toErrorMessage("Kunne ikke fjerne " + right.userName + " som lokal administrator");
-                });
+                        msg.toErrorMessage("Kunne ikke fjerne " + right.userName + " som lokal administrator");
+                    });
             };
 
-            $scope.organizationSelectOptions = selectLazyLoading('api/organization', formatOrganization, null);
-
-            function formatOrganization(org) {
-                var result = '<div>' + org.text + '</div>';
-                if (org.cvr) {
-                    result += '<div class="small">' + org.cvr + '</div>';
-                }
-                return result;
-            }
-
-            function selectLazyLoading(url, format, paramAry) {
-                return {
-                    minimumInputLength: 1,
-                    allowClear: true,
-                    placeholder: ' ',
-                    formatResult: format,
-                    ajax: {
-                        data: function (term, page) {
-                            return { query: term };
-                        },
-                        quietMillis: 500,
-                        transport: function (queryParams) {
-                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                            res.abort = function () {
-                                return null;
-                            };
-
-                            return res;
-                        },
-
-                        results: function (data, page) {
-                            var results = [];
-
-                            _.each(data.data.response, function (obj: { id: any; name: any; cvr: any }) {
-                                results.push({
-                                    id: obj.id,
-                                    text: obj.name ? obj.name : 'Unavngiven',
-                                    cvr: obj.cvr
-                                });
-                            });
-
-                            return { results: results };
-                        }
-                    }
-                };
-            }
+            $scope.organizationSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100", "orgId=" + user.currentOrganizationId], (item, items) => {
+                items.push({
+                    id: item.id,
+                    text: item.name ? item.name : 'Unavngiven',
+                    cvr: item.cvrNumber
+                });
+            }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
         }
     ]);
 })(angular, app);

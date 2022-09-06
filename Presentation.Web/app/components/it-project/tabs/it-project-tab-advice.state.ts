@@ -12,7 +12,7 @@
                     return project;
                 }],
                 type: [function () {
-                    return "itProject";
+                    return Kitos.Models.Advice.AdviceType.ItProject;
                 }],
                 advicename: [
                     '$http', '$stateParams', function ($http, $stateParams) {

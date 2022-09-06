@@ -2,19 +2,13 @@
     export const ItSystemUsageUiCustomizationBluePrint = {
         module: UICustomization.CustomizableKitosModule.ItSystemUsage,
         readOnly: false,
-        helpText: "Bemærk: Skjules faneblad/felt fjernes relaterede felt(er) også fra overbliksbillederne.",
+        helpText: Configs.helpTexts.generalUiCustomizationHelpText,
         text: "IT-Systemer i anvendelse",
         children: {
             frontPage: {
                 text: "Systemforside",
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab
-            },
-            interfaces: {
-                text: "Udstillede snitflader"
-            },
-            systemRelations: {
-                text: "Relationer"
             },
             contracts: {
                 text: "Kontrakter",
@@ -26,8 +20,18 @@
                     }
                 }
             },
-            hierarchy: {
-                text: "Hierarki"
+            projects: {
+                text: "Projekter",
+                readOnly: true,
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
+            },
+            dataProcessing: {
+                text: "Databehandling",
+                readOnly: true,
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
+            },
+            gdpr: {
+                text: "GDPR"
             },
             systemRoles: {
                 text: "Systemroller"
@@ -35,25 +39,26 @@
             organization: {
                 text: "Organisation"
             },
+            systemRelations: {
+                text: "Relationer"
+            },
+            interfaces: {
+                text: "Udstillede snitflader"
+            },
+            archiving: {
+                text: "Arkivering"
+            },
+            hierarchy: {
+                text: "Hierarki"
+            },
             localKle: {
                 text: "Lokale KLE"
-            },
-            projects: {
-                text: "Projekter",
-                readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
             },
             advice: {
                 text: "Advis"
             },
             localReferences: {
                 text: "Lokale referencer"
-            },
-            archiving: {
-                text: "Arkivering"
-            },
-            gdpr: {
-                text: "GDPR"
             }
         }
     };

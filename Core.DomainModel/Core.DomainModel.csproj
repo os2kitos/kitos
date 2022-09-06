@@ -54,6 +54,7 @@
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
+    <Compile Include="ItContract\CriticalityType.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />
     <Compile Include="Events\EntityBeingDeletedEvent.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
+    <Compile Include="LocalOptions\LocalCriticalityType.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
@@ -165,7 +167,6 @@
     <Compile Include="LocalOptions\LocalItProjectRole.cs" />
     <Compile Include="LocalOptions\LocalItProjectType.cs" />
     <Compile Include="LocalOptions\LocalAgreementElementType.cs" />
-    <Compile Include="LocalOptions\LocalHandoverTrialType.cs" />
     <Compile Include="LocalOptions\LocalItContractRole.cs" />
     <Compile Include="LocalOptions\LocalItContractTemplateType.cs" />
     <Compile Include="LocalOptions\LocalItContractType.cs" />
@@ -184,17 +185,14 @@
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\DataProtectionAdvisor.cs" />
     <Compile Include="Organization\DataResponsible.cs" />
-    <Compile Include="Organization\DomainEvents\AccessRightsChanged.cs" />
+    <Compile Include="Organization\DomainEvents\AdministrativeAccessRightsChanged.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="IHierarchy.cs" />
-    <Compile Include="ItContract\HandoverTrial.cs" />
-    <Compile Include="ItContract\HandoverTrialType.cs" />
     <Compile Include="ItContract\ItContractItSystemUsage.cs" />
     <Compile Include="ItContract\OptionExtendType.cs" />
     <Compile Include="ItContract\PaymentFreqencyType.cs" />
-    <Compile Include="ItContract\PaymentMilestone.cs" />
     <Compile Include="ItContract\PaymentModelType.cs" />
     <Compile Include="ItContract\PriceRegulationType.cs" />
     <Compile Include="ItContract\EconomyStream.cs" />
@@ -267,7 +265,7 @@
     <Compile Include="GDPR\YearMonthIntervalOption.cs" />
     <Compile Include="Shared\YesNoUndecidedOption.cs" />
     <Compile Include="Shared\YesNoIrrelevantOption.cs" />
-    <Compile Include="SSO\SsoOrganizationIdentity.cs" />
+    <Compile Include="Organization\StsOrganizationIdentity.cs" />
     <Compile Include="SSO\SsoUserIdentity.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="Tracking\LifeCycleTrackingEvent.cs" />

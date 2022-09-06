@@ -66,8 +66,8 @@
     <Reference Include="Moq, Version=4.14.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.14.5\lib\net45\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Polly, Version=7.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
       <HintPath>..\packages\Polly.7.2.1\lib\net472\Polly.dll</HintPath>
@@ -114,11 +114,15 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Authorization\GetOrganizationsTests.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
+    <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
+    <Compile Include="Options\V1\OptionApiTests.cs" />
     <Compile Include="Organizations\OrganizationSequentialTests.cs" />
+    <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
+    <Compile Include="Tools\LocalOptionHelper.cs" />
     <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />
     <Compile Include="Tools\External\ApiV2HelperPatchPayloadExtensions.cs" />
     <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
@@ -173,6 +177,7 @@
     <Compile Include="Tools\External\InterfaceV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationUnitV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationUserV2Helper.cs" />
+    <Compile Include="Tools\External\Rights\RightsType.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\HttpCommandAssertionHelper.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
@@ -191,9 +196,13 @@
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\Model\OrgRightDTO.cs" />
+    <Compile Include="Tools\Model\RightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
     <Compile Include="Tools\OrganizationHelper.cs" />
+    <Compile Include="Tools\OrganizationUnitHelper.cs" />
     <Compile Include="Tools\ReferencesHelper.cs" />
+    <Compile Include="Tools\External\Rights\RightsHelper.cs" />
+    <Compile Include="Tools\SsoIdentityHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TaskUsageHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
@@ -202,6 +211,7 @@
     <Compile Include="Tools\UserHelper.cs" />
     <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
     <Compile Include="UI_Configuration\UIConfigurationTests.cs" />
+    <Compile Include="Users\UserRolesManagementApiTest.cs" />
     <Compile Include="Users\UserTest.cs" />
   </ItemGroup>
   <ItemGroup>

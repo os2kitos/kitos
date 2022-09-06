@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
@@ -42,5 +43,7 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="enforceDeletion">If set to <c>true</c> any removal conflicts will be ignored and the deletion will proceed</param>
         /// <returns></returns>
         Maybe<OperationError> RemoveOrganization(Guid organizationUuid, bool enforceDeletion);
+
+        Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId);
     }
 }

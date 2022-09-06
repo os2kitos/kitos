@@ -75,7 +75,7 @@ describe("User is able to create and view relation",
                     .then(() => checkForUsedByDescription(relationSystemName1, description))
                     .then(() => checkForUsedByReference(relationSystemName1, reference))
                     .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType))
-                    .then(() => checkContractTimeOverviewToShowRelationCount(contractName, expectedRelationCount))
+                    .then(() => checkContractOverviewToShowRelationCount(contractName, expectedRelationCount))
                     .then(() => ContractHelper.openContract(contractName))
                     .then(() => ContractNavigation.openSystemsPage())
                     .then(() => browser.waitForAngular())
@@ -156,6 +156,6 @@ function checkContractForFrequencyType(systemName: string, frequencyType: string
     expect(ContractSystemPage.getFrequencyType(systemName).getText()).toMatch(frequencyType);
 }
 
-function checkContractTimeOverviewToShowRelationCount(contractName: string, expectedCount: string) {
+function checkContractOverviewToShowRelationCount(contractName: string, expectedCount: string) {
     expect(ContractHelper.getRelationCountFromContractName(contractName)).toBe(expectedCount);
 }

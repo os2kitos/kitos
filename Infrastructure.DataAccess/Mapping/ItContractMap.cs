@@ -25,6 +25,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsUnique(false)
                 .HasName("IX_Name");
 
+            HasIndex(x => x.ProcurementInitiated)
+                .IsUnique(false)
+                .HasName("IX_ProcurementInitiated");
+
             // Table & Column Mappings
             ToTable("ItContract");
 
@@ -58,6 +62,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Children)
                 .HasForeignKey(d => d.ParentId)
                 .WillCascadeOnDelete(false);
+
+            HasOptional(t => t.Criticality)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.CriticalityId);
 
             HasMany(t => t.AssociatedAgreementElementTypes)
                .WithRequired(t => t.ItContract)

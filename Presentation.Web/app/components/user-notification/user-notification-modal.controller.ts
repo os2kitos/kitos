@@ -182,7 +182,6 @@
 
                             $scope.$watch("stateName", function (newValue, oldValue) {
                                 if ($scope.stateName === Constants.SRef.ContractOverview ||
-                                    $scope.stateName === Constants.SRef.ContractPlanOverview ||
                                     $scope.stateName === Constants.SRef.ProjectOverview ||
                                     $scope.stateName === Constants.SRef.SystemUsageOverview ||
                                     $scope.stateName === Constants.SRef.DataProcessingRegistrationOverview) {
@@ -238,8 +237,6 @@
                             function resolveContextType(contextAsString: string): Models.UserNotification.RelatedEntityType {
                                 switch (contextAsString) {
                                     case Constants.SRef.ContractOverview:
-                                        return Models.UserNotification.RelatedEntityType.itContract;
-                                    case Constants.SRef.ContractPlanOverview:
                                         return Models.UserNotification.RelatedEntityType.itContract;
                                     case Constants.SRef.SystemUsageOverview:
                                         return Models.UserNotification.RelatedEntityType.itSystemUsage;

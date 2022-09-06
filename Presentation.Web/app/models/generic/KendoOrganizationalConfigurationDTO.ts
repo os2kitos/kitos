@@ -1,6 +1,7 @@
 ﻿module Kitos.Models.Generic {
     export enum OverviewType {
-        ItSystemUsage = 0
+        ItSystemUsage = 0,
+        ItContract = 1
     }
 
     export interface IKendoOrganizationalConfigurationDTO {

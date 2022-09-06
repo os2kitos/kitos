@@ -22,18 +22,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public class ItSystemUsageResponseMapper : IItSystemUsageResponseMapper
     {
-        private readonly IOrganizationRepository _organizationRepository;
         private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
         private readonly IGenericRepository<RegisterType> _registerTypesRepository;
 
         public ItSystemUsageResponseMapper(
-            IOrganizationRepository organizationRepository,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository,
             IGenericRepository<RegisterType> registerTypesRepository)
         {
-            _organizationRepository = organizationRepository;
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
             _registerTypesRepository = registerTypesRepository;
@@ -120,11 +117,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Location = systemUsage.ArchiveLocation?.MapIdentityNamePairDTO(),
                 TestLocation = systemUsage.ArchiveTestLocation?.MapIdentityNamePairDTO(),
                 Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
-                //TODO: Simplify mapping once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
-                Supplier = systemUsage
-                    .SupplierId?
-                    .Transform(id => _organizationRepository.GetById(id).Select(org => org.MapShallowOrganizationResponseDTO()))?
-                    .GetValueOrDefault(),
+                Supplier = systemUsage.ArchiveSupplier?.MapShallowOrganizationResponseDTO(),
                 JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodDTO
                 {
                     Approved = period.Approved,
@@ -267,6 +260,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             return systemUsage.UserCount switch
             {
+                null or UserCount.UNDECIDED => null,
                 UserCount.BELOWTEN => new ExpectedUsersIntervalDTO { LowerBound = 0, UpperBound = 9 },
                 UserCount.TENTOFIFTY => new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
                 UserCount.FIFTYTOHUNDRED => new ExpectedUsersIntervalDTO { LowerBound = 50, UpperBound = 100 },

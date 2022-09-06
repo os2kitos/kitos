@@ -154,8 +154,8 @@
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
@@ -343,16 +343,40 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
+    <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
+    <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
-    <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />
+    <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\right-entity.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
+    <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />
+    <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-contract-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\helpers\KendoToolbarCustomizationHelper.ts" />
+    <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
+    <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
+    <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
+    <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
+    <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
+    <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
+    <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
+    <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
+    <Compile Include="Models\API\V1\Users\TransferRightsRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Users\BusinessRoleScope.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRoleOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRegularOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseOptionTypeV2Controller.cs" />
@@ -374,6 +398,7 @@
     <Compile Include="Controllers\API\V2\External\Generic\IPropertyUpdateRule.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\MustUpdateIfDefinedOrEnforcedChangeRule.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractCriticalityTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementElementTypeV2Controller.cs" />
@@ -381,7 +406,6 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractProcurementStrategyV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementExtensionOptionsTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractNoticePeriodMonthTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractHandoverTrialTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPurchaseTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTemplateTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
@@ -431,9 +455,13 @@
     <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
     <Compile Include="Infrastructure\Model\Request\ICurrentRequestStream.cs" />
     <Compile Include="Models\API\V1\EntityWithOrganizationRelationshipDTO.cs" />
+    <Compile Include="Models\API\V1\Generic\Queries\V1BoundedPaginationQuery.cs" />
+    <Compile Include="Models\API\V1\Generic\Queries\IV1StandardPaginationQueryParameters.cs" />
+    <Compile Include="Models\API\V1\ItContract\ContractOptionsDTO.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\InterfaceExposedOnSystemsOutsideTheOrganizationConflictDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRemovalConflictsDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationOrgUnitDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\SystemExposingInterfacesDefinedInOtherOrganizationsConflictDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\SystemSetAsParentSystemToSystemsInOtherOrganizationsConflictDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\SystemWithUsageOutsideOrganizationConflictDTO.cs" />
@@ -449,7 +477,6 @@
     <Compile Include="Models\API\V2\Request\Contract\ContractWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\CreateNewContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractProcurementDataWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\Contract\HandoverTrialRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
@@ -458,12 +485,10 @@
     <Compile Include="Models\API\V2\Request\Interface\IRightsHolderWritableItInterfacePropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\RightsHolderPartialUpdateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\PaymentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Tracking\TrackingEventResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\PaymentAuditStatus.cs" />
-    <Compile Include="Models\API\V2\Types\Contract\PaymentMileStoneDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\ProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Validity\ValidityWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
@@ -581,9 +606,11 @@
     <Content Include="app\components\global-admin\global-admin-organization-modal-delete.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\components\local-config\ui-customization\local-ui-customization.view.html" />
+    <Content Include="app\components\org\user\user-delete-directives\org-user-roles-table.view.html" />
     <Content Include="app\components\user-notification\user-notification-modal.view.html" />
     <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
@@ -740,6 +767,8 @@
     <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\ui-customization.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
+    <TypeScriptCompile Include="app\models\users\user-role-assignment-dto.ts" />
+    <TypeScriptCompile Include="app\models\users\user-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
@@ -773,6 +802,9 @@
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\GDPR\OversightDateViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Generic\option-type-view-model.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\edit-org-unit-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\OrganizationDeletionConflictsViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
@@ -788,9 +820,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-migration.ts" />
     <TypeScriptCompile Include="app\models\it-system\archiveDutyRecommendation.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
-    <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
-    <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\MultipleSelectionViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\SingleSelectionViewModel.ts" />
@@ -808,6 +838,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
     <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
     <TypeScriptCompile Include="app\services\helpTextService.ts" />
@@ -831,7 +862,6 @@
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
-    <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\LogConfig.cs" />
@@ -848,7 +878,6 @@
     <Compile Include="Controllers\API\V1\ItInterfaceController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\V1\ItProjectStatusController.cs" />
-    <Compile Include="Controllers\API\V1\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\V1\GenericHierarchyApiController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationRightController.cs" />
     <Compile Include="Controllers\API\V1\DataRowController.cs" />
@@ -869,7 +898,6 @@
     <Compile Include="Controllers\API\V1\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\API\V1\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\V1\OData\ConfigsController.cs" />
-    <Compile Include="Controllers\API\V1\OData\EconomyStreamsController.cs" />
     <Compile Include="Controllers\API\V1\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractRightsController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractsController.cs" />
@@ -890,7 +918,6 @@
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalDataTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalFrequencyTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalGoalTypesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalHandoverTrialTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalInterfaceTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalItContractRolesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalItContractTemplateTypesController.cs" />
@@ -918,7 +945,6 @@
     <Compile Include="Controllers\API\V1\OData\OptionControllers\DataTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\FrequencyTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\GoalTypesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\OptionControllers\HandoverTrialTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\InterfaceTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\ItContractRolesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\ItContractTemplateTypesController.cs" />
@@ -970,18 +996,15 @@
     <Compile Include="Models\API\V1\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\API\V1\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
-    <Compile Include="Models\API\V1\HandoverTrialDTO.cs" />
     <Compile Include="Models\API\V1\ItInterfaceDTO.cs" />
     <Compile Include="Models\API\V1\ItInterfaceExhibitDTO.cs" />
     <Compile Include="Models\API\V1\ItProjectPhaseDTO.cs" />
     <Compile Include="Models\API\V1\ItProjectStatusDTO.cs" />
     <Compile Include="Models\API\V1\ExcelImportErrorDTO.cs" />
     <Compile Include="Models\API\V1\PagingModel.cs" />
-    <Compile Include="Controllers\API\V1\PaymentMilestoneController.cs" />
     <Compile Include="Models\API\V1\ItContractSystemDTO.cs" />
     <Compile Include="Models\API\V1\ItProjectSimpleDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemSimpleDTO.cs" />
-    <Compile Include="Models\API\V1\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\V1\EconomyStreamController.cs" />
     <Compile Include="Models\API\V1\EconomyStreamDTO.cs" />
     <Compile Include="Controllers\API\V1\ItContractController.cs" />
@@ -1095,6 +1118,7 @@
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.reference.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-contract\contract.main.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\01_Parallel\it-contract\LocalAdmin.ItContract.UiCustomization.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\System.Main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\Organization\CreateUser.e2e.spec.ts" />
@@ -1112,6 +1136,7 @@
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SelectHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigation.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigationSrefs.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigationSrefs.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigation.ts" />
@@ -1159,6 +1184,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageDataProcessing.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageGDPR.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
@@ -1200,9 +1226,7 @@
     <Content Include="app\shared\globalAdvis\it-advice-global.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.modal.view.html" />
     <Content Include="app\components\it-advice\it-advice-modal-view.html" />
-    <Content Include="app\components\it-contract\it-contract-tab-advice.view.html" />
     <Content Include="app\components\it-advice\it-advice.view.html" />
-    <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
     <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-main.view.html" />
@@ -1219,7 +1243,7 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
-    <TypeScriptCompile Include="app\components\it-advice\It-advice.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-advice\it-advice.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference.ts" />
@@ -1242,7 +1266,6 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-details\it-contract-plan-detail.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-edit-options.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionList\localOptionList.directive.ts" />
@@ -1264,10 +1287,7 @@
     <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\services\itContractsService.ts" />
-    <TypeScriptCompile Include="app\services\itProjectService.ts" />
-    <TypeScriptCompile Include="app\services\itSystemService.ts" />
     <TypeScriptCompile Include="app\services\NavigationService.ts" />
-    <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\userGetService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
@@ -1307,14 +1327,6 @@
     <Content Include="app\shared\typeahead\typeahead.view.html" />
     <Content Include="Content\css\app.css" />
     <Content Include="Content\css\app.min.css" />
-    <Content Include="Content\css\fonts\tinymce-small.eot" />
-    <Content Include="Content\css\fonts\tinymce-small.svg" />
-    <Content Include="Content\css\fonts\tinymce-small.ttf" />
-    <Content Include="Content\css\fonts\tinymce-small.woff" />
-    <Content Include="Content\css\fonts\tinymce.eot" />
-    <Content Include="Content\css\fonts\tinymce.svg" />
-    <Content Include="Content\css\fonts\tinymce.ttf" />
-    <Content Include="Content\css\fonts\tinymce.woff" />
     <Content Include="Content\css\maps\app.min.css.map" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
@@ -1396,11 +1408,9 @@
     <Content Include="app\components\home\home.view.html" />
     <Content Include="app\components\it-contract\it-contract-edit.view.html" />
     <Content Include="app\components\it-contract\it-contract-overview.view.html" />
-    <Content Include="app\components\it-contract\it-contract-plan.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-deadlines.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-economy.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.view.html" />
-    <Content Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-systems.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-roles.view.html" />
     <Content Include="app\components\it-project\it-project-overview.view.html" />
@@ -1481,20 +1491,6 @@
     <TypeScriptCompile Include="app\models\config.ts" />
     <TypeScriptCompile Include="app\models\entity.ts" />
     <TypeScriptCompile Include="app\models\it-contract\advice.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\agreement-element.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\contract-template.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\contract-type.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\handover-trial-type.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\handover-trial.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\it-contract-rights.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\option-extend.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\payment-frequency.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\payment-milestone.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\payment-model.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\price-regulation.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\procurement-strategy.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\purchase-form.ts" />
-    <TypeScriptCompile Include="app\models\it-contract\termination-deadline.ts" />
     <TypeScriptCompile Include="app\models\it-project\communication.ts" />
     <TypeScriptCompile Include="app\models\it-project\economy-year.ts" />
     <TypeScriptCompile Include="app\models\it-project\goal-status.ts" />
@@ -1504,24 +1500,17 @@
     <TypeScriptCompile Include="app\models\it-project\it-project-org-unit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-priority.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-status.ts" />
-    <TypeScriptCompile Include="app\models\it-project\it-project-type.ts" />
     <TypeScriptCompile Include="app\models\it-project\risk.ts" />
     <TypeScriptCompile Include="app\models\it-project\stakeholder.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\frequency.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-org-unit-usage.ts" />
-    <TypeScriptCompile Include="app\models\it-system\archive-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-row.ts" />
-    <TypeScriptCompile Include="app\models\it-system\data-type.ts" />
-    <TypeScriptCompile Include="app\models\it-system\interface.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-use.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface.ts" />
-    <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-right.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-role.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-type.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit.ts" />
-    <TypeScriptCompile Include="app\models\it-system\business-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-base.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-it-system-usage.ts" />
@@ -1549,7 +1538,6 @@
     <TypeScriptCompile Include="app\components\home\home-edit-user.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-deadlines.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-subnav.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.controller.ts" />
@@ -1569,8 +1557,6 @@
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-plan.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-economy.controller.ts" />
@@ -1649,9 +1635,11 @@
     <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\library-bundle.min.js" />
-    <Content Include="Scripts\skins\lightgray\content.min.css" />
-    <Content Include="Scripts\skins\lightgray\skin.min.css" />
     <EmbeddedResource Include="Scripts\SwaggerUICustom.js" />
+    <Content Include="Scripts\skins\content\default\content.css" />
+    <Content Include="Scripts\skins\content\default\content.min.css" />
+    <Content Include="Scripts\skins\ui\oxide\content.min.css" />
+    <Content Include="Scripts\skins\ui\oxide\skin.min.css" />
     <Content Include="Tests\PARALLEL_VS_SEQUENTIAL.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -1730,6 +1718,18 @@
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.Company\Infrastructure.STS.Company.csproj">
+      <Project>{09A799FA-3781-419B-AB54-3C76219FD2DE}</Project>
+      <Name>Infrastructure.STS.Company</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.OrganizationUnit\Infrastructure.STS.OrganizationUnit.csproj">
+      <Project>{77C5BEDB-CC7F-4D6F-BF34-EC72B57C03C8}</Project>
+      <Name>Infrastructure.STS.OrganizationUnit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.Organization\Infrastructure.STS.Organization.csproj">
+      <Project>{3DC91665-93BB-442D-B186-7E90C7CD6E32}</Project>
+      <Name>Infrastructure.STS.Organization</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

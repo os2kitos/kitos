@@ -195,11 +195,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Theory]
+        [InlineData(null, null, UserCount.UNDECIDED)]
         [InlineData(0, 9, UserCount.BELOWTEN)]
         [InlineData(10, 50, UserCount.TENTOFIFTY)]
         [InlineData(50, 100, UserCount.FIFTYTOHUNDRED)]
         [InlineData(100, null, UserCount.HUNDREDPLUS)]
-        public void Can_Create_With_General_Data_With_All_Data_Defined(int minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
+        public void Can_Create_With_General_Data_With_All_Data_Defined(int? minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
@@ -224,7 +225,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue(),
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue(),
                     AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
-                    NumberOfExpectedUsersInterval = Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers, maxNumberOfUsers)).AsChangedValue(),
+                    NumberOfExpectedUsersInterval = minimumNumberOfUsers == null && maxNumberOfUsers == null ? 
+                        Maybe<(int lower, int? upperBound)>.None.AsChangedValue() : 
+                        Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers.GetValueOrDefault(), maxNumberOfUsers)).AsChangedValue(),
                 }
             };
 
@@ -855,7 +858,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void Can_Create_With_Archiving()
         {
             //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables(true);
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
 
             var archiveTypeUuid = A<Guid>();
@@ -893,7 +896,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -984,7 +987,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void Can_Create_With_Archiving_If_ArchiveTypeUuid_Not_Available_In_Org_But_The_Value_Is_Not_Changed()
         {
             //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables(true);
 
             var archiveTypeUuid = A<Guid>();
             var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
@@ -1026,7 +1029,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -1096,7 +1099,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void Can_Create_With_Archiving_If_ArchiveLocationUuid_Not_Available_In_Org_But_The_Value_Is_Not_Changed()
         {
             //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables(true);
 
             var archiveLocationUuid = A<Guid>();
             var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
@@ -1138,7 +1141,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -1212,7 +1215,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void Can_Create_With_Archiving_If_ArchiveTestLocationUuid_Not_Available_In_Org_But_The_Value_Is_Not_Changed()
         {
             //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables(true);
 
             var archiveTestLocationUuid = A<Guid>();
             var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
@@ -1254,7 +1257,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
+            AssertArchivingParameters(archivingParameters, createResult.Value);
         }
 
         [Fact]
@@ -2390,8 +2393,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Null(actual.ArchiveType);
             Assert.Null(actual.ArchiveLocation);
             Assert.Null(actual.ArchiveTestLocation);
-            Assert.Equal("", actual.ArchiveSupplier);
-            Assert.Null(actual.SupplierId);
+            Assert.Null(actual.ArchiveSupplier);
             Assert.Null(actual.ArchiveFromSystem);
             Assert.Null(actual.Registertype);
             Assert.Null(actual.ArchiveFreq);
@@ -2400,14 +2402,13 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
         }
 
-        private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, int expectedSupplierId, ItSystemUsage actual)
+        private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, ItSystemUsage actual)
         {
             Assert.Equal(expected.ArchiveDuty.NewValue, actual.ArchiveDuty);
             Assert.Equal(expected.ArchiveTypeUuid.NewValue.Value, actual.ArchiveType.Uuid);
             Assert.Equal(expected.ArchiveLocationUuid.NewValue.Value, actual.ArchiveLocation.Uuid);
             Assert.Equal(expected.ArchiveTestLocationUuid.NewValue.Value, actual.ArchiveTestLocation.Uuid);
-            Assert.Equal(expectedSupplierName, actual.ArchiveSupplier);
-            Assert.Equal(expectedSupplierId, actual.SupplierId);
+            Assert.Equal(expected.ArchiveSupplierOrganizationUuid.NewValue.Value, actual.ArchiveSupplier.Uuid);
             Assert.Equal(expected.ArchiveActive.NewValue, actual.ArchiveFromSystem);
             Assert.Equal(expected.ArchiveDocumentBearing.NewValue, actual.Registertype);
             Assert.Equal(expected.ArchiveFrequencyInMonths.NewValue, actual.ArchiveFreq);
@@ -2591,12 +2592,15 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
         }
 
-        private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables()
+        private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables(bool assignUuidToOrganization = false)
         {
             var systemUuid = A<Guid>();
             var organizationUuid = A<Guid>();
             var transactionMock = ExpectTransaction();
             var organization = CreateOrganization();
+            if(assignUuidToOrganization)
+                organization.Uuid = organizationUuid;
+
             var itSystem = new ItSystem { Id = A<int>() };
             var itSystemUsage = new ItSystemUsage
             {

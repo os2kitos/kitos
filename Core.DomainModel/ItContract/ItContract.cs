@@ -10,6 +10,7 @@ using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
 
 using Core.DomainModel.Notification;
+using Core.DomainModel.Shared;
 
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -27,13 +28,11 @@ namespace Core.DomainModel.ItContract
             Children = new List<ItContract>();
             AssociatedAgreementElementTypes = new List<ItContractAgreementElementTypes>();
             AssociatedSystemUsages = new List<ItContractItSystemUsage>();
-            PaymentMilestones = new List<PaymentMilestone>();
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
             UserNotifications = new List<UserNotification>();
-            HandoverTrials = new List<HandoverTrial>();
             Uuid = Guid.NewGuid();
             MarkAsDirty();
         }
@@ -218,7 +217,7 @@ namespace Core.DomainModel.ItContract
         public virtual Organization.Organization Supplier { get; set; }
 
         /// <summary>
-        ///     Gets or sets the chosen procurement strategy option identifier. (udbudsstrategi)
+        ///     Gets or sets the chosen procurement strategy option identifier. (Genanskaffelsesstrategi)
         /// </summary>
         /// <value>
         ///     Chosen procurement strategy identifier.
@@ -226,7 +225,7 @@ namespace Core.DomainModel.ItContract
         public int? ProcurementStrategyId { get; set; }
 
         /// <summary>
-        ///     Gets or sets the chosen procurement strategy option. (udbudsstrategi)
+        ///     Gets or sets the chosen procurement strategy option. (Genanskaffelsesstrategi)
         /// </summary>
         /// <value>
         ///     Chosen procurement strategy.
@@ -234,26 +233,34 @@ namespace Core.DomainModel.ItContract
         public virtual ProcurementStrategyType ProcurementStrategy { get; set; }
 
         /// <summary>
-        ///     Gets or sets the procurement plan half. (udbudsplan)
+        ///     Gets or sets the procurement plan half. (genanskaffelsesplan)
         /// </summary>
         /// <remarks>
         ///     The other part of this option is <see cref="ProcurementPlanYear" />
         /// </remarks>
         /// <value>
-        ///     Can be either 1 for the 1st and 2nd quarter or 2 for the 3rd and 4th quarter.
+        ///     Can have a value between 1 and 4 for each of the quarters.
         /// </value>
-        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanQuarter { get; set; }
 
         /// <summary>
-        ///     Gets or sets the procurement plan year. (udbudsplan)
+        ///     Gets or sets the procurement plan year. (genanskaffelsesplan)
         /// </summary>
         /// <remarks>
-        ///     the other part of this option is <see cref="ProcurementPlanHalf" />
+        ///     the other part of this option is <see cref="ProcurementPlanQuarter" />
         /// </remarks>
         /// <value>
         ///     The procurement plan year.
         /// </value>
         public int? ProcurementPlanYear { get; set; }
+
+        /// <summary>
+        ///     Gets or sets if procurement has been initiated (Genanskaffelse igangsat)
+        /// </summary>
+        /// <value>
+        ///     Yes/No/Undecided procurment initiated.
+        /// </value>
+        public YesNoUndecidedOption? ProcurementInitiated { get; set; }
 
         /// <summary>
         ///     Gets or sets the chosen contract template identifier.
@@ -326,6 +333,23 @@ namespace Core.DomainModel.ItContract
         ///     The contract children.
         /// </value>
         public virtual ICollection<ItContract> Children { get; set; }
+
+
+        /// <summary>
+        ///     Id of criticality type ItContract
+        /// </summary>
+        /// <value>
+        ///     The criticality type identifier.
+        /// </value>
+        public int? CriticalityId { get; set; }
+
+        /// <summary>
+        ///     The criticality of ItContract
+        /// </summary>
+        /// <value>
+        ///     The criticality.
+        /// </value>
+        public virtual CriticalityType Criticality { get; set; }
 
         #endregion
 
@@ -401,25 +425,9 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual TerminationDeadlineType TerminationDeadline { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the payment milestones.
-        /// </summary>
-        /// <value>
-        ///     The payment milestones.
-        /// </value>
-        public virtual ICollection<PaymentMilestone> PaymentMilestones { get; set; }
-
         public int? OptionExtendId { get; set; }
         public virtual OptionExtendType OptionExtend { get; set; }
         public int ExtendMultiplier { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the handover trials.
-        /// </summary>
-        /// <value>
-        ///     The handover trials.
-        /// </value>
-        public virtual ICollection<HandoverTrial> HandoverTrials { get; set; }
 
         /// <summary>
         ///
@@ -575,6 +583,12 @@ namespace Core.DomainModel.ItContract
             ContractTemplate = null;
         }
 
+        public void ResetCriticality()
+        {
+            Criticality?.Track();
+            Criticality = null;
+        }
+
         public Maybe<OperationError> UpdateContractValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
         {
             var validFromDate = newValidFrom?.Date;
@@ -660,19 +674,19 @@ namespace Core.DomainModel.ItContract
 
         public void ResetProcurementPlan()
         {
-            ProcurementPlanHalf = null;
+            ProcurementPlanQuarter = null;
             ProcurementPlanYear = null;
         }
 
-        public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
+        public Maybe<OperationError> UpdateProcurementPlan((byte quarter, int year) plan)
         {
-            var (half, year) = plan;
-            if (half is < 1 or > 2)
+            var (quarter, year) = plan;
+            if (quarter is < 1 or > 4)
             {
-                return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
+                return new OperationError("Quarter Of Year has to be either 1, 2, 3 or 4", OperationFailure.BadInput);
             }
 
-            ProcurementPlanHalf = half;
+            ProcurementPlanQuarter = quarter;
             ProcurementPlanYear = year;
             return Maybe<OperationError>.None;
         }
@@ -731,29 +745,6 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
-        public void ResetHandoverTrials()
-        {
-            HandoverTrials.Clear();
-        }
-
-        public Maybe<OperationError> AddHandoverTrial(HandoverTrialType trialType, DateTime? expected, DateTime? approved)
-        {
-            if (trialType == null)
-                throw new ArgumentNullException(nameof(trialType));
-
-            if (expected.HasValue == false && approved.HasValue == false)
-                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
-
-            HandoverTrials.Add(new HandoverTrial()
-            {
-                Approved = approved?.Date,
-                Expected = expected?.Date,
-                ItContract = this,
-                HandoverTrialType = trialType
-            });
-            return Maybe<OperationError>.None;
-        }
-
         public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
         {
             if (extendMultiplier < 0)
@@ -805,30 +796,6 @@ namespace Core.DomainModel.ItContract
         {
             PriceRegulation.Track();
             PriceRegulation = null;
-        }
-
-        public void ResetPaymentMilestones()
-        {
-            PaymentMilestones.Track();
-            PaymentMilestones.Clear();
-        }
-
-        public Maybe<OperationError> AddPaymentMilestone(string title, DateTime? expected, DateTime? approved)
-        {
-            if (string.IsNullOrEmpty(title))
-                return new OperationError("Error: title cannot be empty", OperationFailure.BadInput);
-
-            if (expected.HasValue == false && approved.HasValue == false)
-                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
-
-            PaymentMilestones.Add(new PaymentMilestone()
-            {
-                Title = title,
-                Expected = expected?.Date,
-                Approved = approved?.Date
-            });
-
-            return Maybe<OperationError>.None;
         }
 
         public void ResetInternalEconomyStreams()

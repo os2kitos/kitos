@@ -38,6 +38,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<Core.DomainModel.Advice.Advice> Advices { get; set; }
+        public DbSet<Core.DomainModel.Advice.AdviceUserRelation> AdviceUserRelations { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
@@ -56,8 +57,8 @@ namespace Infrastructure.DataAccess
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<GoalType> GoalTypes { get; set; }
         public DbSet<Handover> Handovers { get; set; }
-        public DbSet<HandoverTrial> HandoverTrials { get; set; }
-        public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
+        public DbSet<CriticalityType> CriticalityTypes { get; set; }
+        public DbSet<LocalCriticalityType> LocalCriticalityTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
@@ -84,7 +85,6 @@ namespace Infrastructure.DataAccess
         public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentFreqencyType> PaymentFreqencyTypes { get; set; }
-        public DbSet<PaymentMilestone> PaymentMilestones { get; set; }
         public DbSet<PaymentModelType> PaymentModelTypes { get; set; }
         public DbSet<PriceRegulationType> PriceRegulationTypes { get; set; }
         public DbSet<ProcurementStrategyType> ProcurementStrategyTypes { get; set; }
@@ -107,7 +107,6 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalDataType> LocalDataTypes { get; set; }
         public DbSet<LocalRelationFrequencyType> LocalRelationFrequencyTypes { get; set; }
         public DbSet<LocalGoalType> LocalGoalTypes { get; set; }
-        public DbSet<LocalHandoverTrialType> LocalHandoverTrialTypes { get; set; }
         public DbSet<LocalInterfaceType> LocalInterfaceTypes { get; set; }
         public DbSet<LocalItContractRole> LocalItContractRoles { get; set; }
         public DbSet<LocalItContractTemplateType> LocalItContractTemplateTypes { get; set; }
@@ -141,7 +140,7 @@ namespace Infrastructure.DataAccess
         public DbSet<BrokenExternalReferencesReport> BrokenExternalReferencesReports { get; set; }
         public DbSet<ItSystemUsageSensitiveDataLevel> ItSystemUsageSensitiveDataLevels { get; set; }
         public DbSet<SsoUserIdentity> SsoUserIdentities { get; set; }
-        public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities { get; set; }
+        public DbSet<StsOrganizationIdentity> SsoOrganizationIdentities { get; set; }
         public DbSet<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
         public DbSet<DataProcessingRegistrationRole> DataProcessingRegistrationRoles { get; set; }
         public DbSet<LocalDataProcessingRegistrationRole> LocalDataProcessingRegistrationRoles { get; set; }
@@ -204,8 +203,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new GoalTypeMap());
             modelBuilder.Configurations.Add(new HandoverMap());
-            modelBuilder.Configurations.Add(new HandoverTrialMap());
-            modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
+            modelBuilder.Configurations.Add(new CriticalityTypeMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
@@ -255,7 +253,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new BrokenLinkInInterfaceMap());
             modelBuilder.Configurations.Add(new ItSystemUsageSensitiveDataLevelMap());
             modelBuilder.Configurations.Add(new SsoUserIdentityMap());
-            modelBuilder.Configurations.Add(new SsoOrganizationIdentityMap());
+            modelBuilder.Configurations.Add(new StsOrganizationIdentityMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationRightMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationRoleMap());
@@ -283,6 +281,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new LifeCycleTrackingEventMap());
             modelBuilder.Configurations.Add(new UIModuleCustomizationMap());
             modelBuilder.Configurations.Add(new CustomizedUINodeMap());
+            modelBuilder.Configurations.Add(new AdviceUserRelationMap());
         }
     }
 }

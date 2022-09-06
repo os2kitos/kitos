@@ -383,10 +383,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var requestDto = new CreateNewContractRequestDTO()
+            var requestDto = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
-                Name = CreateName()
+                Name = CreateName(),
             };
 
             //Act
@@ -686,17 +686,18 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(true, true, false)]
-        [InlineData(true, false, true)]
-        [InlineData(false, true, true)]
-        [InlineData(false, false, false)]
-        public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements)
+        [InlineData(true, true, true, true)]
+        [InlineData(true, true, true, false)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, false, true, true)]
+        [InlineData(false, true, true, true)]
+        [InlineData(false, false, false, false)]
+        public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements);
-            var request = new CreateNewContractRequestDTO()
+            var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements, withCriticalityType);
+            var request = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName(),
@@ -708,7 +709,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(request.General, contractType, contractTemplateType, agreementElements, freshDTO);
+            AssertGeneralDataSection(request.General, contractType, contractTemplateType, agreementElements, criticalityType, freshDTO);
         }
 
         [Fact]
@@ -724,24 +725,23 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var dto = await ItContractV2Helper.PostContractAsync(token, request);
 
             //Act
-            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             using var response1 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, freshDTO);
+            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, criticalityType, freshDTO);
 
             //Act - new values
-            (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, false, true, false);
+            (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, false, true, false, false);
             using var response2 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
-
-
+            
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, freshDTO);
+            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, criticalityType, freshDTO);
 
             //Act - reset
             var resetRequest = new ContractGeneralDataWriteRequestDTO();
@@ -750,7 +750,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(resetRequest, null, null, null, freshDTO);
+            AssertGeneralDataSection(resetRequest, null, null, null, null, freshDTO);
         }
 
         [Theory]
@@ -907,85 +907,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertSupplier(changes, freshDTO);
-        }
-
-        [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(true, true, false)]
-        [InlineData(true, false, true)]
-        [InlineData(false, true, true)]
-        [InlineData(false, false, false)]
-        public async Task Can_POST_With_HandoverTrials(bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
-        {
-            //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
-
-            var handoverTrials = await CreateHandoverTrials(organization, oneWithBothExpectedAndApproved, oneWithExpectedOnly, oneWithApprovedOnly);
-
-            var request = new CreateNewContractRequestDTO
-            {
-                OrganizationUuid = organization.Uuid,
-                Name = CreateName(),
-                HandoverTrials = handoverTrials
-            };
-
-            //Act
-            var dto = await ItContractV2Helper.PostContractAsync(token, request);
-
-            //Assert
-            var responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertHandoverTrials(request.HandoverTrials, responseDto);
-        }
-
-        [Fact]
-        public async Task Can_PATCH_HandoverTrials()
-        {
-            //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
-
-
-            var request = new CreateNewContractRequestDTO
-            {
-                OrganizationUuid = organization.Uuid,
-                Name = CreateName(),
-            };
-            var dto = await ItContractV2Helper.PostContractAsync(token, request);
-
-            //Act
-            var handoverTrials = await CreateHandoverTrials(organization, true, true, true);
-            using var response1 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
-            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
-
-            //Assert
-            var responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertHandoverTrials(handoverTrials, responseDto);
-
-            //Act 
-            handoverTrials = await CreateHandoverTrials(organization, true, true, false);
-            using var response2 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
-            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
-
-            //Assert
-            responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertHandoverTrials(handoverTrials, responseDto);
-
-            //Act 
-            handoverTrials = await CreateHandoverTrials(organization, true, false, false);
-            using var response3 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
-            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
-
-            //Assert
-            responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertHandoverTrials(handoverTrials, responseDto);
-
-            //Act 
-            handoverTrials = new List<HandoverTrialRequestDTO>();
-            using var response4 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
-            Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
-
-            //Assert
-            responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertHandoverTrials(handoverTrials, responseDto);
         }
 
         [Fact]
@@ -1666,10 +1587,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (token, _, organization) = await CreatePrerequisitesAsync();
             var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
             var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
-            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequest) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequest) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var handoverTrials = await CreateHandoverTrials(organization, true, true, true);
             var externalReferences = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
             var systemUsageUuids = await CreateSystemUsageUuids(token, organization);
             var roles = await CreateRoles(organization);
@@ -1688,7 +1608,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 General = generalDataWriteRequest,
                 Responsible = contractResponsibleDataWriteRequest,
                 Supplier = supplierRequest,
-                HandoverTrials = handoverTrials,
                 ExternalReferences = externalReferences,
                 SystemUsageUuids = systemUsageUuids,
                 Roles = roles,
@@ -1709,10 +1628,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             AssertCrossReference(parent, contractDTO.ParentContract);
             AssertProcurement(procurementRequest, procurementStrategy, purchaseType, contractDTO.Procurement);
-            AssertGeneralDataSection(generalDataWriteRequest, contractType, contractTemplateType, agreementElements, contractDTO);
+            AssertGeneralDataSection(generalDataWriteRequest, contractType, contractTemplateType, agreementElements, criticalityType, contractDTO);
             AssertResponsible(contractResponsibleDataWriteRequest, contractDTO);
             AssertSupplier(supplierRequest, contractDTO);
-            AssertHandoverTrials(handoverTrials, contractDTO);
             AssertExternalReferenceResults(externalReferences, contractDTO);
             AssertMultiAssignment(systemUsageUuids, contractDTO.SystemUsages);
             AssertRoleAssignments(roles, contractDTO);
@@ -1734,10 +1652,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             var parent1 = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
             var (procurementRequest1, procurementStrategy1, purchaseType1) = await CreateProcurementRequestAsync(organization.Uuid);
-            var (contractType1, contractTemplateType1, agreementElements1, generalDataWriteRequest1) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType1, contractTemplateType1, agreementElements1, criticalityType1, generalDataWriteRequest1) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest1 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest1 = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var handoverTrials1 = await CreateHandoverTrials(organization, true, true, true);
             var externalReferences1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
             var systemUsageUuids1 = await CreateSystemUsageUuids(token, organization);
             var roles1 = await CreateRoles(organization);
@@ -1754,7 +1671,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 General = generalDataWriteRequest1,
                 Responsible = contractResponsibleDataWriteRequest1,
                 Supplier = supplierRequest1,
-                HandoverTrials = handoverTrials1,
                 ExternalReferences = externalReferences1,
                 SystemUsageUuids = systemUsageUuids1,
                 Roles = roles1,
@@ -1775,10 +1691,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(requestDto1.Name, contractDTO1.Name);
             AssertCrossReference(parent1, contractDTO1.ParentContract);
             AssertProcurement(procurementRequest1, procurementStrategy1, purchaseType1, contractDTO1.Procurement);
-            AssertGeneralDataSection(generalDataWriteRequest1, contractType1, contractTemplateType1, agreementElements1, contractDTO1);
+            AssertGeneralDataSection(generalDataWriteRequest1, contractType1, contractTemplateType1, agreementElements1, criticalityType1, contractDTO1);
             AssertResponsible(contractResponsibleDataWriteRequest1, contractDTO1);
             AssertSupplier(supplierRequest1, contractDTO1);
-            AssertHandoverTrials(handoverTrials1, contractDTO1);
             AssertExternalReferenceResults(externalReferences1, contractDTO1);
             AssertMultiAssignment(systemUsageUuids1, contractDTO1.SystemUsages);
             AssertRoleAssignments(roles1, contractDTO1);
@@ -1791,10 +1706,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange - Put on filled
             var parent2 = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
             var (procurementRequest2, procurementStrategy2, purchaseType2) = await CreateProcurementRequestAsync(organization.Uuid);
-            var (contractType2, contractTemplateType2, agreementElements2, generalDataWriteRequest2) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var (contractType2, contractTemplateType2, agreementElements2, criticalityType2, generalDataWriteRequest2) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest2 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest2 = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var handoverTrials2 = await CreateHandoverTrials(organization, true, true, true);
             var externalReferences2 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
             var systemUsageUuids2 = await CreateSystemUsageUuids(token, organization);
             var roles2 = await CreateRoles(organization);
@@ -1811,7 +1725,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 General = generalDataWriteRequest2,
                 Responsible = contractResponsibleDataWriteRequest2,
                 Supplier = supplierRequest2,
-                HandoverTrials = handoverTrials2,
                 ExternalReferences = externalReferences2,
                 SystemUsageUuids = systemUsageUuids2,
                 Roles = roles2,
@@ -1832,10 +1745,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(requestDto2.Name, contractDTO2.Name);
             AssertCrossReference(parent2, contractDTO2.ParentContract);
             AssertProcurement(procurementRequest2, procurementStrategy2, purchaseType2, contractDTO2.Procurement);
-            AssertGeneralDataSection(generalDataWriteRequest2, contractType2, contractTemplateType2, agreementElements2, contractDTO2);
+            AssertGeneralDataSection(generalDataWriteRequest2, contractType2, contractTemplateType2, agreementElements2, criticalityType2, contractDTO2);
             AssertResponsible(contractResponsibleDataWriteRequest2, contractDTO2);
             AssertSupplier(supplierRequest2, contractDTO2);
-            AssertHandoverTrials(handoverTrials2, contractDTO2);
             AssertExternalReferenceResults(externalReferences2, contractDTO2);
             AssertMultiAssignment(systemUsageUuids2, contractDTO2.SystemUsages);
             AssertRoleAssignments(roles2, contractDTO2);
@@ -1861,7 +1773,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(requestDto3.Name, contractDTO3.Name);
             AssertCrossReference((ItContractResponseDTO)null, contractDTO3.ParentContract);
             AssertProcurement(requestDto3.Procurement, null, null, contractDTO3.Procurement);
-            AssertGeneralDataSection(requestDto3.General, null, null, null, contractDTO3);
+            AssertGeneralDataSection(requestDto3.General, null, null, null, null, contractDTO3);
 
             var responsibleResponse = contractDTO3.Responsible;
             Assert.Null(responsibleResponse.OrganizationUnit);
@@ -1875,7 +1787,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Null(supplierResponse.SignedBy);
             Assert.False(supplierResponse.Signed);
 
-            Assert.Empty(contractDTO3.HandoverTrials);
             Assert.Empty(contractDTO3.ExternalReferences);
             Assert.Empty(contractDTO3.SystemUsages);
             Assert.Empty(contractDTO3.Roles);
@@ -2032,24 +1943,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertCrossReference(paymentFrequencyType, actual.PaymentFrequency);
             AssertCrossReference(paymentModelType, actual.PaymentModel);
             AssertCrossReference(priceRegulationType, actual.PriceRegulation);
-
-            if (expected?.PaymentMileStones == null)
-            {
-                Assert.Empty(actual.PaymentMileStones);
-            }
-            else
-            {
-                var expectedMilestones = expected.PaymentMileStones.OrderBy(x => x.Title).ToList();
-                var actualMilestones = actual.PaymentMileStones.OrderBy(x => x.Title).ToList();
-
-                Assert.Equal(expectedMilestones.Count, actualMilestones.Count);
-                for (var i = 0; i < expectedMilestones.Count; i++)
-                {
-                    Assert.Equal(expectedMilestones[i].Title, actualMilestones[i].Title);
-                    Assert.Equal(expectedMilestones[i].Expected?.Date, actualMilestones[i].Expected?.Date);
-                    Assert.Equal(expectedMilestones[i].Approved?.Date, actualMilestones[i].Approved?.Date);
-                }
-            }
         }
 
         private async Task<(
@@ -2080,7 +1973,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 PaymentFrequencyUuid = paymentFrequencyType?.Uuid,
                 PaymentModelUuid = paymentModelType?.Uuid,
                 PriceRegulationUuid = priceRegulationType?.Uuid,
-                PaymentMileStones = withMilestones ? Many<PaymentMileStoneDTO>().ToList() : new List<PaymentMileStoneDTO>()
             };
 
             return (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType);
@@ -2109,7 +2001,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements)
+        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, IdentityNamePairResponseDTO criticalityType,ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             var contractType = withContractType
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
@@ -2123,12 +2015,17 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractAgreementElementTypes,
                     organization.Uuid, 10, 0)).RandomItems(2).ToList()
                 : null;
+            var criticalityType = withCriticalityType
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.CriticalityTypes,
+                    organization.Uuid, 10, 0)).RandomItem()
+                : null;
             var generalDataWriteRequestDto = new ContractGeneralDataWriteRequestDTO()
             {
                 Notes = A<string>(),
                 ContractId = A<string>(),
                 ContractTypeUuid = contractType?.Uuid,
                 ContractTemplateUuid = contractTemplateType?.Uuid,
+                CriticalityUuid = criticalityType?.Uuid,
                 AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
                 Validity = new ValidityWriteRequestDTO()
                 {
@@ -2138,7 +2035,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 }
             };
 
-            return (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto);
+            return (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto);
         }
 
         private static void AssertGeneralDataSection(
@@ -2146,6 +2043,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             IdentityNamePairResponseDTO expectedContractType,
             IdentityNamePairResponseDTO expectedContractTemplateType,
             List<IdentityNamePairResponseDTO> expectedAgreementElements,
+            IdentityNamePairResponseDTO criticalityType,
             ItContractResponseDTO freshDTO)
         {
             Assert.Equal(request?.Notes, freshDTO.General.Notes);
@@ -2155,6 +2053,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(request?.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
             Assert.Equal(request?.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
             Assert.Equal(request?.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
+            AssertCrossReference(criticalityType, freshDTO.General.Criticality);
 
             if (expectedAgreementElements == null)
                 Assert.Empty(freshDTO.General.AgreementElements);
@@ -2288,8 +2187,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
             else
             {
-                Assert.Equal(expected.ProcurementPlan.HalfOfYear, actual.ProcurementPlan.HalfOfYear);
+                Assert.Equal(expected.ProcurementPlan.QuarterOfYear, actual.ProcurementPlan.QuarterOfYear);
                 Assert.Equal(expected.ProcurementPlan.Year, actual.ProcurementPlan.Year);
+                Assert.Equal(expected.ProcurementInitiated, actual.ProcurementInitiated);
             }
         }
 
@@ -2297,13 +2197,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             var procurementStrategy = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes, organizationUuid, 10, 0)).RandomItem();
             var purchaseType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes, organizationUuid, 10, 0)).RandomItem();
-            var request = new ContractProcurementDataWriteRequestDTO()
+            var request = new ContractProcurementDataWriteRequestDTO
             {
                 ProcurementStrategyUuid = procurementStrategy.Uuid,
                 PurchaseTypeUuid = purchaseType.Uuid,
-                ProcurementPlan = new ProcurementPlanDTO()
+                ProcurementInitiated = A<YesNoUndecidedChoice>(),
+                ProcurementPlan = new ProcurementPlanDTO
                 {
-                    HalfOfYear = Convert.ToByte((A<int>() % 1) + 1),
+                    QuarterOfYear = Convert.ToByte((A<int>() % 4) + 1),
                     Year = A<int>()
                 }
             };
@@ -2317,67 +2218,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Name = CreateName(),
                 OrganizationUuid = organizationUuid
             };
-        }
-
-        private static void AssertHandoverTrials(IEnumerable<HandoverTrialRequestDTO> request, ItContractResponseDTO responseDto)
-        {
-            var expectedHandoverTrials = request
-                .OrderBy(x => x.HandoverTrialTypeUuid)
-                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
-                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
-                .ToList();
-            var actualHandoverTrials = responseDto.HandoverTrials
-                .OrderBy(x => x.HandoverTrialType.Uuid)
-                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
-                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
-                .ToList();
-
-            Assert.Equal(expectedHandoverTrials.Count, actualHandoverTrials.Count);
-            for (var i = 0; i < actualHandoverTrials.Count; i++)
-            {
-                var expected = expectedHandoverTrials[i];
-                var actual = actualHandoverTrials[i];
-                Assert.Equal(expected.HandoverTrialTypeUuid, actual.HandoverTrialType.Uuid);
-                Assert.Equal(expected.ExpectedAt?.Date, actual.ExpectedAt);
-                Assert.Equal(expected.ApprovedAt?.Date, actual.ApprovedAt);
-            }
-        }
-
-        private async Task<List<HandoverTrialRequestDTO>> CreateHandoverTrials(OrganizationDTO organization, bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
-        {
-            var handoverTrialTypes = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractHandoverTrialTypes, organization.Uuid, 10, 0)).ToList();
-            var handoverTrials = new List<HandoverTrialRequestDTO>();
-
-            //Add three valid combinations
-            if (oneWithBothExpectedAndApproved)
-            {
-                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
-                {
-                    HandoverTrialTypeUuid = type.Uuid,
-                    ExpectedAt = A<DateTime>(),
-                    ApprovedAt = A<DateTime>()
-                }));
-            }
-
-            if (oneWithExpectedOnly)
-            {
-                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
-                {
-                    HandoverTrialTypeUuid = type.Uuid,
-                    ExpectedAt = A<DateTime>(),
-                }));
-            }
-
-            if (oneWithApprovedOnly)
-            {
-                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO()
-                {
-                    HandoverTrialTypeUuid = type.Uuid,
-                    ApprovedAt = A<DateTime>()
-                }));
-            }
-
-            return handoverTrials;
         }
 
         private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ContractPaymentsDataResponseDTO freshDto)
