@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
@@ -33,15 +34,16 @@ namespace Core.DomainServices.Contract
     IDomainEventHandler<EntityBeingDeletedEvent<ItSystemUsage>>,
     IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
     IDomainEventHandler<EntityBeingDeletedEvent<DataProcessingRegistration>>,
-    IDomainEventHandler<EntityUpdatedEvent<Organization>>
+    IDomainEventHandler<EntityUpdatedEvent<Organization>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<Organization>>
     {
     private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItContractOverviewReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<ItContract, ItContractOverviewReadModel> _readModelUpdate;
 
         public BuildItContractOverviewReadModelOnChangesHandler(
-            IPendingReadModelUpdateRepository pendingReadModelUpdateRepository, 
-            IItContractOverviewReadModelRepository readModelRepository, 
+            IPendingReadModelUpdateRepository pendingReadModelUpdateRepository,
+            IItContractOverviewReadModelRepository readModelRepository,
             IReadModelUpdate<ItContract, ItContractOverviewReadModel> readModelUpdate)
         {
             _pendingReadModelUpdateRepository = pendingReadModelUpdateRepository;
@@ -51,8 +53,9 @@ namespace Core.DomainServices.Contract
 
         public void Handle(EntityBeingDeletedEvent<ItContract> domainEvent)
         {
-            //TODO: Handle by parent
             _readModelRepository.DeleteBySourceId(domainEvent.Entity.Id);
+
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_Parent));
         }
 
         public void Handle(EntityCreatedEvent<ItContract> domainEvent)
@@ -64,13 +67,16 @@ namespace Core.DomainServices.Contract
             _readModelRepository.Add(model); //Add one immediately
 
             //Schedule additional update to refresh once deferred updates are applied
-            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract));
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract));
         }
 
         public void Handle(EntityUpdatedEvent<ItContract> domainEvent)
         {
-            //TODO: Handle by parent
-            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract));
+            ScheduleUpdates
+            (
+                PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract),
+                PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_Parent)
+            );
         }
 
         private void BuildFromSource(ItContractOverviewReadModel model, ItContract contract)
@@ -80,88 +86,99 @@ namespace Core.DomainServices.Contract
 
         public void Handle(EntityUpdatedEvent<OrganizationUnit> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_OrgaizationUnit));
         }
 
         public void Handle(EntityBeingDeletedEvent<OrganizationUnit> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_OrgaizationUnit));
         }
 
         public void Handle(EntityUpdatedEvent<CriticalityType> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_CriticalityType));
         }
 
         public void Handle(EntityUpdatedEvent<Organization> domainEvent)
         {
-            //TODO: Supplier
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_Organization));
+        }
+        public void Handle(EntityBeingDeletedEvent<Organization> domainEvent)
+        {
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_Organization));
         }
 
         public void Handle(EntityUpdatedEvent<ItContractType> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_ItContractType));
         }
 
         public void Handle(EntityUpdatedEvent<ItContractTemplateType> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_ItContractTemplateType));
         }
 
         public void Handle(EntityUpdatedEvent<PurchaseFormType> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_PurchaseFormType));
         }
 
         public void Handle(EntityUpdatedEvent<ProcurementStrategyType> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_ProcurementStrategyType));
         }
 
         public void Handle(EntityUpdatedEvent<User> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_User));
         }
 
         public void Handle(EntityBeingDeletedEvent<User> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_User));
         }
 
         public void Handle(EntityUpdatedEvent<DataProcessingRegistration> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_DataProcessingRegistration));
         }
 
         public void Handle(EntityBeingDeletedEvent<DataProcessingRegistration> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_DataProcessingRegistration));
         }
 
         public void Handle(EntityUpdatedEvent<ItSystemUsage> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_ItSystemUsage));
         }
 
         public void Handle(EntityBeingDeletedEvent<ItSystemUsage> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_ItSystemUsage));
         }
 
         public void Handle(EntityUpdatedEvent<ItSystem> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_ItSystem));
         }
 
         public void Handle(EntityUpdatedEvent<OptionExtendType> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_OptionExtendType));
         }
 
         public void Handle(EntityUpdatedEvent<TerminationDeadlineType> domainEvent)
         {
-            throw new System.NotImplementedException();
+            ScheduleUpdates(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItContract_TerminationDeadlineType));
+        }
+
+        private void ScheduleUpdates(params PendingReadModelUpdate[] pendingReadModelUpdates)
+        {
+            if (pendingReadModelUpdates.Any())
+            {
+                _pendingReadModelUpdateRepository.AddMany(pendingReadModelUpdates);
+            }
         }
     }
 }

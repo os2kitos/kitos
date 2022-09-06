@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItContract.Read;
 
@@ -11,5 +12,6 @@ namespace Core.DomainServices.Repositories.Contract
         ItContractOverviewReadModel Add(ItContractOverviewReadModel model);
         void DeleteBySourceId(int sourceEntityId);
         Maybe<ItContractOverviewReadModel> GetBySourceId(int sourceId);
+        IEnumerable<ItContractOverviewReadModel> GetByResponsibleOrganizationUnit(int orgUnitId);
     }
 }

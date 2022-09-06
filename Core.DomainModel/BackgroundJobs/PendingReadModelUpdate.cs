@@ -28,7 +28,21 @@ namespace Core.DomainModel.BackgroundJobs
         ItSystemUsage_ItInterface = 18,
         
         //IT-Contract
-        ItContract = 50
+        ItContract = 50,
+        ItContract_Parent = 51,
+        ItContract_OrgaizationUnit = 52,
+        ItContract_CriticalityType = 53,
+        ItContract_Organization = 54,
+        ItContract_ItContractType = 55,
+        ItContract_ItContractTemplateType = 56,
+        ItContract_PurchaseFormType = 57,
+        ItContract_ProcurementStrategyType = 58,
+        ItContract_User = 59,
+        ItContract_DataProcessingRegistration = 60,
+        ItContract_ItSystemUsage = 61,
+        ItContract_ItSystem = 62,
+        ItContract_OptionExtendType = 63,
+        ItContract_TerminationDeadlineType = 64
     }
 
     public class PendingReadModelUpdate : IHasId
