@@ -373,10 +373,8 @@ namespace Presentation.Web.Ninject
         {
             //Register all exposed handlers
             typeof(THandler)
-                .Assembly
-                .GetTypes()
+                .GetInterfaces()
                 .Where(tType => tType.IsImplementationOfGenericType(typeof(IDomainEventHandler<>)))
-                .Where(tType => tType.IsInterface)
                 .ToList()
                 .ForEach(tHandlerInterface => kernel.Bind(tHandlerInterface).To<THandler>().InCommandScope(Mode));
         }
