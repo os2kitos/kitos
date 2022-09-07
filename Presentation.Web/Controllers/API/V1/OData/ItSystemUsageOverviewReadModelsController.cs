@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Linq;
+using System.Web.Http;
 using Core.ApplicationServices.SystemUsage.ReadModels;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
@@ -25,6 +26,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 ? _readModelsService.GetByOrganizationId(organizationId)
                 : _readModelsService.GetByOrganizationAndResponsibleOrganizationUnitId(organizationId,
                     responsibleOrganizationUnitId.Value);
+
+            var response = byOrganizationId.Value.ToList();
+
             return
                 byOrganizationId
                     .Match(onSuccess: Ok, onFailure: FromOperationError);

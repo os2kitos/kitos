@@ -57,6 +57,7 @@ namespace Core.DomainServices.SystemUsage
             destination.SystemName = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.IsActive = source.IsActive;
+            destination.Note = source.Note;
             destination.Version = source.Version;
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
