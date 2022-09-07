@@ -9,7 +9,7 @@
     }
 
     export interface IUICustomizationTreeVisitor {
-        visitNode(node: UINode);
+        visitNode(node: UINode, state?: boolean);
         visitModule(node: CustomizedModuleUI);
     }
 
@@ -163,11 +163,11 @@
                 child.changeAvailableState(fullKey, newState);
 
                 if (this._subtreeIsComplete) {
-                    const visitor = new Services.UICustomization.CollectNodeStatesFromUiCustomizationTreeVisitor();
+                    const visitor = new Services.UICustomization.CountNodeStatesFromUiCustomizationTreeVisitor();
                     this.acceptChildren(visitor, this);
 
-                    const numberOfAvailableChildren = visitor.nodes.filter(x => x.enabled).length;
-                    this._available = numberOfAvailableChildren !== 0;
+                    var newParentState = visitor.counter !== 0;
+                    this.changeAvailableState(fullKey, newParentState);
                 }
                 
                 //TODO: if subtreeIsComplete AND if entire subtree is disabled then disable self. TODO: use the collectstatevisitor and collect call accept on all children to get the answer to the subtree question

@@ -13,7 +13,7 @@
         saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<void>;
     }
 
-    export class CollectNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
+    class CollectNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
         private readonly _nodes: Array<Models.Api.UICustomization.ICustomizedUINodeDTO> = [];
 
         get nodes() {
@@ -25,6 +25,22 @@
                 enabled: node.available,
                 key: node.key
             });
+        }
+
+        visitModule(node: Models.UICustomization.CustomizedModuleUI) { /* We don't care much for modules - we care about the nodes */ }
+    }
+
+    export class CountNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
+        private _nodesByStateCounter: number;
+
+        get counter() {
+            return this._nodesByStateCounter;
+        }
+
+        visitNode(node: Models.UICustomization.UINode, state: boolean) {
+            if (node.available === state) {
+                this._nodesByStateCounter++;
+            }
         }
 
         visitModule(node: Models.UICustomization.CustomizedModuleUI) { /* We don't care much for modules - we care about the nodes */ }
