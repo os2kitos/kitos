@@ -39,6 +39,10 @@
 
         headerName = this.dataProcessingRegistration.name;
 
+        lastChangedBy = this.dataProcessingRegistration.lastChangedByName;
+
+        lastChangedAt = this.dataProcessingRegistration.lastChangedAt;
+
         insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
 
         enableSelectionOfInsecureThirdCountries: boolean;

@@ -916,7 +916,9 @@ namespace Presentation.Web.Controllers.API.V1
                         OversightDate = oversightDate.OversightDate,
                         OversightRemark = oversightDate.OversightRemark
                     })
-                    .ToArray()
+                    .ToArray(),
+                LastChangedAt = value.LastChanged,
+                LastChangedByName = value.LastChangedByUser.GetFullName()
             };
         }
 
