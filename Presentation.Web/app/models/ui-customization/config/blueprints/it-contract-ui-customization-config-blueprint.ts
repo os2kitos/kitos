@@ -4,11 +4,13 @@
         readOnly: false,
         helpText: Configs.helpTexts.generalUiCustomizationHelpText,
         text: "IT Kontrakt",
+        //subtreeIsComplete: false,
         children: {
             frontPage: {
                 text: "Kontraktforside",
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab,
+                subtreeIsComplete: false,
                 children: {
                     contractId: {
                         text: "KontraktID"
@@ -57,6 +59,7 @@
             deadlines: {
                 text: "Aftalefrister",
                 readOnly: false,
+                subtreeIsComplete: true,
                 children: {
                     agreementDeadlines: {
                         text: "Aftalefrister",
@@ -71,6 +74,7 @@
             economy: {
                 text: "Økonomi",
                 readOnly: false,
+                subtreeIsComplete: true,
                 children: {
                     paymentModel: {
                         text: "Betalingsmodel",

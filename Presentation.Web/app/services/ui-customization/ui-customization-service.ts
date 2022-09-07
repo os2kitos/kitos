@@ -13,7 +13,7 @@
         saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<void>;
     }
 
-    class CollectNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
+    export class CollectNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
         private readonly _nodes: Array<Models.Api.UICustomization.ICustomizedUINodeDTO> = [];
 
         get nodes() {
@@ -90,6 +90,8 @@
                         const serverConfig = persistedConfigLookup[nodeBluePrint.fullKey];
                         const available = serverConfig != undefined ? serverConfig : true;
                         const readOnly = nodeBluePrint.readOnly != undefined && nodeBluePrint.readOnly;
+                        const subtreeIsComplete = nodeBluePrint.subtreeIsComplete != undefined &&
+                            nodeBluePrint.subtreeIsComplete;
                         children.push(new Models.UICustomization.UINode
                             (
                                 nodeBluePrint.fullKey,                      //key
@@ -97,6 +99,7 @@
                                 !readOnly && parentAvailable,               //editable
                                 available && parentAvailable,               //available state
                                 readOnly,                                   //readonly
+                                subtreeIsComplete,                          //subtreeIsComplete
                                 buildChildren(nodeBluePrint, available),    //build children recursively,
                                 nodeBluePrint.helpText                      //help text for the local admin
                             )
@@ -106,7 +109,7 @@
                 return children;
             }
 
-            return new Models.UICustomization.CustomizedModuleUI(bluePrint.module, new Models.UICustomization.UINode(bluePrint.module, bluePrint.text, false, true, true, buildChildren(bluePrint, true), bluePrint.helpText));
+            return new Models.UICustomization.CustomizedModuleUI(bluePrint.module, new Models.UICustomization.UINode(bluePrint.module, bluePrint.text, false, true, true, false, buildChildren(bluePrint, true), bluePrint.helpText));
         }
 
         loadActiveConfiguration(module: Models.UICustomization.CustomizableKitosModule): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {

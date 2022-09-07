@@ -6,6 +6,7 @@
         children?: Record<string, ICustomizableUINodeConfig>;
         fullKey?: string; // Added by the post-processor so that controllers/ui can bind to a hierarchy while getting the right key for configuration checks...
         helpText?: string;
+        subtreeIsComplete?: boolean;
     }
 
     export interface ICustomizableUIModuleConfigBluePrint extends ICustomizableUINodeConfig {
