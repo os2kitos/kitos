@@ -752,8 +752,7 @@
                         .withId("note")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.Note))
-                        .withSourceValueEchoExcelOutput());
+                        .withSourceValueEchoRendering());
 
             //Launch kendo grid
             launcher.launch();
