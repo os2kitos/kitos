@@ -12,6 +12,7 @@ namespace Core.DomainServices.Repositories.Contract
         ItContractOverviewReadModel Add(ItContractOverviewReadModel model);
         void DeleteBySourceId(int sourceEntityId);
         Maybe<ItContractOverviewReadModel> GetBySourceId(int sourceId);
-        IEnumerable<ItContractOverviewReadModel> GetByResponsibleOrganizationUnit(int orgUnitId);
+        IQueryable<ItContractOverviewReadModel> GetByOrganizationUnit(int orgUnitId);
+        IQueryable<ItContractOverviewReadModel> GetByParentContract(int parentContractId);
     }
 }

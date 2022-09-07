@@ -25,6 +25,7 @@ namespace Core.BackgroundJobs.Services
         private readonly ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState _scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive;
         private readonly PurgeOrphanedHangfireJobs _purgeOrphanedHangfireJobs;
         private readonly RebuildItContractOverviewReadModelsBatchJob _rebuildItContractOverviewReadModelsBatchJob;
+        private readonly ScheduleItContractOverviewReadModelUpdates _scheduleItContractOverviewReadModelUpdates;
 
         public BackgroundJobLauncher(
             ILogger logger,
@@ -36,7 +37,9 @@ namespace Core.BackgroundJobs.Services
             IRebuildReadModelsJobFactory rebuildReadModelsJobFactory,
             PurgeDuplicatePendingReadModelUpdates purgeDuplicatePendingReadModelUpdates,
             ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive,
-            PurgeOrphanedHangfireJobs purgeOrphanedHangfireJobs, RebuildItContractOverviewReadModelsBatchJob rebuildItContractOverviewReadModelsBatchJob)
+            PurgeOrphanedHangfireJobs purgeOrphanedHangfireJobs, 
+            RebuildItContractOverviewReadModelsBatchJob rebuildItContractOverviewReadModelsBatchJob,
+            ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -49,6 +52,7 @@ namespace Core.BackgroundJobs.Services
             _scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive = scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive;
             _purgeOrphanedHangfireJobs = purgeOrphanedHangfireJobs;
             _rebuildItContractOverviewReadModelsBatchJob = rebuildItContractOverviewReadModelsBatchJob;
+            _scheduleItContractOverviewReadModelUpdates = scheduleItContractOverviewReadModelUpdates;
         }
 
         public async Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default)
@@ -74,6 +78,11 @@ namespace Core.BackgroundJobs.Services
         public async Task LaunchScheduleItSystemUsageOverviewReadModelUpdates(CancellationToken token = default)
         {
             await Launch(_scheduleItSystemUsageOverviewReadModelUpdates, token);
+        }
+
+        public async Task LaunchScheduleItContractOverviewReadModelUpdates(CancellationToken token = default)
+        {
+            await Launch(_scheduleItContractOverviewReadModelUpdates, token);
         }
 
         public async Task LaunchUpdateItSystemUsageOverviewReadModels(CancellationToken token = default)

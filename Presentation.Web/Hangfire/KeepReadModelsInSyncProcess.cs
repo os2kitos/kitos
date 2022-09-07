@@ -58,6 +58,7 @@ namespace Presentation.Web.Hangfire
         {
             backgroundJobLauncher.LaunchScheduleDataProcessingRegistrationReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
             backgroundJobLauncher.LaunchScheduleItSystemUsageOverviewReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
+            backgroundJobLauncher.LaunchScheduleItContractOverviewReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
         private static void CoolDown()

@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Factories\IRebuildReadModelsJobFactory.cs" />
     <Compile Include="Factories\RebuildReadModelsJobFactory.cs" />
+    <Compile Include="Model\BaseContextToReadModelChangeScheduler.cs" />
     <Compile Include="Model\ExternalLinks\CheckExternalLinksBackgroundJob.cs" />
     <Compile Include="Model\IAsyncBackgroundJob.cs" />
     <Compile Include="Model\Maintenance\PurgeOrphanedHangfireJobs.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Model\ReadModels\RebuildItSystemUsageOverviewReadModelsBatchJob.cs" />
     <Compile Include="Model\ReadModels\RebuildReadModelsJob.cs" />
     <Compile Include="Model\ReadModels\ScheduleDataProcessingRegistrationReadModelUpdates.cs" />
+    <Compile Include="Model\ReadModels\ScheduleItContractOverviewReadModelUpdates.cs" />
     <Compile Include="Model\ReadModels\ScheduleItSystemUsageOverviewReadModelUpdates.cs" />
     <Compile Include="Model\ReadModels\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState.cs" />
     <Compile Include="Model\StandardJobIds.cs" />

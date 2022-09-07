@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItContract.Read;
@@ -56,6 +57,20 @@ namespace Core.DomainServices.Repositories.Contract
         public Maybe<ItContractOverviewReadModel> GetBySourceId(int sourceId)
         {
             return _repository.AsQueryable().FirstOrDefault(x => x.SourceEntityId == sourceId);
+        }
+
+        public IQueryable<ItContractOverviewReadModel> GetByOrganizationUnit(int orgUnitId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.ResponsibleOrgUnitId != null && x.ResponsibleOrgUnitId == orgUnitId);
+        }
+
+        public IQueryable<ItContractOverviewReadModel> GetByParentContract(int parentContractId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.ParentContractId != null && x.ParentContractId == parentContractId);
         }
     }
 }
