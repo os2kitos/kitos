@@ -11,6 +11,7 @@ namespace Core.DomainModel.ItContract.Read
             ItSystemUsages = new List<ItContractOverviewReadModelItSystemUsage>();
             DataProcessingAgreements = new List<ItContractOverviewReadModelDataProcessingAgreement>();
             RoleAssignments = new List<ItContractOverviewRoleAssignmentReadModel>();
+            SystemRelations = new List<ItContractOverviewReadModelSystemRelation>();
         }
 
         public int OrganizationId { get; set; }
@@ -47,7 +48,8 @@ namespace Core.DomainModel.ItContract.Read
         public ICollection<ItContractOverviewReadModelItSystemUsage> ItSystemUsages { get; set; } //used for generating links and filtering IN collection (we can add index since the name can be constrained)
         public string ItSystemUsagesCsv { get; set; } //Used for sorting AND excel output 
         public string ItSystemUsagesSystemUuidCsv { get; set; } //Used for sorting AND excel output 
-        public int NumberOfAssociatedSystemRelations { get; set; }
+        public int NumberOfAssociatedSystemRelations { get; set; } //for display, order and filtering
+        public ICollection<ItContractOverviewReadModelSystemRelation> SystemRelations { get; set; } //for lookup used during update scheduling
         public string ActiveReferenceTitle { get; set; }
         public string ActiveReferenceUrl { get; set; }
         public string ActiveReferenceExternalReferenceId { get; set; }
@@ -64,7 +66,6 @@ namespace Core.DomainModel.ItContract.Read
         public int? AuditStatusRed { get; set; }
         public int? AuditStatusYellow { get; set; }
         public int? AuditStatusGreen { get; set; }
-        public int? AuditStatusMax { get; set; }
         public string Duration { get; set; }
         public int? OptionExtendId { get; set; }     // For filtering
         public string OptionExtendName { get; set; } // For sorting
@@ -72,6 +73,7 @@ namespace Core.DomainModel.ItContract.Read
         public string TerminationDeadlineName { get; set; } // For sorting
         public DateTime? IrrevocableTo { get; set; }
         public DateTime? TerminatedAt { get; set; }
+        public int? LastEditedByUserId { get; set; }
         public string LastEditedByUserName { get; set; }
         public DateTime? LastEditedAtDate { get; set; }
     }

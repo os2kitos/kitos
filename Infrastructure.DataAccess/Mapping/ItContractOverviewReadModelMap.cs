@@ -90,6 +90,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(x => x.ParentId)
                 .WillCascadeOnDelete(true);
 
+            HasMany(x => x.SystemRelations)
+                .WithRequired(x => x.Parent)
+                .HasForeignKey(x => x.ParentId)
+                .WillCascadeOnDelete(true);
+
             Property(x => x.DataProcessingAgreementsCsv)
                 .IsOptional();
 
@@ -141,24 +146,16 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_LatestAuditDate");
 
             Property(x => x.AuditStatusWhite)
-                .IsOptional()
-                .HasIndexAnnotation("IX_AuditStatusWhite");
+                .IsOptional();
 
             Property(x => x.AuditStatusRed)
-                .IsOptional()
-                .HasIndexAnnotation("IX_AuditStatusRed");
+                .IsOptional();
 
             Property(x => x.AuditStatusYellow)
-                .IsOptional()
-                .HasIndexAnnotation("IX_AuditStatusYellow");
+                .IsOptional();
 
             Property(x => x.AuditStatusGreen)
-                .IsOptional()
-                .HasIndexAnnotation("IX_AuditStatusGreen");
-
-            Property(x => x.AuditStatusMax)
-                .IsOptional()
-                .HasIndexAnnotation("IX_AuditStatusMax");
+                .IsOptional();
 
             Property(x => x.Duration)
                 .IsOptional()
@@ -181,6 +178,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(UserConstraints.MaxNameLength)
                 .IsOptional()
                 .HasIndexAnnotation("IX_LastEditedByUserName");
+
+            Property(x => x.LastEditedByUserId)
+                .IsOptional()
+                .HasIndexAnnotation("IX_LastEditedByUserId");
 
             Property(x => x.LastEditedAtDate)
                 .IsOptional()

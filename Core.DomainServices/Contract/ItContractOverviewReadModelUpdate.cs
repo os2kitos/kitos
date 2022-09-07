@@ -19,15 +19,18 @@ namespace Core.DomainServices.Contract
         private readonly IGenericRepository<ItContractOverviewRoleAssignmentReadModel> _contractRoleAssignmentRepository;
         private readonly IGenericRepository<ItContractOverviewReadModelDataProcessingAgreement> _contractDataProcessingAgreementRepository;
         private readonly IGenericRepository<ItContractOverviewReadModelItSystemUsage> _contractSystemUsageReadModelRepository;
+        private readonly IGenericRepository<ItContractOverviewReadModelSystemRelation> _relationsRepository;
 
         public ItContractOverviewReadModelUpdate(
             IGenericRepository<ItContractOverviewRoleAssignmentReadModel> contractRoleAssignmentRepository,
             IGenericRepository<ItContractOverviewReadModelDataProcessingAgreement> contractDataProcessingAgreementRepository,
-            IGenericRepository<ItContractOverviewReadModelItSystemUsage> contractSystemUsageReadModelRepository)
+            IGenericRepository<ItContractOverviewReadModelItSystemUsage> contractSystemUsageReadModelRepository,
+            IGenericRepository<ItContractOverviewReadModelSystemRelation> relationsRepository)
         {
             _contractRoleAssignmentRepository = contractRoleAssignmentRepository;
             _contractDataProcessingAgreementRepository = contractDataProcessingAgreementRepository;
             _contractSystemUsageReadModelRepository = contractSystemUsageReadModelRepository;
+            _relationsRepository = relationsRepository;
         }
 
         public void Apply(ItContract source, ItContractOverviewReadModel destination)
@@ -45,6 +48,7 @@ namespace Core.DomainServices.Contract
             destination.TerminatedAt = source.Terminated;
             destination.LastEditedAtDate = source.LastChanged;
             destination.LastEditedByUserName = source.LastChangedByUser?.Transform(GetUserFullName);
+            destination.LastEditedByUserId = source.LastChangedByUserId;
 
             //Supplier
             destination.SupplierId = source.Supplier?.Id;
@@ -89,7 +93,7 @@ namespace Core.DomainServices.Contract
             MapSystemUsages(source, destination);
 
             //Relations
-            destination.NumberOfAssociatedSystemRelations = source.AssociatedSystemRelations.Count;
+            MapSystemRelations(source, destination);
 
             //Reference
             destination.ActiveReferenceTitle = source.Reference?.Title;
@@ -116,6 +120,48 @@ namespace Core.DomainServices.Contract
             //Termination deadline
             destination.TerminationDeadlineId = source.TerminationDeadline?.Id;
             destination.TerminationDeadlineName = source.TerminationDeadline?.Name;
+        }
+
+        private void MapSystemRelations(ItContract source, ItContractOverviewReadModel destination)
+        {
+            destination.NumberOfAssociatedSystemRelations = source.AssociatedSystemRelations.Count;
+
+            var actionContexts = source.AssociatedSystemRelations
+                .ComputeMirrorActions(destination.SystemRelations, x => x.Id.ToString(), x => x.RelationId.ToString())
+                .ToList();
+
+            foreach (var actionContext in actionContexts)
+            {
+                switch (actionContext.Action)
+                {
+                    case EnumerableMirrorExtensions.MirrorAction.AddToDestination:
+                        var newSourceRelation = actionContext.SourceValue.Value;
+                        var item = new ItContractOverviewReadModelSystemRelation()
+                        {
+                            RelationId = newSourceRelation.Id,
+                            Parent = destination
+                        };
+                        PatchRelation(item, newSourceRelation);
+                        destination.SystemRelations.Add(item);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.RemoveFromDestination:
+                        var relationToBeRemoved = actionContext.DestinationValue.Value;
+                        destination.SystemRelations.Remove(relationToBeRemoved);
+                        _relationsRepository.Delete(relationToBeRemoved);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.MergeToDestination:
+                        PatchRelation(actionContext.DestinationValue.Value, actionContext.SourceValue.Value);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        private static void PatchRelation(ItContractOverviewReadModelSystemRelation item, SystemRelation newSourceRelation)
+        {
+            item.FromSystemUsageId = newSourceRelation.FromSystemUsageId;
+            item.ToSystemUsageId = newSourceRelation.ToSystemUsageId;
         }
 
         private static void MapDuration(ItContract source, ItContractOverviewReadModel destination)
@@ -155,10 +201,7 @@ namespace Core.DomainServices.Contract
 
         private static void MapEconomyStreams(ItContract source, ItContractOverviewReadModel destination)
         {
-            destination.AccumulatedAcquisitionCost =
-                destination.AccumulatedOperationCost =
-                    destination.AccumulatedOtherCost =
-                        null;
+            ResetAccumulatedCost(destination, null);
 
             destination.LatestAuditDate = null;
 
@@ -166,11 +209,12 @@ namespace Core.DomainServices.Contract
                 destination.AuditStatusWhite =
                     destination.AuditStatusRed =
                         destination.AuditStatusYellow =
-                            destination.AuditStatusMax =
-                                null;
+                            null;
 
             if (source.ExternEconomyStreams.Any())
             {
+                ResetAccumulatedCost(destination, 0);
+
                 var statuses = new Dictionary<TrafficLight, int>()
                 {
                     {TrafficLight.Green,0},
@@ -202,8 +246,15 @@ namespace Core.DomainServices.Contract
                 destination.AuditStatusWhite = statuses[TrafficLight.White];
                 destination.AuditStatusRed = statuses[TrafficLight.Red];
                 destination.AuditStatusYellow = statuses[TrafficLight.Yellow];
-                destination.AuditStatusMax = statuses.Sum(x => x.Value);
             }
+        }
+
+        private static void ResetAccumulatedCost(ItContractOverviewReadModel destination, int? accCost)
+        {
+            destination.AccumulatedAcquisitionCost =
+                destination.AccumulatedOperationCost =
+                    destination.AccumulatedOtherCost =
+                        accCost;
         }
 
         private void MapSystemUsages(ItContract source, ItContractOverviewReadModel destination)
@@ -221,9 +272,9 @@ namespace Core.DomainServices.Contract
             var actionContexts = itSystemUsages
                 .ComputeMirrorActions
                 (
-                    destination:destination.ItSystemUsages,
-                    computeSourceItemId:s=>s.Id.ToString(),
-                    computeDestinationItemId:d=>d.ItSystemUsageId.ToString()
+                    destination: destination.ItSystemUsages,
+                    computeSourceItemId: s => s.Id.ToString(),
+                    computeDestinationItemId: d => d.ItSystemUsageId.ToString()
                 )
                 .ToList();
 

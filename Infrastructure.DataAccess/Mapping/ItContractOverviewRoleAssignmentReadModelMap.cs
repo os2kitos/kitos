@@ -9,7 +9,7 @@ namespace Infrastructure.DataAccess.Mapping
     public ItContractOverviewRoleAssignmentReadModelMap()
     {
         HasKey(x => x.Id);
-        Property(x => x.Id)
+        Property(x => x.RoleId)
             .HasIndexAnnotation("IX_ItContract_Read_Role_Id");
 
         Property(x => x.UserId)

@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class add_contract_overview_readmodels : DbMigration
+    public partial class add_contract_readmodels : DbMigration
     {
         public override void Up()
         {
@@ -57,7 +57,6 @@
                         AuditStatusRed = c.Int(),
                         AuditStatusYellow = c.Int(),
                         AuditStatusGreen = c.Int(),
-                        AuditStatusMax = c.Int(),
                         Duration = c.String(maxLength: 100),
                         OptionExtendId = c.Int(),
                         OptionExtendName = c.String(maxLength: 150),
@@ -65,6 +64,7 @@
                         TerminationDeadlineName = c.String(maxLength: 150),
                         IrrevocableTo = c.DateTime(precision: 7, storeType: "datetime2"),
                         TerminatedAt = c.DateTime(precision: 7, storeType: "datetime2"),
+                        LastEditedByUserId = c.Int(),
                         LastEditedByUserName = c.String(maxLength: 100),
                         LastEditedAtDate = c.DateTime(precision: 7, storeType: "datetime2"),
                     })
@@ -103,11 +103,6 @@
                 .Index(t => t.PaymentFrequencyId, name: "IX_PaymentFreqencyType_Id")
                 .Index(t => t.PaymentFrequencyName, name: "IX_PaymentFreqencyType_Name")
                 .Index(t => t.LatestAuditDate)
-                .Index(t => t.AuditStatusWhite)
-                .Index(t => t.AuditStatusRed)
-                .Index(t => t.AuditStatusYellow)
-                .Index(t => t.AuditStatusGreen)
-                .Index(t => t.AuditStatusMax)
                 .Index(t => t.Duration)
                 .Index(t => t.OptionExtendId, name: "IX_OptionExtendType_Id")
                 .Index(t => t.OptionExtendName, name: "IX_OptionExtendType_Name")
@@ -115,6 +110,7 @@
                 .Index(t => t.TerminationDeadlineName, name: "IX_TerminationDeadlineType_Name")
                 .Index(t => t.IrrevocableTo)
                 .Index(t => t.TerminatedAt)
+                .Index(t => t.LastEditedByUserId)
                 .Index(t => t.LastEditedByUserName)
                 .Index(t => t.LastEditedAtDate);
             
@@ -161,20 +157,42 @@
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItContractOverviewReadModels", t => t.ParentId, cascadeDelete: true)
-                .Index(t => t.Id, name: "IX_ItContract_Read_Role_Id")
+                .Index(t => t.RoleId, name: "IX_ItContract_Read_Role_Id")
                 .Index(t => t.UserId, name: "IX_ItContract_Read_User_Id")
                 .Index(t => t.UserFullName, name: "IX_ItContract_Read_User_Name")
+                .Index(t => t.ParentId);
+            
+            CreateTable(
+                "dbo.ItContractOverviewReadModelSystemRelations",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        RelationId = c.Int(nullable: false),
+                        FromSystemUsageId = c.Int(nullable: false),
+                        ToSystemUsageId = c.Int(nullable: false),
+                        ParentId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItContractOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.RelationId)
+                .Index(t => t.FromSystemUsageId)
+                .Index(t => t.ToSystemUsageId)
                 .Index(t => t.ParentId);
             
         }
         
         public override void Down()
         {
+            DropForeignKey("dbo.ItContractOverviewReadModelSystemRelations", "ParentId", "dbo.ItContractOverviewReadModels");
             DropForeignKey("dbo.ItContractOverviewReadModels", "SourceEntityId", "dbo.ItContract");
             DropForeignKey("dbo.ItContractOverviewRoleAssignmentReadModels", "ParentId", "dbo.ItContractOverviewReadModels");
             DropForeignKey("dbo.ItContractOverviewReadModels", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.ItContractOverviewReadModelItSystemUsages", "ParentId", "dbo.ItContractOverviewReadModels");
             DropForeignKey("dbo.ItContractOverviewReadModelDataProcessingAgreements", "ParentId", "dbo.ItContractOverviewReadModels");
+            DropIndex("dbo.ItContractOverviewReadModelSystemRelations", new[] { "ParentId" });
+            DropIndex("dbo.ItContractOverviewReadModelSystemRelations", new[] { "ToSystemUsageId" });
+            DropIndex("dbo.ItContractOverviewReadModelSystemRelations", new[] { "FromSystemUsageId" });
+            DropIndex("dbo.ItContractOverviewReadModelSystemRelations", new[] { "RelationId" });
             DropIndex("dbo.ItContractOverviewRoleAssignmentReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItContractOverviewRoleAssignmentReadModels", "IX_ItContract_Read_User_Name");
             DropIndex("dbo.ItContractOverviewRoleAssignmentReadModels", "IX_ItContract_Read_User_Id");
@@ -186,6 +204,7 @@
             DropIndex("dbo.ItContractOverviewReadModelDataProcessingAgreements", "IX_ItContract_Read_Dpr_Name");
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "LastEditedAtDate" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "LastEditedByUserName" });
+            DropIndex("dbo.ItContractOverviewReadModels", new[] { "LastEditedByUserId" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "TerminatedAt" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "IrrevocableTo" });
             DropIndex("dbo.ItContractOverviewReadModels", "IX_TerminationDeadlineType_Name");
@@ -193,11 +212,6 @@
             DropIndex("dbo.ItContractOverviewReadModels", "IX_OptionExtendType_Name");
             DropIndex("dbo.ItContractOverviewReadModels", "IX_OptionExtendType_Id");
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "Duration" });
-            DropIndex("dbo.ItContractOverviewReadModels", new[] { "AuditStatusMax" });
-            DropIndex("dbo.ItContractOverviewReadModels", new[] { "AuditStatusGreen" });
-            DropIndex("dbo.ItContractOverviewReadModels", new[] { "AuditStatusYellow" });
-            DropIndex("dbo.ItContractOverviewReadModels", new[] { "AuditStatusRed" });
-            DropIndex("dbo.ItContractOverviewReadModels", new[] { "AuditStatusWhite" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "LatestAuditDate" });
             DropIndex("dbo.ItContractOverviewReadModels", "IX_PaymentFreqencyType_Name");
             DropIndex("dbo.ItContractOverviewReadModels", "IX_PaymentFreqencyType_Id");
@@ -230,6 +244,7 @@
             DropIndex("dbo.ItContractOverviewReadModels", "IX_Contract_Name");
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "SourceEntityId" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "OrganizationId" });
+            DropTable("dbo.ItContractOverviewReadModelSystemRelations");
             DropTable("dbo.ItContractOverviewRoleAssignmentReadModels");
             DropTable("dbo.ItContractOverviewReadModelItSystemUsages");
             DropTable("dbo.ItContractOverviewReadModelDataProcessingAgreements");

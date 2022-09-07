@@ -31,7 +31,7 @@ namespace Core.ApplicationServices.Contract.ReadModels
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
 
-            return Result<IQueryable<ItContractOverviewReadModel>, OperationError>.Success(_repository.GetByOrganizationAndResponsibleOrganizationUnitId(organizationId, responsibleOrganizationUnit));
+            return Result<IQueryable<ItContractOverviewReadModel>, OperationError>.Success(_repository.GetByOrganizationAndResponsibleOrganizationUnitIncludingSubTree(organizationId, responsibleOrganizationUnit));
         }
     }
 }
