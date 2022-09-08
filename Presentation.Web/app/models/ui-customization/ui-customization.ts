@@ -169,8 +169,6 @@
                     const newParentState = visitor.counter !== 0;
                     this.changeAvailableState(this.key, newParentState);
                 }
-                
-                //TODO: if subtreeIsComplete AND if entire subtree is disabled then disable self. TODO: use the collectstatevisitor and collect call accept on all children to get the answer to the subtree question
             } else {
                 throw new Error(`Cannot change state of descendant ${fullKey} if ancestor with key ${this.key} is unavailable`);
             }

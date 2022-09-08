@@ -4,7 +4,7 @@
         readOnly: false,
         helpText: Configs.helpTexts.generalUiCustomizationHelpText,
         text: "IT Kontrakt",
-        //subtreeIsComplete: false,
+        subtreeIsComplete: false,
         children: {
             frontPage: {
                 text: "Kontraktforside",
