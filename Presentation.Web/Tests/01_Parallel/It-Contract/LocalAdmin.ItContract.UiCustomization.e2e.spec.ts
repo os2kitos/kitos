@@ -5,6 +5,7 @@ import NavigationHelper = require("../../Utility/NavigationHelper");
 import ContractNavigationSrefs = require("../../Helpers/SideNavigation/ContractNavigationSrefs");
 import OrgHelper = require("../../Helpers/OrgHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
+import _ = require("lodash");
 
 describe("Local admin is able customize the IT-Contract UI", () => {
 
@@ -61,14 +62,16 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.isActive", ContractNavigationSrefs.frontPageSref, "contractIsActive"))
 
             // Deadlines tab
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.agreementDeadlines", ContractNavigationSrefs.deadlinesPageSref, "agreement-deadlines"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.deadlines.termination", ContractNavigationSrefs.deadlinesPageSref, "termination"))
+            .then(() => testFieldCustomizationWithSubtreeIsComplete(contractName, "ItContracts.deadlines.agreementDeadlines", ContractNavigationSrefs.deadlinesPageSref, "agreement-deadlines"))
+            .then(() => testFieldCustomizationWithSubtreeIsComplete(contractName, "ItContracts.deadlines.termination", ContractNavigationSrefs.deadlinesPageSref, "termination"))
+            .then(() => testTabCustomizationWithSubtreeIsComplete(contractName, ["ItContracts.deadlines.agreementDeadlines", "ItContracts.deadlines.termination"], ContractNavigationSrefs.deadlinesPageSref))
 
 
             // Economy tab
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.paymentModel", ContractNavigationSrefs.economyPageSref, "payment-model"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.extPayment", ContractNavigationSrefs.economyPageSref, "ext-payment"))
-            .then(() => testFieldCustomization(contractName, "ItContracts.economy.intPayment", ContractNavigationSrefs.economyPageSref, "int-payment"));
+            .then(() => testFieldCustomizationWithSubtreeIsComplete(contractName, "ItContracts.economy.paymentModel", ContractNavigationSrefs.economyPageSref, "payment-model"))
+            .then(() => testFieldCustomizationWithSubtreeIsComplete(contractName, "ItContracts.economy.extPayment", ContractNavigationSrefs.economyPageSref, "ext-payment"))
+            .then(() => testFieldCustomizationWithSubtreeIsComplete(contractName, "ItContracts.economy.intPayment", ContractNavigationSrefs.economyPageSref, "int-payment"))
+            .then(() => testTabCustomizationWithSubtreeIsComplete(contractName, ["ItContracts.economy.paymentModel", "ItContracts.economy.extPayment", "ItContracts.economy.intPayment"], ContractNavigationSrefs.economyPageSref));
     });
 
     function setupUserAndOrg() {
@@ -88,8 +91,21 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => verifyTabVisibility(name, tabSref, false));   //Verify that the tab has now been hidden
     }
 
+    function testTabCustomizationWithSubtreeIsComplete(name: string, settingIds: Array<string>, tabSref: string) {
+        console.log("testTabCustomization for ", name, " and tabSref:", tabSref);
+
+        return verifyTabVisibility(name, tabSref, true)                                                                   //Check that the tab is visible before the change
+            .then(() => openUiConfiguration())                                                                            //Open Ui Customization page and show details
+            .then(() => settingIds.forEach((id) => { checkStateAndToggleSetting(id, false) }))                            //Toggle the setting
+            .then(() => verifyTabVisibility(name, tabSref, false));                                                       //Verify that the tab has now been hidden
+    }
+
     function testFieldCustomization(contractName: string, settingId: string, tabSref: string, settingElementId: string) {
         return testFieldGroupCustomization(contractName, settingId, tabSref, [settingElementId]);
+    }
+
+    function testFieldCustomizationWithSubtreeIsComplete(contractName: string, settingId: string, tabSref: string, settingElementId: string) {
+        return testFieldGroupCustomizationWithSubtreeIsComplete(contractName, settingId, tabSref, [settingElementId]);
     }
 
     function testFieldGroupCustomization(contractName: string, settingId: string, tabSref: string, settingElementIds: Array<string>) {
@@ -97,6 +113,14 @@ describe("Local admin is able customize the IT-Contract UI", () => {
         return verifySettingVisibility(contractName, tabSref, settingElementIds, true)                //Check that the setting is visible before the change
             .then(() => toggleSetting(settingId))                                                   //Toggle the setting
             .then(() => verifySettingVisibility(contractName, tabSref, settingElementIds, false));     //Verify that the setting has now been hidden
+    }
+
+    function testFieldGroupCustomizationWithSubtreeIsComplete(contractName: string, settingId: string, tabSref: string, settingElementIds: Array<string>) {
+        console.log("testFieldCustomization for ", contractName, " and tabSref:", tabSref, " affecting settings with ids:", settingElementIds.join(", "));
+        return verifySettingVisibility(contractName, tabSref, settingElementIds, true)                //Check that the setting is visible before the change
+            .then(() => toggleSetting(settingId))                                                   //Toggle the setting
+            .then(() => verifySettingVisibility(contractName, tabSref, settingElementIds, false))     //Verify that the setting has now been hidden
+            .then(() => toggleSetting(settingId));                                                   //Toggle the setting
     }
 
     function navigateToContract(contractName: string) {
@@ -137,10 +161,25 @@ describe("Local admin is able customize the IT-Contract UI", () => {
 
     function toggleSetting(settingId: string) {
         console.log("toggleSetting for ", settingId);
+        return openUiConfiguration()
+            .then(() => element(by.id(settingId)).click())
+            .then(() => browser.waitForAngular());
+    }
+
+    function checkStateAndToggleSetting(settingId: string, targetState: boolean) {
+        console.log("toggleSetting for ", settingId);
+        return element(by.id(settingId)).isSelected()
+            .then((selected) => {
+                if (selected !== targetState) {
+                    element(by.id(settingId)).click();
+                }
+            })
+            .then(() => browser.waitForAngular());
+    }
+
+    function openUiConfiguration() {
         return navigation.getPage("/#/local-config/contract")
             .then(() => element(by.id("expand_collapse_ItContracts")).click())
-            .then(() => browser.waitForAngular())
-            .then(() => element(by.id(settingId)).click())
             .then(() => browser.waitForAngular());
     }
 
