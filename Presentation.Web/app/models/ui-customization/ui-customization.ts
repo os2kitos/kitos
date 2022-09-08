@@ -14,7 +14,7 @@
     }
 
     export interface IUICustomizationTreeMember {
-        accept(visitor: IUICustomizationTreeVisitor): void;
+        accept(visitor: IUICustomizationTreeVisitor, state?: boolean): void;
     }
 
     export interface IUICustomizationNodeSearch {
@@ -162,12 +162,12 @@
                 const child = this.getChildCallPath(fullKey);
                 child.changeAvailableState(fullKey, newState);
 
-                if (this._subtreeIsComplete) {
+                if (this.subtreeIsComplete) {
                     const visitor = new Services.UICustomization.CountNodeStatesFromUiCustomizationTreeVisitor();
-                    this.acceptChildren(visitor, this);
+                    this.acceptChildren(visitor, this, true);
 
-                    var newParentState = visitor.counter !== 0;
-                    this.changeAvailableState(fullKey, newParentState);
+                    const newParentState = visitor.counter !== 0;
+                    this.changeAvailableState(this.key, newParentState);
                 }
                 
                 //TODO: if subtreeIsComplete AND if entire subtree is disabled then disable self. TODO: use the collectstatevisitor and collect call accept on all children to get the answer to the subtree question
@@ -176,13 +176,13 @@
             }
         }
 
-        accept(visitor: IUICustomizationTreeVisitor): void {
-            visitor.visitNode(this);
-            this.children.forEach(child => child.accept(visitor));
+        accept(visitor: IUICustomizationTreeVisitor, state?: boolean): void {
+            visitor.visitNode(this, state);
+            this.children.forEach(child => child.accept(visitor, state));
         }
 
-        acceptChildren(visitor: IUICustomizationTreeVisitor, node: IUINode): void {
-            node.children.forEach(child => child.accept(visitor));
+        acceptChildren(visitor: IUICustomizationTreeVisitor, node: IUINode, state?: boolean): void {
+            node.children.forEach(child => child.accept(visitor, state));
         }
         
         get children(): IUINode[] { return this._children; }
@@ -204,6 +204,8 @@
         }
 
         get available() { return this._available; }
+
+        get subtreeIsComplete() { return this._subtreeIsComplete; }
 
         get key() { return this._key; }
 
@@ -242,9 +244,9 @@
 
         get root() { return this._root; }
 
-        accept(visitor: IUICustomizationTreeVisitor): void {
+        accept(visitor: IUICustomizationTreeVisitor, state?: boolean): void {
             visitor.visitModule(this);
-            this._root.accept(visitor);
+            this._root.accept(visitor, state);
         }
     }
 }

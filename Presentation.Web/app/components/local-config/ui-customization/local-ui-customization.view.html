@@ -29,6 +29,10 @@
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             {{:: tabConfig.helpText}}
                         </span>
+                        <span ng-if="tabConfig.subtreeIsComplete" class="help-block small">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            {{::ctrl.subtreeIsCompleteHelpText}}
+                        </span>
                     </label>
                 </td>
                 <td ng-if="tabConfig.children.length == 0">
@@ -44,6 +48,10 @@
                             <span ng-if="fieldConfig.helpText" class="help-block small">
                                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                                 {{:: fieldConfig.helpText}}
+                            </span>
+                            <span ng-if="fieldConfig.subtreeIsComplete" class="help-block small">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                {{::ctrl.subtreeIsCompleteHelpText}}
                             </span>
                         </label>
                     </div>

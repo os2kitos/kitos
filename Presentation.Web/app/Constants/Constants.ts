@@ -38,4 +38,8 @@
         static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
         static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
     }
+
+    export class UiCustomization {
+        static readonly subtreeIsCompleteHelpText = "Some help text about why root is being disabled along with the children";
+    }
 }
