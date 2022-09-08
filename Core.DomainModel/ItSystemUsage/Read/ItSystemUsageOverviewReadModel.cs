@@ -54,6 +54,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string SystemName { get; set; }
         public bool ItSystemDisabled { get; set; }
         public bool IsActive { get; set; }
+        public string Note { get; set; }
         public string ParentItSystemName { get; set; }
         public int? ParentItSystemId { get; set; }
         public bool? ParentItSystemDisabled { get; set; }
