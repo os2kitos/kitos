@@ -179,6 +179,14 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LastEditedAtDate)
                 .IsOptional()
                 .HasIndexAnnotation("IX_LastEditedAtDate");
+
+            Property(x => x.Concluded)
+                .IsOptional()
+                .HasIndexAnnotation("IX_Concluded");
+
+            Property(x => x.ExpirationDate)
+                .IsOptional()
+                .HasIndexAnnotation("IX_ExpirationDate");
         }
 
         private void MapOptionTypeReference<T>(Expression<Func<ItContractOverviewReadModel, int?>> idExpression, Expression<Func<ItContractOverviewReadModel, string>> nameExpression)

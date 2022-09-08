@@ -67,6 +67,8 @@
                         LastEditedByUserId = c.Int(),
                         LastEditedByUserName = c.String(maxLength: 100),
                         LastEditedAtDate = c.DateTime(precision: 7, storeType: "datetime2"),
+                        Concluded = c.DateTime(precision: 7, storeType: "datetime2"),
+                        ExpirationDate = c.DateTime(precision: 7, storeType: "datetime2"),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -112,7 +114,9 @@
                 .Index(t => t.TerminatedAt)
                 .Index(t => t.LastEditedByUserId)
                 .Index(t => t.LastEditedByUserName)
-                .Index(t => t.LastEditedAtDate);
+                .Index(t => t.LastEditedAtDate)
+                .Index(t => t.Concluded)
+                .Index(t => t.ExpirationDate);
             
             CreateTable(
                 "dbo.ItContractOverviewReadModelDataProcessingAgreements",
@@ -202,6 +206,8 @@
             DropIndex("dbo.ItContractOverviewReadModelItSystemUsages", "IX_ItContract_Read_System_Uuid");
             DropIndex("dbo.ItContractOverviewReadModelDataProcessingAgreements", new[] { "ParentId" });
             DropIndex("dbo.ItContractOverviewReadModelDataProcessingAgreements", "IX_ItContract_Read_Dpr_Name");
+            DropIndex("dbo.ItContractOverviewReadModels", new[] { "ExpirationDate" });
+            DropIndex("dbo.ItContractOverviewReadModels", new[] { "Concluded" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "LastEditedAtDate" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "LastEditedByUserName" });
             DropIndex("dbo.ItContractOverviewReadModels", new[] { "LastEditedByUserId" });

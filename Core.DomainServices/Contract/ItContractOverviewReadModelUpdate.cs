@@ -49,6 +49,8 @@ namespace Core.DomainServices.Contract
             destination.LastEditedAtDate = source.LastChanged;
             destination.LastEditedByUserName = source.LastChangedByUser?.Transform(GetUserFullName);
             destination.LastEditedByUserId = source.LastChangedByUserId;
+            destination.Concluded = source.Concluded;
+            destination.ExpirationDate = source.ExpirationDate;
 
             //Supplier
             destination.SupplierId = source.Supplier?.Id;

@@ -76,5 +76,8 @@ namespace Core.DomainModel.ItContract.Read
         public int? LastEditedByUserId { get; set; }
         public string LastEditedByUserName { get; set; }
         public DateTime? LastEditedAtDate { get; set; }
+        public DateTime? Concluded { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+
     }
 }

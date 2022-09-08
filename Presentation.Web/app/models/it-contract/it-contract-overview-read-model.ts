@@ -57,5 +57,7 @@
         TerminatedAt: Date | null
         LastEditedByUserName: string
         LastEditedAtDate: Date
+        Concluded: Date | null
+        ExpirationDate : Date | null
     }
 }
