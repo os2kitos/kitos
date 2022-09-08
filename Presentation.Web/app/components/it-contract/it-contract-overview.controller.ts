@@ -7,6 +7,8 @@
         mainGridOptions: IKendoGridOptions<Kitos.Models.ViewModel.ItContract.ItContractOverviewViewModel>;
         canCreate: boolean;
 
+        
+        private readonly procurementInitiatedPropertyName = "ProcurementInitiated";
         private readonly criticalityIdPropertyName = "CriticalityId";
         private readonly contractTypeIdPropertyName = "ContractTypeId";
         private readonly contractTemplateIdPropertyName = "ContractTemplateId";
@@ -116,10 +118,10 @@
                 var searchedValue = matchingFilterParts[3];
                 const yesValue = `${Models.Api.Shared.YesNoIrrelevantOption.YES.valueOf()}`;
                 if (searchedValue.indexOf(yesValue) !== -1) {
-                    return filterUrl.replace(pattern, "DataProcessingAgreements}/Any");
+                    return filterUrl.replace(pattern, "DataProcessingAgreements/Any()");
                 }
 
-                return filterUrl.replace(pattern, "(not DataProcessingAgreements}/Any)");
+                return filterUrl.replace(pattern, "(not DataProcessingAgreements/Any())");
             }
 
             const replaceProcurementFilter = (filterUrl: string, column: string) => {
@@ -266,6 +268,11 @@
 
                             //DPR fix - interpret the yes | no to lookups in the backend collections
                             parameterMap.$filter = replaceDprFilter(parameterMap.$filter);
+
+                            //blank/null fix for enum types
+                            parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
+                                this.procurementInitiatedPropertyName,
+                                Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
                             //Cleanup filter if invalid ODATA Filter (can happen when we strip params such as responsible org unit)
                             if (parameterMap.$filter === "") {
@@ -535,7 +542,7 @@
                             : ""))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("ProcurementInitiated")
+                        .withDataSourceName(this.procurementInitiatedPropertyName)
                         .withTitle("Genanskaffelse igangsat")
                         .withId("procurementInitiated")
                         .withStandardWidth(185)
@@ -745,6 +752,8 @@
                     builder
                         .withDataSourceName("LatestAuditDate")
                         .withTitle("Audit dato")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withId("auditDate")
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.economy.children.extPayment))
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LatestAuditDate))

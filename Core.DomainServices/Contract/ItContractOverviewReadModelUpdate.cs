@@ -43,14 +43,14 @@ namespace Core.DomainServices.Contract
             destination.ContractId = source.ItContractId;
             destination.ContractSigner = source.ContractSigner;
             destination.ProcurementInitiated = source.ProcurementInitiated;
-            destination.OperationRemunerationBegunDate = source.OperationRemunerationBegun;
-            destination.IrrevocableTo = source.IrrevocableTo;
-            destination.TerminatedAt = source.Terminated;
-            destination.LastEditedAtDate = source.LastChanged;
+            destination.OperationRemunerationBegunDate = source.OperationRemunerationBegun?.Date;
+            destination.IrrevocableTo = source.IrrevocableTo?.Date;
+            destination.TerminatedAt = source.Terminated?.Date;
+            destination.LastEditedAtDate = source.LastChanged.Date;
             destination.LastEditedByUserName = source.LastChangedByUser?.Transform(GetUserFullName);
             destination.LastEditedByUserId = source.LastChangedByUserId;
-            destination.Concluded = source.Concluded;
-            destination.ExpirationDate = source.ExpirationDate;
+            destination.Concluded = source.Concluded?.Date;
+            destination.ExpirationDate = source.ExpirationDate?.Date;
 
             //Supplier
             destination.SupplierId = source.Supplier?.Id;
@@ -235,8 +235,8 @@ namespace Core.DomainServices.Contract
                     destination.AccumulatedOtherCost += economyStream.Other;
                     statuses[economyStream.AuditStatus]++;
 
-                    var latestAuditDateBeforeUpdate = destination.LatestAuditDate;
-                    var currentStreamAuditDate = economyStream.AuditDate;
+                    var latestAuditDateBeforeUpdate = destination.LatestAuditDate?.Date;
+                    var currentStreamAuditDate = economyStream.AuditDate?.Date;
                     if (latestAuditDateBeforeUpdate == null)
                     {
                         destination.LatestAuditDate = currentStreamAuditDate;
