@@ -918,7 +918,7 @@ namespace Presentation.Web.Controllers.API.V1
                     })
                     .ToArray(),
                 LastChangedAt = value.LastChanged,
-                LastChangedByName = value.LastChangedByUser.GetFullName()
+                LastChangedByName = value.LastChangedByUser?.GetFullName()
             };
         }
 

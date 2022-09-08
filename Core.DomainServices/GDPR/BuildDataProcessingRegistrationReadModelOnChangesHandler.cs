@@ -67,6 +67,8 @@ namespace Core.DomainServices.GDPR
             BuildFromSource(model, domainEvent.Entity);
 
             _readModelRepository.Add(model);
+
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
         }
 
         public void Handle(EntityUpdatedEvent<DataProcessingRegistration> domainEvent)
