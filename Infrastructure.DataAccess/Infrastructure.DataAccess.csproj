@@ -902,6 +902,10 @@
     <Compile Include="Migrations\202208250848514_Remove_Project_Module.designer.cs">
       <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202209070640375_AddedNoteToItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202209070640375_AddedNoteToItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202209070640375_AddedNoteToItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1503,6 +1507,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202208250848514_Remove_Project_Module.resx">
       <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209070640375_AddedNoteToItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202209070640375_AddedNoteToItSystemUsageOverviewReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
