@@ -907,9 +907,9 @@
     <Compile Include="Migrations\202208250848514_Remove_Project_Module.designer.cs">
       <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202209071227128_add_contract_readmodels.cs" />
-    <Compile Include="Migrations\202209071227128_add_contract_readmodels.designer.cs">
-      <DependentUpon>202209071227128_add_contract_readmodels.cs</DependentUpon>
+    <Compile Include="Migrations\202209080721502_add_itcontract_overview_readmodel.cs" />
+    <Compile Include="Migrations\202209080721502_add_itcontract_overview_readmodel.designer.cs">
+      <DependentUpon>202209080721502_add_itcontract_overview_readmodel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1513,8 +1513,8 @@
     <EmbeddedResource Include="Migrations\202208250848514_Remove_Project_Module.resx">
       <DependentUpon>202208250848514_Remove_Project_Module.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202209071227128_add_contract_readmodels.resx">
-      <DependentUpon>202209071227128_add_contract_readmodels.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202209080721502_add_itcontract_overview_readmodel.resx">
+      <DependentUpon>202209080721502_add_itcontract_overview_readmodel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

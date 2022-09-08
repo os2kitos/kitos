@@ -201,7 +201,11 @@ namespace Core.DomainServices.Contract
 
         private static void MapEconomyStreams(ItContract source, ItContractOverviewReadModel destination)
         {
-            ResetAccumulatedCost(destination, null);
+            //Reset
+            destination.AccumulatedAcquisitionCost =
+                destination.AccumulatedOperationCost =
+                    destination.AccumulatedOtherCost =
+                        0;
 
             destination.LatestAuditDate = null;
 
@@ -209,12 +213,11 @@ namespace Core.DomainServices.Contract
                 destination.AuditStatusWhite =
                     destination.AuditStatusRed =
                         destination.AuditStatusYellow =
-                            null;
+                            0;
 
+            //If any streams, then compute all related columns
             if (source.ExternEconomyStreams.Any())
             {
-                ResetAccumulatedCost(destination, 0);
-
                 var statuses = new Dictionary<TrafficLight, int>()
                 {
                     {TrafficLight.Green,0},
@@ -247,14 +250,6 @@ namespace Core.DomainServices.Contract
                 destination.AuditStatusRed = statuses[TrafficLight.Red];
                 destination.AuditStatusYellow = statuses[TrafficLight.Yellow];
             }
-        }
-
-        private static void ResetAccumulatedCost(ItContractOverviewReadModel destination, int? accCost)
-        {
-            destination.AccumulatedAcquisitionCost =
-                destination.AccumulatedOperationCost =
-                    destination.AccumulatedOtherCost =
-                        accCost;
         }
 
         private void MapSystemUsages(ItContract source, ItContractOverviewReadModel destination)
@@ -316,7 +311,7 @@ namespace Core.DomainServices.Contract
         private static void PatchItSystemUsage(ItContractOverviewReadModelItSystemUsage itSystemUsage, ItSystemUsage newItem)
         {
             itSystemUsage.ItSystemUsageName = newItem.ItSystem.Name;
-            itSystemUsage.ItSystemUsageSystemUuid = newItem.ItSystem.Uuid;
+            itSystemUsage.ItSystemUsageSystemUuid = newItem.ItSystem.Uuid.ToString("D");
         }
 
         private void MapDataProcessingAgreements(ItContract source, ItContractOverviewReadModel destination)

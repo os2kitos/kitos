@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class add_contract_readmodels : DbMigration
+    public partial class add_itcontract_overview_readmodel : DbMigration
     {
         public override void Up()
         {
@@ -44,19 +44,19 @@
                         ActiveReferenceTitle = c.String(),
                         ActiveReferenceUrl = c.String(),
                         ActiveReferenceExternalReferenceId = c.String(),
-                        AccumulatedAcquisitionCost = c.Int(),
-                        AccumulatedOperationCost = c.Int(),
-                        AccumulatedOtherCost = c.Int(),
+                        AccumulatedAcquisitionCost = c.Int(nullable: false),
+                        AccumulatedOperationCost = c.Int(nullable: false),
+                        AccumulatedOtherCost = c.Int(nullable: false),
                         OperationRemunerationBegunDate = c.DateTime(precision: 7, storeType: "datetime2"),
                         PaymentModelId = c.Int(),
                         PaymentModelName = c.String(maxLength: 150),
                         PaymentFrequencyId = c.Int(),
                         PaymentFrequencyName = c.String(maxLength: 150),
                         LatestAuditDate = c.DateTime(precision: 7, storeType: "datetime2"),
-                        AuditStatusWhite = c.Int(),
-                        AuditStatusRed = c.Int(),
-                        AuditStatusYellow = c.Int(),
-                        AuditStatusGreen = c.Int(),
+                        AuditStatusWhite = c.Int(nullable: false),
+                        AuditStatusRed = c.Int(nullable: false),
+                        AuditStatusYellow = c.Int(nullable: false),
+                        AuditStatusGreen = c.Int(nullable: false),
                         Duration = c.String(maxLength: 100),
                         OptionExtendId = c.Int(),
                         OptionExtendName = c.String(maxLength: 150),
@@ -134,7 +134,7 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         ItSystemUsageId = c.Int(nullable: false),
-                        ItSystemUsageSystemUuid = c.Guid(nullable: false),
+                        ItSystemUsageSystemUuid = c.String(maxLength: 50),
                         ItSystemUsageName = c.String(maxLength: 200),
                         ParentId = c.Int(nullable: false),
                     })

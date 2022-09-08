@@ -122,15 +122,12 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional();
 
             Property(x => x.AccumulatedAcquisitionCost)
-                .IsOptional()
                 .HasIndexAnnotation("IX_AccumulatedAcquisitionCost");
 
             Property(x => x.AccumulatedOperationCost)
-                .IsOptional()
                 .HasIndexAnnotation("IX_AccumulatedOperationCost");
 
             Property(x => x.AccumulatedOtherCost)
-                .IsOptional()
                 .HasIndexAnnotation("IX_AccumulatedOtherCost");
 
             Property(x => x.OperationRemunerationBegunDate)
@@ -145,17 +142,13 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_LatestAuditDate");
 
-            Property(x => x.AuditStatusWhite)
-                .IsOptional();
+            Property(x => x.AuditStatusWhite);
 
-            Property(x => x.AuditStatusRed)
-                .IsOptional();
+            Property(x => x.AuditStatusRed);
 
-            Property(x => x.AuditStatusYellow)
-                .IsOptional();
+            Property(x => x.AuditStatusYellow);
 
-            Property(x => x.AuditStatusGreen)
-                .IsOptional();
+            Property(x => x.AuditStatusGreen);
 
             Property(x => x.Duration)
                 .IsOptional()
