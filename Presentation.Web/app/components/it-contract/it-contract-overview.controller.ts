@@ -179,7 +179,7 @@
                     .withUser(user)
                     .withEntityTypeName("IT Kontrakt")
                     .withExcelOutputName("IT Kontrakt Overblik")
-                    .withStorageKey("it-contract-full-overview-options")
+                    .withStorageKey("it-contract-full-overview-options-v2")
                     .withUrlFactory(options => {
                         var urlParameters =
                             "?$expand=" +
@@ -460,6 +460,24 @@
                             dataItem.Id,
                             dataItem.Name))
                         .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Concluded")
+                        .withTitle("Gyldig fra")
+                        .withId("concluded")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.agreementPeriod))
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Concluded)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExpirationDate")
+                        .withTitle("Gyldig til")
+                        .withId("expirationDate")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.agreementPeriod))
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ExpirationDate)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.criticalityPropertyName)
