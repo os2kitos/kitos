@@ -106,13 +106,6 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.182.tgz#05301a4d5e62963227eaafe0ce04dd77c54ea5c2"
   integrity sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==
 
-"@types/protractor-http-mock@^0.10.2":
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/@types/protractor-http-mock/-/protractor-http-mock-0.10.2.tgz#536eabe8c836b66a97c2eecc06115c23b6936704"
-  integrity sha512-xZ95Cvz3Ly9sxgrMyP0FyIWRPMlmLfufvsdf6nWNr/FPZQEOS2EEmIRlKvwhsUhjIFzCmvyUmPcPdvvIncxAZg==
-  dependencies:
-    "@types/selenium-webdriver" "^2"
-
 "@types/protractor@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/protractor/-/protractor-4.0.0.tgz#11915845b38d483f7060d74ec8e2eeee43573999"
@@ -124,11 +117,6 @@
   version "0.0.32"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-0.0.32.tgz#bd284e57c84f1325da702babfc82a5328190c0c5"
   integrity sha512-qYi3YV9inU/REEfxwVcGZzbS3KG/Xs90lv0Pr+lDtuVjBPGd1A+eciXzVSaRvLify132BfcvhvEjeVahrUl0Ug==
-
-"@types/selenium-webdriver@^2":
-  version "2.53.47"
-  resolved "https://registry.yarnpkg.com/@types/selenium-webdriver/-/selenium-webdriver-2.53.47.tgz#16671dedebb581b0633b461f27bb6b6ffe4dd008"
-  integrity sha512-/W+XIgz9TYGmK9nte+nFDeKd9SsGD5ZLWWmBEYbbCyImHk03xQXyA2iv/HCE9dfMhz4HaQ1W3ctASoFjojeH8A==
 
 "@types/selenium-webdriver@^3.0.0":
   version "3.0.20"

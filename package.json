@@ -26,7 +26,6 @@
         "@types/jquery": "^3.5.14",
         "@types/lodash": "4.14.182",
         "@types/protractor": "^4.0.0",
-        "@types/protractor-http-mock": "^0.10.2",
         "@types/ui-select": "^0.19.1",
         "del": "^2.2.0",
         "eslint": "^6.8.0",
