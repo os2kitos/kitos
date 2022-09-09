@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Types;
+using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.ItContract.Read;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.BackgroundJobs.Model
 {
-    public abstract class BaseContextToReadModelChangeScheduler : IAsyncBackgroundJob
+    public abstract class BaseContextToReadModelChangeScheduler<TReadModel, TModel> : IAsyncBackgroundJob where TReadModel : IReadModel<TModel>
     {
         private readonly IPendingReadModelUpdateRepository _updateRepository;
         private readonly ITransactionManager _transactionManager;
@@ -20,8 +20,8 @@ namespace Core.BackgroundJobs.Model
 
         protected BaseContextToReadModelChangeScheduler(
             string id,
-            PendingReadModelUpdateSourceCategory rootUpdateCategory, 
-            ITransactionManager transactionManager, 
+            PendingReadModelUpdateSourceCategory rootUpdateCategory,
+            ITransactionManager transactionManager,
             IPendingReadModelUpdateRepository updateRepository)
         {
             RootUpdateCategory = rootUpdateCategory;
@@ -34,7 +34,7 @@ namespace Core.BackgroundJobs.Model
         {
             var updatesExecuted = 0;
             var idsAlreadyScheduled = _updateRepository
-                .GetMany(PendingReadModelUpdateSourceCategory.ItContract, int.MaxValue)
+                .GetMany(RootUpdateCategory, int.MaxValue)
                 .Select(x => x.SourceId)
                 .ToList();
 
@@ -46,13 +46,20 @@ namespace Core.BackgroundJobs.Model
         }
         protected abstract int ProjectDependencyChangesToRoot(HashSet<int> alreadyScheduledIds, CancellationToken token);
 
-        #region common stuff 3
+        protected int ScheduleRootEntityChanges(
+            CancellationToken token,
+            HashSet<int> alreadyScheduledIds,
+            PendingReadModelUpdateSourceCategory childChangeType,
+            Func<PendingReadModelUpdate, IQueryable<TReadModel>> getQuery)
+        {
+            return ScheduleRootEntityChanges(token, alreadyScheduledIds, childChangeType, update => getQuery(update).Select(rm => rm.SourceEntityId));
+        }
 
         protected int ScheduleRootEntityChanges(
-            CancellationToken token, 
-            HashSet<int> alreadyScheduledIds, 
-            PendingReadModelUpdateSourceCategory childChangeType, 
-            Func<PendingReadModelUpdate, IQueryable<ItContractOverviewReadModel>> getQuery)
+            CancellationToken token,
+            HashSet<int> alreadyScheduledIds,
+            PendingReadModelUpdateSourceCategory childChangeType,
+            Func<PendingReadModelUpdate, IQueryable<int>> getRootIdsQuery)
         {
             var updatesExecuted = 0;
             foreach (var update in _updateRepository.GetMany(childChangeType, int.MaxValue).ToList())
@@ -62,7 +69,7 @@ namespace Core.BackgroundJobs.Model
 
                 using var transaction = _transactionManager.Begin();
 
-                var ids = getQuery(update).Select(x => x.SourceEntityId).ToList();
+                var ids = getRootIdsQuery(update).Distinct().ToList();
 
                 PerformUpdate(alreadyScheduledIds, ids, update, transaction);
                 updatesExecuted++;
@@ -93,6 +100,5 @@ namespace Core.BackgroundJobs.Model
             _updateRepository.Delete(userUpdate);
             transaction.Commit();
         }
-        #endregion common stuff 3
     }
 }

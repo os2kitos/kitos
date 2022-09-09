@@ -1,20 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.BackgroundJobs.Model.ReadModels
 {
-    public class ScheduleItContractOverviewReadModelUpdates : BaseContextToReadModelChangeScheduler
+    public class ScheduleItContractOverviewReadModelUpdates : BaseContextToReadModelChangeScheduler<ItContractOverviewReadModel, ItContract>
     {
         private readonly IItContractOverviewReadModelRepository _readModelRepository;
 
         public ScheduleItContractOverviewReadModelUpdates(
             IPendingReadModelUpdateRepository updateRepository,
             IItContractOverviewReadModelRepository readModelRepository,
-            ITransactionManager transactionManager):base(
+            ITransactionManager transactionManager) : base(
             StandardJobIds.ScheduleItContractReadModelUpdates,
             PendingReadModelUpdateSourceCategory.ItContract,
             transactionManager,
