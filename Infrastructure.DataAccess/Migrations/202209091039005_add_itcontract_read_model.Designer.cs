@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class add_itcontract_overview_readmodel : IMigrationMetadata
+    public sealed partial class add_itcontract_read_model : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(add_itcontract_overview_readmodel));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(add_itcontract_read_model));
         
         string IMigrationMetadata.Id
         {
-            get { return "202209081059086_add_itcontract_overview_readmodel"; }
+            get { return "202209091039005_add_itcontract_read_model"; }
         }
         
         string IMigrationMetadata.Source

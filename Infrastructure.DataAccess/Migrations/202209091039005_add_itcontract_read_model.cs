@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class add_itcontract_overview_readmodel : DbMigration
+    public partial class add_itcontract_read_model : DbMigration
     {
         public override void Up()
         {

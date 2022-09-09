@@ -11,7 +11,7 @@ class SelectStatus2Wrapper {
      */
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
-        this.dropdownElement = $(this.cssSelector + " a.dropdown-toggle");
+        this.dropdownElement = $cssSelector(this.cssSelector + " a.dropdown-toggle");
         this.options = element.all(by.css(cssLocator + " .traffic-light li a"));
     }
 
@@ -63,7 +63,7 @@ class SelectStatus2Wrapper {
      * @return Promise that resolves to a boolean indicating if the element is disabled
      */
     public isDisabled(): webdriver.promise.Promise<boolean> {
-        return $(this.cssSelector + " div:not(.dropdown)").isDisplayed();
+        return $cssSelector(this.cssSelector + " div:not(.dropdown)").isDisplayed();
     }
 
     /**
