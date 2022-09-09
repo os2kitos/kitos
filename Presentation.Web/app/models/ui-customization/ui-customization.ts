@@ -9,12 +9,12 @@
     }
 
     export interface IUICustomizationTreeVisitor {
-        visitNode(node: UINode, state?: boolean);
+        visitNode(node: UINode);
         visitModule(node: CustomizedModuleUI);
     }
 
     export interface IUICustomizationTreeMember {
-        accept(visitor: IUICustomizationTreeVisitor, state?: boolean): void;
+        accept(visitor: IUICustomizationTreeVisitor): void;
     }
 
     export interface IUICustomizationNodeSearch {
@@ -163,8 +163,8 @@
                 child.changeAvailableState(fullKey, newState);
 
                 if (this.subtreeIsComplete) {
-                    const visitor = new Services.UICustomization.CountNodeStatesFromUiCustomizationTreeVisitor();
-                    this.acceptChildren(visitor, this, true);
+                    const visitor = new Services.UICustomization.CountNodeStatesFromUiCustomizationTreeVisitor(true);
+                    this.acceptChildren(visitor, this);
 
                     const newParentState = visitor.counter !== 0;
                     this.changeAvailableState(this.key, newParentState);
@@ -174,13 +174,13 @@
             }
         }
 
-        accept(visitor: IUICustomizationTreeVisitor, state?: boolean): void {
-            visitor.visitNode(this, state);
-            this.children.forEach(child => child.accept(visitor, state));
+        accept(visitor: IUICustomizationTreeVisitor): void {
+            visitor.visitNode(this);
+            this.children.forEach(child => child.accept(visitor));
         }
 
-        acceptChildren(visitor: IUICustomizationTreeVisitor, node: IUINode, state?: boolean): void {
-            node.children.forEach(child => child.accept(visitor, state));
+        acceptChildren(visitor: IUICustomizationTreeVisitor, node: IUINode): void {
+            node.children.forEach(child => child.accept(visitor));
         }
         
         get children(): IUINode[] { return this._children; }
@@ -242,9 +242,9 @@
 
         get root() { return this._root; }
 
-        accept(visitor: IUICustomizationTreeVisitor, state?: boolean): void {
+        accept(visitor: IUICustomizationTreeVisitor): void {
             visitor.visitModule(this);
-            this._root.accept(visitor, state);
+            this._root.accept(visitor);
         }
     }
 }

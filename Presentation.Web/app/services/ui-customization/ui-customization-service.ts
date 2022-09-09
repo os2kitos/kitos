@@ -32,13 +32,18 @@
 
     export class CountNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
         private _nodesByStateCounter: number = 0;
+        private _state: boolean;
+
+        constructor(state: boolean) {
+            this._state = state;
+        }
 
         get counter() {
             return this._nodesByStateCounter;
         }
 
-        visitNode(node: Models.UICustomization.UINode, state: boolean) {
-            if (node.available === state) {
+        visitNode(node: Models.UICustomization.UINode) {
+            if (node.available === this._state) {
                 this._nodesByStateCounter += 1;
             }
         }

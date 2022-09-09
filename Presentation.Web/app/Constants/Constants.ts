@@ -38,8 +38,4 @@
         static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
         static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
     }
-
-    export class UiCustomization {
-        static readonly subtreeIsCompleteHelpText = "Fanenbladdet slås fra hvis alle felter/grupper fjernes, da siden ellers vil være uden indhold.";
-    }
 }

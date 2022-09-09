@@ -5,10 +5,9 @@ import NavigationHelper = require("../../Utility/NavigationHelper");
 import ContractNavigationSrefs = require("../../Helpers/SideNavigation/ContractNavigationSrefs");
 import OrgHelper = require("../../Helpers/OrgHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
-import _ = require("lodash");
 
 describe("Local admin is able customize the IT-Contract UI", () => {
-
+    
     var loginHelper = new Login();
     var testFixture = new TestFixtureWrapper();
     var navigation = new NavigationHelper();
@@ -93,10 +92,12 @@ describe("Local admin is able customize the IT-Contract UI", () => {
 
     function testTabCustomizationWithSubtreeIsComplete(name: string, settingIds: Array<string>, tabSref: string) {
         console.log("testTabCustomization for ", name, " and tabSref:", tabSref);
-
+        
         return verifyTabVisibility(name, tabSref, true)                                                                   //Check that the tab is visible before the change
             .then(() => openUiConfiguration())                                                                            //Open Ui Customization page and show details
-            .then(() => settingIds.forEach((id) => { checkStateAndToggleSetting(id, false) }))                            //Toggle the setting
+            .then(() => settingIds.reduce((promise, item) => {
+                return promise.then(() => checkStateAndToggleSetting(item, false));
+            }, protractor.promise.when([])))                                                                              //Toggle the setting
             .then(() => verifyTabVisibility(name, tabSref, false));                                                       //Verify that the tab has now been hidden
     }
 
@@ -118,9 +119,9 @@ describe("Local admin is able customize the IT-Contract UI", () => {
     function testFieldGroupCustomizationWithSubtreeIsComplete(contractName: string, settingId: string, tabSref: string, settingElementIds: Array<string>) {
         console.log("testFieldCustomization for ", contractName, " and tabSref:", tabSref, " affecting settings with ids:", settingElementIds.join(", "));
         return verifySettingVisibility(contractName, tabSref, settingElementIds, true)                //Check that the setting is visible before the change
-            .then(() => toggleSetting(settingId))                                                   //Toggle the setting
+            .then(() => toggleSetting(settingId))                                                     //Toggle the setting
             .then(() => verifySettingVisibility(contractName, tabSref, settingElementIds, false))     //Verify that the setting has now been hidden
-            .then(() => toggleSetting(settingId));                                                   //Toggle the setting
+            .then(() => toggleSetting(settingId));                                                    //Toggle the setting
     }
 
     function navigateToContract(contractName: string) {
@@ -162,19 +163,17 @@ describe("Local admin is able customize the IT-Contract UI", () => {
     function toggleSetting(settingId: string) {
         console.log("toggleSetting for ", settingId);
         return openUiConfiguration()
-            .then(() => element(by.id(settingId)).click())
-            .then(() => browser.waitForAngular());
+            .then(() => findAndClickSetting(settingId));
     }
 
     function checkStateAndToggleSetting(settingId: string, targetState: boolean) {
         console.log("toggleSetting for ", settingId);
-        return element(by.id(settingId)).isSelected()
+        return getSetting(settingId).isSelected()
             .then((selected) => {
                 if (selected !== targetState) {
-                    element(by.id(settingId)).click();
+                    findAndClickSetting(settingId);
                 }
-            })
-            .then(() => browser.waitForAngular());
+            });
     }
 
     function openUiConfiguration() {
@@ -182,6 +181,16 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => element(by.id("expand_collapse_ItContracts")).click())
             .then(() => browser.waitForAngular());
     }
+
+    function findAndClickSetting(settingId: string) {
+        return getSetting(settingId).click()
+            .then(() => browser.waitForAngular());
+    }
+
+    function getSetting(settingId: string) {
+        return element(by.id(settingId));
+    }
+
 
     function createName(prefix: string) {
         return `${prefix}_${new Date().getTime()}`;

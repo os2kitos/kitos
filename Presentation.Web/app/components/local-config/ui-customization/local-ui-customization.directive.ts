@@ -51,7 +51,7 @@
                     this.customizationModel = customizationModel;
                 });
 
-            this.subtreeIsCompleteHelpText = Constants.UiCustomization.subtreeIsCompleteHelpText;
+            this.subtreeIsCompleteHelpText = Kitos.Models.UICustomization.Configs.helpTexts.subtreeIsCompleteHelpText;
         }
 
         toggleSetting(key : string) {
