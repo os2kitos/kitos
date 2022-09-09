@@ -25,7 +25,8 @@
                     <label class="local-ui-customization-option">
                         <input id="{{::tabConfig.key}}" type="checkbox" ng-checked="tabConfig.available" ng-disabled="!tabConfig.editable" ng-click="ctrl.toggleSetting(tabConfig.key)" />
                         {{:: tabConfig.text}}
-                        <span ng-if="tabConfig.subtreeIsComplete && tabConfig.children.length > 0" class="help-block small italic">
+                        <span ng-if="tabConfig.subtreeIsComplete && tabConfig.children.length > 0" class="help-block small">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
                             {{::ctrl.subtreeIsCompleteHelpText}}
                         </span>
                         <span ng-if="tabConfig.helpText" class="help-block small">

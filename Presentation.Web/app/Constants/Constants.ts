@@ -40,6 +40,6 @@
     }
 
     export class UiCustomization {
-        static readonly subtreeIsCompleteHelpText = "Some help text about why root is being disabled along with the children";
+        static readonly subtreeIsCompleteHelpText = "Fanenbladdet slås fra hvis alle felter/grupper fjernes, da siden ellers vil være uden indhold.";
     }
 }
