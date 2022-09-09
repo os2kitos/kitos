@@ -744,7 +744,15 @@
                             .map(relatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-link`, "it-system.usage.main", relatedItSystemUsage.ItSystemUsageId, relatedItSystemUsage.ItSystemUsageName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
                         .withSourceValueEchoExcelOutput()
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.systemRelations)));
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.systemRelations)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Note")
+                        .withTitle("Note")
+                        .withId("note")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentOverflow()
+                        .withSourceValueEchoRendering());
 
             //Launch kendo grid
             launcher.launch();
