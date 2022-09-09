@@ -41,7 +41,7 @@
 
         lastChangedBy = this.dataProcessingRegistration.lastChangedByName;
 
-        lastChangedAt = this.dataProcessingRegistration.lastChangedAt;
+        lastChangedAt = Kitos.Helpers.RenderFieldsHelper.renderDate(this.dataProcessingRegistration.lastChangedAt);
 
         insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
 
