@@ -89,14 +89,14 @@
                     (today > moment(itSystemUsage.concluded, Kitos.Constants.DateFormat.DanishDateFormat).startOf("day") && itSystemUsage.expirationDate == null) ||
                     (today < moment(itSystemUsage.expirationDate, Kitos.Constants.DateFormat.DanishDateFormat).endOf("day") && itSystemUsage.concluded == null) ||
                     (itSystemUsage.expirationDate == null && itSystemUsage.concluded == null)) {
-                    itSystemUsage.isActive = true;
+                    itSystemUsage.activeAccordingToValidityPeriod = true;
                 }
                 else {
                     if (itSystemUsage.active) {
-                        itSystemUsage.isActive = true;
+                        itSystemUsage.activeAccordingToValidityPeriod = true;
                     }
                     else {
-                        itSystemUsage.isActive = false;
+                        itSystemUsage.activeAccordingToValidityPeriod = false;
                     }
                 }
             }

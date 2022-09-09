@@ -240,25 +240,25 @@
 
             launcher = launcher.withColumn(builder =>
                 builder
-                    .withDataSourceName("IsActive")
+                    .withDataSourceName("ActiveAccordingToValidityPeriod")
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                    .withTitle("Gyldig/Ikke gyldig")
-                    .withId("isActive")
+                    .withTitle("Status ifølge datofelter")
+                    .withId("ActiveAccordingToValidityPeriod")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                     .withFixedValueRange([
                         {
-                            textValue: "Gyldig",
+                            textValue: "Aktivt",
                             remoteValue: true
                         },
                         {
-                            textValue: "Ikke gyldig",
+                            textValue: "Ikke Aktivt",
                             remoteValue: false
                         }
                     ],
                         false)
-                    .withRendering(dataItem => dataItem.IsActive ? '<span class="fa fa-file text-success" aria-hidden="true"></span>' : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
+                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktiv')
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                    .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig")
+                    .withExcelOutput(dataItem => dataItem.ActiveAccordingToValidityPeriod ? "Aktivt" : "Ikke aktiv")
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder

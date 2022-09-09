@@ -81,7 +81,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(itSystemUsage.Concluded, dto.General.Validity.ValidFrom);
             Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity.ValidTo);
             Assert.Equal(itSystemUsage.Active, dto.General.Validity.EnforcedValid);
-            Assert.Equal(itSystemUsage.IsActive, dto.General.Validity.Valid);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.Valid);
         }
 
         [Fact]

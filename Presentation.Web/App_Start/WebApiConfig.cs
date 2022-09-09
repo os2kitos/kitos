@@ -366,7 +366,7 @@ namespace Presentation.Web
                 builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
             builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsage))
-                .AddProperty(typeof(ItSystemUsage).GetProperty(nameof(ItSystemUsage.IsActive)));
+                .AddProperty(typeof(ItSystemUsage).GetProperty(nameof(ItSystemUsage.IsActiveAccordingToDateFields)));
 
             //read models
             BindEntitySet<ItSystemUsageOverviewReadModel, ItSystemUsageOverviewReadModelsController>(builder);

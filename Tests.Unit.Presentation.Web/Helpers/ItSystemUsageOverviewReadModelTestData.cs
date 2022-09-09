@@ -13,7 +13,7 @@ namespace Tests.Unit.Presentation.Web.Helpers
             return new ItSystemUsageOverviewReadModel
             {
                 Id = Fixture.Create<int>(),
-                IsActive = isActive,
+                ActiveAccordingToValidityPeriod = isActive,
                 SourceEntity = new ItSystemUsage
                 {
                     Id = Fixture.Create<int>(),
