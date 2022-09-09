@@ -67,7 +67,7 @@ describe("Global Admin can",
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                     .then(() => getDeleteButtonFromReference(referenceName).click())
                     .then(() => browser.switchTo().alert().accept())
-                    .then(() => expect(getReferenceId(referenceId).isPresent()).toBeFalse());
+                    .then(() => expect(getReferenceId(referenceId).isPresent()).toBeFalsy());
             });
     });
 

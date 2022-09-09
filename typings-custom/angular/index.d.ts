@@ -4,7 +4,7 @@ declare var angular: angular.IAngularStatic;
 
 // Support for painless dependency injection
 interface Function {
-    $inject?: string[];
+    $inject?: readonly string[];
 }
 
 // Collapse angular into ng
@@ -18,6 +18,7 @@ declare module 'angular' {
 // ng module (angular.js)
 ///////////////////////////////////////////////////////////////////////////////
 declare namespace angular {
+    type Injectable<T extends Function> = T | Array<string | T>;
 
     // not directly implemented, but ensures that constructed class implements $get
     interface IServiceProviderClass {
