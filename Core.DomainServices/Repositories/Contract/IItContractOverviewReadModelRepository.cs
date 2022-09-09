@@ -25,5 +25,6 @@ namespace Core.DomainServices.Repositories.Contract
         IQueryable<ItContractOverviewReadModel> GetByItContractType(int contractTypeId);
         IQueryable<ItContractOverviewReadModel> GetBySupplier(int organizationId);
         IQueryable<ItContractOverviewReadModel> GetByCriticalityType(int criticalityTypeId);
+        IQueryable<ItContractOverviewReadModel> GetReadModelsMustUpdateToChangeActiveState();
     }
 }

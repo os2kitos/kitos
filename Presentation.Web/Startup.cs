@@ -80,6 +80,12 @@ namespace Presentation.Web
                 cronExpression: Cron.Daily(), // Every night at 00:00
                 timeZone: TimeZoneInfo.Local);
 
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleContractRmAsync(CancellationToken.None)),
+                cronExpression: Cron.Daily(), // Every night at 00:00
+                timeZone: TimeZoneInfo.Local);
+
 
             /******************
              * ON-DEMAND JOBS *

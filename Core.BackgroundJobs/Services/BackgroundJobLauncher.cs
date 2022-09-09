@@ -26,6 +26,7 @@ namespace Core.BackgroundJobs.Services
         private readonly PurgeOrphanedHangfireJobs _purgeOrphanedHangfireJobs;
         private readonly RebuildItContractOverviewReadModelsBatchJob _rebuildItContractOverviewReadModelsBatchJob;
         private readonly ScheduleItContractOverviewReadModelUpdates _scheduleItContractOverviewReadModelUpdates;
+        private readonly ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState _contractOverviewReadModelsWhichChangesActiveState;
 
         public BackgroundJobLauncher(
             ILogger logger,
@@ -39,7 +40,8 @@ namespace Core.BackgroundJobs.Services
             ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive,
             PurgeOrphanedHangfireJobs purgeOrphanedHangfireJobs, 
             RebuildItContractOverviewReadModelsBatchJob rebuildItContractOverviewReadModelsBatchJob,
-            ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates)
+            ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates, 
+            ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState contractOverviewReadModelsWhichChangesActiveState)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -53,11 +55,17 @@ namespace Core.BackgroundJobs.Services
             _purgeOrphanedHangfireJobs = purgeOrphanedHangfireJobs;
             _rebuildItContractOverviewReadModelsBatchJob = rebuildItContractOverviewReadModelsBatchJob;
             _scheduleItContractOverviewReadModelUpdates = scheduleItContractOverviewReadModelUpdates;
+            _contractOverviewReadModelsWhichChangesActiveState = contractOverviewReadModelsWhichChangesActiveState;
         }
 
         public async Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default)
         {
             await Launch(_rebuildItContractOverviewReadModelsBatchJob, token);
+        }
+
+        public async Task LaunchUpdateStaleContractRmAsync(CancellationToken token = default)
+        {
+            await Launch(_contractOverviewReadModelsWhichChangesActiveState, token);
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)

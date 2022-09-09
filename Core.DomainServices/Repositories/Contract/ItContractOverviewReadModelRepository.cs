@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries.Contract;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
 
@@ -192,6 +194,24 @@ namespace Core.DomainServices.Repositories.Contract
         {
             return BeginQuery().Where(x => x.CriticalityId == criticalityTypeId);
 
+        }
+
+        public IQueryable<ItContractOverviewReadModel> GetReadModelsMustUpdateToChangeActiveState()
+        {
+            var now = DateTime.Now;
+            var expiringReadModelIds = _repository
+                .AsQueryable()
+                .Transform(new QueryReadModelsWhichShouldExpire(now).Apply)
+                .Select(x => x.Id);
+
+            var activatingReadModelIds = _repository
+                .AsQueryable()
+                .Transform(new QueryReadModelsWhichShouldBecomeActive(now).Apply)
+                .Select(x => x.Id);
+
+            var idsOfReadModelsWhichMustUpdate = expiringReadModelIds.Concat(activatingReadModelIds).Distinct().ToList();
+
+            return _repository.AsQueryable().ByIds(idsOfReadModelsWhichMustUpdate);
         }
 
         private IQueryable<ItContractOverviewReadModel> BeginQuery()

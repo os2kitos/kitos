@@ -591,6 +591,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<RebuildItSystemUsageOverviewReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleItSystemUsageOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleItContractOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
 
             //contract

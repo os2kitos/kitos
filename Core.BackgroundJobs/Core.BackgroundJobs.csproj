@@ -83,6 +83,7 @@
     <Compile Include="Model\ReadModels\ScheduleDataProcessingRegistrationReadModelUpdates.cs" />
     <Compile Include="Model\ReadModels\ScheduleItContractOverviewReadModelUpdates.cs" />
     <Compile Include="Model\ReadModels\ScheduleItSystemUsageOverviewReadModelUpdates.cs" />
+    <Compile Include="Model\ReadModels\ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState.cs" />
     <Compile Include="Model\ReadModels\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState.cs" />
     <Compile Include="Model\StandardJobIds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
