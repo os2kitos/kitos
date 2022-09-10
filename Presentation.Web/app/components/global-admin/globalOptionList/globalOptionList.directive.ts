@@ -37,7 +37,7 @@
         public mainGrid: IKendoGrid<Models.IOptionEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope","inMemoryCacheService"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -46,7 +46,8 @@
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
             private notify,
-            private $scope) {
+            private $scope,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;
@@ -218,6 +219,7 @@
                 .then(function onSuccess(result) {
                     msg.toSuccessMessage("Feltet er opdateret.");
                     superClass.$(`#${superClass.dirId}`).data("kendoGrid").dataSource.read();
+                    this.inMemoryCacheService.clear();
                 }, function onError(result) {
                     if (result.status === 409) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
@@ -227,7 +229,7 @@
                 });
         };
 
-        private pushUp = (e: JQueryEventObject) => {
+        pushUp = (e: JQueryEventObject) => {
             e.preventDefault();
 
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
@@ -241,12 +243,13 @@
             }
 
             this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.inMemoryCacheService.clear();
                 this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
             });
 
         };
 
-        private pushDown = (e: JQueryEventObject) => {
+        pushDown = (e: JQueryEventObject) => {
             e.preventDefault();
 
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
@@ -259,6 +262,7 @@
                 Priority: priority - 1
             }
             this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.inMemoryCacheService.clear();
                 this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
             });
         };

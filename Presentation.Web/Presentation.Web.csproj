@@ -850,6 +850,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
     <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
     <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
@@ -868,6 +869,7 @@
     <TypeScriptCompile Include="app\services\ui-customization\ui-customization-state-service.ts" />
     <TypeScriptCompile Include="app\services\ui-customization\ui-customization-service.ts" />
     <TypeScriptCompile Include="app\services\userNotificationService.ts" />
+    <TypeScriptCompile Include="app\shared\cache\in-memory-cache.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
     <TypeScriptCompile Include="app\shared\EntityMapper.ts" />
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
@@ -1082,6 +1084,7 @@
     <TypeScriptCompile Include="app\shared\selectRole\selectRole.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
+    <TypeScriptCompile Include="app\shared\time\system-time.ts" />
     <TypeScriptCompile Include="app\utility\ClipBoardHelper.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />

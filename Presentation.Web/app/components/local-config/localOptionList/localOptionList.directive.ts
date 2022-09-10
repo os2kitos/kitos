@@ -39,13 +39,14 @@
         public mainGrid: IKendoGrid<Models.IOptionEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
 
-        public static $inject: string[] = ["$", "$state", "$scope", "localOptionUrlResolver"];
+        public static $inject: string[] = ["$", "$state", "$scope", "localOptionUrlResolver","inMemoryCacheService"];
 
         constructor(
             private $: JQueryStatic,
-            private $state: ng.ui.IStateService,
+            $state: ng.ui.IStateService,
             private $scope,
-            private localOptionUrlResolver: Kitos.Services.LocalOptions.ILocalOptionUrlResolver) {
+            localOptionUrlResolver: Kitos.Services.LocalOptions.ILocalOptionUrlResolver,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;
@@ -98,7 +99,7 @@
                         field: "IsLocallyAvailable", title: "Aktiv", width: 112,
                         persistId: "isLocallyAvailable", 
                         attributes: { "class": "text-center" },
-                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${localOptionUrlResolver.resolveAutosaveUrl(parseInt(this.optionType.toString()))}" data-field="OptionId"> # } #`,
+                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-ng-click="ctrl.onAvailabilityChanged()" data-autosave="${localOptionUrlResolver.resolveAutosaveUrl(parseInt(this.optionType.toString()))}" data-field="OptionId"> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -140,14 +141,20 @@
                     } as any
                 ]
             };
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
                 });
             }
         }
+
+        onAvailabilityChanged() {
+            this.inMemoryCacheService.clear();
+        }
+
         //NOTE: Referenced from kendo configuration above - static analysis will say it is unused
-        private editOption = (e: JQueryEventObject) => {
+        editOption = (e: JQueryEventObject) => {
             e.preventDefault();
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));

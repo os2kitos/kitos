@@ -7,7 +7,7 @@
         mainGridOptions: IKendoGridOptions<Kitos.Models.ViewModel.ItContract.ItContractOverviewViewModel>;
         canCreate: boolean;
 
-        
+
         private readonly procurementInitiatedPropertyName = "ProcurementInitiated";
         private readonly criticalityIdPropertyName = "CriticalityId";
         private readonly contractTypeIdPropertyName = "ContractTypeId";
@@ -882,10 +882,10 @@
                                 .getOverviewAuthorization()
                         ],
                         orgUnits: [
-                            "$http", "user", "_",
-                            ($http, user, _) => $http
-                                .get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
-                                .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                            "_", "organizationUnitOdataService",
+                            (_, organizationUnitOdataService: Services.Organization.IOrganizationUnitOdataService) => organizationUnitOdataService
+                                .getOrganizationUnits()
+                                .then(result => _.addHierarchyLevelOnFlatAndSort(result, "Id", "ParentId"))
                         ],
                         uiState: [
                             "uiCustomizationStateService", (uiCustomizationStateService: Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Models.UICustomization.CustomizableKitosModule.ItContract)

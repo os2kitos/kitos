@@ -33,8 +33,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService) {
+        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService, inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -341,7 +341,7 @@
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", function($modalScope, $modalInstance, autofocus) {
+                        "$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
                             autofocus();
 
                             // edit or create-new mode
@@ -403,7 +403,7 @@
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
                             $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
-                            $modalScope.patch = function() {
+                            $modalScope.patch = function () {
                                 // don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
@@ -432,10 +432,11 @@
                                     url: "api/organizationUnit/" + id + "?organizationId=" + user.currentOrganizationId,
                                     data: data
                                 }).then((result) => {
-                                        notify.addSuccessMessage(name + " er ændret.");
+                                    notify.addSuccessMessage(name + " er ændret.");
 
-                                        $modalInstance.close(result.data.response);
-                                    },
+                                    $modalInstance.close(result.data.response);
+                                    inMemoryCacheService.clear();
+                                },
                                     (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
                                         $modalScope.submitting = false;
                                         if (error.data.msg.indexOf("Duplicate entry") > -1) {
@@ -446,7 +447,7 @@
                                     });
                             };
 
-                            $modalScope.post = function() {
+                            $modalScope.post = function () {
                                 // don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
@@ -473,10 +474,11 @@
                                     url: "api/organizationUnit/",
                                     data: data
                                 }).then((result) => {
-                                        notify.addSuccessMessage(name + " er gemt.");
+                                    notify.addSuccessMessage(name + " er gemt.");
 
-                                        $modalInstance.close(result.data.response);
-                                    },
+                                    $modalInstance.close(result.data.response);
+                                    inMemoryCacheService.clear();
+                                },
                                     (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
                                         $modalScope.submitting = false;
                                         if (error.data.msg.indexOf("Duplicate entry") > -1) {
@@ -487,7 +489,7 @@
                                     });
                             };
 
-                            $modalScope.new = function() {
+                            $modalScope.new = function () {
                                 autofocus();
 
                                 $modalScope.createNew = true;
@@ -498,7 +500,7 @@
                                 };
                             };
 
-                            $modalScope.delete = function() {
+                            $modalScope.delete = function () {
                                 //don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
@@ -508,23 +510,24 @@
                                     unit.id +
                                     "?organizationId=" +
                                     user.currentOrganizationId).then((result) => {
-                                        $modalInstance.close();
                                         notify.addSuccessMessage(unit.name + " er slettet!");
+                                        inMemoryCacheService.clear();
+                                        $modalInstance.close();
                                     },
-                                    (error) => {
-                                        $modalScope.submitting = false;
+                                        (error) => {
+                                            $modalScope.submitting = false;
 
-                                        notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
+                                            notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
                                                             Organisationsenheden bliver brugt som reference i en eller flere IT Systemer og/eller IT Kontrakter.<br /><br />
                                                             Fjern referencen for at kunne slette denne enhed.`);
-                                    });
+                                        });
 
                             };
 
-                            $modalScope.cancel = function() {
+                            $modalScope.cancel = function () {
                                 $modalInstance.dismiss("cancel");
                             };
-                            
+
                             function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {
 
                                 let existingChoice: { id: number; text: string };
@@ -554,8 +557,8 @@
                                         if (!!newElement) {
                                             $modalScope.orgUnit.newParent = newElement.id;
                                         }
-                                }
-                            };
+                                    }
+                                };
                             }
                         }
                     ]

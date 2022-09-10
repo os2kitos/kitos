@@ -12,7 +12,7 @@
         valueModifiedTo: any;
     }
 
-    export class ItContractsService implements IItContractsService{
+    export class ItContractsService implements IItContractsService {
 
         private handleServerError(error) {
             return new Services.Generic.ApiWrapper(this.$http).handleServerError(error);
@@ -62,33 +62,51 @@
         }
 
         getApplicableItContractOptions(organizationId: number): angular.IPromise<Models.ItContract.IItContractOptions> {
-            return this
-                    .$http
-                    .get<API.Models.IApiWrapper<any>>(`api/itcontract/available-options-in/${organizationId}`)
-                    .then(
-                        result => {
-                            var response = result.data as { response: Models.ItContract.IItContractOptions}
-                            return response.response;
-                        },
-                error => this.handleServerError(error)
-            );
-        }
+            const cacheKey = "contractOptions" + organizationId;
+            const result = this.inMemoryCacheService.getEntry<Models.ItContract.IItContractOptions>(cacheKey);
+            if (result != null) {
+                return this.$q.resolve(result);
+            }
 
-        getAvailableProcurementPlans(organizationId: number): angular.IPromise<Models.ItContract.IContractProcurementPlanDTO[]> {
-            return this.$http
-                .get<API.Models.IApiWrapper<any>>(`api/itcontract/applied-procurement-plans/${organizationId}`)
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(`api/itcontract/available-options-in/${organizationId}`)
                 .then(
                     result => {
-                        var response = result.data as { response: Models.ItContract.IContractProcurementPlanDTO[] }
-                        return response.response;
+                        var response = result.data as { response: Models.ItContract.IItContractOptions }
+                        const value = response.response;
+                        this.inMemoryCacheService.setEntry(cacheKey, value, Kitos.Shared.Time.Offset.compute(Kitos.Shared.Time.TimeUnit.Minutes, 10));
+                        return value;
                     },
                     error => this.handleServerError(error)
                 );
         }
 
-        static $inject: string[] = ["$http"];
+        getAvailableProcurementPlans(organizationId: number): angular.IPromise<Models.ItContract.IContractProcurementPlanDTO[]> {
+            const cacheKey = "procurementPlans_" + organizationId;
+            const result = this.inMemoryCacheService.getEntry<Models.ItContract.IContractProcurementPlanDTO[]>(cacheKey);
+            if (result != null) {
+                return this.$q.resolve(result);
+            }
+            return this.$http
+                .get<API.Models.IApiWrapper<any>>(`api/itcontract/applied-procurement-plans/${organizationId}`)
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.ItContract.IContractProcurementPlanDTO[] }
+                        const value = response.response;
+                        this.inMemoryCacheService.setEntry(cacheKey, value, Kitos.Shared.Time.Offset.compute(Kitos.Shared.Time.TimeUnit.Minutes, 5));
+                        return value;
+                    },
+                    error => this.handleServerError(error)
+                );
+        }
 
-        constructor(private readonly $http: IHttpServiceWithCustomConfig) {
+        static $inject: string[] = ["$http", "inMemoryCacheService", "$q"];
+
+        constructor(
+            private readonly $http: IHttpServiceWithCustomConfig,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            private readonly $q: ng.IQService) {
 
         }
 
