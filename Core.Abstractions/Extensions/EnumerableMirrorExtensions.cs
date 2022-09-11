@@ -52,7 +52,7 @@ namespace Core.Abstractions.Extensions
             var destinationState = destinationCollection.ToDictionary(computeDestinationItemId);
 
             //Find intersections and items which must be removed based on evaluation of the destination collection
-            foreach (var state in sourceState)
+            foreach (var state in sourceState.ToList())
             {
                 // Incoming item with same identity exists in the destination collection
                 if (destinationState.TryGetValue(state.Key, out var existingValue))
