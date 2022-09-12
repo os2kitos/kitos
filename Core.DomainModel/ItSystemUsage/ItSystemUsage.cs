@@ -73,15 +73,7 @@ namespace Core.DomainModel.ItSystemUsage
                 return today >= startDate.Date && today <= endDate;
             }
         }
-
-        /// <summary>
-        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActive"/>)
-        /// </summary>
-        /// <value>
-        ///   Active.
-        /// </value>
-        public bool Active { get; set; }
-
+        
         /// <summary>
         ///     When the system began. (indgået)
         /// </summary>
@@ -129,6 +121,14 @@ namespace Core.DomainModel.ItSystemUsage
         /// The local call system.
         /// </value>
         public string LocalCallName { get; set; }
+        /// <summary>
+        /// Gets or sets the life cycle status of this system usage.
+        /// </summary>
+        /// <value>
+        /// The life cycle status type of the system.
+        /// </value>
+        public LifeCycleStatusType? LifeCycleStatus { get; set; }
+
         /// <summary>
         /// Organization Unit responsible for this system usage.
         /// </summary>

@@ -66,6 +66,7 @@
     <Compile Include="Events\IDomainEvents.cs" />
     <Compile Include="Events\NamedEntityChangedNameEvent.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
+    <Compile Include="ItSystemUsage\LifeCycleStatusType.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="LocalOptions\LocalCriticalityType.cs" />
