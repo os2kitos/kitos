@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
@@ -605,7 +606,54 @@ namespace Tests.Unit.Core.DomainServices.Contract
             }
         }
 
-        //TODO: Role assignments
+        [Fact]
+        public void Apply_Can_Map_RoleAssignments()
+        {
+            //Arrange
+            var itContract = new ItContract
+            {
+                Rights = Many<int>().Select(right =>
+                {
+                    var roleId = A<int>();
+                    var userId = A<int>();
+                    return new ItContractRight
+                    {
+                        RoleId = roleId,
+                        Role = new ItContractRole
+                        {
+                            Id = roleId,
+                            Name = A<string>()
+                        },
+                        UserId = userId,
+                        User = new User
+                        {
+                            Id = userId,
+                            Name = A<string>(),
+                            LastName = A<string>(),
+                            Email = A<string>()
+                        }
+                    };
+                }).ToList()
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.Equal(itContract.Rights.Count, itContractOverviewReadModel.RoleAssignments.Count);
+            foreach (var itContractRight in itContract.Rights)
+            {
+                Assert.Contains(itContractOverviewReadModel.RoleAssignments,
+                    assignment =>
+                        assignment.Email == itContractRight.User.Email &&
+                        assignment.RoleId == itContractRight.Role.Id &&
+                        assignment.UserFullName == itContractRight.User.GetFullName() &&
+                        assignment.UserId == itContractRight.User.Id
+                );
+            }
+        }
+
 
         //TODO: DPRs
 
