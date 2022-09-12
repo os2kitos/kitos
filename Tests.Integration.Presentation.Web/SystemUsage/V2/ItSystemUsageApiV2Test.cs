@@ -397,7 +397,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 NumberOfExpectedUsers = new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
                 Validity = new ValidityWriteRequestDTO
                 {
-                    EnforcedValid = A<bool>(),
+                    LifeCycleStatus = A<LifeCycleStatusChoice?>(),
                     ValidFrom = DateTime.UtcNow.Date,
                     ValidTo = DateTime.UtcNow.Date.AddDays(Math.Abs(A<short>()))
                 },
@@ -1783,7 +1783,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     .GetValueOrDefault(),
                 Validity = new ValidityWriteRequestDTO
                 {
-                    EnforcedValid = A<bool>(),
+                    LifeCycleStatus = A<LifeCycleStatusChoice?>(),
                     ValidFrom = DateTime.UtcNow.Date,
                     ValidTo = DateTime.UtcNow.Date.AddDays(Math.Abs(A<short>()))
                 },

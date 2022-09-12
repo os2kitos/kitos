@@ -175,6 +175,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Validity = new ValidityResponseDTO
                 {
                     Valid = systemUsage.IsActiveAccordingToDateFields,
+                    LifeCycleStatus = MapLifeCycleStatus(systemUsage),
                     ValidFrom = systemUsage.Concluded,
                     ValidTo = systemUsage.ExpirationDate
                 }
@@ -218,6 +219,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)
         {
             return systemUsage.ArchiveDuty?.ToArchiveDutyChoice();
+        }
+
+        private static LifeCycleStatusChoice? MapLifeCycleStatus(ItSystemUsage systemUsage)
+        {
+            return systemUsage.LifeCycleStatus?.ToLifeCycleStatusChoice();
         }
 
         public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation systemRelation)

@@ -69,12 +69,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemParentName = A<string>();
             var systemParentDisabled = A<bool>();
 
-            var systemUsageActive = A<bool>();
-            var systemUsageExpirationDate = DateTime.Now.AddDays(-1);
             var systemUsageVersion = A<string>();
             var systemUsageLocalCallName = A<string>();
             var systemUsageLocalSystemId = A<string>();
-            var concluded = A<DateTime>();
+            var concluded = DateTime.UtcNow.AddDays(-A<int>());
+            var systemUsageExpirationDate = DateTime.UtcNow.AddDays(A<int>());
             var archiveDuty = A<ArchiveDutyTypes>();
             var riskAssessment = A<DataOptions>();
             var linkToDirectoryUrl = A<string>();
@@ -119,7 +118,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // System Usage changes
             var body = new
             {
-                Active = systemUsageActive,
                 ExpirationDate = systemUsageExpirationDate,
                 Version = systemUsageVersion,
                 LocalCallName = systemUsageLocalCallName,
@@ -138,7 +136,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
             var isHoldingDocument = A<bool>();
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
-
+             
             // Responsible Organization Unit
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId).DisposeAsync(); //Adding default organization as organization unit
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId).DisposeAsync(); //Using default organization as responsible organization unit
@@ -216,14 +214,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             // From System Usage
+            const bool expectSystemUsageIsActive = true;
+
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(organizationId, readModel.OrganizationId);
-            Assert.Equal(systemUsageActive, readModel.ActiveAccordingToValidityPeriod);
             Assert.Equal(systemUsageVersion, readModel.Version);
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.ObjectOwnerName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
-            Assert.Equal(concluded, readModel.Concluded);
+            Assert.True(readModel.Concluded.HasValue);
+            Assert.Equal(concluded.Date, readModel.Concluded.Value.Date);
+            Assert.Equal(expectSystemUsageIsActive, readModel.ActiveAccordingToValidityPeriod);
             Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);

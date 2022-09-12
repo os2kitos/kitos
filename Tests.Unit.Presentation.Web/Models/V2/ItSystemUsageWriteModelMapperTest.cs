@@ -186,7 +186,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
-            AssertPropertyContainsResetDataChange(mappedGeneralSection.EnforceActive);
+
+            Assert.Null(mappedGeneralSection.LifeCycleStatus);
             AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidFrom);
             AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidTo);
         }
@@ -615,7 +616,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noNotes,
             bool noSystemVersion,
             bool noNumberOfExpectedUsers,
-            bool noEnforceActive,
+            bool noLifeCycleStatus,
             bool noValidFrom,
             bool noValidTo,
             bool noMainContractUuid)
@@ -629,7 +630,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noNotes,
                 noSystemVersion,
                 noNumberOfExpectedUsers,
-                noEnforceActive,
+                noLifeCycleStatus,
                 noValidFrom,
                 noValidTo,
                 noMainContractUuid);
@@ -645,7 +646,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noNotes, generalSection.Notes.IsUnchanged);
             Assert.Equal(noSystemVersion, generalSection.SystemVersion.IsUnchanged);
             Assert.Equal(noNumberOfExpectedUsers, generalSection.NumberOfExpectedUsersInterval.IsUnchanged);
-            Assert.Equal(noEnforceActive, generalSection.EnforceActive.IsUnchanged);
+            Assert.Equal(noLifeCycleStatus, generalSection.LifeCycleStatus.IsUnchanged);
             Assert.Equal(noValidFrom, generalSection.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, generalSection.ValidTo.IsUnchanged);
             Assert.Equal(noMainContractUuid, generalSection.MainContractUuid.IsUnchanged);
@@ -661,7 +662,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noNotes,
             bool noSystemVersion,
             bool noNumberOfExpectedUsers,
-            bool noEnforceActive,
+            bool noLifeCycleStatus,
             bool noValidFrom,
             bool noValidTo,
             bool noMainContractUuid)
@@ -675,7 +676,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noNotes,
                 noSystemVersion,
                 noNumberOfExpectedUsers,
-                noEnforceActive,
+                noLifeCycleStatus,
                 noValidFrom,
                 noValidTo,
                 noMainContractUuid);
@@ -691,7 +692,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(generalSection.Notes.HasChange);
             Assert.True(generalSection.SystemVersion.HasChange);
             Assert.True(generalSection.NumberOfExpectedUsersInterval.HasChange);
-            Assert.True(generalSection.EnforceActive.HasChange);
+            Assert.True(generalSection.LifeCycleStatus.HasChange);
             Assert.True(generalSection.ValidFrom.HasChange);
             Assert.True(generalSection.ValidTo.HasChange);
             Assert.True(generalSection.MainContractUuid.HasChange);
@@ -1237,11 +1238,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private static void AssertCommonGeneralDataWriteProperties(GeneralDataWriteRequestDTO input, UpdatedSystemUsageGeneralProperties output)
         {
+
             Assert.Equal(input.LocalCallName, AssertPropertyContainsDataChange(output.LocalCallName));
             Assert.Equal(input.LocalSystemId, AssertPropertyContainsDataChange(output.LocalSystemId));
             Assert.Equal(input.SystemVersion, AssertPropertyContainsDataChange(output.SystemVersion));
             Assert.Equal(input.DataClassificationUuid, AssertPropertyContainsDataChange(output.DataClassificationUuid));
-            Assert.Equal(input.Validity?.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceActive));
+            Assert.Equal(input.Validity?.LifeCycleStatus, AssertPropertyContainsDataChange(output.LifeCycleStatus)?.ToLifeCycleStatusChoice());
             Assert.Equal(input.Validity?.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
             Assert.Equal(input.Validity?.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.Notes));

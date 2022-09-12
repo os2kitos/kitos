@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
 
 namespace Presentation.Web.Models.API.V1
@@ -45,17 +46,14 @@ namespace Presentation.Web.Models.API.V1
         public IEnumerable<ItContractSystemDTO> Contracts { get; set; }
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
-        public string ObjectOwnerFullName
-        {
-            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
-        }
+        public string ObjectOwnerFullName => ObjectOwnerName + " " + ObjectOwnerLastName;
+
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
-
-        public bool? Active { get; set; }
-
+        
         public bool ActiveAccordingToValidityPeriod { get; set; }
+        public LifeCycleStatusType LifeCycleStatus { get; set; }
 
         public DateTime? Concluded { get; set; }
 
