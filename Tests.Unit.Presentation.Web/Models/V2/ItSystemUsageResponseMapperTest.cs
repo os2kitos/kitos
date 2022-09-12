@@ -80,7 +80,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentity(itSystemUsage.MainContract.ItContract, dto.General.MainContract);
             Assert.Equal(itSystemUsage.Concluded, dto.General.Validity.ValidFrom);
             Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity.ValidTo);
-            Assert.Equal(itSystemUsage.Active, dto.General.Validity.EnforcedValid);
             Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.Valid);
         }
 
@@ -579,7 +578,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.Version = A<string>();
             itSystemUsage.ItSystemCategories = new ItSystemCategories { Name = A<string>(), Uuid = A<Guid>() };
             itSystemUsage.MainContract = new ItContractItSystemUsage { ItContract = new ItContract() { Name = A<string>(), Uuid = A<Guid>() } };
-            itSystemUsage.Active = A<bool>();
             itSystemUsage.Concluded = A<DateTime>();
             itSystemUsage.ExpirationDate = A<DateTime>();
         }

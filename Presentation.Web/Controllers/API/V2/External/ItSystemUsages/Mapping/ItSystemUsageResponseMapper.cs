@@ -174,7 +174,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 SystemVersion = systemUsage.Version,
                 Validity = new ValidityResponseDTO
                 {
-                    EnforcedValid = systemUsage.Active,
                     Valid = systemUsage.IsActiveAccordingToDateFields,
                     ValidFrom = systemUsage.Concluded,
                     ValidTo = systemUsage.ExpirationDate

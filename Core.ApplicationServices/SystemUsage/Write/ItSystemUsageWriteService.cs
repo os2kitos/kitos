@@ -491,7 +491,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.Notes, (systemUsage, notes) => systemUsage.Note = notes))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.NumberOfExpectedUsersInterval, UpdateExpectedUsersInterval))
-                .Bind(usage => usage.WithOptionalUpdate(generalProperties.EnforceActive, (systemUsage, enforceActive) => systemUsage.Active = enforceActive.GetValueOrFallback(false)))
                 .Bind(usage => UpdateValidityPeriod(usage, generalProperties))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.MainContractUuid, UpdateMainContract));
         }

@@ -240,7 +240,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(generalProperties.LocalSystemId.NewValue, itSystemUsage.LocalSystemId);
             Assert.Equal(generalProperties.SystemVersion.NewValue, itSystemUsage.Version);
             Assert.Equal(generalProperties.Notes.NewValue, itSystemUsage.Note);
-            Assert.Equal(generalProperties.EnforceActive.NewValue.Value, itSystemUsage.Active);
             Assert.Equal(generalProperties.DataClassificationUuid.NewValue.Value, itSystemUsage.ItSystemCategories.Uuid);
             Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, itSystemUsage.Concluded);
             Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, itSystemUsage.ExpirationDate);
@@ -448,7 +447,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             itSystemUsage.LocalSystemId = localSystemId;
             itSystemUsage.Version = version;
             itSystemUsage.Note = note;
-            itSystemUsage.Active = active;
             itSystemUsage.Concluded = concluded;
             itSystemUsage.ExpirationDate = expirationDate;
             itSystemUsage.UserCount = userCount;
@@ -475,7 +473,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(localSystemId, itSystemUsage.LocalSystemId);
             Assert.Equal(version, itSystemUsage.Version);
             Assert.Equal(note, itSystemUsage.Note);
-            Assert.Equal(active, itSystemUsage.Active);
             Assert.Equal(expirationDate, itSystemUsage.ExpirationDate);
             Assert.Equal(concluded, itSystemUsage.Concluded);
             Assert.Equal(userCount, itSystemUsage.UserCount);
@@ -2126,7 +2123,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             }
             else
             {
-                Assert.Equal(generalProperties.EnforceActive.NewValue.Value, actual.Active);
                 Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, actual.Concluded);
                 Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, actual.ExpirationDate);
             }

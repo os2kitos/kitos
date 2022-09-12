@@ -17,7 +17,6 @@ namespace Tests.Unit.Presentation.Web.Helpers
                 SourceEntity = new ItSystemUsage
                 {
                     Id = Fixture.Create<int>(),
-                    Active = sourceIsActive,
                     Concluded = sourceConcluded,
                     ExpirationDate = sourceExpirationDate
                 }

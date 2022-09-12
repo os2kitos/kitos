@@ -8,9 +8,10 @@ namespace Core.DomainModel.ItSystemUsage
 {
     public enum LifeCycleStatusType
     {
-        NotInUse = 0,
-        PhasingIn = 1,
-        Operational = 2,
-        PhasingOut = 3
+        Undecided = 0,
+        NotInUse = 1,
+        PhasingIn = 2,
+        Operational = 3,
+        PhasingOut = 4
     }
 }
