@@ -23,7 +23,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         {
             var query = responsibleOrganizationUnitId == null
                 ? _readModelsService.GetByOrganizationId(organizationId)
-                : _readModelsService.GetByOrganizationAndResponsibleOrganizationUnitId(organizationId,
+                : _readModelsService.GetByOrganizationIdAndIdOrgOrganizationUnitSubTree(organizationId,
                     responsibleOrganizationUnitId.Value);
 
             return query.Match(onSuccess: Ok, onFailure: FromOperationError);

@@ -21,17 +21,21 @@ namespace Core.ApplicationServices.Contract.ReadModels
         public Result<IQueryable<ItContractOverviewReadModel>, OperationError> GetByOrganizationId(int organizationId)
         {
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
+            {
                 return new OperationError(OperationFailure.Forbidden);
+            }
 
             return Result<IQueryable<ItContractOverviewReadModel>, OperationError>.Success(_repository.GetByOrganizationId(organizationId));
         }
 
-        public Result<IQueryable<ItContractOverviewReadModel>, OperationError> GetByOrganizationAndResponsibleOrganizationUnitId(int organizationId, int responsibleOrganizationUnit)
+        public Result<IQueryable<ItContractOverviewReadModel>, OperationError> GetByOrganizationIdAndIdOrgOrganizationUnitSubTree(int organizationId, int organizationUnitId)
         {
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
+            {
                 return new OperationError(OperationFailure.Forbidden);
+            }
 
-            return Result<IQueryable<ItContractOverviewReadModel>, OperationError>.Success(_repository.GetByOrganizationAndResponsibleOrganizationUnitIncludingSubTree(organizationId, responsibleOrganizationUnit));
+            return Result<IQueryable<ItContractOverviewReadModel>, OperationError>.Success(_repository.GetByOrganizationAndResponsibleOrganizationUnitIncludingSubTree(organizationId, organizationUnitId));
         }
     }
 }

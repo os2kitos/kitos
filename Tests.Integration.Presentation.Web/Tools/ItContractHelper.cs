@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.Read;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Xunit;
@@ -157,6 +159,14 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItContractRole>();
+        }
+
+        public static async Task<IEnumerable<ItContractOverviewReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItContractOverviewReadModels?$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItContractOverviewReadModel>();
         }
     }
 }

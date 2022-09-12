@@ -11,7 +11,10 @@ using Infrastructure.Services.DataAccess;
 
 namespace Core.BackgroundJobs.Model
 {
-    public abstract class BaseContextToReadModelChangeScheduler<TReadModel, TModel> : IAsyncBackgroundJob where TReadModel : IReadModel<TModel>
+    public abstract class BaseContextToReadModelChangeScheduler<TReadModel, TModel> : IAsyncBackgroundJob where
+        TReadModel : 
+        class /*class constraint is required for EF expressions to accept queries on interface type*/, 
+        IReadModel<TModel>
     {
         private readonly IPendingReadModelUpdateRepository _updateRepository;
         private readonly ITransactionManager _transactionManager;
