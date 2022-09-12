@@ -3,15 +3,15 @@ using System.Linq;
 using System.Net;
 using Core.DomainModel;
 using System.Threading.Tasks;
-using Core.DomainModel.ItContract.Read;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.GDPR;
 using Presentation.Web.Models.API.V1.SystemRelations;
+using Tests.Integration.Presentation.Web.Tools.External.Rights;
+using Tests.Integration.Presentation.Web.Tools.Model;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Extensions;
 
@@ -66,8 +66,6 @@ namespace Tests.Integration.Presentation.Web.Contract
         [Fact]
         public async Task ReadModels_Contain_Correct_Content()
         {
-            //MapRoleAssignments(source, destination);
-
             //Arrange
             var organizationId = _organization.Id;
             var name = CreateName();
@@ -139,6 +137,13 @@ namespace Tests.Integration.Presentation.Web.Contract
             await ItContractHelper.AddItSystemUsage(itContract.Id, usage1.Id, organizationId);
             await ItContractHelper.AddItSystemUsage(itContract.Id, usage2.Id, organizationId);
 
+            var user1Id = await HttpApi.CreateOdataUserAsync(new ApiUserDTO() { Email = $"{A<Guid>():N}@kitos.dk", Name = A<string>(), LastName = A<string>() }, OrganizationRole.User, organizationId);
+            var user2Id = await HttpApi.CreateOdataUserAsync(new ApiUserDTO() { Email = $"{A<Guid>():N}@kitos.dk", Name = A<string>(), LastName = A<string>() }, OrganizationRole.User, organizationId);
+            var role1 = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ContractRoles, organizationId)).RandomItem();
+            var role2 = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ContractRoles, organizationId)).RandomItem();
+            await RightsHelper.AddUserRole(user1Id, organizationId, RightsType.ItContractRights, idOfRoleToUse: role1.Id, objectId: itContract.Id);
+            await RightsHelper.AddUserRole(user2Id, organizationId, RightsType.ItContractRights, idOfRoleToUse: role2.Id, objectId: itContract.Id);
+
             //Act
             await ReadModelTestTools.WaitForReadModelQueueDepletion();
 
@@ -186,6 +191,11 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Equal(economy.AuditStatus == TrafficLight.Yellow ? 1 : 0, readModel.AuditStatusYellow);
             Assert.Equal(2, readModel.NumberOfAssociatedSystemRelations);
             AssertCsv(readModel.ItSystemUsagesCsv, itSystem1.Name, itSystem2.Name);
+            Assert.Equal(2, readModel.RoleAssignments.Count);
+            var roleAssignment1 = Assert.Single(readModel.RoleAssignments.Where(x => x.RoleId == role1.Id));
+            Assert.Equal(user1Id, roleAssignment1.UserId);
+            var roleAssignment2 = Assert.Single(readModel.RoleAssignments.Where(x => x.RoleId == role2.Id));
+            Assert.Equal(user2Id, roleAssignment2.UserId);
         }
 
         private static void AssertCsv(string csv, params string[] expectedNames)
