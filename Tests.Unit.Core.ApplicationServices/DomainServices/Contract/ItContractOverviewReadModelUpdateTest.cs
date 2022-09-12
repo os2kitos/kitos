@@ -4,6 +4,7 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
@@ -687,7 +688,43 @@ namespace Tests.Unit.Core.DomainServices.Contract
             Assert.Equal(string.Join(", ", expectedAgreements.Select(x => x.Name)), itContractOverviewReadModel.DataProcessingAgreementsCsv);
         }
 
-        //TODO: System usages
+        [Fact]
+        public void Apply_Can_Map_ItSystemUsages()
+        {
+            //Arrange
+            var systemUsages = Many<string>().Select(name => new ItContractItSystemUsage() { ItSystemUsage = new ()
+            {
+                Id = A<int>(),
+                ItSystem = new ItSystem()
+                {
+                    Id = A<int>(),
+                    Name = name
+                }
+            }}).ToList();
+
+            var itContract = new ItContract
+            {
+                AssociatedSystemUsages = systemUsages
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.Equal(systemUsages.Count, itContractOverviewReadModel.ItSystemUsages.Count);
+            foreach (var systemUsage in systemUsages)
+            {
+                Assert.Contains(itContractOverviewReadModel.ItSystemUsages,
+                    rm =>
+                        rm.ItSystemUsageId== systemUsage.ItSystemUsage.Id &&
+                        rm.ItSystemUsageSystemUuid == systemUsage.ItSystemUsage.ItSystem.Uuid.ToString("D") &&
+                        rm.ItSystemUsageName == systemUsage.ItSystemUsage.ItSystem.Name
+                );
+            }
+            Assert.Equal(string.Join(", ", systemUsages.Select(x => x.ItSystemUsage.ItSystem.Name)), itContractOverviewReadModel.ItSystemUsagesCsv);
+            Assert.Equal(string.Join(", ", systemUsages.Select(x => x.ItSystemUsage.ItSystem.Uuid.ToString("D"))), itContractOverviewReadModel.ItSystemUsagesSystemUuidCsv);
+        }
 
         //TODO: Relations
 
@@ -858,9 +895,5 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 Assert.Equal(itContract.TerminationDeadline.Name, itContractOverviewReadModel.TerminationDeadlineName);
             }
         }
-
-
-        //TODO: removals in collections
-        //TODO: Additions to collections
     }
 }
