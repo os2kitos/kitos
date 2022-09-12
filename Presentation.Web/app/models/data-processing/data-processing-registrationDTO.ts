@@ -7,6 +7,8 @@
     export interface IDataProcessingRegistrationDTO {
         id: number,
         name: string,
+        lastChangedAt: Date,
+        lastChangedByName: string,
         references: Array<IDataProcessingReferenceDTO>;
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
