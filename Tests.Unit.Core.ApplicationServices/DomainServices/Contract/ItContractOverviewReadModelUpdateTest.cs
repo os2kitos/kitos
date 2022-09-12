@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
@@ -955,8 +956,47 @@ namespace Tests.Unit.Core.DomainServices.Contract
             Assert.Equal(expectedResult, itContractOverviewReadModel.Duration);
         }
 
+        [Fact]
+        public void Apply_Can_Map_Economy()
+        {
+            //Arrange
+            var itContract = new ItContract
+            {
+                InternEconomyStreams = Many<int>().Select(_ => new EconomyStream
+                {
+                    Acquisition = 1000000,
+                    Other = 1000000,
+                    Operation = 1000000,
+                }).ToList(), //Add the internals to ensure they do NOT affect the result of the computation if present
+                ExternEconomyStreams = Many<int>().Select(_ => new EconomyStream
+                {
+                    Acquisition = A<int>() % 1000,
+                    Other = A<int>() % 1000,
+                    Operation = A<int>() % 1000,
+                    AuditStatus = A<TrafficLight>(),
+                    AuditDate = A<DateTime>()
+                }).ToList()
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
 
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
 
-        //TODO: Economy streams
+            //Assert
+            Assert.Equal(itContract.ExternEconomyStreams.Sum(x => x.Operation), itContractOverviewReadModel.AccumulatedOperationCost);
+            Assert.Equal(itContract.ExternEconomyStreams.Sum(x => x.Other), itContractOverviewReadModel.AccumulatedOtherCost);
+            Assert.Equal(itContract.ExternEconomyStreams.Sum(x => x.Acquisition), itContractOverviewReadModel.AccumulatedAcquisitionCost);
+            Assert.Equal(itContract.ExternEconomyStreams.OrderByDescending(x => x.AuditDate.GetValueOrDefault()).First().AuditDate?.Date, itContractOverviewReadModel.LatestAuditDate);
+            var sourceAuditStatuses = itContract.ExternEconomyStreams.GroupBy(x => x.AuditStatus).ToDictionary(x => x.Key, x => x.Count());
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Green,itContractOverviewReadModel.AuditStatusGreen);
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Red,itContractOverviewReadModel.AuditStatusRed);
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Yellow,itContractOverviewReadModel.AuditStatusYellow);
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.White,itContractOverviewReadModel.AuditStatusWhite);
+        }
+
+        private static void AssertAuditStatus(Dictionary<TrafficLight, int> sourceAuditStatuses, TrafficLight statusType, int mappedResult)
+        {
+            Assert.Equal(sourceAuditStatuses.ContainsKey(statusType) ? sourceAuditStatuses[statusType] : 0, mappedResult);
+        }
     }
 }
