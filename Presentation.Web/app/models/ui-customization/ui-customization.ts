@@ -166,8 +166,9 @@
                     const visitor = new Services.UICustomization.CountNodesByAvailableStateUiCustomizationTreeVisitor(true);
                     this.acceptChildren(visitor);
 
-                    const newParentState = visitor.counter !== 0;
-                    this.changeAvailableState(this.key, newParentState);
+                    if (visitor.counter === 0 && this.editable) {
+                        this.changeAvailableState(this.key, false);
+                    }
                 }
             } else {
                 throw new Error(`Cannot change state of descendant ${fullKey} if ancestor with key ${this.key} is unavailable`);
