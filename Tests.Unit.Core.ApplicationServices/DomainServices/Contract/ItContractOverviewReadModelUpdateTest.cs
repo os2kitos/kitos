@@ -5,6 +5,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
@@ -18,10 +19,10 @@ namespace Tests.Unit.Core.DomainServices.Contract
     public class ItContractOverviewReadModelUpdateTest : WithAutoFixture
     {
         private readonly ItContractOverviewReadModelUpdate _sut;
-        private Mock<IGenericRepository<ItContractOverviewRoleAssignmentReadModel>> _roleAssignmentReposioryMock;
-        private Mock<IGenericRepository<ItContractOverviewReadModelDataProcessingAgreement>> _dprAssignmentRepositoryMock;
-        private Mock<IGenericRepository<ItContractOverviewReadModelItSystemUsage>> _systemUsageAssignmentRepositoryMock;
-        private Mock<IGenericRepository<ItContractOverviewReadModelSystemRelation>> _associatedSystemRelationRepositoryMock;
+        private readonly Mock<IGenericRepository<ItContractOverviewRoleAssignmentReadModel>> _roleAssignmentReposioryMock;
+        private readonly Mock<IGenericRepository<ItContractOverviewReadModelDataProcessingAgreement>> _dprAssignmentRepositoryMock;
+        private readonly Mock<IGenericRepository<ItContractOverviewReadModelItSystemUsage>> _systemUsageAssignmentRepositoryMock;
+        private readonly Mock<IGenericRepository<ItContractOverviewReadModelSystemRelation>> _associatedSystemRelationRepositoryMock;
 
         public ItContractOverviewReadModelUpdateTest()
         {
@@ -692,15 +693,18 @@ namespace Tests.Unit.Core.DomainServices.Contract
         public void Apply_Can_Map_ItSystemUsages()
         {
             //Arrange
-            var systemUsages = Many<string>().Select(name => new ItContractItSystemUsage() { ItSystemUsage = new ()
+            var systemUsages = Many<string>().Select(name => new ItContractItSystemUsage()
             {
-                Id = A<int>(),
-                ItSystem = new ItSystem()
+                ItSystemUsage = new()
                 {
                     Id = A<int>(),
-                    Name = name
+                    ItSystem = new ItSystem()
+                    {
+                        Id = A<int>(),
+                        Name = name
+                    }
                 }
-            }}).ToList();
+            }).ToList();
 
             var itContract = new ItContract
             {
@@ -717,7 +721,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
             {
                 Assert.Contains(itContractOverviewReadModel.ItSystemUsages,
                     rm =>
-                        rm.ItSystemUsageId== systemUsage.ItSystemUsage.Id &&
+                        rm.ItSystemUsageId == systemUsage.ItSystemUsage.Id &&
                         rm.ItSystemUsageSystemUuid == systemUsage.ItSystemUsage.ItSystem.Uuid.ToString("D") &&
                         rm.ItSystemUsageName == systemUsage.ItSystemUsage.ItSystem.Name
                 );
@@ -726,7 +730,40 @@ namespace Tests.Unit.Core.DomainServices.Contract
             Assert.Equal(string.Join(", ", systemUsages.Select(x => x.ItSystemUsage.ItSystem.Uuid.ToString("D"))), itContractOverviewReadModel.ItSystemUsagesSystemUuidCsv);
         }
 
-        //TODO: Relations
+        [Fact]
+        public void Apply_Can_Map_SystemRelations()
+        {
+            //Arrange
+            var systemRelations = Many<int>().Select(relationId => new SystemRelation(new ItSystemUsage())
+            {
+                Id = relationId,
+                FromSystemUsageId = A<int>(),
+                ToSystemUsageId = A<int>(),
+
+            }).ToList();
+
+            var itContract = new ItContract
+            {
+                AssociatedSystemRelations = systemRelations
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.Equal(systemRelations.Count, itContractOverviewReadModel.NumberOfAssociatedSystemRelations);
+            Assert.Equal(systemRelations.Count, itContractOverviewReadModel.SystemRelations.Count);
+            foreach (var systemRelation in systemRelations)
+            {
+                Assert.Contains(itContractOverviewReadModel.SystemRelations,
+                    rm =>
+                        rm.RelationId == systemRelation.Id &&
+                        rm.FromSystemUsageId == systemRelation.FromSystemUsageId &&
+                        rm.ToSystemUsageId == systemRelation.ToSystemUsageId
+                );
+            }
+        }
 
         [Theory]
         [InlineData(true)]
