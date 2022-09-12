@@ -9,7 +9,7 @@ class Select2TagWrapper {
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
 
-        this.element = $(this.cssSelector);
+        this.element = $cssSelector(this.cssSelector);
         this.options = element.all(by.css(".select2-results-dept-0"));
         this.selectedOptionsSelector = this.cssSelector + " .select2-search-choice";
     }
@@ -43,7 +43,7 @@ class Select2TagWrapper {
      * @return Promise that resolves to a boolean indicating if the dropdown is disabled or not.
      */
     public isDisabled(): webdriver.promise.Promise<boolean> {
-        return $(this.cssSelector + ".select2-container-disabled").isPresent();
+        return $cssSelector(this.cssSelector + ".select2-container-disabled").isPresent();
     }
 
     /**
