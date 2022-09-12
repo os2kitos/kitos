@@ -65,7 +65,57 @@ namespace Tests.Unit.Core.DomainServices.Contract
             Assert.Equal(itContract.Name, itContractOverviewReadModel.Name);
         }
 
-        //TODO: IsActive()
+        [Fact]
+        public void Apply_Can_Map_IsActive_To_False_When_Invalid_Due_To_Date_Period()
+        {
+            //Arrange
+            var itContract = new ItContract
+            {
+                Concluded = DateTime.Today.AddDays(1)
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.False(itContractOverviewReadModel.IsActive);
+        }
+
+        [Fact]
+        public void Apply_Can_Map_IsActive_To_True_When_Enforced_And_Invalid_Due_To_Date_Period()
+        {
+            //Arrange
+            var itContract = new ItContract
+            {
+                Concluded = DateTime.Today.AddDays(1),
+                Active = true
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.True(itContractOverviewReadModel.IsActive);
+        }
+
+        [Fact]
+        public void Apply_Can_Map_IsActive_To_True_Due_To_Date_Period()
+        {
+            //Arrange
+            var itContract = new ItContract
+            {
+                Concluded = DateTime.Today.AddDays(-1)
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.True(itContractOverviewReadModel.IsActive);
+        }
 
         [Fact]
         public void Apply_Can_Map_ContractId()
@@ -200,7 +250,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
             //Arrange
             var itContract = new ItContract
             {
-                LastChangedByUser = new User()
+                LastChangedByUser = new User
                 {
                     Name = A<string>(),
                     LastName = A<string>()
