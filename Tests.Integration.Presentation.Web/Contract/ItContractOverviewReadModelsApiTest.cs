@@ -3,12 +3,15 @@ using System.Linq;
 using System.Net;
 using Core.DomainModel;
 using System.Threading.Tasks;
+using Core.DomainModel.ItContract.Read;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.GDPR;
+using Presentation.Web.Models.API.V1.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Extensions;
 
@@ -65,16 +68,16 @@ namespace Tests.Integration.Presentation.Web.Contract
         {
             //MapRoleAssignments(source, destination);
 
-            //MapSystemUsages(source, destination);
-
-            ////Relations
-            //MapSystemRelations(source, destination);
-
             //Arrange
             var organizationId = _organization.Id;
             var name = CreateName();
+            var itSystem1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organizationId, AccessModifier.Public);
+            var itSystem2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organizationId, AccessModifier.Public);
+            var usage1 = await ItSystemHelper.TakeIntoUseAsync(itSystem1.Id, organizationId);
+            var usage2 = await ItSystemHelper.TakeIntoUseAsync(itSystem2.Id, organizationId);
+
             var dpr1 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName());
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id,YesNoIrrelevantOption.YES).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, YesNoIrrelevantOption.YES).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             var dpr2 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName());
             await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr2.Id, YesNoIrrelevantOption.YES).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName()); //not included since it is not an agreement
@@ -91,7 +94,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             var optionExtend = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.OptionExtendTypes, organizationId)).RandomItem();
             var terminationDeadline = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.TerminationDeadlineTypes, organizationId)).RandomItem();
             var referenceDto = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), $"https//a{A<int>()}b.dk", setTargetId: x => x.ItContract_Id = itContract.Id);
-            var economy = await ItContractHelper.CreateExternEconomyStream(itContract.Id,organizationUnit.Id,A<int>(),A<int>(),A<int>(),A<DateTime>(),A<TrafficLight>());
+            var economy = await ItContractHelper.CreateExternEconomyStream(itContract.Id, organizationUnit.Id, A<int>(), A<int>(), A<int>(), A<DateTime>(), A<TrafficLight>());
             var changes = new
             {
                 ItContractId = A<string>(),
@@ -121,6 +124,20 @@ namespace Tests.Integration.Presentation.Web.Contract
             await ItContractHelper.PatchContract(itContract.Id, organizationId, changes);
             await ItContractHelper.SendAssignDataProcessingRegistrationAsync(itContract.Id, dpr1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             await ItContractHelper.SendAssignDataProcessingRegistrationAsync(itContract.Id, dpr2.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO
+            {
+                ContractId = itContract.Id,
+                FromUsageId = usage2.Id,
+                ToUsageId = usage1.Id
+            });
+            await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO
+            {
+                ContractId = itContract.Id,
+                FromUsageId = usage1.Id,
+                ToUsageId = usage2.Id
+            });
+            await ItContractHelper.AddItSystemUsage(itContract.Id, usage1.Id, organizationId);
+            await ItContractHelper.AddItSystemUsage(itContract.Id, usage2.Id, organizationId);
 
             //Act
             await ReadModelTestTools.WaitForReadModelQueueDepletion();
@@ -158,10 +175,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.NotNull(readModel.LastEditedByUserId);
             Assert.NotNull(readModel.LastEditedByUserName);
             Assert.NotNull(readModel.LastEditedAtDate);
-            var dpas = readModel.DataProcessingAgreementsCsv.Split(new[]{", "},StringSplitOptions.RemoveEmptyEntries).ToList();
-            Assert.Equal(2,dpas.Count);
-            Assert.Contains(dpr1.Name, dpas);
-            Assert.Contains(dpr2.Name,dpas);
+            AssertCsv(readModel.DataProcessingAgreementsCsv, dpr1.Name, dpr2.Name);
             Assert.Equal(economy.Acquisition, readModel.AccumulatedAcquisitionCost);
             Assert.Equal(economy.Operation, readModel.AccumulatedOperationCost);
             Assert.Equal(economy.Other, readModel.AccumulatedOtherCost);
@@ -170,6 +184,17 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Equal(economy.AuditStatus == TrafficLight.White ? 1 : 0, readModel.AuditStatusWhite);
             Assert.Equal(economy.AuditStatus == TrafficLight.Red ? 1 : 0, readModel.AuditStatusRed);
             Assert.Equal(economy.AuditStatus == TrafficLight.Yellow ? 1 : 0, readModel.AuditStatusYellow);
+            Assert.Equal(2, readModel.NumberOfAssociatedSystemRelations);
+            AssertCsv(readModel.ItSystemUsagesCsv, itSystem1.Name, itSystem2.Name);
+        }
+
+        private static void AssertCsv(string csv, params string[] expectedNames)
+        {
+            var dpas = csv.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            Assert.Equal(expectedNames.Length, dpas.Count);
+
+            foreach (var expectedName in expectedNames)
+                Assert.Contains(expectedName, dpas);
         }
 
         private static void AssertReferencedEntity(int idFromModel, string nameFromModel, int? idFromReadModel, string nameFromReadModel)
