@@ -163,8 +163,8 @@
                 child.changeAvailableState(fullKey, newState);
 
                 if (this.subtreeIsComplete) {
-                    const visitor = new Services.UICustomization.CountNodeStatesFromUiCustomizationTreeVisitor(true);
-                    this.acceptChildren(visitor, this);
+                    const visitor = new Services.UICustomization.CountNodesByAvailableStateUiCustomizationTreeVisitor(true);
+                    this.acceptChildren(visitor);
 
                     const newParentState = visitor.counter !== 0;
                     this.changeAvailableState(this.key, newParentState);
@@ -176,11 +176,11 @@
 
         accept(visitor: IUICustomizationTreeVisitor): void {
             visitor.visitNode(this);
-            this.children.forEach(child => child.accept(visitor));
+            this.acceptChildren(visitor);
         }
 
-        acceptChildren(visitor: IUICustomizationTreeVisitor, node: IUINode): void {
-            node.children.forEach(child => child.accept(visitor));
+        private acceptChildren(visitor: IUICustomizationTreeVisitor): void {
+            this.children.forEach(child => child.accept(visitor));
         }
         
         get children(): IUINode[] { return this._children; }

@@ -30,12 +30,12 @@
         visitModule(node: Models.UICustomization.CustomizedModuleUI) { /* We don't care much for modules - we care about the nodes */ }
     }
 
-    export class CountNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
+    export class CountNodesByAvailableStateUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
         private _nodesByStateCounter: number = 0;
-        private _state: boolean;
+        private _matchAvailableState: boolean;
 
-        constructor(state: boolean) {
-            this._state = state;
+        constructor(matchAvailableState: boolean) {
+            this._matchAvailableState = matchAvailableState;
         }
 
         get counter() {
@@ -43,8 +43,8 @@
         }
 
         visitNode(node: Models.UICustomization.UINode) {
-            if (node.available === this._state) {
-                this._nodesByStateCounter += 1;
+            if (node.available === this._matchAvailableState) {
+                this._nodesByStateCounter++;
             }
         }
 
