@@ -800,8 +800,6 @@ namespace Tests.Unit.Core.DomainServices.Contract
             }
         }
 
-        //TODO: Economy streams
-
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -865,8 +863,6 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 Assert.Equal(itContract.PaymentFreqency.Name, itContractOverviewReadModel.PaymentFrequencyName);
             }
         }
-
-        //TODO: Duration
 
         [Theory]
         [InlineData(true)]
@@ -932,5 +928,35 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 Assert.Equal(itContract.TerminationDeadline.Name, itContractOverviewReadModel.TerminationDeadlineName);
             }
         }
+
+        [Theory]
+        [InlineData(false, null, null, "")]
+        [InlineData(true, null, null, "Løbende")]
+        [InlineData(false, 2, null, "2 år")]
+        [InlineData(false, 2, 1, "2 år og 1 måned")]
+        [InlineData(false, 2, 3, "2 år og 3 måneder")]
+        [InlineData(false, null, 3, "3 måneder")]
+        [InlineData(false, null, 1, "1 måned")]
+        public void Apply_Can_Map_Duration(bool ongoing, int? years, int? months, string expectedResult)
+        {
+            //Arrange
+            var itContract = new ItContract
+            {
+                DurationOngoing = ongoing,
+                DurationYears = years,
+                DurationMonths = months
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.Equal(expectedResult, itContractOverviewReadModel.Duration);
+        }
+
+
+
+        //TODO: Economy streams
     }
 }
