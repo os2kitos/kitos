@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Organization;
@@ -654,8 +655,37 @@ namespace Tests.Unit.Core.DomainServices.Contract
             }
         }
 
+        [Fact]
+        public void Apply_Can_Map_DataProcessingRegistrations()
+        {
+            //Arrange
+            var dataProcessingRegistrations = Many<string>().Select(name => new DataProcessingRegistration { Id = A<int>(), Name = name }).ToList();
 
-        //TODO: DPRs
+            //Set all but the first to concluded
+            var expectedAgreements = dataProcessingRegistrations.Skip(1).ToList();
+            expectedAgreements.ForEach(x => x.SetIsAgreementConcluded(YesNoIrrelevantOption.YES));
+
+            var itContract = new ItContract
+            {
+                DataProcessingRegistrations = dataProcessingRegistrations
+            };
+            var itContractOverviewReadModel = new ItContractOverviewReadModel();
+
+            //Act
+            _sut.Apply(itContract, itContractOverviewReadModel);
+
+            //Assert
+            Assert.Equal(expectedAgreements.Count, itContractOverviewReadModel.DataProcessingAgreements.Count);
+            foreach (var dataProcessingRegistration in expectedAgreements)
+            {
+                Assert.Contains(itContractOverviewReadModel.DataProcessingAgreements,
+                    rm =>
+                        rm.DataProcessingRegistrationId == dataProcessingRegistration.Id &&
+                        rm.DataProcessingRegistrationName == dataProcessingRegistration.Name
+                );
+            }
+            Assert.Equal(string.Join(", ", expectedAgreements.Select(x => x.Name)), itContractOverviewReadModel.DataProcessingAgreementsCsv);
+        }
 
         //TODO: System usages
 
