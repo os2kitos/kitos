@@ -30,6 +30,27 @@
         visitModule(node: Models.UICustomization.CustomizedModuleUI) { /* We don't care much for modules - we care about the nodes */ }
     }
 
+    export class CountNodesByAvailableStateUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
+        private _nodesByStateCounter: number = 0;
+        private _matchAvailableState: boolean;
+
+        constructor(matchAvailableState: boolean) {
+            this._matchAvailableState = matchAvailableState;
+        }
+
+        get counter() {
+            return this._nodesByStateCounter;
+        }
+
+        visitNode(node: Models.UICustomization.UINode) {
+            if (node.available === this._matchAvailableState) {
+                this._nodesByStateCounter++;
+            }
+        }
+
+        visitModule(node: Models.UICustomization.CustomizedModuleUI) { /* We don't care much for modules - we care about the nodes */ }
+    }
+
     class UICustomizationService implements IUICustomizationService {
 
         static $inject = ["genericApiWrapper", "userService", "uiCustomizationStateCache", "apiUseCaseFactory"];
@@ -90,6 +111,8 @@
                         const serverConfig = persistedConfigLookup[nodeBluePrint.fullKey];
                         const available = serverConfig != undefined ? serverConfig : true;
                         const readOnly = nodeBluePrint.readOnly != undefined && nodeBluePrint.readOnly;
+                        const subtreeIsComplete = nodeBluePrint.subtreeIsComplete != undefined &&
+                            nodeBluePrint.subtreeIsComplete;
                         children.push(new Models.UICustomization.UINode
                             (
                                 nodeBluePrint.fullKey,                      //key
@@ -97,6 +120,7 @@
                                 !readOnly && parentAvailable,               //editable
                                 available && parentAvailable,               //available state
                                 readOnly,                                   //readonly
+                                subtreeIsComplete,                          //subtreeIsComplete
                                 buildChildren(nodeBluePrint, available),    //build children recursively,
                                 nodeBluePrint.helpText                      //help text for the local admin
                             )
@@ -106,7 +130,7 @@
                 return children;
             }
 
-            return new Models.UICustomization.CustomizedModuleUI(bluePrint.module, new Models.UICustomization.UINode(bluePrint.module, bluePrint.text, false, true, true, buildChildren(bluePrint, true), bluePrint.helpText));
+            return new Models.UICustomization.CustomizedModuleUI(bluePrint.module, new Models.UICustomization.UINode(bluePrint.module, bluePrint.text, false, true, true, false, buildChildren(bluePrint, true), bluePrint.helpText));
         }
 
         loadActiveConfiguration(module: Models.UICustomization.CustomizableKitosModule): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {
