@@ -367,6 +367,7 @@
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-life-cycle-status.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-usage-life-cycle-status-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
     <TypeScriptCompile Include="app\models\right-entity.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />

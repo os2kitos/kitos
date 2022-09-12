@@ -27,6 +27,7 @@
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
+            //TODO: use enum
             $scope.lifeCycleStatusOptions = Kitos.Models.ItSystemUsage.LifeCycleStatusOptions.getAll();
 
             $scope.numberOfUsersOptions = [

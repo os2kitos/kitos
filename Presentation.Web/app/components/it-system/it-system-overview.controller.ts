@@ -752,7 +752,23 @@
                         .withId("note")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering());
+                        .withSourceValueEchoRendering())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LifeCycleStatus")
+                        .withTitle("Status")
+                        .withId("LifeCycleStatus")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(Models.ViewModel.ItSystemUsage.LifeCycleStatusViewModel.lifeCycleStatusOptions.map(value => {
+                            return {
+                                textValue: value.text,
+                                remoteValue: value.textValue
+                            }
+                        })
+                        , false)
+                        .withRendering(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
+                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)));
 
             //Launch kendo grid
             launcher.launch();

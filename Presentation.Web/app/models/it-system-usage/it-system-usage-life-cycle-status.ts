@@ -1,26 +1,36 @@
 ﻿module Kitos.Models.ItSystemUsage {
-    export interface ILifeCycleStatus {
+    export enum LifeCycleStatusType {
+        Undecided = 0,
+        NotInUse = 1,
+        PhasingIn = 2,
+        Operational = 3,
+        PhasingOut = 4
+    }
+
+    /*export interface ILifeCycleStatus {
         id: number;
         text: string;
     }
 
     export class LifeCycleStatusFactory {
-        static mapFromNumeric(value: number): IArchiveDuty {
+        static mapmap(value: LifeCycleStatusType): IArchiveDuty {
             switch (value) {
-            case 0:
+                case LifeCycleStatusType.Undecided:
                 return { text: Constants.Select2.EmptyField, id: value };
-            case 1:
+                case LifeCycleStatusType.NotInUse:
                 return { text: "Under indfasning", id: value };
-            case 2:
+                case LifeCycleStatusType.PhasingIn:
                 return { text: "I drift", id: value };
-            case 3:
+                case LifeCycleStatusType.Operational:
                 return { text: "Under udfasning", id: value };
-            case 4:
+                case LifeCycleStatusType.PhasingOut:
                 return { text: "Ikke i drift", id: value };
             default:
                 return null;
             }
         }
+
+
     }
 
     export class LifeCycleStatusOptions {
@@ -33,5 +43,5 @@
 
             return results;
         }
-    }
+    }*/
 }
