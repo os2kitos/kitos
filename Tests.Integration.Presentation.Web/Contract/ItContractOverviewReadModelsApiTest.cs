@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using Core.DomainModel;
 using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
@@ -62,33 +63,21 @@ namespace Tests.Integration.Presentation.Web.Contract
         [Fact]
         public async Task ReadModels_Contain_Correct_Content()
         {
-            //Arrange
-            var organizationId = _organization.Id;
-            var name = CreateName();
-
-            //destination.LastEditedAtDate = source.LastChanged.Date;
-            //destination.LastEditedByUserName = source.LastChangedByUser?.Transform(GetUserFullName);
-            //destination.LastEditedByUserId = source.LastChangedByUserId;
-
             //MapRoleAssignments(source, destination);
-
-            //MapDataProcessingAgreements(source, destination);
 
             //MapSystemUsages(source, destination);
 
             ////Relations
             //MapSystemRelations(source, destination);
 
-            ////Reference
-            //destination.ActiveReferenceTitle = source.Reference?.Title;
-            //destination.ActiveReferenceUrl = source.Reference?.URL;
-            //destination.ActiveReferenceExternalReferenceId = source.Reference?.ExternalReferenceId;
-
-            //MapEconomyStreams(source, destination);
-
-            ////Duration
-            //MapDuration(source, destination);
-
+            //Arrange
+            var organizationId = _organization.Id;
+            var name = CreateName();
+            var dpr1 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName());
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id,YesNoIrrelevantOption.YES).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            var dpr2 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName());
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr2.Id, YesNoIrrelevantOption.YES).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName()); //not included since it is not an agreement
             var parentContract = await ItContractHelper.CreateContract(CreateName(), organizationId);
             var itContract = await ItContractHelper.CreateContract(name, organizationId);
             var organizationUnit = await OrganizationUnitHelper.GetOrganizationUnitsAsync(organizationId);
@@ -101,7 +90,9 @@ namespace Tests.Integration.Presentation.Web.Contract
             var paymentFrequency = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.PaymentFrequencyTypes, organizationId)).RandomItem();
             var optionExtend = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.OptionExtendTypes, organizationId)).RandomItem();
             var terminationDeadline = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.TerminationDeadlineTypes, organizationId)).RandomItem();
-            var changes = new 
+            var referenceDto = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), $"https//a{A<int>()}b.dk", setTargetId: x => x.ItContract_Id = itContract.Id);
+            var economy = await ItContractHelper.CreateExternEconomyStream(itContract.Id,organizationUnit.Id,A<int>(),A<int>(),A<int>(),A<DateTime>(),A<TrafficLight>());
+            var changes = new
             {
                 ItContractId = A<string>(),
                 ContractSigner = A<string>(),
@@ -125,8 +116,11 @@ namespace Tests.Integration.Presentation.Web.Contract
                 PaymentFreqencyId = paymentFrequency.Id,
                 OptionExtendId = optionExtend.Id,
                 TerminationDeadlineId = terminationDeadline.Id,
+                DurationOngoing = true
             };
             await ItContractHelper.PatchContract(itContract.Id, organizationId, changes);
+            await ItContractHelper.SendAssignDataProcessingRegistrationAsync(itContract.Id, dpr1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractHelper.SendAssignDataProcessingRegistrationAsync(itContract.Id, dpr2.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Act
             await ReadModelTestTools.WaitForReadModelQueueDepletion();
@@ -157,9 +151,28 @@ namespace Tests.Integration.Presentation.Web.Contract
             AssertReferencedEntity(paymentFrequency.Id, paymentFrequency.Name, readModel.PaymentFrequencyId, readModel.PaymentFrequencyName);
             AssertReferencedEntity(optionExtend.Id, optionExtend.Name, readModel.OptionExtendId, readModel.OptionExtendName);
             AssertReferencedEntity(terminationDeadline.Id, terminationDeadline.Name, readModel.TerminationDeadlineId, readModel.TerminationDeadlineName);
+            Assert.Equal("Løbende", readModel.Duration);
+            Assert.Equal(referenceDto.ExternalReferenceId, readModel.ActiveReferenceExternalReferenceId);
+            Assert.Equal(referenceDto.Title, readModel.ActiveReferenceTitle);
+            Assert.Equal(referenceDto.URL, readModel.ActiveReferenceUrl);
+            Assert.NotNull(readModel.LastEditedByUserId);
+            Assert.NotNull(readModel.LastEditedByUserName);
+            Assert.NotNull(readModel.LastEditedAtDate);
+            var dpas = readModel.DataProcessingAgreementsCsv.Split(new[]{", "},StringSplitOptions.RemoveEmptyEntries).ToList();
+            Assert.Equal(2,dpas.Count);
+            Assert.Contains(dpr1.Name, dpas);
+            Assert.Contains(dpr2.Name,dpas);
+            Assert.Equal(economy.Acquisition, readModel.AccumulatedAcquisitionCost);
+            Assert.Equal(economy.Operation, readModel.AccumulatedOperationCost);
+            Assert.Equal(economy.Other, readModel.AccumulatedOtherCost);
+            Assert.Equal(economy.AuditDate?.Date, readModel.LatestAuditDate);
+            Assert.Equal(economy.AuditStatus == TrafficLight.Green ? 1 : 0, readModel.AuditStatusGreen);
+            Assert.Equal(economy.AuditStatus == TrafficLight.White ? 1 : 0, readModel.AuditStatusWhite);
+            Assert.Equal(economy.AuditStatus == TrafficLight.Red ? 1 : 0, readModel.AuditStatusRed);
+            Assert.Equal(economy.AuditStatus == TrafficLight.Yellow ? 1 : 0, readModel.AuditStatusYellow);
         }
 
-        private void AssertReferencedEntity(int idFromModel, string nameFromModel, int? idFromReadModel, string nameFromReadModel)
+        private static void AssertReferencedEntity(int idFromModel, string nameFromModel, int? idFromReadModel, string nameFromReadModel)
         {
             Assert.Equal(idFromModel, idFromReadModel);
             Assert.Equal(nameFromModel, nameFromReadModel);

@@ -41,7 +41,5 @@ namespace Presentation.Web.Models.API.V1
         public DateTime? AuditDate { get; set; }
 
         public string Note { get; set; }
-
-        public AccessModifier AccessModifier { get; set; }
     }
 }
