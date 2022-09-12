@@ -365,6 +365,7 @@
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-life-cycle-status.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
     <TypeScriptCompile Include="app\models\right-entity.ts" />
@@ -382,6 +383,7 @@
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
@@ -566,6 +568,7 @@
     <Compile Include="Models\API\V2\Types\SystemUsage\ArchiveDutyChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\DataSensitivityLevelChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\HostingChoice.cs" />
+    <Compile Include="Models\API\V2\Types\SystemUsage\LifeCycleStatusChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\RiskLevelChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\TechnicalPrecautionChoice.cs" />
     <Compile Include="Models\API\V2\Types\Shared\YesNoDontKnowChoice.cs" />

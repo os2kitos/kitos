@@ -98,6 +98,18 @@
                            ng-blur="patchDate('expirationDate', usage.expirationDate)"
                            data-field="expirationDate">
                 </div>
+                <div class="form-group">
+                    
+                    <!--TODO: change data-label to danish-->
+                    <select-simple data-id="lifeCycleStatus"
+                                   data-label="FIELD NAME"
+                                   data-options="lifeCycleStatusOptions"
+                                   data-ng-model="usageViewModel.lifeCycleStatus"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-auto-save-url="{{::autoSaveUrl}}"
+                                   data-field="lifeCycleStatus">
+                    </select-simple>
+                </div>
                 <div class="checkbox">
                     <input type="checkbox" id="system-int-signed"
                            class="tags-checkbox sr-only"

@@ -27,6 +27,8 @@
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
+            $scope.lifeCycleStatusOptions = Kitos.Models.ItSystemUsage.LifeCycleStatusOptions.getAll();
+
             $scope.numberOfUsersOptions = [
                 { id: "4", text: Kitos.Constants.Select2.EmptyField },
                 { id: "0", text: "<10" },
