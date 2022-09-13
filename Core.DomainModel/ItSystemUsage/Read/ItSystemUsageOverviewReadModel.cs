@@ -101,6 +101,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string LinkToDirectoryName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
 
+        public LifeCycleStatusType? LifeCycleStatus { get; set; }
+
         public string DataProcessingRegistrationsConcludedAsCsv { get; set; }
         public string DataProcessingRegistrationNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; }

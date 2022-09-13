@@ -8,6 +8,7 @@
         public override void Up()
         {
             AddColumn("dbo.ItSystemUsage", "LifeCycleStatus", c => c.Int());
+            AddColumn("dbo.ItSystemUsageOverviewReadModels", "LifeCycleStatus", c => c.Int());
             CreateIndex("dbo.ItSystemUsage", "LifeCycleStatus", name: "ItSystemUsage_Index_LifeCycleStatus");
             Sql(@"UPDATE dbo.ItSystemUsage
                   SET LifeCycleStatus = 
@@ -23,13 +24,14 @@
         {
             AddColumn("dbo.ItSystemUsage", "Active", c => c.Boolean(nullable: false));
             Sql(@"UPDATE dbo.ItSystemUsage
-                  SET Active = 
-                        CASE LifeCycleStatus
+                  SET LifeCycleStatus = 
+                        CASE Active
 							WHEN 0 THEN 0
-							ELSE 1
+							WHEN 1 THEN 3
 						END;"
             );
             DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_LifeCycleStatus");
+            DropColumn("dbo.ItSystemUsageOverviewReadModels", "LifeCycleStatus");
             DropColumn("dbo.ItSystemUsage", "LifeCycleStatus");
         }
     }

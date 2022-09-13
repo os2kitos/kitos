@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202209120809093_RemovedActiveFromSystemUsage"; }
+            get { return "202209130756266_RemovedActiveFromSystemUsage"; }
         }
         
         string IMigrationMetadata.Source

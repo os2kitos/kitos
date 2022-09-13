@@ -767,8 +767,8 @@
                             }
                         })
                         , false)
-                        .withRendering(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.LifeCycleStatus))
-                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.LifeCycleStatus))
+                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
+                        .withExcelOutput(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)));
 
             //Launch kendo grid
