@@ -45,7 +45,7 @@
                 case "PhasingOut":
                     return "Ikke i drift";
                 default:
-                    return null;
+                    return "";
             }
         }
 

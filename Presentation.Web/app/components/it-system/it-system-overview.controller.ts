@@ -154,6 +154,8 @@
                             .replace(/\( and /, "(") //First criteria removed
                             .replace(/ and \)/, ")"); // Last criteria removed
 
+                        parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter, "LifeCycleStatus", Models.ItSystemUsage.LifeCycleStatusType.Undecided);
+
                         //Cleanup filter if invalid
                         if (parameterMap.$filter === "") {
                             delete parameterMap.$filter;
@@ -767,7 +769,7 @@
                             }
                         })
                         , false)
-                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
+                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus) )
                         .withExcelOutput(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)));
 
