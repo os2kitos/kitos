@@ -23,7 +23,6 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
         {
             //Arrange
             var excludedSinceReadModelIsCurrentlyInActive = CreateReadModel(false, false, _now.AddDays(-2), _now.AddDays(-1));
-            var excludedSinceSourceModelIsForcedActive = CreateReadModel(true, true, _now.AddDays(-2), _now.AddDays(-1));
             var excludedBecauseExpirationDateIsNull = CreateReadModel(true, false, _now.AddDays(-2), null);
             var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, false, _now.AddDays(-2), _now);
             var includedSinceExpired = CreateReadModel(true, false, null, _now.AddDays(-1));
@@ -32,7 +31,6 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
             var input = new[]
             {
                 excludedSinceReadModelIsCurrentlyInActive,
-                excludedSinceSourceModelIsForcedActive,
                 excludedBecauseExpirationDateIsNull,
                 excludedBecauseExpirationDateHasNotPassed,
                 includedSinceExpired

@@ -187,7 +187,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
 
-            Assert.Null(mappedGeneralSection.LifeCycleStatus);
+            Assert.True(mappedGeneralSection.LifeCycleStatus.HasChange);
+            Assert.Null(mappedGeneralSection.LifeCycleStatus.NewValue);
             AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidFrom);
             AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidTo);
         }
@@ -1187,7 +1188,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noNotes,
             bool noSystemVersion,
             bool noNumberOfExpectedUsers,
-            bool noEnforceActive,
+            bool noLifeCycleStatus,
             bool noValidFrom,
             bool noValidTo,
             bool noMainContractUuid)
@@ -1202,7 +1203,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noMainContractUuid) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.MainContractUuid));
 
             var validityProperties = GetAllInputPropertyNames<ValidityWriteRequestDTO>();
-            if (noEnforceActive) validityProperties.Remove(nameof(ValidityWriteRequestDTO.EnforcedValid));
+            if (noLifeCycleStatus) validityProperties.Remove(nameof(ValidityWriteRequestDTO.LifeCycleStatus));
             if (noValidFrom) validityProperties.Remove(nameof(ValidityWriteRequestDTO.ValidFrom));
             if (noValidTo) validityProperties.Remove(nameof(ValidityWriteRequestDTO.ValidTo));
 
