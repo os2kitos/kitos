@@ -57,6 +57,7 @@
         readOnly: boolean;
         editable: boolean;
         available: boolean;
+        subtreeIsComplete?: boolean;
         key: string;
         children: Array<IUINode>;
         helpText?: string;
@@ -66,17 +67,19 @@
         private readonly _isReadOnly: boolean;
         private _editable: boolean;
         private _available: boolean;
+        private readonly _subtreeIsComplete: boolean;
         private readonly _helpText: string | undefined;
         private readonly _key: string;
         private readonly _children: IUINode[];
         private readonly _childGroupLookup: Record<string, IUINode>;
         private readonly _text: string;
 
-        constructor(key: string, text: string, editable: boolean, available: boolean, isReadOnly: boolean, children: IUINode[], helpText?: string) {
+        constructor(key: string, text: string, editable: boolean, available: boolean, isReadOnly: boolean, subtreeIsComplete: boolean, children: IUINode[], helpText?: string) {
             this._isReadOnly = isReadOnly;
             this._children = children ?? [];
             this._editable = editable && !isReadOnly;
             this._available = available;
+            this._subtreeIsComplete = subtreeIsComplete;
             this._key = key;
             this._text = text;
             this._helpText = helpText;
@@ -158,6 +161,15 @@
             } else if (this.available) {
                 const child = this.getChildCallPath(fullKey);
                 child.changeAvailableState(fullKey, newState);
+
+                if (this.subtreeIsComplete) {
+                    const visitor = new Services.UICustomization.CountNodesByAvailableStateUiCustomizationTreeVisitor(true);
+                    this.acceptChildren(visitor);
+
+                    if (visitor.counter === 0 && this.editable) {
+                        this.changeAvailableState(this.key, false);
+                    }
+                }
             } else {
                 throw new Error(`Cannot change state of descendant ${fullKey} if ancestor with key ${this.key} is unavailable`);
             }
@@ -165,9 +177,13 @@
 
         accept(visitor: IUICustomizationTreeVisitor): void {
             visitor.visitNode(this);
-            this.children.forEach(child => child.accept(visitor));
+            this.acceptChildren(visitor);
         }
 
+        private acceptChildren(visitor: IUICustomizationTreeVisitor): void {
+            this.children.forEach(child => child.accept(visitor));
+        }
+        
         get children(): IUINode[] { return this._children; }
 
         get readOnly() { return this._isReadOnly; }
@@ -187,6 +203,8 @@
         }
 
         get available() { return this._available; }
+
+        get subtreeIsComplete() { return this._subtreeIsComplete; }
 
         get key() { return this._key; }
 
