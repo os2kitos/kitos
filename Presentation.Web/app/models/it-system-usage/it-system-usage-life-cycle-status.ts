@@ -7,41 +7,40 @@
         PhasingOut = 4
     }
 
-    /*export interface ILifeCycleStatus {
+    export interface ILifeCycleStatus {
         id: number;
         text: string;
     }
 
     export class LifeCycleStatusFactory {
-        static mapmap(value: LifeCycleStatusType): IArchiveDuty {
+        static mapValueFromString(value: LifeCycleStatusType): ILifeCycleStatus {
             switch (value) {
                 case LifeCycleStatusType.Undecided:
-                return { text: Constants.Select2.EmptyField, id: value };
+                    return { text: Constants.Select2.EmptyField, id: value };
                 case LifeCycleStatusType.NotInUse:
-                return { text: "Under indfasning", id: value };
+                    return { text: "Under indfasning", id: value };
                 case LifeCycleStatusType.PhasingIn:
-                return { text: "I drift", id: value };
-                case LifeCycleStatusType.Operational:
-                return { text: "Under udfasning", id: value };
+                    return { text: "I drift", id: value };
+                case LifeCycleStatusType.Operational: 
+                    return { text: "Under udfasning", id: value };
                 case LifeCycleStatusType.PhasingOut:
-                return { text: "Ikke i drift", id: value };
+                    return { text: "Ikke i drift", id: value };
             default:
                 return null;
             }
         }
-
-
     }
 
     export class LifeCycleStatusOptions {
-        static getAll(): ILifeCycleStatus[] {
-            const results = new Array<ILifeCycleStatus>();
+        options: ILifeCycleStatus[];
 
-            for (let i = 0; i <= 4; i++) {
-                results.push(LifeCycleStatusFactory.mapFromNumeric(i));
-            }
-
-            return results;
+        constructor() {
+            this.options = Object.keys(LifeCycleStatusType)
+                .filter(item => !isNaN(Number(item)))
+                .map((value) => {
+                    return LifeCycleStatusFactory.mapValueFromString(Number(value));
+                }
+            );
         }
-    }*/
+    }
 }

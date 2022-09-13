@@ -61,6 +61,7 @@
         HasMainContract: boolean;
         SensitiveDataLevelsAsCsv: string | null;
         ArchiveDuty: string | null;
+        LifeCycleStatus: string | null;
         IsHoldingDocument: boolean;
         ActiveArchivePeriodEndDate: Date | null;
         RiskSupervisionDocumentationName: string | null;

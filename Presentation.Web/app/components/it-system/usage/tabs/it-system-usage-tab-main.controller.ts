@@ -28,7 +28,8 @@
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
             //TODO: use enum
-            $scope.lifeCycleStatusOptions = Kitos.Models.ItSystemUsage.LifeCycleStatusOptions.getAll();
+            const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
+            $scope.lifeCycleStatusOptions = lifeCycleStatusOptions.options;
 
             $scope.numberOfUsersOptions = [
                 { id: "4", text: Kitos.Constants.Select2.EmptyField },

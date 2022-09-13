@@ -37,6 +37,7 @@
             uiState: Models.UICustomization.ICustomizedModuleUI
         ) {
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+            const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
 
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
@@ -759,15 +760,15 @@
                         .withTitle("Status")
                         .withId("LifeCycleStatus")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(Models.ViewModel.ItSystemUsage.LifeCycleStatusViewModel.lifeCycleStatusOptions.map(value => {
+                        .withFixedValueRange(lifeCycleStatusOptions.options.map(value => {
                             return {
                                 textValue: value.text,
-                                remoteValue: value.textValue
+                                remoteValue: value.id
                             }
                         })
                         , false)
-                        .withRendering(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
-                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
+                        .withRendering(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.LifeCycleStatus))
+                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.LifeCycleStatus))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)));
 
             //Launch kendo grid
