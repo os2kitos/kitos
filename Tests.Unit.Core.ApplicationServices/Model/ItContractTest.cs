@@ -93,7 +93,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var result = sut.SetAgreementElements(new List<AgreementElementType>{agreementElement});
+            var result = sut.SetAgreementElements(new List<AgreementElementType> { agreementElement });
 
             //Assert
             Assert.True(result.IsNone);
@@ -501,7 +501,7 @@ namespace Tests.Unit.Core.Model
             var result = sut.AssignDataProcessingRegistration(dpr);
 
             //Assert
-            Assert.True(result.Failed); 
+            Assert.True(result.Failed);
             Assert.Contains("Cannot assign Data Processing Registration to Contract within different Organization", result.Error.Message.GetValueOrEmptyString());
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
@@ -649,6 +649,201 @@ namespace Tests.Unit.Core.Model
 
             //Assert
             Assert.Null(sut.TerminationDeadline);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Validate_Returns_Error_If_Start_Date_Has_Not_Passed(bool enforceValid)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var sut = new ItContract()
+            {
+                Concluded = now.AddDays(1),
+                Active = enforceValid
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.Equal(enforceValid, result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            var validationError = Assert.Single(result.ValidationErrors);
+            Assert.Equal(ItContractValidationError.StartDateNotPassed, validationError);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Validate_Returns_Error_If_End_Date_Has_Passed(bool enforceValid)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var sut = new ItContract()
+            {
+                ExpirationDate = now.AddDays(-1),
+                Active = enforceValid
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.Equal(enforceValid, result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            var validationError = Assert.Single(result.ValidationErrors);
+            Assert.Equal(ItContractValidationError.EndDatePassed, validationError);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Validate_Returns_Error_If_Termination_Deadline_Has_Passed_With_No_TerminationPeriod(bool enforceValid)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var sut = new ItContract()
+            {
+                Terminated = now.AddDays(-1),
+                Active = enforceValid
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.Equal(enforceValid, result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            var validationError = Assert.Single(result.ValidationErrors);
+            Assert.Equal(ItContractValidationError.TerminationPeriodExceeded, validationError);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Validate_Returns_Error_If_Termination_Deadline_Has_Passed_With_And_TerminationPeriod_Passed(bool enforceValid)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var terminationDeadline = new Random(A<int>()).Next(1, 12);
+            var sut = new ItContract()
+            {
+                Terminated = now.AddDays(-1).AddMonths(-1 * terminationDeadline),
+                TerminationDeadline = new TerminationDeadlineType
+                {
+                    Name = terminationDeadline.ToString("D")
+                },
+                Active = enforceValid
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.Equal(enforceValid, result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            var validationError = Assert.Single(result.ValidationErrors);
+            Assert.Equal(ItContractValidationError.TerminationPeriodExceeded, validationError);
+        }
+
+        [Theory]
+        [InlineData(true, 0)]
+        [InlineData(false, 0)]
+        [InlineData(false, 1)]
+        public void Validate_Returns_Success_If_Termination_Deadline_Has_Not_Passed(bool enforceValid, int dayOffset)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var sut = new ItContract
+            {
+                Terminated = now.AddDays(dayOffset),
+                Active = enforceValid
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.True(result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            Assert.Empty(result.ValidationErrors);
+        }
+
+        [Theory]
+        [InlineData(true, 0)]
+        [InlineData(false, 0)]
+        [InlineData(false, 1)]
+        public void Validate_Returns_Success_If_Termination_Deadline_Passed_But_TerminationPeriod_Has_Not_Passed(bool enforceValid, int dayOffset)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var terminationDeadline = new Random(A<int>()).Next(1, 12);
+            var sut = new ItContract
+            {
+                Terminated = now.AddMonths(-1 * terminationDeadline).AddDays(dayOffset),
+                Active = enforceValid,
+                TerminationDeadline = new TerminationDeadlineType
+                {
+                    Name = terminationDeadline.ToString("D")
+                },
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.True(result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            Assert.Empty(result.ValidationErrors);
+        }
+
+        [Theory]
+        [InlineData(true, 0)]
+        [InlineData(false, 0)]
+        [InlineData(false, -1)]
+        public void Validate_Returns_Success_If_Start_Date_Has_Passed(bool enforceValid, int dayOffset)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var sut = new ItContract
+            {
+                Concluded = now.AddDays(dayOffset),
+                ExpirationDate = now,
+                Active = enforceValid
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.True(result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            Assert.Empty(result.ValidationErrors);
+        }
+
+        [Theory]
+        [InlineData(true, 0)]
+        [InlineData(false, 0)]
+        [InlineData(false, 1)]
+        public void Validate_Returns_Success_If_End_Date_Has_Not_Passed(bool enforceValid, int dayOffset)
+        {
+            //Arrange
+            var now = A<DateTime>().Date;
+            var sut = new ItContract
+            {
+                ExpirationDate = now.AddDays(dayOffset),
+                Active = enforceValid
+            };
+
+            //Act
+            var result = sut.Validate(now);
+
+            //Assert
+            Assert.True(result.Result);//If not enforced valid we expect the value to be false
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            Assert.Empty(result.ValidationErrors);
         }
     }
 }
