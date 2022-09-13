@@ -6,6 +6,7 @@
         children?: Record<string, ICustomizableUINodeConfig>;
         fullKey?: string; // Added by the post-processor so that controllers/ui can bind to a hierarchy while getting the right key for configuration checks...
         helpText?: string;
+        subtreeIsComplete?: boolean;
     }
 
     export interface ICustomizableUIModuleConfigBluePrint extends ICustomizableUINodeConfig {
@@ -37,6 +38,7 @@
     export const helpTexts = {
         cannotChangeTab: "Det er ikke muligt at slå dette faneblad fra",
         cannotChangeTabOnlyThroughModuleConfig: "Det er kun muligt at fjerne dette faneblad ved at slå det relaterede modul fra",
-        generalUiCustomizationHelpText: "Bemærk: Skjules faneblad/felt fjernes relaterede felt(er) også fra overbliksbillederne."
+        generalUiCustomizationHelpText: "Bemærk: Skjules faneblad/felt fjernes relaterede felt(er) også fra overbliksbillederne.",
+        subtreeIsCompleteHelpText: "Fanenbladdet slås fra hvis alle felter/grupper fjernes, da siden ellers vil være uden indhold."
     }
 }

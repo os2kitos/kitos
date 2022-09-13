@@ -4,7 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Xunit;
@@ -15,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         public static async Task<ItContractDTO> CreateContract(string name, int organizationId)
         {
-            using var createdResponse = await SendCreateContract(name,organizationId);
+            using var createdResponse = await SendCreateContract(name, organizationId);
             Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
             var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
 
@@ -139,7 +142,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
-            
+
         }
 
         public static async Task<HttpResponseMessage> SendAssignCriticalityTypeAsync(int organizationId, int contractId, int criticalityId, Cookie optionalLogin = null)
@@ -157,6 +160,34 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItContractRole>();
+        }
+
+        public static async Task<IEnumerable<ItContractOverviewReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItContractOverviewReadModels?$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItContractOverviewReadModel>();
+        }
+
+        public static async Task<EconomyStreamDTO> CreateExternEconomyStream(int contractId, int? organizationUnitId, int acquisition, int operation, int other, DateTime? auditDate, TrafficLight auditStatus)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new
+            {
+                ExternPaymentForId = contractId,
+                Acquisition = acquisition,
+                Operation = operation,
+                Other = other,
+                AuditStatus = auditStatus,
+                AuditDate = auditDate,
+                OrganizationUnitId = organizationUnitId
+            };
+
+            using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/EconomyStream?contractId={contractId}"), cookie, body);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<EconomyStreamDTO>();
         }
     }
 }

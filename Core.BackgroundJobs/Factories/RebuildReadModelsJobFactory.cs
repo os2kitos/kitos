@@ -5,6 +5,7 @@ using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.BackgroundJobs;
@@ -16,15 +17,18 @@ namespace Core.BackgroundJobs.Factories
     {
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<DataProcessingRegistration> _dprRepository;
+        private readonly IGenericRepository<ItContract> _contractRepository;
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
 
         public RebuildReadModelsJobFactory(
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<DataProcessingRegistration> dprRepository,
+            IGenericRepository<ItContract> contractRepository,
             IPendingReadModelUpdateRepository pendingReadModelUpdateRepository)
         {
             _systemUsageRepository = systemUsageRepository;
             _dprRepository = dprRepository;
+            _contractRepository = contractRepository;
             _pendingReadModelUpdateRepository = pendingReadModelUpdateRepository;
         }
 
@@ -44,6 +48,11 @@ namespace Core.BackgroundJobs.Factories
                     id = StandardJobIds.RebuildDataProcessingReadModels;
                     getIds = () => _dprRepository.AsQueryable().Select(x => x.Id).AsEnumerable();
                     updateSourceCategory = PendingReadModelUpdateSourceCategory.DataProcessingRegistration;
+                    break;
+                case ReadModelRebuildScope.ItContract:
+                    id = StandardJobIds.RebuildItContractReadModels;
+                    getIds = () => _contractRepository.AsQueryable().Select(x => x.Id).AsEnumerable();
+                    updateSourceCategory = PendingReadModelUpdateSourceCategory.ItContract;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scope), scope, null);

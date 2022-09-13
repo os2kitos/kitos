@@ -44,6 +44,12 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(onSuccess: _ => Ok(), onFailure: FromOperationFailure);
         }
 
+        [NonAction]
+        public override HttpResponseMessage GetAll(PagingModel<ExternalReference> paging)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void RaiseUpdated(ExternalReference item)
         {
             var entityWithExternalReferences = item.GetOwner();

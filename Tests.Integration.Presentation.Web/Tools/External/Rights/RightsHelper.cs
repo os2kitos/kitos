@@ -5,17 +5,18 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
+using Tests.Toolkit.Extensions;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External.Rights
 {
     public class RightsHelper
     {
-        public static async Task AddUserRole(int userId, int orgId, RightsType rightsType, string name = "", int? objectId = null, Cookie optionalLogin = null)
+        public static async Task AddUserRole(int userId, int orgId, RightsType rightsType, string name = "", int? objectId = null, int? idOfRoleToUse = null,Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var roleId = await GetDefaultRoleIdForRight(rightsType, cookie);
+            var roleId = idOfRoleToUse ?? await GetDefaultRoleIdForRight(rightsType, cookie);
             var roleDto = new RightDTO
             {
                 UserId = userId,
@@ -86,7 +87,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var contractRoles = await ItContractHelper.GetRolesAsync(cookie);
                     Assert.NotEmpty(contractRoles);
 
-                    var singleContractRole = contractRoles.FirstOrDefault();
+                    var singleContractRole = contractRoles.RandomItem();
                     Assert.NotNull(singleContractRole);
 
                     return singleContractRole.Id;
@@ -94,7 +95,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var systemRoles = await ItSystemHelper.GetRolesAsync(cookie);
                     Assert.NotEmpty(systemRoles);
 
-                    var singleSystemRole = systemRoles.FirstOrDefault();
+                    var singleSystemRole = systemRoles.RandomItem();
                     Assert.NotNull(singleSystemRole);
 
                     return singleSystemRole.Id;
@@ -102,7 +103,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var organizationUnitRoles = await OrganizationUnitHelper.GetOrganizationUnitRolesAsync(cookie);
                     Assert.NotEmpty(organizationUnitRoles);
 
-                    var singleOrganizationUnit = organizationUnitRoles.FirstOrDefault();
+                    var singleOrganizationUnit = organizationUnitRoles.RandomItem();
                     Assert.NotNull(singleOrganizationUnit);
 
                     return singleOrganizationUnit.Id;

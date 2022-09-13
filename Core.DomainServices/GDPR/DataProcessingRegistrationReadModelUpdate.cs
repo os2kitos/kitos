@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Mapping;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 
@@ -92,7 +93,7 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(x => (x.ItSystem.Name, x.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
+            destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(usage => usage.MapItSystemName()));
             destination.SystemUuidsAsCsv = string.Join(", ", source.SystemUsages.Select(x => x.ItSystem.Uuid));
         }
 
@@ -168,7 +169,7 @@ namespace Core.DomainServices.GDPR
             });
         }
 
-        private string GetNameOfOption<TOption>(
+        private static string GetNameOfOption<TOption>(
             DataProcessingRegistration parent,
             TOption optionEntity,
             IOptionsService<DataProcessingRegistration, TOption> service)

@@ -11,6 +11,7 @@ module Kitos.Utility.KendoGrid {
     export enum KendoGridColumnFiltering {
         StartsWith,
         Contains,
+        NumberComparision,
         Date,
         FixedValueRange
     }
@@ -332,6 +333,17 @@ module Kitos.Utility.KendoGrid {
                                     eq: "Lig med",
                                     gte: "Fra og med",
                                     lte: "Til og med"
+                                }
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.NumberComparision:
+                        return {
+                            operators: {
+                                number: {
+                                    eq: "Lig med",
+                                    neq: "Forskellig fra",
+                                    gte: "Større eller lig med",
+                                    lte: "Mindre eller lig med"
                                 }
                             }
                         } as any as kendo.ui.GridColumnFilterable;

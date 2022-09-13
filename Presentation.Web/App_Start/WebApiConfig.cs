@@ -20,6 +20,7 @@ using Microsoft.OData.UriParser;
 using System.Collections.Generic;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystemUsage.Read;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing.Conventions;
@@ -185,6 +186,11 @@ namespace Presentation.Web
             var contracts = BindEntitySet<ItContract, ItContractsController>(builder);
             contracts.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             contracts.HasRequiredBinding(o => o.Supplier, entitySetOrganizations);
+
+            //contract read models
+            BindEntitySet<ItContractOverviewReadModel, ItContractOverviewReadModelsController>(builder);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItContractOverviewReadModel)).RemoveProperty(typeof(ItContractOverviewReadModel).GetProperty(nameof(ItContractOverviewReadModel.SourceEntity)));
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItContractOverviewReadModel)).RemoveProperty(typeof(ItContractOverviewReadModel).GetProperty(nameof(ItContractOverviewReadModel.Organization)));
 
             BindEntitySet<InterfaceType, InterfaceTypesController>(builder);
 

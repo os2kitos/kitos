@@ -9,7 +9,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
     {
         IQueryable<ItSystemUsageOverviewReadModel> GetByOrganizationId(int organizationId);
         ItSystemUsageOverviewReadModel Add(ItSystemUsageOverviewReadModel newModel);
-        void Delete(ItSystemUsageOverviewReadModel readModel);
         void DeleteBySourceId(int sourceId);
         Maybe<ItSystemUsageOverviewReadModel> GetBySourceId(int sourceId);
         void Update(ItSystemUsageOverviewReadModel readModel);

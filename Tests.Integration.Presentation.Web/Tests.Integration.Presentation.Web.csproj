@@ -127,6 +127,7 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Authorization\GetOrganizationsTests.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
+    <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
     <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="Tools\ObjectCreateHelper.cs" />
     <Compile Include="Tools\OrganizationHelper.cs" />
     <Compile Include="Tools\OrganizationUnitHelper.cs" />
+    <Compile Include="Tools\ReadModelTestTools.cs" />
     <Compile Include="Tools\ReferencesHelper.cs" />
     <Compile Include="Tools\External\Rights\RightsHelper.cs" />
     <Compile Include="Tools\SsoIdentityHelper.cs" />

@@ -365,7 +365,9 @@
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
     <TypeScriptCompile Include="app\models\right-entity.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
@@ -375,6 +377,7 @@
     <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
@@ -813,7 +816,6 @@
     <TypeScriptCompile Include="app\models\ViewModel\GDPR\OversightDateViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\option-type-view-model.ts" />
-    <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\edit-org-unit-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\OrganizationDeletionConflictsViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
@@ -848,6 +850,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
     <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
     <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
@@ -866,6 +869,7 @@
     <TypeScriptCompile Include="app\services\ui-customization\ui-customization-state-service.ts" />
     <TypeScriptCompile Include="app\services\ui-customization\ui-customization-service.ts" />
     <TypeScriptCompile Include="app\services\userNotificationService.ts" />
+    <TypeScriptCompile Include="app\shared\cache\in-memory-cache.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
     <TypeScriptCompile Include="app\shared\EntityMapper.ts" />
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
@@ -1080,6 +1084,7 @@
     <TypeScriptCompile Include="app\shared\selectRole\selectRole.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
+    <TypeScriptCompile Include="app\shared\time\system-time.ts" />
     <TypeScriptCompile Include="app\utility\ClipBoardHelper.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />

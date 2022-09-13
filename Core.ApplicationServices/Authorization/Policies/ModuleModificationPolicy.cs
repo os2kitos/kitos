@@ -132,8 +132,7 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return IsSystemModuleAdmin(organizationId) || IsContractModuleAdmin(organizationId);
             }
 
-            //NOTE: Other types are yet to be restricted by this policy. In the end a child of e.g. Itsystem should not hit this policy since it is a modification to the root ..> it system
-            return true;
+            return false;
         }
 
         private bool IsRightsHolder(int organizationId)
