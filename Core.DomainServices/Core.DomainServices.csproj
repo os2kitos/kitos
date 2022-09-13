@@ -60,8 +60,10 @@
     <Compile Include="Context\FallbackUserResolver.cs" />
     <Compile Include="Context\IDefaultOrganizationResolver.cs" />
     <Compile Include="Context\IFallbackUserResolver.cs" />
+    <Compile Include="Contract\BuildItContractOverviewReadModelOnChangesHandler.cs" />
     <Compile Include="Contract\ContractDataProcessingRegistrationAssignmentService.cs" />
     <Compile Include="Contract\IContractDataProcessingRegistrationAssignmentService.cs" />
+    <Compile Include="Contract\ItContractOverviewReadModelUpdate.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationBasisForTransferAssignmentService.cs" />
@@ -87,6 +89,7 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="Mapping\ReadModelMappingHelpers.cs" />
     <Compile Include="Model\StsOrganization\ResolveOrganizationTreeError.cs" />
     <Compile Include="Model\StsOrganization\StsOrganizationUnit.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
@@ -101,6 +104,8 @@
     <Compile Include="Queries\Contract\QueryByDataProcessingRegistrationUuid.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUuid.cs" />
+    <Compile Include="Queries\Contract\QueryReadModelsWhichShouldBecomeActive.cs" />
+    <Compile Include="Queries\Contract\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\DPR\QueryByAgreementConcluded.cs" />
     <Compile Include="Queries\DPR\QueryBySubDataProcessorUuid.cs" />
     <Compile Include="Queries\DPR\QueryByDataProcessorUuid.cs" />
@@ -134,6 +139,8 @@
     <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
+    <Compile Include="Repositories\Contract\IItContractOverviewReadModelRepository.cs" />
+    <Compile Include="Repositories\Contract\ItContractOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Notification\IUserNotificationRepository.cs" />

@@ -95,13 +95,17 @@ namespace Presentation.Web.Controllers.API.V1
 
             var stream = Map<EconomyStreamDTO, EconomyStream>(streamDTO);
 
-            if (streamDTO.ExternPaymentForId != null)
+            if (streamDTO.ExternPaymentForId == contractId)
             {
                 stream.ExternPaymentFor = contract;
             }
-            else
+            else if (streamDTO.InternPaymentForId == contractId)
             {
                 stream.InternPaymentFor = contract;
+            }
+            else
+            {
+                return BadRequest();
             }
 
             var savedItem = PostQuery(stream);

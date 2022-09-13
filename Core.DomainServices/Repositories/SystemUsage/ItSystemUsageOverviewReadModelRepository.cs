@@ -45,7 +45,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
             }
         }
 
-        public void Delete(ItSystemUsageOverviewReadModel readModel)
+        private void Delete(ItSystemUsageOverviewReadModel readModel)
         {
             if (readModel == null) throw new ArgumentNullException(nameof(readModel));
 

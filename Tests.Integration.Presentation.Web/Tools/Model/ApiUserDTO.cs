@@ -9,6 +9,6 @@
         public string Email { get; set; }
 
         public bool? HasApiAccess { get; set; }
-        public bool? HasStakeHolderAccess { get; set; }
+        public bool? HasStakeHolderAccess { get; set; } = false;
     }
 }

@@ -34,6 +34,8 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string NoticePeriodMonthTypes = "TerminationDeadlineTypes";
             public const string ContractRoles = "ItContractRoles";
             public const string CriticalityTypes = "CriticalityTypes";
+            public const string OptionExtendTypes = "OptionExtendTypes";
+            public const string TerminationDeadlineTypes = "TerminationDeadlineTypes";
 
             public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";
             public const string DataProcessingBasisForTransferOptions = "DataProcessingBasisForTransferOptions";

@@ -36,7 +36,7 @@
         mainGrid: IKendoGrid<Models.IRoleEntity>;
         mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        static $inject: string[] = ["$http", "_", "$", "$state", "notify", "$scope"];
+        static $inject: string[] = ["$http", "_", "$", "$state", "notify", "$scope","inMemoryCacheService"];
 
         constructor(
             private readonly $http: ng.IHttpService,
@@ -44,7 +44,8 @@
             private readonly $: JQueryStatic,
             $state: ng.ui.IStateService,
             private readonly notify,
-            private readonly $scope) {
+            private readonly $scope,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;
@@ -227,6 +228,7 @@
                 .then(function onSuccess(result) {
                     msg.toSuccessMessage("Feltet er opdateret.");
                     superClass.$(`#${superClass.dirId}`).data("kendoGrid").dataSource.read();
+                    this.inMemoryCacheService.clear();
                 }, function onError(result) {
                     if (result.status === 409) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
@@ -250,6 +252,7 @@
             };
 
             this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.inMemoryCacheService.clear();
                 this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
             });
         }

@@ -43,7 +43,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
             var idsOfSourceEntitiesWhichHaveChangedState = _readModelRepository
                 .GetReadModelsMustUpdateToChangeActiveState()
-                .Select(x => x.SourceEntity.Id)
+                .Select(x => x.SourceEntityId)
                 .Distinct()
                 .ToList();
 

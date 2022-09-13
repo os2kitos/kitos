@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItContract;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;
@@ -34,8 +35,12 @@ namespace Tools.Test.Database.Model.Tasks
                 OrganizationId = commonOrg.Id,
                 LastChangedByUserId = globalAdmin.Id,
             };
-
             context.ItContracts.Add(itContract);
+            context.SaveChanges();
+
+            var pendingReadModelUpdate = PendingReadModelUpdate.Create(itContract.Id, PendingReadModelUpdateSourceCategory.ItContract);
+
+            context.PendingReadModelUpdates.Add(pendingReadModelUpdate);
             context.SaveChanges();
 
             return true;

@@ -78,9 +78,14 @@
     <Compile Include="Mapping\DataProcessingDataResponsibleOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewReadModelDataProcessingAgreementMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewReadModelItSystemUsageMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewReadModelSystemRelationMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewArchivePeriodReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
+    <Compile Include="Mapping\ItContractOverviewReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewUsingSystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewUsedBySystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
@@ -906,6 +911,10 @@
     <Compile Include="Migrations\202209070640375_AddedNoteToItSystemUsageOverviewReadModel.designer.cs">
       <DependentUpon>202209070640375_AddedNoteToItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202209091039005_add_itcontract_read_model.cs" />
+    <Compile Include="Migrations\202209091039005_add_itcontract_read_model.designer.cs">
+      <DependentUpon>202209091039005_add_itcontract_read_model.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1510,6 +1519,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209070640375_AddedNoteToItSystemUsageOverviewReadModel.resx">
       <DependentUpon>202209070640375_AddedNoteToItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209091039005_add_itcontract_read_model.resx">
+      <DependentUpon>202209091039005_add_itcontract_read_model.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

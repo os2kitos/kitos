@@ -80,6 +80,12 @@ namespace Presentation.Web
                 cronExpression: Cron.Daily(), // Every night at 00:00
                 timeZone: TimeZoneInfo.Local);
 
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleContractRmAsync(CancellationToken.None)),
+                cronExpression: Cron.Daily(), // Every night at 00:00
+                timeZone: TimeZoneInfo.Local);
+
 
             /******************
              * ON-DEMAND JOBS *
@@ -94,6 +100,12 @@ namespace Presentation.Web
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.RebuildItSystemUsageReadModels,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.ItSystemUsage, CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
+
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.RebuildItContractReadModels,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.ItContract, CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
                 timeZone: TimeZoneInfo.Local);
 
