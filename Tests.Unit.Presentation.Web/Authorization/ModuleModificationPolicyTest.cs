@@ -73,8 +73,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        // UNKNOWN ENTITY FALLBACK
-        [InlineData(typeof(Entity), false, false, null, true)]//Unrestricted entity type always returns true from the creation perspective
         // GLOBAL ADMIN
         [InlineData(typeof(ItSystem), false, true, null, true)]
         [InlineData(typeof(ItInterface), false, true, null, true)]

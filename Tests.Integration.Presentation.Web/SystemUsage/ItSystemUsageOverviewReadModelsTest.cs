@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -1006,26 +1003,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
         private static async Task WaitForReadModelQueueDepletion()
         {
-            await WaitForAsync(
-                () =>
-                {
-                    return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
-                }, TimeSpan.FromSeconds(120));
-        }
-
-        private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)
-        {
-            bool conditionMet;
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            do
-            {
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
-                conditionMet = await check();
-            } while (conditionMet == false && stopwatch.Elapsed <= howLong);
-
-            Assert.True(conditionMet, $"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
+            await ReadModelTestTools.WaitForReadModelQueueDepletion();
         }
     }
 }

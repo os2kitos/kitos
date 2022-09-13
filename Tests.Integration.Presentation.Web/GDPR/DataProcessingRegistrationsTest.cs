@@ -72,7 +72,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.NotNull(gotten);
-            dto.ToExpectedObject().ShouldMatch(gotten);
+            Assert.Equal(dto.Id, gotten.Id);
+            Assert.Equal(dto.Name, gotten.Name);
+            Assert.Equal(dto.Uuid, gotten.Uuid);
         }
 
         [Fact]

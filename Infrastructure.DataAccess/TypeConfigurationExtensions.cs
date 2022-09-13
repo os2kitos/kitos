@@ -37,7 +37,7 @@ namespace Infrastructure.DataAccess
         public static PrimitivePropertyConfiguration HasIndexAnnotation(
             this PrimitivePropertyConfiguration property,
             string indexName,
-            int columnOrder,
+            int columnOrder = 0,
             bool unique = false)
         {
             var indexAttribute = new IndexAttribute(indexName, columnOrder) { IsUnique = unique };

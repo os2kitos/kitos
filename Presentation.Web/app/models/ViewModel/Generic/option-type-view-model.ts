@@ -16,7 +16,11 @@
         //Cache texts for quick lookup texts
         private readonly valueToTextMap: { [key: number]: IOptionValues };
 
-        getOptionText(id: number): string {
+        getOptionText(id: number | null | undefined): string {
+            if (id == null || id == undefined) {
+                return "";
+            }
+
             const value = this.valueToTextMap[id];
             if (!value) {
                 return "";

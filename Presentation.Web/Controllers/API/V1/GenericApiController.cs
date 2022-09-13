@@ -73,39 +73,6 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
-        /// <summary>
-        /// POST api/T?getDetailedInfo
-        /// </summary>
-        /// <param name="ids">ID's of entities to retrieve</param>
-        /// <returns>HTML code for success or failure</returns>
-        public virtual HttpResponseMessage PostGetFromIds([FromBody] int[] ids, [FromUri] bool? getDetailedInfo)
-        {
-            if (ids.Length > MaxEntities)
-            {
-                return BadRequest($"Please limit the number of ID's you are asking for. Max is {MaxEntities} ID's per request");
-            }
-
-            var result = ids
-                .Distinct()
-                .Select(id => Repository.GetByKey(id))
-                .ToList();
-
-            var disAllowedItemIds = result
-                .Where(x => AllowRead(x) == false)
-                .Select(x => x.Id)
-                .ToList();
-
-            if (disAllowedItemIds.Any())
-            {
-                var noReadAccessIds = disAllowedItemIds.Transform(disallowedIds => string.Join(";", disallowedIds));
-
-                return Forbidden($"You are now allowed to read the information on items with the following ID's: '{noReadAccessIds}'");
-            }
-
-            return Ok(Map(result));
-
-        }
-
         // GET api/T
         /// <summary>
         /// Get single from base entity controller

@@ -57,6 +57,7 @@
             deadlines: {
                 text: "Aftalefrister",
                 readOnly: false,
+                subtreeIsComplete: true,
                 children: {
                     agreementDeadlines: {
                         text: "Aftalefrister",
@@ -71,6 +72,7 @@
             economy: {
                 text: "Økonomi",
                 readOnly: false,
+                subtreeIsComplete: true,
                 children: {
                     paymentModel: {
                         text: "Betalingsmodel",

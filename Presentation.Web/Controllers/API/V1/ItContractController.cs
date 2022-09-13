@@ -298,7 +298,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignOversightOption(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
+        public HttpResponseMessage AssignDataProcessingRegistration(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
         {
             if (dataProcessingRegistrationId == null)
                 return BadRequest($"{nameof(dataProcessingRegistrationId)} must be provided");
@@ -314,7 +314,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveOversightOption(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
+        public HttpResponseMessage RemoveDataProcessingRegistration(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
         {
             if (dataProcessingRegistrationId == null)
                 return BadRequest($"{nameof(dataProcessingRegistrationId)} must be provided");
