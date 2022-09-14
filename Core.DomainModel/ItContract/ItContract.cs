@@ -22,7 +22,6 @@ namespace Core.DomainModel.ItContract
     /// </summary>
     public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid, IHasDirtyMarking
     {
-
         public ItContract()
         {
             Children = new List<ItContract>();
@@ -54,14 +53,17 @@ namespace Core.DomainModel.ItContract
                 endDate = ExpirationDate.Value.Date;
             }
 
+            //Valid yet?
             if (today < startDate)
             {
                 errors.Add(ItContractValidationError.StartDateNotPassed);
             }
+            //Expired?
             if (today > endDate)
             {
                 errors.Add(ItContractValidationError.EndDatePassed);
             }
+            //If contract has been terminated, determine if the termination deadline has passed
             if (Terminated.HasValue)
             {
                 var terminationDate = Terminated.Value.Date;
@@ -71,7 +73,6 @@ namespace Core.DomainModel.ItContract
                     int.TryParse(TerminationDeadline.Name, out deadline);
                     terminationDate = terminationDate.AddMonths(deadline);
                 }
-                // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
                 if (today > terminationDate.Date)
                 {
                     errors.Add(ItContractValidationError.TerminationPeriodExceeded);
