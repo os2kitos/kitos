@@ -53,27 +53,8 @@ namespace Core.DomainModel.ItSystemUsage
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
         }
 
-        public bool IsActiveAccordingToDateFields
-        {
-            get
-            {
-                if (Concluded == null && ExpirationDate == null) 
-                    return true;
+        public bool IsActiveAccordingToDateFields => CheckDatesValidity().Result;
 
-                var today = DateTime.UtcNow;
-                var startDate = this.Concluded ?? today;
-                var endDate = DateTime.MaxValue;
-
-                if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
-                {
-                    endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
-                }
-
-                // indgået-dato <= dags dato <= udløbs-dato
-                return today >= startDate.Date && today <= endDate;
-            }
-        }
-        
         /// <summary>
         ///     When the system began. (indgået)
         /// </summary>
@@ -868,11 +849,50 @@ namespace Core.DomainModel.ItSystemUsage
             LastChanged = DateTime.UtcNow;
         }
 
-        public bool CheckSystemValidity()
+        public ItSystemUsageValidationResult CheckSystemValidity()
         {
-            //TODO: add other conditions in the following tasks
-            return IsActiveAccordingToDateFields || 
-                   (LifeCycleStatus != null && LifeCycleStatus != LifeCycleStatusType.Undecided);
+            var errors = new List<ItSystemUsageValidationError>();
+            var isLifeCycleStatusSet = LifeCycleStatus != null && LifeCycleStatus != LifeCycleStatusType.Undecided;
+
+            errors.AddRange(CheckDatesValidity().ValidationErrors);
+
+            if (isLifeCycleStatusSet)
+            {
+                return new ItSystemUsageValidationResult(true, errors);
+            }
+            errors.Add(ItSystemUsageValidationError.LifeCycleStatusNotSet);
+
+            return new ItSystemUsageValidationResult(false, errors);
+        }
+
+        private ItSystemUsageValidationResult CheckDatesValidity()
+        {
+            var errors = new List<ItSystemUsageValidationError>();
+
+            if (Concluded == null && ExpirationDate == null)
+                return new ItSystemUsageValidationResult(true, errors);
+
+            var today = DateTime.UtcNow;
+            var startDate = this.Concluded ?? today;
+            var endDate = DateTime.MaxValue;
+
+            if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
+            {
+                endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
+            }
+
+            //Valid yet?
+            if (today < startDate)
+            {
+                errors.Add(ItSystemUsageValidationError.StartDateNotPassed);
+            }
+            //Expired?
+            if (today > endDate)
+            {
+                errors.Add(ItSystemUsageValidationError.EndDatePassed);
+            }
+
+            return new ItSystemUsageValidationResult(false, errors);
         }
     }
 }
