@@ -106,6 +106,9 @@
                             parameterMap.$filter = replaceNullOptionQuery(parameterMap.$filter);
 
                             parameterMap.$filter = replaceEmptyOptionQuery(parameterMap.$filter);
+
+                            //Cleanup broken queries due to stripping
+                            Helpers.OdataQueryHelper.cleanupModifiedKendoFilterConfig(parameterMap);
                         }
 
                         return parameterMap;

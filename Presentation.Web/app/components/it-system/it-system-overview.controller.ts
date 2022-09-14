@@ -148,15 +148,7 @@
                                 ""); //Org unit id is handled by the url factory since it is not a regular odata query
 
                         //Cleanup broken queries due to stripping
-                        parameterMap.$filter = parameterMap.$filter
-                            .replace("and  and", "and") //in the middle of other criteria
-                            .replace(/\( and /, "(") //First criteria removed
-                            .replace(/ and \)/, ")"); // Last criteria removed
-
-                        //Cleanup filter if invalid
-                        if (parameterMap.$filter === "") {
-                            delete parameterMap.$filter;
-                        }
+                        Helpers.OdataQueryHelper.cleanupModifiedKendoFilterConfig(parameterMap);
                     }
 
                     //Making sure orgunit is set
