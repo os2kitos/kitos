@@ -919,10 +919,6 @@
     <Compile Include="Migrations\202209130756266_RemovedActiveFromSystemUsage.designer.cs">
       <DependentUpon>202209130756266_RemovedActiveFromSystemUsage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202209131255106_add_itcontract_read_model.cs" />
-    <Compile Include="Migrations\202209131255106_add_itcontract_read_model.designer.cs">
-      <DependentUpon>202209131255106_add_itcontract_read_model.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1533,9 +1529,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209130756266_RemovedActiveFromSystemUsage.resx">
       <DependentUpon>202209130756266_RemovedActiveFromSystemUsage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202209131255106_add_itcontract_read_model.resx">
-      <DependentUpon>202209131255106_add_itcontract_read_model.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
