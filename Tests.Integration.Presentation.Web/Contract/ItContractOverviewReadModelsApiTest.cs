@@ -192,10 +192,8 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Equal(2, readModel.NumberOfAssociatedSystemRelations);
             AssertCsv(readModel.ItSystemUsagesCsv, itSystem1.Name, itSystem2.Name);
             Assert.Equal(2, readModel.RoleAssignments.Count);
-            var roleAssignment1 = Assert.Single(readModel.RoleAssignments.Where(x => x.RoleId == role1.Id));
-            Assert.Equal(user1Id, roleAssignment1.UserId);
-            var roleAssignment2 = Assert.Single(readModel.RoleAssignments.Where(x => x.RoleId == role2.Id));
-            Assert.Equal(user2Id, roleAssignment2.UserId);
+            Assert.Contains(readModel.RoleAssignments, ra => ra.RoleId == role1.Id && ra.UserId == user1Id);
+            Assert.Contains(readModel.RoleAssignments, ra => ra.RoleId == role2.Id && ra.UserId == user2Id);
         }
 
         private static void AssertCsv(string csv, params string[] expectedNames)
