@@ -10,6 +10,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItContract;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -188,6 +189,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/EconomyStream?contractId={contractId}"), cookie, body);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<EconomyStreamDTO>();
+        }
+
+        public static async Task<ContractValidationDetailsResponseDTO> GetItContractValidationDetailsAsync(int contractId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/ItContract/{contractId}/validation-details");
+
+            using var result = await HttpApi.GetWithCookieAsync(url, cookie);
+
+            var dto = await result.ReadResponseBodyAsKitosApiResponseAsync<ContractValidationDetailsResponseDTO>();
+
+            return dto;
         }
     }
 }

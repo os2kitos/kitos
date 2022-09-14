@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Advice;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using ExpectedObjects;
@@ -16,7 +17,7 @@ namespace Tests.Integration.Presentation.Web.Contract
     public class ItContractTest : WithAutoFixture
     {
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
-        
+
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.LocalAdmin)]
@@ -143,6 +144,37 @@ namespace Tests.Integration.Presentation.Web.Contract
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, conflictedResponse.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(false, false, true)]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, false)]
+        public async Task Can_Get_Validation_Details(bool expectDateError, bool enforceValid, bool expectValid)
+        {
+            //Arrange
+            var itContractDto = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
+            await ItContractHelper.PatchContract(itContractDto.Id, TestEnvironment.DefaultOrganizationId, new
+            {
+                Active = enforceValid,
+                Concluded = DateTime.Now.AddDays(expectDateError ? 1 : -1)
+            });
+
+            //Act
+            var result = await ItContractHelper.GetItContractValidationDetailsAsync(itContractDto.Id);
+
+            //Assert
+            Assert.Equal(expectValid, result.Valid);
+            Assert.Equal(enforceValid, result.EnforcedValid);
+            if (expectDateError)
+            {
+                var dateError = Assert.Single(result.Errors);
+                Assert.Equal(ItContractValidationError.StartDateNotPassed, dateError);
+            }
+            else
+            {
+                Assert.Empty(result.Errors);
+            }
         }
     }
 }
