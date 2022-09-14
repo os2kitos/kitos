@@ -58,7 +58,7 @@ namespace Core.DomainModel.ItSystemUsage
             get
             {
                 if (Concluded == null && ExpirationDate == null) 
-                    return false;
+                    return true;
 
                 var today = DateTime.UtcNow;
                 var startDate = this.Concluded ?? today;
@@ -75,7 +75,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         /// <summary>
-        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActive"/>)
+        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActiveAccordingToDateFields"/>)
         /// </summary>
         /// <value>
         ///   Active.
@@ -866,6 +866,12 @@ namespace Core.DomainModel.ItSystemUsage
         public void MarkAsDirty()
         {
             LastChanged = DateTime.UtcNow;
+        }
+
+        public bool CheckSystemValidity()
+        {
+            //TODO: add other conditions in the following tasks
+            return IsActiveAccordingToDateFields;
         }
     }
 }
