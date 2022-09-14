@@ -22,7 +22,6 @@ namespace Core.DomainModel.ItContract
     /// </summary>
     public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid, IHasDirtyMarking
     {
-
         public ItContract()
         {
             Children = new List<ItContract>();
@@ -40,43 +39,57 @@ namespace Core.DomainModel.ItContract
 
         public Guid Uuid { get; set; }
 
+        public ItContractValidationResult Validate(DateTime todayReference)
+        {
+            var enforcedActive = Active;
+            var errors = new List<ItContractValidationError>();
+            
+            var today = todayReference.Date;
+            var startDate = (Concluded ?? today).Date;
+            var endDate = DateTime.MaxValue;
+
+            if (ExpirationDate.HasValue && ExpirationDate.Value.Date != DateTime.MaxValue.Date)
+            {
+                endDate = ExpirationDate.Value.Date;
+            }
+
+            //Valid yet?
+            if (today < startDate)
+            {
+                errors.Add(ItContractValidationError.StartDateNotPassed);
+            }
+            //Expired?
+            if (today > endDate)
+            {
+                errors.Add(ItContractValidationError.EndDatePassed);
+            }
+            //If contract has been terminated, determine if the termination deadline has passed
+            if (Terminated.HasValue)
+            {
+                var terminationDate = Terminated.Value.Date;
+                if (TerminationDeadline != null)
+                {
+                    int deadline;
+                    int.TryParse(TerminationDeadline.Name, out deadline);
+                    terminationDate = terminationDate.AddMonths(deadline);
+                }
+                if (today > terminationDate.Date)
+                {
+                    errors.Add(ItContractValidationError.TerminationPeriodExceeded);
+                }
+            }
+
+            return new ItContractValidationResult(enforcedActive, errors);
+        }
+        public ItContractValidationResult Validate()
+        {
+            return Validate(DateTime.Now);
+        }
+
         /// <summary>
         ///     Whether the contract is active or not
         /// </summary>
-        public bool IsActive
-        {
-            get
-            {
-                if (!Active)
-                {
-                    var today = DateTime.UtcNow;
-                    var startDate = Concluded ?? today;
-                    var endDate = DateTime.MaxValue;
-
-                    if (ExpirationDate.HasValue && ExpirationDate.Value.Date != DateTime.MaxValue.Date)
-                    {
-                        endDate = new DateTime(ExpirationDate.Value.Year, ExpirationDate.Value.Month, ExpirationDate.Value.Day, 23, 59, 59);
-                    }
-
-                    if (Terminated.HasValue)
-                    {
-                        var terminationDate = Terminated;
-                        if (TerminationDeadline != null)
-                        {
-                            int deadline;
-                            int.TryParse(TerminationDeadline.Name, out deadline);
-                            terminationDate = Terminated.Value.AddMonths(deadline);
-                        }
-                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                        return today >= startDate.Date && today <= terminationDate.Value.Date.AddDays(1).AddTicks(-1);
-                    }
-
-                    // indgået-dato <= dags dato <= udløbs-dato
-                    return today >= startDate.Date && today <= endDate;
-                }
-                return Active;
-            }
-        }
+        public bool IsActive => Validate().Result;
 
         public int? ReferenceId { get; set; }
 

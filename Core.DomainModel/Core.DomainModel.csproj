@@ -56,6 +56,8 @@
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
+    <Compile Include="ItContract\ItContractValidationCategory.cs" />
+    <Compile Include="ItContract\ItContractValidationResult.cs" />
     <Compile Include="ItContract\Read\ItContractOverviewReadModel.cs" />
     <Compile Include="ItContract\Read\ItContractOverviewReadModelItSystemUsage.cs" />
     <Compile Include="ItContract\Read\ItContractOverviewReadModelDataProcessingAgreement.cs" />

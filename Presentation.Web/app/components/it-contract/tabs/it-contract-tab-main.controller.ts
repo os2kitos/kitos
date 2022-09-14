@@ -84,12 +84,13 @@
             'notify', 'contract', 'contractTypes', 'contractTemplates',
             'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess',
             'user', 'autofocus', 'kitosUsers', "uiState",
-            "criticalityOptions", "select2LoadingService",
+            "criticalityOptions", "select2LoadingService", "itContractService",
             function ($scope, $http, _, $stateParams,
                 notify, contract, contractTypes, contractTemplates,
                 purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess,
                 user: Kitos.Services.IUser, autofocus, kitosUsers, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
-                criticalityOptions: Kitos.Models.IOptionEntity[], select2LoadingService: Kitos.Services.ISelect2LoadingService) {
+                criticalityOptions: Kitos.Models.IOptionEntity[], select2LoadingService: Kitos.Services.ISelect2LoadingService,
+                itContractService: Kitos.Services.ItContract.IItContractService) {
 
                 const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
@@ -120,6 +121,8 @@
                 $scope.isActiveEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.isActive);
 
                 bindProcurementInitiated();
+                reloadValidationStatus();
+
                 var today = new Date();
 
                 if (!contract.active) {
@@ -201,6 +204,22 @@
                     }
                 };
 
+                function reloadValidationStatus() {
+                    itContractService.getValidationDetails(contract.id).then(newStatus => {
+                        $scope.validationStatus = newStatus;
+                    });
+                }
+
+                $scope.toggleOverride = () => {
+                    const newActive = !contract.active;
+                    patch({ active: newActive }, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId).then(updatedContract => {
+                        contract.active = updatedContract.active;
+                        reloadValidationStatus();
+                    });
+                }
+
+                $scope.reloadValidationStatus = () => reloadValidationStatus();
+
                 function updateProcurement(procurementPlanQuarter, procurementPlanYear) {
                     contract = $scope.contract;
 
@@ -212,9 +231,10 @@
 
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
-                    $http({ method: 'PATCH', url: url, data: payload })
+                    return $http({ method: 'PATCH', url: url, data: payload })
                         .then(function onSuccess(result) {
                             msg.toSuccessMessage("Feltet er opdateret.");
+                            return result.data.response;
                         }, function onError(result) {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
@@ -242,25 +262,6 @@
                     });
                 }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
 
-                $scope.override = () => {
-                    isActive();
-                }
-
-                function isActive() {
-                    var today = moment();
-                    let fromDate = moment($scope.contract.concluded, Kitos.Constants.DateFormat.DanishDateFormat).startOf('day');
-                    let endDate = moment($scope.contract.expirationDate, Kitos.Constants.DateFormat.DanishDateFormat).endOf('day');
-                    if ($scope.contract.active || today.isBetween(fromDate, endDate, null, '[]') ||
-                        (today.isSameOrAfter(fromDate) && !endDate.isValid()) ||
-                        (today.isSameOrBefore(endDate) && !fromDate.isValid()) ||
-                        (!fromDate.isValid() && !endDate.isValid())) {
-                        $scope.contract.isActive = true;
-                    }
-                    else {
-                        $scope.contract.isActive = false;
-                    }
-                }
-
                 $scope.checkContractValidity = (field, value) => {
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
@@ -271,8 +272,8 @@
                     var payload = {};
                     if (value === "") {
                         payload[field] = null;
-                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
-                        isActive();
+                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId)
+                            .then(_ => reloadValidationStatus());
                     }
                     else if (value == null) {
                         //made to prevent error message on empty value i.e. open close datepicker
@@ -286,8 +287,8 @@
                     else {
                         var dateString = date.format("YYYY-MM-DD");
                         payload[field] = dateString;
-                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
-                        isActive();
+                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId)
+                            .then(_ => reloadValidationStatus());
                     }
                 }
 

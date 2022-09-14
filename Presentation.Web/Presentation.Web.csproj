@@ -366,7 +366,8 @@
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-life-cycle-status.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-details-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
@@ -386,8 +387,8 @@
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
-    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
+    <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
     <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
@@ -571,7 +572,6 @@
     <Compile Include="Models\API\V2\Types\SystemUsage\ArchiveDutyChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\DataSensitivityLevelChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\HostingChoice.cs" />
-    <Compile Include="Models\API\V2\Types\SystemUsage\LifeCycleStatusChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\RiskLevelChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\TechnicalPrecautionChoice.cs" />
     <Compile Include="Models\API\V2\Types\Shared\YesNoDontKnowChoice.cs" />
@@ -853,6 +853,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\it-contract\it-contract-service.ts" />
     <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
     <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
@@ -1710,7 +1711,7 @@
       <Name>Core.DomainServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
-      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
+      <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
       <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Ninject\Infrastructure.Ninject.csproj">
