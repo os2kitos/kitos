@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202209090842227_ChangedIsActiveToActiveAccordingToValidityPeriod"; }
+            get { return "202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod"; }
         }
         
         string IMigrationMetadata.Source
