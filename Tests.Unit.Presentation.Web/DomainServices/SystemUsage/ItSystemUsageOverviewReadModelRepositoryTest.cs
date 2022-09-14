@@ -27,10 +27,10 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
         public void GetReadModelsMustUpdateToChangeActiveState_Returns_ReadModels_Where_Active_State_Is_Stale()
         {
             //Arrange - 1 that must expire and 1 that must be activated
-            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, false, _now.Date, _now.Date.AddDays(1));
-            var excludedSinceConcludedSinceExpired = CreateReadModel(false, false, _now.Date.AddDays(-2), _now.Date.AddDays(-1));
-            var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, false, _now.AddDays(-2), _now);
-            var includedSinceExpired = CreateReadModel(true, false, null, _now.AddDays(-1));
+            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1));
+            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1));
+            var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, _now.AddDays(-2), _now);
+            var includedSinceExpired = CreateReadModel(true, null, _now.AddDays(-1));
             _repositoryMock.Setup(x => x.AsQueryable()).Returns(new[]
             {
                 includedSinceExpired,

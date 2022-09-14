@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class RemovedActiveFromSystemUsage : DbMigration
+    public partial class AddedLifeCycleStatus : DbMigration
     {
         public override void Up()
         {
