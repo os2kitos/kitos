@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class ChangedIsActiveToActiveAccordingToValidityPeriod : IMigrationMetadata
+    public sealed partial class AddedLifeCycleStatus : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedIsActiveToActiveAccordingToValidityPeriod));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedLifeCycleStatus));
         
         string IMigrationMetadata.Id
         {
-            get { return "202209090842227_ChangedIsActiveToActiveAccordingToValidityPeriod"; }
+            get { return "202209140724090_AddedLifeCycleStatus"; }
         }
         
         string IMigrationMetadata.Source
