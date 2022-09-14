@@ -383,6 +383,20 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(Ok, FromOperationError);
         }
 
+        [HttpGet]
+        [Route("{contractId}/validation-details")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetValidationStatus(int contractId)
+        {
+            return _itContractService
+                .GetContract(contractId)
+                .Select(contract => contract.Validate())
+                .Select(details => new ContractValidationDetailsResponseDTO(details.Result, details.EnforcedValid, details.ValidationErrors))
+                .Match(Ok, FromOperationError);
+        }
+
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages.Select(x => x.ItSystemUsage));

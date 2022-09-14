@@ -274,10 +274,8 @@
                                 this.procurementInitiatedPropertyName,
                                 Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
-                            //Cleanup filter if invalid ODATA Filter (can happen when we strip params such as responsible org unit)
-                            if (parameterMap.$filter === "") {
-                                delete parameterMap.$filter;
-                            }
+                            //Cleanup broken queries due to stripping
+                            Helpers.OdataQueryHelper.cleanupModifiedKendoFilterConfig(parameterMap);
                         }
 
                         //Making sure orgunit is set
