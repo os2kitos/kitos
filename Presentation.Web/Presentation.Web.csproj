@@ -366,6 +366,8 @@
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-details-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
@@ -851,6 +853,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\it-contract\it-contract-service.ts" />
     <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
     <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
