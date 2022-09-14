@@ -346,8 +346,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(contract.Id, readModel.MainContractId);
             Assert.Equal(contract.Supplier.Id, readModel.MainContractSupplierId);
             Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
-            Assert.Equal(contract.IsActive, readModel.MainContractIsActive.GetValueOrDefault(false));
-            Assert.True(readModel.HasMainContract);
+            Assert.Equal(contract.IsActive, readModel.MainContractIsActive);
 
             //ArchivePeriods
             var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);

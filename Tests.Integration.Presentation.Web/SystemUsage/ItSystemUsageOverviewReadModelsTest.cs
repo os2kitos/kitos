@@ -288,7 +288,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(organizationId, readModel.MainContractSupplierId);
             Assert.Equal(organizationName, readModel.MainContractSupplierName);
             Assert.True(readModel.MainContractIsActive);
-            Assert.True(readModel.HasMainContract);
 
             // ArchivePeriods
             Assert.Equal(archivePeriodEndDate, readModel.ActiveArchivePeriodEndDate);
@@ -561,8 +560,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Null(readModel.MainContractId);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
-            Assert.Null(readModel.MainContractIsActive);
-            Assert.False(readModel.HasMainContract);
+            Assert.False(readModel.MainContractIsActive);
         }
 
         [Fact]

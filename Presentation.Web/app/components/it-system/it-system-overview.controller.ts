@@ -469,8 +469,8 @@
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("HasMainContract")
-                        .withTitle("Kontrakt")
+                        .withDataSourceName("MainContractIsActive")
+                        .withTitle("Aktivt ifølge markeret kontrakt")
                         .withId("contract")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
@@ -478,27 +478,18 @@
                         (
                             [
                                 {
-                                    textValue: "Har kontrakt",
+                                    textValue: "Aktivt",
                                     remoteValue: true
                                 },
                                 {
-                                    textValue: "Ingen kontrakt",
+                                    textValue: "Ikke aktivt",
                                     remoteValue: false
                                 }
                             ]
                             ,
                             false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withRendering(dataItem => {
-
-                            if (dataItem.MainContractIsActive == null) {
-                                return "";
-                            }
-                            const decorationClass = dataItem.MainContractIsActive
-                                ? "fa-file text-success"
-                                : "fa-file-o text-muted";
-                            return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.SourceEntityId}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
-                        })
+                        .withRendering(dataItem => { return dataItem.MainContractIsActive ? "Aktivt" : "Ikke aktivt"; })
                         .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : "")
                         .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
 
