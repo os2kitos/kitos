@@ -246,7 +246,7 @@
                     .withDataSourceName("ActiveAccordingToValidityPeriod")
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                     .withTitle("Status ifølge datofelter")
-                    .withId("ActiveAccordingToValidityPeriod")
+                    .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                     .withFixedValueRange([
                         {
@@ -254,14 +254,13 @@
                             remoteValue: true
                         },
                         {
-                            textValue: "Ikke Aktivt",
+                            textValue: "Ikke aktivt",
                             remoteValue: false
                         }
                     ],
                         false)
                     .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktiv')
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                    .withExcelOutput(dataItem => dataItem.ActiveAccordingToValidityPeriod ? "Aktivt" : "Ikke aktiv")
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
