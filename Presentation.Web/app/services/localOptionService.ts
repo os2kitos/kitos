@@ -98,7 +98,7 @@
         DataProcessingOversightOptions,
         DataProcessingDataResponsibleOptions,
         DataProcessingCountryOptions,
-        CriticalityTypes
+        CriticalityTypes,
     }
 
     export interface ILocalOptionUrlResolver {

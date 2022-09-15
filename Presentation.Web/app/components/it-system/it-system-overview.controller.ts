@@ -149,17 +149,7 @@
                                 ""); //Org unit id is handled by the url factory since it is not a regular odata query
 
                         //Cleanup broken queries due to stripping
-                        parameterMap.$filter = parameterMap.$filter
-                            .replace("and  and", "and") //in the middle of other criteria
-                            .replace(/\( and /, "(") //First criteria removed
-                            .replace(/ and \)/, ")"); // Last criteria removed
-
-                        parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter, "LifeCycleStatus", Models.ItSystemUsage.LifeCycleStatusType.Undecided);
-
-                        //Cleanup filter if invalid
-                        if (parameterMap.$filter === "") {
-                            delete parameterMap.$filter;
-                        }
+                        Helpers.OdataQueryHelper.cleanupModifiedKendoFilterConfig(parameterMap);
                     }
 
                     //Making sure orgunit is set
@@ -246,7 +236,7 @@
                     .withDataSourceName("ActiveAccordingToValidityPeriod")
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                     .withTitle("Status ifølge datofelter")
-                    .withId("ActiveAccordingToValidityPeriod")
+                    .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                     .withFixedValueRange([
                         {
@@ -254,14 +244,13 @@
                             remoteValue: true
                         },
                         {
-                            textValue: "Ikke Aktivt",
+                            textValue: "Ikke aktivt",
                             remoteValue: false
                         }
                     ],
                         false)
                     .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktiv')
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                    .withExcelOutput(dataItem => dataItem.ActiveAccordingToValidityPeriod ? "Aktivt" : "Ikke aktiv")
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder

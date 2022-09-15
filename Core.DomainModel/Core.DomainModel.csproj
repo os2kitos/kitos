@@ -56,6 +56,8 @@
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
+    <Compile Include="ItContract\ItContractValidationCategory.cs" />
+    <Compile Include="ItContract\ItContractValidationResult.cs" />
     <Compile Include="ItContract\Read\ItContractOverviewReadModel.cs" />
     <Compile Include="ItContract\Read\ItContractOverviewReadModelItSystemUsage.cs" />
     <Compile Include="ItContract\Read\ItContractOverviewReadModelDataProcessingAgreement.cs" />
@@ -71,6 +73,8 @@
     <Compile Include="Events\IDomainEvents.cs" />
     <Compile Include="Events\NamedEntityChangedNameEvent.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
+    <Compile Include="ItSystemUsage\ItSystemUsageValidationError.cs" />
+    <Compile Include="ItSystemUsage\ItSystemUsageValidationResult.cs" />
     <Compile Include="ItSystemUsage\LifeCycleStatusType.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
@@ -78,6 +82,7 @@
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
+    <Compile Include="Shared\GenericValidationResult.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />

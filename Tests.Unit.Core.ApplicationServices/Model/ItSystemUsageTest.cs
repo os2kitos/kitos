@@ -319,6 +319,83 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(expectedResult, _sut.UserCount);
         }
 
+        [Fact]
+        public void Valid_When_LifeCycleStatus_Is_Not_Set_And_Date_Fields_Are_Not_Set()
+        {
+            var itSystemUsage = new ItSystemUsage();
+
+            Assert.True(itSystemUsage.CheckSystemValidity().Result);
+        }
+
+        [Theory, MemberData(nameof(DateValidityData))]
+        public void Valid_When_Date_Fields_Are_Valid_And_LifeCycleStatus_Is_Not_Set(DateTime startDate, DateTime endDate)
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                Concluded = startDate, 
+                ExpirationDate = endDate
+            };
+
+            Assert.True(itSystemUsage.CheckSystemValidity().Result);
+        }
+
+        [Theory]
+        [InlineData(LifeCycleStatusType.NotInUse)]
+        [InlineData(LifeCycleStatusType.Operational)]
+        [InlineData(LifeCycleStatusType.PhasingIn)]
+        [InlineData(LifeCycleStatusType.PhasingOut)]
+        public void Valid_When_LifeCycleStatus_Has_Active_Value_And_Date_Fields_Are_Invalid(LifeCycleStatusType lifeCycleStatus)
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                LifeCycleStatus = lifeCycleStatus,
+                Concluded = DateTime.UtcNow.AddDays(1),
+            };
+
+            Assert.True(itSystemUsage.CheckSystemValidity().Result);
+        }
+
+        [Fact]
+        public void Invalid_When_LifeCycleStatus_Has_Inactive_Value_And_Date_Fields_Are_Invalid()
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                LifeCycleStatus = LifeCycleStatusType.Undecided,
+                Concluded = DateTime.UtcNow.AddDays(1),
+            };
+
+            Assert.False(itSystemUsage.CheckSystemValidity().Result);
+        }
+
+        [Fact]
+        public void Invalid_When_LifeCycleStatus_Is_Not_Set_And_Date_Fields_Are_Invalid()
+        {
+            var itSystemUsage = new ItSystemUsage
+                {
+                    Concluded = DateTime.UtcNow.AddDays(1),
+                };
+
+            Assert.False(itSystemUsage.CheckSystemValidity().Result);
+        }
+
+        [Fact]
+        public void Invalid_When_LifeCycleStatus_Is_Not_Set_And_Date_Fields_Are_Not_Valid()
+        {
+            var itSystemUsage = new ItSystemUsage
+                {
+                    Concluded = DateTime.UtcNow.AddDays(1),
+                };
+
+            Assert.False(itSystemUsage.CheckSystemValidity().Result);
+        }
+
+        public static readonly object[][] DateValidityData =
+        {
+            new object[] {DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1)},
+            new object[] {DateTime.UtcNow.AddDays(-1), DateTime.MaxValue},
+            new object[] {null, DateTime.UtcNow.AddDays(1)}
+        };
+
         private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);
@@ -327,5 +404,6 @@ namespace Tests.Unit.Core.Model
             Assert.True(operationError.Message.HasValue);
             Assert.Equal(message, operationError.Message.Value);
         }
+
     }
 }

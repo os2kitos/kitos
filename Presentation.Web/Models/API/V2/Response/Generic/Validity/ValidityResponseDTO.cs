@@ -6,9 +6,13 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Validity
     public class ValidityResponseDTO
     {
         /// <summary>
-        /// Determines if the entity is considered valid. This is computed from both "EnforcedValid" as well as ValidFrom/To. In case of the ItSystemUsage, it's only computed from the date fields
+        /// Determines if the entity is considered valid. This is computed from both "EnforcedValid" as well as ValidAccordingToValidityPeriod.
         /// </summary>
         public bool Valid { get; set; }
+        /// <summary>
+        /// Determines if the entity is considered valid based on the validity period defined by ValidFrom and ValidTo
+        /// </summary>
+        public bool ValidAccordingToValidityPeriod { get; set; }
         /// <summary>
         /// Determines if this entity has been forced into valid state even if context properties would dictate otherwise (e.g. no longer in use)
         /// </summary>

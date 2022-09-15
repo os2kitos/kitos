@@ -86,5 +86,24 @@
             var matchedString = filterRequest.replace(pattern, "$2");
             return parseInt(matchedString);
         }
+
+        /**
+         * Cleans up odata filter query from kendo config, so that it remains valid or is deleted alltogether.
+         * @param parameterMap
+         */
+        static cleanupModifiedKendoFilterConfig(parameterMap: { $filter :string}): void {
+
+            if (parameterMap.$filter) {
+                parameterMap.$filter = parameterMap.$filter
+                    .replace("and  and", "and") //in the middle of other criteria
+                    .replace(/\( and /, "(") //First criteria removed
+                    .replace(/ and \)/, ")"); // Last criteria removed
+            }
+
+            //Cleanup filter if invalid ODATA Filter (can happen when we strip params such as responsible org unit)
+            if (parameterMap.$filter === "" || parameterMap.$filter === null) {
+                delete parameterMap.$filter;
+            }
+        }
     }
 }
