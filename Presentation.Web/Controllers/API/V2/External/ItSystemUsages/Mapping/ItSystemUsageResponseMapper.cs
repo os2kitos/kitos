@@ -171,7 +171,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 SystemVersion = systemUsage.Version,
                 Validity = new ValidityResponseDTO
                 {
-                    Valid = systemUsage.CheckSystemValidity(),
+                    Valid = systemUsage.CheckSystemValidity().Result,
                     ValidAccordingToValidityPeriod = systemUsage.IsActiveAccordingToDateFields,
                     LifeCycleStatus = MapLifeCycleStatus(systemUsage),
                     ValidFrom = systemUsage.Concluded,

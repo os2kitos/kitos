@@ -53,7 +53,7 @@ namespace Core.DomainModel.ItSystemUsage
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
         }
 
-        public bool IsActiveAccordingToDateFields => CheckDatesValidity().Result;
+        public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Result;
 
         /// <summary>
         ///     When the system began. (indgået)
@@ -854,7 +854,8 @@ namespace Core.DomainModel.ItSystemUsage
             var errors = new List<ItSystemUsageValidationError>();
             var isLifeCycleStatusSet = LifeCycleStatus != null && LifeCycleStatus != LifeCycleStatusType.Undecided;
 
-            errors.AddRange(CheckDatesValidity().ValidationErrors);
+            var today = DateTime.UtcNow;
+            errors.AddRange(CheckDatesValidity(today).ValidationErrors);
 
             if (isLifeCycleStatusSet)
             {
@@ -865,14 +866,14 @@ namespace Core.DomainModel.ItSystemUsage
             return new ItSystemUsageValidationResult(false, errors);
         }
 
-        private ItSystemUsageValidationResult CheckDatesValidity()
+        private ItSystemUsageValidationResult CheckDatesValidity(DateTime todayReference)
         {
             var errors = new List<ItSystemUsageValidationError>();
 
             if (Concluded == null && ExpirationDate == null)
                 return new ItSystemUsageValidationResult(true, errors);
 
-            var today = DateTime.UtcNow;
+            var today = todayReference.Date;
             var startDate = this.Concluded ?? today;
             var endDate = DateTime.MaxValue;
 
