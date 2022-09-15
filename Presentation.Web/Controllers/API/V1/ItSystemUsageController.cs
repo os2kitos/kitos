@@ -441,7 +441,6 @@ namespace Presentation.Web.Controllers.API.V1
         [HttpGet]
         [Route("{usageId}/validation-details")]
         [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetValidationStatus(int usageId)
         {
