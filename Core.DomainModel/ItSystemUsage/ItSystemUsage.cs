@@ -861,7 +861,10 @@ namespace Core.DomainModel.ItSystemUsage
             {
                 return new ItSystemUsageValidationResult(true, errors);
             }
-            errors.Add(ItSystemUsageValidationError.LifeCycleStatusNotSet);
+            if (errors.Count != 0)
+            {
+                errors.Add(ItSystemUsageValidationError.LifeCycleStatusNotSet);
+            }
 
             return new ItSystemUsageValidationResult(false, errors);
         }
