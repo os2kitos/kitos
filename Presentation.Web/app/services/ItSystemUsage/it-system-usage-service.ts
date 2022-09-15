@@ -6,9 +6,17 @@
         patchSystemUsage(systemUsageId: number, orgId: number, payload: any);
         //Odata kept here to keep all pages working as they used to
         patchSystem(id: number, payload: any);
+        getValidationDetails(usageId: number): ng.IPromise<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>;
     }
 
     export class ItSystemUsageService implements IItSystemUsageService {
+        getValidationDetails(usageId: number): ng.IPromise<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO> {
+            return this.$http
+                .get<API.Models.IApiWrapper<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>>(`api/itsystemusage/${usageId}/validation-details`)
+                .then(response => {
+                    return response.data.response;
+                });
+        }
 
         static $inject = ["$http", "notify"];
         constructor(private readonly $http: ng.IHttpService, private notify) {

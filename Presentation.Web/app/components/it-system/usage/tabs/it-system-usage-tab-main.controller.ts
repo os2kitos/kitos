@@ -13,8 +13,8 @@
         });
     }]);
 
-    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus",
-        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus) => {
+    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus", "itSystemUsageService",
+        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
             var itSystemUsage = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
             $rootScope.page.title = "IT System - Anvendelse";
             $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsage.id}`;
@@ -27,7 +27,6 @@
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
-            //TODO: use enum
             const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
             $scope.lifeCycleStatusOptions = lifeCycleStatusOptions.options;
 
@@ -43,6 +42,8 @@
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
+
+            reloadValidationStatus();
 
             $scope.patchDate = (field, value) => {
                 var expirationDate = itSystemUsage.expirationDate;
@@ -63,7 +64,7 @@
                     notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
                 }
                 else {
-                    checkIfActive();
+                    reloadValidationStatus();
 
                     var dateString = date.format("YYYY-MM-DD");
                     var payload = {};
@@ -83,27 +84,12 @@
                     });
             }
 
-            $scope.checkSystemValidity = () => {
-                checkIfActive();
-            }
-
-            function checkIfActive() {
-                const today = moment();
-
-                if (today.isBetween(moment(itSystemUsage.concluded, Kitos.Constants.DateFormat.DanishDateFormat).startOf("day"), moment(itSystemUsage.expirationDate, Kitos.Constants.DateFormat.DanishDateFormat).endOf("day"), null, "[]") ||
-                    (today > moment(itSystemUsage.concluded, Kitos.Constants.DateFormat.DanishDateFormat).startOf("day") && itSystemUsage.expirationDate == null) ||
-                    (today < moment(itSystemUsage.expirationDate, Kitos.Constants.DateFormat.DanishDateFormat).endOf("day") && itSystemUsage.concluded == null) ||
-                    (itSystemUsage.expirationDate == null && itSystemUsage.concluded == null)) {
-                    itSystemUsage.activeAccordingToValidityPeriod = true;
-                }
-                else {
-                    if (itSystemUsage.active) {
-                        itSystemUsage.activeAccordingToValidityPeriod = true;
-                    }
-                    else {
-                        itSystemUsage.activeAccordingToValidityPeriod = false;
-                    }
-                }
+            $scope.checkSystemValidity = () => reloadValidationStatus();
+            
+            function reloadValidationStatus() {
+                itSystemUsageService.getValidationDetails(itSystemUsage.id).then(newStatus => {
+                    $scope.validationStatus = newStatus;
+                });
             }
         }
     ]);
