@@ -580,6 +580,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.Version = A<string>();
             itSystemUsage.ItSystemCategories = new ItSystemCategories { Name = A<string>(), Uuid = A<Guid>() };
             itSystemUsage.MainContract = new ItContractItSystemUsage { ItContract = new ItContract() { Name = A<string>(), Uuid = A<Guid>() } };
+            itSystemUsage.LifeCycleStatus = A<LifeCycleStatusType>();
             itSystemUsage.Concluded = A<DateTime>();
             itSystemUsage.ExpirationDate = A<DateTime>();
         }
