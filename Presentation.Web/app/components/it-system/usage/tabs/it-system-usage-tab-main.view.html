@@ -99,7 +99,7 @@
                            data-field="expirationDate">
                 </div>
                 <div class="form-group">
-                    
+
                     <select-simple data-id="lifeCycleStatus"
                                    data-label="Status"
                                    data-options="lifeCycleStatusOptions"
@@ -109,18 +109,44 @@
                                    data-field="lifeCycleStatus">
                     </select-simple>
                 </div>
+                <div class="col-xs-12" ng-if="validationStatus">
+                    <label class="control-label small">Status</label>
+                    <!-- Show the simple version of the status if there are no details to explain-->
+                    <div class="form-group object-status-active-summary" ng-if="validationStatus.valid && validationStatus.errors.length === 0">
+                        <span ng-if="validationStatus.valid">Kontrakten er <strong>gyldig</strong></span>
+                    </div>
+                    <!-- Show the detailed summary if there are errors involved at all-->
+                    <div class="form-group object-status-active-summary" ng-if="validationStatus.errors.length > 0">
+                        <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
+                            <span ng-if="validationStatus.valid">Kontrakten er <strong>gyldig</strong></span>
+                            <span ng-if="!validationStatus.valid">Kontrakten er <strong>ikke gyldig</strong></span>
+                            <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isValidationDetailsExpanded, 'fa-plus-square-o': !isValidationDetailsExpanded}"></i>
+                        </a>
+                        <p ng-if="isValidationDetailsExpanded && validationStatus.enforcedValid && validationStatus.errors.length > 0" style="margin-top: 5px;">
+                            Gyldigheden er <strong>gennemtvunget</strong> og kontrakten er derfor gyldig på trods af at:
+                        </p>
+                        <p ng-if="isValidationDetailsExpanded && !validationStatus.enforcedValid && validationStatus.errors.length > 0" style="margin-top: 5px;">
+                            Følgende gør kontrakten ugyldig:
+                        </p>
+                        <ul ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" ng-repeat="error in validationStatus.errors">
+                            <li ng-if="error === 0">'Gyldig fra' er endnu ikke passeret</li>
+                            <li ng-if="error === 1">'Gyldig til' er overskredet</li>
+                            <li ng-if="error === 2">Kontrakten er opsagt og evt. opsigelsesfrist er overskredet</li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="last-changed-by-name" class="control-label small">Sidst redigeret: Bruger</label>
-                    <input type="text" 
-                           id="last-changed-by-name" 
-                           value="{{lastChangedBy}}" 
+                    <input type="text"
+                           id="last-changed-by-name"
+                           value="{{lastChangedBy}}"
                            class="form-control input-sm"
                            disabled>
                 </div>
                 <div class="form-group">
                     <label for="last-changed" class="control-label small">Sidst redigeret: Dato</label>
                     <input type="text"
-                           id="last-changed" 
+                           id="last-changed"
                            value="{{lastChanged}}"
                            class="form-control input-sm"
                            disabled>
