@@ -80,7 +80,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentity(itSystemUsage.MainContract.ItContract, dto.General.MainContract);
             Assert.Equal(itSystemUsage.Concluded, dto.General.Validity.ValidFrom);
             Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity.ValidTo);
-            Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.Valid);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.ValidAccordingToValidityPeriod);
+            Assert.Equal(itSystemUsage.CheckSystemValidity().Result, dto.General.Validity.Valid);
+
+            if (itSystemUsage.LifeCycleStatus == null)
+            {
+                Assert.Null(dto.General.Validity.LifeCycleStatus);
+            }
         }
 
         [Fact]
