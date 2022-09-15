@@ -75,7 +75,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         /// <summary>
-        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActiveAccordingToDateFields"/>)
+        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="CheckSystemValidity"/>)
         /// </summary>
         /// <value>
         ///   Active.
@@ -871,7 +871,7 @@ namespace Core.DomainModel.ItSystemUsage
         public bool CheckSystemValidity()
         {
             //TODO: add other conditions in the following tasks
-            return IsActiveAccordingToDateFields;
+            return IsActiveAccordingToDateFields || Active;
         }
     }
 }
