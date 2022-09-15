@@ -319,6 +319,67 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(expectedResult, _sut.UserCount);
         }
 
+        [Fact]
+        public void Valid_When_Active_Is_Not_Set_And_Date_Fields_Are_Not_Set()
+        {
+            var itSystemUsage = new ItSystemUsage();
+
+            Assert.True(itSystemUsage.CheckSystemValidity());
+        }
+
+        [Theory, MemberData(nameof(DateValidityData))]
+        public void Valid_When_Date_Fields_Are_Valid_And_Active_Is_Not_Set(DateTime startDate, DateTime endDate)
+        {
+            var itSystemUsage = new ItSystemUsage
+                {
+                    Concluded = startDate, 
+                    ExpirationDate = endDate
+                };
+
+            Assert.True(itSystemUsage.CheckSystemValidity());
+        }
+
+        [Fact]
+        public void Valid_When_Active_Is_True_And_Date_Fields_Are_Invalid()
+        {
+            var itSystemUsage = new ItSystemUsage
+                {
+                    Active = true,
+                    Concluded = DateTime.UtcNow.AddDays(1),
+                };
+
+            Assert.True(itSystemUsage.CheckSystemValidity());
+        }
+
+        [Fact]
+        public void Invalid_When_Active_Is_Not_Set_And_Date_Fields_Are_Invalid()
+        {
+            var itSystemUsage = new ItSystemUsage
+                {
+                    Concluded = DateTime.UtcNow.AddDays(1),
+                };
+
+            Assert.False(itSystemUsage.CheckSystemValidity());
+        }
+
+        [Fact]
+        public void Invalid_When_Active_Is_True_And_Date_Fields_Are_Valid()
+        {
+            var itSystemUsage = new ItSystemUsage
+                {
+                    Concluded = DateTime.UtcNow.AddDays(1),
+                };
+
+            Assert.False(itSystemUsage.CheckSystemValidity());
+        }
+
+        public static readonly object[][] DateValidityData =
+        {
+            new object[] {DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1)},
+            new object[] {DateTime.UtcNow.AddDays(-1), DateTime.MaxValue},
+            new object[] {null, DateTime.UtcNow.AddDays(1)}
+        };
+
         private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);
@@ -327,5 +388,6 @@ namespace Tests.Unit.Core.Model
             Assert.True(operationError.Message.HasValue);
             Assert.Equal(message, operationError.Message.Value);
         }
+
     }
 }

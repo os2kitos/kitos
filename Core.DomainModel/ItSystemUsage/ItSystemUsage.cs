@@ -870,7 +870,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public bool CheckSystemValidity()
         {
-            //TODO: add other conditions in the following tasks
             return IsActiveAccordingToDateFields || Active;
         }
     }
