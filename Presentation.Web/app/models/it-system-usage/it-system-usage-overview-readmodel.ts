@@ -33,7 +33,7 @@
         SourceEntityId: number;
         SystemName: string;
         ItSystemDisabled: boolean;
-        IsActive: boolean;
+        ActiveAccordingToValidityPeriod: boolean;
         Note: string;
         ItSystemUuid: string;
         LocalSystemId: string | null;

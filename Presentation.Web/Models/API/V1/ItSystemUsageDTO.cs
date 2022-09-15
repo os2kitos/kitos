@@ -55,7 +55,7 @@ namespace Presentation.Web.Models.API.V1
 
         public bool? Active { get; set; }
 
-        public bool IsActive { get; set; }
+        public bool ActiveAccordingToValidityPeriod { get; set; }
 
         public DateTime? Concluded { get; set; }
 

@@ -282,7 +282,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //System usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(systemUsage.OrganizationId, readModel.OrganizationId);
-            Assert.Equal(systemUsage.IsActive, readModel.IsActive);
+            Assert.Equal(systemUsage.IsActiveAccordingToDateFields, readModel.ActiveAccordingToValidityPeriod);
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
@@ -383,33 +383,33 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_IsActive_False_When_ExpirationDate_Is_Earlier_Than_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Earlier_Than_Today()
         {
             //Act
-            var readModel = Test_IsActive_Based_On_ExpirationDate(DateTime.Now.AddDays(-A<int>()));
+            var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now.AddDays(-A<int>()));
 
             //Assert
-            Assert.False(readModel.IsActive);
+            Assert.False(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_IsActive_False_When_ExpirationDate_Is_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Today()
         {
             //Act
-            var readModel = Test_IsActive_Based_On_ExpirationDate(DateTime.Now);
+            var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now);
 
             //Assert
-            Assert.False(readModel.IsActive);
+            Assert.False(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_IsActive_False_When_ExpirationDate_Is_Later_Than_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Later_Than_Today()
         {
             //Act
-            var readModel = Test_IsActive_Based_On_ExpirationDate(DateTime.Now.AddDays(A<int>()));
+            var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now.AddDays(A<int>()));
 
             //Assert
-            Assert.False(readModel.IsActive);
+            Assert.False(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
@@ -632,7 +632,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(HostedAt.UNDECIDED, readModel.HostedAt);
         }
 
-        private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
+        private ItSystemUsageOverviewReadModel Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime expirationDate)
         {
             var system = new ItSystem
             {

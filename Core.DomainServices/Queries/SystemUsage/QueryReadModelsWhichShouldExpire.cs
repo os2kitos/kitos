@@ -21,9 +21,7 @@ namespace Core.DomainServices.Queries.SystemUsage
 
                 x =>
                     // All currently set as active in the read model
-                    x.IsActive &&
-                    // Remove results where the date has no effect (active overrides all other logic)
-                    x.SourceEntity.Active == false &&
+                    x.ActiveAccordingToValidityPeriod &&
                     // Expiration data defined
                     x.SourceEntity.ExpirationDate != null &&
                     // Expiration date has passed

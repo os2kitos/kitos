@@ -53,30 +53,29 @@ namespace Core.DomainModel.ItSystemUsage
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
         }
 
-        public bool IsActive
+        public bool IsActiveAccordingToDateFields
         {
             get
             {
-                if (!this.Active)
+                if (Concluded == null && ExpirationDate == null) 
+                    return true;
+
+                var today = DateTime.UtcNow;
+                var startDate = this.Concluded ?? today;
+                var endDate = DateTime.MaxValue;
+
+                if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
                 {
-                    var today = DateTime.UtcNow;
-                    var startDate = this.Concluded ?? today;
-                    var endDate = DateTime.MaxValue;
-
-                    if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
-                    {
-                        endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
-                    }
-
-                    // indgået-dato <= dags dato <= udløbs-dato
-                    return today >= startDate.Date && today <= endDate;
+                    endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
                 }
-                return this.Active;
+
+                // indgået-dato <= dags dato <= udløbs-dato
+                return today >= startDate.Date && today <= endDate;
             }
         }
 
         /// <summary>
-        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActive"/>)
+        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="CheckSystemValidity"/>)
         /// </summary>
         /// <value>
         ///   Active.
@@ -867,6 +866,11 @@ namespace Core.DomainModel.ItSystemUsage
         public void MarkAsDirty()
         {
             LastChanged = DateTime.UtcNow;
+        }
+
+        public bool CheckSystemValidity()
+        {
+            return IsActiveAccordingToDateFields || Active;
         }
     }
 }
