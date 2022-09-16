@@ -14,15 +14,13 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.ItContract;
-using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [PublicApi]
+    [RoutePrefix("api/itsystemusage")]
     public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -438,17 +436,6 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
-        [HttpGet]
-        [Route("{usageId}/validation-details")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetValidationStatus(int usageId)
-        {
-            var systemUsageValidity = _itSystemUsageService.GetById(usageId).CheckSystemValidity();
-
-            return Ok(MapToValidationResponseDTO(systemUsageValidity));
-        }
-
         protected override void DeleteQuery(ItSystemUsage entity)
         {
             var result = _itSystemUsageService.Delete(entity.Id);
@@ -462,9 +449,5 @@ namespace Presentation.Web.Controllers.API.V1
                 throw new InvalidOperationException(result.Error.ToString());
             }
         }
-
-        private static ItSystemUsageValidationDetailsResponseDTO MapToValidationResponseDTO(ItSystemUsageValidationResult validation) =>
-            new (validation.Result, validation.EnforcedValid,
-                validation.ValidationErrors);
     }
 }
