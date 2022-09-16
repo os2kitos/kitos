@@ -328,6 +328,7 @@ namespace Tests.Unit.Core.Model
 
             Assert.True(validity.Result);
             Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
         }
 
         [Theory, MemberData(nameof(DateValidData))]
@@ -343,6 +344,7 @@ namespace Tests.Unit.Core.Model
 
             Assert.True(validity.Result);
             Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
         }
 
         [Theory]
@@ -362,6 +364,7 @@ namespace Tests.Unit.Core.Model
             Assert.True(validity.Result);
             Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
             Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
         }
 
         [Theory]
@@ -378,6 +381,26 @@ namespace Tests.Unit.Core.Model
             var validity = itSystemUsage.CheckSystemValidity();
 
             Assert.False(validity.Result);
+            Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
+        }
+
+        [Fact]
+        public void Valid_When_Contract_Is_Active()
+        {
+            var itContract = new ItContract {Active = true};
+            var itContractItSystemUsage = new ItContractItSystemUsage{ItContract = itContract};
+            var itSystemUsage = new ItSystemUsage 
+            {
+                MainContract = itContractItSystemUsage,
+                Concluded = DateTime.UtcNow.AddDays(1)
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.True(validity.Result);
             Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
             Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
             Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);

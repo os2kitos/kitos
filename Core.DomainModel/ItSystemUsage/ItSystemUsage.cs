@@ -858,13 +858,19 @@ namespace Core.DomainModel.ItSystemUsage
 
             var dateErrors = CheckDatesValidity(today).ToList();
             var validAccordingToStatus = CheckLifeCycleValidity();
-            var isValid = dateErrors.Any() == false || validAccordingToStatus.IsNone;
+            var validAccordingToContract= CheckContractValidity();
+            var isValid = dateErrors.Any() == false || validAccordingToStatus.IsNone || validAccordingToContract.IsNone;
 
             errors.AddRange(dateErrors);
             if (validAccordingToStatus.HasValue)
             {
                 errors.Add(validAccordingToStatus.Value);
             }
+            if (validAccordingToContract.HasValue)
+            {
+                errors.Add(validAccordingToContract.Value);
+            }
+
             return new ItSystemUsageValidationResult(errors, isValid);
         }
 
@@ -899,6 +905,13 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return LifeCycleStatus is null or LifeCycleStatusType.Undecided or LifeCycleStatusType.NotInUse
                 ? ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle
+                : Maybe<ItSystemUsageValidationError>.None;
+        }
+
+        private Maybe<ItSystemUsageValidationError> CheckContractValidity()
+        {
+            return MainContract == null || !MainContract.ItContract.Active
+                ? ItSystemUsageValidationError.MainContractNotActive
                 : Maybe<ItSystemUsageValidationError>.None;
         }
     }
