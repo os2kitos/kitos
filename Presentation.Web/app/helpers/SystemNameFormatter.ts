@@ -16,7 +16,7 @@
     export class InterfaceNameFormat {
 
         private static readonly noValueFallback = "";
-        private static readonly inactiveSystemNameSuffix = " (Ikke tilgængeligt)";
+        private static readonly inactiveSystemNameSuffix = " (Ikke aktiv)";
 
         static apply(name: String, disabled: boolean) {
             if (!name) {
