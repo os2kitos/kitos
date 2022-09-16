@@ -211,8 +211,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             // From System Usage
-            const bool expectSystemUsageIsActive = true;
-
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(organizationId, readModel.OrganizationId);
             Assert.Equal(systemUsageVersion, readModel.Version);
@@ -221,7 +219,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
             Assert.True(readModel.Concluded.HasValue);
             Assert.Equal(concluded.Date, readModel.Concluded.Value.Date);
-            Assert.Equal(expectSystemUsageIsActive, readModel.ActiveAccordingToValidityPeriod);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
             Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
@@ -318,42 +316,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmOutgoingRelatedItSystemUsage = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
             Assert.Equal(outgoingRelationSystemUsage.Id, rmOutgoingRelatedItSystemUsage.ItSystemUsageId);
             Assert.Equal(outgoingRelationSystemName, rmOutgoingRelatedItSystemUsage.ItSystemUsageName);
-        }
-
-        [Fact]
-        public async Task ReadModels_ActiveAccordingToValidityPeriod_Is_True_When_ExpirationDate_Is_Today()
-        {
-            //Act
-            var readModel = await Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now);
-
-            //Assert
-            Assert.True(readModel.ActiveAccordingToValidityPeriod);
-        }
-
-        [Fact]
-        public async Task ReadModels_ActiveAccordingToValidityPeriod_Is_True_When_ExpirationDate_Is_After_Today()
-        {
-            //Arrange
-            var expirationDate = DateTime.Now.AddDays(A<int>());
-
-            //Act
-            var readModel = await Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(expirationDate);
-
-            //Assert
-            Assert.True(readModel.ActiveAccordingToValidityPeriod);
-        }
-
-        [Fact]
-        public async Task ReadModels_ActiveAccordingToValidityPeriod_Is_False_When_ExpirationDate_Is_Earlier_Than_Today()
-        {
-            //Arrange
-            var expirationDate = DateTime.Now.AddDays(-A<int>());
-
-            //Act
-            var readModel = await Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(expirationDate);
-
-            //Assert
-            Assert.False(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
