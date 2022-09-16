@@ -395,7 +395,6 @@ namespace Tests.Unit.Core.Model
             new object[] {LifeCycleStatusType.Undecided, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
             new object[] {LifeCycleStatusType.NotInUse, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
             new object[] {null, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
-            new object[] {null, null, DateTime.UtcNow.AddDays(-1)},
             new object[] {null, DateTime.UtcNow.AddDays(1), null}
         };
         
