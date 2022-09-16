@@ -248,7 +248,7 @@
                         }
                     ],
                         false)
-                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktiv')
+                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktivt')
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>

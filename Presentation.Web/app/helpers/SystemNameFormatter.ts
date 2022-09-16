@@ -3,7 +3,7 @@
     export class SystemNameFormat {
 
         private static readonly noValueFallback = "";
-        private static readonly inactiveSystemNameSuffix = " (Ikke aktivt)"; // the space is intentional as it is a suffix to an existing name
+        private static readonly inactiveSystemNameSuffix = " (Ikke tilgængeligt)"; // the space is intentional as it is a suffix to an existing name
 
         static apply(name: String, disabled : boolean) {
             if (!name) {
@@ -16,7 +16,7 @@
     export class InterfaceNameFormat {
 
         private static readonly noValueFallback = "";
-        private static readonly inactiveSystemNameSuffix = " (Ikke aktiv)";
+        private static readonly inactiveSystemNameSuffix = " (Ikke tilgængeligt)";
 
         static apply(name: String, disabled: boolean) {
             if (!name) {
