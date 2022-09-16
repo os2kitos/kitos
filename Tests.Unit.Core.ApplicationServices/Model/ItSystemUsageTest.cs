@@ -369,7 +369,7 @@ namespace Tests.Unit.Core.Model
 
         [Theory]
         [MemberData(nameof(ValidationInvalidData))]
-        public void Invalid_When_LifeCycleStatus_Has_Inactive_Value_And_Date_Fields_Are_Invalid(LifeCycleStatusType? lifeCycleStatus, DateTime startDate, DateTime endDate)
+        public void Invalid_When_LifeCycleStatus_Has_Inactive_Value_And_Date_Fields_Are_Invalid(LifeCycleStatusType? lifeCycleStatus, DateTime? startDate, DateTime? endDate)
         {
             var itSystemUsage = new ItSystemUsage
             {
@@ -418,6 +418,7 @@ namespace Tests.Unit.Core.Model
             new object[] {LifeCycleStatusType.Undecided, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
             new object[] {LifeCycleStatusType.NotInUse, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
             new object[] {null, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
+            new object[] {null, null, DateTime.UtcNow.AddDays(-1)},
             new object[] {null, DateTime.UtcNow.AddDays(1), null}
         };
         

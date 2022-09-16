@@ -56,7 +56,8 @@
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId);
+                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId)
+                        .then(_ => reloadValidationStatus());
                 } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                 }
@@ -64,12 +65,11 @@
                     notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
                 }
                 else {
-                    reloadValidationStatus();
-
                     var dateString = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = dateString;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId);
+                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId)
+                        .then(_ => reloadValidationStatus());
                 }
             }
 
@@ -79,6 +79,7 @@
                 $http({ method: "PATCH", url: url, data: payload })
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Feltet er opdateret.");
+                        reloadValidationStatus();
                     }, function onError(result) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                     });

@@ -113,26 +113,26 @@
                     <label class="control-label small">Status</label>
                     <!-- Show the simple version of the status if there are no details to explain-->
                     <div class="form-group object-status-active-summary" ng-if="validationStatus.valid">
+                        <span ng-if="validationStatus.valid">Kontrakten er <strong>gyldig</strong></span>
+                    </div>
+                    <!-- Show the detailed summary if there are errors involved at all-->
+                    <div class="form-group object-status-active-summary" ng-if="!validationStatus.valid">
                         <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
                             <!--TODO: To danish-->
-                            <span ng-if="validationStatus.valid">System is <strong>gyldig</strong></span>
+                            <span ng-if="!validationStatus.valid">System is <strong>ikke gyldig</strong></span>
                             <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isValidationDetailsExpanded, 'fa-plus-square-o': !isValidationDetailsExpanded}"></i>
                         </a>
                         <p ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" style="margin-top: 5px;">
                             Reasons why System is valid:
                         </p>
-                        <ul ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0">
-                            <li ng-if="!validationStatus.errors.includes('0')">'Start date' passed</li>
-                            <li ng-if="!validationStatus.errors.includes('1')">'End date' not passed</li>
+                        <ul ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" ng-repeat="error in validationStatus.errors">
+                            <li ng-if="error === 0">'Start date' not passed</li>
+                            <li ng-if="error === 1">'End date' passed</li>
 
                             <!--TODO: Change text to danish-->
-                            <li ng-if="!validationStatus.errors.includes('2')">System is operational according to the Life Cycle Status</li>
-                            <li ng-if="!validationStatus.errors.includes('3')">Main Contract is active</li>
+                            <li ng-if="error === 2">System is not operational according to the Life Cycle Status</li>
+                            <li ng-if="error === 3">Main Contract not is active</li>
                         </ul>
-                    </div>
-                    <!-- Show the detailed summary if there are errors involved at all-->
-                    <div class="form-group object-status-active-summary" ng-if="!validationStatus.valid">
-                        <span ng-if="!validationStatus.valid">Kontrakten er <strong>ikke gyldig</strong></span>
                     </div>
                 </div>
                 <div class="form-group">
