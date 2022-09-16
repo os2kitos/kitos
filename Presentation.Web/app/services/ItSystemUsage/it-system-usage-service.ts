@@ -10,18 +10,18 @@
     }
 
     export class ItSystemUsageService implements IItSystemUsageService {
+        static $inject = ["$http", "notify"];
+        constructor(private readonly $http: ng.IHttpService, private readonly notify) {
+        }
+
         getValidationDetails(usageId: number): ng.IPromise<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO> {
             return this.$http
-                .get<API.Models.IApiWrapper<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>>(`api/itsystemusage?usageId=${usageId}/validation-details`)
+                .get<API.Models.IApiWrapper<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>>(`api/v1/itsystemusage/${usageId}/validation-details`)
                 .then(response => {
                     return response.data.response;
                 });
         }
-
-        static $inject = ["$http", "notify"];
-        constructor(private readonly $http: ng.IHttpService, private notify) {
-        }
-
+        
         addDataLevel(systemUsageId: number, dataLevel: number) {
             return this.$http.patch(`api/v1/itsystemusage/${systemUsageId}/sensitivityLevel/add`, dataLevel);
         }
