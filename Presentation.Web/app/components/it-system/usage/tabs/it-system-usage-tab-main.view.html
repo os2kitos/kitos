@@ -112,29 +112,27 @@
                 <div ng-if="validationStatus">
                     <label class="control-label small">Status</label>
                     <!-- Show the simple version of the status if there are no details to explain-->
-                    <div class="form-group object-status-active-summary" ng-if="validationStatus.valid && validationStatus.errors.length === 0">
-                        <span ng-if="validationStatus.valid">System er <strong>gyldig</strong></span>
-                    </div>
-                    <!-- Show the detailed summary if there are errors involved at all-->
-                    <div class="form-group object-status-active-summary" ng-if="validationStatus.errors.length > 0">
+                    <div class="form-group object-status-active-summary" ng-if="validationStatus.valid">
                         <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
-                            <span ng-if="validationStatus.valid">Kontrakten er <strong>gyldig</strong></span>
-                            <span ng-if="!validationStatus.valid">Kontrakten er <strong>ikke gyldig</strong></span>
+                            <!--TODO: To danish-->
+                            <span ng-if="validationStatus.valid">System is <strong>gyldig</strong></span>
                             <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isValidationDetailsExpanded, 'fa-plus-square-o': !isValidationDetailsExpanded}"></i>
                         </a>
-                        <p ng-if="isValidationDetailsExpanded && validationStatus.enforcedValid && validationStatus.errors.length > 0" style="margin-top: 5px;">
-                            Gyldigheden er <strong>gennemtvunget</strong> og kontrakten er derfor gyldig på trods af at:
+                        <p ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" style="margin-top: 5px;">
+                            Reasons why System is valid:
                         </p>
-                        <p ng-if="isValidationDetailsExpanded && !validationStatus.enforcedValid && validationStatus.errors.length > 0" style="margin-top: 5px;">
-                            Følgende gør kontrakten ugyldig:
-                        </p>
-                        <ul ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" ng-repeat="error in validationStatus.errors">
-                            <li ng-if="error === 0">'Gyldig fra' er endnu ikke passeret</li>
-                            <li ng-if="error === 1">'Gyldig til' er overskredet</li>
+                        <ul ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0">
+                            <li ng-if="!validationStatus.errors.includes('0')">'Start date' passed</li>
+                            <li ng-if="!validationStatus.errors.includes('1')">'End date' not passed</li>
 
                             <!--TODO: Change text to danish-->
-                            <li ng-if="error === 2">Contract status is not set</li>
+                            <li ng-if="!validationStatus.errors.includes('2')">System is operational according to the Life Cycle Status</li>
+                            <li ng-if="!validationStatus.errors.includes('3')">Main Contract is active</li>
                         </ul>
+                    </div>
+                    <!-- Show the detailed summary if there are errors involved at all-->
+                    <div class="form-group object-status-active-summary" ng-if="!validationStatus.valid">
+                        <span ng-if="!validationStatus.valid">Kontrakten er <strong>ikke gyldig</strong></span>
                     </div>
                 </div>
                 <div class="form-group">
