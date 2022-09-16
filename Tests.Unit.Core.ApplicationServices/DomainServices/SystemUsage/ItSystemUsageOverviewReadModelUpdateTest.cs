@@ -283,6 +283,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(systemUsage.OrganizationId, readModel.OrganizationId);
             Assert.Equal(systemUsage.IsActiveAccordingToDateFields, readModel.ActiveAccordingToValidityPeriod);
+            Assert.Equal(systemUsage.IsActiveAccordingToLifeCycle, readModel.ActiveAccordingToLifeCycle);
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
@@ -645,7 +646,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                ExpirationDate = DateTime.Now.AddDays(-1),
+                ExpirationDate = expirationDate,
                 ObjectOwner = defaultTestUser,
                 LastChangedByUser = defaultTestUser,
                 LastChanged = A<DateTime>(),

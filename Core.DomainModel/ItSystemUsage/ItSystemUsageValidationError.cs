@@ -4,6 +4,6 @@
     {
         StartDateNotPassed = 0,
         EndDatePassed = 1,
-        LifeCycleStatusNotSet = 2,
+        NotOperationalAccordingToLifeCycle = 2,
     }
 }
