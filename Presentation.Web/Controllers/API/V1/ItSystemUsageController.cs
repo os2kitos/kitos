@@ -20,7 +20,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API.V1
 {
     [PublicApi]
-    [RoutePrefix("api/itsystemusage")]
     public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
