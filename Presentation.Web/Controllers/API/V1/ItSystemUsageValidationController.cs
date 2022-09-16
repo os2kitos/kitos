@@ -33,7 +33,6 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         private static ItSystemUsageValidationDetailsResponseDTO MapToValidationResponseDTO(ItSystemUsageValidationResult validation) =>
-            new(validation.Result, validation.EnforcedValid,
-                validation.ValidationErrors);
+            new(validation.Result, validation.ValidationErrors);
     }
 }

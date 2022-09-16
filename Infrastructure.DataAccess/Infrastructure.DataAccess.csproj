@@ -919,9 +919,9 @@
     <Compile Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.designer.cs">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202209140724090_AddedLifeCycleStatus.cs" />
-    <Compile Include="Migrations\202209140724090_AddedLifeCycleStatus.designer.cs">
-      <DependentUpon>202209140724090_AddedLifeCycleStatus.cs</DependentUpon>
+    <Compile Include="Migrations\202209160900384_AddedLifeCycleStatus.cs" />
+    <Compile Include="Migrations\202209160900384_AddedLifeCycleStatus.designer.cs">
+      <DependentUpon>202209160900384_AddedLifeCycleStatus.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\202209141108342_ChangedSystemUsageMainContract.cs" />
     <Compile Include="Migrations\202209141108342_ChangedSystemUsageMainContract.designer.cs">
@@ -1538,8 +1538,8 @@
     <EmbeddedResource Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.resx">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202209140724090_AddedLifeCycleStatus.resx">
-      <DependentUpon>202209140724090_AddedLifeCycleStatus.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202209160900384_AddedLifeCycleStatus.resx">
+      <DependentUpon>202209160900384_AddedLifeCycleStatus.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209141108342_ChangedSystemUsageMainContract.resx">
       <DependentUpon>202209141108342_ChangedSystemUsageMainContract.cs</DependentUpon>

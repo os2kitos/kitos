@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.ItSystemUsage
 {
-    public class ItSystemUsageValidationResult : GenericValidationResult<ItSystemUsageValidationError>
+    public class ItSystemUsageValidationResult
     {
-        public ItSystemUsageValidationResult(bool enforcedValid, IEnumerable<ItSystemUsageValidationError> validationErrors) : base(enforcedValid, validationErrors)
+        public IEnumerable<ItSystemUsageValidationError> ValidationErrors { get; }
+        public bool Result { get; }
+
+        public ItSystemUsageValidationResult(IEnumerable<ItSystemUsageValidationError> validationErrors, bool valid)
         {
+            ValidationErrors = validationErrors.ToList();
+            Result = valid;
         }
     }
 }

@@ -82,7 +82,6 @@
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
-    <Compile Include="Shared\GenericValidationResult.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
