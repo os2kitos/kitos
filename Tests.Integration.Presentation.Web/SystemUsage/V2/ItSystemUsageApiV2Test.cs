@@ -1904,9 +1904,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
         private static void AssertValidity(ValidityWriteRequestDTO validityInput, ValidityResponseDTO validityResponse, bool expectedDateValidity, bool expectedLifeCycleValidity)
         {
-            //TODO: Just pass the "validity" dtos
-            //TODO: Also remember to test ValidAccordingToValidityPeriod (one version with false and one with true)
-            //TODO: Also remember to test ValidAccordingToLifeCyckeStatus (one version with false and one with true)
             Assert.Equal(validityResponse?.ValidFrom, validityInput?.ValidFrom);
             Assert.Equal(validityResponse?.ValidTo, validityInput?.ValidTo);
             Assert.Equal(validityResponse?.LifeCycleStatus, validityInput?.LifeCycleStatus);
