@@ -335,8 +335,6 @@ namespace Tests.Unit.Core.Model
             var validity = itSystemUsage.CheckSystemValidity();
 
             Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
         }
 
         [Theory]
