@@ -193,7 +193,7 @@
                             "?$expand=" +
                             "RoleAssignments($select=RoleId,UserId,UserFullName,Email)," +
                             "DataProcessingAgreements($select=DataProcessingRegistrationId,DataProcessingRegistrationName)," +
-                            "ItSystemUsages($select=ItSystemUsageId,ItSystemUsageName)";
+                            "ItSystemUsages($select=ItSystemUsageId,ItSystemUsageName,ItSystemIsDisabled)";
 
                         const selectedOrgId: number | null = options.currentOrgUnit;
                         var query = `/odata/Organizations(${user.currentOrganizationId})/ItContractOverviewReadModels`;
@@ -632,7 +632,7 @@
                                     `kendo-contract-system-usages-${system.ItSystemUsageId}`,
                                     "it-system.usage.main",
                                     system.ItSystemUsageId,
-                                    system.ItSystemUsageName));
+                                    Helpers.SystemNameFormat.apply(system.ItSystemUsageName, system.ItSystemIsDisabled)));
 
                             });
                             return activeSystemUsages.join(", ");

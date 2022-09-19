@@ -35,6 +35,7 @@
         ItSystemUsages: Array<{
             ItSystemUsageId: number
             ItSystemUsageName: string
+            ItSystemIsDisabled: boolean
         }>
         NumberOfAssociatedSystemRelations: number
         ActiveReferenceTitle: string | null

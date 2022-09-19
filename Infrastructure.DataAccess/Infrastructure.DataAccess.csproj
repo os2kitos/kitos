@@ -919,6 +919,10 @@
     <Compile Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.designer.cs">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs" />
+    <Compile Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.designer.cs">
+      <DependentUpon>202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1529,6 +1533,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.resx">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.resx">
+      <DependentUpon>202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
