@@ -25,6 +25,8 @@ describe("Only Global Admins can create user with special permissions, Parallel"
             expect(pageObject.hasStakeHolderAccessCheckBox.isPresent()).toBeTrue();
         });
 
+        //TODO: Extend with the "start user preference test".. see that it exists
+
         it("Local Admin cannot enable special permissions on new user", () => {
             loginHelper.loginAsLocalAdmin();
             pageObject.getPage();

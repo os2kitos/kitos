@@ -13,7 +13,7 @@
         isContractAdmin: boolean;
         isRightsHolder: boolean;
         hasStakeHolderAccess: boolean;
-        primaryStartUnitId : string
+        primaryStartUnitId: string
     }
 
     class EditOrganizationUserController {
@@ -24,7 +24,7 @@
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public hasApi = false;
-        public primaryStartUnitOptions: Array<{ id: string, name: string }>;
+        public primaryStartUnitOptions: Array<Kitos.Models.ViewModel.User.IPreferredStartUnitChoice>;
 
         private userId: number;
         private originalVm;

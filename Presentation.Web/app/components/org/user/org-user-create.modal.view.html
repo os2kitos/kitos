@@ -55,7 +55,7 @@
                 <div ng-repeat="startUnit in ctrl.primaryStartUnitOptions">
                     <label class="radio-inline">
                         <input type="radio" data-ng-model="ctrl.vm.primaryStartUnitId" name="inlineRadioOptions"
-                               id="inlineRadioHome" value="{{::startUnit.id}}" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> {{::startUnit.name}}
+                               id="{{::startUnit.htmlSafeId}}}}" value="{{::startUnit.id}}" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> {{::startUnit.name}}
                     </label>
                 </div>
             </div>

@@ -26,7 +26,7 @@
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public hasApi = false;
-        public primaryStartUnitOptions: Array<{ id: string, name: string }>;
+        public primaryStartUnitOptions: Array<Kitos.Models.ViewModel.User.IPreferredStartUnitChoice>;
 
         public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
 
