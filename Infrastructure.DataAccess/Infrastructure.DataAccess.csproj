@@ -919,6 +919,10 @@
     <Compile Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.designer.cs">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs" />
+    <Compile Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.designer.cs">
+      <DependentUpon>202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202209190835471_AddedLifeCycleStatus.cs" />
     <Compile Include="Migrations\202209190835471_AddedLifeCycleStatus.designer.cs">
       <DependentUpon>202209190835471_AddedLifeCycleStatus.cs</DependentUpon>
@@ -1533,6 +1537,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.resx">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.resx">
+      <DependentUpon>202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209190835471_AddedLifeCycleStatus.resx">
       <DependentUpon>202209190835471_AddedLifeCycleStatus.cs</DependentUpon>
