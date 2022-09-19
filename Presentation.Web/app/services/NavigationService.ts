@@ -2,7 +2,14 @@
     export class NavigationService {
 
         checkState = (state: string) => {
-            const allowedStates = ["index", "organization.overview", "it-system.overview", "it-contract.overview", "data-processing.overview"];
+            const allowedStates = [
+                Constants.ApplicationStateId.Index,
+                Constants.ApplicationStateId.OrganizationOverview,
+                Constants.ApplicationStateId.SystemUsageOverview,
+                Constants.ApplicationStateId.SystemCatalog,
+                Constants.ApplicationStateId.ContractOverview,
+                Constants.ApplicationStateId.DataProcessingRegistrationOverview
+            ];
             return allowedStates.indexOf(state) > -1;
         };
     }

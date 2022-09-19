@@ -78,8 +78,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService", "$cookies",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService, $cookies) => {
+    "$rootScope", "$state", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService", "$cookies",
+    ($rootScope, $state, userService, uiSelect2Config, navigationService: Kitos.Services.NavigationService, $timeout, $, needsWidthFixService, $cookies) => {
         // init info
         $rootScope.page = {
             title: "Index",

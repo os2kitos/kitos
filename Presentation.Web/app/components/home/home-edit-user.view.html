@@ -49,25 +49,9 @@
                         Primær start enhed:
                     </label>
                     <div>
-                        <label class="radio-inline">
+                        <label ng-repeat="startUnit in primaryStartUnits" class="radio-inline">
                             <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                                   id="inlineRadioHome" value="index" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Start side
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                                   id="inlineRadioOrganisation" value="organization.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Organisation
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                                   id="inlineRadioItSystemer" value="it-system.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT Systemer
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                                   id="inlineRadioItkontrakter" value="it-contract.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT kontrakter
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                                   id="inlineRadioDataProcessingRegistration" value="data-processing.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Databehandling
+                                   id="inlineRadioHome" value="{{::startUnit.id}}" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> {{::startUnit.name}}
                         </label>
                     </div>
                     <br/>

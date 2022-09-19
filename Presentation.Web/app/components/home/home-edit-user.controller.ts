@@ -46,6 +46,7 @@
 
             $scope.orgUnits = orgUnits;
             $scope.allowClear = false;
+            $scope.primaryStartUnits = Kitos.Models.ViewModel.User.options;
 
             var selectedOrgUnit = () => _.find(orgUnits, (orgUnit) => orgUnit.id === String(user.defaultOrganizationUnitId));
 
@@ -56,10 +57,7 @@
                     email: user.email,
                     phoneNumber: user.phoneNumber,
                     defaultUserStartPreference: user.defaultUserStartPreference,
-                    defaultOrganizationUnit: orgUnit,
-                    isUsingDefaultOrgUnit: user.isUsingDefaultOrgUnit,
-                    currentOrganizationName: user.currentOrganizationName,
-                    currentOrganizationUnitName: user.currentOrganizationUnitName
+                    defaultOrganizationUnit: orgUnit
                 };
 
             }
@@ -74,7 +72,7 @@
                     var orgUnit = _.find(orgUnits, (orgUnit) => orgUnit.id === String(newUser.defaultOrganizationUnitId));
                     init(newUser, orgUnit);
                     notify.addSuccessMessage("Feltet er opdateret!");
-                }, function() {
+                }, function () {
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                 });
             };
