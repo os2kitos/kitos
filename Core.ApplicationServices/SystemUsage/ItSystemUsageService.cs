@@ -188,7 +188,7 @@ namespace Core.ApplicationServices.SystemUsage
             return _usageRepository.GetByKey(usageId);
         }
 
-        public Result<ItSystemUsage, OperationError> GetItSystemUsageById(int usageId)
+        public Result<ItSystemUsage, OperationError> GetWithResultById(int usageId)
         {
             return _usageRepository
                 .GetByKey(usageId)
