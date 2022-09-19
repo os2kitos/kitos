@@ -18,7 +18,7 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Validity
         /// </summary>
         public bool EnforcedValid { get; set; }
         /// <summary>
-        /// If specified, the entity is valid from this date.
+        /// Life cycle status of the entity
         /// </summary>
         public LifeCycleStatusChoice? LifeCycleStatus{ get; set; }
         /// <summary>

@@ -254,6 +254,27 @@
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("ActiveAccordingToLifeCycle")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                        .withTitle("Aktiv ifølge status")
+                        .withId("isActiveAccordingToLifeCycle")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange([
+                            {
+                                textValue: "Aktivt",
+                                remoteValue: true
+                            },
+                            {
+                                textValue: "Ikke aktivt",
+                                remoteValue: false
+                            }
+                        ],
+                        false)
+                        .withRendering(dataItem => dataItem.ActiveAccordingToLifeCycle ? 'Aktivt' : 'Ikke aktiv')
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("LocalSystemId")
                         .withTitle("Lokal System ID")
                         .withId("localid")
@@ -758,9 +779,7 @@
                             }
                         })
                         , false)
-                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus) )
-                        .withExcelOutput(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)));
+                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus)));
 
             //Launch kendo grid
             launcher.launch();

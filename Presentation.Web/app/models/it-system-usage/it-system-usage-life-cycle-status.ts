@@ -7,28 +7,23 @@
         PhasingOut = 4
     }
 
-    export interface ILifeCycleStatus {
-        id: number;
-        text: string;
-    }
-
     export class LifeCycleStatusOptions {
-        options: ILifeCycleStatus[];
+        options: Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType>[];
 
-        mapValueFromEnum(value: LifeCycleStatusType): ILifeCycleStatus {
+        mapValueFromEnum(value: LifeCycleStatusType): Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType> {
             switch (value) {
-            case LifeCycleStatusType.Undecided:
-                return { text: Constants.Select2.EmptyField, id: value };
-            case LifeCycleStatusType.NotInUse:
-                return { text: "Under indfasning", id: value };
-            case LifeCycleStatusType.PhasingIn:
-                return { text: "I drift", id: value };
-            case LifeCycleStatusType.Operational:
-                return { text: "Under udfasning", id: value };
-            case LifeCycleStatusType.PhasingOut:
-                return { text: "Ikke i drift", id: value };
-            default:
-                return null;
+                case LifeCycleStatusType.Undecided:
+                    return { text: Constants.Select2.EmptyField, id: value, optionalObjectContext: value };
+                case LifeCycleStatusType.NotInUse:
+                    return { text: "Under indfasning", id: value, optionalObjectContext: value };
+                case LifeCycleStatusType.PhasingIn:
+                    return { text: "I drift", id: value, optionalObjectContext: value };
+                case LifeCycleStatusType.Operational:
+                    return { text: "Under udfasning", id: value, optionalObjectContext: value };
+                case LifeCycleStatusType.PhasingOut:
+                    return { text: "Ikke i drift", id: value, optionalObjectContext: value };
+                default:
+                    return null;
             }
         }
 

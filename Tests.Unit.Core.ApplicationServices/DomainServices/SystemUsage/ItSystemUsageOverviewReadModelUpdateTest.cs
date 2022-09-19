@@ -395,23 +395,23 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_True_When_ExpirationDate_Is_Today()
         {
             //Act
             var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now);
 
             //Assert
-            Assert.False(readModel.ActiveAccordingToValidityPeriod);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Later_Than_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_True_When_ExpirationDate_Is_Later_Than_Today()
         {
             //Act
             var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now.AddDays(A<int>()));
 
             //Assert
-            Assert.False(readModel.ActiveAccordingToValidityPeriod);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]

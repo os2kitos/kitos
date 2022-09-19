@@ -27,9 +27,11 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetValidationStatus(int usageId)
         {
-            var systemUsageValidity = _itSystemUsageService.GetById(usageId).CheckSystemValidity();
-
-            return Ok(MapToValidationResponseDTO(systemUsageValidity));
+            return _itSystemUsageService
+                .GetItSystemUsageById(usageId)
+                .Select(usage => usage.CheckSystemValidity())
+                .Select(details => MapToValidationResponseDTO(details))
+                .Match(Ok, FromOperationError);
         }
 
         private static ItSystemUsageValidationDetailsResponseDTO MapToValidationResponseDTO(ItSystemUsageValidationResult validation) =>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -67,6 +68,10 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// GDPR-specific registrations
         /// </summary>
         public GDPRRegistrationsResponseDTO GDPR { get; set; }
+        /// <summary>
+        /// Validity-specific registrations
+        /// </summary>
+        public ValidityResponseDTO Validity { get; set; }
         /// <summary>
         /// Contains registered relations to other system usages within the organization
         /// </summary>
