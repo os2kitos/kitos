@@ -1124,7 +1124,7 @@
         .module("app")
         .config([
             "$stateProvider", $stateProvider => {
-                $stateProvider.state("it-system.catalog", {
+                $stateProvider.state(Kitos.Constants.ApplicationStateId.SystemCatalog, {
                     url: "/catalog",
                     templateUrl: "app/components/it-system/it-system-catalog.view.html",
                     controller: CatalogController,

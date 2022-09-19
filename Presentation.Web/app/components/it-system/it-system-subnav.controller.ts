@@ -13,9 +13,9 @@
             controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', '$scope', '$timeout', function ($rootScope, $http, $state, $modal, notify, user, $scope, $timeout) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
-                    { state: 'it-system.overview', substate: 'it-system.usage', text: "IT Systemer i " + user.currentOrganizationName },
-                    { state: 'it-system.catalog', substate: 'it-system.edit', text: 'IT Systemkatalog' },
-                    { state: 'it-system.interfaceCatalog', substate: 'it-system.interface-edit.main', text: 'Snitfladekatalog' }
+                    { state: Kitos.Constants.ApplicationStateId.SystemUsageOverview, substate: 'it-system.usage', text: "IT Systemer i " + user.currentOrganizationName },
+                    { state: Kitos.Constants.ApplicationStateId.SystemCatalog, substate: 'it-system.edit', text: 'IT Systemkatalog' },
+                    { state: Kitos.Constants.ApplicationStateId.InterfaceCatalog, substate: 'it-system.interface-edit.main', text: 'Snitfladekatalog' }
                 ];
 
                 $rootScope.page.subnav.buttons = [

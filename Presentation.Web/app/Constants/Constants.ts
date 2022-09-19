@@ -7,6 +7,7 @@
         static readonly ContractOverview = "it-contract.overview";
         static readonly DataProcessingRegistrationOverview = "data-processing.overview";
         static readonly OrganizationOverview = "organization.overview";
+        static readonly InterfaceCatalog = "it-system.interfaceCatalog";
     }
 
     export class CSRF {
