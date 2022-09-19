@@ -18,6 +18,7 @@
         SignerForContracts?: ItContract.IItContract[];
         /** Stakeholder access */
         HasStakeHolderAccess: boolean;
+        DefaultUserStartPreference?: string;
     }
 
     export interface IContactPerson extends IEntity {
@@ -35,6 +36,7 @@
         IsGlobalAdmin?: boolean;
         HasApiAccess?: boolean;
         HasStakeHolderAccess?: boolean;
+        DefaultUserStartPreference?: string;
     }
 
     export interface ICreateUserPayload {
