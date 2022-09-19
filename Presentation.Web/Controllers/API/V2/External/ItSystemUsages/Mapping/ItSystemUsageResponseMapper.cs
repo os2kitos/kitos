@@ -10,7 +10,6 @@ using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -173,6 +172,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 {
                     Valid = systemUsage.CheckSystemValidity().Result,
                     ValidAccordingToValidityPeriod = systemUsage.IsActiveAccordingToDateFields,
+                    ValidAccordingToLifeCycle = systemUsage.IsActiveAccordingToLifeCycle,
                     LifeCycleStatus = MapLifeCycleStatus(systemUsage),
                     ValidFrom = systemUsage.Concluded,
                     ValidTo = systemUsage.ExpirationDate

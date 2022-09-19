@@ -1,14 +1,11 @@
-﻿using Presentation.Web.Models.API.V2.Types.SystemUsage;
-using System;
+﻿using System;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
-namespace Presentation.Web.Models.API.V2.Request.Generic.Validity
+
+namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
     public class ValidityWriteRequestDTO
-    {
-        /// <summary>
-        /// Determines if the entity has been forced into valid state even if context properties would dictate otherwise (e.g. no longer in use)
-        /// </summary>
-        public bool EnforcedValid { get; set; }
+    { 
         /// <summary>
         /// Determines the life cycle status of the system (e.g. Not in use, Operational)
         /// </summary>
