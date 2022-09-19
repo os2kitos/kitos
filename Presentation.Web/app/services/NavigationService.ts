@@ -1,15 +1,9 @@
 ﻿module Kitos.Services {
+    const allowedStates = Kitos.Models.ViewModel.User.options.map(option => option.id);
+
     export class NavigationService {
 
         checkState = (state: string) => {
-            const allowedStates = [
-                Constants.ApplicationStateId.Index,
-                Constants.ApplicationStateId.OrganizationOverview,
-                Constants.ApplicationStateId.SystemUsageOverview,
-                Constants.ApplicationStateId.SystemCatalog,
-                Constants.ApplicationStateId.ContractOverview,
-                Constants.ApplicationStateId.DataProcessingRegistrationOverview
-            ];
             return allowedStates.indexOf(state) > -1;
         };
     }
