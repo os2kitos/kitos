@@ -69,10 +69,6 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// </summary>
         public GDPRRegistrationsResponseDTO GDPR { get; set; }
         /// <summary>
-        /// Validity-specific registrations
-        /// </summary>
-        public ValidityResponseDTO Validity { get; set; }
-        /// <summary>
         /// Contains registered relations to other system usages within the organization
         /// </summary>
         public IEnumerable<SystemRelationResponseDTO> OutgoingSystemRelations { get; set; }

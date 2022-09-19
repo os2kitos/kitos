@@ -139,6 +139,10 @@
                                 "i"),
                                 dprUndecidedQuery);
 
+                        parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
+                            "LifeCycleStatus",
+                            Models.ItSystemUsage.LifeCycleStatusType.Undecided);
+
                         // Org unit is stripped from the odata query and passed on to the url factory!
                         const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnitId eq (\\d+)`, "i");
                         if (captureOrgUnit.test(parameterMap.$filter) === true) {
