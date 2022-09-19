@@ -828,7 +828,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             gdprResponse = dto.GDPR;
             AssertGDPR(gdprVersion3, gdprResponse);
         }
-
+        
 
         [Fact]
         public async Task Can_PATCH_Validity()
@@ -836,41 +836,41 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
 
-            var validityVersion1 = CreateValidityInput();
-            var validityVersion2 = CreateValidityInput();
-            var validityVersion3 = new ValidityWriteRequestDTO();
+            var generalVersion1 = CreateValidityInput();
+            var generalVersion2 = CreateValidityInput();
+            var generalVersion3 = new GeneralDataUpdateRequestDTO();
             
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Act
-            await ItSystemUsageV2Helper.SendPatchValidity(token, usageDTO.Uuid, validityVersion1)
+            await ItSystemUsageV2Helper.SendPatchGeneral(token, usageDTO.Uuid, generalVersion1)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
 
             //Assert version 1
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDTO.Uuid);
-            var validityResponse = dto.Validity;
-            AssertValidity(validityVersion1, validityResponse);
+            var generalResponse = dto.General;
+            AssertValidity(generalVersion1, generalResponse);
 
             //Act
-            await ItSystemUsageV2Helper.SendPatchValidity(token, usageDTO.Uuid, validityVersion2)
+            await ItSystemUsageV2Helper.SendPatchGeneral(token, usageDTO.Uuid, generalVersion2)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
 
             //Assert version 2
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDTO.Uuid);
-            validityResponse = dto.Validity;
-            AssertValidity(validityVersion2, validityResponse);
+            generalResponse = dto.General;
+            AssertValidity(generalVersion2, generalResponse);
 
             //Act - reset
-            await ItSystemUsageV2Helper.SendPatchValidity(token, usageDTO.Uuid, validityVersion3)
+            await ItSystemUsageV2Helper.SendPatchGeneral(token, usageDTO.Uuid, generalVersion3)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
 
             //Assert version 3 - properties should have been reset
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDTO.Uuid);
-            validityResponse = dto.Validity;
-            AssertValidity(validityVersion3, validityResponse);
+            generalResponse = dto.General;
+            AssertValidity(generalVersion3, generalResponse);
         }
 
         [Fact]
@@ -1880,17 +1880,24 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
         }
 
-        private ValidityWriteRequestDTO CreateValidityInput()
+        private GeneralDataUpdateRequestDTO CreateValidityInput()
         {
-            var validityInput = A<ValidityWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
-            validityInput.ValidFrom = DateTime.UtcNow.AddDays(-1);
-            validityInput.ValidTo = DateTime.UtcNow.AddDays(1);
-            validityInput.LifeCycleStatus = A<LifeCycleStatusChoice>();
-            return validityInput;
+            return new GeneralDataUpdateRequestDTO
+            {
+                Validity = new ValidityWriteRequestDTO
+                {
+                    ValidFrom = DateTime.UtcNow.AddDays(-1).Date,
+                    ValidTo = DateTime.UtcNow.AddDays(1).Date,
+                    LifeCycleStatus = A<LifeCycleStatusChoice>()
+                }
+            };
         }
 
-        private static void AssertValidity(ValidityWriteRequestDTO validityInput, ValidityResponseDTO validityResponse)
+        private static void AssertValidity(GeneralDataUpdateRequestDTO validityInput, GeneralDataResponseDTO validityResponse)
         {
+            Assert.Equal(validityInput.Validity?.ValidFrom, validityResponse.Validity?.ValidFrom);
+            Assert.Equal(validityInput.Validity?.ValidTo, validityResponse.Validity?.ValidTo);
+            Assert.Equal(validityInput.Validity?.LifeCycleStatus, validityResponse.Validity?.LifeCycleStatus);
         }
 
         private async Task<(string token, User user, OrganizationDTO organization, ItSystemDTO system)> CreatePrerequisitesAsync()
