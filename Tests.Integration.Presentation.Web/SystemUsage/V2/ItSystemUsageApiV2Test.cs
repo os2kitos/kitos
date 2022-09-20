@@ -853,7 +853,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert version 1
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             var generalResponse = dto.General.Validity;
-            AssertValidity(validityVersion1, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: true);
+            AssertValidity(validityVersion1, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: true, expectedMainContractValidity: true);
 
             //Act
             await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion2)
@@ -863,7 +863,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert version 2
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             generalResponse = dto.General.Validity;
-            AssertValidity(validityVersion2, generalResponse, expectedDateValidity: false, expectedLifeCycleValidity: false);
+            AssertValidity(validityVersion2, generalResponse, expectedDateValidity: false, expectedLifeCycleValidity: false, expectedMainContractValidity: false);
 
             //Act - reset
             await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion3)
@@ -873,7 +873,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert version 3 - properties should have been reset
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             generalResponse = dto.General.Validity;
-            AssertValidity(validityVersion3, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: false);
+            AssertValidity(validityVersion3, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: false, expectedMainContractValidity: false);
         }
 
         [Fact]
@@ -1893,13 +1893,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
         }
 
-        private static void AssertValidity(ItSystemUsageValidityWriteRequestDTO validityInput, ItSystemUsageValidityResponseDTO validityResponse, bool expectedDateValidity, bool expectedLifeCycleValidity)
+        private static void AssertValidity(ItSystemUsageValidityWriteRequestDTO validityInput, ItSystemUsageValidityResponseDTO validityResponse, bool expectedDateValidity, bool expectedLifeCycleValidity, bool expectedMainContractValidity)
         {
             Assert.Equal(validityResponse?.ValidFrom, validityInput?.ValidFrom);
             Assert.Equal(validityResponse?.ValidTo, validityInput?.ValidTo);
             Assert.Equal(validityResponse?.LifeCycleStatus, validityInput?.LifeCycleStatus);
             Assert.Equal(expectedDateValidity, validityResponse?.ValidAccordingToValidityPeriod);
             Assert.Equal(expectedLifeCycleValidity, validityResponse?.ValidAccordingToLifeCycle);
+            Assert.Equal(expectedMainContractValidity, validityResponse?.ValidAccordingToMainContract);
         }
 
         private async Task<(string token, User user, OrganizationDTO organization, ItSystemDTO system)> CreatePrerequisitesAsync()

@@ -55,6 +55,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
         public bool IsActiveAccordingToLifeCycle => CheckLifeCycleValidity().IsNone;
+        public bool IsActiveAccordingToMainContract=> CheckContractValidity().IsNone;
 
         /// <summary>
         ///     When the system began. (indgået)
