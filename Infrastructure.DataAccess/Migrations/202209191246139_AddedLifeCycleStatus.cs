@@ -21,7 +21,7 @@
 							WHEN 1 THEN 3
 						END;"
             );
-            //DropColumn("dbo.ItSystemUsage", "Active");
+            DropColumn("dbo.ItSystemUsage", "Active");
         }
         
         public override void Down()
