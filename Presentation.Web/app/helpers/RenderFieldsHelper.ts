@@ -67,5 +67,9 @@
         static renderDate(date: Date | string | undefined | null) {
             return ExcelExportHelper.renderDate(date);
         }
+
+        static renderActiveNotActive(value: boolean) {
+            return value ? "Aktivt" : "Ikke aktivt";
+        }
     }
 }

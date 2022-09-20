@@ -66,18 +66,19 @@
                 return orderBy;
             };
 
-            const active = "Aktivt";
-            const notActive = "Ikke aktivt";
-
+            const texts = {
+                active: "Aktivt",
+                notActive: "Ikke aktivt"
+            }
             const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] =>
             {
                 return [
                     {
-                        textValue: active,
+                        textValue: texts.active,
                         remoteValue: true
                     },
                     {
-                        textValue: notActive,
+                        textValue: texts.notActive,
                         remoteValue: false
                     }]
             }
@@ -259,7 +260,7 @@
                     .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                     .withFixedValueRange(createActiveRange(), false)
-                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? active : notActive)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToValidityPeriod))
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
@@ -270,7 +271,7 @@
                         .withId("isActiveAccordingToLifeCycle")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(createActiveRange(), false)
-                        .withRendering(dataItem => dataItem.ActiveAccordingToLifeCycle ? active : notActive)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToLifeCycle))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
