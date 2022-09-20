@@ -88,24 +88,7 @@
     export class LifeCycleStatusOptions {
         options: Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType>[];
         private readonly enumStringToTextMap: Record<string, string>;
-
-        //private mapValueFromEnum(value: LifeCycleStatusType): Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType> {
-        //    switch (value) {
-        //        case LifeCycleStatusType.Undecided:
-        //            return { text: LifeCycleStatus.Undecided.Text, id: value, optionalObjectContext: value };
-        //        case LifeCycleStatusType.PhasingIn:
-        //            return { text: LifeCycleStatus.PhasingIn.Text, id: value, optionalObjectContext: value };
-        //        case LifeCycleStatusType.Operational:
-        //            return { text: LifeCycleStatus.Operational.Text, id: value, optionalObjectContext: value };
-        //        case LifeCycleStatusType.PhasingOut:
-        //            return { text: LifeCycleStatus.PhasingOut.Text, id: value, optionalObjectContext: value };
-        //        case LifeCycleStatusType.NotInUse:
-        //            return { text: LifeCycleStatus.NotInUse.Text, id: value, optionalObjectContext: value };
-        //        default:
-        //            return null;
-        //    }
-        //}
-
+        
         mapValueFromString(value: string): string {
             return this.enumStringToTextMap[value] ?? "";
         }
