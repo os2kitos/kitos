@@ -858,8 +858,9 @@ namespace Core.DomainModel.ItSystemUsage
 
             var dateErrors = CheckDatesValidity(today).ToList();
             var validAccordingToStatus = CheckLifeCycleValidity();
-            var validAccordingToContract= CheckContractValidity();
-            var isValid = dateErrors.Any() == false || validAccordingToStatus.IsNone || validAccordingToContract.IsNone;
+            var validAccordingToContract = CheckContractValidity();
+            //If either one of the conditions pass the system is considered active
+            var isValid = dateErrors.Any() == false && validAccordingToStatus.IsNone && validAccordingToContract.IsNone;
 
             errors.AddRange(dateErrors);
             if (validAccordingToStatus.HasValue)
@@ -881,21 +882,15 @@ namespace Core.DomainModel.ItSystemUsage
 
             var today = todayReference.Date;
             var startDate = (this.Concluded ?? today).Date;
-            var endDate = DateTime.MaxValue;
-
-            if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
-            {
-                endDate = ExpirationDate.Value.Date;
-            }
 
             //Valid yet?
-            if (Concluded == null || today < startDate)
+            if (today < startDate)
             {
                 yield return ItSystemUsageValidationError.StartDateNotPassed;
             }
 
             //Expired?
-            if (ExpirationDate == null || today > endDate)
+            if (!ExpirationDate.HasValue || today > ExpirationDate.Value.Date)
             {
                 yield return ItSystemUsageValidationError.EndDatePassed;
             }

@@ -1,7 +1,7 @@
-﻿using System;
-using Presentation.Web.Models.API.V2.Types.SystemUsage;
+﻿using Presentation.Web.Models.API.V2.Types.SystemUsage;
+using System;
 
-namespace Presentation.Web.Models.API.V2.Response.Generic.Validity
+namespace Presentation.Web.Models.API.V2.Response.SystemUsage
 {
     public class ValidityResponseDTO
     {
@@ -13,14 +13,13 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Validity
         /// Determines if the entity is considered valid based on the validity period defined by ValidFrom and ValidTo
         /// </summary>
         public bool ValidAccordingToValidityPeriod { get; set; }
+        public bool ValidAccordingToLifeCycle{ get; set; }
         /// <summary>
-        /// Determines if this entity has been forced into valid state even if context properties would dictate otherwise (e.g. no longer in use)
+        /// Life cycle status of the entity
         /// </summary>
-        public bool EnforcedValid { get; set; }
-        /// <summary>
-        /// If specified, the entity is valid from this date.
-        /// </summary>
-        public LifeCycleStatusChoice? LifeCycleStatus{ get; set; }
+        public LifeCycleStatusChoice? LifeCycleStatus { get; set; }
+
+        //TODO: Add ValidAccordingToMainItContract (for the next task regarding itcontract)
         /// <summary>
         /// If specified, the entity is valid from this date.
         /// </summary>

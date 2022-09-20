@@ -310,10 +310,11 @@ namespace Core.DomainServices.Contract
             return system.MapItSystemName();
         }
 
-        private static void PatchItSystemUsage(ItContractOverviewReadModelItSystemUsage itSystemUsage, ItSystemUsage newItem)
+        private static void PatchItSystemUsage(ItContractOverviewReadModelItSystemUsage readModel, ItSystemUsage newItem)
         {
-            itSystemUsage.ItSystemUsageName = newItem.ItSystem.Name;
-            itSystemUsage.ItSystemUsageSystemUuid = newItem.ItSystem.Uuid.ToString("D");
+            readModel.ItSystemUsageName = newItem.ItSystem.Name;
+            readModel.ItSystemUsageSystemUuid = newItem.ItSystem.Uuid.ToString("D");
+            readModel.ItSystemIsDisabled = newItem.ItSystem.Disabled;
         }
 
         private void MapDataProcessingAgreements(ItContract source, ItContractOverviewReadModel destination)

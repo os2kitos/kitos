@@ -13,7 +13,7 @@ namespace Core.DomainServices.Mapping
 
         public static string MapItSystemName(this ItSystem system)
         {
-            return $"{system.Name}{(system.Disabled ? " (Ikke aktivt)" : "")}";
+            return $"{system.Name}{(system.Disabled ? " (Ikke tilgængeligt)" : "")}";
         }
     }
 }

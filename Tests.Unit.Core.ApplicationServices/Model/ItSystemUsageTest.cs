@@ -328,7 +328,6 @@ namespace Tests.Unit.Core.Model
 
             Assert.True(validity.Result);
             Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
         }
 
         [Theory, MemberData(nameof(DateValidData))]
@@ -344,32 +343,29 @@ namespace Tests.Unit.Core.Model
 
             Assert.True(validity.Result);
             Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
         }
 
         [Theory]
         [InlineData(LifeCycleStatusType.Operational)]
         [InlineData(LifeCycleStatusType.PhasingIn)]
         [InlineData(LifeCycleStatusType.PhasingOut)]
-        public void Valid_When_LifeCycleStatus_Has_Active_Value_And_Date_Fields_Are_Invalid(LifeCycleStatusType lifeCycleStatus)
+        public void Valid_When_AllValid(LifeCycleStatusType lifeCycleStatus)
         {
             var itSystemUsage = new ItSystemUsage
             {
                 LifeCycleStatus = lifeCycleStatus,
-                Concluded = DateTime.UtcNow.AddDays(1),
+                ExpirationDate = DateTime.UtcNow.AddDays(1),
+                Concluded = DateTime.UtcNow.AddDays(-1),
             };
 
             var validity = itSystemUsage.CheckSystemValidity();
 
             Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
         }
 
         [Theory]
         [MemberData(nameof(ValidationInvalidData))]
-        public void Invalid_When_LifeCycleStatus_Has_Inactive_Value_And_Date_Fields_Are_Invalid(LifeCycleStatusType? lifeCycleStatus, DateTime? startDate, DateTime? endDate)
+        public void Invalid_When_Any_Invalid(LifeCycleStatusType? lifeCycleStatus, DateTime startDate, DateTime endDate)
         {
             var itSystemUsage = new ItSystemUsage
             {
@@ -387,25 +383,6 @@ namespace Tests.Unit.Core.Model
             Assert.Contains(ItSystemUsageValidationError.MainContractNotActive, validity.ValidationErrors);
         }
 
-        [Fact]
-        public void Valid_When_Contract_Is_Active()
-        {
-            var itContract = new ItContract {Active = true};
-            var itContractItSystemUsage = new ItContractItSystemUsage{ItContract = itContract};
-            var itSystemUsage = new ItSystemUsage 
-            {
-                MainContract = itContractItSystemUsage,
-                Concluded = DateTime.UtcNow.AddDays(1)
-            };
-
-            var validity = itSystemUsage.CheckSystemValidity();
-
-            Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
-        }
-
         public static readonly object[][] DateValidData =
         {
             new object[] {DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1)},
@@ -418,7 +395,6 @@ namespace Tests.Unit.Core.Model
             new object[] {LifeCycleStatusType.Undecided, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
             new object[] {LifeCycleStatusType.NotInUse, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
             new object[] {null, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
-            new object[] {null, null, DateTime.UtcNow.AddDays(-1)},
             new object[] {null, DateTime.UtcNow.AddDays(1), null}
         };
         

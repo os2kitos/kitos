@@ -919,9 +919,13 @@
     <Compile Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.designer.cs">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202209160900384_AddedLifeCycleStatus.cs" />
-    <Compile Include="Migrations\202209160900384_AddedLifeCycleStatus.designer.cs">
-      <DependentUpon>202209160900384_AddedLifeCycleStatus.cs</DependentUpon>
+    <Compile Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs" />
+    <Compile Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.designer.cs">
+      <DependentUpon>202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202209191246139_AddedLifeCycleStatus.cs" />
+    <Compile Include="Migrations\202209191246139_AddedLifeCycleStatus.designer.cs">
+      <DependentUpon>202209191246139_AddedLifeCycleStatus.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\202209161125266_ChangedSystemUsageHasMainContract.cs" />
     <Compile Include="Migrations\202209161125266_ChangedSystemUsageHasMainContract.designer.cs">
@@ -1538,8 +1542,11 @@
     <EmbeddedResource Include="Migrations\202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.resx">
       <DependentUpon>202209140623198_ChangedIsActiveToActiveAccordingToValidityPeriod.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202209160900384_AddedLifeCycleStatus.resx">
-      <DependentUpon>202209160900384_AddedLifeCycleStatus.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.resx">
+      <DependentUpon>202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209191246139_AddedLifeCycleStatus.resx">
+      <DependentUpon>202209191246139_AddedLifeCycleStatus.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209161125266_ChangedSystemUsageHasMainContract.resx">
       <DependentUpon>202209161125266_ChangedSystemUsageHasMainContract.cs</DependentUpon>

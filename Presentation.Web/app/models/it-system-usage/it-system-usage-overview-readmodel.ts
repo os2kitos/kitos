@@ -34,6 +34,7 @@
         SystemName: string;
         ItSystemDisabled: boolean;
         ActiveAccordingToValidityPeriod: boolean;
+        ActiveAccordingToLifeCycle: boolean;
         Note: string;
         ItSystemUuid: string;
         LocalSystemId: string | null;

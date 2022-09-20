@@ -105,8 +105,9 @@
         itSystem: ViewModel.ItSystem.ISystemViewModel;
         concluded;
         expirationDate;
-        lifeCycleStatus: Models.ItSystemUsage.ILifeCycleStatus;
+        lifeCycleStatus: ViewModel.Generic.Select2OptionViewModel<Models.ItSystemUsage.LifeCycleStatusType>;
         activeAccordingToValidityPeriod: boolean;
+        activeAccordingToLifeCycle: boolean;
         active: boolean;
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
@@ -134,8 +135,9 @@
         itSystem: ViewModel.ItSystem.ISystemViewModel;
         concluded: any;
         expirationDate: any;
-        lifeCycleStatus: Models.ItSystemUsage.ILifeCycleStatus;
+        lifeCycleStatus: ViewModel.Generic.Select2OptionViewModel<Models.ItSystemUsage.LifeCycleStatusType>;
         activeAccordingToValidityPeriod: boolean;
+        activeAccordingToLifeCycle: boolean;
         active: boolean;
         isBusinessCritical: DataOption;
         precautions: DataOption;

@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddedLifeCycleStatus : IMigrationMetadata
+    public sealed partial class Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedLifeCycleStatus));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State));
         
         string IMigrationMetadata.Id
         {
-            get { return "202209160900384_AddedLifeCycleStatus"; }
+            get { return "202209161036169_Extend_ItContractOverviewItSystemUsageReadModel_With_disabled_State"; }
         }
         
         string IMigrationMetadata.Source

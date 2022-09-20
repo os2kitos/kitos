@@ -188,17 +188,21 @@ namespace Core.ApplicationServices.SystemUsage
             return _usageRepository.GetByKey(usageId);
         }
 
+        public Result<ItSystemUsage, OperationError> GetWithResultById(int usageId)
+        {
+            return _usageRepository
+                .GetByKey(usageId)
+                .FromNullable()
+                .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
+        }
+
         public Result<ItSystemUsage, OperationError> GetByUuid(Guid uuid)
         {
             return _usageRepository
                 .AsQueryable()
                 .ByUuid(uuid)
                 .FromNullable()
-                .Match<Result<ItSystemUsage, OperationError>>
-                (
-                    systemUsage => _authorizationContext.AllowReads(systemUsage) ? systemUsage : new OperationError(OperationFailure.Forbidden),
-                    () => new OperationError(OperationFailure.NotFound)
-                );
+                .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)
@@ -281,6 +285,11 @@ namespace Core.ApplicationServices.SystemUsage
         public Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
+        }
+
+        private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)
+        {
+            return _authorizationContext.AllowReads(usage) ? Result<ItSystemUsage, OperationError>.Success(usage) : new OperationError(OperationFailure.Forbidden);
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<ItSystemUsage, Result<TSuccess, OperationError>> mutation)
