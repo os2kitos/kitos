@@ -38,4 +38,20 @@
         static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
         static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
     }
+
+    export class LifeCycleStatus {
+        static readonly UndecidedTitle = "Undecided";
+
+        static readonly NotInUseDescription = "Under indfasning";
+        static readonly NotInUseTitle = "NotInUse";
+
+        static readonly PhasingInDescription = "I drift";
+        static readonly PhasingInTitle = "PhasingIn";
+
+        static readonly OperationalDescription = "Under udfasning";
+        static readonly OperationalTitle = "Operational";
+
+        static readonly PhasingOutDescription = "Ikke i drift";
+        static readonly PhasingOutTitle = "PhasingOut";
+    }
 }

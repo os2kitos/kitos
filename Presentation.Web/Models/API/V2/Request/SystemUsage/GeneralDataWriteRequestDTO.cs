@@ -45,6 +45,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// <summary>
         /// Validity of the system usage
         /// </summary>
-        public ValidityWriteRequestDTO Validity { get; set; }
+        public ItSystemUsageValidityWriteRequestDTO Validity { get; set; }
     }
 }

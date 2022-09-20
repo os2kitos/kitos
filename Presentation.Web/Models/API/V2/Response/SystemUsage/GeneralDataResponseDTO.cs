@@ -32,7 +32,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// Specifies the validity of this system usage
         /// </summary>
-        public ValidityResponseDTO Validity { get; set; }
+        public ItSystemUsageValidityResponseDTO Validity { get; set; }
         /// <summary>
         /// Defines the master contract for this system (many contracts can point to a system usage but only one can be the master contract)
         /// </summary>

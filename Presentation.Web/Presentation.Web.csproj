@@ -503,7 +503,7 @@
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\SystemUsage\ValidityWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\ItSystemUsageValidityWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\IRightsHolderWritableSystemPropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\RightsHolderPartialUpdateSystemPropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\IRightsHolderWritableItInterfacePropertiesDTO.cs" />
@@ -512,7 +512,7 @@
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractValidityResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\PaymentResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Response\SystemUsage\ValidityResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageValidityResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Tracking\TrackingEventResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\PaymentAuditStatus.cs" />
     <Compile Include="Models\API\V2\Types\Contract\ProcurementPlanDTO.cs" />
@@ -1718,10 +1718,6 @@
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
       <Name>Core.DomainServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
-      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
-      <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Ninject\Infrastructure.Ninject.csproj">
       <Project>{c01c5f9e-6904-4b4c-94b1-12d7c83f8070}</Project>

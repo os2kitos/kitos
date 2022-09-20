@@ -872,7 +872,7 @@ namespace Core.DomainModel.ItSystemUsage
                 errors.Add(validAccordingToContract.Value);
             }
 
-            return new ItSystemUsageValidationResult(errors, isValid);
+            return new ItSystemUsageValidationResult(errors);
         }
 
         private IEnumerable<ItSystemUsageValidationError> CheckDatesValidity(DateTime todayReference)
@@ -881,7 +881,8 @@ namespace Core.DomainModel.ItSystemUsage
                 yield break;
 
             var today = todayReference.Date;
-            var startDate = (this.Concluded ?? today).Date;
+            var startDate = (Concluded ?? today).Date;
+            var endDate = (ExpirationDate ?? DateTime.MaxValue).Date;
 
             //Valid yet?
             if (today < startDate)
@@ -890,7 +891,7 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             //Expired?
-            if (!ExpirationDate.HasValue || today > ExpirationDate.Value.Date)
+            if (today > endDate)
             {
                 yield return ItSystemUsageValidationError.EndDatePassed;
             }

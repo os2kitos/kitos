@@ -3,7 +3,11 @@
     using System;
     using System.Data.Entity.Migrations;
     
+<<<<<<<< HEAD:Infrastructure.DataAccess/Migrations/202209161125266_ChangedSystemUsageHasMainContract.cs
     public partial class ChangedSystemUsageHasMainContract : DbMigration
+========
+    public partial class ChangedHasMainContract : DbMigration
+>>>>>>>> feature/KITOSUDV-3212-merge-fix:Infrastructure.DataAccess/Migrations/202209200853095_ChangedHasMainContract.cs
     {
         public override void Up()
         {

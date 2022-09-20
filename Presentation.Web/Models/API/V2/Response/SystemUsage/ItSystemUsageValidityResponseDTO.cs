@@ -3,7 +3,7 @@ using System;
 
 namespace Presentation.Web.Models.API.V2.Response.SystemUsage
 {
-    public class ValidityResponseDTO
+    public class ItSystemUsageValidityResponseDTO
     {
         /// <summary>
         /// Determines if the entity is considered valid. This is computed from both "EnforcedValid" as well as ValidAccordingToValidityPeriod.
@@ -13,13 +13,18 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// Determines if the entity is considered valid based on the validity period defined by ValidFrom and ValidTo
         /// </summary>
         public bool ValidAccordingToValidityPeriod { get; set; }
+        /// <summary>
+        /// Determines if the entity is considered valid based on the Life Cycle
+        /// </summary>
         public bool ValidAccordingToLifeCycle{ get; set; }
+        /// <summary>
+        /// Determines if the entity is considered valid based on the MainContract.IsActive
+        /// </summary>
+        public bool ValidAccordingToMainContract{ get; set; }
         /// <summary>
         /// Life cycle status of the entity
         /// </summary>
         public LifeCycleStatusChoice? LifeCycleStatus { get; set; }
-
-        //TODO: Add ValidAccordingToMainItContract (for the next task regarding itcontract)
         /// <summary>
         /// If specified, the entity is valid from this date.
         /// </summary>

@@ -927,9 +927,9 @@
     <Compile Include="Migrations\202209191246139_AddedLifeCycleStatus.designer.cs">
       <DependentUpon>202209191246139_AddedLifeCycleStatus.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202209161125266_ChangedSystemUsageHasMainContract.cs" />
-    <Compile Include="Migrations\202209161125266_ChangedSystemUsageHasMainContract.designer.cs">
-      <DependentUpon>202209161125266_ChangedSystemUsageHasMainContract.cs</DependentUpon>
+    <Compile Include="Migrations\202209200853095_ChangedHasMainContract.cs" />
+    <Compile Include="Migrations\202209200853095_ChangedHasMainContract.designer.cs">
+      <DependentUpon>202209200853095_ChangedHasMainContract.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1548,8 +1548,8 @@
     <EmbeddedResource Include="Migrations\202209191246139_AddedLifeCycleStatus.resx">
       <DependentUpon>202209191246139_AddedLifeCycleStatus.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202209161125266_ChangedSystemUsageHasMainContract.resx">
-      <DependentUpon>202209161125266_ChangedSystemUsageHasMainContract.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202209200853095_ChangedHasMainContract.resx">
+      <DependentUpon>202209200853095_ChangedHasMainContract.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
