@@ -4,7 +4,7 @@ import Login = require("../../Helpers/LoginHelper");
 import WaitTimers = require("../../Utility/waitTimers");
 import createUserHelper = require("../../Helpers/CreateUserHelper");
 
-describe("Only Global Admins can create user with special permissions, Sequential",
+describe("Only Global Admins can edit user with special permissions, Sequential",
     () => {
         var testFixture = new TestFixtureWrapper();
         var userHelper = new createUserHelper();
@@ -17,14 +17,22 @@ describe("Only Global Admins can create user with special permissions, Sequentia
             testFixture.cleanupState();
         });
 
-        function executeSpecialPermissionUseCase(mutate: () => webdriver.promise.Promise<void>, validate: () => webdriver.promise.Promise<boolean>) {
+        function openPage() {
             return loginHelper.loginAsGlobalAdmin()
                 .then(() => pageObject.getPage())
                 .then(() => browser.waitForAngular())
-                .then(() => browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds))
+                .then(() => browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds));
+        }
+
+        function waitForKendoGridLoad() {
+            return browser.waitForAngular()
+                .then(() => browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userEmail), waitUpTo.twentySeconds));
+        }
+
+        function executeSpecialPermissionUseCase(mutate: () => webdriver.promise.Promise<void>, validate: () => webdriver.promise.Promise<boolean>) {
+            return openPage()
                 .then(() => mutate())
-                .then(() => browser.waitForAngular())
-                .then(() => browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userEmail), waitUpTo.twentySeconds))
+                .then(() => waitForKendoGridLoad())
                 .then(() => validate());
         }
 
@@ -43,9 +51,9 @@ describe("Only Global Admins can create user with special permissions, Sequentia
         function canSetStakeHolderAccessTo(value: boolean) {
             const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
             executeSpecialPermissionUseCase(() => {
-                    console.log("Updating StakeHolderAccess status to " + value);
-                    return userHelper.updateStakeHolderAccessOnUser(credentials.username, value);
-                },
+                console.log("Updating StakeHolderAccess status to " + value);
+                return userHelper.updateStakeHolderAccessOnUser(credentials.username, value);
+            },
                 () => {
                     console.log("Checking that StakeHolderAccess status is updated");
                     return userHelper.checkStakeHolderAccessRoleStatusOnUser(credentials.username, value);
@@ -66,6 +74,14 @@ describe("Only Global Admins can create user with special permissions, Sequentia
 
         it("Global admin is able to set StakeHolder access to FALSE on existing user", () => {
             canSetStakeHolderAccessTo(false);
+        });
+
+        it("It is possible to set primary start unit during user edit", () => {
+            const credentials = loginHelper.getLocalAdminCredentials();
+            openPage()
+                .then(() => waitForKendoGridLoad())
+                .then(() => userHelper.openEditUser(credentials.username))
+                .then(() => userHelper.assertAllPrimaryStartUnitsAvailable());
         });
     });
 

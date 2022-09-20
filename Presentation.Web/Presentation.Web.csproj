@@ -1126,12 +1126,12 @@
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Usage\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Usage\Tabs\Relation.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\Organization\CreateUser.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\01_Parallel\Organization\create-user.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\Organization\UserOverview.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\02_Sequential\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\02_Sequential\it-system\catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\02_Sequential\Local-admin\LocalAdmin.DataProcessing.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\02_Sequential\Organization\CreateUser.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\02_Sequential\Organization\edit-user.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\AdviceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
