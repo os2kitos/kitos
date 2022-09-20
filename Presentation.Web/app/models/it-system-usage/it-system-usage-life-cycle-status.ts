@@ -6,6 +6,33 @@
         Operational = 3,
         PhasingOut = 4
     }
+    
+    export class LifeCycleStatus {
+        static readonly Undecided = {
+            Text: Constants.Select2.EmptyField,
+            EnumStringValue: "Undecided"
+        }
+
+        static readonly PhasingIn = {
+            Text: "Under indfasning",
+            EnumStringValue: "PhasingIn"
+        }
+
+        static readonly Operational = {
+            Text: "I drift",
+            EnumStringValue: "Operational"
+        }
+
+        static readonly PhasingOut = {
+            Text: "Under udfasning",
+            EnumStringValue: "PhasingOut"
+        }
+
+        static readonly NotInUse = {
+            Text: "Ikke i drift",
+            EnumStringValue: "NotInUse"
+        }
+    }
 
     export class LifeCycleStatusOptions {
         options: Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType>[];
@@ -13,15 +40,15 @@
         mapValueFromEnum(value: LifeCycleStatusType): Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType> {
             switch (value) {
                 case LifeCycleStatusType.Undecided:
-                    return { text: Constants.Select2.EmptyField, id: value, optionalObjectContext: value };
-                case LifeCycleStatusType.NotInUse:
-                    return { text: Constants.LifeCycleStatus.NotInUseDescription, id: value, optionalObjectContext: value };
+                    return { text: LifeCycleStatus.Undecided.Text, id: value, optionalObjectContext: value };
                 case LifeCycleStatusType.PhasingIn:
-                    return { text: Constants.LifeCycleStatus.PhasingInDescription, id: value, optionalObjectContext: value };
+                    return { text: LifeCycleStatus.PhasingIn.Text, id: value, optionalObjectContext: value };
                 case LifeCycleStatusType.Operational:
-                    return { text: Constants.LifeCycleStatus.OperationalDescription, id: value, optionalObjectContext: value };
+                    return { text: LifeCycleStatus.Operational.Text, id: value, optionalObjectContext: value };
                 case LifeCycleStatusType.PhasingOut:
-                    return { text: Constants.LifeCycleStatus.PhasingOutDescription, id: value, optionalObjectContext: value };
+                    return { text: LifeCycleStatus.PhasingOut.Text, id: value, optionalObjectContext: value };
+                case LifeCycleStatusType.NotInUse:
+                    return { text: LifeCycleStatus.NotInUse.Text, id: value, optionalObjectContext: value };
                 default:
                     return null;
             }
@@ -29,16 +56,16 @@
 
         mapValueFromString(value: string): string {
             switch (value) {
-                case Constants.LifeCycleStatus.UndecidedTitle:
-                    return Constants.Select2.EmptyField;
-                case Constants.LifeCycleStatus.NotInUseTitle:
-                    return Constants.LifeCycleStatus.NotInUseDescription;
-                case Constants.LifeCycleStatus.PhasingInTitle:
-                    return Constants.LifeCycleStatus.PhasingInDescription;
-                case Constants.LifeCycleStatus.OperationalTitle:
-                    return Constants.LifeCycleStatus.OperationalDescription;
-                case Constants.LifeCycleStatus.PhasingOutTitle:
-                    return Constants.LifeCycleStatus.PhasingOutDescription;
+                case LifeCycleStatus.Undecided.EnumStringValue:
+                    return LifeCycleStatus.Undecided.Text;
+                case LifeCycleStatus.PhasingIn.EnumStringValue:
+                    return LifeCycleStatus.PhasingIn.Text;
+                case LifeCycleStatus.Operational.EnumStringValue:
+                    return LifeCycleStatus.Operational.Text;
+                case LifeCycleStatus.PhasingOut.EnumStringValue:
+                    return LifeCycleStatus.PhasingOut.Text;
+                case LifeCycleStatus.NotInUse.EnumStringValue:
+                    return LifeCycleStatus.NotInUse.Text;
                 default:
                     return "";
             }
