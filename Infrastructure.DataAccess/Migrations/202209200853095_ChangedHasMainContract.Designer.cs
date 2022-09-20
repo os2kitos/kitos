@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class ChangedSystemUsageMainContract : IMigrationMetadata
+    public sealed partial class ChangedHasMainContract : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedSystemUsageMainContract));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedHasMainContract));
         
         string IMigrationMetadata.Id
         {
-            get { return "202209141108342_ChangedSystemUsageMainContract"; }
+            get { return "202209200853095_ChangedHasMainContract"; }
         }
         
         string IMigrationMetadata.Source

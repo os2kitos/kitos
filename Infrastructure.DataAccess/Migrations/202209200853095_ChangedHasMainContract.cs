@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class ChangedSystemUsageMainContract : DbMigration
+    public partial class ChangedHasMainContract : DbMigration
     {
         public override void Up()
         {
