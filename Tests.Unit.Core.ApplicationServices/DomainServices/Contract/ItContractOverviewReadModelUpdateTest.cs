@@ -11,6 +11,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Contract;
+using Core.DomainServices.Mapping;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -702,7 +703,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                     ItSystem = new ItSystem()
                     {
                         Id = A<int>(),
-                        Name = name
+                        Name = name,
+                        Disabled = A<bool>()
                     }
                 }
             }).ToList();
@@ -724,10 +726,11 @@ namespace Tests.Unit.Core.DomainServices.Contract
                     rm =>
                         rm.ItSystemUsageId == systemUsage.ItSystemUsage.Id &&
                         rm.ItSystemUsageSystemUuid == systemUsage.ItSystemUsage.ItSystem.Uuid.ToString("D") &&
-                        rm.ItSystemUsageName == systemUsage.ItSystemUsage.ItSystem.Name
+                        rm.ItSystemUsageName == systemUsage.ItSystemUsage.ItSystem.Name &&
+                        rm.ItSystemIsDisabled == systemUsage.ItSystemUsage.ItSystem.Disabled
                 );
             }
-            Assert.Equal(string.Join(", ", systemUsages.Select(x => x.ItSystemUsage.ItSystem.Name)), itContractOverviewReadModel.ItSystemUsagesCsv);
+            Assert.Equal(string.Join(", ", systemUsages.Select(x => x.ItSystemUsage.MapItSystemName())), itContractOverviewReadModel.ItSystemUsagesCsv);
             Assert.Equal(string.Join(", ", systemUsages.Select(x => x.ItSystemUsage.ItSystem.Uuid.ToString("D"))), itContractOverviewReadModel.ItSystemUsagesSystemUuidCsv);
         }
 
@@ -988,10 +991,10 @@ namespace Tests.Unit.Core.DomainServices.Contract
             Assert.Equal(itContract.ExternEconomyStreams.Sum(x => x.Acquisition), itContractOverviewReadModel.AccumulatedAcquisitionCost);
             Assert.Equal(itContract.ExternEconomyStreams.OrderByDescending(x => x.AuditDate.GetValueOrDefault()).First().AuditDate?.Date, itContractOverviewReadModel.LatestAuditDate);
             var sourceAuditStatuses = itContract.ExternEconomyStreams.GroupBy(x => x.AuditStatus).ToDictionary(x => x.Key, x => x.Count());
-            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Green,itContractOverviewReadModel.AuditStatusGreen);
-            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Red,itContractOverviewReadModel.AuditStatusRed);
-            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Yellow,itContractOverviewReadModel.AuditStatusYellow);
-            AssertAuditStatus(sourceAuditStatuses, TrafficLight.White,itContractOverviewReadModel.AuditStatusWhite);
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Green, itContractOverviewReadModel.AuditStatusGreen);
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Red, itContractOverviewReadModel.AuditStatusRed);
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.Yellow, itContractOverviewReadModel.AuditStatusYellow);
+            AssertAuditStatus(sourceAuditStatuses, TrafficLight.White, itContractOverviewReadModel.AuditStatusWhite);
         }
 
         private static void AssertAuditStatus(Dictionary<TrafficLight, int> sourceAuditStatuses, TrafficLight statusType, int mappedResult)

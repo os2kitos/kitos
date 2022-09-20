@@ -7,7 +7,6 @@ using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
@@ -177,7 +176,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ContractType = contract.ContractType?.MapIdentityNamePairDTO(),
                 AgreementElements = contract.AssociatedAgreementElementTypes?.Select(x => x.AgreementElementType?.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
                 Criticality = contract.Criticality?.MapIdentityNamePairDTO(),
-                Validity = new ValidityResponseDTO
+                Validity = new ContractValidityResponseDTO()
                 {
                     EnforcedValid = contract.Active,
                     Valid = contract.IsActive,

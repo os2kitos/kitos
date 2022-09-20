@@ -113,6 +113,15 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.HostedAt)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HostedAt", 0);
 
+            Property(x => x.ActiveAccordingToValidityPeriod)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToValidityPeriod", 0);
+
+            Property(x => x.ActiveAccordingToLifeCycle)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToLifeCycle", 0);
+
+            Property(x => x.LifeCycleStatus)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LifeCycleStatus", 0);
+
 
 
             //No index bc we don't know how long it might be

@@ -139,6 +139,10 @@
                                 "i"),
                                 dprUndecidedQuery);
 
+                        parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
+                            "LifeCycleStatus",
+                            Models.ItSystemUsage.LifeCycleStatusType.Undecided);
+
                         // Org unit is stripped from the odata query and passed on to the url factory!
                         const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnitId eq (\\d+)`, "i");
                         if (captureOrgUnit.test(parameterMap.$filter) === true) {
@@ -249,9 +253,30 @@
                         }
                     ],
                         false)
-                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktiv')
+                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktivt')
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ActiveAccordingToLifeCycle")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                        .withTitle("Aktiv ifølge status")
+                        .withId("isActiveAccordingToLifeCycle")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange([
+                            {
+                                textValue: "Aktivt",
+                                remoteValue: true
+                            },
+                            {
+                                textValue: "Ikke aktivt",
+                                remoteValue: false
+                            }
+                        ],
+                        false)
+                        .withRendering(dataItem => dataItem.ActiveAccordingToLifeCycle ? 'Aktivt' : 'Ikke aktiv')
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalSystemId")
@@ -749,9 +774,7 @@
                             }
                         })
                         , false)
-                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus) )
-                        .withExcelOutput(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)));
+                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus)));
 
             //Launch kendo grid
             launcher.launch();

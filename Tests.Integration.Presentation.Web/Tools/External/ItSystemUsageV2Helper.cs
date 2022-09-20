@@ -142,6 +142,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.GDPR)));
         }
 
+        public static async Task<HttpResponseMessage> SendPatchValidity(string token, Guid uuid, ValidityWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.GDPR)));
+        }
+
         public static async Task<HttpResponseMessage> SendPatchArchiving(string token, Guid uuid, ArchivingWriteRequestDTO dto)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Archiving)));

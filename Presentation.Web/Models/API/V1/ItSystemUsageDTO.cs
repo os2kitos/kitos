@@ -53,7 +53,7 @@ namespace Presentation.Web.Models.API.V1
         public ExternalReferenceDTO Reference;
         
         public bool ActiveAccordingToValidityPeriod { get; set; }
-        public LifeCycleStatusType LifeCycleStatus { get; set; }
+        public LifeCycleStatusType? LifeCycleStatus { get; set; }
 
         public DateTime? Concluded { get; set; }
 

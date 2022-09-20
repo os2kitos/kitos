@@ -319,54 +319,27 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(expectedResult, _sut.UserCount);
         }
 
-        [Fact]
-        public void Valid_When_LifeCycleStatus_Is_Not_Set_And_Date_Fields_Are_Not_Set()
-        {
-            var itSystemUsage = new ItSystemUsage();
-
-            var validity = itSystemUsage.CheckSystemValidity();
-
-            Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
-        }
-
-        [Theory, MemberData(nameof(DateValidData))]
-        public void Valid_When_Date_Fields_Are_Valid_And_LifeCycleStatus_Is_Not_Set(DateTime startDate, DateTime endDate)
-        {
-            var itSystemUsage = new ItSystemUsage
-            {
-                Concluded = startDate, 
-                ExpirationDate = endDate
-            };
-
-            var validity = itSystemUsage.CheckSystemValidity();
-
-            Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
-        }
-
         [Theory]
         [InlineData(LifeCycleStatusType.Operational)]
         [InlineData(LifeCycleStatusType.PhasingIn)]
         [InlineData(LifeCycleStatusType.PhasingOut)]
-        public void Valid_When_LifeCycleStatus_Has_Active_Value_And_Date_Fields_Are_Invalid(LifeCycleStatusType lifeCycleStatus)
+        public void Valid_When_AllValid(LifeCycleStatusType lifeCycleStatus)
         {
             var itSystemUsage = new ItSystemUsage
             {
                 LifeCycleStatus = lifeCycleStatus,
-                Concluded = DateTime.UtcNow.AddDays(1),
+                ExpirationDate = DateTime.UtcNow.AddDays(1),
+                Concluded = DateTime.UtcNow.AddDays(-1),
             };
 
             var validity = itSystemUsage.CheckSystemValidity();
 
             Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
-            Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
         }
 
         [Theory]
         [MemberData(nameof(ValidationInvalidData))]
-        public void Invalid_When_LifeCycleStatus_Has_Inactive_Value_And_Date_Fields_Are_Invalid(LifeCycleStatusType? lifeCycleStatus, DateTime startDate, DateTime endDate)
+        public void Invalid_When_Any_Invalid(LifeCycleStatusType? lifeCycleStatus, DateTime startDate, DateTime endDate)
         {
             var itSystemUsage = new ItSystemUsage
             {
