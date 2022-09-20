@@ -66,6 +66,22 @@
                 return orderBy;
             };
 
+            const active = "Aktivt";
+            const notActive = "Ikke aktivt";
+
+            const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] =>
+            {
+                return [
+                    {
+                        textValue: active,
+                        remoteValue: true
+                    },
+                    {
+                        textValue: notActive,
+                        remoteValue: false
+                    }]
+            }
+
             //Build and launch kendo grid
             var launcher = kendoGridLauncherFactory
                 .create<Models.ItSystemUsage.IItSystemUsageOverviewReadModel>()
@@ -242,39 +258,19 @@
                     .withTitle("Status ifølge datofelter")
                     .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange([
-                        {
-                            textValue: "Aktivt",
-                            remoteValue: true
-                        },
-                        {
-                            textValue: "Ikke aktivt",
-                            remoteValue: false
-                        }
-                    ],
-                        false)
-                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktivt')
+                    .withFixedValueRange(createActiveRange(), false)
+                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? active : notActive)
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ActiveAccordingToLifeCycle")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                        .withTitle("Aktiv ifølge status")
+                        .withTitle("Status ifølge Status")
                         .withId("isActiveAccordingToLifeCycle")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange([
-                            {
-                                textValue: "Aktivt",
-                                remoteValue: true
-                            },
-                            {
-                                textValue: "Ikke aktivt",
-                                remoteValue: false
-                            }
-                        ],
-                        false)
-                        .withRendering(dataItem => dataItem.ActiveAccordingToLifeCycle ? 'Aktivt' : 'Ikke aktiv')
+                        .withFixedValueRange(createActiveRange(), false)
+                        .withRendering(dataItem => dataItem.ActiveAccordingToLifeCycle ? active : notActive)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>

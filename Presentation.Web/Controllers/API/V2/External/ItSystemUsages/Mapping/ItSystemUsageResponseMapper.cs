@@ -168,7 +168,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 DataClassification = systemUsage.ItSystemCategories?.MapIdentityNamePairDTO(),
                 NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
                 SystemVersion = systemUsage.Version,
-                Validity = new ValidityResponseDTO
+                Validity = new ItSystemUsageValidityResponseDTO
                 {
                     Valid = systemUsage.CheckSystemValidity().Result,
                     ValidAccordingToValidityPeriod = systemUsage.IsActiveAccordingToDateFields,

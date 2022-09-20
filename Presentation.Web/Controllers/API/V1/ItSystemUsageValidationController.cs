@@ -28,9 +28,9 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage GetValidationStatus(int usageId)
         {
             return _itSystemUsageService
-                .GetWithResultById(usageId)
+                .GetItSystemUsageById(usageId)
                 .Select(usage => usage.CheckSystemValidity())
-                .Select(details => MapToValidationResponseDTO(details))
+                .Select(MapToValidationResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 

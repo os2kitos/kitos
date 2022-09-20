@@ -21,19 +21,12 @@
 							WHEN 1 THEN 3
 						END;"
             );
-            DropColumn("dbo.ItSystemUsage", "Active");
+            //DropColumn("dbo.ItSystemUsage", "Active");
         }
         
         public override void Down()
         {
             AddColumn("dbo.ItSystemUsage", "Active", c => c.Boolean(nullable: false));
-            Sql(@"UPDATE dbo.ItSystemUsage
-                  SET Active = 
-                        CASE LifeCycleStatus
-							WHEN 0 THEN 0
-							ELSE 1
-						END;"
-            );
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LifeCycleStatus");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ActiveAccordingToLifeCycle");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ActiveAccordingToValidityPeriod");

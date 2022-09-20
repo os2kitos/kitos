@@ -503,7 +503,7 @@
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\SystemUsage\ValidityWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\ItSystemUsageValidityWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\IRightsHolderWritableSystemPropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\RightsHolderPartialUpdateSystemPropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\IRightsHolderWritableItInterfacePropertiesDTO.cs" />
@@ -512,7 +512,7 @@
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractValidityResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\PaymentResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Response\SystemUsage\ValidityResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageValidityResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Tracking\TrackingEventResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\PaymentAuditStatus.cs" />
     <Compile Include="Models\API\V2\Types\Contract\ProcurementPlanDTO.cs" />

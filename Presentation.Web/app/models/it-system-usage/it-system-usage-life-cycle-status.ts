@@ -29,16 +29,16 @@
 
         mapValueFromString(value: string): string {
             switch (value) {
-                case "Undecided":
+                case Constants.LifeCycleStatus.UndecidedTitle:
                     return Constants.Select2.EmptyField;
-                case "NotInUse":
-                    return "Under indfasning";
-                case "PhasingIn":
-                    return "I drift";
-                case "Operational":
-                    return "Under udfasning";
-                case "PhasingOut":
-                    return "Ikke i drift";
+                case Constants.LifeCycleStatus.NotInUseTitle:
+                    return Constants.LifeCycleStatus.NotInUseDescription;
+                case Constants.LifeCycleStatus.PhasingInTitle:
+                    return Constants.LifeCycleStatus.PhasingInDescription;
+                case Constants.LifeCycleStatus.OperationalTitle:
+                    return Constants.LifeCycleStatus.OperationalDescription;
+                case Constants.LifeCycleStatus.PhasingOutTitle:
+                    return Constants.LifeCycleStatus.PhasingOutDescription;
                 default:
                     return "";
             }
