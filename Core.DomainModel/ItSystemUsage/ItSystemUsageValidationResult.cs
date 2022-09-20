@@ -8,10 +8,10 @@ namespace Core.DomainModel.ItSystemUsage
         public IEnumerable<ItSystemUsageValidationError> ValidationErrors { get; }
         public bool Result { get; }
 
-        public ItSystemUsageValidationResult(IEnumerable<ItSystemUsageValidationError> validationErrors, bool valid)
+        public ItSystemUsageValidationResult(IEnumerable<ItSystemUsageValidationError> validationErrors)
         {
             ValidationErrors = validationErrors.ToList();
-            Result = valid;
+            Result = ValidationErrors.Any() == false;
         }
     }
 }

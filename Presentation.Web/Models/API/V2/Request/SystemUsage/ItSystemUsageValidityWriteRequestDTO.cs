@@ -4,7 +4,7 @@ using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
-    public class ValidityWriteRequestDTO
+    public class ItSystemUsageValidityWriteRequestDTO
     { 
         /// <summary>
         /// Determines the life cycle status of the system (e.g. Not in use, Operational)
