@@ -52,8 +52,9 @@
                 var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
 
+                var payload: {};
                 if (value === "" || value == undefined) {
-                    var payload = {};
+                    payload = {};
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId)
                         .then(_ => reloadValidationStatus());
@@ -64,8 +65,8 @@
                     notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
                 }
                 else {
-                    var dateString = date.format("YYYY-MM-DD");
-                    var payload = {};
+                    const dateString = date.format(formatDateString);
+                    payload = {};
                     payload[field] = dateString;
                     patch(payload, saveUrlWithOrgId)
                         .then(_ => reloadValidationStatus());
