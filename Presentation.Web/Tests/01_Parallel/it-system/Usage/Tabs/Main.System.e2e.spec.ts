@@ -4,13 +4,22 @@ import ItSystemUsageHelper = require("../../../../Helpers/SystemUsageHelper");
 import ItSystemUsageMainPage = require("../../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageMain.po");
 import TestFixtureWrapper = require("../../../../Utility/TestFixtureWrapper");
 import ItSystemUsageCommon = require("../../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageCommon.po");
+import Constants = require("../../../../Utility/Constants");
 
 describe("User is able to view local it system main page information",
     () => {
+        const consts = new Constants();
+
         const userCountInputs = {
             DefaultNull: { text: "" },
             Undecided: { text: " " },
             TenToFifty: { text: "10-50" }
+        };
+
+        const lifeCycleStatusInputs = {
+            DefaultNull: { text: "" },
+            Undecided: { text: " " },
+            Operational: { text: "Under udfasning" }
         };
 
         var loginHelper = new login();
@@ -47,13 +56,26 @@ describe("User is able to view local it system main page information",
             () => {
                 loginHelper.loginAsGlobalAdmin()
                     .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
-                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.DefaultNull.text))
-                    .then(() => ItSystemUsageHelper.selectUserCount(userCountInputs.TenToFifty.text))
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.DefaultNull.text, consts.mainUserCount))
+                    .then(() => ItSystemUsageHelper.selectOption(userCountInputs.TenToFifty.text, consts.mainUserCount))
                     .then(() => browser.refresh())
-                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.TenToFifty.text))
-                    .then(() => ItSystemUsageHelper.selectUserCount(userCountInputs.Undecided.text))
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.TenToFifty.text, consts.mainUserCount))
+                    .then(() => ItSystemUsageHelper.selectOption(userCountInputs.Undecided.text, consts.mainUserCount))
                     .then(() => browser.refresh())
-                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.Undecided.text));
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.Undecided.text, consts.mainUserCount));
+            });
+
+        it("Change LifeCycleStatus from null to Operational, then change to undecided",
+            () => {
+                loginHelper.loginAsGlobalAdmin()
+                    .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
+                    .then(() => ItSystemUsageHelper.validateSelectData(lifeCycleStatusInputs.DefaultNull.text, consts.mainLifeCycleStatus))
+                    .then(() => ItSystemUsageHelper.selectOption(lifeCycleStatusInputs.Operational.text, consts.mainLifeCycleStatus))
+                    .then(() => browser.refresh())
+                    .then(() => ItSystemUsageHelper.validateSelectData(lifeCycleStatusInputs.Operational.text, consts.mainLifeCycleStatus))
+                    .then(() => ItSystemUsageHelper.selectOption(lifeCycleStatusInputs.Undecided.text, consts.mainLifeCycleStatus))
+                    .then(() => browser.refresh())
+                    .then(() => ItSystemUsageHelper.validateSelectData(lifeCycleStatusInputs.Undecided.text, consts.mainLifeCycleStatus));
             });
     }
 );

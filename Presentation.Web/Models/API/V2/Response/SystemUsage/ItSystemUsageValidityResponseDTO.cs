@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Presentation.Web.Models.API.V2.Types.SystemUsage;
+using System;
 
-namespace Presentation.Web.Models.API.V2.Response.Generic.Validity
+namespace Presentation.Web.Models.API.V2.Response.SystemUsage
 {
-    public class ValidityResponseDTO
+    public class ItSystemUsageValidityResponseDTO
     {
         /// <summary>
-        /// Determines if the entity is considered valid. This is computed from both "EnforcedValid" as well as ValidAccordingToValidityPeriod.
+        /// Determines if the entity is considered valid. This is computed from ValidAccordingToValidityPeriod and ValidAccordingToLifeCycle.
         /// </summary>
         public bool Valid { get; set; }
         /// <summary>
@@ -13,9 +14,13 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Validity
         /// </summary>
         public bool ValidAccordingToValidityPeriod { get; set; }
         /// <summary>
-        /// Determines if this entity has been forced into valid state even if context properties would dictate otherwise (e.g. no longer in use)
+        /// Determines if the entity is considered valid based on the Life Cycle
         /// </summary>
-        public bool EnforcedValid { get; set; }
+        public bool ValidAccordingToLifeCycle{ get; set; }
+        /// <summary>
+        /// Life cycle status of the entity
+        /// </summary>
+        public LifeCycleStatusChoice? LifeCycleStatus { get; set; }
         /// <summary>
         /// If specified, the entity is valid from this date.
         /// </summary>

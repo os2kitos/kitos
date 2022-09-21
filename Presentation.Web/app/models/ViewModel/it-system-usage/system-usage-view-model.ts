@@ -105,7 +105,9 @@
         itSystem: ViewModel.ItSystem.ISystemViewModel;
         concluded;
         expirationDate;
+        lifeCycleStatus: ViewModel.Generic.Select2OptionViewModel<Models.ItSystemUsage.LifeCycleStatusType>;
         activeAccordingToValidityPeriod: boolean;
+        activeAccordingToLifeCycle: boolean;
         active: boolean;
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
@@ -133,7 +135,9 @@
         itSystem: ViewModel.ItSystem.ISystemViewModel;
         concluded: any;
         expirationDate: any;
+        lifeCycleStatus: ViewModel.Generic.Select2OptionViewModel<Models.ItSystemUsage.LifeCycleStatusType>;
         activeAccordingToValidityPeriod: boolean;
+        activeAccordingToLifeCycle: boolean;
         active: boolean;
         isBusinessCritical: DataOption;
         precautions: DataOption;
@@ -153,6 +157,7 @@
             this.itSystem = new ViewModel.ItSystem.SystemViewModel(itSystemUsage.itSystem);
             this.concluded = itSystemUsage.concluded;
             this.expirationDate = itSystemUsage.expirationDate;
+            this.lifeCycleStatus = itSystemUsage.lifeCycleStatus;
             this.activeAccordingToValidityPeriod = itSystemUsage.activeAccordingToValidityPeriod;
             this.active = itSystemUsage.active;
             this.lastChanged = Helpers.RenderFieldsHelper.renderDate(itSystemUsage.lastChanged);

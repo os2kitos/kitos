@@ -333,9 +333,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                       Maybe<(int, int?)>.None.AsChangedValue()
                     : OptionalValueChange<Maybe<(int, int?)>>.None,
 
-                EnforceActive = rule.MustUpdate(x => x.General.Validity.EnforcedValid)
-                    ? (source.Validity?.EnforcedValid.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
-                    : OptionalValueChange<Maybe<bool>>.None,
+                LifeCycleStatus = rule.MustUpdate(x => x.General.Validity.LifeCycleStatus)
+                    ? MapEnumChoice(source.Validity?.LifeCycleStatus, LifeCycleStatusMappingExtensions.ToLifeCycleStatusType)
+                    : OptionalValueChange<LifeCycleStatusType?>.None,
 
                 ValidFrom = rule.MustUpdate(x => x.General.Validity.ValidFrom)
                     ? (source.Validity?.ValidFrom?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()

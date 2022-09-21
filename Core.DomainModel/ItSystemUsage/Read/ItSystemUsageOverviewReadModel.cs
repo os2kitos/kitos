@@ -54,6 +54,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string SystemName { get; set; }
         public bool ItSystemDisabled { get; set; }
         public bool ActiveAccordingToValidityPeriod { get; set; }
+        public bool ActiveAccordingToLifeCycle { get; set; }
         public string Note { get; set; }
         public string ParentItSystemName { get; set; }
         public int? ParentItSystemId { get; set; }
@@ -100,6 +101,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string LinkToDirectoryName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
+
+        public LifeCycleStatusType? LifeCycleStatus { get; set; }
 
         public string DataProcessingRegistrationsConcludedAsCsv { get; set; }
         public string DataProcessingRegistrationNamesAsCsv { get; set; }

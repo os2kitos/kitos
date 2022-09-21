@@ -319,67 +319,58 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(expectedResult, _sut.UserCount);
         }
 
-        [Fact]
-        public void Valid_When_Active_Is_Not_Set_And_Date_Fields_Are_Not_Set()
-        {
-            var itSystemUsage = new ItSystemUsage();
-
-            Assert.True(itSystemUsage.CheckSystemValidity());
-        }
-
-        [Theory, MemberData(nameof(DateValidityData))]
-        public void Valid_When_Date_Fields_Are_Valid_And_Active_Is_Not_Set(DateTime startDate, DateTime endDate)
+        [Theory]
+        [InlineData(LifeCycleStatusType.Operational)]
+        [InlineData(LifeCycleStatusType.PhasingIn)]
+        [InlineData(LifeCycleStatusType.PhasingOut)]
+        public void Valid_When_AllValid(LifeCycleStatusType lifeCycleStatus)
         {
             var itSystemUsage = new ItSystemUsage
-                {
-                    Concluded = startDate, 
-                    ExpirationDate = endDate
-                };
+            {
+                LifeCycleStatus = lifeCycleStatus,
+                ExpirationDate = DateTime.UtcNow.AddDays(1),
+                Concluded = DateTime.UtcNow.AddDays(-1),
+            };
 
-            Assert.True(itSystemUsage.CheckSystemValidity());
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.True(validity.Result);
         }
 
-        [Fact]
-        public void Valid_When_Active_Is_True_And_Date_Fields_Are_Invalid()
+        [Theory]
+        [MemberData(nameof(ValidationInvalidData))]
+        public void Invalid_When_Any_Invalid(LifeCycleStatusType? lifeCycleStatus, DateTime startDate, DateTime endDate)
         {
             var itSystemUsage = new ItSystemUsage
-                {
-                    Active = true,
-                    Concluded = DateTime.UtcNow.AddDays(1),
-                };
+            {
+                LifeCycleStatus = lifeCycleStatus,
+                Concluded = startDate,
+                ExpirationDate = endDate
+            };
 
-            Assert.True(itSystemUsage.CheckSystemValidity());
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.False(validity.Result);
+            Assert.Contains(ItSystemUsageValidationError.StartDateNotPassed, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.EndDatePassed, validity.ValidationErrors);
+            Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
         }
 
-        [Fact]
-        public void Invalid_When_Active_Is_Not_Set_And_Date_Fields_Are_Invalid()
-        {
-            var itSystemUsage = new ItSystemUsage
-                {
-                    Concluded = DateTime.UtcNow.AddDays(1),
-                };
-
-            Assert.False(itSystemUsage.CheckSystemValidity());
-        }
-
-        [Fact]
-        public void Invalid_When_Active_Is_True_And_Date_Fields_Are_Valid()
-        {
-            var itSystemUsage = new ItSystemUsage
-                {
-                    Concluded = DateTime.UtcNow.AddDays(1),
-                };
-
-            Assert.False(itSystemUsage.CheckSystemValidity());
-        }
-
-        public static readonly object[][] DateValidityData =
+        public static readonly object[][] DateValidData =
         {
             new object[] {DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1)},
             new object[] {DateTime.UtcNow.AddDays(-1), DateTime.MaxValue},
             new object[] {null, DateTime.UtcNow.AddDays(1)}
         };
 
+        public static readonly object[][] ValidationInvalidData =
+        {
+            new object[] {LifeCycleStatusType.Undecided, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
+            new object[] {LifeCycleStatusType.NotInUse, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
+            new object[] {null, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(-1)},
+            new object[] {null, DateTime.UtcNow.AddDays(1), null}
+        };
+        
         private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);

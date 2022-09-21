@@ -15,7 +15,6 @@ using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
@@ -395,9 +394,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Notes = A<string>(),
                 DataClassificationUuid = dataClassification.Uuid,
                 NumberOfExpectedUsers = new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
-                Validity = new ValidityWriteRequestDTO
+                Validity = new ItSystemUsageValidityWriteRequestDTO
                 {
-                    EnforcedValid = A<bool>(),
+                    LifeCycleStatus = A<LifeCycleStatusChoice?>(),
                     ValidFrom = DateTime.UtcNow.Date,
                     ValidTo = DateTime.UtcNow.Date.AddDays(Math.Abs(A<short>()))
                 },
@@ -414,7 +413,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(request.General.Notes, freshReadDTO.General.Notes);
             Assert.Equal(request.General.NumberOfExpectedUsers.LowerBound, freshReadDTO.General.NumberOfExpectedUsers.LowerBound);
             Assert.Equal(request.General.NumberOfExpectedUsers.UpperBound, freshReadDTO.General.NumberOfExpectedUsers.UpperBound);
-            Assert.Equal(request.General.Validity.EnforcedValid, freshReadDTO.General.Validity.EnforcedValid);
+            Assert.Equal(request.General.Validity.LifeCycleStatus, freshReadDTO.General.Validity.LifeCycleStatus);
             Assert.Equal(request.General.Validity.ValidFrom.GetValueOrDefault().Date, freshReadDTO.General.Validity.ValidFrom.GetValueOrDefault().Date);
             Assert.Equal(request.General.Validity.ValidTo.GetValueOrDefault().Date, freshReadDTO.General.Validity.ValidTo.GetValueOrDefault().Date);
             Assert.Equal(dataClassification.Uuid, freshReadDTO.General.DataClassification.Uuid);
@@ -826,6 +825,55 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDTO.Uuid);
             gdprResponse = dto.GDPR;
             AssertGDPR(gdprVersion3, gdprResponse);
+        }
+        
+
+        [Fact]
+        public async Task Can_PATCH_Validity()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+
+            var date1 = DateTime.UtcNow;
+            var lifeCycle1 = LifeCycleStatusChoice.Operational;
+            var date2 = DateTime.UtcNow.AddDays(-1 - A<int>());
+            var lifeCycle2 = LifeCycleStatusChoice.Undecided;
+
+            var validityVersion1 = CreateValidityInput(date1, lifeCycle1);
+            var validityVersion2 = CreateValidityInput(date2, lifeCycle2);
+            var validityVersion3 = new ItSystemUsageValidityWriteRequestDTO();
+            
+            var usageDto = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Act
+            await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion1)
+                .WithExpectedResponseCode(HttpStatusCode.OK)
+                .DisposeAsync();
+
+            //Assert version 1
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
+            var generalResponse = dto.General.Validity;
+            AssertValidity(validityVersion1, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: true);
+
+            //Act
+            await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion2)
+                .WithExpectedResponseCode(HttpStatusCode.OK)
+                .DisposeAsync();
+
+            //Assert version 2
+            dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
+            generalResponse = dto.General.Validity;
+            AssertValidity(validityVersion2, generalResponse, expectedDateValidity: false, expectedLifeCycleValidity: false);
+
+            //Act - reset
+            await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion3)
+                .WithExpectedResponseCode(HttpStatusCode.OK)
+                .DisposeAsync();
+
+            //Assert version 3 - properties should have been reset
+            dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
+            generalResponse = dto.General.Validity;
+            AssertValidity(validityVersion3, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: false);
         }
 
         [Fact]
@@ -1694,7 +1742,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             {
                 Assert.Equal(expected.NumberOfExpectedUsers.LowerBound, actual.NumberOfExpectedUsers.LowerBound);
                 Assert.Equal(expected.NumberOfExpectedUsers.UpperBound, actual.NumberOfExpectedUsers.UpperBound);
-                Assert.Equal(expected.Validity.EnforcedValid, actual.Validity.EnforcedValid);
+                Assert.Equal(expected.Validity.LifeCycleStatus.GetValueOrDefault(), actual.Validity.LifeCycleStatus.GetValueOrDefault());
                 Assert.Equal(expected.Validity.ValidFrom.GetValueOrDefault().Date, actual.Validity.ValidFrom.GetValueOrDefault().Date);
                 Assert.Equal(expected.Validity.ValidTo.GetValueOrDefault().Date, actual.Validity.ValidTo.GetValueOrDefault().Date);
                 Assert.Equal(expected.DataClassificationUuid, actual.DataClassification.Uuid);
@@ -1703,7 +1751,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             {
                 Assert.Null(actual.NumberOfExpectedUsers);
 
-                Assert.False(actual.Validity.EnforcedValid);
+                Assert.Null(actual.Validity.LifeCycleStatus);
                 Assert.Null(actual.Validity.ValidFrom);
                 Assert.Null(actual.Validity.ValidTo);
 
@@ -1781,9 +1829,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                         UpperBound = interval.upper
                     })
                     .GetValueOrDefault(),
-                Validity = new ValidityWriteRequestDTO
+                Validity = new ItSystemUsageValidityWriteRequestDTO
                 {
-                    EnforcedValid = A<bool>(),
+                    LifeCycleStatus = A<LifeCycleStatusChoice?>(),
                     ValidFrom = DateTime.UtcNow.Date,
                     ValidTo = DateTime.UtcNow.Date.AddDays(Math.Abs(A<short>()))
                 },
@@ -1833,6 +1881,25 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(gdprInput.RetentionPeriodDefined, gdprResponse.RetentionPeriodDefined);
             Assert.Equal(gdprInput.NextDataRetentionEvaluationDate, gdprResponse.NextDataRetentionEvaluationDate);
             Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
+        }
+
+        private static ItSystemUsageValidityWriteRequestDTO CreateValidityInput(DateTime baseDate, LifeCycleStatusChoice lifeCycleStatus)
+        {
+            return new ItSystemUsageValidityWriteRequestDTO
+            {
+                ValidFrom = baseDate.AddDays(-1).Date,
+                ValidTo = baseDate.AddDays(1).Date,
+                LifeCycleStatus = lifeCycleStatus
+            };
+        }
+
+        private static void AssertValidity(ItSystemUsageValidityWriteRequestDTO validityInput, ItSystemUsageValidityResponseDTO validityResponse, bool expectedDateValidity, bool expectedLifeCycleValidity)
+        {
+            Assert.Equal(validityResponse?.ValidFrom, validityInput?.ValidFrom);
+            Assert.Equal(validityResponse?.ValidTo, validityInput?.ValidTo);
+            Assert.Equal(validityResponse?.LifeCycleStatus, validityInput?.LifeCycleStatus);
+            Assert.Equal(expectedDateValidity, validityResponse?.ValidAccordingToValidityPeriod);
+            Assert.Equal(expectedLifeCycleValidity, validityResponse?.ValidAccordingToLifeCycle);
         }
 
         private async Task<(string token, User user, OrganizationDTO organization, ItSystemDTO system)> CreatePrerequisitesAsync()

@@ -23,14 +23,14 @@ class SystemUsageHelper {
         return this.pageObject.waitForKendoGrid();
     }
 
-    static selectUserCount(selection: string) {
+    static selectOption(selection: string, elementId: string) {
         console.log(`Selecting value: '${selection}'`);
-        return Select2Helper.selectWithNoSearch(selection, this.consts.mainUserCount);
+        return Select2Helper.selectWithNoSearch(selection, elementId);
     };
 
-    static validateSelectData(expectedValue: string) {
+    static validateSelectData(expectedValue: string, elementId: string) {
         console.log(`Validating if select contains value: '${expectedValue}'`);
-        return Select2Helper.getData(this.consts.mainUserCount).getText().then(result => expect(result.trim()).toBe(expectedValue.trim()));
+        return Select2Helper.getData(elementId).getText().then(result => expect(result.trim()).toBe(expectedValue.trim()));
     };
 }
 export = SystemUsageHelper;

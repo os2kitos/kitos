@@ -98,22 +98,16 @@
                            ng-blur="patchDate('expirationDate', usage.expirationDate)"
                            data-field="expirationDate">
                 </div>
-                <div class="checkbox">
-                    <input type="checkbox" id="system-int-signed"
-                           class="tags-checkbox sr-only"
-                           data-ng-model="usage.active"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-autosave="{{autoSaveUrl}}"
-                           data-field="active"
-                           data-ng-change="checkSystemValidity()" />
-                    <label for="system-int-signed" style="padding-left:0px;">
-                        <i ng-hide="usage.active" class='glyphicon glyphicon-unchecked'></i>
-                        <i ng-show="usage.active" class='glyphicon glyphicon-check'></i>
-                        <span class='label-content'>
-                            Gyldig:
-                        </span>
-                    </label>
-                    <i ng-show="usage.activeAccordingToValidityPeriod || usage.active" class="fa fa-check" aria-hidden="true"></i>
+                <div class="form-group">
+                    
+                    <select-simple data-id="lifeCycleStatus"
+                                   data-label="Status"
+                                   data-options="lifeCycleStatusOptions"
+                                   data-ng-model="usageViewModel.lifeCycleStatus"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-auto-save-url="{{::autoSaveUrl}}"
+                                   data-field="lifeCycleStatus">
+                    </select-simple>
                 </div>
                 <div class="form-group">
                     <label for="last-changed-by-name" class="control-label small">Sidst redigeret: Bruger</label>

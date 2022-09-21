@@ -66,11 +66,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemParentName = A<string>();
             var systemParentDisabled = A<bool>();
 
-            var systemUsageExpirationDate = DateTime.Now.AddDays(1);
             var systemUsageVersion = A<string>();
             var systemUsageLocalCallName = A<string>();
             var systemUsageLocalSystemId = A<string>();
-            var concluded = DateTime.Now.AddDays(-1); ;
+            var concluded = DateTime.UtcNow.AddDays(-A<int>());
+            var systemUsageExpirationDate = DateTime.UtcNow.AddDays(A<int>());
             var archiveDuty = A<ArchiveDutyTypes>();
             var riskAssessment = A<DataOptions>();
             var linkToDirectoryUrl = A<string>();
@@ -133,7 +133,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
             var isHoldingDocument = A<bool>();
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
-
+             
             // Responsible Organization Unit
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId).DisposeAsync(); //Adding default organization as organization unit
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId).DisposeAsync(); //Using default organization as responsible organization unit
@@ -211,16 +211,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             // From System Usage
-            const bool expectSystemUsageIsActive = true;
-
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(organizationId, readModel.OrganizationId);
             Assert.Equal(systemUsageVersion, readModel.Version);
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.ObjectOwnerName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
-            Assert.Equal(expectSystemUsageIsActive, readModel.ActiveAccordingToValidityPeriod);
-            Assert.Equal(concluded, readModel.Concluded);
+            Assert.True(readModel.Concluded.HasValue);
+            Assert.Equal(concluded.Date, readModel.Concluded.Value.Date);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
             Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
@@ -317,42 +316,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmOutgoingRelatedItSystemUsage = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
             Assert.Equal(outgoingRelationSystemUsage.Id, rmOutgoingRelatedItSystemUsage.ItSystemUsageId);
             Assert.Equal(outgoingRelationSystemName, rmOutgoingRelatedItSystemUsage.ItSystemUsageName);
-        }
-
-        [Fact]
-        public async Task ReadModels_ActiveAccordingToValidityPeriod_Is_True_When_ExpirationDate_Is_Today()
-        {
-            //Act
-            var readModel = await Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now);
-
-            //Assert
-            Assert.True(readModel.ActiveAccordingToValidityPeriod);
-        }
-
-        [Fact]
-        public async Task ReadModels_ActiveAccordingToValidityPeriod_Is_True_When_ExpirationDate_Is_After_Today()
-        {
-            //Arrange
-            var expirationDate = DateTime.Now.AddDays(A<int>());
-
-            //Act
-            var readModel = await Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(expirationDate);
-
-            //Assert
-            Assert.True(readModel.ActiveAccordingToValidityPeriod);
-        }
-
-        [Fact]
-        public async Task ReadModels_ActiveAccordingToValidityPeriod_Is_False_When_ExpirationDate_Is_Earlier_Than_Today()
-        {
-            //Arrange
-            var expirationDate = DateTime.Now.AddDays(-A<int>());
-
-            //Act
-            var readModel = await Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(expirationDate);
-
-            //Assert
-            Assert.False(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]

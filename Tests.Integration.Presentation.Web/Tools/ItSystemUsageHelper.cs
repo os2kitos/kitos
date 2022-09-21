@@ -110,11 +110,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystemusage/{usageSystemId}?organizationId={orgId}"), cookie, body))
-            {
-                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
-                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
-            }
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystemusage/{usageSystemId}?organizationId={orgId}"), cookie, body);
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+            return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
         }
 
         public static async Task<List<GdprExportReportCsvFormat>> GetGDPRExportReport(int organizationId)

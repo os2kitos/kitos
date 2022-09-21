@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 
 namespace Presentation.Web.Models.API.V2.Request.Contract
 {
@@ -36,7 +35,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// <summary>
         /// Validity of the it-contract
         /// </summary>
-        public ValidityWriteRequestDTO Validity { get; set; }
+        public ContractValidityWriteRequestDTO Validity { get; set; }
 
         /// <summary>
         /// Optionally assigned criticality

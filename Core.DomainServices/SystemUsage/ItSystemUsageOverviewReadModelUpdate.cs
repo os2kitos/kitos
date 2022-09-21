@@ -57,6 +57,7 @@ namespace Core.DomainServices.SystemUsage
             destination.SystemName = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.ActiveAccordingToValidityPeriod = source.IsActiveAccordingToDateFields;
+            destination.ActiveAccordingToLifeCycle = source.IsActiveAccordingToLifeCycle;
             destination.Note = source.Note;
             destination.Version = source.Version;
             destination.LocalCallName = source.LocalCallName;
@@ -73,6 +74,7 @@ namespace Core.DomainServices.SystemUsage
             destination.LinkToDirectoryName = source.LinkToDirectoryUrlName;
             destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
             destination.HostedAt = source.HostedAt.GetValueOrDefault(HostedAt.UNDECIDED);
+            destination.LifeCycleStatus = source.LifeCycleStatus;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
