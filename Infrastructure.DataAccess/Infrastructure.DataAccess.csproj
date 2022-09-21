@@ -931,10 +931,6 @@
     <Compile Include="Migrations\202209210602103_ChangedHasMainContract.designer.cs">
       <DependentUpon>202209210602103_ChangedHasMainContract.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202209210623476_AddedActiveAccordingToMainContract.cs" />
-    <Compile Include="Migrations\202209210623476_AddedActiveAccordingToMainContract.designer.cs">
-      <DependentUpon>202209210623476_AddedActiveAccordingToMainContract.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1554,9 +1550,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209210602103_ChangedHasMainContract.resx">
       <DependentUpon>202209210602103_ChangedHasMainContract.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202209210623476_AddedActiveAccordingToMainContract.resx">
-      <DependentUpon>202209210623476_AddedActiveAccordingToMainContract.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

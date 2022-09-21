@@ -99,15 +99,8 @@
                            data-field="expirationDate">
                 </div>
                 <div class="form-group">
-                    <select-simple data-id="lifeCycleStatus"
-                                   data-label="Status"
-                                   data-options="lifeCycleStatusOptions"
-                                   data-ng-model="usageViewModel.lifeCycleStatus"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-auto-save-url="{{::autoSaveUrl}}"
-                                   data-ng-changed="checkSystemValidity"
-                                   data-field="lifeCycleStatus">
-                    </select-simple>
+                    <label for="lifeCycleStatus" class="control-label small">Livscyklus</label>
+                    <single-select-select2 id="lifeCycleStatus" ng-model="lifeCycleStatusModel" />
                 </div>
                 <div ng-if="validationStatus">
                     <label class="control-label small">Aktivt</label>

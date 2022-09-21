@@ -898,14 +898,14 @@ namespace Core.DomainModel.ItSystemUsage
 
         private Maybe<ItSystemUsageValidationError> CheckLifeCycleValidity()
         {
-            return LifeCycleStatus is null or LifeCycleStatusType.Undecided or LifeCycleStatusType.NotInUse
+            return LifeCycleStatus == LifeCycleStatusType.NotInUse
                 ? ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle
                 : Maybe<ItSystemUsageValidationError>.None;
         }
 
         private Maybe<ItSystemUsageValidationError> CheckContractValidity()
         {
-            return MainContract == null || !MainContract.ItContract.IsActive
+            return MainContract?.ItContract?.IsActive == false
                 ? ItSystemUsageValidationError.MainContractNotActive
                 : Maybe<ItSystemUsageValidationError>.None;
         }

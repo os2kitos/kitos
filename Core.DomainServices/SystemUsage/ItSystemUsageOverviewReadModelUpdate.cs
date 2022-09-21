@@ -58,7 +58,6 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.ActiveAccordingToValidityPeriod = source.IsActiveAccordingToDateFields;
             destination.ActiveAccordingToLifeCycle = source.IsActiveAccordingToLifeCycle;
-            destination.ActiveAccordingToMainContract = source.IsActiveAccordingToMainContract;
             destination.Note = source.Note;
             destination.Version = source.Version;
             destination.LocalCallName = source.LocalCallName;
@@ -342,7 +341,7 @@ namespace Core.DomainServices.SystemUsage
             destination.MainContractId = source.MainContract?.ItContractId;
             destination.MainContractSupplierId = source.MainContract?.ItContract?.Supplier?.Id;
             destination.MainContractSupplierName = source.MainContract?.ItContract?.Supplier?.Name;
-            destination.MainContractIsActive = source.MainContract is {ItContract.IsActive: true};
+            destination.MainContractIsActive = source.IsActiveAccordingToMainContract;
         }
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

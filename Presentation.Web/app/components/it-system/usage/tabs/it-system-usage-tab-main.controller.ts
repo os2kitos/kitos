@@ -13,8 +13,8 @@
         });
     }]);
 
-    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus", "itSystemUsageService",
-        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
+    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus", "itSystemUsageService", "select2LoadingService", 
+        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
             var itSystemUsage = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
             $rootScope.page.title = "IT System - Anvendelse";
             $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsage.id}`;
@@ -26,9 +26,7 @@
             $scope.lastChanged = itSystemUsage.lastChanged;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
-
-            const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
-            $scope.lifeCycleStatusOptions = lifeCycleStatusOptions.options;
+            const saveUrlWithOrgId = $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId;
 
             $scope.numberOfUsersOptions = [
                 { id: "4", text: Kitos.Constants.Select2.EmptyField },
@@ -44,6 +42,7 @@
             };
 
             reloadValidationStatus();
+            bindLifeCycleStatusModel();
 
             $scope.patchDate = (field, value) => {
                 var expirationDate = itSystemUsage.expirationDate;
@@ -56,7 +55,7 @@
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId)
+                    patch(payload, saveUrlWithOrgId)
                         .then(_ => reloadValidationStatus());
                 } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
@@ -68,7 +67,7 @@
                     var dateString = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = dateString;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId)
+                    patch(payload, saveUrlWithOrgId)
                         .then(_ => reloadValidationStatus());
                 }
             }
@@ -85,12 +84,24 @@
                     });
             }
 
-            $scope.checkSystemValidity = () => reloadValidationStatus();
-            
             function reloadValidationStatus() {
                 itSystemUsageService.getValidationDetails(itSystemUsage.id).then(newStatus => {
                     $scope.validationStatus = newStatus;
                 });
+            }
+
+            function bindLifeCycleStatusModel() {
+                const options = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions().options;
+                const currentId = itSystemUsage.lifeCycleStatus ?? 0;
+
+                $scope.lifeCycleStatusModel = {
+                    selectedElement: options[currentId],
+                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, false),
+                    elementSelected: (newElement) => {
+                        const payload = { lifeCycleStatus: newElement.optionalObjectContext };
+                        patch(payload, saveUrlWithOrgId).then(_ => reloadValidationStatus());
+                    }
+                }
             }
         }
     ]);

@@ -253,7 +253,7 @@
                 builder
                     .withDataSourceName("ActiveAccordingToValidityPeriod")
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                    .withTitle("Status ifølge datofelter")
+                    .withTitle("Status (Datofelter)")
                     .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                     .withFixedValueRange(createActiveRange(), false)
@@ -264,7 +264,7 @@
                     builder
                         .withDataSourceName("ActiveAccordingToLifeCycle")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                        .withTitle("Status ifølge Status")
+                        .withTitle("Status (Livscyklus)")
                         .withId("isActiveAccordingToLifeCycle")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(createActiveRange(), false)
