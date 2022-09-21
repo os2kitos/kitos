@@ -10,7 +10,6 @@ using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -169,11 +168,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 DataClassification = systemUsage.ItSystemCategories?.MapIdentityNamePairDTO(),
                 NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
                 SystemVersion = systemUsage.Version,
-                Validity = new ValidityResponseDTO
+                Validity = new ItSystemUsageValidityResponseDTO
                 {
-                    EnforcedValid = systemUsage.Active,
-                    Valid = systemUsage.CheckSystemValidity(),
+                    Valid = systemUsage.CheckSystemValidity().Result,
                     ValidAccordingToValidityPeriod = systemUsage.IsActiveAccordingToDateFields,
+                    ValidAccordingToLifeCycle = systemUsage.IsActiveAccordingToLifeCycle,
+                    LifeCycleStatus = MapLifeCycleStatus(systemUsage),
                     ValidFrom = systemUsage.Concluded,
                     ValidTo = systemUsage.ExpirationDate
                 }
@@ -217,6 +217,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)
         {
             return systemUsage.ArchiveDuty?.ToArchiveDutyChoice();
+        }
+
+        private static LifeCycleStatusChoice? MapLifeCycleStatus(ItSystemUsage systemUsage)
+        {
+            return systemUsage.LifeCycleStatus?.ToLifeCycleStatusChoice();
         }
 
         public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation systemRelation)

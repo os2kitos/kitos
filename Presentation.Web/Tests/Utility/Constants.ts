@@ -151,6 +151,7 @@
     readonly mainArchive = "archiveDuty";
     readonly mainUUID = "system-uuid";
     readonly mainUserCount = "s2id_numberOfUsers";
+    readonly mainLifeCycleStatus = "s2id_lifeCycleStatus";
 
     readonly relationDescriptionField = "relationDescription";
     readonly relationReferenceField = "relationReference";
