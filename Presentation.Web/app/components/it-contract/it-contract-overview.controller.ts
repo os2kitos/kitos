@@ -860,7 +860,7 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider) => {
-            $stateProvider.state("it-contract.overview",
+            $stateProvider.state(Kitos.Constants.ApplicationStateId.ContractOverview,
                 {
                     url: "/overview",
                     templateUrl: "app/components/it-contract/it-contract-overview.view.html",

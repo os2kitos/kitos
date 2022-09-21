@@ -13,6 +13,7 @@
         isContractAdmin: boolean;
         isRightsHolder: boolean;
         hasStakeHolderAccess: boolean;
+        primaryStartUnitId: string
     }
 
     class EditOrganizationUserController {
@@ -23,6 +24,7 @@
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public hasApi = false;
+        public primaryStartUnitOptions: Array<Kitos.Models.ViewModel.User.IPreferredStartUnitChoice>;
 
         private userId: number;
         private originalVm;
@@ -53,7 +55,8 @@
                 isSystemAdmin: hasRole(Models.OrganizationRole.SystemModuleAdmin),
                 isContractAdmin: hasRole(Models.OrganizationRole.ContractModuleAdmin),
                 isRightsHolder: hasRole(Models.OrganizationRole.RightsHolderAccess),
-                hasStakeHolderAccess: user.HasStakeHolderAccess
+                hasStakeHolderAccess: user.HasStakeHolderAccess,
+                primaryStartUnitId: user.DefaultUserStartPreference
             };
             this.originalVm = _.clone(userVm);
 
@@ -64,6 +67,7 @@
             this.isUserOrgAdmin = currentUser.isOrgAdmin;
             this.isUserSystemAdmin = currentUser.isSystemAdmin;
             this.isUserContractAdmin = currentUser.isContractAdmin;
+            this.primaryStartUnitOptions = Kitos.Models.ViewModel.User.options;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
@@ -102,7 +106,8 @@
                 PhoneNumber: this.vm.phoneNumber,
                 Email: this.vm.email,
                 HasApiAccess: this.vm.hasApi,
-                HasStakeHolderAccess: this.vm.hasStakeHolderAccess
+                HasStakeHolderAccess: this.vm.hasStakeHolderAccess,
+                DefaultUserStartPreference: this.vm.primaryStartUnitId
             };
             this.$http.patch(`/odata/Users(${this.userId})`, payload);
 

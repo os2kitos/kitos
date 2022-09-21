@@ -19,6 +19,7 @@ exports.watch = function (callBack) {
 exports.deployProd = deploy.deployProd;
 
 exports.clean = deploy.clean;
+exports.cleanTests = deploy.cleanTests;
 
 exports.lint = linting.lint;
 

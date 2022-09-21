@@ -101,7 +101,7 @@
                     $http.delete("api/itsystem/" + systemId + "?organizationId=" + user.currentOrganizationId)
                         .then(function onSuccess(result) {
                             msg.toSuccessMessage("IT System  er slettet!");
-                            $state.go("it-system.catalog");
+                            $state.go(Kitos.Constants.ApplicationStateId.SystemCatalog);
                         }, function onError(result) {
                             msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(result.status, result.data.response));
                         });

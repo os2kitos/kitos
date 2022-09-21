@@ -110,7 +110,7 @@
                 phoneNumber: user.phoneNumber,
                 uuid: user.uuid,
                 hasApi: user.hasApi,
-                defaultUserStartPreference: user.defaultUserStartPreference || "index",
+                defaultUserStartPreference: user.defaultUserStartPreference || Kitos.Constants.ApplicationStateId.Index,
 
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,

@@ -13,6 +13,7 @@
         hasApi: boolean;
         isRightsHolder: boolean;
         hasStakeHolderAccess: boolean;
+        primaryStartUnitId: string;
     }
 
     class CreateOrganizationUserController {
@@ -25,6 +26,7 @@
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public hasApi = false;
+        public primaryStartUnitOptions: Array<Kitos.Models.ViewModel.User.IPreferredStartUnitChoice>;
 
         public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
 
@@ -32,7 +34,7 @@
             private $http: IHttpServiceWithCustomConfig,
             private $q: ng.IQService,
             private notify,
-            private autofocus,
+            autofocus,
             private user: Kitos.Services.IUser,
             private _: _.LoDashStatic) {
             if (!user.currentOrganizationId) {
@@ -46,6 +48,7 @@
             this.isUserSystemAdmin = user.isSystemAdmin;
             this.isUserContractAdmin = user.isContractAdmin;
             this.hasApi = user.hasApi;
+            this.primaryStartUnitOptions = Kitos.Models.ViewModel.User.options;
 
             autofocus();
             this.busy = false;
@@ -78,8 +81,8 @@
                     Email: this.vm.email,
                     PhoneNumber: this.vm.phoneNumber,
                     HasApiAccess: this.vm.hasApi,
-                    HasStakeHolderAccess: this.vm.hasStakeHolderAccess
-
+                    HasStakeHolderAccess: this.vm.hasStakeHolderAccess,
+                    DefaultUserStartPreference: this.vm.primaryStartUnitId
                 },
                 organizationId: this.user.currentOrganizationId,
                 sendMailOnCreation: sendMail
