@@ -41,8 +41,8 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            reloadValidationStatus();
             bindLifeCycleStatusModel();
+            reloadValidationStatus();
 
             $scope.patchDate = (field, value) => {
                 var expirationDate = itSystemUsage.expirationDate;
@@ -92,13 +92,20 @@
             }
 
             function bindLifeCycleStatusModel() {
-                const options = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions().options;
+                const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
+                const options = lifeCycleStatusOptions.options;
                 const currentId = itSystemUsage.lifeCycleStatus ?? 0;
+                const optionsWithCurrentId = options.filter(x => x.id === currentId);
+                if (!optionsWithCurrentId)
+                    return;
+
+                const selectedElement = optionsWithCurrentId[0];
 
                 $scope.lifeCycleStatusModel = {
-                    selectedElement: options[currentId],
+                    selectedElement: selectedElement,
                     select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, false),
                     elementSelected: (newElement) => {
+                        $scope.usage.lifeCycleStatus = newElement.optionalObjectContext;
                         const payload = { lifeCycleStatus: newElement.optionalObjectContext };
                         patch(payload, saveUrlWithOrgId).then(_ => reloadValidationStatus());
                     }
