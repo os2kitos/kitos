@@ -69,7 +69,16 @@
         }
 
         static renderActiveNotActive(value: boolean) {
-            return value ? "Aktivt" : "Ikke aktivt";
+            return value ? RenderFieldsHelper.texts.active : RenderFieldsHelper.texts.notActive;
+        }
+
+        static getTexts(): { active: string, notActive: string } {
+            return RenderFieldsHelper.texts;
+        }
+
+        private static readonly texts = {
+            active: "Aktivt",
+            notActive: "Ikke aktivt"
         }
     }
 }

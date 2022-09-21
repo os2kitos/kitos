@@ -6,24 +6,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-<<<<<<<< HEAD:Infrastructure.DataAccess/Migrations/202209161125266_ChangedSystemUsageHasMainContract.Designer.cs
-    public sealed partial class ChangedSystemUsageHasMainContract : IMigrationMetadata
-    {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedSystemUsageHasMainContract));
-        
-        string IMigrationMetadata.Id
-        {
-            get { return "202209161125266_ChangedSystemUsageHasMainContract"; }
-========
     public sealed partial class ChangedHasMainContract : IMigrationMetadata
     {
         private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedHasMainContract));
         
         string IMigrationMetadata.Id
         {
-            get { return "202209200853095_ChangedHasMainContract"; }
->>>>>>>> feature/KITOSUDV-3212-merge-fix:Infrastructure.DataAccess/Migrations/202209200853095_ChangedHasMainContract.Designer.cs
+            get { return "202209210602103_ChangedHasMainContract"; }
         }
         
         string IMigrationMetadata.Source
