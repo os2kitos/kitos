@@ -17,7 +17,7 @@
             Sql(@"UPDATE dbo.ItSystemUsage
                   SET LifeCycleStatus = 
                         CASE Active
-							WHEN 0 THEN 0
+							WHEN 0 THEN NULL
 							WHEN 1 THEN 3
 						END;"
             );

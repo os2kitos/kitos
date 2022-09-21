@@ -6,7 +6,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
     public class ItSystemUsageValidityResponseDTO
     {
         /// <summary>
-        /// Determines if the entity is considered valid. This is computed from both "EnforcedValid" as well as ValidAccordingToValidityPeriod.
+        /// Determines if the entity is considered valid. This is computed from ValidAccordingToValidityPeriod and ValidAccordingToLifeCycle.
         /// </summary>
         public bool Valid { get; set; }
         /// <summary>
