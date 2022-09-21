@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202209200853095_ChangedHasMainContract"; }
+            get { return "202209210602103_ChangedHasMainContract"; }
         }
         
         string IMigrationMetadata.Source
