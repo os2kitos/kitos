@@ -1,13 +1,15 @@
 ﻿using System;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
-namespace Presentation.Web.Models.API.V2.Request.Generic.Validity
+
+namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
-    public class ValidityWriteRequestDTO
-    {
+    public class ItSystemUsageValidityWriteRequestDTO
+    { 
         /// <summary>
-        /// Determines if the entity has been forced into valid state even if context properties would dictate otherwise (e.g. no longer in use)
+        /// Determines the life cycle status of the system (e.g. Not in use, Operational)
         /// </summary>
-        public bool EnforcedValid { get; set; }
+        public LifeCycleStatusChoice? LifeCycleStatus { get; set; }
         /// <summary>
         /// If specified, the entity is valid from this date.
         /// Must be less than or equal to ValidTo

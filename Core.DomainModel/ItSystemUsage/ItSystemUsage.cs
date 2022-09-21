@@ -53,34 +53,8 @@ namespace Core.DomainModel.ItSystemUsage
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
         }
 
-        public bool IsActiveAccordingToDateFields
-        {
-            get
-            {
-                if (Concluded == null && ExpirationDate == null) 
-                    return true;
-
-                var today = DateTime.UtcNow;
-                var startDate = this.Concluded ?? today;
-                var endDate = DateTime.MaxValue;
-
-                if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
-                {
-                    endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
-                }
-
-                // indgået-dato <= dags dato <= udløbs-dato
-                return today >= startDate.Date && today <= endDate;
-            }
-        }
-
-        /// <summary>
-        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="CheckSystemValidity"/>)
-        /// </summary>
-        /// <value>
-        ///   Active.
-        /// </value>
-        public bool Active { get; set; }
+        public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
+        public bool IsActiveAccordingToLifeCycle => CheckLifeCycleValidity().IsNone;
 
         /// <summary>
         ///     When the system began. (indgået)
@@ -129,6 +103,14 @@ namespace Core.DomainModel.ItSystemUsage
         /// The local call system.
         /// </value>
         public string LocalCallName { get; set; }
+        /// <summary>
+        /// Gets or sets the life cycle status of this system usage.
+        /// </summary>
+        /// <value>
+        /// The life cycle status type of the system.
+        /// </value>
+        public LifeCycleStatusType? LifeCycleStatus { get; set; }
+
         /// <summary>
         /// Organization Unit responsible for this system usage.
         /// </summary>
@@ -777,7 +759,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Result<ArchivePeriod, OperationError> AddArchivePeriod(DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
-            if(startDate.Date > endDate.Date)
+            if (startDate.Date > endDate.Date)
                 return new OperationError($"StartDate: {startDate.Date} cannot be before EndDate: {endDate.Date}", OperationFailure.BadInput);
 
             var newPeriod = new ArchivePeriod()
@@ -868,9 +850,51 @@ namespace Core.DomainModel.ItSystemUsage
             LastChanged = DateTime.UtcNow;
         }
 
-        public bool CheckSystemValidity()
+        public ItSystemUsageValidationResult CheckSystemValidity()
         {
-            return IsActiveAccordingToDateFields || Active;
+            var errors = new List<ItSystemUsageValidationError>();
+
+            var today = DateTime.UtcNow.Date;
+
+            var dateErrors = CheckDatesValidity(today).ToList();
+            var validAccordingToStatus = CheckLifeCycleValidity();
+
+            errors.AddRange(dateErrors);
+            if (validAccordingToStatus.HasValue)
+            {
+                errors.Add(validAccordingToStatus.Value);
+            }
+
+            return new ItSystemUsageValidationResult(errors);
+        }
+
+        private IEnumerable<ItSystemUsageValidationError> CheckDatesValidity(DateTime todayReference)
+        {
+            if (Concluded == null && ExpirationDate == null)
+                yield break;
+
+            var today = todayReference.Date;
+            var startDate = (Concluded ?? today).Date;
+            var endDate = (ExpirationDate ?? DateTime.MaxValue).Date;
+
+            //Valid yet?
+            if (today < startDate)
+            {
+                yield return ItSystemUsageValidationError.StartDateNotPassed;
+            }
+
+            //Expired?
+            if (today > endDate)
+            {
+                yield return ItSystemUsageValidationError.EndDatePassed;
+            }
+        }
+
+        private Maybe<ItSystemUsageValidationError> CheckLifeCycleValidity()
+        {
+            return LifeCycleStatus is null or LifeCycleStatusType.Undecided or LifeCycleStatusType.NotInUse
+                ? ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle
+                : Maybe<ItSystemUsageValidationError>.None;
         }
     }
 }

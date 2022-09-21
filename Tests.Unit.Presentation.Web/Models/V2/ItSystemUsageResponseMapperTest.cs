@@ -80,9 +80,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentity(itSystemUsage.MainContract.ItContract, dto.General.MainContract);
             Assert.Equal(itSystemUsage.Concluded, dto.General.Validity.ValidFrom);
             Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity.ValidTo);
-            Assert.Equal(itSystemUsage.Active, dto.General.Validity.EnforcedValid);
+            Assert.Equal(itSystemUsage.LifeCycleStatus, dto.General.Validity.LifeCycleStatus?.ToLifeCycleStatusType());
             Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.ValidAccordingToValidityPeriod);
-            Assert.Equal(itSystemUsage.CheckSystemValidity(), dto.General.Validity.Valid);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToLifeCycle, dto.General.Validity.ValidAccordingToLifeCycle);
+            Assert.Equal(itSystemUsage.CheckSystemValidity().Result, dto.General.Validity.Valid);
         }
 
         [Fact]
@@ -580,7 +581,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.Version = A<string>();
             itSystemUsage.ItSystemCategories = new ItSystemCategories { Name = A<string>(), Uuid = A<Guid>() };
             itSystemUsage.MainContract = new ItContractItSystemUsage { ItContract = new ItContract() { Name = A<string>(), Uuid = A<Guid>() } };
-            itSystemUsage.Active = A<bool>();
+            itSystemUsage.LifeCycleStatus = A<LifeCycleStatusType>();
             itSystemUsage.Concluded = A<DateTime>();
             itSystemUsage.ExpirationDate = A<DateTime>();
         }

@@ -333,7 +333,7 @@
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
-      <Project>{e75385a3-ea7c-4dff-b989-bee64bc506ed}</Project>
+      <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
       <Name>Presentation.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">

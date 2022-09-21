@@ -37,6 +37,7 @@
             uiState: Models.UICustomization.ICustomizedModuleUI
         ) {
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+            const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
 
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
@@ -64,6 +65,20 @@
                 }
                 return orderBy;
             };
+
+            const texts = Kitos.Helpers.RenderFieldsHelper.getTexts();
+            const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] =>
+            {
+                return [
+                    {
+                        textValue: texts.active,
+                        remoteValue: true
+                    },
+                    {
+                        textValue: texts.notActive,
+                        remoteValue: false
+                    }]
+            }
 
             //Build and launch kendo grid
             var launcher = kendoGridLauncherFactory
@@ -137,6 +152,10 @@
                                     .YesNoIrrelevantOption.UNDECIDED}'\\)`,
                                 "i"),
                                 dprUndecidedQuery);
+
+                        parameterMap.$filter = Helpers.OdataQueryHelper.replaceOptionQuery(parameterMap.$filter,
+                            "LifeCycleStatus",
+                            Models.ItSystemUsage.LifeCycleStatusType.Undecided);
 
                         // Org unit is stripped from the odata query and passed on to the url factory!
                         const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnitId eq (\\d+)`, "i");
@@ -237,20 +256,21 @@
                     .withTitle("Status ifølge datofelter")
                     .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange([
-                        {
-                            textValue: "Aktivt",
-                            remoteValue: true
-                        },
-                        {
-                            textValue: "Ikke aktivt",
-                            remoteValue: false
-                        }
-                    ],
-                        false)
-                    .withRendering(dataItem => dataItem.ActiveAccordingToValidityPeriod ? 'Aktivt' : 'Ikke aktivt')
+                    .withFixedValueRange(createActiveRange(), false)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToValidityPeriod))
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ActiveAccordingToLifeCycle")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                        .withTitle("Status ifølge Status")
+                        .withId("isActiveAccordingToLifeCycle")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(createActiveRange(), false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToLifeCycle))
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalSystemId")
@@ -743,7 +763,21 @@
                         .withId("note")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering());
+                        .withSourceValueEchoRendering())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LifeCycleStatus")
+                        .withTitle("Status")
+                        .withId("LifeCycleStatus")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(lifeCycleStatusOptions.options.map(value => {
+                            return {
+                                textValue: value.text,
+                                remoteValue: value.id
+                            }
+                        })
+                        , false)
+                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus)));
 
             //Launch kendo grid
             launcher.launch();

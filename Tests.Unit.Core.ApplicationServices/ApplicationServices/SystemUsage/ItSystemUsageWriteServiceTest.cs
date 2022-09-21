@@ -212,8 +212,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     LocalSystemId = A<string>().AsChangedValue(),
                     SystemVersion = A<string>().AsChangedValue(),
                     Notes = A<string>().AsChangedValue(),
-                    EnforceActive = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
                     DataClassificationUuid = Maybe<Guid>.Some(dataClassificationId).AsChangedValue(),
+                    LifeCycleStatus = A<LifeCycleStatusType?>().AsChangedValue(),
                     ValidFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue(),
                     ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue(),
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue(),
@@ -240,8 +240,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(generalProperties.LocalSystemId.NewValue, itSystemUsage.LocalSystemId);
             Assert.Equal(generalProperties.SystemVersion.NewValue, itSystemUsage.Version);
             Assert.Equal(generalProperties.Notes.NewValue, itSystemUsage.Note);
-            Assert.Equal(generalProperties.EnforceActive.NewValue.Value, itSystemUsage.Active);
             Assert.Equal(generalProperties.DataClassificationUuid.NewValue.Value, itSystemUsage.ItSystemCategories.Uuid);
+            Assert.Equal(generalProperties.LifeCycleStatus.NewValue, itSystemUsage.LifeCycleStatus);
             Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, itSystemUsage.Concluded);
             Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, itSystemUsage.ExpirationDate);
             Assert.Equal(generalProperties.MainContractUuid.NewValue.Value, itSystemUsage.MainContract.ItContract.Uuid);
@@ -448,7 +448,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             itSystemUsage.LocalSystemId = localSystemId;
             itSystemUsage.Version = version;
             itSystemUsage.Note = note;
-            itSystemUsage.Active = active;
             itSystemUsage.Concluded = concluded;
             itSystemUsage.ExpirationDate = expirationDate;
             itSystemUsage.UserCount = userCount;
@@ -475,7 +474,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(localSystemId, itSystemUsage.LocalSystemId);
             Assert.Equal(version, itSystemUsage.Version);
             Assert.Equal(note, itSystemUsage.Note);
-            Assert.Equal(active, itSystemUsage.Active);
             Assert.Equal(expirationDate, itSystemUsage.ExpirationDate);
             Assert.Equal(concluded, itSystemUsage.Concluded);
             Assert.Equal(userCount, itSystemUsage.UserCount);
@@ -2126,7 +2124,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             }
             else
             {
-                Assert.Equal(generalProperties.EnforceActive.NewValue.Value, actual.Active);
                 Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, actual.Concluded);
                 Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, actual.ExpirationDate);
             }
@@ -2192,7 +2189,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     LocalSystemId = A<string>().AsChangedValue(),
                     SystemVersion = A<string>().AsChangedValue(),
                     Notes = A<string>().AsChangedValue(),
-                    EnforceActive = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                    LifeCycleStatus = A<LifeCycleStatusType?>().AsChangedValue(),
                     ValidFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue(),
                     ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue()
                 },
@@ -2240,7 +2237,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     LocalSystemId = "".AsChangedValue(),
                     SystemVersion = "".AsChangedValue(),
                     Notes = "".AsChangedValue(),
-                    EnforceActive = new ChangedValue<Maybe<bool>>(Maybe<bool>.None),
+                    LifeCycleStatus = new ChangedValue<LifeCycleStatusType?>(null),
                     ValidFrom = new ChangedValue<Maybe<DateTime>>(Maybe<DateTime>.None),
                     ValidTo = new ChangedValue<Maybe<DateTime>>(Maybe<DateTime>.None)
                 },

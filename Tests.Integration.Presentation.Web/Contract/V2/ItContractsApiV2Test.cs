@@ -14,7 +14,6 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
-using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
@@ -2027,7 +2026,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 ContractTemplateUuid = contractTemplateType?.Uuid,
                 CriticalityUuid = criticalityType?.Uuid,
                 AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
-                Validity = new ValidityWriteRequestDTO()
+                Validity = new ContractValidityWriteRequestDTO()
                 {
                     ValidFrom = DateTime.Now,
                     EnforcedValid = A<bool>(),

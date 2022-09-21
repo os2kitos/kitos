@@ -179,7 +179,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                Active = A<bool>(),
                 ExpirationDate = DateTime.Now.AddDays(-1),
                 Version = A<string>(),
                 LocalCallName = A<string>(),
@@ -221,7 +220,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 UsedByRelations = new List<SystemRelation>
                 {
                     incomingRelation
-                }
+                },
+                LifeCycleStatus = A<LifeCycleStatusType>()
             };
 
             // Add ResponsibleOrganizationUnit
@@ -283,6 +283,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(systemUsage.OrganizationId, readModel.OrganizationId);
             Assert.Equal(systemUsage.IsActiveAccordingToDateFields, readModel.ActiveAccordingToValidityPeriod);
+            Assert.Equal(systemUsage.IsActiveAccordingToLifeCycle, readModel.ActiveAccordingToLifeCycle);
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
@@ -291,6 +292,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.Id, readModel.LastChangedById);
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
             Assert.Equal(systemUsage.LastChanged, readModel.LastChangedAt);
+            Assert.Equal(systemUsage.LifeCycleStatus, readModel.LifeCycleStatus);
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
             Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
             Assert.Equal(systemUsage.Registertype, readModel.IsHoldingDocument);
@@ -393,23 +395,23 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_True_When_ExpirationDate_Is_Today()
         {
             //Act
             var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now);
 
             //Assert
-            Assert.False(readModel.ActiveAccordingToValidityPeriod);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Later_Than_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_True_When_ExpirationDate_Is_Later_Than_Today()
         {
             //Act
             var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now.AddDays(A<int>()));
 
             //Assert
-            Assert.False(readModel.ActiveAccordingToValidityPeriod);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
@@ -644,8 +646,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                Active = false,
-                ExpirationDate = DateTime.Now.AddDays(-1),
+                ExpirationDate = expirationDate,
                 ObjectOwner = defaultTestUser,
                 LastChangedByUser = defaultTestUser,
                 LastChanged = A<DateTime>(),

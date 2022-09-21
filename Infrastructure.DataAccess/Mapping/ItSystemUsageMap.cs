@@ -88,6 +88,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
                 .HasIndexAnnotation("ItSystemUsage_Index_LinkToDirectoryUrlName", 0);
 
+            Property(x => x.LifeCycleStatus)
+                .HasIndexAnnotation("ItSystemUsage_Index_LifeCycleStatus", 0);
+
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_ItSystemUsage_Uuid", 0);
