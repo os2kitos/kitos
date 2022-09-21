@@ -319,32 +319,6 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(expectedResult, _sut.UserCount);
         }
 
-        [Fact]
-        public void Valid_When_LifeCycleStatus_Is_Not_Set_And_Date_Fields_Are_Not_Set()
-        {
-            var itSystemUsage = new ItSystemUsage();
-
-            var validity = itSystemUsage.CheckSystemValidity();
-
-            Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
-        }
-
-        [Theory, MemberData(nameof(DateValidData))]
-        public void Valid_When_Date_Fields_Are_Valid_And_LifeCycleStatus_Is_Not_Set(DateTime startDate, DateTime endDate)
-        {
-            var itSystemUsage = new ItSystemUsage
-            {
-                Concluded = startDate, 
-                ExpirationDate = endDate
-            };
-
-            var validity = itSystemUsage.CheckSystemValidity();
-
-            Assert.True(validity.Result);
-            Assert.Contains(ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, validity.ValidationErrors);
-        }
-
         [Theory]
         [InlineData(LifeCycleStatusType.Operational)]
         [InlineData(LifeCycleStatusType.PhasingIn)]
@@ -356,6 +330,13 @@ namespace Tests.Unit.Core.Model
                 LifeCycleStatus = lifeCycleStatus,
                 ExpirationDate = DateTime.UtcNow.AddDays(1),
                 Concluded = DateTime.UtcNow.AddDays(-1),
+                MainContract = new ItContractItSystemUsage()
+                {
+                    ItContract = new ItContract()
+                    {
+                        Active = true
+                    }
+                }
             };
 
             var validity = itSystemUsage.CheckSystemValidity();
