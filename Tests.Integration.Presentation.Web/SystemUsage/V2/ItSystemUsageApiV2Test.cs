@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,7 +7,6 @@ using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -437,19 +434,32 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Act
             using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            contract1.Active = true;
+            await ItContractHelper.PatchContract(contract1.Id, organization.Id, contract1);
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             Assert.Equal(contract1.Uuid, freshReadDTO.General.MainContract.Uuid);
             Assert.Equal(contract1.Name, freshReadDTO.General.MainContract.Name);
+            Assert.True(freshReadDTO.General.Validity.ValidAccordingToMainContract);
 
             //Act - set to another contract
             using var response2 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract2.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            contract2.Terminated = DateTime.UtcNow.AddDays(-1);
+            await ItContractHelper.PatchContract(contract2.Id, organization.Id, contract2);
 
             //Assert
             freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             Assert.Equal(contract2.Uuid, freshReadDTO.General.MainContract.Uuid);
             Assert.Equal(contract2.Name, freshReadDTO.General.MainContract.Name);
+            Assert.False(freshReadDTO.General.Validity.ValidAccordingToMainContract);
+
+            //Act - set to contract to null
+            using var response3 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = null }).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.True(freshReadDTO.General.Validity.ValidAccordingToMainContract);
         }
 
         [Fact]
