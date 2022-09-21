@@ -482,22 +482,9 @@
                         .withId("contract")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange
-                        (
-                            [
-                                {
-                                    textValue: "Aktivt",
-                                    remoteValue: true
-                                },
-                                {
-                                    textValue: "Ikke aktivt",
-                                    remoteValue: false
-                                }
-                            ]
-                            ,
-                            false)
+                        .withFixedValueRange(createActiveRange(), false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withRendering(dataItem => { return dataItem.MainContractIsActive ? "Aktivt" : "Ikke aktivt"; })
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.MainContractIsActive))
                         .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : "")
                         .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
 
