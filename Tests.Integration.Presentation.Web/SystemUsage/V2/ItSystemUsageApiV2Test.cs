@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -7,6 +9,7 @@ using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -428,7 +431,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
             var contract1 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
             var contract2 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
-            var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
+            var usageId = GetUsageIdByUuid(newUsage.Uuid);
             await ItContractHelper.AddItSystemUsage(contract1.Id, usageId, organization.Id);
             await ItContractHelper.AddItSystemUsage(contract2.Id, usageId, organization.Id);
 
@@ -456,7 +459,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
             var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
-            var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
+            var usageId = GetUsageIdByUuid(newUsage.Uuid);
             await ItContractHelper.AddItSystemUsage(contract.Id, usageId, organization.Id);
 
             //Act
@@ -827,22 +830,21 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertGDPR(gdprVersion3, gdprResponse);
         }
         
-
         [Fact]
         public async Task Can_PATCH_Validity()
         {
             //Arrange
-            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var (token, _, organization, system) = await CreatePrerequisitesAsync();
 
             var date1 = DateTime.UtcNow;
             var lifeCycle1 = LifeCycleStatusChoice.Operational;
             var date2 = DateTime.UtcNow.AddDays(-1 - A<int>());
-            var lifeCycle2 = LifeCycleStatusChoice.Undecided;
+            var lifeCycle2 = LifeCycleStatusChoice.NotInUse;
 
             var validityVersion1 = CreateValidityInput(date1, lifeCycle1);
             var validityVersion2 = CreateValidityInput(date2, lifeCycle2);
             var validityVersion3 = new ItSystemUsageValidityWriteRequestDTO();
-            
+
             var usageDto = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Act
@@ -853,17 +855,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert version 1
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             var generalResponse = dto.General.Validity;
-            AssertValidity(validityVersion1, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: true, expectedMainContractValidity: true);
+            AssertValidity(validityVersion1, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: true);
 
             //Act
             await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion2)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
-
+            
             //Assert version 2
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             generalResponse = dto.General.Validity;
-            AssertValidity(validityVersion2, generalResponse, expectedDateValidity: false, expectedLifeCycleValidity: false, expectedMainContractValidity: false);
+            AssertValidity(validityVersion2, generalResponse, expectedDateValidity: false, expectedLifeCycleValidity: false);
 
             //Act - reset
             await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion3)
@@ -873,7 +875,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert version 3 - properties should have been reset
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             generalResponse = dto.General.Validity;
-            AssertValidity(validityVersion3, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: false, expectedMainContractValidity: false);
+            AssertValidity(validityVersion3, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: true);
         }
 
         [Fact]
@@ -1893,14 +1895,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
         }
 
-        private static void AssertValidity(ItSystemUsageValidityWriteRequestDTO validityInput, ItSystemUsageValidityResponseDTO validityResponse, bool expectedDateValidity, bool expectedLifeCycleValidity, bool expectedMainContractValidity)
+        private static void AssertValidity(ItSystemUsageValidityWriteRequestDTO validityInput, ItSystemUsageValidityResponseDTO validityResponse, bool expectedDateValidity, bool expectedLifeCycleValidity)
         {
             Assert.Equal(validityResponse?.ValidFrom, validityInput?.ValidFrom);
             Assert.Equal(validityResponse?.ValidTo, validityInput?.ValidTo);
             Assert.Equal(validityResponse?.LifeCycleStatus, validityInput?.LifeCycleStatus);
             Assert.Equal(expectedDateValidity, validityResponse?.ValidAccordingToValidityPeriod);
             Assert.Equal(expectedLifeCycleValidity, validityResponse?.ValidAccordingToLifeCycle);
-            Assert.Equal(expectedMainContractValidity, validityResponse?.ValidAccordingToMainContract);
         }
 
         private async Task<(string token, User user, OrganizationDTO organization, ItSystemDTO system)> CreatePrerequisitesAsync()
@@ -2204,6 +2205,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private static async Task<SystemRelationDTO> CreateRelationAsync(ItSystemUsageDTO fromUsage, ItSystemUsageDTO toUsage, ItContractDTO contract = null)
         {
             return await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO { FromUsageId = fromUsage.Id, ToUsageId = toUsage.Id, ContractId = contract?.Id });
+        }
+
+        private static int GetUsageIdByUuid(Guid uuid)
+        {
+            return DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(uuid).Id);
         }
     }
 }
