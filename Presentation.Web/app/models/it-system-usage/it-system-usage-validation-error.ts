@@ -3,5 +3,6 @@
         StartDateNotPassed = 0,
         EndDatePassed = 1,
         NotOperationalAccordingToLifeCycle = 2,
+        MainContractNotActive = 3
     }
 }

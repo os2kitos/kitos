@@ -115,7 +115,7 @@
                     <div class="form-group object-status-active-summary" ng-if="validationStatus.valid">
                         <span ng-if="validationStatus.valid">Kontrakten er <strong>gyldig</strong></span>
                     </div>
-                    <!-- Show the detailed summary if there are errors involved at all-->
+                    <!-- Show the detailed summary if any errors are involved at all-->
                     <div class="form-group object-status-active-summary" ng-if="!validationStatus.valid">
                         <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
                             <!--TODO: To danish-->
@@ -132,6 +132,32 @@
                             <!--TODO: Change text to danish-->
                             <li ng-if="error === 2">System is not operational according to the Life Cycle Status</li>
                             <li ng-if="error === 3">Main Contract not is active</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-xs-12" ng-if="validationStatus">
+                    <label class="control-label small">Aktivt</label>
+                    <!-- Show the simple version of the status if there are no details to explain-->
+                    <div class="form-group object-status-active-summary" ng-if="validationStatus.valid && validationStatus.errors.length === 0">
+                        <!--TODO: Change text to danish-->
+                        <span ng-if="validationStatus.valid">System is <strong>gyldig</strong></span>
+                    </div>
+                    <!-- Show the detailed summary if any errors are involved at all-->
+                    <div class="form-group object-status-active-summary" ng-if="validationStatus.errors.length > 0">
+                        <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
+                            <span ng-if="validationStatus.valid">Kontrakten er <strong>gyldig</strong></span>
+                            <span ng-if="!validationStatus.valid">Kontrakten er <strong>ikke gyldig</strong></span>
+                            <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isValidationDetailsExpanded, 'fa-plus-square-o': !isValidationDetailsExpanded}"></i>
+                        </a>
+                        <p ng-if="isValidationDetailsExpanded && !validationStatus.enforcedValid && validationStatus.errors.length > 0" style="margin-top: 5px;">
+                            Følgende gør kontrakten ugyldig:
+                        </p>
+                        <ul ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" ng-repeat="error in validationStatus.errors">
+                            <li ng-if="error === 0">'Gyldig fra' er endnu ikke passeret</li>
+                            <li ng-if="error === 1">'Gyldig til' er overskredet</li>
+                            <li ng-if="error === 2">Not operational according to the life cycle</li>
+                            <li ng-if="error === 3">Main contract not active</li>
                         </ul>
                     </div>
                 </div>
