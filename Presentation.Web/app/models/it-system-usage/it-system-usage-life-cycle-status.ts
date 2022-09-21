@@ -14,79 +14,8 @@
         enumValue: LifeCycleStatusType;
     }
 
-
-    class LifeCycleStatus {
-        static getRange(): Array<ILifeCycleOption> {
-            const options: Array<ILifeCycleOption> = [];
-
-            options.push(
-                {
-                    text: Constants.Select2.EmptyField,
-                    enumAsString: this.undecided.enumStringValue,
-                    enumValue: this.undecided.enumValue
-                });
-            options.push(
-                {
-                    text: this.phasingIn.text,
-                    enumAsString: this.phasingIn.enumStringValue,
-                    enumValue: this.phasingIn.enumValue
-                });
-            options.push(
-                {
-                    text: this.operational.text,
-                    enumAsString: this.operational.enumStringValue,
-                    enumValue: this.operational.enumValue
-                });
-            options.push(
-                {
-                    text: this.phasingOut.text,
-                    enumAsString: this.phasingOut.enumStringValue,
-                    enumValue: this.phasingOut.enumValue
-                });
-            options.push(
-                {
-                    text: this.notInUse.text,
-                    enumAsString: this.notInUse.enumStringValue,
-                    enumValue: this.notInUse.enumValue
-                });
-
-            return options;
-        }
-
-
-        static readonly undecided = {
-            text: Constants.Select2.EmptyField,
-            enumStringValue: "Undecided",
-            enumValue: LifeCycleStatusType.Undecided
-        }
-
-        static readonly phasingIn = {
-            text: "Under indfasning",
-            enumStringValue: "PhasingIn",
-            enumValue: LifeCycleStatusType.PhasingIn
-        }
-
-        static readonly operational = {
-            text: "I drift",
-            enumStringValue: "Operational",
-            enumValue: LifeCycleStatusType.Operational
-        }
-
-        static readonly phasingOut = {
-            text: "Under udfasning",
-            enumStringValue: "PhasingOut",
-            enumValue: LifeCycleStatusType.PhasingOut
-        }
-
-        static readonly notInUse = {
-            text: "Ikke i drift",
-            enumStringValue: "NotInUse",
-            enumValue: LifeCycleStatusType.NotInUse
-        }
-    }
-
     export class LifeCycleStatusOptions {
-        options: Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType>[];
+        readonly options: Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType>[];
         private readonly enumStringToTextMap: Record<string, string>;
         
         mapValueFromString(value: string): string {
@@ -94,29 +23,53 @@
         }
 
         constructor() {
-            const optionLookup = LifeCycleStatus.getRange().reduce<{ [key: number]: ILifeCycleOption }>((acc, next) => {
-                acc[next.enumValue] = next;
-                return acc;
-            }, {});
 
-            this.options = Object
-                .keys(LifeCycleStatusType)
-                .filter(item => !isNaN(Number(item)))
-                .map((value) => {
-                    const enumValue = Number(value);
-                    const option = optionLookup[enumValue];
-                    return {
-                        text: option.text,
-                        id: enumValue,
-                        optionalObjectContext: enumValue
-                    } as Models.ViewModel.Generic.Select2OptionViewModel<LifeCycleStatusType>;
+            this.enumStringToTextMap = {};
+            this.options = [];
+
+            //Decides the available range and order of options presented to the user.
+            const optionRange: Array<ILifeCycleOption> = [
+                {
+                    text: Constants.Select2.EmptyField,
+                    enumAsString: "Undecided",
+                    enumValue: LifeCycleStatusType.Undecided
+                },
+                {
+                    text: "Under indfasning",
+                    enumAsString: "PhasingIn",
+                    enumValue: LifeCycleStatusType.PhasingIn
+                },
+                {
+                    text: "I drift",
+                    enumAsString: "Operational",
+                    enumValue: LifeCycleStatusType.Operational
+                },
+                {
+                    text: "Under udfasning",
+                    enumAsString: "PhasingOut",
+                    enumValue: LifeCycleStatusType.PhasingOut
+                },
+                {
+                    text: "Ikke i drift",
+                    enumAsString: "NotInUse",
+                    enumValue: LifeCycleStatusType.NotInUse
                 }
-                );
+            ];
 
-            this.enumStringToTextMap = LifeCycleStatus.getRange().reduce((record, item) => {
-                record[item.enumAsString] = item.text;
-                return record;
-            }, {} as Record<string, string>);
+            //**********************************************//
+            //Setup the fixed option range and lookup table*//
+            //**********************************************//
+            optionRange.forEach(option => {
+                //Add the option
+                this.options.push({
+                    text: option.text,
+                    id: option.enumValue,
+                    optionalObjectContext: option.enumValue
+                });
+
+                //Extend the enumStringToTextMap
+                this.enumStringToTextMap[option.enumAsString] = option.text;
+            });
         }
     }
 }

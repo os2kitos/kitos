@@ -66,10 +66,7 @@
                 return orderBy;
             };
 
-            const texts = {
-                active: "Aktivt",
-                notActive: "Ikke aktivt"
-            }
+            const texts = Kitos.Helpers.RenderFieldsHelper.getTexts();
             const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] =>
             {
                 return [
