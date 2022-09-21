@@ -860,8 +860,6 @@ namespace Core.DomainModel.ItSystemUsage
             var dateErrors = CheckDatesValidity(today).ToList();
             var validAccordingToStatus = CheckLifeCycleValidity();
             var validAccordingToContract = CheckContractValidity();
-            //If either one of the conditions pass the system is considered active
-            var isValid = dateErrors.Any() == false && validAccordingToStatus.IsNone && validAccordingToContract.IsNone;
 
             errors.AddRange(dateErrors);
             if (validAccordingToStatus.HasValue)

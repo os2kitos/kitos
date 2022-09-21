@@ -99,17 +99,16 @@
                            data-field="expirationDate">
                 </div>
                 <div class="form-group">
-
                     <select-simple data-id="lifeCycleStatus"
                                    data-label="Status"
                                    data-options="lifeCycleStatusOptions"
                                    data-ng-model="usageViewModel.lifeCycleStatus"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-auto-save-url="{{::autoSaveUrl}}"
+                                   data-ng-changed="checkSystemValidity"
                                    data-field="lifeCycleStatus">
                     </select-simple>
                 </div>
-
                 <div ng-if="validationStatus">
                     <label class="control-label small">Aktivt</label>
                     <!-- Show the simple version of the status if there are no details to explain-->
@@ -139,7 +138,6 @@
                         </ul>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label for="last-changed-by-name" class="control-label small">Sidst redigeret: Bruger</label>
                     <input type="text"

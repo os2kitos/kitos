@@ -330,9 +330,9 @@ namespace Tests.Unit.Core.Model
                 LifeCycleStatus = lifeCycleStatus,
                 ExpirationDate = DateTime.UtcNow.AddDays(1),
                 Concluded = DateTime.UtcNow.AddDays(-1),
-                MainContract = new ItContractItSystemUsage()
+                MainContract = new ItContractItSystemUsage
                 {
-                    ItContract = new ItContract()
+                    ItContract = new ItContract
                     {
                         Active = true
                     }
