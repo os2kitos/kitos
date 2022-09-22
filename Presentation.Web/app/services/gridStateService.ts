@@ -7,6 +7,7 @@
     }
     export interface IGridStateToBeAppliedAfterLoad {
         columnOrder: Array<LoadedColumnOrder>
+        pageSize: number | null
     }
 
     export interface IGridSavedState {
@@ -161,23 +162,24 @@
                             }
                         });
 
+                        let statePageSize: number | null = null;
                         //Apply grid options
                         if (state.dataSource) {
                             const statefilters = state.dataSource?.filter;
-                            const statePageSize = state.dataSource?.pageSize;
+                            statePageSize = state.dataSource?.pageSize;
                             const stateSort = state.dataSource?.sort;
-                            const statePage = state.dataSource?.page;
                             setup.dataSource.filter = statefilters ?? setup.dataSource.filter;
-                            setup.dataSource.pageSize = statePageSize ?? setup.dataSource.pageSize;
                             setup.dataSource.sort = stateSort ?? setup.dataSource.sort;
-                            setup.dataSource.page = statePage ?? setup.dataSource.page ?? 1;
                         }
                         completeLoading();
 
                         return {
                             //Saved indexes must be applied after rendering since the map only contains values for visible columns. sorting beforehand will move all currently invistible columns out of the original order.
-                            columnOrder: savedIndexes
+                            columnOrder: savedIndexes,
+                            pageSize: statePageSize ?? null
                         }
+                    }, error => {
+                        return { columnOrder: [], pageSize: null };
                     });
             }
 

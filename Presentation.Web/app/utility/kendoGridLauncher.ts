@@ -866,6 +866,8 @@ module Kitos.Utility.KendoGrid {
                 });
 
             //Build the grid
+            const defaultPageSize = 100;
+            const validPageSizes = [10, 25, 50, 100, 200, "all"];
             const mainGridOptions: IKendoGridOptions<TDataSource> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -881,7 +883,7 @@ module Kitos.Utility.KendoGrid {
                         field: this.standardSortingSourceField,
                         dir: "asc"
                     },
-                    pageSize: 100,
+                    pageSize: defaultPageSize,
                     serverPaging: true,
                     serverSorting: true,
                     serverFiltering: true,
@@ -905,7 +907,7 @@ module Kitos.Utility.KendoGrid {
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200, "all"],
+                    pageSizes: validPageSizes,
                     buttonCount: 5
                 },
                 sortable: {
@@ -961,21 +963,22 @@ module Kitos.Utility.KendoGrid {
                         });
                     });
 
+                    this.postCreationActions.push(_ => {
+                        //Loading the data from the server now that the grid is ready
+                        //NOTE: Using the pageSize() method since read().. will change the pagesize to the size of the response.. this way we keep inside the stored ranges
+                        let pageSize = settingsToBeLoadedAfterRendering.pageSize;
+                        if (!pageSize || validPageSizes.indexOf(pageSize) === -1) {
+                            pageSize = defaultPageSize;
+                        }
+                        this.gridBinding.mainGrid.dataSource.pageSize(pageSize);
+                    });
                     // assign the generated grid options. Kendo will start after this
                     this.gridBinding.mainGridOptions = mainGridOptions;
                 });
         }
 
         launch() {
-            let awaitingInitialRefresh = true;
             let awaitingDeferredActions = true;
-
-            this.$scope.$on("kendoRendered", (_) => {
-                if (awaitingInitialRefresh) {
-                    awaitingInitialRefresh = false;
-                    this.refreshData();
-                }
-            });
 
             this.$scope.$on("kendoWidgetCreated", (_, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -993,9 +996,7 @@ module Kitos.Utility.KendoGrid {
                     });
                 }
             });
-
-            //Defer until page change is complete
-            this.$timeout(() => this.build(), 1, false);
+            this.build();
         }
     }
 
