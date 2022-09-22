@@ -1,6 +1,14 @@
 ﻿module Kitos.Services {
     "use strict";
 
+    export interface LoadedColumnOrder {
+        persistId: string,
+        columnIndex: number
+    }
+    export interface IGridStateToBeAppliedAfterLoad {
+        columnOrder: Array<LoadedColumnOrder>
+    }
+
     export interface IGridSavedState {
         dataSource?: kendo.data.DataSourceOptions;
         columnState?: { [persistId: string]: { index: number; width: number, hidden?: boolean } };
@@ -17,7 +25,7 @@
          * Applies the current locally saved options along with server options to a kendo configuration
          * @param setup
          */
-        applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<void>;
+        applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<IGridStateToBeAppliedAfterLoad>;
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
@@ -124,16 +132,16 @@
                 });
             }
 
-            function applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<void> {
+            function applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<IGridStateToBeAppliedAfterLoad> {
                 return getSavedGridOptions(setup.columns)
                     .then(state => {
-                        const savedIndexes: Record<string, number> = {};
-                        var undefinedPreferenceStartIndex = setup.columns.length * 10;
+                        const savedIndexes: Array<LoadedColumnOrder> = [];
+                        //var undefinedPreferenceStartIndex = setup.columns.length * 10; //TODO: Kill me
 
                         //Apply the state to the column configuration
                         setup.columns.forEach(column => {
                             //Push undefined preferences to the back of defined indexes
-                            savedIndexes[column.persistId] = undefinedPreferenceStartIndex++;
+                            //savedIndexes[column.persistId] = undefinedPreferenceStartIndex++; //TODO: Kill me
 
                             if (state.columnState) {
                                 const columnState = state.columnState[column.persistId];
@@ -142,7 +150,15 @@
                                     if (columnState !== undefined) {
                                         column.width = columnState.width ?? column.width;
                                         column.hidden = columnState.hidden !== undefined ? columnState.hidden : column.hidden;
-                                        savedIndexes[column.persistId] = columnState.index !== undefined ? columnState.index : savedIndexes[column.persistId];
+                                        const savedColumnIndex = columnState.index;
+                                        if (savedColumnIndex !== undefined) {
+                                            savedIndexes.push({
+                                                persistId: column.persistId,
+                                                columnIndex: savedColumnIndex
+                                            });
+                                        }
+
+                                        //savedIndexes[column.persistId] = columnState.index !== undefined ? columnState.index : savedIndexes[column.persistId]; //TODO: Kill it
                                     }
                                 }
                             }
@@ -154,11 +170,11 @@
                         //TODO: That's different in the old version where it repositioned the rendered columns but did not affect the columns config.. perhaps we can set an attribute
                         //TODO: Investigate if there is an index property on a column config...
                         //TODO: Based on investigation it could appear that orderIndex is currently not exposed this part must be postponed until after rendering has completed.... bad shit
-                        setup.columns.sort((a, b) => {
-                            const indexA = savedIndexes[a.persistId];
-                            const indexB = savedIndexes[b.persistId];
-                            return indexA - indexB;
-                        });
+                        //setup.columns.sort((a, b) => {
+                        //    const indexA = savedIndexes[a.persistId];
+                        //    const indexB = savedIndexes[b.persistId];
+                        //    return indexA - indexB;
+                        //}); //TODO: Kill it
 
                         //Apply grid options
                         if (state.dataSource) {
@@ -172,6 +188,10 @@
                             setup.dataSource.page = statePage ?? setup.dataSource.page ?? 1;
                         }
                         completeLoading();
+
+                        return {
+                            columnOrder: savedIndexes
+                        }
                     });
             }
 

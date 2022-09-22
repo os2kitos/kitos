@@ -519,6 +519,7 @@ module Kitos.Utility.KendoGrid {
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
         private overviewType: Models.Generic.OverviewType = null;
+        private postCreationActions: Array<(gridBinding: IGridViewAccess<TDataSource>) => void> = [];
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -723,6 +724,11 @@ module Kitos.Utility.KendoGrid {
             if (value == null) {
                 throw `${name} is a required field and must be provided`;
             }
+        }
+
+        private applyDeferredActions() {
+            this.postCreationActions.forEach(action => action(this.gridBinding));
+            this.postCreationActions = []; //Clear any bindings held in this array
         }
 
         private build() {
@@ -931,7 +937,32 @@ module Kitos.Utility.KendoGrid {
 
             this.gridState
                 .applySavedGridOptions(mainGridOptions)
-                .then(() => {
+                .then((settingsToBeLoadedAfterRendering) => {
+                    //Defer a post-build action to reorder columns (initially column order will be the array order so if we change that the "filter menu" order will be messed up if we clear the state)
+                    this.postCreationActions.push(access => {
+                        const createdColumns = access.mainGrid.columns;
+                        settingsToBeLoadedAfterRendering.columnOrder.forEach(savedColumnOrder => {
+                            var columnIndex = this._.findIndex(createdColumns, column => {
+                                if (!column.hasOwnProperty("persistId")) {
+                                    console.error(`Unable to find persistId property in grid column with field=${column.field}`);
+                                    return false;
+                                }
+
+                                return column.persistId === savedColumnOrder.persistId;
+                            });
+                            if (columnIndex !== -1) {
+                                var columnObj = createdColumns[columnIndex];
+                                // reorder column
+                                if (savedColumnOrder.columnIndex !== columnIndex) {
+                                    // check if index is out of bounds
+                                    if (savedColumnOrder.columnIndex < createdColumns.length) {
+                                        access.mainGrid.reorderColumn(savedColumnOrder.columnIndex, columnObj);
+                                    }
+                                }
+                            }
+                        });
+                    });
+
                     // assign the generated grid options. Kendo will start after this
                     this.gridBinding.mainGridOptions = mainGridOptions;
                 });
@@ -939,7 +970,8 @@ module Kitos.Utility.KendoGrid {
 
         launch() {
             let awaitingInitialRefresh = true;
-            
+            let awaitingDeferredActions = true;
+
             this.$scope.$on("kendoRendered", (_) => {
                 if (awaitingInitialRefresh) {
                     awaitingInitialRefresh = false;
@@ -952,6 +984,10 @@ module Kitos.Utility.KendoGrid {
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
                 if (widget === this.gridBinding.mainGrid) {
+                    if (awaitingDeferredActions) {
+                        this.applyDeferredActions();
+                        awaitingDeferredActions = false;
+                    }
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
                     this.$(".k-grid-excel").click(() => {
