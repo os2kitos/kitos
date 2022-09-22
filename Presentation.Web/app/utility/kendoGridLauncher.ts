@@ -680,7 +680,9 @@ module Kitos.Utility.KendoGrid {
 
         clearGridForOrganization() {
             if (confirm(`Er du sikker på at du vil slette standard kolonneopsætning af felter til ${this.user.currentOrganizationName}`)) {
-                this.gridState.deleteGridOrganizationalConfiguration(this.overviewType);
+                this.gridState
+                    .deleteGridOrganizationalConfiguration(this.overviewType)
+                    .then(() => this.reload());
             }
         }
 
@@ -701,9 +703,7 @@ module Kitos.Utility.KendoGrid {
 
         // clears grid filters by removing the localStorageItem and reloading the page
         clearOptions() {
-            this.gridState.removeProfile();
-            this.gridState.removeLocal();
-            this.gridState.removeSession();
+            this.gridState.reset();
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge gendannet til standardopsætning ");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
@@ -744,8 +744,6 @@ module Kitos.Utility.KendoGrid {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
                     clearOptions: () => this.clearOptions(),
                     saveGridProfile: () => this.saveGridProfile(),
-                    loadGridProfile: () => this.loadGridProfile(),
-                    clearGridProfile: () => this.clearGridProfile(),
                     doesGridProfileExist: () => this.doesGridProfileExist(),
                     saveGridForOrganization: () => this.saveGridForOrganization(),
                     clearGridForOrganization: () => this.clearGridForOrganization(),
@@ -938,7 +936,7 @@ module Kitos.Utility.KendoGrid {
             this.gridState
                 .applySavedGridOptions(mainGridOptions)
                 .then((settingsToBeLoadedAfterRendering) => {
-                    //Defer a post-build action to reorder columns (initially column order will be the array order so if we change that the "filter menu" order will be messed up if we clear the state)
+                    //Saved indexes must be applied after rendering since the map only contains values for visible columns. sorting beforehand will move all currently invisible columns out of the original order, and that will affect the filter menu.
                     this.postCreationActions.push(access => {
                         const createdColumns = access.mainGrid.columns;
                         settingsToBeLoadedAfterRendering.columnOrder.forEach(savedColumnOrder => {

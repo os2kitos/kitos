@@ -34,9 +34,10 @@
         removeProfile: () => void;
         removeLocal: () => void;
         removeSession: () => void;
-        deleteGridOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType) => void;
+        deleteGridOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType) => ng.IPromise<void>;
         doesGridDivergeFromOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType, grid: Kitos.IKendoGrid<any>) => boolean;
         canDeleteGridOrganizationalConfiguration: () => boolean;
+        reset: () => void;
     }
 
     gridStateService.$inject = [
@@ -47,7 +48,6 @@
         "_",
         "KendoFilterService",
         "notify",
-        "$state",
         "sha256"
     ];
 
@@ -59,7 +59,6 @@
         _: _.LoDashStatic,
         KendoFilterService: KendoFilterService,
         notify,
-        $state: ng.ui.IStateService,
         sha256: Hash
     ): IGridStateFactory {
         var factory: IGridStateFactory = {
@@ -85,6 +84,7 @@
             var gridLoading: boolean = true;
 
             var service: IGridStateService = {
+                reset: reset,
                 completeLoading: completeLoading,
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
@@ -136,12 +136,11 @@
                 return getSavedGridOptions(setup.columns)
                     .then(state => {
                         const savedIndexes: Array<LoadedColumnOrder> = [];
-                        //var undefinedPreferenceStartIndex = setup.columns.length * 10; //TODO: Kill me
 
                         //Apply the state to the column configuration
                         setup.columns.forEach(column => {
                             //Push undefined preferences to the back of defined indexes
-                            //savedIndexes[column.persistId] = undefinedPreferenceStartIndex++; //TODO: Kill me
+                            savedIndexes[column.persistId] = null;
 
                             if (state.columnState) {
                                 const columnState = state.columnState[column.persistId];
@@ -157,24 +156,10 @@
                                                 columnIndex: savedColumnIndex
                                             });
                                         }
-
-                                        //savedIndexes[column.persistId] = columnState.index !== undefined ? columnState.index : savedIndexes[column.persistId]; //TODO: Kill it
                                     }
                                 }
                             }
                         });
-
-                        //Sort the columns based on persisted preferences
-                        //TODO: One remaining problem here!!!
-                        //TODO: The ordering also affects the position in the menu and when the grid profile is cleared and restored to org, all columns are moved to the back (for some odd reason)
-                        //TODO: That's different in the old version where it repositioned the rendered columns but did not affect the columns config.. perhaps we can set an attribute
-                        //TODO: Investigate if there is an index property on a column config...
-                        //TODO: Based on investigation it could appear that orderIndex is currently not exposed this part must be postponed until after rendering has completed.... bad shit
-                        //setup.columns.sort((a, b) => {
-                        //    const indexA = savedIndexes[a.persistId];
-                        //    const indexB = savedIndexes[b.persistId];
-                        //    return indexA - indexB;
-                        //}); //TODO: Kill it
 
                         //Apply grid options
                         if (state.dataSource) {
@@ -190,6 +175,7 @@
                         completeLoading();
 
                         return {
+                            //Saved indexes must be applied after rendering since the map only contains values for visible columns. sorting beforehand will move all currently invistible columns out of the original order.
                             columnOrder: savedIndexes
                         }
                     });
@@ -435,14 +421,12 @@
                     });
             }
 
-            function deleteGridOrganizationalConfiguration(overviewType: Models.Generic.OverviewType) {
-                KendoFilterService.deleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
+            function deleteGridOrganizationalConfiguration(overviewType: Models.Generic.OverviewType): ng.IPromise<void> {
+                return KendoFilterService.deleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((res) => {
                         if (res.status === 200) {
-                            notify.addSuccessMessage("Organisationens kolonneopsætningen er slettet");
-                            removeSession();
-                            removeLocal();
-                            $state.go(".", null, { reload: true });
+                            notify.addSuccessMessage("Organisationens kolonneopsætningen er slettet og overblikket er nulstillet");
+                            reset();
                         }
                     }, (error) => {
                         notify.addErrorMessage("Der opstod en fejl i forsøget på at slette den gemte kolonneopsætningen");
@@ -460,6 +444,13 @@
                 if ($window.localStorage.getItem(profileStorageKey))
                     return true;
                 return false;
+            }
+
+            function reset() {
+                removeLocal();
+                removeSession();
+                removeOrgConfig();
+                removeProfile();
             }
 
             function removeSession(): void {
