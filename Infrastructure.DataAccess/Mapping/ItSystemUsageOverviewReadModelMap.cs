@@ -122,6 +122,9 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LifeCycleStatus)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LifeCycleStatus", 0);
 
+            Property(x => x.SystemActive)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_SystemActive", 0);
+
 
 
             //No index bc we don't know how long it might be

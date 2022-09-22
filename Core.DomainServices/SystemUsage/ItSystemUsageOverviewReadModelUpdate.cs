@@ -58,6 +58,7 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.ActiveAccordingToValidityPeriod = source.IsActiveAccordingToDateFields;
             destination.ActiveAccordingToLifeCycle = source.IsActiveAccordingToLifeCycle;
+            destination.SystemActive = source.CheckSystemValidity().Result;
             destination.Note = source.Note;
             destination.Version = source.Version;
             destination.LocalCallName = source.LocalCallName;
