@@ -858,17 +858,17 @@ namespace Core.DomainModel.ItSystemUsage
             var today = DateTime.UtcNow.Date;
 
             var dateErrors = CheckDatesValidity(today).ToList();
-            var validAccordingToStatus = CheckLifeCycleValidity();
-            var validAccordingToContract = CheckContractValidity();
+            var hasLifeCycleStatusValidationError = CheckLifeCycleValidity();
+            var hasContractValidityError = CheckContractValidity();
 
             errors.AddRange(dateErrors);
-            if (validAccordingToStatus.HasValue)
+            if (hasLifeCycleStatusValidationError.HasValue)
             {
-                errors.Add(validAccordingToStatus.Value);
+                errors.Add(hasLifeCycleStatusValidationError.Value);
             }
-            if (validAccordingToContract.HasValue)
+            if (hasContractValidityError.HasValue)
             {
-                errors.Add(validAccordingToContract.Value);
+                errors.Add(hasContractValidityError.Value);
             }
 
             return new ItSystemUsageValidationResult(errors);

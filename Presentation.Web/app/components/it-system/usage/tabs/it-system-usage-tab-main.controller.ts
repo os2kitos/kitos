@@ -55,8 +55,7 @@
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
-                    patch(payload, saveUrlWithOrgId)
-                        .then(_ => reloadValidationStatus());
+                    patch(payload, saveUrlWithOrgId);
                 } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                 }
@@ -67,8 +66,7 @@
                     const dateString = date.format(formatDateString);
                     var payload = {};
                     payload[field] = dateString;
-                    patch(payload, saveUrlWithOrgId)
-                        .then(_ => reloadValidationStatus());
+                    patch(payload, saveUrlWithOrgId);
                 }
             }
 
@@ -106,7 +104,7 @@
                     elementSelected: (newElement) => {
                         $scope.usage.lifeCycleStatus = newElement.optionalObjectContext;
                         const payload = { lifeCycleStatus: newElement.optionalObjectContext };
-                        patch(payload, saveUrlWithOrgId).then(_ => reloadValidationStatus());
+                        patch(payload, saveUrlWithOrgId);
                     }
                 }
             }

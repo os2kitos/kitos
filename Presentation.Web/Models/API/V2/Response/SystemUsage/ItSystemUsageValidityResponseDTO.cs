@@ -6,7 +6,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
     public class ItSystemUsageValidityResponseDTO
     {
         /// <summary>
-        /// Determines if the entity is considered valid. This is computed from ValidAccordingToValidityPeriod and ValidAccordingToLifeCycle.
+        /// Determines if the entity is considered valid. This is computed from ValidAccordingToValidityPeriod, ValidAccordingToLifeCycle and ValidAccordingToMainContract.
         /// </summary>
         public bool Valid { get; set; }
         /// <summary>
@@ -18,7 +18,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// </summary>
         public bool ValidAccordingToLifeCycle{ get; set; }
         /// <summary>
-        /// Determines if the entity is considered valid based on the MainContract.IsActive
+        /// Determines if the entity is considered valid based on the validity of the related contract
         /// </summary>
         public bool ValidAccordingToMainContract{ get; set; }
         /// <summary>
