@@ -59,7 +59,6 @@
         Concluded: Date | null;
         MainContractSupplierName: string | null;
         MainContractIsActive: boolean | null;
-        HasMainContract: boolean;
         SensitiveDataLevelsAsCsv: string | null;
         ArchiveDuty: string | null;
         LifeCycleStatus: string | null;

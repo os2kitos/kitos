@@ -477,37 +477,14 @@
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("HasMainContract")
-                        .withTitle("Kontrakt")
+                        .withDataSourceName("MainContractIsActive")
+                        .withTitle("Status (Markeret kontrakt)")
                         .withId("contract")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange
-                        (
-                            [
-                                {
-                                    textValue: "Har kontrakt",
-                                    remoteValue: true
-                                },
-                                {
-                                    textValue: "Ingen kontrakt",
-                                    remoteValue: false
-                                }
-                            ]
-                            ,
-                            false)
+                        .withFixedValueRange(createActiveRange(), false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withRendering(dataItem => {
-
-                            if (dataItem.MainContractIsActive == null) {
-                                return "";
-                            }
-                            const decorationClass = dataItem.MainContractIsActive
-                                ? "fa-file text-success"
-                                : "fa-file-o text-muted";
-                            return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.SourceEntityId}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
-                        })
-                        .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : "")
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.MainContractIsActive))
                         .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
 
                 .withColumn(builder =>
@@ -788,7 +765,7 @@
         .module("app")
         .config([
             "$stateProvider", $stateProvider => {
-                $stateProvider.state("it-system.overview", {
+                $stateProvider.state(Kitos.Constants.ApplicationStateId.SystemUsageOverview, {
                     url: "/overview",
                     templateUrl: "app/components/it-system/it-system-overview.view.html",
                     controller: OverviewController,

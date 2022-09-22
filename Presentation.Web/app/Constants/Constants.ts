@@ -1,9 +1,13 @@
 ﻿module Kitos.Constants {
 
-    export class SRef {
+    export class ApplicationStateId {
+        static readonly Index = "index";
         static readonly SystemUsageOverview = "it-system.overview";
+        static readonly SystemCatalog = "it-system.catalog";
         static readonly ContractOverview = "it-contract.overview";
         static readonly DataProcessingRegistrationOverview = "data-processing.overview";
+        static readonly OrganizationOverview = "organization.overview";
+        static readonly InterfaceCatalog = "it-system.interfaceCatalog";
     }
 
     export class CSRF {
