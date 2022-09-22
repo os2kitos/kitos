@@ -13,9 +13,15 @@
         });
     }]);
 
-    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus", "itSystemUsageService", "select2LoadingService", 
-        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
+    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories",
+        "autofocus", "itSystemUsageService", "select2LoadingService", "uiState",
+        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus,
+            itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService,
+            select2LoadingService: Kitos.Services.ISelect2LoadingService,
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             var itSystemUsage = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+
             $rootScope.page.title = "IT System - Anvendelse";
             $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsage.id}`;
             $scope.hasViewAccess = user.currentOrganizationId === itSystemUsage.organizationId;
@@ -27,6 +33,9 @@
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
             const saveUrlWithOrgId = $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId;
+
+            $scope.showDateFields = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.dateFields);
+            $scope.showLifeCycleStatus = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.lifeCycleStatus);
 
             $scope.numberOfUsersOptions = [
                 { id: "4", text: Kitos.Constants.Select2.EmptyField },
