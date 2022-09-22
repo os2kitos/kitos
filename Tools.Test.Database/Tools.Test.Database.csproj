@@ -46,9 +46,6 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Infrastructure.DataAccess">
-      <HintPath>..\Output\DataAccess\Infrastructure.DataAccess.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -99,6 +96,10 @@
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
       <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
+      <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
+      <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
