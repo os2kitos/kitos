@@ -270,7 +270,8 @@
                         .withFixedValueRange(createActiveRange(), false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToLifeCycle))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage) &&
+                                                      uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.lifeCycleStatus)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalSystemId")
