@@ -1,8 +1,7 @@
-﻿namespace Infrastructure.DataAccess.Migrations
+﻿using System.Data.Entity.Migrations;
+
+namespace Infrastructure.DataAccess.Migrations
 {
-    using System;
-    using System.Data.Entity.Migrations;
-    
     public partial class ChangedHasMainContract : DbMigration
     {
         public override void Up()

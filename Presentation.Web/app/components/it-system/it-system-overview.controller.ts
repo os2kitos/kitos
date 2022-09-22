@@ -253,7 +253,7 @@
                 builder
                     .withDataSourceName("ActiveAccordingToValidityPeriod")
                     .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                    .withTitle("Status ifølge datofelter")
+                    .withTitle("Status (Datofelter)")
                     .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                     .withFixedValueRange(createActiveRange(), false)
@@ -264,7 +264,7 @@
                     builder
                         .withDataSourceName("ActiveAccordingToLifeCycle")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                        .withTitle("Status ifølge Status")
+                        .withTitle("Status (Livscyklus)")
                         .withId("isActiveAccordingToLifeCycle")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(createActiveRange(), false)
@@ -480,13 +480,13 @@
                         .withDataSourceName("MainContractIsActive")
                         .withTitle("Status (Markeret kontrakt)")
                         .withId("contract")
+                        .withStandardWidth(190)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(createActiveRange(), false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.MainContractIsActive))
                         .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
-
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("MainContractSupplierName")
@@ -744,7 +744,7 @@
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LifeCycleStatus")
-                        .withTitle("Status")
+                        .withTitle("Livscyklus")
                         .withId("LifeCycleStatus")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(lifeCycleStatusOptions.options.map(value => {

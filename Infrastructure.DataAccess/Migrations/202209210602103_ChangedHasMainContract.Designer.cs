@@ -6,7 +6,6 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
     public sealed partial class ChangedHasMainContract : IMigrationMetadata
     {
         private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedHasMainContract));

@@ -55,6 +55,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
         public bool IsActiveAccordingToLifeCycle => CheckLifeCycleValidity().IsNone;
+        public bool IsActiveAccordingToMainContract=> CheckContractValidity().IsNone;
 
         /// <summary>
         ///     When the system began. (indgået)
@@ -857,12 +858,17 @@ namespace Core.DomainModel.ItSystemUsage
             var today = DateTime.UtcNow.Date;
 
             var dateErrors = CheckDatesValidity(today).ToList();
-            var validAccordingToStatus = CheckLifeCycleValidity();
+            var hasLifeCycleStatusValidationError = CheckLifeCycleValidity();
+            var hasContractValidityError = CheckContractValidity();
 
             errors.AddRange(dateErrors);
-            if (validAccordingToStatus.HasValue)
+            if (hasLifeCycleStatusValidationError.HasValue)
             {
-                errors.Add(validAccordingToStatus.Value);
+                errors.Add(hasLifeCycleStatusValidationError.Value);
+            }
+            if (hasContractValidityError.HasValue)
+            {
+                errors.Add(hasContractValidityError.Value);
             }
 
             return new ItSystemUsageValidationResult(errors);
@@ -892,8 +898,15 @@ namespace Core.DomainModel.ItSystemUsage
 
         private Maybe<ItSystemUsageValidationError> CheckLifeCycleValidity()
         {
-            return LifeCycleStatus is null or LifeCycleStatusType.Undecided or LifeCycleStatusType.NotInUse
+            return LifeCycleStatus == LifeCycleStatusType.NotInUse
                 ? ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle
+                : Maybe<ItSystemUsageValidationError>.None;
+        }
+
+        private Maybe<ItSystemUsageValidationError> CheckContractValidity()
+        {
+            return MainContract?.ItContract?.IsActive == false
+                ? ItSystemUsageValidationError.MainContractNotActive
                 : Maybe<ItSystemUsageValidationError>.None;
         }
     }
