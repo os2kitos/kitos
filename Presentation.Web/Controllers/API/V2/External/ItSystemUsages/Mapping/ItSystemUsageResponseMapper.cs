@@ -173,6 +173,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     Valid = systemUsage.CheckSystemValidity().Result,
                     ValidAccordingToValidityPeriod = systemUsage.IsActiveAccordingToDateFields,
                     ValidAccordingToLifeCycle = systemUsage.IsActiveAccordingToLifeCycle,
+                    ValidAccordingToMainContract = systemUsage.IsActiveAccordingToMainContract,
                     LifeCycleStatus = MapLifeCycleStatus(systemUsage),
                     ValidFrom = systemUsage.Concluded,
                     ValidTo = systemUsage.ExpirationDate

@@ -428,25 +428,38 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
             var contract1 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
             var contract2 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
-            var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
+            var usageId = GetUsageIdByUuid(newUsage.Uuid);
             await ItContractHelper.AddItSystemUsage(contract1.Id, usageId, organization.Id);
             await ItContractHelper.AddItSystemUsage(contract2.Id, usageId, organization.Id);
 
             //Act
             using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            contract1.Active = true;
+            await ItContractHelper.PatchContract(contract1.Id, organization.Id, contract1);
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             Assert.Equal(contract1.Uuid, freshReadDTO.General.MainContract.Uuid);
             Assert.Equal(contract1.Name, freshReadDTO.General.MainContract.Name);
+            Assert.True(freshReadDTO.General.Validity.ValidAccordingToMainContract);
 
             //Act - set to another contract
             using var response2 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract2.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            contract2.Terminated = DateTime.UtcNow.AddDays(-1);
+            await ItContractHelper.PatchContract(contract2.Id, organization.Id, contract2);
 
             //Assert
             freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             Assert.Equal(contract2.Uuid, freshReadDTO.General.MainContract.Uuid);
             Assert.Equal(contract2.Name, freshReadDTO.General.MainContract.Name);
+            Assert.False(freshReadDTO.General.Validity.ValidAccordingToMainContract);
+
+            //Act - set to contract to null
+            using var response3 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = null }).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.True(freshReadDTO.General.Validity.ValidAccordingToMainContract);
         }
 
         [Fact]
@@ -456,7 +469,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
             var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
-            var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
+            var usageId = GetUsageIdByUuid(newUsage.Uuid);
             await ItContractHelper.AddItSystemUsage(contract.Id, usageId, organization.Id);
 
             //Act
@@ -827,22 +840,21 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertGDPR(gdprVersion3, gdprResponse);
         }
         
-
         [Fact]
         public async Task Can_PATCH_Validity()
         {
             //Arrange
-            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var (token, _, organization, system) = await CreatePrerequisitesAsync();
 
             var date1 = DateTime.UtcNow;
             var lifeCycle1 = LifeCycleStatusChoice.Operational;
             var date2 = DateTime.UtcNow.AddDays(-1 - A<int>());
-            var lifeCycle2 = LifeCycleStatusChoice.Undecided;
+            var lifeCycle2 = LifeCycleStatusChoice.NotInUse;
 
             var validityVersion1 = CreateValidityInput(date1, lifeCycle1);
             var validityVersion2 = CreateValidityInput(date2, lifeCycle2);
             var validityVersion3 = new ItSystemUsageValidityWriteRequestDTO();
-            
+
             var usageDto = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Act
@@ -859,7 +871,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion2)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
-
+            
             //Assert version 2
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             generalResponse = dto.General.Validity;
@@ -873,7 +885,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert version 3 - properties should have been reset
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             generalResponse = dto.General.Validity;
-            AssertValidity(validityVersion3, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: false);
+            AssertValidity(validityVersion3, generalResponse, expectedDateValidity: true, expectedLifeCycleValidity: true);
         }
 
         [Fact]
@@ -2203,6 +2215,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private static async Task<SystemRelationDTO> CreateRelationAsync(ItSystemUsageDTO fromUsage, ItSystemUsageDTO toUsage, ItContractDTO contract = null)
         {
             return await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO { FromUsageId = fromUsage.Id, ToUsageId = toUsage.Id, ContractId = contract?.Id });
+        }
+
+        private static int GetUsageIdByUuid(Guid uuid)
+        {
+            return DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(uuid).Id);
         }
     }
 }

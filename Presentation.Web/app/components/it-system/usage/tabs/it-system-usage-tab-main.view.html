@@ -99,28 +99,44 @@
                            data-field="expirationDate">
                 </div>
                 <div class="form-group">
-                    
-                    <select-simple data-id="lifeCycleStatus"
-                                   data-label="Status"
-                                   data-options="lifeCycleStatusOptions"
-                                   data-ng-model="usageViewModel.lifeCycleStatus"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-auto-save-url="{{::autoSaveUrl}}"
-                                   data-field="lifeCycleStatus">
-                    </select-simple>
+                    <label for="lifeCycleStatus" class="control-label small">Livscyklus</label>
+                    <single-select-select2 id="lifeCycleStatus" ng-model="lifeCycleStatusModel" />
+                </div>
+                <div ng-if="validationStatus">
+                    <label class="control-label small">Status</label>
+                    <!-- Show the simple version of the status if there are no details to explain-->
+                    <div class="form-group object-status-active-summary" ng-if="validationStatus.valid">
+                        <span>Systemet er <strong>aktivt</strong></span>
+                    </div>
+                    <!-- Show the detailed summary if any errors are involved at all-->
+                    <div class="form-group object-status-active-summary" ng-if="!validationStatus.valid">
+                        <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
+                            <span>Systemet er <strong>ikke aktivt</strong></span>
+                            <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isValidationDetailsExpanded, 'fa-plus-square-o': !isValidationDetailsExpanded}"></i>
+                        </a>
+                        <p ng-if="isValidationDetailsExpanded" style="margin-top: 5px;">
+                            Følgende gør systemet inaktivt:
+                        </p>
+                        <ul ng-if="isValidationDetailsExpanded" ng-repeat="error in validationStatus.errors">
+                            <li ng-if="error === 0">'Gyldig fra' er endnu ikke passeret</li>
+                            <li ng-if="error === 1">'Gyldig til' er overskredet</li>
+                            <li ng-if="error === 2">Livscyklus</li>
+                            <li ng-if="error === 3">Den markerede kontrakt</li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="last-changed-by-name" class="control-label small">Sidst redigeret: Bruger</label>
-                    <input type="text" 
-                           id="last-changed-by-name" 
-                           value="{{lastChangedBy}}" 
+                    <input type="text"
+                           id="last-changed-by-name"
+                           value="{{lastChangedBy}}"
                            class="form-control input-sm"
                            disabled>
                 </div>
                 <div class="form-group">
                     <label for="last-changed" class="control-label small">Sidst redigeret: Dato</label>
                     <input type="text"
-                           id="last-changed" 
+                           id="last-changed"
                            value="{{lastChanged}}"
                            class="form-control input-sm"
                            disabled>

@@ -13,8 +13,8 @@
         });
     }]);
 
-    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus", "itSystemUsageService",
-        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
+    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus", "itSystemUsageService", "select2LoadingService", 
+        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
             var itSystemUsage = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
             $rootScope.page.title = "IT System - Anvendelse";
             $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsage.id}`;
@@ -26,9 +26,7 @@
             $scope.lastChanged = itSystemUsage.lastChanged;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
-
-            const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
-            $scope.lifeCycleStatusOptions = lifeCycleStatusOptions.options;
+            const saveUrlWithOrgId = $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId;
 
             $scope.numberOfUsersOptions = [
                 { id: "4", text: Kitos.Constants.Select2.EmptyField },
@@ -43,6 +41,7 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
 
+            bindLifeCycleStatusModel();
             reloadValidationStatus();
 
             $scope.patchDate = (field, value) => {
@@ -52,11 +51,11 @@
                 var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
                 var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-
+                
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId);
+                    patch(payload, saveUrlWithOrgId);
                 } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                 }
@@ -64,12 +63,10 @@
                     notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
                 }
                 else {
-                    reloadValidationStatus();
-
-                    var dateString = date.format("YYYY-MM-DD");
+                    const dateString = date.format(formatDateString);
                     var payload = {};
                     payload[field] = dateString;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId);
+                    patch(payload, saveUrlWithOrgId);
                 }
             }
 
@@ -79,17 +76,37 @@
                 $http({ method: "PATCH", url: url, data: payload })
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Feltet er opdateret.");
+                        reloadValidationStatus();
                     }, function onError(result) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                     });
             }
 
-            $scope.checkSystemValidity = () => reloadValidationStatus();
-            
             function reloadValidationStatus() {
                 itSystemUsageService.getValidationDetails(itSystemUsage.id).then(newStatus => {
                     $scope.validationStatus = newStatus;
                 });
+            }
+
+            function bindLifeCycleStatusModel() {
+                const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
+                const options = lifeCycleStatusOptions.options;
+                const currentId = itSystemUsage.lifeCycleStatus ?? 0;
+                const optionsWithCurrentId = options.filter(x => x.id === currentId);
+                if (!optionsWithCurrentId)
+                    return;
+
+                const selectedElement = optionsWithCurrentId[0];
+
+                $scope.lifeCycleStatusModel = {
+                    selectedElement: selectedElement,
+                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, false),
+                    elementSelected: (newElement) => {
+                        $scope.usage.lifeCycleStatus = newElement.optionalObjectContext;
+                        const payload = { lifeCycleStatus: newElement.optionalObjectContext };
+                        patch(payload, saveUrlWithOrgId);
+                    }
+                }
             }
         }
     ]);

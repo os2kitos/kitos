@@ -83,6 +83,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(itSystemUsage.LifeCycleStatus, dto.General.Validity.LifeCycleStatus?.ToLifeCycleStatusType());
             Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.ValidAccordingToValidityPeriod);
             Assert.Equal(itSystemUsage.IsActiveAccordingToLifeCycle, dto.General.Validity.ValidAccordingToLifeCycle);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToMainContract, dto.General.Validity.ValidAccordingToMainContract);
             Assert.Equal(itSystemUsage.CheckSystemValidity().Result, dto.General.Validity.Valid);
         }
 
