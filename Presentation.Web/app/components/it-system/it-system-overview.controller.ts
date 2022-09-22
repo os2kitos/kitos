@@ -744,7 +744,7 @@
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LifeCycleStatus")
-                        .withTitle("Status")
+                        .withTitle("Livscyklus")
                         .withId("LifeCycleStatus")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(lifeCycleStatusOptions.options.map(value => {
