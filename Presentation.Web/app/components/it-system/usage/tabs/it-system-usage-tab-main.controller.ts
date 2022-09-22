@@ -51,10 +51,9 @@
                 var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
                 var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-
-                var payload: {};
+                
                 if (value === "" || value == undefined) {
-                    payload = {};
+                    var payload = {};
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId)
                         .then(_ => reloadValidationStatus());
@@ -66,7 +65,7 @@
                 }
                 else {
                     const dateString = date.format(formatDateString);
-                    payload = {};
+                    var payload = {};
                     payload[field] = dateString;
                     patch(payload, saveUrlWithOrgId)
                         .then(_ => reloadValidationStatus());
