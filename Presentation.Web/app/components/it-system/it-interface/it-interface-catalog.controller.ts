@@ -739,7 +739,7 @@
         .module("app")
         .config([
             "$stateProvider", $stateProvider => {
-                $stateProvider.state("it-system.interfaceCatalog", {
+                $stateProvider.state(Kitos.Constants.ApplicationStateId.InterfaceCatalog, {
                     url: "/interface-catalog",
                     templateUrl: "app/components/it-system/it-interface/it-interface-catalog.view.html",
                     controller: CatalogController,

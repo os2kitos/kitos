@@ -765,7 +765,7 @@
         .module("app")
         .config([
             "$stateProvider", $stateProvider => {
-                $stateProvider.state("it-system.overview", {
+                $stateProvider.state(Kitos.Constants.ApplicationStateId.SystemUsageOverview, {
                     url: "/overview",
                     templateUrl: "app/components/it-system/it-system-overview.view.html",
                     controller: OverviewController,

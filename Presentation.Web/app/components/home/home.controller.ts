@@ -1,7 +1,7 @@
 ﻿((ng, app) => {
     app.config([
         "$stateProvider", $stateProvider => {
-            $stateProvider.state("index", {
+            $stateProvider.state(Kitos.Constants.ApplicationStateId.Index, {
                 url: "/?to",
                 templateUrl: "app/components/home/home.view.html",
                 controller: "home.IndexCtrl",
@@ -22,7 +22,7 @@
             const factory = new Kitos.Models.ViewModel.Sso.SsoStateViewModelFactory($);
             let ssoStateViewModel = factory.createFromViewState();
 
-            if (ssoStateViewModel.startPreference && ssoStateViewModel.startPreference !== "index") {
+            if (ssoStateViewModel.startPreference && ssoStateViewModel.startPreference !== Kitos.Constants.ApplicationStateId.Index) {
                 if (navigationService.checkState(ssoStateViewModel.startPreference)) {
 
                     $state.go(ssoStateViewModel.startPreference, null, { reload: true });
@@ -81,7 +81,7 @@
                         if (navigationService.checkState(user.defaultUserStartPreference)) {
                             $state.go(user.defaultUserStartPreference);
                         } else {
-                            $state.go("index");
+                            $state.go(Kitos.Constants.ApplicationStateId.Index);
                         }
                     }
                 }, error => {

@@ -446,7 +446,7 @@
         .module("app")
         .config([
             "$stateProvider", $stateProvider => {
-                $stateProvider.state("data-processing.overview", {
+                $stateProvider.state(Kitos.Constants.ApplicationStateId.DataProcessingRegistrationOverview, {
                     url: "/overview",
                     templateUrl: "app/components/data-processing/data-processing-registration-overview.view.html",
                     controller: OverviewController,

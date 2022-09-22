@@ -18,9 +18,9 @@
                     localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
 
                     const stateNames = {
-                        itSystemUsages: Kitos.Constants.SRef.SystemUsageOverview,
-                        itContracts: Kitos.Constants.SRef.ContractOverview,
-                        dataProcessingRegistrations: Kitos.Constants.SRef.DataProcessingRegistrationOverview
+                        itSystemUsages: Kitos.Constants.ApplicationStateId.SystemUsageOverview,
+                        itContracts: Kitos.Constants.ApplicationStateId.ContractOverview,
+                        dataProcessingRegistrations: Kitos.Constants.ApplicationStateId.DataProcessingRegistrationOverview
                     };
 
                     $scope.$watch("stateName", (newValue, oldValue) => {

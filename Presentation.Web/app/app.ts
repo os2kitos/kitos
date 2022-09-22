@@ -78,8 +78,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService", "$cookies",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService, $cookies) => {
+    "$rootScope", "$state", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService", "$cookies",
+    ($rootScope, $state, userService, uiSelect2Config, navigationService: Kitos.Services.NavigationService, $timeout, $, needsWidthFixService, $cookies) => {
         // init info
         $rootScope.page = {
             title: "Index",
@@ -130,7 +130,7 @@ app.run([
         $rootScope.logout = () => {
             userService.logout().then(() => {
                 $rootScope.changingOrganization = false;
-                $state.go("index");
+                $state.go(Kitos.Constants.ApplicationStateId.Index);
                 $cookies.remove(Kitos.Constants.CSRF.CSRFCookie);
             });
         };
@@ -148,7 +148,7 @@ app.run([
 
                 } else {
 
-                    $state.go("index", null, { reload: true });
+                    $state.go(Kitos.Constants.ApplicationStateId.Index, null, { reload: true });
 
                 }
             });
@@ -167,7 +167,7 @@ app.run([
                 event.preventDefault();
 
                 // bad authentication
-                $state.go("index", { to: toState.name, toParams: toParams });
+                $state.go(Kitos.Constants.ApplicationStateId.Index, { to: toState.name, toParams: toParams });
             });
         });
 
@@ -180,7 +180,7 @@ app.run([
 
         // when something goes wrong during state change (e.g a rejected resolve)
         $rootScope.$on("$stateChangeError", (event, toState, toParams, fromState, fromParams, error) => {
-            $state.go("index");
+            $state.go(Kitos.Constants.ApplicationStateId.Index);
         });
 
         // Fixes the blank spaces problem when deselecting columns (OS2KITOS-607)
