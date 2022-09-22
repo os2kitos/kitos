@@ -522,7 +522,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Null(readModel.MainContractId);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
-            Assert.False(readModel.MainContractIsActive);
+            Assert.True(readModel.MainContractIsActive);
         }
 
         [Fact]

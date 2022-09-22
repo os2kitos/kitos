@@ -103,31 +103,25 @@
                     <single-select-select2 id="lifeCycleStatus" ng-model="lifeCycleStatusModel" />
                 </div>
                 <div ng-if="validationStatus">
-                    <label class="control-label small">Aktivt</label>
+                    <label class="control-label small">Status</label>
                     <!-- Show the simple version of the status if there are no details to explain-->
-                    <div class="form-group object-status-active-summary" ng-if="validationStatus.valid && validationStatus.errors.length === 0">
-                        <!--TODO: Change text to danish-->
-                        <span ng-if="validationStatus.valid">System is <strong>gyldig</strong></span>
+                    <div class="form-group object-status-active-summary" ng-if="validationStatus.valid">
+                        <span ng-if="validationStatus.valid">Systemet er <strong>aktivt</strong></span>
                     </div>
                     <!-- Show the detailed summary if any errors are involved at all-->
-                    <div class="form-group object-status-active-summary" ng-if="validationStatus.errors.length > 0">
+                    <div class="form-group object-status-active-summary" ng-if="!validationStatus.valid">
                         <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
-                            <!--TODO: Change text to danish-->
-                            <span ng-if="validationStatus.valid">System is <strong>gyldig</strong></span>
-                            <span ng-if="!validationStatus.valid">System is <strong>ikke gyldig</strong></span>
+                            <span>Systemet er <strong>ikke aktivt</strong></span>
                             <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isValidationDetailsExpanded, 'fa-plus-square-o': !isValidationDetailsExpanded}"></i>
                         </a>
-                        <p ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" style="margin-top: 5px;">
-                            <!--TODO: Change text to danish-->
-                            Følgende gør SYSTEM ugyldig:
+                        <p ng-if="isValidationDetailsExpanded" style="margin-top: 5px;">
+                            Følgende gør systemet inaktivt:
                         </p>
-                        <ul ng-if="isValidationDetailsExpanded && validationStatus.errors.length > 0" ng-repeat="error in validationStatus.errors">
+                        <ul ng-if="isValidationDetailsExpanded" ng-repeat="error in validationStatus.errors">
                             <li ng-if="error === 0">'Gyldig fra' er endnu ikke passeret</li>
                             <li ng-if="error === 1">'Gyldig til' er overskredet</li>
-                            <!--TODO: Change text to danish-->
-                            <li ng-if="error === 2">Not operational according to the life cycle</li>
-                            <!--TODO: Change text to danish-->
-                            <li ng-if="error === 3">Main contract not active</li>
+                            <li ng-if="error === 2">Livscyklus</li>
+                            <li ng-if="error === 3">Den markerede kontrakt</li>
                         </ul>
                     </div>
                 </div>
