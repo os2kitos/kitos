@@ -1,7 +1,7 @@
 ﻿module Kitos.Services {
     "use strict";
 
-    interface IGridSavedState {
+    export interface IGridSavedState {
         dataSource?: kendo.data.DataSourceOptions;
         columnState?: { [persistId: string]: { index: number; width: number, hidden?: boolean } };
     }
@@ -13,7 +13,11 @@
     export interface IGridStateService {
         completeLoading: () => void;
         saveGridOptions: (grid: Kitos.IKendoGrid<any>) => void;
-        getSavedGridOptions: (grid: IKendoGridColumn<any>[]) => Promise<IGridSavedState>;
+        /**
+         * Applies the current locally saved options along with server options to a kendo configuration
+         * @param setup
+         */
+        applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<void>;
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
@@ -76,7 +80,7 @@
                 completeLoading: completeLoading,
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
-                getSavedGridOptions: getSavedGridOptions,
+                applySavedGridOptions: applySavedGridOptions,
                 saveGridProfile: saveGridProfile,
                 loadGridProfile: loadGridProfile,
                 saveGridOrganizationalConfiguration: saveGridOrganizationalConfiguration,
@@ -120,21 +124,68 @@
                 });
             }
 
+            function applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<void> {
+                return getSavedGridOptions(setup.columns)
+                    .then(state => {
+                        const savedIndexes: Record<string, number> = {};
+                        var undefinedPreferenceStartIndex = setup.columns.length * 10;
+
+                        //Apply the state to the column configuration
+                        setup.columns.forEach(column => {
+                            //Push undefined preferences to the back of defined indexes
+                            savedIndexes[column.persistId] = undefinedPreferenceStartIndex++;
+
+                            if (state.columnState) {
+                                const columnState = state.columnState[column.persistId];
+                                if (columnState) {
+
+                                    if (columnState !== undefined) {
+                                        column.width = columnState.width ?? column.width;
+                                        column.hidden = columnState.hidden !== undefined ? columnState.hidden : column.hidden;
+                                        savedIndexes[column.persistId] = columnState.index !== undefined ? columnState.index : savedIndexes[column.persistId];
+                                    }
+                                }
+                            }
+                        });
+
+                        //Sort the columns based on persisted preferences
+                        //TODO: One remaining problem here!!!
+                        //TODO: The ordering also affects the position in the menu and when the grid profile is cleared and restored to org, all columns are moved to the back (for some odd reason)
+                        //TODO: That's different in the old version where it repositioned the rendered columns but did not affect the columns config.. perhaps we can set an attribute
+                        //TODO: Investigate if there is an index property on a column config...
+                        //TODO: Based on investigation it could appear that orderIndex is currently not exposed this part must be postponed until after rendering has completed.... bad shit
+                        setup.columns.sort((a, b) => {
+                            const indexA = savedIndexes[a.persistId];
+                            const indexB = savedIndexes[b.persistId];
+                            return indexA - indexB;
+                        });
+
+                        //Apply grid options
+                        if (state.dataSource) {
+                            const statefilters = state.dataSource?.filter;
+                            const statePageSize = state.dataSource?.pageSize;
+                            const stateSort = state.dataSource?.sort;
+                            const statePage = state.dataSource?.page;
+                            setup.dataSource.filter = statefilters ?? setup.dataSource.filter;
+                            setup.dataSource.pageSize = statePageSize ?? setup.dataSource.pageSize;
+                            setup.dataSource.sort = stateSort ?? setup.dataSource.sort;
+                            setup.dataSource.page = statePage ?? setup.dataSource.page ?? 1;
+                        }
+                        completeLoading();
+                    });
+            }
+
+            /**
+             * Loads the saved state from the different storages and combines with the personal options
+             * 
+             * @param columns
+             */
             function getSavedGridOptions(columns: IKendoGridColumn<any>[]): Promise<IGridSavedState> {
-                //TODO: Might be that filters are actually never part of this since they must be loaded from the profile
-                //TODO: Check if filters are actually set! -> one thing is the size and order - another thing is the options
                 var storedState = getStoredOptions(columns);
                 return checkServerGridConfig(overviewType)
                     .then((savedOptions: boolean) => {
                         return savedOptions ? getStoredOptions(columns) : storedState;
                     }, () => storedState);
-
-                /*
-                 * //TODO: Use page size is actually reset to the original page size 
-                 * //TODO: the gridoptions can be set initially maybe or merged fromthe config before setting it
-                 grid.setOptions(gridOptions);
-                grid.dataSource.pageSize(grid.dataSource.options.pageSize);
-                 */
             }
 
             // loads kendo grid options from localStorage
@@ -556,7 +607,6 @@
                         }
                     }
                 });
-                //TODO: check the contenst when filters are here!
                 grid.setOptions(gridOptions);
                 grid.dataSource.pageSize(grid.dataSource.options.pageSize);
                 completeLoading();

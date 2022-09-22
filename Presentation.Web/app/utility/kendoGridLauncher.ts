@@ -29,7 +29,7 @@ module Kitos.Utility.KendoGrid {
 
     export interface IExtendedKendoGridColumn<TDataSource> extends IKendoGridColumn<TDataSource> {
         schemaMutation: (map: any) => void;
-        kitosIncluded : boolean;
+        kitosIncluded: boolean;
     }
 
     export interface IKendoParameter {
@@ -515,7 +515,7 @@ module Kitos.Utility.KendoGrid {
         private user: Services.IUser = null;
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
-        private columnFactories: (()=>IExtendedKendoGridColumn<TDataSource>)[] = [];
+        private columnFactories: (() => IExtendedKendoGridColumn<TDataSource>)[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
         private overviewType: Models.Generic.OverviewType = null;
@@ -645,9 +645,8 @@ module Kitos.Utility.KendoGrid {
             KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.gridBinding.mainGrid);
         }
 
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.gridState.loadGridOptions(this.gridBinding.mainGrid);
+        private refreshData() {
+            this.gridBinding.mainGrid.dataSource.read();
         }
 
         saveGridProfile() {
@@ -657,7 +656,7 @@ module Kitos.Utility.KendoGrid {
 
         loadGridProfile() {
             this.gridState.loadGridProfile(this.gridBinding.mainGrid);
-            this.gridBinding.mainGrid.dataSource.read();
+            this.refreshData();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
 
@@ -733,7 +732,7 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
             this.checkRequiredField("gridBinding", this.gridBinding);
-            
+
             this.$scope.kendoVm = {
                 standardToolbar: {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
@@ -930,18 +929,29 @@ module Kitos.Utility.KendoGrid {
                 columns: columns,
             };
 
-            // assign the generated grid options to the scope value, kendo will do the rest
-            this.gridBinding.mainGridOptions = mainGridOptions;
+            this.gridState
+                .applySavedGridOptions(mainGridOptions)
+                .then(() => {
+                    // assign the generated grid options. Kendo will start after this
+                    this.gridBinding.mainGridOptions = mainGridOptions;
+                });
         }
 
         launch() {
-            this.$scope.$on("kendoWidgetCreated", (event, widget) => {
+            let awaitingInitialRefresh = true;
+            
+            this.$scope.$on("kendoRendered", (_) => {
+                if (awaitingInitialRefresh) {
+                    awaitingInitialRefresh = false;
+                    this.refreshData();
+                }
+            });
+
+            this.$scope.$on("kendoWidgetCreated", (_, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
                 if (widget === this.gridBinding.mainGrid) {
-
-                    this.loadGridOptions();
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
                     this.$(".k-grid-excel").click(() => {
