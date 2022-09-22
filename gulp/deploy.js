@@ -19,11 +19,14 @@ const cleanJsAndMaps = function (callBack) {
     return del
     (
         [
-            paths.typescriptOutput,
             paths.appMaps
         ].concat(paths.allJavaScriptNoTests)
     );
 };
+
+const cleanTestScripts = function (_) {
+    return del(paths.allTestJavaScript);
+}
 
 // create css bundled file
 const css = function (callBack) {
@@ -130,3 +133,5 @@ const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, an
 exports.deployProd = series(typescript, parallel(scripts, styles), cleanJsAndMaps);
 
 exports.clean = parallel(cleanStyles, cleanScripts);
+
+exports.cleanTests = series(cleanTestScripts);

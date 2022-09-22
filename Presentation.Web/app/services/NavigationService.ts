@@ -1,8 +1,9 @@
-﻿module Kitos.Services {
-    export class NavigationService {
+﻿
+module Kitos.Services {
 
+    export class NavigationService {
         checkState = (state: string) => {
-            const allowedStates = ["index", "organization.overview", "it-system.overview", "it-contract.overview", "data-processing.overview"];
+            const allowedStates = Kitos.Models.ViewModel.User.options.map(option => option.id);
             return allowedStates.indexOf(state) > -1;
         };
     }

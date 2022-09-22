@@ -174,9 +174,9 @@
                         '$scope', '$uibModal', 'userNotificationService', 'userService', function ($scope, $uibModal, userNotificationService: Services.UserNotification.IUserNotificationService, userService: Services.IUserService) {
 
                             $scope.$watch("stateName", function (newValue, oldValue) {
-                                if ($scope.stateName === Constants.SRef.ContractOverview ||
-                                    $scope.stateName === Constants.SRef.SystemUsageOverview ||
-                                    $scope.stateName === Constants.SRef.DataProcessingRegistrationOverview) {
+                                if ($scope.stateName === Constants.ApplicationStateId.ContractOverview ||
+                                    $scope.stateName === Constants.ApplicationStateId.SystemUsageOverview ||
+                                    $scope.stateName === Constants.ApplicationStateId.DataProcessingRegistrationOverview) {
 
                                     userService
                                         .getUser()
@@ -228,11 +228,11 @@
 
                             function resolveContextType(contextAsString: string): Models.UserNotification.RelatedEntityType {
                                 switch (contextAsString) {
-                                    case Constants.SRef.ContractOverview:
+                                    case Constants.ApplicationStateId.ContractOverview:
                                         return Models.UserNotification.RelatedEntityType.itContract;
-                                    case Constants.SRef.SystemUsageOverview:
+                                    case Constants.ApplicationStateId.SystemUsageOverview:
                                         return Models.UserNotification.RelatedEntityType.itSystemUsage;
-                                    case Constants.SRef.DataProcessingRegistrationOverview:
+                                    case Constants.ApplicationStateId.DataProcessingRegistrationOverview:
                                         return Models.UserNotification.RelatedEntityType.dataProcessingRegistration;
                                     default:
                                         return null;
