@@ -91,9 +91,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractSupplierName", 0);
 
-            Property(x => x.HasMainContract)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HasMainContract", 0);
-
             Property(x => x.ArchiveDuty)
                .IsOptional()
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
