@@ -10,7 +10,7 @@
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab,
                 children: {
-                    dateFields: {
+                    usagePeriod: {
                         text: "Datofelter",
                         helpText: "Dækker felterne “Ibrugtagningsdato” og “Slutdato for anvendelse”"
                     },

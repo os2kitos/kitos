@@ -259,7 +259,7 @@
                     .withFixedValueRange(createActiveRange(), false)
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToValidityPeriod))
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                    .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.dateFields)))
+                    .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.usagePeriod)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ActiveAccordingToLifeCycle")
@@ -545,7 +545,7 @@
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Concluded))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Concluded))
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.dateFields)))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.usagePeriod)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ArchiveDuty")

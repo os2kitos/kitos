@@ -47,7 +47,7 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             .then(() => testTabCustomization(systemName, "ItSystemUsages.localReferences", LocalItSystemNavigationSrefs.referencesSref))
             .then(() => testFieldCustomization(systemName, "ItSystemUsages.contracts.selectContractToDetermineIfItSystemIsActive", LocalItSystemNavigationSrefs.contractsSref, "selectMainContractSection"))
             .then(() => testFieldCustomization(systemName, "ItSystemUsages.frontPage.lifeCycleStatus", LocalItSystemNavigationSrefs.mainPageSref, "lifeCycleStatus"))
-            .then(() => testFieldGroupCustomization(systemName, "ItSystemUsages.frontPage.dateFields", LocalItSystemNavigationSrefs.mainPageSref, ["agreement-concluded", "agreement-expiration"]));
+            .then(() => testFieldGroupCustomization(systemName, "ItSystemUsages.frontPage.usagePeriod", LocalItSystemNavigationSrefs.mainPageSref, ["agreement-concluded", "agreement-expiration"]));
     });
 
     function testTabCustomization(systemName: string, settingId: string, tabSref: string) {
