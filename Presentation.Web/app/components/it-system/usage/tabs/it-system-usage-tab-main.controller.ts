@@ -34,7 +34,7 @@
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
             const saveUrlWithOrgId = $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId;
 
-            $scope.showDateFields = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.usagePeriod);
+            $scope.showUsagePeriod = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.usagePeriod);
             $scope.showLifeCycleStatus = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.lifeCycleStatus);
 
             $scope.numberOfUsersOptions = [
