@@ -38,19 +38,6 @@
                 <input type="text" name="phoneNumber" id="phoneNumber" data-ng-model="ctrl.vm.phoneNumber" class="form-control" data-ng-required="false" data-disabled-on-busy>
             </div>
         </div>
-        <div class="form-group" ng-if="ctrl.isUserLocalAdmin || ctrl.isUserGlobalAdmin">
-            <label for="primaryStartUnit" class="col-xs-3 control-label">
-                Primær startenehed
-            </label>
-            <div id="primaryStartUnit" class="col-xs-8">
-                <div ng-repeat="startUnit in ctrl.primaryStartUnitOptions">
-                    <label class="radio-inline">
-                        <input type="radio" data-ng-model="ctrl.vm.primaryStartUnitId" name="inlineRadioOptions"
-                               id="{{::startUnit.htmlSafeId}}" value="{{::startUnit.id}}" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> {{::startUnit.name}}
-                    </label>
-                </div>
-            </div>
-        </div>
         <div class="form-group">
             <label for="roller" class="col-xs-3 control-label">
                 Roller
@@ -98,6 +85,19 @@
                     <div class="checkbox">
                         <label><input ng-disabled="emailExists" type="checkbox" value="" data-ng-model="ctrl.vm.hasStakeHolderAccess">Interessentadgang</label>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-if="ctrl.isUserLocalAdmin || ctrl.isUserGlobalAdmin">
+            <label for="primaryStartUnit" class="col-xs-3 control-label">
+                Primær startenehed
+            </label>
+            <div id="primaryStartUnit" class="col-xs-8">
+                <div ng-repeat="startUnit in ctrl.primaryStartUnitOptions">
+                    <label class="radio-inline">
+                        <input type="radio" data-ng-model="ctrl.vm.primaryStartUnitId" name="inlineRadioOptions"
+                               id="{{::startUnit.htmlSafeId}}" value="{{::startUnit.id}}" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> {{::startUnit.name}}
+                    </label>
                 </div>
             </div>
         </div>
