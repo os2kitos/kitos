@@ -29,7 +29,7 @@ module Kitos.Utility.KendoGrid {
 
     export interface IExtendedKendoGridColumn<TDataSource> extends IKendoGridColumn<TDataSource> {
         schemaMutation: (map: any) => void;
-        kitosIncluded : boolean;
+        kitosIncluded: boolean;
     }
 
     export interface IKendoParameter {
@@ -515,10 +515,11 @@ module Kitos.Utility.KendoGrid {
         private user: Services.IUser = null;
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
-        private columnFactories: (()=>IExtendedKendoGridColumn<TDataSource>)[] = [];
+        private columnFactories: (() => IExtendedKendoGridColumn<TDataSource>)[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
         private overviewType: Models.Generic.OverviewType = null;
+        private postCreationActions: Array<(gridBinding: IGridViewAccess<TDataSource>) => void> = [];
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -645,9 +646,8 @@ module Kitos.Utility.KendoGrid {
             KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.gridBinding.mainGrid);
         }
 
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.gridState.loadGridOptions(this.gridBinding.mainGrid);
+        private refreshData() {
+            this.gridBinding.mainGrid.dataSource.read();
         }
 
         saveGridProfile() {
@@ -657,7 +657,7 @@ module Kitos.Utility.KendoGrid {
 
         loadGridProfile() {
             this.gridState.loadGridProfile(this.gridBinding.mainGrid);
-            this.gridBinding.mainGrid.dataSource.read();
+            this.refreshData();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
 
@@ -680,7 +680,9 @@ module Kitos.Utility.KendoGrid {
 
         clearGridForOrganization() {
             if (confirm(`Er du sikker på at du vil slette standard kolonneopsætning af felter til ${this.user.currentOrganizationName}`)) {
-                this.gridState.deleteGridOrganizationalConfiguration(this.overviewType);
+                this.gridState
+                    .deleteGridOrganizationalConfiguration(this.overviewType)
+                    .then(() => this.reload());
             }
         }
 
@@ -701,9 +703,7 @@ module Kitos.Utility.KendoGrid {
 
         // clears grid filters by removing the localStorageItem and reloading the page
         clearOptions() {
-            this.gridState.removeProfile();
-            this.gridState.removeLocal();
-            this.gridState.removeSession();
+            this.gridState.reset();
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge gendannet til standardopsætning ");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
@@ -726,6 +726,11 @@ module Kitos.Utility.KendoGrid {
             }
         }
 
+        private applyDeferredActions() {
+            this.postCreationActions.forEach(action => action(this.gridBinding));
+            this.postCreationActions = []; //Clear any bindings held in this array
+        }
+
         private build() {
             this.checkRequiredField("$scope", this.$scope);
             this.checkRequiredField("storageKey", this.storageKey);
@@ -733,14 +738,12 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
             this.checkRequiredField("gridBinding", this.gridBinding);
-            
+
             this.$scope.kendoVm = {
                 standardToolbar: {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
                     clearOptions: () => this.clearOptions(),
                     saveGridProfile: () => this.saveGridProfile(),
-                    loadGridProfile: () => this.loadGridProfile(),
-                    clearGridProfile: () => this.clearGridProfile(),
                     doesGridProfileExist: () => this.doesGridProfileExist(),
                     saveGridForOrganization: () => this.saveGridForOrganization(),
                     clearGridForOrganization: () => this.clearGridForOrganization(),
@@ -863,6 +866,8 @@ module Kitos.Utility.KendoGrid {
                 });
 
             //Build the grid
+            const defaultPageSize = 100;
+            const validPageSizes = [10, 25, 50, 100, 200, "all"];
             const mainGridOptions: IKendoGridOptions<TDataSource> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -878,7 +883,7 @@ module Kitos.Utility.KendoGrid {
                         field: this.standardSortingSourceField,
                         dir: "asc"
                     },
-                    pageSize: 100,
+                    pageSize: defaultPageSize,
                     serverPaging: true,
                     serverSorting: true,
                     serverFiltering: true,
@@ -902,7 +907,7 @@ module Kitos.Utility.KendoGrid {
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200, "all"],
+                    pageSizes: validPageSizes,
                     buttonCount: 5
                 },
                 sortable: {
@@ -930,18 +935,60 @@ module Kitos.Utility.KendoGrid {
                 columns: columns,
             };
 
-            // assign the generated grid options to the scope value, kendo will do the rest
-            this.gridBinding.mainGridOptions = mainGridOptions;
+            this.gridState
+                .applySavedGridOptions(mainGridOptions)
+                .then((settingsToBeLoadedAfterRendering) => {
+                    //Saved indexes must be applied after rendering since the map only contains values for visible columns. sorting beforehand will move all currently invisible columns out of the original order, and that will affect the filter menu.
+                    this.postCreationActions.push(access => {
+                        const createdColumns = access.mainGrid.columns;
+                        settingsToBeLoadedAfterRendering.columnOrder.forEach(savedColumnOrder => {
+                            var columnIndex = this._.findIndex(createdColumns, column => {
+                                if (!column.hasOwnProperty("persistId")) {
+                                    console.error(`Unable to find persistId property in grid column with field=${column.field}`);
+                                    return false;
+                                }
+
+                                return column.persistId === savedColumnOrder.persistId;
+                            });
+                            if (columnIndex !== -1) {
+                                var columnObj = createdColumns[columnIndex];
+                                // reorder column
+                                if (savedColumnOrder.columnIndex !== columnIndex) {
+                                    // check if index is out of bounds
+                                    if (savedColumnOrder.columnIndex < createdColumns.length) {
+                                        access.mainGrid.reorderColumn(savedColumnOrder.columnIndex, columnObj);
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                    this.postCreationActions.push(_ => {
+                        //Loading the data from the server now that the grid is ready
+                        //NOTE: Using the pageSize() method since read().. will change the pagesize to the size of the response.. this way we keep inside the stored ranges
+                        let pageSize = settingsToBeLoadedAfterRendering.pageSize;
+                        if (!pageSize || validPageSizes.indexOf(pageSize) === -1) {
+                            pageSize = defaultPageSize;
+                        }
+                        this.gridBinding.mainGrid.dataSource.pageSize(pageSize);
+                    });
+                    // assign the generated grid options. Kendo will start after this
+                    this.gridBinding.mainGridOptions = mainGridOptions;
+                });
         }
 
         launch() {
-            this.$scope.$on("kendoWidgetCreated", (event, widget) => {
+            let awaitingDeferredActions = true;
+
+            this.$scope.$on("kendoWidgetCreated", (_, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
                 if (widget === this.gridBinding.mainGrid) {
-
-                    this.loadGridOptions();
+                    if (awaitingDeferredActions) {
+                        this.applyDeferredActions();
+                        awaitingDeferredActions = false;
+                    }
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
                     this.$(".k-grid-excel").click(() => {
@@ -949,9 +996,7 @@ module Kitos.Utility.KendoGrid {
                     });
                 }
             });
-
-            //Defer until page change is complete
-            this.$timeout(() => this.build(), 1, false);
+            this.build();
         }
     }
 
