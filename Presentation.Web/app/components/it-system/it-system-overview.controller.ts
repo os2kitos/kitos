@@ -67,8 +67,7 @@
             };
 
             const texts = Kitos.Helpers.RenderFieldsHelper.getTexts();
-            const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] =>
-            {
+            const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] => {
                 return [
                     {
                         textValue: texts.active,
@@ -273,6 +272,18 @@
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.lifeCycleStatus)))
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("MainContractIsActive")
+                        .withTitle("Status (Markeret kontrakt)")
+                        .withId("contract")
+                        .withStandardWidth(190)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(createActiveRange(), false)
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.MainContractIsActive))
+                        .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("LocalSystemId")
                         .withTitle("Lokal System ID")
                         .withId("localid")
@@ -475,18 +486,6 @@
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
-                .withColumn(builder =>
-                    builder
-                        .withDataSourceName("MainContractIsActive")
-                        .withTitle("Status (Markeret kontrakt)")
-                        .withId("contract")
-                        .withStandardWidth(190)
-                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(createActiveRange(), false)
-                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.MainContractIsActive))
-                        .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("MainContractSupplierName")
@@ -754,7 +753,7 @@
                                 remoteValue: value.id
                             }
                         })
-                        , false)
+                            , false)
                         .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.lifeCycleStatus)));
 
