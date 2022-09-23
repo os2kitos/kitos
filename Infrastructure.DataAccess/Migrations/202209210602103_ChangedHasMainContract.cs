@@ -8,7 +8,7 @@ namespace Infrastructure.DataAccess.Migrations
         {
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_HasMainContract");
             Sql(@"  UPDATE dbo.ItSystemUsageOverviewReadModels 
-                    SET MainContractIsActive = false 
+                    SET MainContractIsActive = 0 
                     WHERE MainContractIsActive IS NULL;");
             AlterColumn("dbo.ItSystemUsageOverviewReadModels", "MainContractIsActive", c => c.Boolean(nullable: false));
             DropColumn("dbo.ItSystemUsageOverviewReadModels", "HasMainContract");
