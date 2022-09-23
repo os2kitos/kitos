@@ -8,7 +8,16 @@
             frontPage: {
                 text: "Systemforside",
                 readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTab
+                helpText: Configs.helpTexts.cannotChangeTab,
+                children: {
+                    usagePeriod: {
+                        text: "Datofelter",
+                        helpText: "Dækker felterne “Ibrugtagningsdato” og “Slutdato for anvendelse”"
+                    },
+                    lifeCycleStatus: {
+                        text: "Livscyklus"
+                    }
+                }
             },
             contracts: {
                 text: "Kontrakter",

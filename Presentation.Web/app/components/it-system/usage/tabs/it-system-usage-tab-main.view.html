@@ -76,7 +76,7 @@
                            data-ng-disabled="true"
                            value="{{usage.objectOwnerFullName}}">
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-if="showUsagePeriod">
                     <label for="agreement-concluded" class="control-label small"> Ibrugtagningsdato</label>
                     <input id="agreement-concluded"
                            type="text"
@@ -88,7 +88,7 @@
                            ng-blur="patchDate('concluded', usage.concluded)"
                            data-field="concluded">
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-if="showUsagePeriod">
                     <label for="agreement-expiration" class="control-label small">Slutdato for anvendelse</label>
                     <input type="text" class="form-control" id="agreement-expiration"
                            data-kendo-date-picker
@@ -98,7 +98,7 @@
                            ng-blur="patchDate('expirationDate', usage.expirationDate)"
                            data-field="expirationDate">
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-if="showLifeCycleStatus">
                     <label for="lifeCycleStatus" class="control-label small">Livscyklus</label>
                     <single-select-select2 id="lifeCycleStatus" ng-model="lifeCycleStatusModel" />
                 </div>
