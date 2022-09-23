@@ -7,6 +7,9 @@ namespace Infrastructure.DataAccess.Migrations
         public override void Up()
         {
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_HasMainContract");
+            Sql(@"  UPDATE dbo.ItSystemUsageOverviewReadModels 
+                    SET MainContractIsActive = false 
+                    WHERE MainContractIsActive IS NULL;");
             AlterColumn("dbo.ItSystemUsageOverviewReadModels", "MainContractIsActive", c => c.Boolean(nullable: false));
             DropColumn("dbo.ItSystemUsageOverviewReadModels", "HasMainContract");
         }
