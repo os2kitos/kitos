@@ -23,7 +23,8 @@
             "needsWidthFixService",
             "overviewOptions",
             "_",
-            "uiState"
+            "uiState",
+            "$window"
         ];
 
         constructor(
@@ -34,7 +35,8 @@
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
             _,
-            uiState: Models.UICustomization.ICustomizedModuleUI
+            uiState: Models.UICustomization.ICustomizedModuleUI,
+            $window
         ) {
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
             const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
@@ -80,7 +82,26 @@
                     }]
             }
 
-            //Build and launch kendo grid
+            var mainGridLocal = this.mainGrid;
+            var showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
+            var toggleActiveSystemsFilterBtnText = "";
+
+            updateToggleActiveSystemsFilterBtnText();
+
+            function updateToggleActiveSystemsFilterBtnText(): void {
+                toggleActiveSystemsFilterBtnText = showInactiveSystems
+                    ? "Vis aktive IT-Systemer"
+                    : "Vis ikke aktive IT-Systemer";
+            }
+            
+            function toggleActiveSystemsMasterFilter(): void {
+                showInactiveSystems = !showInactiveSystems;
+                ItSystem.Settings.CatalogState.setShowInactiveSystems($window, user.id, showInactiveSystems);
+                updateToggleActiveSystemsFilterBtnText();
+                mainGridLocal.dataSource.read();
+            }
+
+        //Build and launch kendo grid
             var launcher = kendoGridLauncherFactory
                 .create<Models.ItSystemUsage.IItSystemUsageOverviewReadModel>()
                 .withScope($scope)
@@ -173,6 +194,13 @@
                     //Making sure orgunit is set
                     (options as any).currentOrgUnit = activeOrgUnit;
 
+                    const existing = parameterMap.$filter;
+                    const hadExisting = _.isEmpty(existing) === false;
+                    parameterMap.$filter = `SystemActive eq ${showInactiveSystems ? "true" : "false"} ${hadExisting ? " and (" + existing + ")" : ""}`;// ${this.showInactiveSystems ? "true" : "false"}  ${hadExisting ? " and (" + existing + ")" : ""}`;
+                    if (hadExisting) {
+                        parameterMap.$filter = `(${parameterMap.$filter})`;
+                    }
+
                     return parameterMap;
                 })
                 .withResponseParser(response => {
@@ -248,6 +276,16 @@
                     link: `api/v1/gdpr-report/csv/${user.currentOrganizationId}`
                 } as Utility.KendoGrid.IKendoToolbarEntry);
             }
+
+            launcher = launcher.withToolbarEntry({
+                id: "toggleActiveSystemsFilter",
+                title: toggleActiveSystemsFilterBtnText,
+                color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                enabled: () => true,
+                onClick: () => toggleActiveSystemsMasterFilter()
+            } as Utility.KendoGrid.IKendoToolbarEntry);
 
             launcher = launcher.withColumn(builder =>
                 builder
