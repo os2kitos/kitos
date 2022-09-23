@@ -140,23 +140,17 @@
 
                         //Apply the state to the column configuration
                         setup.columns.forEach(column => {
-                            //Push undefined preferences to the back of defined indexes
-                            savedIndexes[column.persistId] = null;
-
                             if (state.columnState) {
-                                const columnState = state.columnState[column.persistId];
-                                if (columnState) {
-
-                                    if (columnState !== undefined) {
-                                        column.width = columnState.width ?? column.width;
-                                        column.hidden = columnState.hidden !== undefined ? columnState.hidden : column.hidden;
-                                        const savedColumnIndex = columnState.index;
-                                        if (savedColumnIndex !== undefined) {
-                                            savedIndexes.push({
-                                                persistId: column.persistId,
-                                                columnIndex: savedColumnIndex
-                                            });
-                                        }
+                                const currentColumnState = state.columnState[column.persistId];
+                                if (currentColumnState !== undefined) {
+                                    column.width = currentColumnState.width ?? column.width;
+                                    column.hidden = currentColumnState.hidden !== undefined ? currentColumnState.hidden : column.hidden;
+                                    const savedColumnIndex = currentColumnState.index;
+                                    if (savedColumnIndex !== undefined) {
+                                        savedIndexes.push({
+                                            persistId: column.persistId,
+                                            columnIndex: savedColumnIndex
+                                        });
                                     }
                                 }
                             }
