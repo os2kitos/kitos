@@ -3,39 +3,53 @@
         $stateProvider.state("it-system.usage.contracts", {
             url: "/contracts",
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-contracts.view.html",
-            controller: "system.EditContracts"
+            controller: "system.EditContracts",
+            resolve: {
+                itSystemUsage: [
+                    "itSystemUsageService", "$stateParams", (itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, $stateParams) => itSystemUsageService.getItSystemUsage($stateParams.id)
+                ]
+            }
         });
     }]);
 
-    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "apiUseCaseFactory", "contractUiState",
-        ($scope, $http, itSystemUsage, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory, contractUiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
+    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "apiUseCaseFactory", "contractUiState", "itSystemUsageService",
+        ($scope, $http, itSystemUsage, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory, contractUiState: Kitos.Models.UICustomization.ICustomizedModuleUI, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
             var usageId = itSystemUsage.id;
+            bindContracts(itSystemUsage);
+            var currentMainContract = null;
 
-            $scope.usage = itSystemUsage;
-            $scope.contracts = entityMapper.mapApiResponseToSelect2ViewModel(itSystemUsage.contracts);
-            $scope.mainContractId = itSystemUsage.mainContractId;
+            const reloadContractState = () => {
+                return itSystemUsageService.getItSystemUsage(usageId)
+                    .then((usage) => bindContracts(usage));
+            }
 
             $scope.saveMainContract = id => {
-                if (itSystemUsage.mainContractId === id || _.isUndefined(id)) {
+                if (currentMainContract === id || _.isUndefined(id)) {
                     return;
                 }
                 if (id) {
                     apiUseCaseFactory
                         .createAssignmentCreation(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`))
-                        .executeAsync((_) => {
-                            const contracts = itSystemUsage.contracts;
-                            const match = contracts && contracts.find(x => { return x.id === id });
-                            itSystemUsage.mainContractIsActive = match && match.isActive;
-                        }
-                        );
-                    itSystemUsage.mainContractId = id;
+                        .executeAsync((_) => reloadContractState());
                 } else {
                     apiUseCaseFactory
                         .createAssignmentRemoval(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`))
-                        .executeAsync((_) => itSystemUsage.mainContractIsActive = false);
-                    itSystemUsage.mainContractId = null;
+                        .executeAsync((_) => reloadContractState());
                 }
             };
+
+            function bindContracts(usage) {
+                $scope.usage = usage;
+                $scope.contracts = entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts);
+                $scope.mainContractId = usage.mainContractId;
+                currentMainContract = usage.mainContractId;
+                let match
+                if (usage.mainContractId !== null) {
+                    match = usage.contracts && usage.contracts.find(x => { return x.id === usage.mainContractId });
+                }
+                itSystemUsage.mainContractIsActive = match?.isActive;
+
+            }
 
             //UI Customization
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
