@@ -29,7 +29,12 @@ namespace Core.DomainServices.Queries.SystemUsage
                             // Include only if not expired or no expiration defined
                             (x.SourceEntity.ExpirationDate == null || currentTime <= x.SourceEntity.ExpirationDate)
                         )
-                    )
+                    ) &&
+                    x.MainContractIsActive == false &&
+                    // Include if Main Contract is active
+                    (x.SourceEntity.MainContract == null || x.SourceEntity.MainContract.ItContract.IsActive == true)
+
+
             );
         }
     }

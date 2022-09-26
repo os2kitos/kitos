@@ -14,6 +14,7 @@
         private storageKey = "it-system-overview-options";
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: IKendoGridOptions<IItSystemUsageOverview>;
+        toggleActiveSystemsFilterBtnText: string;
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -79,17 +80,17 @@
                     {
                         textValue: texts.notActive,
                         remoteValue: false
-                    }]
+                    }];
             }
 
-            var mainGridLocal = this.mainGrid;
             var showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
             var toggleActiveSystemsFilterBtnText = "";
+            var self = this;
 
             updateToggleActiveSystemsFilterBtnText();
 
-            function updateToggleActiveSystemsFilterBtnText(): void {
-                toggleActiveSystemsFilterBtnText = showInactiveSystems
+            function updateToggleActiveSystemsFilterBtnText(): string {
+                return showInactiveSystems
                     ? "Vis aktive IT-Systemer"
                     : "Vis ikke aktive IT-Systemer";
             }
@@ -98,7 +99,7 @@
                 showInactiveSystems = !showInactiveSystems;
                 ItSystem.Settings.CatalogState.setShowInactiveSystems($window, user.id, showInactiveSystems);
                 updateToggleActiveSystemsFilterBtnText();
-                mainGridLocal.dataSource.read();
+                self.mainGrid.dataSource.read();
             }
 
         //Build and launch kendo grid
@@ -279,7 +280,8 @@
 
             launcher = launcher.withToolbarEntry({
                 id: "toggleActiveSystemsFilter",
-                title: toggleActiveSystemsFilterBtnText,
+                title: updateToggleActiveSystemsFilterBtnText(),
+                getTitle: () => updateToggleActiveSystemsFilterBtnText(),
                 color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,

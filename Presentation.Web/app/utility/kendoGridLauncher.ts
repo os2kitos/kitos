@@ -467,6 +467,7 @@ module Kitos.Utility.KendoGrid {
 
     export interface IKendoToolbarEntry {
         title: string;
+        getTitle?: () => string;
         id: string;
         onClick?: () => void;
         link?: string;
@@ -788,22 +789,59 @@ module Kitos.Utility.KendoGrid {
                 }
             ];
 
+            this.customToolbarEntries.unshift({
+                id: "combinedFilterButtons",
+                title: "Choose filter option",
+                color: KendoToolbarButtonColor.Grey,
+                position: KendoToolbarButtonPosition.Left,
+                implementation: KendoToolbarImplementation.DropDownList,
+                enabled: () => true,
+                dropDownConfiguration: {
+                    selectedOptionChanged: newItem => {
+                        if (!newItem)
+                            return;
+
+                        newItem.originalObject.onClick();
+                    },
+                    availableOptions: [
+                        {
+                            id: "clearFilter1",
+                            text: "Gendan kolonneopsætning",
+                            originalObject: { onClick: this.$scope.kendoVm.standardToolbar.clearOptions() }
+                        } as IKendoToolbarDropDownEntry,
+                        {
+                            id: "saveFilter1",
+                            text: "Gem filter",
+                            originalObject: { onClick: this.$scope.kendoVm.standardToolbar.saveGridProfile() }
+                        } as IKendoToolbarDropDownEntry,
+                        {
+                            id: "useFilter1",
+                            text: "Anvend filter",
+                            originalObject: { onClick: this.$scope.kendoVm.standardToolbar.loadGridProfile() }
+                        } as IKendoToolbarDropDownEntry,]
+                }
+            } as IKendoToolbarEntry);
+
             //Add the excel export button with multiple options
             const excelExportDropdownEntry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid);
             this.customToolbarEntries.push(excelExportDropdownEntry);
 
             this._.forEach(this.customToolbarEntries, entry => {
+                
                 switch (entry.implementation) {
                     case KendoToolbarImplementation.Button:
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>{{kendoVm.${entry.id}.getTitle()}}</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
+                            getTitle: () => {
+                                return entry.getTitle === undefined ? entry.title : entry.getTitle();
+                            },
                             onClick: entry.onClick,
                             enabled: entry.enabled(),
-                            show: entry.show
+                            show: entry.show,
                         };
                         break;
                     case KendoToolbarImplementation.Link:

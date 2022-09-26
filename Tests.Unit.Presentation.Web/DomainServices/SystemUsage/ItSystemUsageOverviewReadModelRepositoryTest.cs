@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -26,14 +27,23 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
         [Fact]
         public void GetReadModelsMustUpdateToChangeActiveState_Returns_ReadModels_Where_Active_State_Is_Stale()
         {
+            var mainContract = new ItContractItSystemUsage
+            {
+                ItContract = new ItContract
+                {
+                    Terminated = DateTime.UtcNow.AddDays(-1)
+                }
+            };
+
             //Arrange - 1 that must expire and 1 that must be activated
-            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1));
-            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1));
-            var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, _now.AddDays(-2), _now);
-            var includedSinceExpired = CreateReadModel(true, null, _now.AddDays(-1));
+            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1), null);
+            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1), null);
+            var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, _now.AddDays(-2), _now, null);
+            var includedSinceExpiredAndTerminated = CreateReadModel(true, null, _now.AddDays(-1), mainContract);
+
             _repositoryMock.Setup(x => x.AsQueryable()).Returns(new[]
             {
-                includedSinceExpired,
+                includedSinceExpiredAndTerminated,
                 includedSinceConcludedHasPassedAndNotExpired,
                 excludedSinceConcludedSinceExpired,
                 excludedBecauseExpirationDateHasNotPassed
@@ -44,7 +54,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
 
             //Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains(includedSinceExpired, result);
+            Assert.Contains(includedSinceExpiredAndTerminated, result);
             Assert.Contains(includedSinceConcludedHasPassedAndNotExpired, result);
         }
     }

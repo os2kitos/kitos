@@ -25,7 +25,10 @@ namespace Core.DomainServices.Queries.SystemUsage
                     // Expiration data defined
                     x.SourceEntity.ExpirationDate != null &&
                     // Expiration date has passed
-                    x.SourceEntity.ExpirationDate < currentTime
+                    x.SourceEntity.ExpirationDate < currentTime &&
+                    // Main Contract is inactive
+                    x.SourceEntity.MainContract != null && 
+                    x.SourceEntity.MainContract.ItContract.IsActive == false
             );
         }
     }

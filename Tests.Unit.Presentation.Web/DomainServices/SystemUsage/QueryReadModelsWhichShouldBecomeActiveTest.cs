@@ -22,12 +22,11 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
         public void Apply_Includes_Systems_Which_Are_Currently_Inactive_But_Should_Be_Active()
         {
             //Arrange
-            var excludedSinceReadModelIsCurrentlyActive = CreateReadModel(true, null, null);
-            var excludedSinceConcludedHasNotYetPassed = CreateReadModel(false, _now.Date.AddDays(1), null);
-            var includedSinceConcludedHasPassedAndNoExpiration = CreateReadModel(false, _now.Date, null);
-            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1));
-            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1));
-
+            var excludedSinceReadModelIsCurrentlyActive = CreateReadModel(true, null, null, null);
+            var excludedSinceConcludedHasNotYetPassed = CreateReadModel(false, _now.Date.AddDays(1), null, null);
+            var includedSinceConcludedHasPassedAndNoExpiration = CreateReadModel(false, _now.Date, null, null);
+            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1), null);
+            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1), null);
 
             var input = new[]
             {
