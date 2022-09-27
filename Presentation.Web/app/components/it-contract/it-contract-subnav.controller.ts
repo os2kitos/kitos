@@ -17,6 +17,7 @@
                 $rootScope.page.subnav.buttons = [
                     { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
                 ];
+                $rootScope.page.subnav.showAnyButtons = (state) => Kitos.Helpers.SubNav.showAnyButtons($rootScope, state);
                 $rootScope.subnavPositionCenter = false;
 
                 function remove() {
