@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -122,7 +121,16 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LifeCycleStatus)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LifeCycleStatus", 0);
 
+            Property(x => x.Concluded)
+                .IsOptional()
+                .HasIndexAnnotation("IX_Concluded");
 
+            Property(x => x.ExpirationDate)
+                .IsOptional()
+                .HasIndexAnnotation("IX_ExpirationDate");
+
+            Property(x => x.LastChangedAt)
+                .HasIndexAnnotation("IX_LastChangedAt");
 
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();

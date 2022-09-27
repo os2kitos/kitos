@@ -533,8 +533,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChangedAt)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Concluded")
@@ -543,7 +542,15 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Concluded))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Concluded))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.usagePeriod)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ExpirationDate")
+                        .withTitle("Slutdato for anvendelse")
+                        .withId("systemUsageExpirationDate")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ExpirationDate))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.usagePeriod)))
                 .withColumn(builder =>
                     builder
