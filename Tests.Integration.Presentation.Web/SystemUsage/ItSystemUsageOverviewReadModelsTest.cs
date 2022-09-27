@@ -220,7 +220,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(concluded.Date, readModel.Concluded?.Date);
             Assert.Equal(systemUsageExpirationDate.Date, readModel.ExpirationDate?.Date);
             Assert.True(readModel.ActiveAccordingToValidityPeriod);
-            Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
+            Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChangedAt.Date);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
             Assert.Equal(linkToDirectoryUrlName, readModel.LinkToDirectoryName);

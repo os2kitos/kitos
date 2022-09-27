@@ -305,6 +305,7 @@
                     builder
                         .withDataSourceName("ParentItSystemName")
                         .withTitle("Overordnet IT System")
+                        .withStandardWidth(170)
                         .withId("parentsysname")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-parent-system-rendering`, "it-system.edit.main", dataItem.ParentItSystemId, Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ParentItSystemDisabled)))
@@ -452,6 +453,7 @@
                         .withDataSourceName("LocalReferenceDocumentId")
                         .withTitle("Dokument ID / Sagsnr.")
                         .withId("folderref")
+                        .withStandardWidth(170)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
@@ -512,6 +514,7 @@
                         .withDataSourceName("ObjectOwnerName")
                         .withTitle("Taget i anvendelse af")
                         .withId("ownername")
+                        .withStandardWidth(170)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withSourceValueEchoRendering()
@@ -521,6 +524,7 @@
                         .withDataSourceName("LastChangedByName")
                         .withTitle("Sidst redigeret: Bruger")
                         .withId("lastchangedname")
+                        .withStandardWidth(170)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withSourceValueEchoRendering()
@@ -530,6 +534,7 @@
                         .withDataSourceName("LastChangedAt")
                         .withTitle("Sidste redigeret: Dato")
                         .withId("changed")
+                        .withStandardWidth(170)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withInitialVisibility(false)
@@ -547,11 +552,27 @@
                     builder
                         .withDataSourceName("ExpirationDate")
                         .withTitle("Slutdato for anvendelse")
+                        .withStandardWidth(175)
                         .withId("systemUsageExpirationDate")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ExpirationDate))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.usagePeriod)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LifeCycleStatus")
+                        .withTitle("Livscyklus")
+                        .withId("LifeCycleStatus")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(lifeCycleStatusOptions.options.map(value => {
+                            return {
+                                textValue: value.text,
+                                remoteValue: value.id
+                            }
+                        })
+                            , false)
+                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.lifeCycleStatus)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ArchiveDuty")
@@ -578,6 +599,7 @@
                         .withDataSourceName("IsHoldingDocument")
                         .withTitle("Er dokumentbærende")
                         .withId("Registertype")
+                        .withStandardWidth(175)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
@@ -602,6 +624,7 @@
                         .withId("ArchivePeriodsEndDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withoutSorting()   //NOTICE: NO sorting OR filtering on computed field!
+                        .withStandardWidth(170)
                         .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
@@ -651,6 +674,7 @@
                         .withTitle("Systemets overordnede formål")
                         .withId("GeneralPurpose")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withStandardWidth(210)
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
@@ -660,6 +684,7 @@
                         .withDataSourceName("DataProcessingRegistrationsConcludedAsCsv")
                         .withTitle("Databehandleraftale er indgået")
                         .withId("dataProcessingAgreementConcluded")
+                        .withStandardWidth(220)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             [
@@ -732,6 +757,7 @@
                         .withTitle("Systemer der anvender systemet")
                         .withId("incomingRelatedItSystemUsages")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withStandardWidth(230)
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withRendering(dataItem => dataItem
@@ -747,22 +773,7 @@
                         .withId("note")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering())
-                .withColumn(builder =>
-                    builder
-                        .withDataSourceName("LifeCycleStatus")
-                        .withTitle("Livscyklus")
-                        .withId("LifeCycleStatus")
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(lifeCycleStatusOptions.options.map(value => {
-                            return {
-                                textValue: value.text,
-                                remoteValue: value.id
-                            }
-                        })
-                            , false)
-                        .withRendering(dataItem => lifeCycleStatusOptions.mapValueFromString(dataItem.LifeCycleStatus))
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.lifeCycleStatus)));
+                        .withSourceValueEchoRendering());
 
             //Launch kendo grid
             launcher.launch();
