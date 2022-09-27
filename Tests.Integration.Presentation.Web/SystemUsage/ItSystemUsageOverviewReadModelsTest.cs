@@ -217,10 +217,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.ObjectOwnerName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
-            Assert.True(readModel.Concluded.HasValue);
-            Assert.Equal(concluded.Date, readModel.Concluded.Value.Date);
+            Assert.Equal(concluded.Date, readModel.Concluded?.Date);
+            Assert.Equal(systemUsageExpirationDate.Date, readModel.ExpirationDate?.Date);
             Assert.True(readModel.ActiveAccordingToValidityPeriod);
-            Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
+            Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChangedAt.Date);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
             Assert.Equal(linkToDirectoryUrlName, readModel.LinkToDirectoryName);
