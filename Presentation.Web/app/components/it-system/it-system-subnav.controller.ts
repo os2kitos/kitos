@@ -10,7 +10,7 @@
                 }],
 
             },
-            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', '$scope', '$timeout', function ($rootScope, $http, $state, $modal, notify, user, $scope, $timeout) {
+            controller: ['$rootScope', '$http', '$state', 'notify', 'user', '$scope', function ($rootScope, $http, $state, notify, user, $scope) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
                     { state: Kitos.Constants.ApplicationStateId.SystemUsageOverview, substate: 'it-system.usage', text: "IT Systemer i " + user.currentOrganizationName },
@@ -24,6 +24,8 @@
                     },
                     { func: removeInterface, text: 'Slet Snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }
                 ];
+
+                $rootScope.page.subnav.showAnyButtons = (state) => Kitos.Helpers.SubNav.showAnyButtons($rootScope, state);
 
                 $rootScope.subnavPositionCenter = false;
 

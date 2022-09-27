@@ -25,6 +25,7 @@
             $rootScope.page.subnav.buttons = [
                 { func: remove, text: "Slet Registrering", style: "btn-danger", showWhen: "data-processing.edit-registration", dataElementType: 'removeDataProcessingRegistrationButton' }
             ];
+            $rootScope.page.subnav.showAnyButtons = (state) => Kitos.Helpers.SubNav.showAnyButtons($rootScope, state);
 
             $rootScope.subnavPositionCenter = false;
 
