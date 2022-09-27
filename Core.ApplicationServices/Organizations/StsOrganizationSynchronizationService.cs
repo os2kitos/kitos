@@ -28,24 +28,36 @@ namespace Core.ApplicationServices.Organizations
             _authorizationContext = authorizationContext;
         }
 
+        public Maybe<OperationError> ValidateConnection(Guid organizationId)
+        {
+            return GetOrganizationWithImportPermission(organizationId)
+                .Match(ValidateConnection, error => error);
+        }
+
+        private OperationError ValidateConnection(Organization organizationId)
+        {
+            //TODO: Exchange the 
+            throw new NotImplementedException();
+        }
+
         public Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<uint> levelsToInclude)
         {
-            var orgWithPermission = _organizationService
+            return
+                GetOrganizationWithImportPermission(organizationId)
+                    .Bind(LoadOrganizationUnits)
+                    .Bind(root => FilterByRequestedLevels(root, levelsToInclude));
+        }
+
+        private Result<StsOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
+        {
+            return _stsOrganizationUnitService.ResolveOrganizationTree(organization).Match<Result<StsOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
+        }
+
+        private Result<Organization, OperationError> GetOrganizationWithImportPermission(Guid organizationId)
+        {
+            return _organizationService
                 .GetOrganization(organizationId)
                 .Bind(WithImportPermission);
-
-            if (orgWithPermission.Failed)
-                return orgWithPermission.Error;
-
-            var organization = orgWithPermission.Value;
-            var orgTreeResult = _stsOrganizationUnitService.ResolveOrganizationTree(organization);
-            if (orgTreeResult.Failed)
-            {
-                var detailedOperationError = orgTreeResult.Error;
-                return new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType);
-            }
-
-            return FilterByRequestedLevels(orgTreeResult.Value, levelsToInclude);
         }
 
         private Result<Organization, OperationError> WithImportPermission(Organization organization)
