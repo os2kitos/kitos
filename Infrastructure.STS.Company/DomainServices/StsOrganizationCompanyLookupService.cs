@@ -23,6 +23,7 @@ namespace Infrastructure.STS.Company.DomainServices
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Virksomhed/5";
         }
 
+        //TODO: More detailed response - we need the info for the validation endpoint!
         public Result<Guid, OperationError> ResolveStsOrganizationCompanyUuid(Organization organization)
         {
             if (organization == null)
@@ -37,7 +38,8 @@ namespace Infrastructure.STS.Company.DomainServices
             var response = channel.soeg(request);
 
             var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
-            var stsError = statusResult.StatusKode.ParseStsError();
+            //TODO: Extend with service agreement related - test by calling into places we dont have an agreement: https://www.serviceplatformen.dk/administration/errorcodes-doc/errorcodes/4afb35be-7b7a-45b3-ab01-bd5017a8b182_errorcodes.html
+            var stsError = statusResult.StatusKode.ParseStsError(); 
             if (stsError.HasValue)
             {
                 return new OperationError($"Error resolving the organization company from STS:{statusResult.StatusKode}:{statusResult.FejlbeskedTekst}", OperationFailure.UnknownError);

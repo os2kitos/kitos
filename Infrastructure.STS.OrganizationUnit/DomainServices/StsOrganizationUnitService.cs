@@ -140,6 +140,11 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
         }
 
+        public Maybe<OperationError> ValidateConnection(Organization organization)
+        {
+            throw new NotImplementedException();
+        }
+
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType1) root, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)
         {
             var processingStack = new Stack<Guid>();

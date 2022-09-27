@@ -22,7 +22,7 @@ namespace Infrastructure.STS.Organization.DomainServices
         private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
         private readonly string _serviceRoot;
-        
+
         public StsOrganizationService(
             StsOrganisationIntegrationConfiguration configuration,
             IStsOrganizationCompanyLookupService companyLookupService,
@@ -34,6 +34,12 @@ namespace Infrastructure.STS.Organization.DomainServices
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
+        }
+
+        public Maybe<OperationError> ValidateConnection(Core.DomainModel.Organization.Organization organization)
+        {
+            return ResolveExternalUuid(organization)
+                .Match(_ => Maybe<OperationError>.None, error => error);
         }
 
         public Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveStsOrganizationUuid(Core.DomainModel.Organization.Organization organization)
@@ -50,18 +56,10 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return fkOrgIdentity.ExternalUuid;
             }
 
-            if (organization.IsCvrInvalid())
-            {
-                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.BadState, ResolveOrganizationUuidError.InvalidCvrOnOrganization);
-            }
+            var companyUuid = ResolveExternalUuid(organization);
 
-            //Resolve the associated company uuid
-            var companyUuid = _companyLookupService.ResolveStsOrganizationCompanyUuid(organization);
             if (companyUuid.Failed)
-            {
-                _logger.Error("Error {error} while resolving company uuid for organization with id {id}", companyUuid.Error.ToString(), organization.Id);
-                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToLookupOrganizationCompany);
-            }
+                return companyUuid.Value;
 
             //Search for the organization based on the resolved company (all organizations are tied to a company)
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
@@ -95,6 +93,26 @@ namespace Infrastructure.STS.Organization.DomainServices
             }
 
             return uuid;
+        }
+
+        private Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveExternalUuid(Core.DomainModel.Organization.Organization organization)
+        {
+            if (organization.IsCvrInvalid())
+            {
+                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.BadState, ResolveOrganizationUuidError.InvalidCvrOnOrganization);
+            }
+
+            //Resolve the associated company uuid
+            var companyUuid = _companyLookupService.ResolveStsOrganizationCompanyUuid(organization);
+            if (companyUuid.Failed)
+            {
+                _logger.Error("Error {error} while resolving company uuid for organization with id {id}",
+                    companyUuid.Error.ToString(), organization.Id);
+                return new DetailedOperationError<ResolveOrganizationUuidError>(
+                    OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToLookupOrganizationCompany);
+            }
+
+            return companyUuid.Value;
         }
 
         private static soegRequest CreateSearchForOrganizationRequest(Core.DomainModel.Organization.Organization organization, Guid companyUuid)

@@ -34,10 +34,9 @@ namespace Core.ApplicationServices.Organizations
                 .Match(ValidateConnection, error => error);
         }
 
-        private OperationError ValidateConnection(Organization organizationId)
+        private Maybe<OperationError> ValidateConnection(Organization organization)
         {
-            //TODO: Exchange the 
-            throw new NotImplementedException();
+            return _stsOrganizationUnitService.ValidateConnection(organization);
         }
 
         public Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<uint> levelsToInclude)
