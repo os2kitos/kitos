@@ -42,4 +42,38 @@
         static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
         static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
     }
+
+    export class FilterCustomDropdown {
+        static readonly Id = "combinedFilterButtons";
+        static readonly DefaultTitle = "Choose filter option";
+        static readonly DataKey = "kendoDropDownList";
+
+        static readonly SaveFilter = {
+            Id: "saveFilter",
+            Text: "Gem filter",
+        };
+
+        static readonly UseFilter = {
+            Id: "useFilter",
+            Text: "Anvend filter",
+        };
+
+        static readonly DeleteFilter = {
+            Id: "deleteFilter",
+            Text: "Slet filter"
+        };
+
+        static readonly DefaultOptionFilter = {
+            Id: "chooseFilterOption",
+            Text: "- - - Vælg hvordan - - -"
+        };
+
+        static readonly SelectAllId = "exportExcelAll";
+        static readonly SelectAllValue = "Alle kolonner";
+        static readonly SelectOnlyVisibleId = "exportExcelOnlyVisible";
+        static readonly SelectOnlyVisibleValue = "Viste kolonner";
+
+        static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
+        static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
+    }
 }

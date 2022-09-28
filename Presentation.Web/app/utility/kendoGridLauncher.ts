@@ -29,7 +29,7 @@ module Kitos.Utility.KendoGrid {
 
     export interface IExtendedKendoGridColumn<TDataSource> extends IKendoGridColumn<TDataSource> {
         schemaMutation: (map: any) => void;
-        kitosIncluded : boolean;
+        kitosIncluded: boolean;
     }
 
     export interface IKendoParameter {
@@ -458,9 +458,11 @@ module Kitos.Utility.KendoGrid {
         id: string;
         text: string;
         originalObject?: any;
-        template?: () => string;
+    }
+
+    export interface ICustomKendoToolbarDropDownEntry extends IKendoToolbarDropDownEntry {
         enabled?: () => boolean;
-        isDeleted?: boolean;
+        readonly template?: string;
     }
 
     export interface IKendoToolbarDropDownConfiguration {
@@ -519,7 +521,7 @@ module Kitos.Utility.KendoGrid {
         private user: Services.IUser = null;
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
-        private columnFactories: (()=>IExtendedKendoGridColumn<TDataSource>)[] = [];
+        private columnFactories: (() => IExtendedKendoGridColumn<TDataSource>)[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
         private overviewType: Models.Generic.OverviewType = null;
@@ -737,7 +739,7 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
             this.checkRequiredField("gridBinding", this.gridBinding);
-            
+
             this.$scope.kendoVm = {
                 standardToolbar: {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
@@ -762,24 +764,24 @@ module Kitos.Utility.KendoGrid {
                     template:
                         "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
                 },
-                {
-                    name: "saveFilter1",
-                    text: "Gem filter",
-                    template:
-                        '<button data-element-type="saveFilterButton" type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="kendoVm.standardToolbar.saveGridProfile()">#: text #</button>'
-                },
-                {
-                    name: "useFilter1",
-                    text: "Anvend filter",
-                    template:
-                        '<button data-element-type="useFilterButton" type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="kendoVm.standardToolbar.loadGridProfile()" data-ng-disabled="!kendoVm.standardToolbar.doesGridProfileExist()">#: text #</button>'
-                },
-                {
-                    name: "deleteFilter1",
-                    text: "Slet filter",
-                    template:
-                        "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
-                },
+                //{
+                //    name: "saveFilter1",
+                //    text: "Gem filter",
+                //    template:
+                //        '<button data-element-type="saveFilterButton" type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="kendoVm.standardToolbar.saveGridProfile()">#: text #</button>'
+                //},
+                //{
+                //    name: "useFilter1",
+                //    text: "Anvend filter",
+                //    template:
+                //        '<button data-element-type="useFilterButton" type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="kendoVm.standardToolbar.loadGridProfile()" data-ng-disabled="!kendoVm.standardToolbar.doesGridProfileExist()">#: text #</button>'
+                //},
+                //{
+                //    name: "deleteFilter1",
+                //    text: "Slet filter",
+                //    template:
+                //        "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
+                //},
                 {
                     name: "filterOrg",
                     text: "Gem kolonneopsætning for organisation",
@@ -789,23 +791,18 @@ module Kitos.Utility.KendoGrid {
                     name: "removeFilterOrg",
                     text: "Slet kolonneopsætning for organisation",
                     template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
-                },
-                {
-                    name: "combinedFilterButtons",
-                    text: "Test",
-                    template: `<select data-element-type='combinedFilterButtonsDropDownList' id='combinedFilterButtons' class='k-disabled' kendo-drop-down-list="kendoVm.combinedFilterButtons.list" k-options="kendoVm.combinedFilterButtons.getOptions()"></select>`
                 }
             ];
 
-            //const filterBtn = this.createFilterDropdown();
-            //this.customToolbarEntries.unshift(filterBtn);
+            const filterDropdown = this.setupFilterDropdown();
+            this.customToolbarEntries.unshift(filterDropdown);
 
             //Add the excel export button with multiple options
             const excelExportDropdownEntry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid);
             this.customToolbarEntries.push(excelExportDropdownEntry);
 
             this._.forEach(this.customToolbarEntries, entry => {
-                
+
                 switch (entry.implementation) {
                     case KendoToolbarImplementation.Button:
                         toolbar.push({
@@ -833,17 +830,27 @@ module Kitos.Utility.KendoGrid {
                         };
                         break;
                     case KendoToolbarImplementation.DropDownList:
-                        toolbar.push({
+
+                        const dropdown = {
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)} k-disabled' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
-                        });
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                        };
+
+                        if (entry.id === Constants.FilterCustomDropdown.Id) {
+                            toolbar.splice(1, 0, dropdown);
+                        } else {
+                            toolbar.push(dropdown);
+                        }
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
                             getOptions: () => {
                                 // The excel options are customized and not a generic dropdown
                                 if (entry === excelExportDropdownEntry) {
                                     return Helpers.ExcelExportHelper.createExportToExcelDropDownOptions(entry);
+                                }
+                                if (entry === filterDropdown) {
+                                    return this.createCustomDropdown(entry);
                                 }
                                 return {
                                     autoBind: false,
@@ -852,14 +859,11 @@ module Kitos.Utility.KendoGrid {
                                     dataValueField: "id",
                                     optionLabel: entry.title,
                                     enabled: true,
-                                    template: (item) => {
-                                        if (item.template === undefined)
-                                            return item.text;
-
-                                        item.isDeleted = true;
-                                        return item.template(item.text, false);
-                                    },
                                     change: e => {
+                                        if (!e.dataItem.enabled) {
+                                            e.preventDefault();
+                                        }
+
                                         var selectedId = e.sender.value();
                                         const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
                                         entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
@@ -885,7 +889,7 @@ module Kitos.Utility.KendoGrid {
                         columns.push(gridColumn);
                     }
                 });
-            
+
             //Build the grid
             const mainGridOptions: IKendoGridOptions<TDataSource> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -956,54 +960,6 @@ module Kitos.Utility.KendoGrid {
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.gridBinding.mainGridOptions = mainGridOptions;
-
-            const test = kendo.template(`<span #: isDeleted ? 'style="background-color: red;"': ''#">
-       #: name #
-    </span>`);
-
-            this.$scope.kendoVm["combinedFilterButtons"] = {
-                getOptions: () => {
-                    return {
-                        dataSource: [
-                            {
-                                id: "saveFilter",
-                                text: "Gem filter",
-                                isDeleted: true,
-                                originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.saveGridProfile() }
-                            } as IKendoToolbarDropDownEntry,
-                            {
-                                id: "useFilter",
-                                text: "Anvend filter",
-                                isDeleted: false,
-                                originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.loadGridProfile() }, 
-                                //template: (text): string => { return `<span class="k-button-icontext #: 'k-disabled'#"><span class="k-icon k-i-file-excel"></span>${text}</span>`; }
-                            } as IKendoToolbarDropDownEntry,
-                            {
-                                id: "deleteFilter",
-                                text: "Slet filter",
-                                isDeleted: false,
-                                originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.clearGridProfile() }
-                            } as IKendoToolbarDropDownEntry
-                        ],
-                        dataTextField: "name",
-                        dataValueField: "id",
-                        select:
-                            function(e) {
-                                if (e.dataItem.isDeleted) {
-                                    e.preventDefault();
-                                }
-                                const dropdown = $("#combinedFilterButtons").data("kendoDropDownList");
-                                const item = dropdown.dataSource.get(e.dataItem.id);
-                                item.set("isDeleted", true);
-
-                                e.dataItem.isDeleted = true;
-                            },
-                        template: kendo.template(`<span style="#: isDeleted ? 'color: grey;': ''#">
-       #: text #
-    </span>`)
-                    }
-                }
-            };
         }
 
         launch() {
@@ -1026,52 +982,98 @@ module Kitos.Utility.KendoGrid {
             this.$timeout(() => this.build(), 1, false);
         }
 
-        private createFilterDropdown(): IKendoToolbarEntry {
+        private setupFilterDropdown(): IKendoToolbarEntry {
+            const self = this;
             return {
                 show: true,
-                id: "combinedFilterButtons",
-                title: "Choose filter option",
+                id: Constants.FilterCustomDropdown.Id,
+                title: Constants.FilterCustomDropdown.DefaultTitle,
                 color: KendoToolbarButtonColor.Grey,
                 position: KendoToolbarButtonPosition.Left,
                 implementation: KendoToolbarImplementation.DropDownList,
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: newItem => {
-                       //var dropdown = jQuery(`#combinedFilterButtons`).data("kendoDropDownList");
-                       //var res = dropdown.dataSource.options.get(1);
-                       //res.set("isDeleted", true);
-
-                        if (!newItem)
+                        if (!newItem || newItem.id === Constants.FilterCustomDropdown.DefaultOptionFilter.Id)
                             return;
 
                         newItem.originalObject.onClick();
 
-                        jQuery(`#combinedFilterButtons`).data(Constants.ExcelExportDropdown.DataKey)
-                            .value("combinedFilterButtons");
+                        const dropdown = jQuery(`#${Constants.FilterCustomDropdown.Id}`).data("kendoDropDownList");
+                        dropdown.value(Constants.FilterCustomDropdown.DefaultOptionFilter.Id);
+                        dropdown.dataSource.read();
                     },
                     availableOptions: [
                         {
-                            id: "saveFilter",
-                            text: "Gem filter",
+                            id: Constants.FilterCustomDropdown.DefaultOptionFilter.Id,
+                            text: Constants.FilterCustomDropdown.DefaultOptionFilter.Text,
+                            enabled: () => true
+                        },
+                        {
+                            id: Constants.FilterCustomDropdown.SaveFilter.Id,
+                            text: Constants.FilterCustomDropdown.SaveFilter.Text,
                             enabled: () => true,
-                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.saveGridProfile() }
-                        } as IKendoToolbarDropDownEntry,
+                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.saveGridProfile() },
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry,
                         {
-                            id: "useFilter",
-                            text: "Anvend filter",
-                            enabled: () => false,
-                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.loadGridProfile() }, // style="background-color: red;
-                            template: (text): string => { return `<span class="k-button-icontext #: 'k-disabled'#"><span class="k-icon k-i-file-excel"></span>${text}</span>`; }
-                        } as IKendoToolbarDropDownEntry,
+                            id: Constants.FilterCustomDropdown.UseFilter.Id,
+                            text: Constants.FilterCustomDropdown.UseFilter.Text,
+                            enabled: () => this.$scope.kendoVm.standardToolbar.doesGridProfileExist(),
+                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.loadGridProfile() },
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry,
                         {
-                            id: "deleteFilter",
-                            text: "Slet filter",
-                            enabled: () => false,
-                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.clearGridProfile() }
-                        } as IKendoToolbarDropDownEntry
-                    ]
+                            id: Constants.FilterCustomDropdown.DeleteFilter.Id,
+                            text: Constants.FilterCustomDropdown.DeleteFilter.Text,
+                            enabled: () => this.$scope.kendoVm.standardToolbar.doesGridProfileExist(),
+                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.clearGridProfile() },
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry
+                    ],
+                },
+                customOnSelectMethod: (e) => {
                 }
             } as IKendoToolbarEntry;
+        }
+
+        private createCustomDropdown(entry: IKendoToolbarEntry) {
+            return {
+                autoBind: false,
+                dataSource: entry.dropDownConfiguration.availableOptions,
+                dataTextField: "text",
+                dataValueField: "id",
+                enabled: true,
+                template: ((item) => {
+                    if (item.template === undefined)
+                        return item.text;
+                    
+                    return item.template;
+                }),
+                //Always show the title in the combobox selector
+                valueTemplate: (_) => entry.title,
+                select: (e) => {
+                    if (e.dataItem.enabled !== undefined && !e.dataItem.enabled()) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === e.dataItem.id);
+                    entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                    this.saveGridOptions();
+                }
+            }
+
+        }
+
+        private getKendoDisabledTemplate(item: ICustomKendoToolbarDropDownEntry): string {
+            return `<span class="${!item.enabled() ? "faded-gray" : ""}">${item.text}</span>`;
         }
     }
 
