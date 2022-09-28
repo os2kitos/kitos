@@ -36,10 +36,20 @@ namespace Infrastructure.STS.Organization.DomainServices
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
         }
 
-        public Maybe<OperationError> ValidateConnection(Core.DomainModel.Organization.Organization organization)
+        public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Core.DomainModel.Organization.Organization organization)
         {
             return ResolveExternalUuid(organization)
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .Match(_ => Maybe<DetailedOperationError<CheckConnectionError>>.None, error =>
+                {
+                    var connectionError = error.Detail switch
+                    {
+                        ResolveOrganizationUuidError.InvalidCvrOnOrganization => CheckConnectionError.InvalidCvrOnOrganization,
+                        ResolveOrganizationUuidError.MissingServiceAgreement => CheckConnectionError.MissingServiceAgreement,
+                        ResolveOrganizationUuidError.ExistingServiceAgreementIssue => CheckConnectionError.ExistingServiceAgreementIssue,
+                        _ => CheckConnectionError.Unknown
+                    };
+                    return new DetailedOperationError<CheckConnectionError>(error.FailureType, connectionError, error.Message.GetValueOrFallback(string.Empty));
+                });
         }
 
         public Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveStsOrganizationUuid(Core.DomainModel.Organization.Organization organization)
@@ -69,7 +79,7 @@ namespace Infrastructure.STS.Organization.DomainServices
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
             var response = channel.soeg(searchRequest);
             var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
-            var stsError = statusResult.StatusKode.ParseStsError();
+            var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
             if (stsError.HasValue)
             {
                 _logger.Error("Failed to search for organization ({id}) by company uuid {uuid}. Failed with {stsError} {code} and {message}", organization.Id, companyUuid.Value, stsError.Value, statusResult.StatusKode, statusResult.FejlbeskedTekst);
@@ -108,8 +118,22 @@ namespace Infrastructure.STS.Organization.DomainServices
             {
                 _logger.Error("Error {error} while resolving company uuid for organization with id {id}",
                     companyUuid.Error.ToString(), organization.Id);
-                return new DetailedOperationError<ResolveOrganizationUuidError>(
-                    OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToLookupOrganizationCompany);
+
+                var detailedError = companyUuid.Error.Detail switch
+                {
+                    StsError.MissingServiceAgreement => ResolveOrganizationUuidError.MissingServiceAgreement,
+                    StsError.ExistingServiceAgreementIssue => ResolveOrganizationUuidError.ExistingServiceAgreementIssue,
+                    _ => ResolveOrganizationUuidError.FailedToLookupOrganizationCompany
+                };
+
+                var operationFailure = companyUuid.Error.Detail switch
+                {
+                    StsError.MissingServiceAgreement => companyUuid.Error.FailureType,
+                    StsError.ExistingServiceAgreementIssue => companyUuid.Error.FailureType,
+                    _ => OperationFailure.UnknownError
+                };
+
+                return new DetailedOperationError<ResolveOrganizationUuidError>(operationFailure, detailedError);
             }
 
             return companyUuid.Value;

@@ -6,6 +6,8 @@
         FailedToLookupOrganizationCompany,
         FailedToSearchForOrganizationByCompanyUuid,
         DuplicateOrganizationResults,
-        FailedToSaveUuidOnKitosOrganization
+        FailedToSaveUuidOnKitosOrganization,
+        MissingServiceAgreement,
+        ExistingServiceAgreementIssue
     }
 }

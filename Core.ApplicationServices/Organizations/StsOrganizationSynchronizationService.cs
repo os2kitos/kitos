@@ -28,13 +28,13 @@ namespace Core.ApplicationServices.Organizations
             _authorizationContext = authorizationContext;
         }
 
-        public Maybe<OperationError> ValidateConnection(Guid organizationId)
+        public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Guid organizationId)
         {
             return GetOrganizationWithImportPermission(organizationId)
-                .Match(ValidateConnection, error => error);
+                .Match(ValidateConnection, error => new DetailedOperationError<CheckConnectionError>(error.FailureType, CheckConnectionError.Unknown, error.Message.GetValueOrDefault()));
         }
 
-        private Maybe<OperationError> ValidateConnection(Organization organization)
+        private Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Organization organization)
         {
             return _stsOrganizationUnitService.ValidateConnection(organization);
         }

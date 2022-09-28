@@ -59,7 +59,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
                 var searchResponse = channel.soeg(searchRequest);
 
                 var searchStatusResult = searchResponse.SoegResponse1.SoegOutput.StandardRetur;
-                var stsError = searchStatusResult.StatusKode.ParseStsError();
+                var stsError = searchStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (stsError.HasValue)
                 {
                     _logger.Error("Failed to search for org units for org with sts uuid: {stsuuid} failed with {code} {message}", organizationStsUuid, searchStatusResult.StatusKode, searchStatusResult.FejlbeskedTekst);
@@ -75,7 +75,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
 
                 var listStatusResult = listResponse.ListResponse1.ListOutput.StandardRetur;
-                var listStsError = listStatusResult.StatusKode.ParseStsError();
+                var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (listStsError.HasValue)
                 {
                     _logger.Error("Failed to list units for org units for org with sts uuid: {stsuuid} and unit uuids: {uuids} failed with {code} {message}", organizationStsUuid, string.Join(",", currentPage), listStatusResult.StatusKode, listStatusResult.FejlbeskedTekst);
@@ -140,9 +140,13 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
         }
 
-        public Maybe<OperationError> ValidateConnection(Organization organization)
+        public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Organization organization)
         {
-            throw new NotImplementedException();
+            if (organization == null)
+            {
+                throw new ArgumentNullException(nameof(organization));
+            }
+            return _organizationService.ValidateConnection(organization);
         }
 
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType1) root, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)
