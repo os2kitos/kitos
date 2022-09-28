@@ -39,8 +39,15 @@ namespace Presentation.Web.Controllers.API.V1
                 .ValidateConnection(organizationId)
                 .Match
                 (
-                    error => Ok(new CheckStsOrganizationConnectionResponse(false, error.Detail)),
-                    () => Ok(new CheckStsOrganizationConnectionResponse(true))
+                    error => Ok(new CheckStsOrganizationConnectionResponseDTO
+                    {
+                        Error = error.Detail,
+                        Connected = false
+                    }),
+                    () => Ok(new CheckStsOrganizationConnectionResponseDTO()
+                    {
+                        Connected = true
+                    })
                 );
 
         }
