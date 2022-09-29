@@ -853,13 +853,7 @@ module Kitos.Utility.KendoGrid {
                                     optionLabel: entry.title,
                                     enabled: true,
                                     change: e => {
-                                        if (!e.dataItem.enabled) {
-                                            e.preventDefault();
-                                        }
-
-                                        var selectedId = e.sender.value();
-                                        const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
-                                        entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                                        this.triggerSelectedOptionChanged(e, entry);
                                         this.saveGridOptions();
                                     }
                                 }
@@ -899,11 +893,7 @@ module Kitos.Utility.KendoGrid {
                                     valueTemplate: (_) => entry.title,
                                     change: (e) => {
                                         try {
-                                            var selectedId = e.sender.value();
-                                            const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
-                                            entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
-                                                ? newSelection[0]
-                                                : null);
+                                            this.triggerSelectedOptionChanged(e, entry);
                                         } catch (ex) {
                                             console.log(ex);
                                         }
@@ -1081,39 +1071,12 @@ module Kitos.Utility.KendoGrid {
             } as IKendoToolbarEntry;
         }
 
-        private createCustomDropdown(entry: IKendoToolbarEntry) {
-            return {
-                autoBind: false,
-                dataSource: entry.dropDownConfiguration.availableOptions,
-                dataTextField: "text",
-                dataValueField: "id",
-                enabled: true,
-                template: ((item) => {
-                    if (item.template === undefined)
-                        return item.text;
-                    
-                    return item.template;
-                }),
-                //Always show the title in the combobox selector
-                valueTemplate: (_) => entry.title,
-                change: (e) => {
-                    try {
-                        if (e.dataItem.enabled !== undefined && !e.dataItem.enabled()) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        var selectedId = e.sender.value();
-                        const newSelection =
-                            entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
-                        entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
-                            ? newSelection[0]
-                            : null);
-                    } catch (ex) {
-                        console.log(ex);
-                    }
-                }
-            }
+        private triggerSelectedOptionChanged(e: {sender: {value: () => string }}, entry: IKendoToolbarEntry): void {
+            var selectedId = e.sender.value();
+            const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+            entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
+                ? newSelection[0]
+                : null);
         }
 
         private getKendoDisabledTemplate(item: ICustomKendoToolbarDropDownEntry): string {
