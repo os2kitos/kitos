@@ -11,11 +11,13 @@ using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Advice
 {
+    [Collection(nameof(SequentialTestGroup))]
     public class AdviceTest : WithAutoFixture, IAsyncLifetime
     {
         private ItContractDTO _root;
