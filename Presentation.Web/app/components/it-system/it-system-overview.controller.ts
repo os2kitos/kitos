@@ -89,8 +89,8 @@
 
             function updateToggleActiveSystemsFilterBtnText(): string {
                 return showInactiveSystems
-                    ? "Vis aktive IT-Systemer"
-                    : "Vis ikke aktive IT-Systemer";
+                    ? "Vis ikke aktive IT Systemer"
+                    : "Vis aktive IT Systemer";
             }
             
             function toggleActiveSystemsMasterFilter(): void {
