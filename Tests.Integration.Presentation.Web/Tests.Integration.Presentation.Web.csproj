@@ -124,7 +124,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advice\AdviceSequentialTest.cs" />
     <Compile Include="Advice\AdviceTest.cs" />
+    <Compile Include="Advice\AdviceTestBase.cs" />
     <Compile Include="Authorization\GetOrganizationsTests.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
