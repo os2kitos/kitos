@@ -107,7 +107,7 @@ namespace Infrastructure.STS.Organization.DomainServices
 
         private Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveExternalUuid(Core.DomainModel.Organization.Organization organization)
         {
-            if (organization.Cvr == null || organization.IsCvrInvalid())
+            if (string.IsNullOrWhiteSpace(organization.Cvr) || organization.IsCvrInvalid())
             {
                 return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.BadState, ResolveOrganizationUuidError.InvalidCvrOnOrganization);
             }
