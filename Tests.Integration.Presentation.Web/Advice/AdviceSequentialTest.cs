@@ -27,7 +27,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
 
             //Wait for the advice to have been sent
-            await WaitForAsync(() => Task.FromResult(DatabaseAccess.MapFromEntitySet<Core.DomainModel.Advice.Advice, bool>(advices => advices.AsQueryable().ById(createdAdvice.Id).AdviceSent.Any())), TimeSpan.FromSeconds(30));
+            await WaitForAsync(() => Task.FromResult(DatabaseAccess.MapFromEntitySet<Core.DomainModel.Advice.Advice, bool>(advices => advices.AsQueryable().ById(createdAdvice.Id).AdviceSent.Any())), TimeSpan.FromSeconds(120));
 
 
             //Act
