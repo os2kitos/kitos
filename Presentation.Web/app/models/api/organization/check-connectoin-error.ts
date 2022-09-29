@@ -1,7 +1,5 @@
-﻿namespace Core.DomainServices.Model.StsOrganization
-{
-    public enum CheckConnectionError
-    {
+﻿module Kitos.Models.Api.Organization {
+    export enum CheckConnectionError {
         InvalidCvrOnOrganization = 0,
         MissingServiceAgreement = 1,
         ExistingServiceAgreementIssue = 2,
