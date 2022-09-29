@@ -125,7 +125,7 @@
 
                         mainGrid().saveAsExcel();
 
-                        jQuery(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                        jQuery(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.KendoDropdown.DataKey)
                             .value(Constants.ExcelExportDropdown.ChooseWhichExcelOptionId);
                     },
                     availableOptions: [

@@ -26,7 +26,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
             {
                 ItContract = new ItContract
                 {
-                    Terminated = DateTime.UtcNow.AddDays(-1)
+                    Terminated = _now.Date.AddDays(-1)
                 }
             };
 

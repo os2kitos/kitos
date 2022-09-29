@@ -69,7 +69,7 @@
                 return orderBy;
             };
 
-            const texts = Kitos.Helpers.RenderFieldsHelper.getTexts();
+            const texts = Helpers.RenderFieldsHelper.getTexts();
             const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] =>
             {
                 return [
@@ -84,7 +84,6 @@
             }
 
             var showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
-            var toggleActiveSystemsFilterBtnText = "";
             var self = this;
 
             updateToggleActiveSystemsFilterBtnText();
@@ -197,7 +196,7 @@
 
                     const existing = parameterMap.$filter;
                     const hadExisting = _.isEmpty(existing) === false;
-                    parameterMap.$filter = `SystemActive eq ${showInactiveSystems ? "true" : "false"} ${hadExisting ? " and (" + existing + ")" : ""}`;// ${this.showInactiveSystems ? "true" : "false"}  ${hadExisting ? " and (" + existing + ")" : ""}`;
+                    parameterMap.$filter = `SystemActive eq ${showInactiveSystems ? "true" : "false"} ${hadExisting ? " and (" + existing + ")" : ""}`;
                     if (hadExisting) {
                         parameterMap.$filter = `(${parameterMap.$filter})`;
                     }

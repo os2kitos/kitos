@@ -766,24 +766,6 @@ module Kitos.Utility.KendoGrid {
                     template:
                         "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
                 },
-                //{
-                //    name: "saveFilter1",
-                //    text: "Gem filter",
-                //    template:
-                //        '<button data-element-type="saveFilterButton" type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="kendoVm.standardToolbar.saveGridProfile()">#: text #</button>'
-                //},
-                //{
-                //    name: "useFilter1",
-                //    text: "Anvend filter",
-                //    template:
-                //        '<button data-element-type="useFilterButton" type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="kendoVm.standardToolbar.loadGridProfile()" data-ng-disabled="!kendoVm.standardToolbar.doesGridProfileExist()">#: text #</button>'
-                //},
-                //{
-                //    name: "deleteFilter1",
-                //    text: "Slet filter",
-                //    template:
-                //        "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
-                //},
                 {
                     name: "filterOrg",
                     text: "Gem kolonneopsætning for organisation",
@@ -810,15 +792,15 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>{{kendoVm.${entry.id}.getTitle()}}</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>{{kendoVm.${entry.id}.getEntryTitle()}}</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
-                            getTitle: () => {
+                            getEntryTitle: () => {
                                 return entry.getTitle === undefined ? entry.title : entry.getTitle();
                             },
                             onClick: entry.onClick,
                             enabled: entry.enabled(),
-                            show: entry.show,
+                            show: entry.show
                         };
                         break;
                     case KendoToolbarImplementation.Link:
@@ -1029,7 +1011,7 @@ module Kitos.Utility.KendoGrid {
 
                         newItem.onClick();
                         
-                        const dropdown = jQuery(`#${Constants.CustomFilterDropdown.Id}`).data(Constants.CustomFilterDropdown.DataKey);
+                        const dropdown = jQuery(`#${Constants.CustomFilterDropdown.Id}`).data(Constants.KendoDropdown.DataKey);
                         dropdown.value(Constants.CustomFilterDropdown.DefaultOptionFilter.Id);
                         dropdown.dataSource.read();
                     },

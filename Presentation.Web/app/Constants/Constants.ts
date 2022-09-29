@@ -29,10 +29,13 @@
 
     }
 
+    export class KendoDropdown {
+        static readonly DataKey = "kendoDropDownList";
+    }
+
     export class ExcelExportDropdown {
         static readonly Id = "excelExportSelector";
         static readonly DefaultTitle = "Eksportér til Excel";
-        static readonly DataKey = "kendoDropDownList";
 
         static readonly SelectAllId = "exportExcelAll";
         static readonly SelectAllValue = "Alle kolonner";
@@ -46,7 +49,6 @@
     export class CustomFilterDropdown {
         static readonly Id = "combinedFilterButtonsDropDownList";
         static readonly DefaultTitle = "Choose filter option";
-        static readonly DataKey = "kendoDropDownList";
 
         static readonly SaveFilter = {
             Id: "saveFilter",
