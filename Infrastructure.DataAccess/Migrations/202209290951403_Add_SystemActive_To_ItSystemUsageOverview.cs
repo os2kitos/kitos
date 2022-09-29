@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class SystemUsageOverViewReadModelSystemActive : DbMigration
+    public partial class Add_SystemActive_To_ItSystemUsageOverview : DbMigration
     {
         public override void Up()
         {
