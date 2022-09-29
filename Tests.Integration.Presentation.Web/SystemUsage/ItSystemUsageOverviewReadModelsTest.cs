@@ -220,6 +220,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.True(readModel.Concluded.HasValue);
             Assert.Equal(concluded.Date, readModel.Concluded.Value.Date);
             Assert.True(readModel.ActiveAccordingToValidityPeriod);
+            Assert.True(readModel.ActiveAccordingToLifeCycle);
+            Assert.True(readModel.SystemActive);
             Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);

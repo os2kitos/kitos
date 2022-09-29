@@ -444,7 +444,8 @@ module Kitos.Utility.KendoGrid {
     export enum KendoToolbarImplementation {
         Button,
         Link,
-        DropDownList
+        DropDownList,
+        CustomTemplateDropDownList
     }
 
     export enum KendoToolbarMargin {
@@ -461,7 +462,8 @@ module Kitos.Utility.KendoGrid {
     }
 
     export interface ICustomKendoToolbarDropDownEntry extends IKendoToolbarDropDownEntry {
-        enabled?: () => boolean;
+        enabled: () => boolean;
+        onClick: () => void;
         readonly template?: string;
     }
 
@@ -830,27 +832,18 @@ module Kitos.Utility.KendoGrid {
                         };
                         break;
                     case KendoToolbarImplementation.DropDownList:
-
-                        const dropdown = {
+                        
+                        toolbar.push({
                             name: entry.id,
                             text: entry.title,
                             template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
-                        };
-
-                        if (entry.id === Constants.FilterCustomDropdown.Id) {
-                            toolbar.splice(1, 0, dropdown);
-                        } else {
-                            toolbar.push(dropdown);
-                        }
+                        });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
                             getOptions: () => {
                                 // The excel options are customized and not a generic dropdown
                                 if (entry === excelExportDropdownEntry) {
                                     return Helpers.ExcelExportHelper.createExportToExcelDropDownOptions(entry);
-                                }
-                                if (entry === filterDropdown) {
-                                    return this.createCustomDropdown(entry);
                                 }
                                 return {
                                     autoBind: false,
@@ -868,6 +861,52 @@ module Kitos.Utility.KendoGrid {
                                         const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
                                         entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
                                         this.saveGridOptions();
+                                    }
+                                }
+                            }
+                        };
+                        break;
+                    case KendoToolbarImplementation.CustomTemplateDropDownList:
+
+                        const dropdown = {
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                        };
+
+                        if (entry.id === Constants.CustomFilterDropdown.Id) {
+                            toolbar.splice(1, 0, dropdown);
+                        } else {
+                            toolbar.push(dropdown);
+                        }
+
+                        this.$scope.kendoVm[entry.id] = {
+                            enabled: entry.enabled(),
+                            getOptions: () => {
+                                return {
+                                    autoBind: false,
+                                    dataSource: entry.dropDownConfiguration.availableOptions,
+                                    dataTextField: "text",
+                                    dataValueField: "id",
+                                    enabled: true,
+                                    template: ((item) => {
+                                        if (item.template === undefined)
+                                            return item.text;
+
+                                        return item.template;
+                                    }),
+                                    //Always show the title in the combobox selector
+                                    valueTemplate: (_) => entry.title,
+                                    change: (e) => {
+                                        try {
+                                            var selectedId = e.sender.value();
+                                            const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+                                            entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
+                                                ? newSelection[0]
+                                                : null);
+                                        } catch (ex) {
+                                            console.log(ex);
+                                        }
                                     }
                                 }
                             }
@@ -986,59 +1025,58 @@ module Kitos.Utility.KendoGrid {
             const self = this;
             return {
                 show: true,
-                id: Constants.FilterCustomDropdown.Id,
-                title: Constants.FilterCustomDropdown.DefaultTitle,
+                id: Constants.CustomFilterDropdown.Id,
+                title: Constants.CustomFilterDropdown.DefaultTitle,
                 color: KendoToolbarButtonColor.Grey,
                 position: KendoToolbarButtonPosition.Left,
-                implementation: KendoToolbarImplementation.DropDownList,
+                implementation: KendoToolbarImplementation.CustomTemplateDropDownList,
                 enabled: () => true,
                 dropDownConfiguration: {
-                    selectedOptionChanged: newItem => {
-                        if (!newItem || newItem.id === Constants.FilterCustomDropdown.DefaultOptionFilter.Id)
+                    selectedOptionChanged: (newItem: ICustomKendoToolbarDropDownEntry) => {
+                        if (!newItem) {
                             return;
+                        }
 
-                        newItem.originalObject.onClick();
-
-                        const dropdown = jQuery(`#${Constants.FilterCustomDropdown.Id}`).data("kendoDropDownList");
-                        dropdown.value(Constants.FilterCustomDropdown.DefaultOptionFilter.Id);
+                        newItem.onClick();
+                        
+                        const dropdown = jQuery(`#${Constants.CustomFilterDropdown.Id}`).data(Constants.CustomFilterDropdown.DataKey);
+                        dropdown.value(Constants.CustomFilterDropdown.DefaultOptionFilter.Id);
                         dropdown.dataSource.read();
                     },
                     availableOptions: [
                         {
-                            id: Constants.FilterCustomDropdown.DefaultOptionFilter.Id,
-                            text: Constants.FilterCustomDropdown.DefaultOptionFilter.Text,
-                            enabled: () => true
+                            id: Constants.CustomFilterDropdown.DefaultOptionFilter.Id,
+                            text: Constants.CustomFilterDropdown.DefaultOptionFilter.Text,
+                            enabled: () => false
                         },
                         {
-                            id: Constants.FilterCustomDropdown.SaveFilter.Id,
-                            text: Constants.FilterCustomDropdown.SaveFilter.Text,
+                            id: Constants.CustomFilterDropdown.SaveFilter.Id,
+                            text: Constants.CustomFilterDropdown.SaveFilter.Text,
                             enabled: () => true,
-                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.saveGridProfile() },
+                            onClick: () => this.saveGridProfile(),
                             get template(): string {
                                 return self.getKendoDisabledTemplate(this);
                             }
                         } as ICustomKendoToolbarDropDownEntry,
                         {
-                            id: Constants.FilterCustomDropdown.UseFilter.Id,
-                            text: Constants.FilterCustomDropdown.UseFilter.Text,
-                            enabled: () => this.$scope.kendoVm.standardToolbar.doesGridProfileExist(),
-                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.loadGridProfile() },
+                            id: Constants.CustomFilterDropdown.UseFilter.Id,
+                            text: Constants.CustomFilterDropdown.UseFilter.Text,
+                            enabled: () => this.doesGridProfileExist(),
+                            onClick: () => this.loadGridProfile(),
                             get template(): string {
                                 return self.getKendoDisabledTemplate(this);
                             }
                         } as ICustomKendoToolbarDropDownEntry,
                         {
-                            id: Constants.FilterCustomDropdown.DeleteFilter.Id,
-                            text: Constants.FilterCustomDropdown.DeleteFilter.Text,
-                            enabled: () => this.$scope.kendoVm.standardToolbar.doesGridProfileExist(),
-                            originalObject: { onClick: () => this.$scope.kendoVm.standardToolbar.clearGridProfile() },
+                            id: Constants.CustomFilterDropdown.DeleteFilter.Id,
+                            text: Constants.CustomFilterDropdown.DeleteFilter.Text,
+                            enabled: () => this.doesGridProfileExist(),
+                            onClick: () => this.clearGridProfile(),
                             get template(): string {
                                 return self.getKendoDisabledTemplate(this);
                             }
                         } as ICustomKendoToolbarDropDownEntry
-                    ],
-                },
-                customOnSelectMethod: (e) => {
+                    ]
                 }
             } as IKendoToolbarEntry;
         }
@@ -1058,18 +1096,24 @@ module Kitos.Utility.KendoGrid {
                 }),
                 //Always show the title in the combobox selector
                 valueTemplate: (_) => entry.title,
-                select: (e) => {
-                    if (e.dataItem.enabled !== undefined && !e.dataItem.enabled()) {
-                        e.preventDefault();
-                        return;
-                    }
+                change: (e) => {
+                    try {
+                        if (e.dataItem.enabled !== undefined && !e.dataItem.enabled()) {
+                            e.preventDefault();
+                            return;
+                        }
 
-                    const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === e.dataItem.id);
-                    entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
-                    this.saveGridOptions();
+                        var selectedId = e.sender.value();
+                        const newSelection =
+                            entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+                        entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
+                            ? newSelection[0]
+                            : null);
+                    } catch (ex) {
+                        console.log(ex);
+                    }
                 }
             }
-
         }
 
         private getKendoDisabledTemplate(item: ICustomKendoToolbarDropDownEntry): string {

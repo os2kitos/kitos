@@ -43,8 +43,8 @@
         static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
     }
 
-    export class FilterCustomDropdown {
-        static readonly Id = "combinedFilterButtons";
+    export class CustomFilterDropdown {
+        static readonly Id = "combinedFilterButtonsDropDownList";
         static readonly DefaultTitle = "Choose filter option";
         static readonly DataKey = "kendoDropDownList";
 
@@ -64,7 +64,7 @@
         };
 
         static readonly DefaultOptionFilter = {
-            Id: "chooseFilterOption",
+            Id: "defaultFitlerOption",
             Text: "- - - Vælg hvordan - - -"
         };
 
