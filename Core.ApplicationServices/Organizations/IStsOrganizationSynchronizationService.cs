@@ -8,7 +8,6 @@ namespace Core.ApplicationServices.Organizations
     {
         /// <summary>
         /// Validates if KITOS can read organization data from STS Organisation
-        /// </summary>
         Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Guid organizationId);
         /// <summary>
         /// Retrieves a view of the organization as it exists in STS Organization
