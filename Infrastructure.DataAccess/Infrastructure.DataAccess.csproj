@@ -931,6 +931,10 @@
     <Compile Include="Migrations\202209210602103_ChangedHasMainContract.designer.cs">
       <DependentUpon>202209210602103_ChangedHasMainContract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.cs" />
+    <Compile Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.designer.cs">
+      <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202209231033345_SystemUsageOverViewReadModelSystemActive.cs" />
     <Compile Include="Migrations\202209231033345_SystemUsageOverViewReadModelSystemActive.designer.cs">
       <DependentUpon>202209231033345_SystemUsageOverViewReadModelSystemActive.cs</DependentUpon>
@@ -1554,6 +1558,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209210602103_ChangedHasMainContract.resx">
       <DependentUpon>202209210602103_ChangedHasMainContract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.resx">
+      <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209231033345_SystemUsageOverViewReadModelSystemActive.resx">
       <DependentUpon>202209231033345_SystemUsageOverViewReadModelSystemActive.cs</DependentUpon>

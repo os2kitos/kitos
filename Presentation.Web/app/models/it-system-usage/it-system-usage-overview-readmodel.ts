@@ -57,6 +57,7 @@
         LastChangedByName: string | null;
         LastChangedAt: Date | null;
         Concluded: Date | null;
+        ExpirationDate: Date | null;
         MainContractSupplierName: string | null;
         MainContractIsActive: boolean | null;
         SensitiveDataLevelsAsCsv: string | null;

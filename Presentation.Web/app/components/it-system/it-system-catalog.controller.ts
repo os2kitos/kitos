@@ -175,8 +175,8 @@
 
         updateToggleActiveSystemsMasterFilterBtnText(): void {
             this.toggleActiveSystemsMasterFilterBtnText = this.showInactiveSystems
-                ? "Vis aktive systemer"
-                : "Vis deaktiverede systemer";
+                ? "Vis tilgængelige systemer"
+                : "Vis \"ikke tilgængelige\" systemer";
         }
 
         toggleActiveSystemsMasterFilter(): void {

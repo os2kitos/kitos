@@ -1,7 +1,16 @@
 ﻿module Kitos.Services {
     "use strict";
 
-    interface IGridSavedState {
+    export interface LoadedColumnOrder {
+        persistId: string,
+        columnIndex: number
+    }
+    export interface IGridStateToBeAppliedAfterLoad {
+        columnOrder: Array<LoadedColumnOrder>
+        pageSize: number | null
+    }
+
+    export interface IGridSavedState {
         dataSource?: kendo.data.DataSourceOptions;
         columnState?: { [persistId: string]: { index: number; width: number, hidden?: boolean } };
     }
@@ -11,7 +20,13 @@
     }
 
     export interface IGridStateService {
+        completeLoading: () => void;
         saveGridOptions: (grid: Kitos.IKendoGrid<any>) => void;
+        /**
+         * Applies the current locally saved options along with server options to a kendo configuration
+         * @param setup
+         */
+        applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<IGridStateToBeAppliedAfterLoad>;
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
@@ -20,9 +35,10 @@
         removeProfile: () => void;
         removeLocal: () => void;
         removeSession: () => void;
-        deleteGridOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType) => void;
+        deleteGridOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType) => ng.IPromise<void>;
         doesGridDivergeFromOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType, grid: Kitos.IKendoGrid<any>) => boolean;
         canDeleteGridOrganizationalConfiguration: () => boolean;
+        reset: () => void;
     }
 
     gridStateService.$inject = [
@@ -33,7 +49,6 @@
         "_",
         "KendoFilterService",
         "notify",
-        "$state",
         "sha256"
     ];
 
@@ -45,7 +60,6 @@
         _: _.LoDashStatic,
         KendoFilterService: KendoFilterService,
         notify,
-        $state: ng.ui.IStateService,
         sha256: Hash
     ): IGridStateFactory {
         var factory: IGridStateFactory = {
@@ -71,8 +85,11 @@
             var gridLoading: boolean = true;
 
             var service: IGridStateService = {
+                reset: reset,
+                completeLoading: completeLoading,
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
+                applySavedGridOptions: applySavedGridOptions,
                 saveGridProfile: saveGridProfile,
                 loadGridProfile: loadGridProfile,
                 saveGridOrganizationalConfiguration: saveGridOrganizationalConfiguration,
@@ -85,6 +102,10 @@
                 canDeleteGridOrganizationalConfiguration: canDeleteGridOrganizationalConfiguration
             };
             return service;
+
+            function completeLoading() {
+                gridLoading = false;
+            }
 
             async function checkServerGridConfig(overviewType: Models.Generic.OverviewType) {
                 // Organizational configuration not yet activated for overview
@@ -112,6 +133,63 @@
                 });
             }
 
+            function applySavedGridOptions(setup: Kitos.IKendoGridOptions<any>): Promise<IGridStateToBeAppliedAfterLoad> {
+                return getSavedGridOptions(setup.columns)
+                    .then(state => {
+                        const savedIndexes: Array<LoadedColumnOrder> = [];
+
+                        //Apply the state to the column configuration
+                        setup.columns.forEach(column => {
+                            if (state.columnState) {
+                                const currentColumnState = state.columnState[column.persistId];
+                                if (currentColumnState !== undefined) {
+                                    column.width = currentColumnState.width ?? column.width;
+                                    column.hidden = currentColumnState.hidden !== undefined ? currentColumnState.hidden : column.hidden;
+                                    const savedColumnIndex = currentColumnState.index;
+                                    if (savedColumnIndex !== undefined) {
+                                        savedIndexes.push({
+                                            persistId: column.persistId,
+                                            columnIndex: savedColumnIndex
+                                        });
+                                    }
+                                }
+                            }
+                        });
+
+                        let statePageSize: number | null = null;
+                        //Apply grid options
+                        if (state.dataSource) {
+                            const statefilters = state.dataSource?.filter;
+                            statePageSize = state.dataSource?.pageSize;
+                            const stateSort = state.dataSource?.sort;
+                            setup.dataSource.filter = statefilters ?? setup.dataSource.filter;
+                            setup.dataSource.sort = stateSort ?? setup.dataSource.sort;
+                        }
+                        completeLoading();
+
+                        return {
+                            //Saved indexes must be applied after rendering since the map only contains values for visible columns. sorting beforehand will move all currently invistible columns out of the original order.
+                            columnOrder: savedIndexes,
+                            pageSize: statePageSize ?? null
+                        }
+                    }, error => {
+                        return { columnOrder: [], pageSize: null };
+                    });
+            }
+
+            /**
+             * Loads the saved state from the different storages and combines with the personal options
+             * 
+             * @param columns
+             */
+            function getSavedGridOptions(columns: IKendoGridColumn<any>[]): Promise<IGridSavedState> {
+                var storedState = getStoredOptions(columns);
+                return checkServerGridConfig(overviewType)
+                    .then((savedOptions: boolean) => {
+                        return savedOptions ? getStoredOptions(columns) : storedState;
+                    }, () => storedState);
+            }
+
             // loads kendo grid options from localStorage
             function loadGridOptions(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters): void {
                 // load grid immediately from local storage data
@@ -130,7 +208,7 @@
 
             // gets all the saved options, both session and local, and merges
             // them together so that the correct options are overwritten
-            function getStoredOptions(grid: Kitos.IKendoGrid<any>): IGridSavedState {
+            function getStoredOptions(activeGridColumns: IKendoGridColumn<any>[]): IGridSavedState {
                 // load options from organization configuration storage
                 var orgStorageColumns: Models.Generic.IKendoColumnConfigurationDTO[];
                 var orgStorageColumnsItem = $window.localStorage.getItem(organizationalConfigurationColumnsKey);
@@ -194,7 +272,7 @@
                         var gridColumnWidths: { [persistId: string]: { width: number, originallyHidden: boolean } } = {};
 
                         // We need to iterate over all columns to hide them. During the iteration we also store the column widths and original hidden value in a map (In case we have a bad configuration and need to rebuild the old configuration)
-                        grid.columns.forEach(x => {
+                        activeGridColumns.forEach(x => {
                             gridColumnWidths[x.persistId] = { width: x.width as number, originallyHidden: x.hidden };
                             x.hidden = true;
                         });
@@ -222,7 +300,7 @@
                             // Remove the saved data from the server as the grid don't have any similar fields and is therefore invalid.
                             removeOrgConfig();
                             // We have to make the original columns visible again in order to not break the grid
-                            grid.columns.forEach(x => {
+                            activeGridColumns.forEach(x => {
                                 x.hidden = gridColumnWidths[x.persistId].originallyHidden;
                             });
                         } else {
@@ -339,14 +417,12 @@
                     });
             }
 
-            function deleteGridOrganizationalConfiguration(overviewType: Models.Generic.OverviewType) {
-                KendoFilterService.deleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
+            function deleteGridOrganizationalConfiguration(overviewType: Models.Generic.OverviewType): ng.IPromise<void> {
+                return KendoFilterService.deleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((res) => {
                         if (res.status === 200) {
-                            notify.addSuccessMessage("Organisationens kolonneopsætningen er slettet");
-                            removeSession();
-                            removeLocal();
-                            $state.go(".", null, { reload: true });
+                            notify.addSuccessMessage("Organisationens kolonneopsætningen er slettet og overblikket er nulstillet");
+                            reset();
                         }
                     }, (error) => {
                         notify.addErrorMessage("Der opstod en fejl i forsøget på at slette den gemte kolonneopsætningen");
@@ -355,7 +431,7 @@
 
             function loadGridProfile(grid: Kitos.IKendoGrid<any>): void {
                 removeSession();
-                var storedState = getStoredOptions(grid);
+                var storedState = getStoredOptions(grid.columns);
                 var gridOptions = _.omit(storedState, "columnState");
                 grid.setOptions(gridOptions);
             }
@@ -364,6 +440,13 @@
                 if ($window.localStorage.getItem(profileStorageKey))
                     return true;
                 return false;
+            }
+
+            function reset() {
+                removeLocal();
+                removeSession();
+                removeOrgConfig();
+                removeProfile();
             }
 
             function removeSession(): void {
@@ -470,7 +553,7 @@
 
             function loadGrid(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters) {
                 var gridId = grid.element[0].id;
-                var storedState = getStoredOptions(grid);
+                var storedState = getStoredOptions(grid.columns);
                 var columnState = <IGridSavedState>_.pick(storedState, "columnState");
 
                 var gridOptionsWithInitialFilter = _.merge({ dataSource: { filter: initialFilter } }, storedState);
@@ -531,10 +614,9 @@
                         }
                     }
                 });
-
                 grid.setOptions(gridOptions);
                 grid.dataSource.pageSize(grid.dataSource.options.pageSize);
-                gridLoading = false;
+                completeLoading();
             }
         }
     }

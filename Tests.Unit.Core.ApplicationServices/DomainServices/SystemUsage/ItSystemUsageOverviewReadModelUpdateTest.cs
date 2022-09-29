@@ -292,9 +292,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.GetFullName(), readModel.ObjectOwnerName);
             Assert.Equal(user.Id, readModel.LastChangedById);
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
-            Assert.Equal(systemUsage.LastChanged, readModel.LastChangedAt);
+            Assert.Equal(systemUsage.LastChanged.Date, readModel.LastChangedAt.Date);
             Assert.Equal(systemUsage.LifeCycleStatus, readModel.LifeCycleStatus);
-            Assert.Equal(systemUsage.Concluded, readModel.Concluded);
+            Assert.Equal(systemUsage.Concluded?.Date, readModel.Concluded?.Date);
+            Assert.Equal(systemUsage.ExpirationDate?.Date, readModel.ExpirationDate?.Date);
             Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
             Assert.Equal(systemUsage.Registertype, readModel.IsHoldingDocument);
             Assert.Equal(systemUsage.RiskSupervisionDocumentationUrlName, readModel.RiskSupervisionDocumentationName);

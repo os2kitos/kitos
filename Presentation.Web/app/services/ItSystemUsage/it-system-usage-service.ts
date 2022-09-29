@@ -1,6 +1,7 @@
 ﻿module Kitos.Services.ItSystemUsage {
 
     export interface IItSystemUsageService {
+        getItSystemUsage(systemUsageId: number): ng.IPromise<any>;
         addDataLevel(systemUsageId: number, dataLevel: number);
         removeDataLevel(systemUsageId: number, dataLevel: number);
         patchSystemUsage(systemUsageId: number, orgId: number, payload: any);
@@ -41,6 +42,11 @@
                     },
                     () => this.notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
         }
+        getItSystemUsage(systemUsageId: number): ng.IPromise<any> {
+            return this.$http.get<any>("api/itSystemUsage/" + systemUsageId)
+                .then(result => result.data.response)
+        }
+
     }
 
     app.service("itSystemUsageService", ItSystemUsageService);
