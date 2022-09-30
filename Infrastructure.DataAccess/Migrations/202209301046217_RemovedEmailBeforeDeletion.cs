@@ -9,7 +9,7 @@
         {
             DropColumn("dbo.User", "EmailBeforeDeletion");
             Sql(@"
-                UPDATE ""User""
+                UPDATE [User]
                 SET Name = 'Slettet bruger'
                 WHERE Deleted = 1;"
             );
