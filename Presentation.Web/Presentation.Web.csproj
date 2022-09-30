@@ -363,6 +363,7 @@
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />

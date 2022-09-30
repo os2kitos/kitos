@@ -61,17 +61,19 @@
                 var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
                 var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-                
+
+                if (Kitos.Helpers.ValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify)) {
+                    return;
+                }
+                if (Kitos.Helpers.ValidationHelper.checkIfDateIsInvalid(date, notify)) {
+                    return;
+                }
+
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId);
-                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                }
-                else if (fromDate >= endDate) {
-                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
-                }
+                } 
                 else {
                     const dateString = date.format(formatDateString);
                     var payload = {};
