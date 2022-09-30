@@ -19,9 +19,6 @@ namespace Core.DomainModel
         /* IT SUPPORT */
         public int ItSupportModuleNameId { get; set; }
         public string ItSupportGuide { get; set; }
-        public bool ShowTabOverview { get; set; }
-        public bool ShowColumnTechnology { get; set; }
-        public bool ShowColumnUsage { get; set; }
 
         public virtual Organization.Organization Organization { get; set; }
 
@@ -33,9 +30,6 @@ namespace Core.DomainModel
                     ShowItSystemModule = true,
                     ShowItContractPrefix = true,
                     ShowItSystemPrefix = true,
-                    ShowColumnTechnology = true,
-                    ShowColumnUsage = true,
-                    ShowTabOverview = true,
                     ShowDataProcessing = true,
                     ObjectOwner = objectOwner,
                     LastChangedByUser = objectOwner

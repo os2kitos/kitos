@@ -123,9 +123,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             //Arrange
             var body = new
             {
-                ShowColumnUsage = A<bool>(),
-                ShowTabOverview = A<bool>(),
-                ShowColumnTechnology = A<bool>(),
                 ShowItSystemModule = A<bool>(),
                 ShowItSystemPrefix = A<bool>(),
                 ShowItContractModule = A<bool>(),
@@ -141,9 +138,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             var configResponse = await LocalConfigHelper.GetLocalConfig(organizationId);
             Assert.Equal(HttpStatusCode.OK, configResponse.StatusCode);
             var config = await configResponse.ReadResponseBodyAsAsync<Config>();
-            Assert.Equal(body.ShowColumnUsage, config.ShowColumnUsage);
-            Assert.Equal(body.ShowTabOverview, config.ShowTabOverview);
-            Assert.Equal(body.ShowColumnTechnology, config.ShowColumnTechnology);
             Assert.Equal(body.ShowItSystemModule, config.ShowItSystemModule);
             Assert.Equal(body.ShowItSystemPrefix, config.ShowItSystemPrefix);
             Assert.Equal(body.ShowItContractModule, config.ShowItContractModule);
