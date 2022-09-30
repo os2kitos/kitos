@@ -140,15 +140,6 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
         }
 
-        public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Organization organization)
-        {
-            if (organization == null)
-            {
-                throw new ArgumentNullException(nameof(organization));
-            }
-            return _organizationService.ValidateConnection(organization);
-        }
-
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType1) root, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)
         {
             var processingStack = new Stack<Guid>();

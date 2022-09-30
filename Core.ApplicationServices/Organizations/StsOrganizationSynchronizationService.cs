@@ -14,17 +14,20 @@ namespace Core.ApplicationServices.Organizations
         private readonly IStsOrganizationUnitService _stsOrganizationUnitService;
         private readonly IOrganizationService _organizationService;
         private readonly ILogger _logger;
+        private readonly IStsOrganizationService _stsOrganizationService;
         private readonly IAuthorizationContext _authorizationContext;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
             IStsOrganizationUnitService stsOrganizationUnitService,
             IOrganizationService organizationService,
-            ILogger logger)
+            ILogger logger,
+            IStsOrganizationService stsOrganizationService)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
             _logger = logger;
+            _stsOrganizationService = stsOrganizationService;
             _authorizationContext = authorizationContext;
         }
 
@@ -36,7 +39,7 @@ namespace Core.ApplicationServices.Organizations
 
         private Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Organization organization)
         {
-            return _stsOrganizationUnitService.ValidateConnection(organization);
+            return _stsOrganizationService.ValidateConnection(organization);
         }
 
         public Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<uint> levelsToInclude)
