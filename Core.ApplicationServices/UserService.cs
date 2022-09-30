@@ -334,7 +334,7 @@ namespace Core.ApplicationServices
         private static void Delete(User user)
         {
             user.LockedOutDate = DateTime.Now;
-            user.EmailBeforeDeletion = user.Email;
+            user.Name = "Slettet bruger";
             user.Email = $"{Guid.NewGuid()}_deleted_user@kitos.dk";
             user.PhoneNumber = null;
             user.LastName = $"{(user.LastName ?? "").TrimEnd()} (SLETTET)";
