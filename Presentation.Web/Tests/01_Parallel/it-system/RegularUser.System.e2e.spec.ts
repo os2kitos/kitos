@@ -25,14 +25,6 @@ describe("Regular user IT Systems tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    it("Apply and delete filter buttons are disabled", () => {
-        loginHelper.loginAsRegularUser()
-            .then(() => pageObject.getPage())
-            .then(() => browser.wait(ec.presenceOf(headerButtons.useFilter), waitUpTo.twentySeconds))
-            .then(() => expect(headerButtonsHelper.isUseDisabled()).toEqual("true"))
-            .then(() => expect(headerButtonsHelper.isDeleteDisabled()).toEqual("true"));
-    });
-
     it("Can open IT system",() => {
         loginHelper.loginAsRegularUser()
             .then(() => pageObject.getPage())
