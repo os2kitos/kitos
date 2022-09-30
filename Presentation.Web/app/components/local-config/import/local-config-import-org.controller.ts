@@ -10,11 +10,12 @@
     ]);
 
     app.controller('local-config.import.ImportOrgCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', 'user',
-        function ($rootScope, $scope, $http, notify, user) {
+        '$scope', '$http', 'notify', 'user',
+        function ($scope, $http, notify, user) {
             $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportOrgUnits';
             $scope.title = 'organisationsenheder';
-
+            $scope.showFkOrgImport = true;
+            $scope.currentOrganizationUuid = user.currentOrganizationUuid;
             //Import OrganizationUnits
             $scope.submit = function () {
                 var msg = notify.addInfoMessage("Læser excel ark...", false);
