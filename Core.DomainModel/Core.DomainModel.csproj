@@ -238,7 +238,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
-    <Compile Include="Organization\TaskUsage.cs" />
     <Compile Include="Qa\References\BrokenExternalReferencesReport.cs" />
     <Compile Include="Qa\References\BrokenLinkCause.cs" />
     <Compile Include="Qa\References\BrokenLinkInInterface.cs" />

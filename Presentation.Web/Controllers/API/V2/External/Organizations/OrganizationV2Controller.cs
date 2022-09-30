@@ -251,11 +251,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 Name = unit.Name,
                 UnitId = unit.LocalId,
                 Ean = unit.Ean,
-                ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO()),
-                Kle = unit
-                    .TaskUsages
-                    .Select(taskUsage => taskUsage.TaskRef.MapIdentityNamePairDTO())
-                    .ToList()
+                ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO())
             };
         }
         private OrganizationUserResponseDTO ToUserResponseDTO((Guid organizationUuid, User user) context)

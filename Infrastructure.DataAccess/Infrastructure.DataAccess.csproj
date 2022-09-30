@@ -134,7 +134,6 @@
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />
-    <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRoleMap.cs" />
@@ -935,6 +934,10 @@
     <Compile Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.designer.cs">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202209300954018_Remove_TaskUsage.cs" />
+    <Compile Include="Migrations\202209300954018_Remove_TaskUsage.designer.cs">
+      <DependentUpon>202209300954018_Remove_TaskUsage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1557,6 +1560,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.resx">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209300954018_Remove_TaskUsage.resx">
+      <DependentUpon>202209300954018_Remove_TaskUsage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

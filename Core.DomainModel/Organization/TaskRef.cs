@@ -18,7 +18,6 @@ namespace Core.DomainModel.Organization
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.ItSystemUsagesOptOut = new List<ItSystemUsage.ItSystemUsage>();
-            this.Usages = new List<TaskUsage>();
         }
 
         /// <summary>
@@ -54,11 +53,6 @@ namespace Core.DomainModel.Organization
 
         public virtual TaskRef Parent { get; set; }
         public virtual ICollection<TaskRef> Children { get; set; }
-
-        /// <summary>
-        /// Usages of this task
-        /// </summary>
-        public virtual ICollection<TaskUsage> Usages { get; set; }
 
         /// <summary>
         /// ItSystems which have been marked with this task

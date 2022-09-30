@@ -1047,7 +1047,6 @@
     <Compile Include="Controllers\API\V1\ItSystemUsageController.cs" />
     <Compile Include="Models\API\V1\DataRowDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemDTO.cs" />
-    <Compile Include="Controllers\API\V1\TaskUsageController.cs" />
     <Compile Include="Models\API\V1\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\API\V1\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitController.cs" />
@@ -1084,10 +1083,7 @@
     <Compile Include="Models\API\V1\RightInputDTO.cs" />
     <Compile Include="Models\API\V1\RoleDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefSelectedDTO.cs" />
-    <Compile Include="Models\API\V1\TaskRefUsageDTO.cs" />
-    <Compile Include="Models\API\V1\TaskUsageDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefDTO.cs" />
-    <Compile Include="Models\API\V1\TaskUsageNestedDTO.cs" />
     <Compile Include="Models\API\V1\TextDTO.cs" />
     <Compile Include="Models\API\V1\UserDTO.cs" />
     <Compile Include="Models\API\V1\UserOrganizationsDTO.cs" />
