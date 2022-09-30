@@ -16,8 +16,8 @@
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$location", "$",
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $location, $) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "notify", "userService", "texts", "navigationService", "$sce", "$location", "$", "featureToggleService",
+        ($rootScope, $scope, $http, $state, notify, userService, texts, navigationService, $sce, $location, $, featureToggleService: Kitos.Services.FeatureToggle.IFeatureToggleService) => {
 
             const factory = new Kitos.Models.ViewModel.Sso.SsoStateViewModelFactory($);
             let ssoStateViewModel = factory.createFromViewState();
@@ -28,6 +28,12 @@
                     $state.go(ssoStateViewModel.startPreference, null, { reload: true });
                     return;
                 }
+            }
+
+            const ftFactory = new Kitos.Models.ViewModel.FeatureToggle.FeatureToggleViewModelFactory($);
+            const ftViewModel = ftFactory.createFromViewState();
+            if (ftViewModel.featureToggle !== null) {
+                featureToggleService.addFeature(ftViewModel.featureToggle);
             }
 
             $rootScope.page.title = "Index";
