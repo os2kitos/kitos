@@ -41,7 +41,7 @@
         ) {
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
             const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
-
+            
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
@@ -82,15 +82,15 @@
                     }];
             }
 
-            var showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
-            var self = this;
 
+            var self = this;
+            var showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
             updateToggleActiveSystemsFilterBtnText();
 
             function updateToggleActiveSystemsFilterBtnText(): string {
                 return showInactiveSystems
-                    ? "Vis ikke aktive IT Systemer"
-                    : "Vis aktive IT Systemer";
+                    ? "Vis aktive IT Systemer"
+                    : "Vis ikke aktive IT Systemer";
             }
             
             function toggleActiveSystemsMasterFilter(): void {
@@ -195,7 +195,7 @@
 
                     const existing = parameterMap.$filter;
                     const hadExisting = _.isEmpty(existing) === false;
-                    parameterMap.$filter = `SystemActive eq ${showInactiveSystems ? "true" : "false"} ${hadExisting ? " and (" + existing + ")" : ""}`;
+                    parameterMap.$filter = `SystemActive eq ${showInactiveSystems ? "false" : "true"} ${hadExisting ? " and (" + existing + ")" : ""}`;
                     if (hadExisting) {
                         parameterMap.$filter = `(${parameterMap.$filter})`;
                     }
