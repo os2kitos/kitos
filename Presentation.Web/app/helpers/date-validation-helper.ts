@@ -1,8 +1,8 @@
 ﻿module Kitos.Helpers {
-    export class ValidationHelper {
-        static checkIfStartDateIsGreaterThanEndDate(startDate: moment.Moment, endDate: moment.Moment, notify): boolean {
+    export class DateValidationHelper {
+        static checkIfStartDateIsGreaterThanEndDate(startDate: moment.Moment, endDate: moment.Moment, notify, startDateFieldName: string, endDateFieldName: string): boolean {
             if (startDate >= endDate) {
-                notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
+                notify.addErrorMessage(`Den indtastede ${endDateFieldName} er før ${startDateFieldName}.`);
                 return true;
             }
 

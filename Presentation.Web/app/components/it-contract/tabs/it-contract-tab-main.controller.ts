@@ -271,12 +271,6 @@
                     var date = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, "YYYY-MM-DDTHH:mm:ssZ"], true);
                     var payload = {};
 
-                    if (Kitos.Helpers.ValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify)) {
-                        return;
-                    }
-                    if (Kitos.Helpers.ValidationHelper.checkIfDateIsInvalid(date, notify)) {
-                        return;
-                    }
 
                     if (value === "") {
                         payload[field] = null;
@@ -285,6 +279,12 @@
                     }
                     else if (value == null) {
                         //made to prevent error message on empty value i.e. open close datepicker
+                    }
+                    else if (Kitos.Helpers.DateValidationHelper.checkIfDateIsInvalid(date, notify)) {
+                        return;
+                    }
+                    else if (Kitos.Helpers.DateValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify, "startdatoen", "slutdato")) {
+                        return;
                     }
                     else {
                         var dateString = date.format("YYYY-MM-DD");

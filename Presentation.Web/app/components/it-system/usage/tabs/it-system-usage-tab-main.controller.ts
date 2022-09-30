@@ -61,19 +61,18 @@
                 var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
                 var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-
-                if (Kitos.Helpers.ValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify)) {
-                    return;
-                }
-                if (Kitos.Helpers.ValidationHelper.checkIfDateIsInvalid(date, notify)) {
-                    return;
-                }
-
+                
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId);
                 } 
+                else if (Kitos.Helpers.DateValidationHelper.checkIfDateIsInvalid(date, notify)) {
+                    return;
+                }
+                else if (Kitos.Helpers.DateValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify, "Ibrugtagningsdato", "Slutdato")) {
+                    return;
+                }
                 else {
                     const dateString = date.format(formatDateString);
                     var payload = {};
