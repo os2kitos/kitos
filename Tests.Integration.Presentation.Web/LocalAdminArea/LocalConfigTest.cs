@@ -15,7 +15,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             //Arrange
             var body = new
             {
-                ShowColumnUsage = true
+                ShowItSystemModule = true
             };
             const int organizationId = TestEnvironment.SecondOrganizationId;
 
@@ -24,45 +24,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-        }
-
-        [Fact]
-        public async Task Can_Set_Column_Usage()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowColumnUsage = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-
-        [Fact]
-        public async Task Can_Set_Tab_Overview()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowTabOverview = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-        
-        [Fact]
-        public async Task Can_Set_Column_Technology_Usage()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowColumnTechnology = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
         }
 
         [Fact]
