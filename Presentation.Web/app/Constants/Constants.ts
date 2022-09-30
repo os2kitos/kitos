@@ -48,21 +48,21 @@
 
     export class CustomFilterDropdown {
         static readonly Id = "combinedFilterButtonsDropDownList";
-        static readonly DefaultTitle = "Choose filter option";
+        static readonly DefaultTitle = "Filtrering og sortering";
 
         static readonly SaveFilter = {
             Id: "saveFilter",
-            Text: "Gem filter",
+            Text: "Gem",
         };
 
         static readonly UseFilter = {
             Id: "useFilter",
-            Text: "Anvend filter",
+            Text: "Anvend",
         };
 
         static readonly DeleteFilter = {
             Id: "deleteFilter",
-            Text: "Slet filter"
+            Text: "Slet"
         };
 
         static readonly DefaultOptionFilter = {

@@ -43,6 +43,7 @@
             const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
             
             $rootScope.page.title = "IT System - Overblik";
+            const pageName = "systemUsage";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
             //Lookup maps
@@ -84,19 +85,18 @@
 
 
             var self = this;
-            var showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
-            updateToggleActiveSystemsFilterBtnText();
+            var showInactiveSystems = ItSystem.Settings.OverviewState.getShowInactiveSystems($window, user.id, pageName);
 
-            function updateToggleActiveSystemsFilterBtnText(): string {
+            function getToggleActiveSystemsFilterBtnText(): string {
                 return showInactiveSystems
                     ? "Vis aktive IT Systemer"
-                    : "Vis ikke aktive IT Systemer";
+                    : "Vis \"ikke aktive\" IT Systemer";
             }
-            
+                                              
             function toggleActiveSystemsMasterFilter(): void {
                 showInactiveSystems = !showInactiveSystems;
-                ItSystem.Settings.CatalogState.setShowInactiveSystems($window, user.id, showInactiveSystems);
-                updateToggleActiveSystemsFilterBtnText();
+                ItSystem.Settings.OverviewState.setShowInactiveSystems($window, user.id, pageName, showInactiveSystems);
+                getToggleActiveSystemsFilterBtnText();
                 self.mainGrid.dataSource.read();
             }
 
@@ -278,8 +278,8 @@
 
             launcher = launcher.withToolbarEntry({
                 id: "toggleActiveSystemsFilter",
-                title: updateToggleActiveSystemsFilterBtnText(),
-                getTitle: () => updateToggleActiveSystemsFilterBtnText(),
+                title: getToggleActiveSystemsFilterBtnText(),
+                getTitle: () => getToggleActiveSystemsFilterBtnText(),
                 color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,

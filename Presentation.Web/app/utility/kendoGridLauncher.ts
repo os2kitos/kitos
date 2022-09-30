@@ -762,12 +762,20 @@ module Kitos.Utility.KendoGrid {
                 }
             };
 
+            const filterDropdown = this.setupFilterDropdown();
+            this.customToolbarEntries.unshift(filterDropdown);
+
             var toolbar = [
                 {
                     name: "clearFilter",
                     text: "Gendan kolonneopsætning",
                     template:
                         "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
+                },
+                {
+                    name: filterDropdown.id,
+                    text: filterDropdown.title,
+                    template: `<select data-element-type='${filterDropdown.id}DropDownList' id='${filterDropdown.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(filterDropdown.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(filterDropdown.margins)}' kendo-drop-down-list="kendoVm.${filterDropdown.id}.list" k-options="kendoVm.${filterDropdown.id}.getOptions()"></select>`
                 },
                 {
                     name: "filterOrg",
@@ -780,9 +788,6 @@ module Kitos.Utility.KendoGrid {
                     template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
-
-            const filterDropdown = this.setupFilterDropdown();
-            this.customToolbarEntries.unshift(filterDropdown);
 
             //Add the excel export button with multiple options
             const excelExportDropdownEntry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid);
@@ -846,17 +851,13 @@ module Kitos.Utility.KendoGrid {
                         };
                         break;
                     case KendoToolbarImplementation.CustomTemplateDropDownList:
-
-                        const dropdown = {
-                            name: entry.id,
-                            text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
-                        };
-
-                        if (entry.id === Constants.CustomFilterDropdown.Id) {
-                            toolbar.splice(1, 0, dropdown);
-                        } else {
-                            toolbar.push(dropdown);
+                        
+                        if (entry.id !== Constants.CustomFilterDropdown.Id) {
+                            toolbar.push({
+                                name: entry.id,
+                                text: entry.title,
+                                template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            });
                         }
 
                         this.$scope.kendoVm[entry.id] = {
