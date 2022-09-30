@@ -9,8 +9,6 @@ describe("Regular user IT Systems tests", () => {
     var pageObject = new ItSystemOverviewPo(); 
     var waitUpTo = new WaitTimers();
     var testFixture = new TestFixtureWrapper();
-    var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
-    var headerButtonsHelper = pageObject.kendoToolbarHelper.headerButtons;
     var gridObjects = pageObject.kendoToolbarWrapper.columnObjects();
 
     afterEach(() => {
