@@ -223,7 +223,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.True(readModel.ActiveAccordingToLifeCycle);
             Assert.True(readModel.SystemActive);
             Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChangedAt.Date);
-            Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
             Assert.Equal(linkToDirectoryUrlName, readModel.LinkToDirectoryName);
