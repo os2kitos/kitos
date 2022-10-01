@@ -207,7 +207,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <returns>An organization unit</returns>
         [HttpGet]
         [Route("organizations/{organizationUuid}/organization-units/{organizationUnitId}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUnitResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
