@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.SSO;
 using Core.DomainModel.Tracking;
+using Core.DomainModel.Users;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -50,6 +51,22 @@ namespace Core.DomainModel
         /// User has been granted api access
         /// </summary>
         public bool? HasApiAccess { get; set; }
+
+        public IEnumerable<AuthenticationScheme> GetAuthenticationSchemes()
+        {
+            if (CanAuthenticate())
+            {
+                if (HasApiAccess == true)
+                {
+                    //API users can only authenticate with tokens
+                    yield return AuthenticationScheme.Token;
+                }
+                else
+                {
+                    yield return AuthenticationScheme.Cookie;
+                }
+            }
+        }
         /// <summary>
         /// User has been marked as a user with stake holder access
         /// </summary>
