@@ -278,7 +278,6 @@
 
             launcher = launcher.withToolbarEntry({
                 id: "toggleActiveSystemsFilter",
-                title: getToggleActiveSystemsFilterBtnText(),
                 getTitle: () => getToggleActiveSystemsFilterBtnText(),
                 color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,

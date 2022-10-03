@@ -473,7 +473,7 @@ module Kitos.Utility.KendoGrid {
     }
 
     export interface IKendoToolbarEntry {
-        title: string;
+        title?: string;
         getTitle?: () => string;
         id: string;
         onClick?: () => void;
@@ -794,6 +794,12 @@ module Kitos.Utility.KendoGrid {
             this.customToolbarEntries.push(excelExportDropdownEntry);
 
             this._.forEach(this.customToolbarEntries, entry => {
+                if (!entry.title && !entry.getTitle) {
+                    throw `Invalid toolbar implementation: either "title" or "getTitle" has to be defined`;
+                }
+                if (entry.title && entry.getTitle) {
+                    throw `Invalid toolbar implementation: both "title" and "getTitle" cannot be defined at the same time`;
+                }
 
                 switch (entry.implementation) {
                     case KendoToolbarImplementation.Button:
@@ -859,7 +865,6 @@ module Kitos.Utility.KendoGrid {
                                 template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                             });
                         }
-
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
                             getOptions: () => {
@@ -875,8 +880,7 @@ module Kitos.Utility.KendoGrid {
 
                                         return item.template;
                                     }),
-                                    //Always show the title in the combobox selector
-                                    valueTemplate: (_) => entry.title,
+                                    optionLabel: entry.title,
                                     change: (e) => {
                                         try {
                                             this.triggerSelectedOptionChanged(e, entry);
@@ -1051,22 +1055,18 @@ module Kitos.Utility.KendoGrid {
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: (newItem: ICustomKendoToolbarDropDownEntry) => {
-                        if (!newItem) {
+                        const dropdown = jQuery(`#${Constants.CustomFilterDropdown.Id}`).data(Constants.KendoDropdown.DataKey);
+                        if (!newItem || !newItem.enabled()) {
+                            dropdown.value(Constants.CustomFilterDropdown.Id);
                             return;
                         }
 
                         newItem.onClick();
                         
-                        const dropdown = jQuery(`#${Constants.CustomFilterDropdown.Id}`).data(Constants.KendoDropdown.DataKey);
-                        dropdown.value(Constants.CustomFilterDropdown.DefaultOptionFilter.Id);
+                        dropdown.value(Constants.CustomFilterDropdown.Id);
                         dropdown.dataSource.read();
                     },
                     availableOptions: [
-                        {
-                            id: Constants.CustomFilterDropdown.DefaultOptionFilter.Id,
-                            text: Constants.CustomFilterDropdown.DefaultOptionFilter.Text,
-                            enabled: () => false
-                        },
                         {
                             id: Constants.CustomFilterDropdown.SaveFilter.Id,
                             text: Constants.CustomFilterDropdown.SaveFilter.Text,
@@ -1099,8 +1099,8 @@ module Kitos.Utility.KendoGrid {
             } as IKendoToolbarEntry;
         }
 
-        private triggerSelectedOptionChanged(e: {sender: {value: () => string }}, entry: IKendoToolbarEntry): void {
-            var selectedId = e.sender.value();
+        private triggerSelectedOptionChanged(e: {sender: {value: () => string}}, entry: IKendoToolbarEntry): void {
+            const selectedId = e.sender.value();
             const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
             entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
                 ? newSelection[0]
