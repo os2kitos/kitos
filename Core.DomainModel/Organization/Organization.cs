@@ -126,6 +126,7 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<UIModuleCustomization> UIModuleCustomizations { get; set; }
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ArchiveSupplierForItSystems { get; set; }
+        public virtual StsOrganizationConnection StsOrganizationConnection { get; set; }
 
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace Core.DomainModel.Organization
         {
             if (module == null)
                 throw new ArgumentNullException(nameof(module));
-            
+
             return UIModuleCustomizations
                 .SingleOrDefault(config => config.Module == module)
                 .FromNullable();
@@ -167,14 +168,14 @@ namespace Core.DomainModel.Organization
                 throw new ArgumentNullException("Module parameter cannot be null");
             if (nodes == null)
                 throw new ArgumentNullException("Nodes parameter cannot be null");
-            
+
             var uiNodes = nodes.ToList();
             var customizedUiNodes = uiNodes.ToList();
-            
+
             var moduleCustomization = GetUiModuleCustomization(module).GetValueOrDefault();
             if (moduleCustomization == null)
             {
-                moduleCustomization = new UIModuleCustomization {Organization = this, Module = module};
+                moduleCustomization = new UIModuleCustomization { Organization = this, Module = module };
                 UIModuleCustomizations.Add(moduleCustomization);
             }
 

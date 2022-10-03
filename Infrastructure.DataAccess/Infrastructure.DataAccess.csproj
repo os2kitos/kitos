@@ -95,6 +95,7 @@
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
+    <Compile Include="Mapping\StsOrganizationConnectionMap.cs" />
     <Compile Include="Mapping\StsOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
@@ -935,9 +936,9 @@
     <Compile Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.designer.cs">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202210030546163_Add_Organization_Unit_Origin_Info.cs" />
-    <Compile Include="Migrations\202210030546163_Add_Organization_Unit_Origin_Info.designer.cs">
-      <DependentUpon>202210030546163_Add_Organization_Unit_Origin_Info.cs</DependentUpon>
+    <Compile Include="Migrations\202210030613577_Add_Organization_Unit_Origin_Info.cs" />
+    <Compile Include="Migrations\202210030613577_Add_Organization_Unit_Origin_Info.designer.cs">
+      <DependentUpon>202210030613577_Add_Organization_Unit_Origin_Info.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1562,8 +1563,8 @@
     <EmbeddedResource Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.resx">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202210030546163_Add_Organization_Unit_Origin_Info.resx">
-      <DependentUpon>202210030546163_Add_Organization_Unit_Origin_Info.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202210030613577_Add_Organization_Unit_Origin_Info.resx">
+      <DependentUpon>202210030613577_Add_Organization_Unit_Origin_Info.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

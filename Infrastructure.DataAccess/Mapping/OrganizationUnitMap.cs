@@ -39,7 +39,7 @@ namespace Infrastructure.DataAccess.Mapping
                 //Non-unique index since it's an external origin uuid determined by an external system
                 .HasIndexAnnotation("IX_OrganizationUnit_UUID");
 
-            Property(x => x.OrganizationId)
+            Property(x => x.Origin)
                 .IsRequired()
                 .HasIndexAnnotation("IX_OrganizationUnit_Origin");
         }
