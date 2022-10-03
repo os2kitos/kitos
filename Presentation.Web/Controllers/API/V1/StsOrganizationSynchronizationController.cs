@@ -32,34 +32,7 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("connection-status")] //TODO: Obsolete this endpoint and add the access status to the other one!
-        public HttpResponseMessage GetConnectionStatus(Guid organizationId)
-        {
-            return _stsOrganizationSynchronizationService
-                .ValidateConnection(organizationId)
-                .Match
-                (
-                    error => Ok(new StsOrganizationConnectionResponseDTO
-                    {
-                        AccessStatus = new StsOrganizationAccessStatusResponseDTO
-                        {
-                            AccessGranted = false,
-                            Error = error.Detail
-                        }
-                    }),
-                    () => Ok(new StsOrganizationConnectionResponseDTO
-                    {
-                        AccessStatus = new StsOrganizationAccessStatusResponseDTO
-                        {
-                            AccessGranted = true
-                        }
-                    })
-                );
-
-        }
-
-        [HttpGet]
-        [Route("synchronization-status")]
+        [Route("connection-status")]
         public HttpResponseMessage GetSynchronizationStatus(Guid organizationId)
         {
             return _stsOrganizationSynchronizationService
@@ -70,7 +43,12 @@ namespace Presentation.Web.Controllers.API.V1
                     SynchronizationDepth = details.SynchronizationDepth,
                     CanCreateConnection = details.CanCreateConnection,
                     CanDeleteConnection = details.CanDeleteConnection,
-                    CanUpdateConnection = details.CanUpdateConnection
+                    CanUpdateConnection = details.CanUpdateConnection,
+                    AccessStatus = new StsOrganizationAccessStatusResponseDTO
+                    {
+                        AccessGranted = details.CheckConnectionError == null,
+                        Error = details.CheckConnectionError
+                    }
                 })
                 .Match(Ok, FromOperationError);
 

@@ -2,6 +2,7 @@
 {
     public class StsOrganizationSynchronizationDetailsResponseDTO
     {
+        public StsOrganizationAccessStatusResponseDTO AccessStatus { get; set; }
         public bool Connected { get; set; }
         public int? SynchronizationDepth { get; set; }
         public bool CanCreateConnection { get; set; }

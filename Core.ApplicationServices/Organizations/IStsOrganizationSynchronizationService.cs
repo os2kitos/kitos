@@ -8,12 +8,6 @@ namespace Core.ApplicationServices.Organizations
     public interface IStsOrganizationSynchronizationService
     {
         /// <summary>
-        /// Validates if KITOS can read organization data from STS Organisation
-        /// </summary>
-        /// <param name="organizationId"></param>
-        /// <returns></returns>
-        Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Guid organizationId);
-        /// <summary>
         /// Gets the synchronization details of the organization
         /// </summary>
         /// <param name="organizationId"></param>

@@ -61,7 +61,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var root = await response.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationConnectionResponseDTO>();
+            var root = await response.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
             Assert.Equal(expectConnected, root.AccessStatus.AccessGranted);
             Assert.Equal(expectedError, root.AccessStatus.Error);
         }

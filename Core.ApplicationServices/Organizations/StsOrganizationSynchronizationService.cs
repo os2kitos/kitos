@@ -32,12 +32,6 @@ namespace Core.ApplicationServices.Organizations
             _authorizationContext = authorizationContext;
         }
 
-        public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Guid organizationId)
-        {
-            return GetOrganizationWithImportPermission(organizationId)
-                .Match(ValidateConnection, error => new DetailedOperationError<CheckConnectionError>(error.FailureType, CheckConnectionError.Unknown, error.Message.GetValueOrDefault()));
-        }
-
         public Result<StsOrganizationSynchronizationDetails, OperationError> GetSynchronizationDetails(Guid organizationId)
         {
             return GetOrganizationWithImportPermission(organizationId)
@@ -47,7 +41,15 @@ namespace Core.ApplicationServices.Organizations
                     var isConnected = organization.StsOrganizationConnection?.Connected == true;
                     var canCreateConnection = currentConnectionStatus.IsNone && organization.StsOrganizationConnection?.Connected != true;
                     var canUpdateConnection = currentConnectionStatus.IsNone && isConnected;
-                    return new StsOrganizationSynchronizationDetails(isConnected, organization.StsOrganizationConnection?.SynchronizationDepth, canCreateConnection, canUpdateConnection, isConnected);
+                    return new StsOrganizationSynchronizationDetails
+                    (
+                        isConnected,
+                        organization.StsOrganizationConnection?.SynchronizationDepth,
+                        canCreateConnection,
+                        canUpdateConnection,
+                        isConnected,
+                        currentConnectionStatus.Match(error => error.Detail, () => default(CheckConnectionError?))
+                    );
                 });
         }
 
