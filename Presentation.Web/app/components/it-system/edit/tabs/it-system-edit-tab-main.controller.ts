@@ -39,12 +39,12 @@
                 $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2(
                     "api/itsystem",
                     true,
-                    [`excludeId=${itSystem.id}`, `orgId=${user.currentOrganizationId}`, `take=25`],
+                    [`excludeId=${itSystem.id}`, `orgId=${user.currentOrganizationId}`, `take=100`],
                     false);
                 $scope.organizationSelectOptions = select2LoadingService.loadSelect2(
                     "api/organization",
                     true,
-                    [`orgId=${user.currentOrganizationId}`, 'take=25'],
+                    [`orgId=${user.currentOrganizationId}`, 'take=100'],
                     false);
 
                 $scope.hasWriteAccess = hasWriteAccess;
