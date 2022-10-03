@@ -319,7 +319,7 @@
                     },
                     {
 
-                        field: "hasApi", title: "API adgang", width: 96,
+                        field: "hasApi", title: "API bruger", width: 96,
                         persistId: "apiaccess", 
                         attributes: { "class": "text-center", "data-element-type": "userObject" },
                         headerAttributes: {

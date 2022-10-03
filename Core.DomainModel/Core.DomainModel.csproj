@@ -261,6 +261,7 @@
     <Compile Include="UIConfiguration\UIModuleCustomization.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationConstraints.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Users\AuthenticationScheme.cs" />
     <Compile Include="Users\UserConstraints.cs" />
   </ItemGroup>
   <ItemGroup>
