@@ -61,9 +61,9 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var root = await response.ReadResponseBodyAsKitosApiResponseAsync<CheckStsOrganizationConnectionResponseDTO>();
-            Assert.Equal(expectConnected, root.Connected);
-            Assert.Equal(expectedError, root.Error);
+            var root = await response.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationConnectionResponseDTO>();
+            Assert.Equal(expectConnected, root.AccessStatus.AccessGranted);
+            Assert.Equal(expectedError, root.AccessStatus.Error);
         }
 
         private async Task<Guid> GetOrCreateOrgWithCvr(GetTokenResponseDTO token, string cvr)

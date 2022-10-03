@@ -39,14 +39,20 @@ namespace Presentation.Web.Controllers.API.V1
                 .ValidateConnection(organizationId)
                 .Match
                 (
-                    error => Ok(new CheckStsOrganizationConnectionResponseDTO
+                    error => Ok(new StsOrganizationConnectionResponseDTO
                     {
-                        Error = error.Detail,
-                        Connected = false
+                        AccessStatus = new StsOrganizationAccessStatusResponseDTO
+                        {
+                            AccessGranted = false,
+                            Error = error.Detail
+                        }
                     }),
-                    () => Ok(new CheckStsOrganizationConnectionResponseDTO()
+                    () => Ok(new StsOrganizationConnectionResponseDTO
                     {
-                        Connected = true
+                        AccessStatus = new StsOrganizationAccessStatusResponseDTO
+                        {
+                            AccessGranted = true
+                        }
                     })
                 );
 

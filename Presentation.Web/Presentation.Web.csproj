@@ -366,7 +366,8 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
-    <TypeScriptCompile Include="app\models\Api\organization\check-sts-organization-connection-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\sts-organization-access-status-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\sts-organization-connection-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
@@ -400,7 +401,8 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\CheckStsOrganizationConnectionResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationConnectionResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
     <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
