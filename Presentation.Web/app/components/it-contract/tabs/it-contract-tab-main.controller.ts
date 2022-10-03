@@ -265,9 +265,6 @@
                 $scope.checkContractValidity = (field, value) => {
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
-                    var formatDateString = "YYYY-MM-DD";
-                    var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day');
-                    var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day');
                     var date = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, "YYYY-MM-DDTHH:mm:ssZ"], true);
                     var payload = {};
 
@@ -280,10 +277,7 @@
                     else if (value == null) {
                         //made to prevent error message on empty value i.e. open close datepicker
                     }
-                    else if (Kitos.Helpers.DateValidationHelper.checkIfDateIsInvalid(date, notify)) {
-                        return;
-                    }
-                    else if (Kitos.Helpers.DateValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify, "startdatoen", "slutdato")) {
+                    else if (Kitos.Helpers.DateValidationHelper.validateInterval(date, concluded, expirationDate, notify, "Gyldig fra", "Gyldig til") === false) {
                         return;
                     }
                     else {

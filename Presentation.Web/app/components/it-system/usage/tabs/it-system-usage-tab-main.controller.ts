@@ -57,9 +57,6 @@
                 
                 var expirationDate = $scope.usage.expirationDate;
                 var concluded = $scope.usage.concluded;
-                var formatDateString = "YYYY-MM-DD";
-                var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
-                var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 
                 if (value === "" || value == undefined) {
@@ -67,14 +64,11 @@
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId);
                 } 
-                else if (Kitos.Helpers.DateValidationHelper.checkIfDateIsInvalid(date, notify)) {
-                    return;
-                }
-                else if (Kitos.Helpers.DateValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify, "Ibrugtagningsdato", "Slutdato")) {
+                else if (Kitos.Helpers.DateValidationHelper.validateInterval(date, concluded, expirationDate, notify, "Ibrugtagningsdato", "Slutdato for anvendelse")) {
                     return;
                 }
                 else {
-                    const dateString = date.format(formatDateString);
+                    const dateString = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = dateString;
                     patch(payload, saveUrlWithOrgId);
