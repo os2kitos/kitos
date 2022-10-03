@@ -682,9 +682,9 @@ module Kitos.Utility.KendoGrid {
 
         saveGridForOrganization() {
             if (confirm(`Er du sikker på at du vil gemme nuværende kolonneopsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
-                this.gridState
+                return this.gridState
                     .saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType)
-                    .then(() => this.reload());
+                    .then(()=>this.$state.reload());
             }
         }
 
@@ -753,12 +753,6 @@ module Kitos.Utility.KendoGrid {
                 standardToolbar: {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
                     clearOptions: () => this.clearOptions(),
-                    saveGridProfile: () => this.saveGridProfile(),
-                    doesGridProfileExist: () => this.doesGridProfileExist(),
-                    saveGridForOrganization: () => this.saveGridForOrganization(),
-                    clearGridForOrganization: () => this.clearGridForOrganization(),
-                    showGridForOrganizationButtons: () => this.showGridForOrganizationButtons(),
-                    canDeleteGridForOrganization: () => this.canDeleteGridForOrganization(),
                     doesGridDivergeFromDefault: () => this.doesGridDivergeFromDefault(),
                     gridDivergenceText: () => this.doesGridDivergeFromDefault() ? "OBS: Opsætning af overblik afviger fra kommunens standardoverblik. Tryk på 'Gendan kolonneopsætning' for at benytte den gældende opsætning" : ""
                 }
@@ -1115,10 +1109,7 @@ module Kitos.Utility.KendoGrid {
                         {
                             id: Constants.LocalAdminDropdown.RemoveFilterOrg.Id,
                             text: Constants.LocalAdminDropdown.RemoveFilterOrg.Text,
-                            enabled: () => {
-                                const res = self.canDeleteGridForOrganization();
-                                return res;
-                            },
+                            enabled: () =>  self.canDeleteGridForOrganization(),
                             onClick: () => this.clearGridForOrganization(),
                             get template(): string {
                                 return self.getKendoDisabledTemplate(this);
@@ -1151,7 +1142,7 @@ module Kitos.Utility.KendoGrid {
         }
 
         private getKendoDisabledTemplate(item: ICustomKendoToolbarDropDownEntry): string {
-            return `<span class="${!item.enabled() ? "faded-gray" : ""}">${item.text}</span>`;
+            return `<span ng-class="{'faded-gray': ${!item.enabled()}}">${item.text}</span>`;
         }
     }
 
