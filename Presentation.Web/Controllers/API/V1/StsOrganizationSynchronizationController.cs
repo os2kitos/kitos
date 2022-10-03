@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("connection-status")]
+        [Route("connection-status")] //TODO: Obsolete this endpoint and add the access status to the other one!
         public HttpResponseMessage GetConnectionStatus(Guid organizationId)
         {
             return _stsOrganizationSynchronizationService
