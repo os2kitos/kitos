@@ -1,6 +1,7 @@
-﻿namespace Infrastructure.DataAccess.Migrations
+﻿using Infrastructure.DataAccess.Tools;
+
+namespace Infrastructure.DataAccess.Migrations
 {
-    using System;
     using System.Data.Entity.Migrations;
     
     public partial class RemovedEmailBeforeDeletion : DbMigration
@@ -13,8 +14,9 @@
                 SET Name = 'Slettet bruger'
                 WHERE Deleted = 1;"
             );
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Users_Not_Associated_With_Any_Org.sql"));
         }
-        
+
         public override void Down()
         {
             AddColumn("dbo.User", "EmailBeforeDeletion", c => c.String());
