@@ -1,4 +1,3 @@
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -33,6 +32,16 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_OrganizationUnit_UUID", 0);
+
+
+            Property(x => x.ExternalOriginUuid)
+                .IsOptional()
+                //Non-unique index since it's an external origin uuid determined by an external system
+                .HasIndexAnnotation("IX_OrganizationUnit_UUID");
+
+            Property(x => x.OrganizationId)
+                .IsRequired()
+                .HasIndexAnnotation("IX_OrganizationUnit_Origin");
         }
     }
 }

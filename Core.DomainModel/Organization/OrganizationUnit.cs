@@ -18,8 +18,19 @@ namespace Core.DomainModel.Organization
             OwnedTasks = new List<TaskRef>();
             DefaultUsers = new List<OrganizationRight>();
             Using = new List<ItSystemUsageOrgUnitUsage>();
-            Uuid = Guid.NewGuid();
+            var uuid = Guid.NewGuid();
+            Uuid = uuid;
+            Origin = OrganizationUnitOrigin.Kitos;
         }
+
+        /// <summary>
+        /// Determines the origin of the organization unit
+        /// </summary>
+        public OrganizationUnitOrigin Origin { get; set; }
+        /// <summary>
+        /// Determines the optional external origin-specific uuid
+        /// </summary>
+        public Guid ExternalOriginUuid { get; set; }
 
         public string LocalId { get; set; }
 
