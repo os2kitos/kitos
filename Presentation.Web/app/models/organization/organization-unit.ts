@@ -12,8 +12,6 @@
         OrganizationId: number;
         /** The organization which the unit belongs to. */
         Organization: IOrganization;
-        /** The usage of task on this Organization Unit.Should be a subset of the TaskUsages of the parent department. */
-        TaskUsages: Array<ITaskUsage>;
         OwnedTasks: Array<ITaskRef>;
         /** Users which have set this as their default OrganizationUnit. */
         DefaultUsers: Array<IOrganizationRight>;

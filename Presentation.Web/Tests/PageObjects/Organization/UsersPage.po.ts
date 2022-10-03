@@ -31,7 +31,7 @@ class UsersPage implements IPageObject {
             "it-system.catalog",
             "it-contract.overview",
             "data-processing.overview",
-            "organization.overview"
+            "organization.structure"
         ].map(x => x.replace(".", "_"));
     }
 }

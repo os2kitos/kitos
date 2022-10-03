@@ -15,7 +15,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             //Arrange
             var body = new
             {
-                ShowColumnUsage = true
+                ShowItSystemModule = true
             };
             const int organizationId = TestEnvironment.SecondOrganizationId;
 
@@ -24,45 +24,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-        }
-
-        [Fact]
-        public async Task Can_Set_Column_Usage()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowColumnUsage = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-
-        [Fact]
-        public async Task Can_Set_Tab_Overview()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowTabOverview = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-        
-        [Fact]
-        public async Task Can_Set_Column_Technology_Usage()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowColumnTechnology = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
         }
 
         [Fact]
@@ -123,9 +84,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             //Arrange
             var body = new
             {
-                ShowColumnUsage = A<bool>(),
-                ShowTabOverview = A<bool>(),
-                ShowColumnTechnology = A<bool>(),
                 ShowItSystemModule = A<bool>(),
                 ShowItSystemPrefix = A<bool>(),
                 ShowItContractModule = A<bool>(),
@@ -141,9 +99,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             var configResponse = await LocalConfigHelper.GetLocalConfig(organizationId);
             Assert.Equal(HttpStatusCode.OK, configResponse.StatusCode);
             var config = await configResponse.ReadResponseBodyAsAsync<Config>();
-            Assert.Equal(body.ShowColumnUsage, config.ShowColumnUsage);
-            Assert.Equal(body.ShowTabOverview, config.ShowTabOverview);
-            Assert.Equal(body.ShowColumnTechnology, config.ShowColumnTechnology);
             Assert.Equal(body.ShowItSystemModule, config.ShowItSystemModule);
             Assert.Equal(body.ShowItSystemPrefix, config.ShowItSystemPrefix);
             Assert.Equal(body.ShowItContractModule, config.ShowItContractModule);
