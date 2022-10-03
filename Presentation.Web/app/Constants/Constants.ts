@@ -65,11 +65,6 @@
             Text: "Slet"
         };
 
-        static readonly DefaultOptionFilter = {
-            Id: "defaultFitlerOption",
-            Text: "- - - Vælg hvordan - - -"
-        };
-
         static readonly SelectAllId = "exportExcelAll";
         static readonly SelectAllValue = "Alle kolonner";
         static readonly SelectOnlyVisibleId = "exportExcelOnlyVisible";
