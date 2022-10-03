@@ -869,7 +869,6 @@ module Kitos.Utility.KendoGrid {
                                         return item.template;
                                     }),
                                     valueTemplate: (_) => entry.title,
-                                    //optionLabel: entry.title,
                                     change: (e) => {
                                         try {
                                             this.triggerSelectedOptionChanged(e, entry);
