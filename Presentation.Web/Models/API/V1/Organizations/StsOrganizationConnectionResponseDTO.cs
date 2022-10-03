@@ -2,7 +2,6 @@
 {
     public class StsOrganizationConnectionResponseDTO
     {
-        //TODO: Add "Connected" boolean to indicate if the organization is connected to STS organization
         /// <summary>
         /// Describes the access status from KITOS to the organization in the FK Organisation system
         /// </summary>

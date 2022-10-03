@@ -2,6 +2,7 @@
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
@@ -35,6 +36,19 @@ namespace Core.ApplicationServices.Organizations
         {
             return GetOrganizationWithImportPermission(organizationId)
                 .Match(ValidateConnection, error => new DetailedOperationError<CheckConnectionError>(error.FailureType, CheckConnectionError.Unknown, error.Message.GetValueOrDefault()));
+        }
+
+        public Result<StsOrganizationSynchronizationDetails, OperationError> GetSynchronizationDetails(Guid organizationId)
+        {
+            return GetOrganizationWithImportPermission(organizationId)
+                .Select(organization =>
+                {
+                    var currentConnectionStatus = ValidateConnection(organization);
+                    var isConnected = organization.StsOrganizationConnection?.Connected == true;
+                    var canCreateConnection = currentConnectionStatus.IsNone && organization.StsOrganizationConnection?.Connected != true;
+                    var canUpdateConnection = currentConnectionStatus.IsNone && isConnected;
+                    return new StsOrganizationSynchronizationDetails(isConnected, organization.StsOrganizationConnection?.SynchronizationDepth, canCreateConnection, canUpdateConnection, isConnected);
+                });
         }
 
         private Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Organization organization)
