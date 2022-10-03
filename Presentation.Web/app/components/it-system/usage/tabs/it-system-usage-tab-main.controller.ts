@@ -57,17 +57,17 @@
                 
                 var expirationDate = $scope.usage.expirationDate;
                 var concluded = $scope.usage.concluded;
-                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId);
                 } 
-                else if (Kitos.Helpers.DateValidationHelper.validateInterval(date, concluded, expirationDate, notify, "Ibrugtagningsdato", "Slutdato for anvendelse")) {
+                else if (Kitos.Helpers.DateValidationHelper.validateInterval(concluded, expirationDate, notify, "Ibrugtagningsdato", "Slutdato for anvendelse") === false) {
                     return;
                 }
                 else {
+                    const date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                     const dateString = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = dateString;

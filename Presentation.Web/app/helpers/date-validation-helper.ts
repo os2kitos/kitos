@@ -1,12 +1,13 @@
 ﻿module Kitos.Helpers {
     export class DateValidationHelper {
-        static validateInterval(selectedDate: moment.Moment, startDate:string , endDate: string, notify, startDateFieldName: string, endDateFieldName: string) {
+        static validateInterval(startDate:string , endDate: string, notify, startDateFieldName: string, endDateFieldName: string) {
             const formatDateString = "YYYY-MM-DD";
             const formattedFromDate = moment(startDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
             const formattedEndDate = moment(endDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
 
-            return DateValidationHelper.checkIfDateIsValid(selectedDate, notify) &&
-                DateValidationHelper.checkIfStartDateIsSmallerThanEndDate(formattedFromDate,
+            return DateValidationHelper.checkIfDateIsValid(formattedFromDate, notify)
+                && DateValidationHelper.checkIfDateIsValid(formattedEndDate, notify)
+                && DateValidationHelper.checkIfStartDateIsSmallerThanEndDate(formattedFromDate,
                     formattedEndDate,
                     notify,
                     startDateFieldName,

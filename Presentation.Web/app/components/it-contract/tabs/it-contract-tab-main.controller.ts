@@ -265,7 +265,6 @@
                 $scope.checkContractValidity = (field, value) => {
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
-                    var date = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, "YYYY-MM-DDTHH:mm:ssZ"], true);
                     var payload = {};
 
 
@@ -277,11 +276,12 @@
                     else if (value == null) {
                         //made to prevent error message on empty value i.e. open close datepicker
                     }
-                    else if (Kitos.Helpers.DateValidationHelper.validateInterval(date, concluded, expirationDate, notify, "Gyldig fra", "Gyldig til") === false) {
+                    else if (Kitos.Helpers.DateValidationHelper.validateInterval(concluded, expirationDate, notify, "Gyldig fra", "Gyldig til") === false) {
                         return;
                     }
                     else {
-                        var dateString = date.format("YYYY-MM-DD");
+                        const date = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, "YYYY-MM-DDTHH:mm:ssZ"], true);
+                        const dateString = date.format("YYYY-MM-DD");
                         payload[field] = dateString;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId)
                             .then(_ => reloadValidationStatus());
