@@ -54,23 +54,26 @@
             reloadValidationStatus();
 
             $scope.patchDate = (field, value) => {
-                var expirationDate = itSystemUsage.expirationDate;
-                var concluded = itSystemUsage.concluded;
+                
+                var expirationDate = $scope.usage.expirationDate;
+                var concluded = $scope.usage.concluded;
                 var formatDateString = "YYYY-MM-DD";
                 var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
                 var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-                
+
+                if (Kitos.Helpers.ValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify)) {
+                    return;
+                }
+                if (Kitos.Helpers.ValidationHelper.checkIfDateIsInvalid(date, notify)) {
+                    return;
+                }
+
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId);
-                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                }
-                else if (fromDate != null && endDate != null && fromDate >= endDate) {
-                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
-                }
+                } 
                 else {
                     const dateString = date.format(formatDateString);
                     var payload = {};

@@ -162,7 +162,7 @@ namespace Tests.Integration.Presentation.Web.Users
 
                 Assert.Contains("_deleted_user@kitos.dk", user.Email);
                 Assert.Contains("(SLETTET)", user.LastName);
-                Assert.Equal(originalEmail, user.EmailBeforeDeletion);
+                Assert.Equal("Slettet bruger", user.Name);
                 Assert.NotNull(user.LockedOutDate);
                 Assert.NotNull(user.DeletedDate);
                 Assert.Null(user.PhoneNumber);

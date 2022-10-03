@@ -270,6 +270,14 @@
                     var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day');
                     var date = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, "YYYY-MM-DDTHH:mm:ssZ"], true);
                     var payload = {};
+
+                    if (Kitos.Helpers.ValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify)) {
+                        return;
+                    }
+                    if (Kitos.Helpers.ValidationHelper.checkIfDateIsInvalid(date, notify)) {
+                        return;
+                    }
+
                     if (value === "") {
                         payload[field] = null;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId)
@@ -277,12 +285,6 @@
                     }
                     else if (value == null) {
                         //made to prevent error message on empty value i.e. open close datepicker
-                    }
-                    else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                    }
-                    else if (fromDate >= endDate) {
-                        notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
                     }
                     else {
                         var dateString = date.format("YYYY-MM-DD");
