@@ -12,6 +12,20 @@
         };
     }
 
+    enum CommandCategory {
+        Create = "create",
+        Update = "update",
+        Delete = "delete"
+    }
+
+    interface IFkOrganizationCommand {
+        id: string
+        text: string
+        onClick: () => void
+        enabled: boolean
+        category: CommandCategory
+    }
+
     interface IFkOrganizationSynchronizationStatus {
         connected: boolean
         synchronizationDepth: number | null
@@ -22,6 +36,7 @@
         accessGranted: boolean | null;
         accessError: string | null
         synchronizationStatus: IFkOrganizationSynchronizationStatus | null
+        commands: Array<IFkOrganizationCommand> | null;
     }
 
     class FkOrganizationImportController implements IFkOrganizationImportController {
@@ -29,6 +44,7 @@
         accessGranted: boolean | null = null;
         accessError: string | null = null;
         synchronizationStatus: IFkOrganizationSynchronizationStatus | null = null;
+        commands: Array<IFkOrganizationCommand> | null = null;
 
         static $inject: string[] = ["stsOrganizationSyncService"];
         constructor(private readonly stsOrganizationSyncService: Kitos.Services.Organization.IStsOrganizationSyncService) {
@@ -38,17 +54,63 @@
             if (this.currentOrganizationUuid === null) {
                 console.error("missing attribute: 'currentOrganizationUuid'");
             } else {
-                this.stsOrganizationSyncService
-                    .getConnectionStatus(this.currentOrganizationUuid)
-                    .then(result => {
-                        this.bindAccessProperties(result);
-                        this.bindSynchronizationStatus(result);
-                    }, error => {
-                        console.error(error);
-                        this.accessGranted = false;
-                        this.accessError = "Der skete en fejl ifm. tjek for forbindelsen til FK Organisation. Genindlæs venligst siden for at prøve igen."
-                    });
+                this.initialize();
             }
+        }
+
+        private initialize() {
+            this.stsOrganizationSyncService
+                .getConnectionStatus(this.currentOrganizationUuid)
+                .then(result => {
+                    this.bindAccessProperties(result);
+                    this.bindSynchronizationStatus(result);
+                    this.bindCommands(result);
+                }, error => {
+                    console.error(error);
+                    this.accessGranted = false;
+                    this.accessError = "Der skete en fejl ifm. tjek for forbindelsen til FK Organisation. Genindlæs venligst siden for at prøve igen.";
+                });
+        }
+
+        private bindCommands(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
+            const newCommands: Array<IFkOrganizationCommand> = [];
+            //if (result.connected) {
+                newCommands.push({
+                    id: "updateSync",
+                    text: "Rediger",
+                    category: CommandCategory.Update,
+                    enabled: result.canUpdateConnection,
+                    onClick: () => {
+                        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3313
+                        // NOTE: Remember to rebind
+                        console.log("UPDATE");
+                    }
+                });
+                newCommands.push({
+                    id: "breakSync",
+                    text: "Afbryd",
+                    category: CommandCategory.Delete,
+                    enabled: result.canDeleteConnection,
+                    onClick: () => {
+                        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3320
+                        // NOTE: Remember to rebind
+                        console.log("DELETE");
+                    }
+                });
+            //} else {
+                newCommands.push({
+                    id: "createSync",
+                    text: "Forbind",
+                    category: CommandCategory.Create,
+                    enabled: result.canCreateConnection,
+                    onClick: () => {
+                        //TODO - open a dialog!
+                        console.log("CREATE");
+                    }
+                });
+            //}
+
+            this.commands = newCommands;
         }
 
         private bindSynchronizationStatus(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
@@ -57,6 +119,9 @@
                 synchronizationDepth: result.synchronizationDepth
             };
             //TODO: Bind the available commands
+            //TODO: Consider
+            // TODO: - Dialog or in-page flow?
+            // TODO: Buttons... same color or?..
         }
 
         private bindAccessProperties(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
