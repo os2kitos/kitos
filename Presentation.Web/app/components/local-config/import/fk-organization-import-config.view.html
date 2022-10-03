@@ -28,7 +28,7 @@
             class="btn right-margin-5px"
             ng-class="{'btn-primary': command.category === 'create' || command.category === 'update' , 'btn-danger': command.category == 'delete'}"
             ng-click="command.onClick()"
-            ng-disabled="command.disabled">
+            ng-disabled="!command.enabled">
         {{::command.text}}
     </button>
 </div>

@@ -1,15 +1,17 @@
 ﻿module Kitos.Services.Organization {
     export interface IStsOrganizationSyncService {
-        getConnectionStatus(organizationId: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>
+        getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>
+        createConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void>
     }
 
     export class StsOrganizationSyncService implements IStsOrganizationSyncService {
 
-        static $inject = ["genericApiWrapper", "inMemoryCacheService", "$q"];
+        static $inject = ["genericApiWrapper", "inMemoryCacheService", "$q", "apiUseCaseFactory"];
         constructor(
             private readonly genericApiWrapper: Services.Generic.ApiWrapper,
             private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
-            private readonly $q: ng.IQService) {
+            private readonly $q: ng.IQService,
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) {
         }
 
         private getBasePath(organizationUuid: string) {
@@ -18,6 +20,10 @@
 
         private getCacheKey(organizationUuid: string) {
             return `FK_CONNECTION_STATUS_${organizationUuid}`;
+        }
+
+        private purgeCache(organizationUuid: string) {
+            this.inMemoryCacheService.deleteEntry(this.getCacheKey(organizationUuid));
         }
 
         getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO> {
@@ -34,7 +40,16 @@
                 });
         }
 
-        //TODO: Purge cache after doing a command!
+        createConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void> {
+            return this.apiUseCaseFactory.createCreation("Forbindelse til FK Organisation", () => {
+                return this.genericApiWrapper.post<void>(`${this.getBasePath(organizationUuidid)}/connection`, {
+                    synchronizationDepth: synchronizationDepth
+                });
+            }).executeAsync(() => {
+                //Clear cache after
+                this.purgeCache(organizationUuidid);
+            });
+        }
     }
 
     app.service("stsOrganizationSyncService", StsOrganizationSyncService);

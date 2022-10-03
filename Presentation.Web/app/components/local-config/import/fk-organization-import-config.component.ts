@@ -54,11 +54,11 @@
             if (this.currentOrganizationUuid === null) {
                 console.error("missing attribute: 'currentOrganizationUuid'");
             } else {
-                this.initialize();
+                this.loadState();
             }
         }
 
-        private initialize() {
+        private loadState() {
             this.stsOrganizationSyncService
                 .getConnectionStatus(this.currentOrganizationUuid)
                 .then(result => {
@@ -74,7 +74,7 @@
 
         private bindCommands(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
             const newCommands: Array<IFkOrganizationCommand> = [];
-            //if (result.connected) {
+            if (result.connected) {
                 newCommands.push({
                     id: "updateSync",
                     text: "Rediger",
@@ -97,7 +97,7 @@
                         console.log("DELETE");
                     }
                 });
-            //} else {
+            } else {
                 newCommands.push({
                     id: "createSync",
                     text: "Forbind",
@@ -106,9 +106,13 @@
                     onClick: () => {
                         //TODO - open a dialog!
                         console.log("CREATE");
+                        //TODO: Open the dialog in stead
+                        this.stsOrganizationSyncService
+                            .createConnection(this.currentOrganizationUuid, null) //TODO: Get second arg
+                            .then(() => this.loadState());
                     }
                 });
-            //}
+            }
 
             this.commands = newCommands;
         }
