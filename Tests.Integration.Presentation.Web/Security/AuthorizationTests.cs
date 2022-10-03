@@ -57,8 +57,8 @@ namespace Tests.Integration.Presentation.Web.Security
             //Act
             var tokenResponse = await HttpApi.PostAsync(url, loginDto);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, tokenResponse.StatusCode);
+            //Assert that unauthorized is returend .. token auth not enabled for the user
+            Assert.Equal(HttpStatusCode.Unauthorized, tokenResponse.StatusCode);
         }
 
         [Fact]

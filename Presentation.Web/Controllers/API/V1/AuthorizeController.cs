@@ -151,12 +151,6 @@ namespace Presentation.Web.Controllers.API.V1
 
                 var user = result.Value;
 
-                if (CanIssueTokenTo(user))
-                {
-                    Logger.Warn("User with Id {id} tried to use get a token for the API but was forbidden", user.Id);
-                    return Forbidden();
-                }
-
                 var token = new TokenValidator().CreateToken(user);
 
                 var response = new GetTokenResponseDTO
