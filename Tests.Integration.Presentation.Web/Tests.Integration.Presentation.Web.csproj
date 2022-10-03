@@ -155,7 +155,6 @@
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
     <Compile Include="KLE\KleUpdateIntegrationTests.cs" />
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />
-    <Compile Include="KLE\TaskUsageIntegrityInput.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUnitsApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
@@ -217,7 +216,6 @@
     <Compile Include="Tools\External\Rights\RightsHelper.cs" />
     <Compile Include="Tools\SsoIdentityHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
-    <Compile Include="Tools\TaskUsageHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\External\ItSystemV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationV2Helper.cs" />

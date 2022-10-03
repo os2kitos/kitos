@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Add_Organization_Unit_Origin_Info : IMigrationMetadata
+    public sealed partial class Remove_TaskUsage : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_Organization_Unit_Origin_Info));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Remove_TaskUsage));
         
         string IMigrationMetadata.Id
         {
-            get { return "202210030603412_Add_Organization_Unit_Origin_Info"; }
+            get { return "202209301050100_Remove_TaskUsage"; }
         }
         
         string IMigrationMetadata.Source

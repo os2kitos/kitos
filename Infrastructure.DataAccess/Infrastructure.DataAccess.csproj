@@ -135,7 +135,6 @@
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />
-    <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRoleMap.cs" />
@@ -936,9 +935,13 @@
     <Compile Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.designer.cs">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202210030613577_Add_Organization_Unit_Origin_Info.cs" />
-    <Compile Include="Migrations\202210030613577_Add_Organization_Unit_Origin_Info.designer.cs">
-      <DependentUpon>202210030613577_Add_Organization_Unit_Origin_Info.cs</DependentUpon>
+    <Compile Include="Migrations\202209301050100_Remove_TaskUsage.cs" />
+    <Compile Include="Migrations\202209301050100_Remove_TaskUsage.designer.cs">
+      <DependentUpon>202209301050100_Remove_TaskUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202210030943073_Add_Sts_Org_Import_Tables.cs" />
+    <Compile Include="Migrations\202210030943073_Add_Sts_Org_Import_Tables.designer.cs">
+      <DependentUpon>202210030943073_Add_Sts_Org_Import_Tables.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1563,8 +1566,11 @@
     <EmbeddedResource Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.resx">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202210030613577_Add_Organization_Unit_Origin_Info.resx">
-      <DependentUpon>202210030613577_Add_Organization_Unit_Origin_Info.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202209301050100_Remove_TaskUsage.resx">
+      <DependentUpon>202209301050100_Remove_TaskUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202210030943073_Add_Sts_Org_Import_Tables.resx">
+      <DependentUpon>202210030943073_Add_Sts_Org_Import_Tables.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

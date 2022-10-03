@@ -153,28 +153,6 @@ namespace Tests.Integration.Presentation.Web.KLE
             });
             #endregion root
 
-            #region organization
-            //Add some task in organization units refs which we expect to be removed
-            MutateDatabase(db =>
-            {
-                using (var taskUsages = new GenericRepository<TaskUsage>(db))
-                using (var taskRefs = new GenericRepository<TaskRef>(db))
-                {
-                    var other = taskRefs.AsQueryable().First();
-                    var objectOwnerId = other.ObjectOwnerId;
-                    var organizationUnitId = other.OwnedByOrganizationUnitId;
-                    var taskRef1 = taskRefs.Insert(CreateTaskRef(objectOwnerId, organizationUnitId));
-                    var taskRef2 = taskRefs.Insert(CreateTaskRef(objectOwnerId, organizationUnitId));
-                    taskRefs.Save();
-
-                    //Add usages which we expect to be removed
-                    taskUsages.Insert(CreateTaskUsage(taskRef1, objectOwnerId, organizationUnitId));
-                    taskUsages.Insert(CreateTaskUsage(taskRef2, objectOwnerId, organizationUnitId));
-                    taskUsages.Save();
-                }
-            });
-            #endregion organization
-
             #region systems
             var system1Dto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
@@ -335,19 +313,6 @@ namespace Tests.Integration.Presentation.Web.KLE
             }
         }
 
-        private static void VerifyTaskUsageIntegrity(IReadOnlyList<TaskUsageIntegrityInput> expectedUsages)
-        {
-            var actualTaskRefs = BuildTaskUsageIntegritySet().ToList();
-            Assert.Equal(expectedUsages.Count, actualTaskRefs.Count);
-
-            for (var i = 0; i < actualTaskRefs.Count; i++)
-            {
-                var expected = expectedUsages[i];
-                var actual = actualTaskRefs[i];
-                expected.ToExpectedObject().ShouldMatch(actual);
-            }
-        }
-
         private static void VerifyTaskRefUsageKeys(IReadOnlyList<string> expectedKeys, IReadOnlyList<string> actualKeys)
         {
             Assert.Equal(expectedKeys.Count, actualKeys.Count);
@@ -369,18 +334,6 @@ namespace Tests.Integration.Presentation.Web.KLE
                 .ToList());
         }
 
-        private static IEnumerable<TaskUsageIntegrityInput> BuildTaskUsageIntegritySet()
-        {
-            return MapFromEntitySet<TaskUsage, IEnumerable<TaskUsageIntegrityInput>>(
-                repository =>
-                    repository
-                        .AsQueryable()
-                        .ToList()
-                        .Select(MapIntegrityInput)
-                        .OrderBy(x => x.TaskRefId)
-                        .ToList());
-        }
-
         private static TaskRefIntegrityInput MapIntegrityInput(TaskRef arg)
         {
             return new TaskRefIntegrityInput
@@ -389,15 +342,6 @@ namespace Tests.Integration.Presentation.Web.KLE
                 ParentTaskKey = arg.Parent?.TaskKey,
                 TaskKey = arg.TaskKey,
                 UUID = arg.Uuid
-            };
-        }
-
-        private static TaskUsageIntegrityInput MapIntegrityInput(TaskUsage arg)
-        {
-            return new TaskUsageIntegrityInput
-            {
-                Id = arg.Id,
-                TaskRefId = arg.TaskRef?.TaskKey ?? throw new InvalidOperationException("Unable to load task key of parent")
             };
         }
 
@@ -466,7 +410,7 @@ namespace Tests.Integration.Presentation.Web.KLE
             ResetKleHistory();
         }
 
-        private TaskRef CreateTaskRef(int? objectOwnerId, int organizationUnitId)
+        private static TaskRef CreateTaskRef(int? objectOwnerId, int organizationUnitId)
         {
             if (TestKeys.TryPop(out var nextKey))
             {
@@ -480,17 +424,6 @@ namespace Tests.Integration.Presentation.Web.KLE
                 };
             }
             throw new InvalidOperationException("Unable to get more keys");
-        }
-
-        private static TaskUsage CreateTaskUsage(TaskRef taskRef1, int? objectOwnerId, int organizationUnitId)
-        {
-            return new()
-            {
-                TaskRefId = taskRef1.Id,
-                LastChangedByUserId = objectOwnerId,
-                ObjectOwnerId = objectOwnerId,
-                OrgUnitId = organizationUnitId
-            };
         }
 
         private static void ResetKleHistory()

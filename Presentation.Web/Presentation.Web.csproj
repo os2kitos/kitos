@@ -690,7 +690,6 @@
     <Compile Include="Models\API\V1\BusinessRoleDTO.cs" />
     <Compile Include="Models\API\V1\CreateItSystemDTO.cs" />
     <Compile Include="Models\API\V1\CreateItsystemUsageDTO.cs" />
-    <Compile Include="Models\API\V1\CreateTaskUsageDTO.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Application\Csv\CsvResponseBuilder.cs" />
@@ -1050,7 +1049,6 @@
     <Compile Include="Controllers\API\V1\ItSystemUsageController.cs" />
     <Compile Include="Models\API\V1\DataRowDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemDTO.cs" />
-    <Compile Include="Controllers\API\V1\TaskUsageController.cs" />
     <Compile Include="Models\API\V1\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\API\V1\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitController.cs" />
@@ -1087,10 +1085,7 @@
     <Compile Include="Models\API\V1\RightInputDTO.cs" />
     <Compile Include="Models\API\V1\RoleDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefSelectedDTO.cs" />
-    <Compile Include="Models\API\V1\TaskRefUsageDTO.cs" />
-    <Compile Include="Models\API\V1\TaskUsageDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefDTO.cs" />
-    <Compile Include="Models\API\V1\TaskUsageNestedDTO.cs" />
     <Compile Include="Models\API\V1\TextDTO.cs" />
     <Compile Include="Models\API\V1\UserDTO.cs" />
     <Compile Include="Models\API\V1\UserOrganizationsDTO.cs" />
@@ -1421,13 +1416,8 @@
     <Content Include="app\components\local-config\local-config-system.view.html" />
     <Content Include="app\components\local-config\local-config-org.view.html" />
     <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
-    <Content Include="app\components\org\overview\org-overview.view.html" />
-    <Content Include="app\components\org\overview\org-overview-modal-comment.view.html" />
-    <Content Include="app\components\org\overview\org-overview-task-foldout-leaf.view.html" />
-    <Content Include="app\components\org\overview\org-overview-task-foldout-node.view.html" />
     <Content Include="app\components\org\structure\org-structure-tree-unit.view.html" />
     <Content Include="app\components\org\structure\org-structure.view.html" />
-    <Content Include="app\components\org\overview\org-overview-usage.view.html" />
     <Content Include="app\components\org\user\org-user-create.modal.view.html" />
     <Content Include="app\components\org\user\org-user-edit.modal.view.html" />
     <Content Include="app\components\org\user\org-user.view.html" />
@@ -1472,7 +1462,6 @@
     <TypeScriptCompile Include="app\models\organization\organization.ts" />
     <TypeScriptCompile Include="app\models\password-reset-request.ts" />
     <TypeScriptCompile Include="app\models\task-ref.ts" />
-    <TypeScriptCompile Include="app\models\task-usage.ts" />
     <TypeScriptCompile Include="app\models\traffic-light.ts" />
     <TypeScriptCompile Include="app\models\Api\api-wrapper.ts" />
     <TypeScriptCompile Include="app\models\user.ts" />
@@ -1519,7 +1508,6 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.controller.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-structure.controller.ts" />
     <TypeScriptCompile Include="app\components\org\org-subnav.controller.ts" />
-    <TypeScriptCompile Include="app\components\org\overview\org-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user.controller.ts" />
     <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
     <TypeScriptCompile Include="app\shared\limitToDots.filter.ts" />

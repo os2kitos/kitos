@@ -240,7 +240,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
-    <Compile Include="Organization\TaskUsage.cs" />
     <Compile Include="Qa\References\BrokenExternalReferencesReport.cs" />
     <Compile Include="Qa\References\BrokenLinkCause.cs" />
     <Compile Include="Qa\References\BrokenLinkInInterface.cs" />
@@ -264,6 +263,7 @@
     <Compile Include="UIConfiguration\UIModuleCustomization.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationConstraints.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Users\AuthenticationScheme.cs" />
     <Compile Include="Users\UserConstraints.cs" />
   </ItemGroup>
   <ItemGroup>

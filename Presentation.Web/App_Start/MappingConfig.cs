@@ -204,16 +204,6 @@ namespace Presentation.Web
                   .ReverseMap()
                   .IgnoreDestinationEntityFields();
 
-            CreateMap<TaskUsage, TaskUsageDTO>()
-                .ForMember(dto => dto.HasDelegations, opt => opt.MapFrom(src => src.Children.Any()))
-                .ReverseMap()
-                .IgnoreDestinationEntityFields();
-
-            CreateMap<TaskUsage, TaskUsageNestedDTO>()
-                .ForMember(dto => dto.HasDelegations, opt => opt.MapFrom(src => src.Children.Any()))
-                .ReverseMap()
-                .IgnoreDestinationEntityFields();
-
             CreateMap<OrganizationRight, OrganizationRightDTO>()
                 .ReverseMap()
                 .IgnoreDestinationEntityFields();

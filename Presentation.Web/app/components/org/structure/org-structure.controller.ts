@@ -33,8 +33,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService, inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
+        "$scope", "$http", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
+        function ($scope, $http: ng.IHttpService, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService, inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -157,7 +157,6 @@
                 };
 
                 loadRights(node);
-                loadTasks();
             };
 
             function loadRights(node) {
@@ -570,159 +569,9 @@
                 });
             };
 
-            $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
-                $scope.pagination.skip = 0;
-                loadTasks();
-            });
-
-            $scope.$watchCollection("pagination", loadTasks);
             $scope.$watchCollection("rightsPagination", function () {
                 loadRights($scope.chosenOrgUnit);
             });
-
-            // default kle mode
-            $scope.showAllTasks = true;
-            // default kle sort order
-            $scope.pagination.orderBy = "taskKey";
-
-            // change between show all tasks and only show active tasks
-            $scope.changeTaskView = function () {
-                $scope.showAllTasks = !$scope.showAllTasks;
-                $scope.pagination.orderBy = $scope.showAllTasks ? "taskKey" : "taskRef.taskKey";
-                $scope.pagination.skip = 0;
-                loadTasks();
-            };
-
-            function loadTasks() {
-                if (!$scope.chosenOrgUnit) return;
-
-                var url = "api/organizationUnit/" + $scope.chosenOrgUnit.id;
-
-                if ($scope.showAllTasks) url += "?tasks";
-                else url += "?usages";
-
-                url += "&taskGroup=" + $scope.selectedTaskGroup;
-                url += "&skip=" + $scope.pagination.skip + "&take=" + $scope.pagination.take;
-
-                if ($scope.pagination.orderBy) {
-                    url += "&orderBy=" + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += "&descending=" + $scope.pagination.descending;
-                }
-
-                $http.get<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
-                    $scope.taskRefUsageList = result.data.response;
-
-                    var paginationHeader = JSON.parse(result.headers("X-Pagination"));
-                    $scope.totalCount = paginationHeader.TotalCount;
-                    decorateTasks();
-                }, (error) => {
-                    notify.addErrorMessage("Kunne ikke hente opgaver!");
-                });
-            }
-
-            function addUsage(refUsage, showMessage) {
-                if (showMessage) var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-
-                const url = `api/taskUsage`;
-
-                const payload = {
-                    taskRefId: refUsage.taskRef.id,
-                    orgUnitId: $scope.chosenOrgUnit.id
-                };
-
-                $http.post<Kitos.API.Models.IApiWrapper<any>>(url, payload).then((result) => {
-                    refUsage.usage = result.data.response;
-                    if (showMessage) msg.toSuccessMessage("Tilknytningen er oprettet");
-                }, (error) => {
-                    if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
-                });
-            }
-
-            function removeUsage(refUsage, showMessage) {
-                if (showMessage) var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-
-                const url = `api/taskUsage/${refUsage.usage.id}?organizationId=${user.currentOrganizationId}`;
-
-                $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
-                    refUsage.usage = null;
-                    if (showMessage) msg.toSuccessMessage("Tilknytningen er fjernet");
-                }, (error) => {
-                    if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
-                });
-            }
-
-            function decorateTasks() {
-                _.each($scope.taskRefUsageList, function (refUsage: { toggleUsage; usage; toggleStar; }) {
-                    refUsage.toggleUsage = function () {
-                        if (refUsage.usage) {
-                            removeUsage(refUsage, true);
-                        } else {
-                            addUsage(refUsage, true);
-                        }
-                    };
-
-                    refUsage.toggleStar = function () {
-                        if (!refUsage.usage) return;
-
-                        var payload = {
-                            starred: !refUsage.usage.starred
-                        };
-
-                        var url = "api/taskUsage/" + refUsage.usage.id;
-                        var msg = notify.addInfoMessage("Opdaterer...", false);
-                        $http<Kitos.API.Models.IApiWrapper<any>>({ method: "PATCH", url: url + "?organizationId=" + user.currentOrganizationId, data: payload }).then(() => {
-                            refUsage.usage.starred = !refUsage.usage.starred;
-                            msg.toSuccessMessage("Feltet er opdateret");
-                        }, (error) => {
-                            msg.toErrorMessage("Fejl!");
-                        });
-                    };
-                });
-            }
-
-            $scope.selectAllTasks = function () {
-                _.each($scope.taskRefUsageList, function (refUsage: { usage }) {
-                    if (!refUsage.usage) {
-                        addUsage(refUsage, false);
-                    }
-                });
-            };
-
-            $scope.removeAllTasks = function () {
-                _.each($scope.taskRefUsageList, function (refUsage: { usage }) {
-                    if (refUsage.usage) {
-                        removeUsage(refUsage, false);
-                    }
-                });
-            };
-
-            $scope.selectTaskGroup = function () {
-                var url = "api/taskusage/taskGroup?orgUnitId=" + $scope.chosenOrgUnit.id + "&taskId=" + $scope.selectedTaskGroup;
-
-                var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-                $http.post<Kitos.API.Models.IApiWrapper<any>>(url, null).then((result) => {
-                    msg.toSuccessMessage("Tilknytningen er oprettet");
-                    reload();
-                }, (error) => {
-                    msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
-                });
-            };
-
-            $scope.removeTaskGroup = function () {
-                var url = "api/taskusage?orgUnitId=" + $scope.chosenOrgUnit.id + "&taskId=" + $scope.selectedTaskGroup;
-
-                var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-                $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then(() => {
-                    msg.toSuccessMessage("Tilknytningen er fjernet");
-                    reload();
-                }, (error) => {
-                    msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
-                });
-            };
-
-            function reload() {
-                $state.go(".", null, { reload: true });
-            }
 
             $scope.dragEnabled = false;
 

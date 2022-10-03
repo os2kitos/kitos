@@ -14,7 +14,6 @@ namespace Core.DomainModel.Organization
         public const int MaxNameLength = 100;
         public OrganizationUnit()
         {
-            TaskUsages = new List<TaskUsage>();
             OwnedTasks = new List<TaskRef>();
             DefaultUsers = new List<OrganizationRight>();
             Using = new List<ItSystemUsageOrgUnitUsage>();
@@ -53,13 +52,6 @@ namespace Core.DomainModel.Organization
         /// The organization which the unit belongs to.
         /// </summary>
         public virtual Organization Organization { get; set; }
-
-        /// <summary>
-        /// The usage of task on this Organization Unit.
-        /// Should be a subset of the TaskUsages of the parent department.
-        /// </summary>
-        public virtual ICollection<TaskUsage> TaskUsages { get; set; }
-
         /// <summary>
         /// Local tasks that was created in this unit
         /// </summary>
