@@ -441,6 +441,11 @@ module Kitos.Utility.KendoGrid {
         Right
     }
 
+    export enum KendoToolbarStandardWidth {
+        Standard,
+        FitContent
+    }
+
     export enum KendoToolbarImplementation {
         Button,
         Link,
@@ -485,6 +490,7 @@ module Kitos.Utility.KendoGrid {
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
         margins?: KendoToolbarMargin[];
+        standardWidth?: KendoToolbarStandardWidth;
     }
 
     type UrlFactory = (options: any) => string;
@@ -758,8 +764,10 @@ module Kitos.Utility.KendoGrid {
                 }
             };
 
-            const localAdminDropdown = this.setupLocalAdminDropdown();
-            this.customToolbarEntries.unshift(localAdminDropdown);
+            if (this.showGridForOrganizationButtons()) {
+                const localAdminDropdown = this.setupLocalAdminDropdown();
+                this.customToolbarEntries.unshift(localAdminDropdown);
+            }
 
             const filterDropdown = this.setupFilterDropdown();
             this.customToolbarEntries.unshift(filterDropdown);
@@ -845,7 +853,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()" ng-show="${entry.show}"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)} ${Helpers.KendoToolbarCustomizationHelper.getStandardWidthCssClass(entry.standardWidth)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()" ng-show="${entry.show}"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
@@ -1080,11 +1088,12 @@ module Kitos.Utility.KendoGrid {
         private setupLocalAdminDropdown(): IKendoToolbarEntry {
             const self = this;
             return {
-                show: this.showGridForOrganizationButtons(),
+                show: true,
                 id: Constants.LocalAdminDropdown.Id,
                 title: Constants.LocalAdminDropdown.DefaultTitle,
                 color: KendoToolbarButtonColor.Grey,
                 position: KendoToolbarButtonPosition.Left,
+                standardWidth: KendoToolbarStandardWidth.FitContent,
                 implementation: KendoToolbarImplementation.CustomTemplateDropDownList,
                 enabled: () => true,
                 dropDownConfiguration: {

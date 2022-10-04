@@ -53,5 +53,20 @@
                     throw `Unknown position ${position}`;
             }
         };
+
+        static getStandardWidthCssClass(standardWidth?: Utility.KendoGrid.KendoToolbarStandardWidth): string {
+            if (standardWidth === undefined) {
+                return "";
+            }
+
+            switch (standardWidth) {
+                case Utility.KendoGrid.KendoToolbarStandardWidth.Standard:
+                    return "";
+                case Utility.KendoGrid.KendoToolbarStandardWidth.FitContent:
+                    return "width-fit-content";
+                default:
+                    throw `Unknown position ${standardWidth}`;
+            }
+        };
     }
 }

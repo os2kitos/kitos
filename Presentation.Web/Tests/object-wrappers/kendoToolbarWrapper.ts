@@ -13,7 +13,7 @@ type HeaderButtons = {
     deleteReference: protractor.ElementFinder,
     editSaveReference: protractor.ElementFinder,
     createReference: protractor.ElementFinder,
-    saveFilterToOrg: protractor.ElementFinder
+    localAdminDropdownReference: protractor.ElementFinder,
 };
 
 type InputFields =
@@ -72,8 +72,7 @@ class kendoToolbarWrapper {
             createDpa: element(byDataElementType(consts.kendoDpaButtonCreate)),
             createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
             deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton)),
-            saveFilterToOrg: element(byDataElementType(consts.filterOrgButton))
-
+            localAdminDropdownReference: element(byDataElementType(consts.localAdminDropdown))
         };
         return buttons;
     }

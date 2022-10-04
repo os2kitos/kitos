@@ -772,7 +772,7 @@
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\settings\catalog-state.ts" />
+    <TypeScriptCompile Include="app\components\it-system\settings\overview-state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-dataProcessing.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
@@ -1127,6 +1127,7 @@
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Catalog\System.Main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\01_Parallel\it-system\LocalAdmin.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\RegularUser.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\tabs\Reference.System.e2e.spec.ts" />

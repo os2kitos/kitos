@@ -73,17 +73,17 @@
     }
 
     export class LocalAdminDropdown {
-        static readonly Id = "combinedLocalAdminButtonsDropDownList";
+        static readonly Id = "combinedLocalAdminButtons";
         static readonly DefaultTitle = "Kolonneopsætning for organisationen";
 
         static readonly FilterOrg = {
             Id: "filterOrg",
-            Text: "Gem kolonneopsætning for organisation",
+            Text: "Gem",
         };
 
         static readonly RemoveFilterOrg = {
             Id: "removeFilterOrg",
-            Text: "Slet kolonneopsætning for organisation",
+            Text: "Slet",
         };
     }
 }

@@ -92,11 +92,10 @@
                     ? "Vis aktive IT Systemer"
                     : "Vis \"ikke aktive\" IT Systemer";
             }
-                                              
+
             function toggleActiveSystemsMasterFilter(): void {
                 showInactiveSystems = !showInactiveSystems;
                 ItSystem.Settings.OverviewState.setShowInactiveSystems($window, user.id, pageName, showInactiveSystems);
-                getToggleActiveSystemsFilterBtnText();
                 self.mainGrid.dataSource.read();
             }
 
