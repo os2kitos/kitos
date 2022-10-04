@@ -146,10 +146,7 @@
                 }
             }
 
-            vm.datepickerOptions = {
-                format: "dd-MM-yyyy",
-                parseFormats: ["yyyy-MM-dd"]
-            };
+            vm.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
             vm.patchDate = (field, value) => {
                 var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
