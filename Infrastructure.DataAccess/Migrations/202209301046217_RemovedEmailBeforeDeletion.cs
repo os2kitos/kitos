@@ -14,6 +14,7 @@ namespace Infrastructure.DataAccess.Migrations
                 SET Name = 'Slettet bruger'
                 WHERE Deleted = 1;"
             );
+            
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Users_Not_Associated_With_Any_Org.sql"));
         }
 
