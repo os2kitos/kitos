@@ -33,7 +33,7 @@
         }
 
         static checkIfDateIsValid(date: moment.Moment, notify, fieldName: string): boolean {
-            if (date != null && !date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+            if (date && !date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                 notify.addErrorMessage(`Den indtastede  \"${fieldName}\" er ugyldig.`);
                 return false;
             }
