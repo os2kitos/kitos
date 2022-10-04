@@ -1125,7 +1125,6 @@
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Catalog\System.Main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\01_Parallel\it-system\LocalAdmin.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\RegularUser.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-system\tabs\Reference.System.e2e.spec.ts" />
