@@ -12,9 +12,7 @@
                 required: "@"
             },
             link: ($scope) => {
-                $scope.dateFormat = {
-                    format: "dd-MM-yyyy"
-                };
+                $scope.dateFormat = Kitos.Configs.standardKendoDatePickerOptions;
             }
         })
     ]);

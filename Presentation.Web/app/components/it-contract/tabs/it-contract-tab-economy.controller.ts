@@ -105,10 +105,7 @@
             }
 
             var baseUrl = "api/economyStream";
-            vm.datepickerOptions = {
-                format: "dd-MM-yyyy",
-                parseFormats: ["yyyy-MM-dd"]
-            };
+            vm.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
             var allStreams = [];
             _.each(externalEconomyStreams,
