@@ -7,29 +7,34 @@
             resolve: {
                 systemCategories: [
                     "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemCategories).getAll()
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemCategories).getAll()
+                ],
+                itSystemUsage: [
+                    "itSystemUsageService", "$stateParams", (itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, $stateParams) => itSystemUsageService.getItSystemUsage($stateParams.id)
                 ]
             }
         });
     }]);
 
     app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories",
-        "autofocus", "itSystemUsageService", "select2LoadingService", "uiState",
+        "autofocus", "itSystemUsageService", "select2LoadingService", "uiState", "itSystemUsage",
         ($rootScope, $scope, $http, notify, user, systemCategories, autofocus,
             itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService,
             select2LoadingService: Kitos.Services.ISelect2LoadingService,
-            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
-            var itSystemUsage = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
+            itSystemUsage) => {
+            var itSystemUsageVm = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel(itSystemUsage);
+            $scope.usage = itSystemUsage;
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
 
             $rootScope.page.title = "IT System - Anvendelse";
-            $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsage.id}`;
-            $scope.hasViewAccess = user.currentOrganizationId === itSystemUsage.organizationId;
+            $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsageVm.id}`;
+            $scope.hasViewAccess = user.currentOrganizationId === itSystemUsageVm.organizationId;
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
-            $scope.system = itSystemUsage.itSystem;
-            $scope.lastChangedBy = itSystemUsage.lastChangedBy;
-            $scope.lastChanged = itSystemUsage.lastChanged;
+            $scope.system = itSystemUsageVm.itSystem;
+            $scope.lastChangedBy = itSystemUsageVm.lastChangedBy;
+            $scope.lastChanged = itSystemUsageVm.lastChanged;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
             const saveUrlWithOrgId = $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId;
@@ -44,38 +49,24 @@
                 { id: "2", text: "50-100" },
                 { id: "3", text: ">100" }
             ];
-
-            $scope.datepickerOptions = {
-                format: "dd-MM-yyyy",
-                parseFormats: ["yyyy-MM-dd"]
-            };
+            
+            $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
             bindLifeCycleStatusModel();
             reloadValidationStatus();
 
             $scope.patchDate = (field, value) => {
-                
+
                 var expirationDate = $scope.usage.expirationDate;
                 var concluded = $scope.usage.concluded;
-                var formatDateString = "YYYY-MM-DD";
-                var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
-                var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
-                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
 
-                if (Kitos.Helpers.ValidationHelper.checkIfStartDateIsGreaterThanEndDate(fromDate, endDate, notify)) {
-                    return;
-                }
-                if (Kitos.Helpers.ValidationHelper.checkIfDateIsInvalid(date, notify)) {
-                    return;
-                }
-
-                if (value === "" || value == undefined) {
+                if (!value) {
                     var payload = {};
                     payload[field] = null;
                     patch(payload, saveUrlWithOrgId);
-                } 
-                else {
-                    const dateString = date.format(formatDateString);
+                }
+                else if (Kitos.Helpers.DateValidationHelper.validateValidityPeriod(concluded, expirationDate, notify, "Ibrugtagningsdato", "Slutdato for anvendelse")) {
+                    const dateString = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, Kitos.Constants.DateFormat.EnglishDateFormat]).format(Kitos.Constants.DateFormat.EnglishDateFormat);
                     var payload = {};
                     payload[field] = dateString;
                     patch(payload, saveUrlWithOrgId);
@@ -95,7 +86,7 @@
             }
 
             function reloadValidationStatus() {
-                itSystemUsageService.getValidationDetails(itSystemUsage.id).then(newStatus => {
+                itSystemUsageService.getValidationDetails(itSystemUsageVm.id).then(newStatus => {
                     $scope.validationStatus = newStatus;
                 });
             }
@@ -103,7 +94,7 @@
             function bindLifeCycleStatusModel() {
                 const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
                 const options = lifeCycleStatusOptions.options;
-                const currentId = itSystemUsage.lifeCycleStatus ?? 0;
+                const currentId = itSystemUsageVm.lifeCycleStatus ?? 0;
                 const optionsWithCurrentId = options.filter(x => x.id === currentId);
                 if (!optionsWithCurrentId)
                     return;
