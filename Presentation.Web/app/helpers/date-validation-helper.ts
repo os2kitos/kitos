@@ -1,16 +1,25 @@
 ﻿module Kitos.Helpers {
     export class DateValidationHelper {
-        static validateInterval(startDate:string , endDate: string, notify, startDateFieldName: string, endDateFieldName: string) {
-            const formatDateString = "YYYY-MM-DD";
-            const formattedFromDate = startDate != null ? moment(startDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day") : null;
-            const formattedEndDate = endDate != null ? moment(endDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day") : null;
+        static validateValidityPeriod(fromDate: string, endDate: string, notify, fromDateFieldName: string, endDateFieldName: string) {
+            const formatDateString = Kitos.Constants.DateFormat.EnglishDateFormat;
+            const formattedFromDate = fromDate ? moment(fromDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day") : null;
+            const formattedEndDate = endDate ? moment(endDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day") : null;
 
-            return DateValidationHelper.checkIfDateIsValid(formattedFromDate, notify)
-                && DateValidationHelper.checkIfDateIsValid(formattedEndDate, notify)
+            if (formattedEndDate == null && formattedFromDate == null) {
+                return true;
+            }
+            if (formattedEndDate == null && formattedFromDate != null) {
+                return this.checkIfDateIsValid(formattedFromDate, notify, fromDateFieldName);
+            }
+            if (formattedEndDate != null && formattedFromDate == null) {
+                return this.checkIfDateIsValid(formattedEndDate, notify, endDateFieldName);
+            }
+            return DateValidationHelper.checkIfDateIsValid(formattedFromDate, notify, fromDateFieldName)
+                && DateValidationHelper.checkIfDateIsValid(formattedEndDate, notify, endDateFieldName)
                 && DateValidationHelper.checkIfStartDateIsSmallerThanEndDate(formattedFromDate,
                     formattedEndDate,
                     notify,
-                    startDateFieldName,
+                    fromDateFieldName,
                     endDateFieldName);
         }
 
@@ -23,9 +32,9 @@
             return true;
         }
 
-        static checkIfDateIsValid(date: moment.Moment, notify): boolean {
+        static checkIfDateIsValid(date: moment.Moment, notify, fieldName: string): boolean {
             if (date != null && !date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                notify.addErrorMessage(`Den indtastede  \"${fieldName}\" er ugyldig.`);
                 return false;
             }
 

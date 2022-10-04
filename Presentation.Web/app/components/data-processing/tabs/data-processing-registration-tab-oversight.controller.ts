@@ -92,9 +92,7 @@
             this.removeOversightDate(oversightId);
         };
 
-        datepickerOptions = {
-            format: "dd-MM-yyyy"
-        };
+        datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
 
         private bindOversigthOptions() {
