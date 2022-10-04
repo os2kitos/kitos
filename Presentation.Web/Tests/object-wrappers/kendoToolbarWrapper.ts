@@ -2,17 +2,13 @@ import CSSLocator = require("./CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 
 type HeaderButtons = {
-    resetFilter: protractor.ElementFinder,
-    saveFilter: protractor.ElementFinder,
-    useFilter: protractor.ElementFinder,
-    deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
     systemCatalogCreate: protractor.ElementFinder,
     createDpa: protractor.ElementFinder,
     editReference: protractor.ElementFinder,
-    deleteReference: protractor.ElementFinder,
     editSaveReference: protractor.ElementFinder,
     createReference: protractor.ElementFinder,
+    deleteReference: protractor.ElementFinder,
     localAdminDropdownReference: protractor.ElementFinder,
 };
 
@@ -63,10 +59,6 @@ class kendoToolbarWrapper {
         var buttons: HeaderButtons = {
             editReference: element(byDataElementType(consts.kendoReferenceEditButton)),
             editSaveReference: element(byDataElementType(consts.kendoReferenceEditSaveButton)),
-            resetFilter: element(byDataElementType(consts.kendoButtonResetFilter)),
-            saveFilter: element(byDataElementType(consts.kendoButtonSaveFilter)),
-            useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
-            deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
             createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
             systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
             createDpa: element(byDataElementType(consts.kendoDpaButtonCreate)),

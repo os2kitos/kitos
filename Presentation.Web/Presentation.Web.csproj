@@ -1152,7 +1152,6 @@
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\OrgHelper.ts" />
