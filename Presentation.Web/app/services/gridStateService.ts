@@ -409,8 +409,8 @@
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Kolonneopsætningen er gemt for organisationen");
-                            $window.localStorage.removeItem(locallyChangedKey);
-                            getGridOrganizationalConfiguration(); // Load the newly saved grid
+                            removeOrgConfig();
+                            return getGridOrganizationalConfiguration() as any; // Load the newly saved grid
                         }
                     }, (error) => {
                         notify.addErrorMessage("Der opstod en fejl i forsøget på at gemme den nye kolonneopsætning");
