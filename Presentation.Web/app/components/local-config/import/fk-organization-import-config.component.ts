@@ -46,8 +46,10 @@
         synchronizationStatus: IFkOrganizationSynchronizationStatus | null = null;
         commands: Array<IFkOrganizationCommand> | null = null;
 
-        static $inject: string[] = ["stsOrganizationSyncService"];
-        constructor(private readonly stsOrganizationSyncService: Kitos.Services.Organization.IStsOrganizationSyncService) {
+        static $inject: string[] = ["stsOrganizationSyncService", "fkOrganisationImportDialogFactory"];
+        constructor(
+            private readonly stsOrganizationSyncService: Kitos.Services.Organization.IStsOrganizationSyncService,
+            private readonly fkOrganisationImportDialogFactory: Kitos.LocalAdmin.FkOrganisation.Modals.IFKOrganisationImportDialogFactory) {
         }
 
         $onInit() {
@@ -104,12 +106,12 @@
                     category: CommandCategory.Create,
                     enabled: result.canCreateConnection,
                     onClick: () => {
-                        //TODO - open a dialog!
-                        console.log("CREATE");
-                        //TODO: Open the dialog in stead
-                        this.stsOrganizationSyncService
-                            .createConnection(this.currentOrganizationUuid, null) //TODO: Get second arg
-                            .then(() => this.loadState());
+                        this.fkOrganisationImportDialogFactory
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null)
+                            .closed.then(() => {
+                                //Reload state from backend if the dialog was closed 
+                                this.loadState();
+                            });
                     }
                 });
             }
