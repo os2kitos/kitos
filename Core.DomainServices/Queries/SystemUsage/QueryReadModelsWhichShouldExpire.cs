@@ -21,13 +21,13 @@ namespace Core.DomainServices.Queries.SystemUsage
 
                 x =>
                     // All currently set as active in the read model
-                    x.ActiveAccordingToValidityPeriod &&
+                    (x.ActiveAccordingToValidityPeriod &&
                     // Expiration data defined
                     x.SourceEntity.ExpirationDate != null &&
                     // Expiration date has passed
-                    x.SourceEntity.ExpirationDate < currentTime &&
+                    x.SourceEntity.ExpirationDate < currentTime) ||
                     // All currently set as active in the read model
-                    x.MainContractIsActive &&
+                    (x.MainContractIsActive &&
                     // Main Contract is not null
                     x.SourceEntity.MainContract != null &&
                     // Remove results where the date has no effect (active overrides all other logic)
@@ -36,11 +36,12 @@ namespace Core.DomainServices.Queries.SystemUsage
                         // Expiration data defined
                         x.SourceEntity.MainContract.ItContract.ExpirationDate != null &&
                         // Expiration date has passed
-                        x.SourceEntity.MainContract.ItContract.ExpirationDate < currentTime || 
+                        x.SourceEntity.MainContract.ItContract.ExpirationDate < currentTime ||
                         // Termination data defined
-                        x.SourceEntity.MainContract.ItContract.Terminated != null && 
+                        x.SourceEntity.MainContract.ItContract.Terminated != null &&
                         // Termination date defined
                         x.SourceEntity.MainContract.ItContract.Terminated < currentTime
+                    )
                     )
             );
         }

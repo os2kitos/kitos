@@ -39,12 +39,12 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
 
             //Arrange
             var excludedSinceReadModelIsCurrentlyActive = CreateReadModel(true, null, null, null);
-            var excludedSinceConcludedHasNotYetPassed = CreateReadModel(false, _now.Date.AddDays(1), null, null);
+            var excludedSinceConcludedHasNotYetPassed = CreateReadModel(false, _now.Date.AddDays(1), null, inactiveMainContract);
             var includedSinceConcludedHasPassedAndNoExpiration = CreateReadModel(false, _now.Date, null, null);
             var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1), null);
             var includedSinceMainContractIsActive= CreateReadModel(false, null, null, activeMainContract);
-            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1), null);
-            var excludedSinceConcludedSinceContractExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1), inactiveMainContract);
+            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1), inactiveMainContract);
+            var excludedSinceConcludedSinceContractExpired = CreateReadModel(false, _now.Date.AddDays(2), null, inactiveMainContract);
 
             var input = new[]
             {
