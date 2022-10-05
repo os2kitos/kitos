@@ -27,6 +27,7 @@
 
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
+        private pageName = "systemCatalog";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
@@ -92,7 +93,7 @@
             this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
             $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
-            this.showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
+            this.showInactiveSystems = ItSystem.Settings.OverviewState.getShowInactiveSystems($window, user.id, this.pageName);
             this.updateToggleActiveSystemsMasterFilterBtnText();
 
             $scope.$on("kendoWidgetCreated",
@@ -181,7 +182,7 @@
 
         toggleActiveSystemsMasterFilter(): void {
             this.showInactiveSystems = !this.showInactiveSystems;
-            ItSystem.Settings.CatalogState.setShowInactiveSystems(this.$window, this.user.id, this.showInactiveSystems);
+            ItSystem.Settings.OverviewState.setShowInactiveSystems(this.$window, this.user.id, this.pageName, this.showInactiveSystems);
             this.updateToggleActiveSystemsMasterFilterBtnText();
             this.mainGrid.dataSource.read();
         }

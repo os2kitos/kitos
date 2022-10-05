@@ -77,7 +77,7 @@ class Login {
                         .then(() => homePage.selectWorkingOrganizationButton.click());
                 }
                 else {
-                    console.log(`Logging in as user other than global or local admin`);
+                    console.log(`Logging in as user other than global admin`);
                     return true;
                 }
             })

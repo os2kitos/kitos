@@ -1,5 +1,4 @@
 ﻿import IPageObject = require("../../IPageObject.po");
-import KendoToolbarHelper = require("../../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper")
 import CssLocatorHelper = require("../../../object-wrappers/CSSLocatorHelper");
 import Constants = require("../../../Utility/Constants");
@@ -18,7 +17,6 @@ class ItSystemCatalog implements IPageObject {
         return this.navigationHelper.getPage("/#/system/catalog");
     }
 
-    kendoToolbarHelper = new KendoToolbarHelper();
     kendoToolbarWrapper = new KendoToolbarWrapper();
     createCatalogForm = element(this.byDataElementType(this.consts.catalogCreateForm));
 
