@@ -432,6 +432,7 @@ module Kitos.Utility.KendoGrid {
     }
 
     export enum KendoToolbarButtonColor {
+        None,
         Grey,
         Green
     }
@@ -690,7 +691,7 @@ module Kitos.Utility.KendoGrid {
             if (confirm(`Er du sikker på at du vil gemme nuværende kolonneopsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
                 return this.gridState
                     .saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType)
-                    .then(()=>this.$state.reload());
+                    .then(() => this.$state.reload());
             }
         }
 
@@ -747,6 +748,19 @@ module Kitos.Utility.KendoGrid {
             this.postCreationActions = []; //Clear any bindings held in this array
         }
 
+        private renderToolbarEntryStylingClasses(entry: IKendoToolbarEntry) {
+            const classes: Array<string> = [];
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color));
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position));
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins));
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getStandardWidthCssClass(entry.standardWidth));
+            return classes
+                .map(c => c.trim())
+                .filter(c => c !== "")
+                .join(" ");
+        }
+
+
         private build() {
             this.checkRequiredField("$scope", this.$scope);
             this.checkRequiredField("storageKey", this.storageKey);
@@ -798,7 +812,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>{{kendoVm.${entry.id}.getEntryTitle()}}</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${this.renderToolbarEntryStylingClasses(entry)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>{{kendoVm.${entry.id}.getEntryTitle()}}</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             getEntryTitle: () => {
@@ -813,18 +827,18 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<a data-element-type='${entry.id}Button' role='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
+                            template: `<a data-element-type='${entry.id}Button' role='button' class='${this.renderToolbarEntryStylingClasses(entry)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled()
                         };
                         break;
                     case KendoToolbarImplementation.DropDownList:
-                        
+
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${this.renderToolbarEntryStylingClasses(entry)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
@@ -849,11 +863,11 @@ module Kitos.Utility.KendoGrid {
                         };
                         break;
                     case KendoToolbarImplementation.CustomTemplateDropDownList:
-                        
+
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)} ${Helpers.KendoToolbarCustomizationHelper.getStandardWidthCssClass(entry.standardWidth)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()" ng-show="${entry.show}"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${this.renderToolbarEntryStylingClasses(entry)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()" ng-show="${entry.show}"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
@@ -1039,9 +1053,11 @@ module Kitos.Utility.KendoGrid {
                 show: true,
                 id: Constants.CustomFilterDropdown.Id,
                 title: Constants.CustomFilterDropdown.DefaultTitle,
-                color: KendoToolbarButtonColor.Grey,
+                color: KendoToolbarButtonColor.None,
+                standardWidth: KendoToolbarStandardWidth.FitContent,
                 position: KendoToolbarButtonPosition.Left,
                 implementation: KendoToolbarImplementation.CustomTemplateDropDownList,
+                margins: [Utility.KendoGrid.KendoToolbarMargin.Left, Utility.KendoGrid.KendoToolbarMargin.Right],
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: (newItem: ICustomKendoToolbarDropDownEntry) => {
@@ -1091,10 +1107,11 @@ module Kitos.Utility.KendoGrid {
                 show: true,
                 id: Constants.LocalAdminDropdown.Id,
                 title: Constants.LocalAdminDropdown.DefaultTitle,
-                color: KendoToolbarButtonColor.Grey,
+                color: KendoToolbarButtonColor.None,
                 position: KendoToolbarButtonPosition.Left,
                 standardWidth: KendoToolbarStandardWidth.FitContent,
                 implementation: KendoToolbarImplementation.CustomTemplateDropDownList,
+                margins: [Utility.KendoGrid.KendoToolbarMargin.Left, Utility.KendoGrid.KendoToolbarMargin.Right],
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: (newItem: ICustomKendoToolbarDropDownEntry) => {
@@ -1118,7 +1135,7 @@ module Kitos.Utility.KendoGrid {
                         {
                             id: Constants.LocalAdminDropdown.RemoveFilterOrg.Id,
                             text: Constants.LocalAdminDropdown.RemoveFilterOrg.Text,
-                            enabled: () =>  self.canDeleteGridForOrganization(),
+                            enabled: () => self.canDeleteGridForOrganization(),
                             onClick: () => this.clearGridForOrganization(),
                             get template(): string {
                                 return self.getKendoDisabledTemplate(this);
@@ -1129,7 +1146,7 @@ module Kitos.Utility.KendoGrid {
             } as IKendoToolbarEntry;
         }
 
-        private triggerSelectedOptionChanged(e: {sender: {value: () => string}}, entry: IKendoToolbarEntry): void {
+        private triggerSelectedOptionChanged(e: { sender: { value: () => string } }, entry: IKendoToolbarEntry): void {
             const selectedId = e.sender.value();
             const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
             entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0

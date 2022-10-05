@@ -19,21 +19,23 @@
 
         static convertMarginEnumToHtmlClass(margin: Utility.KendoGrid.KendoToolbarMargin): string {
             switch (margin) {
-            case Utility.KendoGrid.KendoToolbarMargin.Left:
-                return "kendo-margin-left";
-            case Utility.KendoGrid.KendoToolbarMargin.Right:
-                return "kendo-margin-right";
-            case Utility.KendoGrid.KendoToolbarMargin.Top:
-                throw `Unknown margin ${margin}`;
-            case Utility.KendoGrid.KendoToolbarMargin.Down:
-                throw `Unknown margin ${margin}`;
-            default:
-                throw `Unknown margin ${margin}`;
+                case Utility.KendoGrid.KendoToolbarMargin.Left:
+                    return "kendo-margin-left";
+                case Utility.KendoGrid.KendoToolbarMargin.Right:
+                    return "kendo-margin-right";
+                case Utility.KendoGrid.KendoToolbarMargin.Top:
+                    throw `Unknown margin ${margin}`;
+                case Utility.KendoGrid.KendoToolbarMargin.Down:
+                    throw `Unknown margin ${margin}`;
+                default:
+                    throw `Unknown margin ${margin}`;
             }
         }
 
-        static getColorClass (color: Utility.KendoGrid.KendoToolbarButtonColor): string {
+        static getColorClass(color: Utility.KendoGrid.KendoToolbarButtonColor): string {
             switch (color) {
+                case Utility.KendoGrid.KendoToolbarButtonColor.None:
+                    return "";
                 case Utility.KendoGrid.KendoToolbarButtonColor.Green:
                     return "btn kendo-btn-sm btn-success";
                 case Utility.KendoGrid.KendoToolbarButtonColor.Grey:
@@ -43,7 +45,7 @@
             }
         };
 
-        static getPositionClass (position: Utility.KendoGrid.KendoToolbarButtonPosition): string {
+        static getPositionClass(position: Utility.KendoGrid.KendoToolbarButtonPosition): string {
             switch (position) {
                 case Utility.KendoGrid.KendoToolbarButtonPosition.Left:
                     return "";
@@ -54,7 +56,7 @@
             }
         };
 
-        static getStandardWidthCssClass(standardWidth?: Utility.KendoGrid.KendoToolbarStandardWidth): string {
+        static getStandardWidthCssClass(standardWidth: Utility.KendoGrid.KendoToolbarStandardWidth | undefined): string {
             if (standardWidth === undefined) {
                 return "";
             }

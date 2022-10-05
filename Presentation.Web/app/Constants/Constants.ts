@@ -35,7 +35,7 @@
 
         static readonly DefaultFilter = {
             Id: "defaultFilter",
-            Text: "- - - - Vælg - - - -"
+            Text: Select2.EmptyField
         };
     }
 

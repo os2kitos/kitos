@@ -110,7 +110,7 @@
                 show: true,
                 id: Constants.ExcelExportDropdown.Id,
                 title: Constants.ExcelExportDropdown.DefaultTitle,
-                color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                color: Utility.KendoGrid.KendoToolbarButtonColor.None,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
                 margins: [Utility.KendoGrid.KendoToolbarMargin.Right],

@@ -236,10 +236,11 @@
                 launcher = launcher.withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg systemrolle...",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                    color: Utility.KendoGrid.KendoToolbarButtonColor.None,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    margins: [Utility.KendoGrid.KendoToolbarMargin.Left],
+                    margins: [Utility.KendoGrid.KendoToolbarMargin.Left, Utility.KendoGrid.KendoToolbarMargin.Right],
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                    standardWidth: Utility.KendoGrid.KendoToolbarStandardWidth.Standard,
                     enabled: () => true,
                     dropDownConfiguration: {
                         selectedOptionChanged: newItem => {
@@ -281,6 +282,7 @@
                 color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                margins: [Utility.KendoGrid.KendoToolbarMargin.Left],
                 enabled: () => true,
                 onClick: () => toggleActiveSystemsMasterFilter()
             } as Utility.KendoGrid.IKendoToolbarEntry);
