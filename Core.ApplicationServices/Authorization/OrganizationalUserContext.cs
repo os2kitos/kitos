@@ -88,5 +88,21 @@ namespace Core.ApplicationServices.Authorization
                     return false;
             }
         }
+
+        public bool HasSelectedRoleInSameOrganizationAs(IEntity entity, OrganizationRole role)
+        {
+            switch (entity)
+            {
+                //Prefer match on hasOrganization first since it has static knowledge of organization relationship
+                case IOwnedByOrganization hasOrg:
+                    return HasRole(hasOrg.OrganizationId, role);
+                case IIsPartOfOrganization organizationRelationship:
+                    return organizationRelationship
+                        .GetOrganizationIds()
+                        .Any(x => HasRole(x, role));
+                default:
+                    return false;
+            }
+        }
     }
 }

@@ -58,7 +58,8 @@
             "_",
             "text",
             "allRoles",
-            "userRoleAdministrationService"
+            "userRoleAdministrationService",
+            "userService"
         ];
 
         constructor(
@@ -69,7 +70,8 @@
             private readonly _: ILoDashWithMixins,
             text,
             allRoles: Models.Users.UserRoleAssigmentDTO,
-            private readonly userRoleAdministrationService: Services.IUserRoleAdministrationService) {
+            private readonly userRoleAdministrationService: Services.IUserRoleAdministrationService,
+            private readonly userService: Services.IUserService) {
 
             this.firstName = userToModify.Name;
             this.lastName = userToModify.LastName;
@@ -242,12 +244,19 @@
             if (!confirm('Er du sikker på, at du vil slette brugeren?')) {
                 return;
             }
-            this.userRoleAdministrationService.removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
+            this.userService.deleteUser(this.userToModify.Id)
                 .then(success => {
                     if (success) {
                         this.$uibModalInstance.close();
                     }
                 });
+
+            /* this.userRoleAdministrationService.removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
+                 .then(success => {
+                     if (success) {
+                         this.$uibModalInstance.close();
+                     }
+                 });*/
         }
 
         deleteSelectedRoles() {
