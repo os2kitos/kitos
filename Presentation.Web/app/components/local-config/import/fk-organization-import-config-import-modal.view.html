@@ -33,3 +33,7 @@
         </div>
     </div>
 </div>
+<div class="modal-footer">
+    <button type="submit" ng-disabled="!!(importSettings.synchronizationDepth.$error.number || importSettings.synchronizationDepth.$error.pattern || importSettings.synchronizationDepth.$error.min)" id="btnAssign" class="btn btn-primary" data-ng-click="vm.performImport()" data-disabled-on-busy>Gennemfør synkronisering</button>
+    <button type="submit" class="btn btn-default" data-ng-click="vm.cancel()" data-disabled-on-busy>Afbryd</button>
+</div>

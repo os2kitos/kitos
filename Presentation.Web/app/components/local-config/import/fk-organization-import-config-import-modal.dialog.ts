@@ -28,24 +28,28 @@
     }
 
     class FKOrganisationImportController {
-        static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService"];
+        static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance"];
         constructor(
             readonly flow: FKOrganisationImportFlow,
             private readonly organizationUuid: string,
             private readonly synchronizationDepth: number | null,
-            private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService) {
-            //TODO: Once this becomes an edit dialog, also add the sy c depth
+            private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService,
+            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
         }
 
         $onInit() {
-            //TODO: Use this to begin load of the hierarchy from FK Organization so that it is ready for preview!
+            //TODO: Use this to begin load of the hierarchy from FK Organization so that it is ready for preview! https://os2web.atlassian.net/browse/KITOSUDV-3310
+        }
+
+        cancel() {
+            this.$uibModalInstance.dismiss();
         }
 
         performImport() {
             this.stsOrganizationSyncService
                 .createConnection(this.organizationUuid, this.synchronizationDepth)
                 .then(() => {
-                    //TODO: Then---close the modal instance
+                    this.$uibModalInstance.close();
                 });
         }
     }
