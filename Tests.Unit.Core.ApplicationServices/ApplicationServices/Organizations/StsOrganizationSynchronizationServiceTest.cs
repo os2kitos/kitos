@@ -31,7 +31,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _stsOrganizationUnitService = new Mock<IStsOrganizationUnitService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _sut = new StsOrganizationSynchronizationService(_authorizationContextMock.Object, _stsOrganizationUnitService.Object, _organizationServiceMock.Object, Mock.Of<ILogger>());
+            _sut = new StsOrganizationSynchronizationService(_authorizationContextMock.Object, _stsOrganizationUnitService.Object, _organizationServiceMock.Object, Mock.Of<ILogger>(), Mock.Of<IStsOrganizationService>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

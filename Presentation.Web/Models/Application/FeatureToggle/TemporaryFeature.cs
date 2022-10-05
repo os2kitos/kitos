@@ -5,5 +5,6 @@
     /// </summary>
     public enum TemporaryFeature
     {
+        FK_Organisation = 0
     }
 }

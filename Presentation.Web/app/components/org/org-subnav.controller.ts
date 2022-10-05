@@ -22,10 +22,6 @@
 
                 var subnav = [];
 
-                if (user.currentConfig.showTabOverview) {
-                    subnav.push({ state: 'organization.overview', text: 'Overblik' });
-                }
-
                 subnav.push({ state: 'organization.structure', text: 'Organisation' });
                 subnav.push({ state: 'organization.user', text: 'Brugere' });
                 subnav.push({ state: 'organization.gdpr', text: 'Stamdata' });

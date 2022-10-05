@@ -4,6 +4,8 @@
     {
         NotFound,
         BadInput,
+        MissingServiceAgreement,
+        ExistingServiceAgreementIssue,
         Unknown
     }
 }

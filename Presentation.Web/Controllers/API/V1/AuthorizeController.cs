@@ -20,11 +20,11 @@ using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
-using Presentation.Web.Extensions;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
+using AuthenticationScheme = Core.DomainModel.Users.AuthenticationScheme;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [Route("api/authorize/GetOrganizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
-        public HttpResponseMessage GetOrganizations([FromUri]string orderBy = null, [FromUri]bool? orderByAsc = true)
+        public HttpResponseMessage GetOrganizations([FromUri] string orderBy = null, [FromUri] bool? orderByAsc = true)
         {
             var orgs = GetOrganizationsWithMembershipAccess();
 
@@ -142,7 +142,7 @@ namespace Presentation.Web.Controllers.API.V1
             }
             try
             {
-                var result = AuthenticateUser(loginDto);
+                var result = AuthenticateUser(loginDto, AuthenticationScheme.Token);
 
                 if (result.Failed)
                 {
@@ -150,12 +150,6 @@ namespace Presentation.Web.Controllers.API.V1
                 }
 
                 var user = result.Value;
-
-                if (CanIssueTokenTo(user))
-                {
-                    Logger.Warn("User with Id {id} tried to use get a token for the API but was forbidden", user.Id);
-                    return Forbidden();
-                }
 
                 var token = new TokenValidator().CreateToken(user);
 
@@ -196,7 +190,7 @@ namespace Presentation.Web.Controllers.API.V1
 
             try
             {
-                var result = AuthenticateUser(loginDto);
+                var result = AuthenticateUser(loginDto, AuthenticationScheme.Cookie);
 
                 if (result.Failed)
                 {
@@ -284,8 +278,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return response;
         }
-        
-        private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto)
+
+        private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto, AuthenticationScheme authenticationScheme)
         {
             if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
             {
@@ -304,12 +298,12 @@ namespace Presentation.Web.Controllers.API.V1
                 }
             }
 
-            if (user.CanAuthenticate())
+            if (user.GetAuthenticationSchemes().Contains(authenticationScheme))
             {
                 return user;
             }
 
-            Logger.Info("'AUTH FAILED: Non-global admin' User with id {userId} and no organization rights denied access", user.Id);
+            Logger.Info("'AUTH FAILED: Non-global admin' User with id {userId} and no organization rights or wrong scheme {scheme} denied access", user.Id, authenticationScheme);
             {
                 return Unauthorized();
             }

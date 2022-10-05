@@ -14,38 +14,52 @@ namespace Core.ApplicationServices.Organizations
         private readonly IStsOrganizationUnitService _stsOrganizationUnitService;
         private readonly IOrganizationService _organizationService;
         private readonly ILogger _logger;
+        private readonly IStsOrganizationService _stsOrganizationService;
         private readonly IAuthorizationContext _authorizationContext;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
             IStsOrganizationUnitService stsOrganizationUnitService,
             IOrganizationService organizationService,
-            ILogger logger)
+            ILogger logger,
+            IStsOrganizationService stsOrganizationService)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
             _logger = logger;
+            _stsOrganizationService = stsOrganizationService;
             _authorizationContext = authorizationContext;
+        }
+
+        public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Guid organizationId)
+        {
+            return GetOrganizationWithImportPermission(organizationId)
+                .Match(ValidateConnection, error => new DetailedOperationError<CheckConnectionError>(error.FailureType, CheckConnectionError.Unknown, error.Message.GetValueOrDefault()));
+        }
+
+        private Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Organization organization)
+        {
+            return _stsOrganizationService.ValidateConnection(organization);
         }
 
         public Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<uint> levelsToInclude)
         {
-            var orgWithPermission = _organizationService
+            return
+                GetOrganizationWithImportPermission(organizationId)
+                    .Bind(LoadOrganizationUnits)
+                    .Bind(root => FilterByRequestedLevels(root, levelsToInclude));
+        }
+
+        private Result<StsOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
+        {
+            return _stsOrganizationUnitService.ResolveOrganizationTree(organization).Match<Result<StsOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
+        }
+
+        private Result<Organization, OperationError> GetOrganizationWithImportPermission(Guid organizationId)
+        {
+            return _organizationService
                 .GetOrganization(organizationId)
                 .Bind(WithImportPermission);
-
-            if (orgWithPermission.Failed)
-                return orgWithPermission.Error;
-
-            var organization = orgWithPermission.Value;
-            var orgTreeResult = _stsOrganizationUnitService.ResolveOrganizationTree(organization);
-            if (orgTreeResult.Failed)
-            {
-                var detailedOperationError = orgTreeResult.Error;
-                return new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType);
-            }
-
-            return FilterByRequestedLevels(orgTreeResult.Value, levelsToInclude);
         }
 
         private Result<Organization, OperationError> WithImportPermission(Organization organization)
