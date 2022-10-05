@@ -6,14 +6,30 @@
     </div>
 </div>
 
-<form name="createForm">
-    <div class="modal-body">
-        <div>
-            <!--TODO-->
+<div class="modal-body" name="">
+    <div class="row">
+        <div class="form-group col-xs-12">
+            <form name="importSettings">
+                <div class="col-xs-12">
+                    <label for="sync-levels-input" class="control-label small">Niveauer <field-help-text data-key="local-config-fk-org-import-modal.sync-levels" /></label>
+                </div>
+                <div class="col-xs-4">
+                    <input class="form-control input-sm" type="number" ng-model="vm.synchronizationDepth" step="1" min="1" pattern="^[0-9]*$" name="synchronizationDepth" />
+                </div>
+                <div class="col-xs-12" ng-switch="!!(importSettings.synchronizationDepth.$error.number || importSettings.synchronizationDepth.$error.pattern || importSettings.synchronizationDepth.$error.min)">
+                    <span ng-switch-when="false" ng-if="!vm.synchronizationDepth" class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Alle niveauer i organisationen synkroniseres fra FK Organisation. Angiv antal niveauer for at begrænse hierarkiet.
+                    </span>
+                    <span ng-switch-when="false" ng-if="vm.synchronizationDepth && vm.synchronizationDepth > 0" class="help-block small">
+                        KITOS synkroniserer <strong>{{vm.synchronizationDepth}}</strong> niveauer fra organisationshierarkiet i FK Organisation. Slet indtastningen for at synkronisere det fulde organisationshierarki.
+                    </span>
+                    <span ng-switch-when="true" class="help-block small">
+                        <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true"></i>
+                        <span class="text-danger">Indtast et heltal større end 0 eller lad feltet være tomt.</span>
+                    </span>
+                </div>
+            </form>
         </div>
     </div>
-
-    <div class="modal-footer">
-        <!--TODO-->
-    </div>
-</form>
+</div>
