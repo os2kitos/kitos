@@ -284,6 +284,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.OrganizationId, readModel.OrganizationId);
             Assert.Equal(systemUsage.IsActiveAccordingToDateFields, readModel.ActiveAccordingToValidityPeriod);
             Assert.Equal(systemUsage.IsActiveAccordingToLifeCycle, readModel.ActiveAccordingToLifeCycle);
+            Assert.Equal(systemUsage.CheckSystemValidity().Result, readModel.SystemActive);
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);

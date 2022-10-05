@@ -180,9 +180,7 @@
                     }
                 }
 
-                $scope.datepickerOptions = {
-                    format: "dd-MM-yyyy"
-                };
+                $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
             }]);
 
 })(angular, app);

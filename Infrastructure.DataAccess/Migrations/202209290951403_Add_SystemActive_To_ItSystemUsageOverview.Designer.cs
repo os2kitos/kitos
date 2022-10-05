@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Remove_TaskUsage : IMigrationMetadata
+    public sealed partial class Add_SystemActive_To_ItSystemUsageOverview : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Remove_TaskUsage));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_SystemActive_To_ItSystemUsageOverview));
         
         string IMigrationMetadata.Id
         {
-            get { return "202209301050100_Remove_TaskUsage"; }
+            get { return "202209290951403_Add_SystemActive_To_ItSystemUsageOverview"; }
         }
         
         string IMigrationMetadata.Source
