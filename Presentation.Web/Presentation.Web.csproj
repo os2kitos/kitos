@@ -356,6 +356,7 @@
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
     <TypeScriptCompile Include="app\Configs\kendo-date-picker-options.ts" />
@@ -366,6 +367,8 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\check-sts-organization-connection-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
@@ -375,6 +378,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\feature-toggle\feature-toggle-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
     <TypeScriptCompile Include="app\models\right-entity.ts" />
@@ -398,6 +402,7 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\CheckStsOrganizationConnectionResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
     <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
@@ -635,6 +640,7 @@
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-config.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\components\local-config\ui-customization\local-ui-customization.view.html" />
@@ -683,7 +689,6 @@
     <Compile Include="Models\API\V1\BusinessRoleDTO.cs" />
     <Compile Include="Models\API\V1\CreateItSystemDTO.cs" />
     <Compile Include="Models\API\V1\CreateItsystemUsageDTO.cs" />
-    <Compile Include="Models\API\V1\CreateTaskUsageDTO.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Application\Csv\CsvResponseBuilder.cs" />
@@ -863,11 +868,14 @@
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\user\primary-start-unit-view-model.ts" />
     <TypeScriptCompile Include="app\services\dataProcessingRegistrationService.ts" />
+    <TypeScriptCompile Include="app\services\feature-toggle\feature-toggle-service.ts" />
+    <TypeScriptCompile Include="app\services\feature-toggle\temporary-feature.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\it-contract\it-contract-service.ts" />
     <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
+    <TypeScriptCompile Include="app\services\sts-organization-sync-service.ts" />
     <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
     <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
@@ -1040,7 +1048,6 @@
     <Compile Include="Controllers\API\V1\ItSystemUsageController.cs" />
     <Compile Include="Models\API\V1\DataRowDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemDTO.cs" />
-    <Compile Include="Controllers\API\V1\TaskUsageController.cs" />
     <Compile Include="Models\API\V1\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\API\V1\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitController.cs" />
@@ -1077,10 +1084,7 @@
     <Compile Include="Models\API\V1\RightInputDTO.cs" />
     <Compile Include="Models\API\V1\RoleDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefSelectedDTO.cs" />
-    <Compile Include="Models\API\V1\TaskRefUsageDTO.cs" />
-    <Compile Include="Models\API\V1\TaskUsageDTO.cs" />
     <Compile Include="Models\API\V1\TaskRefDTO.cs" />
-    <Compile Include="Models\API\V1\TaskUsageNestedDTO.cs" />
     <Compile Include="Models\API\V1\TextDTO.cs" />
     <Compile Include="Models\API\V1\UserDTO.cs" />
     <Compile Include="Models\API\V1\UserOrganizationsDTO.cs" />
@@ -1410,13 +1414,8 @@
     <Content Include="app\components\local-config\local-config-system.view.html" />
     <Content Include="app\components\local-config\local-config-org.view.html" />
     <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
-    <Content Include="app\components\org\overview\org-overview.view.html" />
-    <Content Include="app\components\org\overview\org-overview-modal-comment.view.html" />
-    <Content Include="app\components\org\overview\org-overview-task-foldout-leaf.view.html" />
-    <Content Include="app\components\org\overview\org-overview-task-foldout-node.view.html" />
     <Content Include="app\components\org\structure\org-structure-tree-unit.view.html" />
     <Content Include="app\components\org\structure\org-structure.view.html" />
-    <Content Include="app\components\org\overview\org-overview-usage.view.html" />
     <Content Include="app\components\org\user\org-user-create.modal.view.html" />
     <Content Include="app\components\org\user\org-user-edit.modal.view.html" />
     <Content Include="app\components\org\user\org-user.view.html" />
@@ -1461,7 +1460,6 @@
     <TypeScriptCompile Include="app\models\organization\organization.ts" />
     <TypeScriptCompile Include="app\models\password-reset-request.ts" />
     <TypeScriptCompile Include="app\models\task-ref.ts" />
-    <TypeScriptCompile Include="app\models\task-usage.ts" />
     <TypeScriptCompile Include="app\models\traffic-light.ts" />
     <TypeScriptCompile Include="app\models\Api\api-wrapper.ts" />
     <TypeScriptCompile Include="app\models\user.ts" />
@@ -1508,7 +1506,6 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.controller.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-structure.controller.ts" />
     <TypeScriptCompile Include="app\components\org\org-subnav.controller.ts" />
-    <TypeScriptCompile Include="app\components\org\overview\org-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user.controller.ts" />
     <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
     <TypeScriptCompile Include="app\shared\limitToDots.filter.ts" />

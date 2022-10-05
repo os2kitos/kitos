@@ -32,7 +32,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IItInterfaceService _interfaceService;
         private readonly IOrganizationService _organizationService;
         private readonly IDefaultOrganizationResolver _defaultOrganizationResolver;
-        private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
         private readonly IDomainEvents _domainEvents;
 
         public HandleOrganizationBeingDeleted(
@@ -43,7 +42,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             IItInterfaceService interfaceService,
             IOrganizationService organizationService,
             IDefaultOrganizationResolver defaultOrganizationResolver,
-            IGenericRepository<TaskUsage> taskUsageRepository,
             IDomainEvents domainEvents)
         {
             _contractService = contractService;
@@ -53,7 +51,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _interfaceService = interfaceService;
             _organizationService = organizationService;
             _defaultOrganizationResolver = defaultOrganizationResolver;
-            _taskUsageRepository = taskUsageRepository;
             _domainEvents = domainEvents;
         }
 
@@ -156,14 +153,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             var dprs = organization.DataProcessingRegistrations.ToList();
             dprs.ForEach(x => _dataProcessingRegistrationService.Delete(x.Id).ThrowOnFailure());
             organization.DataProcessingRegistrations.Clear();
-
-            //Strip all task usages in the organization
-            foreach (var organizationUnit in organization.OrgUnits.ToList())
-            {
-                _taskUsageRepository.RemoveRange(organizationUnit.TaskUsages.ToList());
-                organizationUnit.TaskUsages.Clear();
-            }
-            _taskUsageRepository.Save();
         }
 
         private void ResolveRightsHolderConflicts(OrganizationRemovalConflicts conflicts, Organization organization)

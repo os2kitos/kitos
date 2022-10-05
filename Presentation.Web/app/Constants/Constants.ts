@@ -6,7 +6,7 @@
         static readonly SystemCatalog = "it-system.catalog";
         static readonly ContractOverview = "it-contract.overview";
         static readonly DataProcessingRegistrationOverview = "data-processing.overview";
-        static readonly OrganizationOverview = "organization.overview";
+        static readonly OrganizationOverview = "organization.structure";
         static readonly InterfaceCatalog = "it-system.interfaceCatalog";
     }
 

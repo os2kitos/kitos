@@ -31,6 +31,27 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(Ok, FromOperationError);
         }
 
+        [HttpGet]
+        [Route("connection-status")]
+        public HttpResponseMessage GetConnectionStatus(Guid organizationId)
+        {
+            return _stsOrganizationSynchronizationService
+                .ValidateConnection(organizationId)
+                .Match
+                (
+                    error => Ok(new CheckStsOrganizationConnectionResponseDTO
+                    {
+                        Error = error.Detail,
+                        Connected = false
+                    }),
+                    () => Ok(new CheckStsOrganizationConnectionResponseDTO()
+                    {
+                        Connected = true
+                    })
+                );
+
+        }
+
         private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(StsOrganizationUnit organizationUnit)
         {
             return new StsOrganizationOrgUnitDTO()

@@ -207,7 +207,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <returns>An organization unit</returns>
         [HttpGet]
         [Route("organizations/{organizationUuid}/organization-units/{organizationUnitId}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUnitResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -251,11 +251,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 Name = unit.Name,
                 UnitId = unit.LocalId,
                 Ean = unit.Ean,
-                ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO()),
-                Kle = unit
-                    .TaskUsages
-                    .Select(taskUsage => taskUsage.TaskRef.MapIdentityNamePairDTO())
-                    .ToList()
+                ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO())
             };
         }
         private OrganizationUserResponseDTO ToUserResponseDTO((Guid organizationUuid, User user) context)

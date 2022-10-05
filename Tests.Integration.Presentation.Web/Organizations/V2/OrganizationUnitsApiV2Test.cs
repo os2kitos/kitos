@@ -24,15 +24,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var taskRef = DatabaseAccess.MapFromEntitySet<TaskRef, TaskRef>(refs => refs.AsQueryable().First());
-            var rootUnitId = DatabaseAccess.MapFromEntitySet<OrganizationUnit, int>(units => units.AsQueryable().ByOrganizationId(organization.Id).First(x => x.ParentId == null).Id);
             var (_, token) = await CreateApiUser(organization);
             var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
             var unit1_1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
             var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
-
-            //Task ref must be set on the parent for the using to be available on children
-            await TaskUsageHelper.CreateTaskUsageAsync(rootUnitId, taskRef.Id);
-            await TaskUsageHelper.CreateTaskUsageAsync(unit2.Id, taskRef.Id);
 
             //Act
             var units = (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid)).ToList();
@@ -41,7 +36,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(4, units.Count); //Organizational hierarchy always contains at least 1 (the root created with the organization and then comes the user defined units)
             var root = Assert.Single(units.Where(x => x.Name == organization.Name));
             Assert.Null(root.ParentOrganizationUnit);
-            Assert.NotNull(root.Kle.SingleOrDefault(x => x.Uuid == taskRef.Uuid));
             AssertCreatedOrganizationUnit(units, unit1, (root.Uuid, root.Name));
             AssertCreatedOrganizationUnit(units, unit1_1, (unit1.Uuid, unit1.Name));
             AssertCreatedOrganizationUnit(units, unit2, (root.Uuid, root.Name), taskRef);
@@ -183,16 +177,15 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         private static void AssertCreatedOrganizationUnit(IEnumerable<OrganizationUnitResponseDTO> allUnits, OrgUnitDTO expectedUnit, (Guid Uuid, string Name) expectedRoot, params TaskRef[] kle)
         {
             var dto = Assert.Single(allUnits.Where(x => x.Uuid == expectedUnit.Uuid));
-            AssertCreatedOrganizationUnit(dto, expectedUnit, expectedRoot, kle);
+            AssertCreatedOrganizationUnit(dto, expectedUnit, expectedRoot);
         }
 
-        private static void AssertCreatedOrganizationUnit(OrganizationUnitResponseDTO dto, OrgUnitDTO expectedUnit, (Guid Uuid, string Name) expectedRoot, params TaskRef[] kle)
+        private static void AssertCreatedOrganizationUnit(OrganizationUnitResponseDTO dto, OrgUnitDTO expectedUnit, (Guid Uuid, string Name) expectedRoot)
         {
             Assert.Equal(expectedRoot.Uuid, dto.ParentOrganizationUnit?.Uuid);
             Assert.Equal(expectedRoot.Name, dto.ParentOrganizationUnit?.Name);
             Assert.Equal(expectedUnit.Ean, dto.Ean);
             Assert.Equal(expectedUnit.LocalId, dto.UnitId);
-            Assert.Equal(kle.Select(x => (x.Uuid, x.TaskKey)), dto.Kle.Select(x => (x.Uuid, x.Name)));
         }
     }
 }
