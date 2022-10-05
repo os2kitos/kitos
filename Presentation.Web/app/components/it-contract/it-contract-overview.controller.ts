@@ -319,10 +319,11 @@
                 launcher = launcher.withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg kontraktrolle...",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                    color: Utility.KendoGrid.KendoToolbarButtonColor.None,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
                     margins: [Utility.KendoGrid.KendoToolbarMargin.Left],
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                    standardWidth: Utility.KendoGrid.KendoToolbarStandardWidth.Standard,
                     enabled: () => true,
                     dropDownConfiguration: {
                         selectedOptionChanged: newItem => {

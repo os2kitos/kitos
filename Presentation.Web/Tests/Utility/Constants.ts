@@ -212,7 +212,7 @@
 
     readonly dataProcessingRegistrationView = "dataProcessingRegistrationView";
 
-    readonly filterOrgButton = "filterOrgButton";
+    readonly localAdminDropdown = "combinedLocalAdminButtonsDropDownList";
 
     //Local admin
 
