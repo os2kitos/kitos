@@ -30,10 +30,18 @@
 
     }
 
+    export class KendoDropdown {
+        static readonly DataKey = "kendoDropDownList";
+
+        static readonly DefaultFilter = {
+            Id: "defaultFilter",
+            Text: Select2.EmptyField
+        };
+    }
+
     export class ExcelExportDropdown {
         static readonly Id = "excelExportSelector";
         static readonly DefaultTitle = "Eksportér til Excel";
-        static readonly DataKey = "kendoDropDownList";
 
         static readonly SelectAllId = "exportExcelAll";
         static readonly SelectAllValue = "Alle kolonner";
@@ -42,5 +50,40 @@
 
         static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
         static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
+    }
+
+    export class CustomFilterDropdown {
+        static readonly Id = "combinedFilterButtonsDropDownList";
+        static readonly DefaultTitle = "Filter";
+
+        static readonly SaveFilter = {
+            Id: "saveFilter",
+            Text: "Gem",
+        };
+
+        static readonly UseFilter = {
+            Id: "useFilter",
+            Text: "Anvend",
+        };
+
+        static readonly DeleteFilter = {
+            Id: "deleteFilter",
+            Text: "Slet"
+        };
+    }
+
+    export class LocalAdminDropdown {
+        static readonly Id = "combinedLocalAdminButtons";
+        static readonly DefaultTitle = "Kolonneopsætning for organisationen";
+
+        static readonly FilterOrg = {
+            Id: "filterOrg",
+            Text: "Gem",
+        };
+
+        static readonly RemoveFilterOrg = {
+            Id: "removeFilterOrg",
+            Text: "Slet",
+        };
     }
 }

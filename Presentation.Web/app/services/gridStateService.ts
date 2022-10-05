@@ -30,7 +30,7 @@
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
-        saveGridOrganizationalConfiguration: (grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType) => void;
+        saveGridOrganizationalConfiguration: (grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType) => ng.IPromise<void>;
         doesGridProfileExist: () => boolean;
         removeProfile: () => void;
         removeLocal: () => void;
@@ -394,7 +394,7 @@
                     });
             }
 
-            function saveGridOrganizationalConfiguration(grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType): void {
+            function saveGridOrganizationalConfiguration(grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType): ng.IPromise<void> {
                 var options = grid.getOptions();
 
                 var columns: Models.Generic.IKendoColumnConfigurationDTO[] = [];
@@ -405,12 +405,12 @@
                     columns.push({ persistId: column.persistId, index: i });
                 }
 
-                KendoFilterService.postConfigurationFromOrg(user.currentOrganizationId, overviewType, columns)
+                return KendoFilterService.postConfigurationFromOrg(user.currentOrganizationId, overviewType, columns)
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Kolonneopsætningen er gemt for organisationen");
-                            $window.localStorage.removeItem(locallyChangedKey);
-                            getGridOrganizationalConfiguration(); // Load the newly saved grid
+                            removeOrgConfig();
+                            return getGridOrganizationalConfiguration() as any; // Load the newly saved grid
                         }
                     }, (error) => {
                         notify.addErrorMessage("Der opstod en fejl i forsøget på at gemme den nye kolonneopsætning");

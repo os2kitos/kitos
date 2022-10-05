@@ -2,18 +2,14 @@ import CSSLocator = require("./CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 
 type HeaderButtons = {
-    resetFilter: protractor.ElementFinder,
-    saveFilter: protractor.ElementFinder,
-    useFilter: protractor.ElementFinder,
-    deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
     systemCatalogCreate: protractor.ElementFinder,
     createDpa: protractor.ElementFinder,
     editReference: protractor.ElementFinder,
-    deleteReference: protractor.ElementFinder,
     editSaveReference: protractor.ElementFinder,
     createReference: protractor.ElementFinder,
-    saveFilterToOrg: protractor.ElementFinder
+    deleteReference: protractor.ElementFinder,
+    localAdminDropdownReference: protractor.ElementFinder,
 };
 
 type InputFields =
@@ -63,17 +59,12 @@ class kendoToolbarWrapper {
         var buttons: HeaderButtons = {
             editReference: element(byDataElementType(consts.kendoReferenceEditButton)),
             editSaveReference: element(byDataElementType(consts.kendoReferenceEditSaveButton)),
-            resetFilter: element(byDataElementType(consts.kendoButtonResetFilter)),
-            saveFilter: element(byDataElementType(consts.kendoButtonSaveFilter)),
-            useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
-            deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
             createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
             systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
             createDpa: element(byDataElementType(consts.kendoDpaButtonCreate)),
             createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
             deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton)),
-            saveFilterToOrg: element(byDataElementType(consts.filterOrgButton))
-
+            localAdminDropdownReference: element(byDataElementType(consts.localAdminDropdown))
         };
         return buttons;
     }

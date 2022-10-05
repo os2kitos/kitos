@@ -935,6 +935,10 @@
     <Compile Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.designer.cs">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202209290951403_Add_SystemActive_To_ItSystemUsageOverview.cs" />
+    <Compile Include="Migrations\202209290951403_Add_SystemActive_To_ItSystemUsageOverview.designer.cs">
+      <DependentUpon>202209290951403_Add_SystemActive_To_ItSystemUsageOverview.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202209301046217_RemovedEmailBeforeDeletion.cs" />
     <Compile Include="Migrations\202209301046217_RemovedEmailBeforeDeletion.designer.cs">
       <DependentUpon>202209301046217_RemovedEmailBeforeDeletion.cs</DependentUpon>
@@ -1561,6 +1565,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209270528087_Add_Expiration_to_itsystemoverview.resx">
       <DependentUpon>202209270528087_Add_Expiration_to_itsystemoverview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209290951403_Add_SystemActive_To_ItSystemUsageOverview.resx">
+      <DependentUpon>202209290951403_Add_SystemActive_To_ItSystemUsageOverview.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202209301046217_RemovedEmailBeforeDeletion.resx">
       <DependentUpon>202209301046217_RemovedEmailBeforeDeletion.cs</DependentUpon>

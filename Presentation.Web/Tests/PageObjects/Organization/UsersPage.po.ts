@@ -1,5 +1,4 @@
 ﻿import IPageObject = require("../IPageObject.po");
-import KendoToolbarHelper = require("../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper")
 import NavigationHelper = require("../../Utility/NavigationHelper");
 import CssLocatorHelper = require("../../Object-wrappers/CSSLocatorHelper");
@@ -13,7 +12,6 @@ class UsersPage implements IPageObject {
         return this.navigationHelper.getPage("/#/organization/user");
     }
 
-    kendoToolbarHelper = new KendoToolbarHelper();
     kendoToolbarWrapper = new KendoToolbarWrapper();
     createUserButton = element(by.linkText("Opret Bruger"));
     hasAPiCheckBox = element(by.model("ctrl.vm.hasApi"));

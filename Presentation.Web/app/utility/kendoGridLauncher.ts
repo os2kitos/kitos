@@ -432,6 +432,7 @@ module Kitos.Utility.KendoGrid {
     }
 
     export enum KendoToolbarButtonColor {
+        None,
         Grey,
         Green
     }
@@ -441,10 +442,16 @@ module Kitos.Utility.KendoGrid {
         Right
     }
 
+    export enum KendoToolbarStandardWidth {
+        Standard,
+        FitContent
+    }
+
     export enum KendoToolbarImplementation {
         Button,
         Link,
-        DropDownList
+        DropDownList,
+        CustomTemplateDropDownList
     }
 
     export enum KendoToolbarMargin {
@@ -460,13 +467,20 @@ module Kitos.Utility.KendoGrid {
         originalObject?: any;
     }
 
+    export interface ICustomKendoToolbarDropDownEntry extends IKendoToolbarDropDownEntry {
+        enabled: () => boolean;
+        onClick: () => void;
+        readonly template?: string;
+    }
+
     export interface IKendoToolbarDropDownConfiguration {
         selectedOptionChanged: (selectedOption: IKendoToolbarDropDownEntry) => void;
         availableOptions: IKendoToolbarDropDownEntry[];
     }
 
     export interface IKendoToolbarEntry {
-        title: string;
+        title?: string;
+        getTitle?: () => string;
         id: string;
         onClick?: () => void;
         link?: string;
@@ -477,6 +491,7 @@ module Kitos.Utility.KendoGrid {
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
         margins?: KendoToolbarMargin[];
+        standardWidth?: KendoToolbarStandardWidth;
     }
 
     type UrlFactory = (options: any) => string;
@@ -674,7 +689,9 @@ module Kitos.Utility.KendoGrid {
 
         saveGridForOrganization() {
             if (confirm(`Er du sikker på at du vil gemme nuværende kolonneopsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
-                this.gridState.saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType);
+                return this.gridState
+                    .saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType)
+                    .then(() => this.$state.reload());
             }
         }
 
@@ -731,6 +748,19 @@ module Kitos.Utility.KendoGrid {
             this.postCreationActions = []; //Clear any bindings held in this array
         }
 
+        private renderToolbarEntryStylingClasses(entry: IKendoToolbarEntry) {
+            const classes: Array<string> = [];
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color));
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position));
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins));
+            classes.push(Helpers.KendoToolbarCustomizationHelper.getStandardWidthCssClass(entry.standardWidth));
+            return classes
+                .map(c => c.trim())
+                .filter(c => c !== "")
+                .join(" ");
+        }
+
+
         private build() {
             this.checkRequiredField("$scope", this.$scope);
             this.checkRequiredField("storageKey", this.storageKey);
@@ -743,16 +773,18 @@ module Kitos.Utility.KendoGrid {
                 standardToolbar: {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
                     clearOptions: () => this.clearOptions(),
-                    saveGridProfile: () => this.saveGridProfile(),
-                    doesGridProfileExist: () => this.doesGridProfileExist(),
-                    saveGridForOrganization: () => this.saveGridForOrganization(),
-                    clearGridForOrganization: () => this.clearGridForOrganization(),
-                    showGridForOrganizationButtons: () => this.showGridForOrganizationButtons(),
-                    canDeleteGridForOrganization: () => this.canDeleteGridForOrganization(),
                     doesGridDivergeFromDefault: () => this.doesGridDivergeFromDefault(),
                     gridDivergenceText: () => this.doesGridDivergeFromDefault() ? "OBS: Opsætning af overblik afviger fra kommunens standardoverblik. Tryk på 'Gendan kolonneopsætning' for at benytte den gældende opsætning" : ""
                 }
             };
+
+            if (this.showGridForOrganizationButtons()) {
+                const localAdminDropdown = this.setupLocalAdminDropdown();
+                this.customToolbarEntries.unshift(localAdminDropdown);
+            }
+
+            const filterDropdown = this.setupFilterDropdown();
+            this.customToolbarEntries.unshift(filterDropdown);
 
             var toolbar = [
                 {
@@ -760,34 +792,6 @@ module Kitos.Utility.KendoGrid {
                     text: "Gendan kolonneopsætning",
                     template:
                         "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
-                },
-                {
-                    name: "saveFilter",
-                    text: "Gem filter",
-                    template:
-                        '<button data-element-type="saveFilterButton" type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="kendoVm.standardToolbar.saveGridProfile()">#: text #</button>'
-                },
-                {
-                    name: "useFilter",
-                    text: "Anvend filter",
-                    template:
-                        '<button data-element-type="useFilterButton" type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="kendoVm.standardToolbar.loadGridProfile()" data-ng-disabled="!kendoVm.standardToolbar.doesGridProfileExist()">#: text #</button>'
-                },
-                {
-                    name: "deleteFilter",
-                    text: "Slet filter",
-                    template:
-                        "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
-                },
-                {
-                    name: "filterOrg",
-                    text: "Gem kolonneopsætning for organisation",
-                    template: "<button data-element-type='filterOrgButton' type='button' class='k-button k-button-icontext' title='Gem kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.saveGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
-                },
-                {
-                    name: "removeFilterOrg",
-                    text: "Slet kolonneopsætning for organisation",
-                    template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
 
@@ -796,14 +800,24 @@ module Kitos.Utility.KendoGrid {
             this.customToolbarEntries.push(excelExportDropdownEntry);
 
             this._.forEach(this.customToolbarEntries, entry => {
+                if (!entry.title && !entry.getTitle) {
+                    throw `Invalid toolbar implementation: either "title" or "getTitle" has to be defined`;
+                }
+                if (entry.title && entry.getTitle) {
+                    throw `Invalid toolbar implementation: both "title" and "getTitle" cannot be defined at the same time`;
+                }
+
                 switch (entry.implementation) {
                     case KendoToolbarImplementation.Button:
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${this.renderToolbarEntryStylingClasses(entry)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>{{kendoVm.${entry.id}.getEntryTitle()}}</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
+                            getEntryTitle: () => {
+                                return entry.getTitle === undefined ? entry.title : entry.getTitle();
+                            },
                             onClick: entry.onClick,
                             enabled: entry.enabled(),
                             show: entry.show
@@ -813,17 +827,18 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<a data-element-type='${entry.id}Button' role='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
+                            template: `<a data-element-type='${entry.id}Button' role='button' class='${this.renderToolbarEntryStylingClasses(entry)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled()
                         };
                         break;
                     case KendoToolbarImplementation.DropDownList:
+
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${this.renderToolbarEntryStylingClasses(entry)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
@@ -838,11 +853,44 @@ module Kitos.Utility.KendoGrid {
                                     dataTextField: "text",
                                     dataValueField: "id",
                                     optionLabel: entry.title,
+                                    enabled: true,
                                     change: e => {
-                                        var selectedId = e.sender.value();
-                                        const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
-                                        entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                                        this.triggerSelectedOptionChanged(e, entry);
                                         this.saveGridOptions();
+                                    }
+                                }
+                            }
+                        };
+                        break;
+                    case KendoToolbarImplementation.CustomTemplateDropDownList:
+
+                        toolbar.push({
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${this.renderToolbarEntryStylingClasses(entry)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()" ng-show="${entry.show}"></select>`
+                        });
+                        this.$scope.kendoVm[entry.id] = {
+                            enabled: entry.enabled(),
+                            getOptions: () => {
+                                return {
+                                    autoBind: false,
+                                    dataSource: entry.dropDownConfiguration.availableOptions,
+                                    dataTextField: "text",
+                                    dataValueField: "id",
+                                    enabled: true,
+                                    template: ((item) => {
+                                        if (item.template === undefined)
+                                            return item.text;
+
+                                        return item.template;
+                                    }),
+                                    valueTemplate: (_) => entry.title,
+                                    change: (e) => {
+                                        try {
+                                            this.triggerSelectedOptionChanged(e, entry);
+                                        } catch (ex) {
+                                            console.log(ex);
+                                        }
                                     }
                                 }
                             }
@@ -997,6 +1045,130 @@ module Kitos.Utility.KendoGrid {
                 }
             });
             this.build();
+        }
+
+        private setupFilterDropdown(): IKendoToolbarEntry {
+            const self = this;
+            return {
+                show: true,
+                id: Constants.CustomFilterDropdown.Id,
+                title: Constants.CustomFilterDropdown.DefaultTitle,
+                color: KendoToolbarButtonColor.None,
+                standardWidth: KendoToolbarStandardWidth.FitContent,
+                position: KendoToolbarButtonPosition.Left,
+                implementation: KendoToolbarImplementation.CustomTemplateDropDownList,
+                margins: [Utility.KendoGrid.KendoToolbarMargin.Left, Utility.KendoGrid.KendoToolbarMargin.Right],
+                enabled: () => true,
+                dropDownConfiguration: {
+                    selectedOptionChanged: (newItem: ICustomKendoToolbarDropDownEntry) => {
+                        self.customDropdownSelectedOptionChanged(newItem, Constants.CustomFilterDropdown.Id);
+                    },
+                    availableOptions: [
+                        {
+                            id: Constants.KendoDropdown.DefaultFilter.Id,
+                            text: Constants.KendoDropdown.DefaultFilter.Text,
+                            enabled: () => false,
+                        } as ICustomKendoToolbarDropDownEntry,
+                        {
+                            id: Constants.CustomFilterDropdown.SaveFilter.Id,
+                            text: Constants.CustomFilterDropdown.SaveFilter.Text,
+                            enabled: () => true,
+                            onClick: () => this.saveGridProfile(),
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry,
+                        {
+                            id: Constants.CustomFilterDropdown.UseFilter.Id,
+                            text: Constants.CustomFilterDropdown.UseFilter.Text,
+                            enabled: () => this.doesGridProfileExist(),
+                            onClick: () => this.loadGridProfile(),
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry,
+                        {
+                            id: Constants.CustomFilterDropdown.DeleteFilter.Id,
+                            text: Constants.CustomFilterDropdown.DeleteFilter.Text,
+                            enabled: () => this.doesGridProfileExist(),
+                            onClick: () => this.clearGridProfile(),
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry
+                    ]
+                }
+            } as IKendoToolbarEntry;
+        }
+
+        private setupLocalAdminDropdown(): IKendoToolbarEntry {
+            const self = this;
+            return {
+                show: true,
+                id: Constants.LocalAdminDropdown.Id,
+                title: Constants.LocalAdminDropdown.DefaultTitle,
+                color: KendoToolbarButtonColor.None,
+                position: KendoToolbarButtonPosition.Left,
+                standardWidth: KendoToolbarStandardWidth.FitContent,
+                implementation: KendoToolbarImplementation.CustomTemplateDropDownList,
+                margins: [Utility.KendoGrid.KendoToolbarMargin.Left, Utility.KendoGrid.KendoToolbarMargin.Right],
+                enabled: () => true,
+                dropDownConfiguration: {
+                    selectedOptionChanged: (newItem: ICustomKendoToolbarDropDownEntry) => {
+                        self.customDropdownSelectedOptionChanged(newItem, Constants.LocalAdminDropdown.Id);
+                    },
+                    availableOptions: [
+                        {
+                            id: Constants.KendoDropdown.DefaultFilter.Id,
+                            text: Constants.KendoDropdown.DefaultFilter.Text,
+                            enabled: () => false,
+                        } as ICustomKendoToolbarDropDownEntry,
+                        {
+                            id: Constants.LocalAdminDropdown.FilterOrg.Id,
+                            text: Constants.LocalAdminDropdown.FilterOrg.Text,
+                            enabled: () => true,
+                            onClick: () => this.saveGridForOrganization(),
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry,
+                        {
+                            id: Constants.LocalAdminDropdown.RemoveFilterOrg.Id,
+                            text: Constants.LocalAdminDropdown.RemoveFilterOrg.Text,
+                            enabled: () => self.canDeleteGridForOrganization(),
+                            onClick: () => this.clearGridForOrganization(),
+                            get template(): string {
+                                return self.getKendoDisabledTemplate(this);
+                            }
+                        } as ICustomKendoToolbarDropDownEntry,
+                    ]
+                }
+            } as IKendoToolbarEntry;
+        }
+
+        private triggerSelectedOptionChanged(e: { sender: { value: () => string } }, entry: IKendoToolbarEntry): void {
+            const selectedId = e.sender.value();
+            const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+            entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0
+                ? newSelection[0]
+                : null);
+        }
+
+        private customDropdownSelectedOptionChanged(newItem: ICustomKendoToolbarDropDownEntry, dropdownId: string): void {
+            const dropdown = jQuery(`#${dropdownId}`).data(Constants.KendoDropdown.DataKey);
+            if (!newItem || !newItem.enabled()) {
+                dropdown.value(Constants.KendoDropdown.DefaultFilter.Id);
+                return;
+            }
+
+            newItem.onClick();
+
+            dropdown.value(Constants.KendoDropdown.DefaultFilter.Id);
+            dropdown.dataSource.read();
+        }
+
+        private getKendoDisabledTemplate(item: ICustomKendoToolbarDropDownEntry): string {
+            return `<span ng-class="{'faded-gray': ${!item.enabled()}}">${item.text}</span>`;
         }
     }
 
