@@ -8,7 +8,6 @@ describe("Regular user has access to features in the contract overview", () => {
     var loginHelper = new Login();
     var consts = new Constants();
     var pageObject = new ItContractOverview();
-    var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var columnObject = pageObject.kendoToolbarWrapper.columnObjects();
     var testFixture = new TestFixtureWrapper();
 
@@ -25,22 +24,6 @@ describe("Regular user has access to features in the contract overview", () => {
     afterAll(() => {
         testFixture.cleanupState();
         testFixture.disableLongRunningTest();
-    });
-
-    it("Reset Filter is clickable", () => {
-        expect(headerButtons.resetFilter.isEnabled()).toBe(true);
-    });
-
-    it("Save Filter is clickable", () => {
-        expect(headerButtons.saveFilter.isEnabled()).toBe(true);
-    });
-
-    it("Use Filter is disabled", () => {
-        expect(headerButtons.useFilter.isEnabled()).toBe(false);
-    });
-
-    it("Delete Filter is disabled", () => {
-        expect(headerButtons.deleteFilter.isEnabled()).toBe(false);
     });
 
     it("User can see contract ", () => {

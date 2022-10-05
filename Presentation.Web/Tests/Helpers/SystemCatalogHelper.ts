@@ -105,14 +105,6 @@ class SystemCatalogHelper {
         return filteredRows.first().element(by.xpath("../..")).element(this.cssHelper.byDataElementType(this.consts.toggleActivatingSystem));
     }
 
-    public static resetFilters() {
-        console.log("Resetting system catalog filters");
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().resetFilter.click())
-            .then(() => browser.waitForAngular());
-    }
-
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
         return SystemCatalogHelper.pageObject.waitForKendoGrid().then(() => browser.waitForAngular());

@@ -285,10 +285,7 @@
                         convert_urls: false
                     };
 
-                    $scope.datepickerOptions = {
-                        format: "dd-MM-yyyy",
-                        parseFormats: ["yyyy-MM-dd"]
-                    };
+                    $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
                     $scope.formHasErrors = () => {
                         if ($scope.adviceTypeData != null &&

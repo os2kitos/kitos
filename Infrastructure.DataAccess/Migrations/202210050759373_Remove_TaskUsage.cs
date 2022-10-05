@@ -2,7 +2,7 @@
 {
     using System;
     using System.Data.Entity.Migrations;
-
+    
     public partial class Remove_TaskUsage : DbMigration
     {
         public override void Up()
@@ -27,27 +27,27 @@
                     SET DefaultUserStartPreference = 'organization.structure' 
                     WHERE DefaultUserStartPreference = 'organization.overview';");
         }
-
+        
         public override void Down()
         {
             CreateTable(
                 "dbo.TaskUsage",
                 c => new
-                {
-                    Id = c.Int(nullable: false, identity: true),
-                    TaskRefId = c.Int(nullable: false),
-                    OrgUnitId = c.Int(nullable: false),
-                    ParentId = c.Int(),
-                    Starred = c.Boolean(nullable: false),
-                    TechnologyStatus = c.Int(nullable: false),
-                    UsageStatus = c.Int(nullable: false),
-                    Comment = c.String(),
-                    ObjectOwnerId = c.Int(nullable: false),
-                    LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
-                    LastChangedByUserId = c.Int(nullable: false),
-                })
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        TaskRefId = c.Int(nullable: false),
+                        OrgUnitId = c.Int(nullable: false),
+                        ParentId = c.Int(),
+                        Starred = c.Boolean(nullable: false),
+                        TechnologyStatus = c.Int(nullable: false),
+                        UsageStatus = c.Int(nullable: false),
+                        Comment = c.String(),
+                        ObjectOwnerId = c.Int(nullable: false),
+                        LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        LastChangedByUserId = c.Int(nullable: false),
+                    })
                 .PrimaryKey(t => t.Id);
-
+            
             AddColumn("dbo.Config", "ShowColumnUsage", c => c.Boolean(nullable: false));
             AddColumn("dbo.Config", "ShowColumnTechnology", c => c.Boolean(nullable: false));
             AddColumn("dbo.Config", "ShowTabOverview", c => c.Boolean(nullable: false));

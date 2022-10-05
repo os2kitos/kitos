@@ -14,6 +14,7 @@
         private storageKey = "it-system-overview-options";
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: IKendoGridOptions<IItSystemUsageOverview>;
+        toggleActiveSystemsFilterBtnText: string;
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -23,7 +24,8 @@
             "needsWidthFixService",
             "overviewOptions",
             "_",
-            "uiState"
+            "uiState",
+            "$window"
         ];
 
         constructor(
@@ -34,12 +36,14 @@
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
             _,
-            uiState: Models.UICustomization.ICustomizedModuleUI
+            uiState: Models.UICustomization.ICustomizedModuleUI,
+            $window
         ) {
             const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
             const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
-
+            
             $rootScope.page.title = "IT System - Overblik";
+            const pageName = "systemUsage";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
             //Lookup maps
@@ -76,10 +80,26 @@
                     {
                         textValue: texts.notActive,
                         remoteValue: false
-                    }]
+                    }];
             }
 
-            //Build and launch kendo grid
+
+            var self = this;
+            var showInactiveSystems = ItSystem.Settings.OverviewState.getShowInactiveSystems($window, user.id, pageName);
+
+            function getToggleActiveSystemsFilterBtnText(): string {
+                return showInactiveSystems
+                    ? "Vis aktive IT Systemer"
+                    : "Vis \"ikke aktive\" IT Systemer";
+            }
+
+            function toggleActiveSystemsMasterFilter(): void {
+                showInactiveSystems = !showInactiveSystems;
+                ItSystem.Settings.OverviewState.setShowInactiveSystems($window, user.id, pageName, showInactiveSystems);
+                self.mainGrid.dataSource.read();
+            }
+
+        //Build and launch kendo grid
             var launcher = kendoGridLauncherFactory
                 .create<Models.ItSystemUsage.IItSystemUsageOverviewReadModel>()
                 .withScope($scope)
@@ -172,6 +192,13 @@
                     //Making sure orgunit is set
                     (options as any).currentOrgUnit = activeOrgUnit;
 
+                    const existing = parameterMap.$filter;
+                    const hadExisting = _.isEmpty(existing) === false;
+                    parameterMap.$filter = `SystemActive eq ${showInactiveSystems ? "false" : "true"} ${hadExisting ? " and (" + existing + ")" : ""}`;
+                    if (hadExisting) {
+                        parameterMap.$filter = `(${parameterMap.$filter})`;
+                    }
+
                     return parameterMap;
                 })
                 .withResponseParser(response => {
@@ -209,10 +236,11 @@
                 launcher = launcher.withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg systemrolle...",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                    color: Utility.KendoGrid.KendoToolbarButtonColor.None,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    margins: [Utility.KendoGrid.KendoToolbarMargin.Left],
+                    margins: [Utility.KendoGrid.KendoToolbarMargin.Left, Utility.KendoGrid.KendoToolbarMargin.Right],
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                    standardWidth: Utility.KendoGrid.KendoToolbarStandardWidth.Standard,
                     enabled: () => true,
                     dropDownConfiguration: {
                         selectedOptionChanged: newItem => {
@@ -247,6 +275,17 @@
                     link: `api/v1/gdpr-report/csv/${user.currentOrganizationId}`
                 } as Utility.KendoGrid.IKendoToolbarEntry);
             }
+
+            launcher = launcher.withToolbarEntry({
+                id: "toggleActiveSystemsFilter",
+                getTitle: () => getToggleActiveSystemsFilterBtnText(),
+                color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                margins: [Utility.KendoGrid.KendoToolbarMargin.Left],
+                enabled: () => true,
+                onClick: () => toggleActiveSystemsMasterFilter()
+            } as Utility.KendoGrid.IKendoToolbarEntry);
 
             launcher = launcher.withColumn(builder =>
                 builder

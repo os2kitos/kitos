@@ -135,10 +135,7 @@
                     $scope.displayActive = false;
                 }
 
-                $scope.datepickerOptions = {
-                    format: "dd-MM-yyyy",
-                    parseFormats: ["yyyy-MM-dd"]
-                };
+                $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
                 $scope.procurementPlans = [];
                 var currentDate = moment();
@@ -170,7 +167,7 @@
 
                 $scope.patchDate = (field, value) => {
                     var date = moment(moment(value, Kitos.Constants.DateFormat.DanishDateFormat, true).format());
-                    if (value === "") {
+                    if (!value) {
                         var payload = {};
                         payload[field] = null;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
@@ -180,7 +177,7 @@
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
 
                     } else {
-                        var dateString = date.format("YYYY-MM-DD");
+                        var dateString = date.format(Kitos.Constants.DateFormat.EnglishDateFormat);
                         var payload = {};
                         payload[field] = dateString;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
@@ -265,27 +262,16 @@
                 $scope.checkContractValidity = (field, value) => {
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
-                    var formatDateString = "YYYY-MM-DD";
-                    var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day');
-                    var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day');
-                    var date = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, "YYYY-MM-DDTHH:mm:ssZ"], true);
                     var payload = {};
-                    if (value === "") {
+
+
+                    if (!value) {
                         payload[field] = null;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId)
                             .then(_ => reloadValidationStatus());
                     }
-                    else if (value == null) {
-                        //made to prevent error message on empty value i.e. open close datepicker
-                    }
-                    else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                    }
-                    else if (fromDate >= endDate) {
-                        notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
-                    }
-                    else {
-                        var dateString = date.format("YYYY-MM-DD");
+                    else if (Kitos.Helpers.DateValidationHelper.validateValidityPeriod(concluded, expirationDate, notify, "Gyldig fra", "Gyldig til")) {
+                        const dateString = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, Kitos.Constants.DateFormat.EnglishDateFormat]).format(Kitos.Constants.DateFormat.EnglishDateFormat);
                         payload[field] = dateString;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId)
                             .then(_ => reloadValidationStatus());

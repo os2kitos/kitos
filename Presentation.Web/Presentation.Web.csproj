@@ -360,11 +360,13 @@
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
+    <TypeScriptCompile Include="app\Configs\kendo-date-picker-options.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-access-status-response-dto.ts" />
@@ -782,7 +784,7 @@
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\settings\catalog-state.ts" />
+    <TypeScriptCompile Include="app\components\it-system\settings\overview-state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-dataProcessing.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
@@ -1162,7 +1164,6 @@
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\OrgHelper.ts" />
@@ -1601,7 +1602,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
-      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
       <Name>Core.Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">

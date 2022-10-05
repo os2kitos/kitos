@@ -29,7 +29,27 @@ namespace Core.DomainServices.Queries.SystemUsage
                             // Include only if not expired or no expiration defined
                             (x.SourceEntity.ExpirationDate == null || currentTime <= x.SourceEntity.ExpirationDate)
                         )
+                    ) ||
+                    x.MainContractIsActive == false &&
+                    // Include if Main Contract is active
+                    (
+                        //Main Contract is null which means it's valid
+                        x.SourceEntity.MainContract == null ||
+                        (
+                            // 1: Common scenario
+                            // Exclude those which were enforced as valid - dates have no effect
+                            x.SourceEntity.MainContract.ItContract.Active == false &&
+                            // Include systems where concluded (start time) has passed or is not defined
+                            (x.SourceEntity.MainContract.ItContract.Concluded == null || x.SourceEntity.MainContract.ItContract.Concluded <= currentTime) &&
+                            // Include only if not expired or no expiration defined
+                            (x.SourceEntity.MainContract.ItContract.ExpirationDate == null || currentTime <= x.SourceEntity.MainContract.ItContract.ExpirationDate) 
+                        ) ||
+                        // 2: Out of sync scenario
+                        // Source entity marked as active (forced) but read model state false, mark as target for update
+                        x.SourceEntity.MainContract.ItContract.Active == true
                     )
+
+
             );
         }
     }

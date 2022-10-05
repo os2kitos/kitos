@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202209301050100_Remove_TaskUsage"; }
+            get { return "202210050759373_Remove_TaskUsage"; }
         }
         
         string IMigrationMetadata.Source

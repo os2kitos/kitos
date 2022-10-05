@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202210030943073_Add_Sts_Org_Import_Tables"; }
+            get { return "202210050901163_Add_Sts_Org_Import_Tables"; }
         }
         
         string IMigrationMetadata.Source
