@@ -653,6 +653,7 @@
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\helpText\inlineHelpText.view.html" />
     <Content Include="app\shared\helpText\field-help-text.view.html" />
+    <Content Include="app\shared\progress-spinner\progress-spinner.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="app\shared\select2Option\select2MultipleOption.view.html" />
@@ -661,6 +662,7 @@
     <Content Include="app\shared\selectOrgUnit\select2OrgUnit.view.html" />
     <Content Include="app\shared\selectRole\selectRole.view.html" />
     <Content Include="app\shared\selectSimple\selectSimple.view.html" />
+    <Content Include="Content\img\loading-spinner.gif" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -903,6 +905,7 @@
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
+    <TypeScriptCompile Include="app\shared\progress-spinner\progress-spinner.component.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />

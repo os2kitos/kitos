@@ -4,7 +4,7 @@
     function setupComponent(): ng.IComponentOptions {
         return {
             bindings: {
-                currentOrganizationUuid: "="
+                currentOrganizationUuid: "<"
             },
             controller: FkOrganizationImportController,
             controllerAs: "ctrl",

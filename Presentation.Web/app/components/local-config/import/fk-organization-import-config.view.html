@@ -1,4 +1,7 @@
-﻿<div class="form-group" ng-if="ctrl.accessGranted !== null">
+﻿<div class="form-group" ng-if="ctrl.accessGranted == null">
+    <progress-spinner data-show-text="true" />
+</div>
+<div class="form-group" ng-if="ctrl.accessGranted !== null">
     <label for="connection-status" class="control-label small">Adgang <field-help-text data-key="local-config-fk-org-status.label" /></label>
     <div id="connection-status">
         <span ng-if="ctrl.accessGranted">KITOS har adgang til organisationens data via FK Organisation</span>
