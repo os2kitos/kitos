@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202209301046217_RemovedEmailBeforeDeletion"; }
+            get { return "202210050748434_RemovedEmailBeforeDeletion"; }
         }
         
         string IMigrationMetadata.Source
