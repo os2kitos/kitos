@@ -19,6 +19,13 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="organizationId"></param>
         /// <param name="levelsToInclude"></param>
         /// <returns></returns>
-        Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<uint> levelsToInclude);
+        Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<int> levelsToInclude);
+        /// <summary>
+        /// Connect the organization to "STS Organisation"
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="levelsToInclude"></param>
+        /// <returns></returns>
+        Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude);
     }
 }

@@ -4,8 +4,8 @@
     function setupComponent(): ng.IComponentOptions {
         return {
             bindings: {
-                showText: "<",
-                customText: "<"
+                showText: "@",
+                customText: "@"
             },
             controller: ProgressSpinnerComponentController,
             controllerAs: "ctrl",
@@ -25,6 +25,7 @@
 
         activeText: string | null = null;
         $onInit() {
+            console.log("showtext:", this.showText, "customText", this.customText);
             if (this.showText) {
                 this.activeText = this.customText ?? "Indlæser indhold...";
             }

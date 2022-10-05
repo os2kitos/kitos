@@ -22,8 +22,8 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("snapshot")] //TODO: Rename to query | preview?
-        public HttpResponseMessage GetSnapshotFromStsOrganization(Guid organizationId, uint? levels = null)
+        [Route("snapshot")]
+        public HttpResponseMessage GetSnapshotFromStsOrganization(Guid organizationId, int? levels = null)
         {
             return _stsOrganizationSynchronizationService
                 .GetStsOrganizationalHierarchy(organizationId, levels.FromNullableValueType())
@@ -56,10 +56,16 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPost]
         [Route("connection")]
-        public HttpResponseMessage CreateConnection(ConnectToStsOrganizationRequestDTO request)
+        public HttpResponseMessage CreateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
-            //TODO: Perform the import (only allowed to CREATE if not already created). If created, the current one must be updated!
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return _stsOrganizationSynchronizationService
+                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .Match(FromOperationError, Ok);
         }
 
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3313 adds the PUT (POST creates the connection)

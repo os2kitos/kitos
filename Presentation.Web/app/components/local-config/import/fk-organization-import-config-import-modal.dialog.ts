@@ -29,6 +29,7 @@
 
     class FKOrganisationImportController {
         static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance"];
+        busy: boolean = false;
         constructor(
             readonly flow: FKOrganisationImportFlow,
             private readonly organizationUuid: string,
@@ -46,10 +47,15 @@
         }
 
         performImport() {
+            this.busy = true;
             this.stsOrganizationSyncService
                 .createConnection(this.organizationUuid, this.synchronizationDepth)
                 .then(() => {
+                    this.busy = false;
                     this.$uibModalInstance.close();
+                }, error => {
+                    console.log("Error:", error);
+                    this.busy = false;
                 });
         }
     }

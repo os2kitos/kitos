@@ -19,7 +19,7 @@ namespace Core.DomainServices.Model.StsOrganization
             Children = children.ToList().AsReadOnly();
         }
 
-        public StsOrganizationUnit Copy(uint? childLevelsToInclude = null)
+        public StsOrganizationUnit Copy(int? childLevelsToInclude = null)
         {
             var children = new List<StsOrganizationUnit>();
             var includeChildren = childLevelsToInclude is > 0 or null;

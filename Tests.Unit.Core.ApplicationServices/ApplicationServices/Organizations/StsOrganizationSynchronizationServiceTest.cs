@@ -31,7 +31,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _stsOrganizationUnitService = new Mock<IStsOrganizationUnitService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _sut = new StsOrganizationSynchronizationService(_authorizationContextMock.Object, _stsOrganizationUnitService.Object, _organizationServiceMock.Object, Mock.Of<ILogger>(), Mock.Of<IStsOrganizationService>());
+            _sut = new StsOrganizationSynchronizationService(_authorizationContextMock.Object, _stsOrganizationUnitService.Object, _organizationServiceMock.Object, Mock.Of<ILogger>(), Mock.Of<IStsOrganizationService>(), null, null);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -53,7 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupHasPermissionReturns(organization, true);
 
             //Act
-            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<uint>.None);
+            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<int>.None);
 
             //Assert
             Assert.True(result.Ok);
@@ -63,7 +63,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
-        public void GetStsOrganizationalHierarchy_With_Level_Limit_Returns_Filtered_Tree(uint levels)
+        public void GetStsOrganizationalHierarchy_With_Level_Limit_Returns_Filtered_Tree(int levels)
         {
             //Arrange
             var organizationId = A<Guid>();
@@ -113,7 +113,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, operationError);
 
             //Act
-            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<uint>.None);
+            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<int>.None);
 
             //Assert
             Assert.True(result.Failed);
@@ -133,7 +133,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupHasPermissionReturns(organization, false);
 
             //Act
-            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<uint>.None);
+            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<int>.None);
 
             //Assert
             Assert.True(result.Failed);
@@ -152,7 +152,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupResolveOrganizationTreeReturns(organization, operationError);
 
             //Act
-            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<uint>.None);
+            var result = _sut.GetStsOrganizationalHierarchy(organizationId, Maybe<int>.None);
 
             //Assert
             Assert.True(result.Failed);
@@ -176,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 .Returns(value);
         }
 
-        private static uint CountMaxLevels(StsOrganizationUnit unit)
+        private static int CountMaxLevels(StsOrganizationUnit unit)
         {
             const int currentLevelContribution = 1;
             return unit
@@ -186,7 +186,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 .FirstOrDefault() + currentLevelContribution;
         }
 
-        private bool Compare(StsOrganizationUnit original, StsOrganizationUnit filtered, uint levelsLeftToCompare)
+        private bool Compare(StsOrganizationUnit original, StsOrganizationUnit filtered, int levelsLeftToCompare)
         {
             Assert.Equal(original.Uuid, filtered.Uuid);
             Assert.Equal(original.Name, filtered.Name);
