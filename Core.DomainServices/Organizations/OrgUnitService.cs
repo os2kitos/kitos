@@ -14,12 +14,10 @@ namespace Core.DomainServices.Organizations
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _itSystemUsageOrgUnitUsageRepository;
-        private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskUsage> taskUsageRepository, IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository)
         {
             _orgUnitRepository = orgUnitRepository;
-            _taskUsageRepository = taskUsageRepository;
             _itSystemUsageOrgUnitUsageRepository = itSystemUsageOrgUnitUsageRepository;
         }
 
@@ -91,15 +89,6 @@ namespace Core.DomainServices.Organizations
 
         public void Delete(int id)
         {
-            // delete task usages
-            var taskUsages = _taskUsageRepository.Get(x => x.OrgUnitId == id);
-            foreach (var taskUsage in taskUsages)
-            {
-                _taskUsageRepository.DeleteByKey(taskUsage.Id);
-            }
-            _taskUsageRepository.Save();
-
-
             // Remove OrgUnit from ItSystemUsages
             var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId == id);
             foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)

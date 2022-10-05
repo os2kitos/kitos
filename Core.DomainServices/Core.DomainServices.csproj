@@ -90,6 +90,7 @@
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="Mapping\ReadModelMappingHelpers.cs" />
+    <Compile Include="Model\StsOrganization\CheckConnectionError.cs" />
     <Compile Include="Model\StsOrganization\ResolveOrganizationTreeError.cs" />
     <Compile Include="Model\StsOrganization\StsOrganizationUnit.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />

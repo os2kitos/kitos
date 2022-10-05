@@ -38,6 +38,16 @@ namespace Tests.Integration.Presentation.Web.Security
         }
 
         [Fact]
+        public async Task Api_Access_User_Cannot_Get_Cookie()
+        {
+            //Act
+            using var cookieResponse = await HttpApi.SendGetCookieAsync(_regularApiUser);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, cookieResponse.StatusCode);
+        }
+
+        [Fact]
         public async Task User_Without_Api_Access_Can_Not_Get_Token()
         {
             //Arrange
@@ -47,16 +57,16 @@ namespace Tests.Integration.Presentation.Web.Security
             //Act
             var tokenResponse = await HttpApi.PostAsync(url, loginDto);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, tokenResponse.StatusCode);
+            //Assert that unauthorized is returend .. token auth not enabled for the user
+            Assert.Equal(HttpStatusCode.Unauthorized, tokenResponse.StatusCode);
         }
 
         [Fact]
         public async Task Get_Token_Returns_401_On_Invalid_Password()
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_regularApiUser.Username, A<string>());
-            
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_globalAdmin.Username, A<string>());
+
             //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
@@ -69,7 +79,7 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Get_Token_Returns_401_On_Invalid_Username()
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(A<string>(), _regularApiUser.Password);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(A<string>(), A<string>());
 
             //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))

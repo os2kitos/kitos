@@ -1,26 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
-using Core.DomainServices.Extensions;
-using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Advice
 {
-    public class AdviceTest : WithAutoFixture, IAsyncLifetime
+    public class AdviceTest : AdviceTestBase
     {
-        private ItContractDTO _root;
-        private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
-
         [Fact]
         public async Task Can_Add_Advice()
         {
@@ -234,28 +225,6 @@ namespace Tests.Integration.Presentation.Web.Advice
         }
 
         [Fact]
-        public async Task Cannot_Delete_Advice_That_Has_Been_Sent()
-        {
-            //Arrange
-            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
-            var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Immediate, recipient);
-
-            using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
-            Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
-            var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
-
-            //Wait for the advice to have been sent
-            await WaitForAsync(() => Task.FromResult(DatabaseAccess.MapFromEntitySet<Core.DomainModel.Advice.Advice, bool>(advices => advices.AsQueryable().ById(createdAdvice.Id).AdviceSent.Any())), TimeSpan.FromSeconds(30));
-
-
-            //Act
-            using var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, deleteResult.StatusCode);
-        }
-
-        [Fact]
         public async Task Cannot_Delete_Inactive_Advice_That_Has_Not_Been_Sent_If_No_Rights()
         {
             //Arrange
@@ -316,71 +285,6 @@ namespace Tests.Integration.Presentation.Web.Advice
         {
             using var createResultBeforeRoleAssignment = await AdviceHelper.PostAdviceAsync(advice, OrganizationId, readOnlyUserCookie);
             Assert.Equal(expectedResult, createResultBeforeRoleAssignment.StatusCode);
-        }
-
-        private Core.DomainModel.Advice.Advice CreateDefaultAdvice(Scheduling schedule, AdviceType type, AdviceUserRelation recipient)
-        {
-            return new Core.DomainModel.Advice.Advice
-            {
-                RelationId = _root.Id,
-                Type = RelatedEntityType.itContract,
-                Body = A<string>(),
-                Subject = A<string>(),
-                Scheduling = schedule,
-                AdviceType = type,
-                Reciepients = new List<AdviceUserRelation>()
-                {
-                    recipient
-                },
-                AlarmDate = DateTime.Now,
-                StopDate = GetRandomDateAfterToday(),
-            };
-        }
-
-
-        private AdviceUserRelation CreateDefaultEmailRecipient(string name)
-        {
-            return new AdviceUserRelation
-            {
-                Email = name,
-                RecieverType = RecieverType.RECIEVER,
-                RecpientType = RecipientType.USER
-            };
-        }
-
-        private string CreateWellformedEmail()
-        {
-            //Make sure special chars are part of the test email
-            return $"{A<string>()}_a.b-c@test.dk";
-        }
-
-        private DateTime GetRandomDateAfterToday()
-        {
-            return DateTime.Now.AddDays(Math.Abs(A<int>()));
-        }
-
-        public async Task InitializeAsync()
-        {
-            _root = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)
-        {
-            bool conditionMet;
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            do
-            {
-                Thread.Sleep(TimeSpan.FromMilliseconds(250));
-                conditionMet = await check();
-            } while (conditionMet == false && stopwatch.Elapsed <= howLong);
-
-            Assert.True(conditionMet, $"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
         }
     }
 }

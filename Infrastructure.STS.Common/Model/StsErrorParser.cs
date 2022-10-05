@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 
 namespace Infrastructure.STS.Common.Model
@@ -10,7 +11,7 @@ namespace Infrastructure.STS.Common.Model
             { "44", StsError.NotFound },
             { "40", StsError.BadInput }
         };
-        public static Maybe<StsError> ParseStsError(this string resultCode)
+        public static Maybe<StsError> ParseStsErrorFromStandardResultCode(this string resultCode)
         {
             if (resultCode == "20")
             {
@@ -18,6 +19,24 @@ namespace Infrastructure.STS.Common.Model
             }
 
             return KnownErrors.TryGetValue(resultCode, out var knownError) ? knownError : StsError.Unknown;
+        }
+
+        public static Maybe<StsError> ParseStsFromErrorCode(this string errorCode)
+        {
+            if (errorCode != null)
+            {
+                if (errorCode.Equals("ServiceAgreementNotFound", StringComparison.OrdinalIgnoreCase))
+                {
+                    return StsError.MissingServiceAgreement;
+                }
+                if (errorCode.Contains("ServiceAgreement"))
+                {
+                    //Covers a lot of different erros related to the service agreement: https://www.serviceplatformen.dk/administration/errorcodes-doc/errorcodes/4afb35be-7b7a-45b3-ab01-bd5017a8b182_errorcodes.html
+                    return StsError.ExistingServiceAgreementIssue;
+                }
+            }
+
+            return StsError.Unknown;
         }
     }
 }
