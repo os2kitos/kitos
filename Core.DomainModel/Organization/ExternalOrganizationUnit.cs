@@ -24,10 +24,6 @@ namespace Core.DomainModel.Organization
 
         public ExternalOrganizationUnit Copy(int? childLevelsToInclude = null)
         {
-            if (childLevelsToInclude is < 1)
-            {
-                throw new ArgumentException("Invalid sync depth");
-            }
             var children = new List<ExternalOrganizationUnit>();
             var includeChildren = childLevelsToInclude is > 0 or null;
             if (includeChildren)
