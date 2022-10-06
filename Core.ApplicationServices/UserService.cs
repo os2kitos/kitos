@@ -337,7 +337,7 @@ namespace Core.ApplicationServices
             user.Name = "Slettet bruger";
             user.Email = $"{Guid.NewGuid()}_deleted_user@kitos.dk";
             user.PhoneNumber = null;
-            user.LastName = $"{(user.LastName ?? "").TrimEnd()} (SLETTET)";
+            user.LastName = "";
             user.DeletedDate = DateTime.Now;
             user.Deleted = true;
             user.IsGlobalAdmin = false;
