@@ -35,6 +35,7 @@
                 $rootScope.page.subnav.buttons = [
                     { func: createUser, dataElementType:'createUserButton', text: 'Opret Bruger', style: 'btn-success', disabled: !hasWriteAccess, icon: 'glyphicon-plus', showWhen: 'organization.user'}
                 ];
+                $rootScope.page.subnav.showAnyButtons = (state) => Kitos.Helpers.SubNav.showAnyButtons($rootScope, state);
                 $rootScope.subnavPositionCenter = false;
 
                 function createUser() {

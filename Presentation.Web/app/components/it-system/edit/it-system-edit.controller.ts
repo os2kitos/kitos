@@ -26,6 +26,10 @@
             "$rootScope", "$scope", "itSystem", "user", "hasWriteAccess", "$state", "notify", "$http", "_", "userAccessRights", "SystemDeletedErrorResponseTranslationService",
             ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, systemDeletedErrorResponseTranslationService) => {
 
+                const systemStateButtonTexts = {
+                    activate: "Gør IT System tilgængeligt",
+                    deactivate: "Gør IT System 'Ikke tilgængeligt'"
+                }
                 $scope.showKLE = user.isGlobalAdmin;
                 $scope.showReference = user.isGlobalAdmin;
 
@@ -43,51 +47,51 @@
                     _.remove($rootScope.page.subnav.buttons, o => o.text === "Slet IT System");
                 }
                 if (userAccessRights.canEdit) {
-                    _.remove($rootScope.page.subnav.buttons, o => o.text === "Deaktivér IT System");
-                    _.remove($rootScope.page.subnav.buttons, o => o.text === "Aktivér IT System");
+                    _.remove($rootScope.page.subnav.buttons, o => o.text === systemStateButtonTexts.deactivate);
+                    _.remove($rootScope.page.subnav.buttons, o => o.text === systemStateButtonTexts.activate);
 
                     if (!itSystem.disabled) {
                         $rootScope.page.subnav.buttons.push(
-                            { func: disableSystem, text: "Deaktivér IT System", style: "btn-danger", showWhen: "it-system.edit" }
+                            { func: disableSystem, text: systemStateButtonTexts.deactivate, style: "btn-danger", showWhen: "it-system.edit" }
                         );
                     } else {
                         $rootScope.page.subnav.buttons.push(
-                            { func: enableSystem, text: "Aktivér IT System", style: "btn-success", showWhen: "it-system.edit" }
+                            { func: enableSystem, text: systemStateButtonTexts.activate, style: "btn-success", showWhen: "it-system.edit" }
                         );
                     }
                 }
                 function disableSystem() {
-                    if (!confirm("Er du sikker på du vil deaktivere systemet?")) {
+                    if (!confirm("Er du sikker på, at du vil gøre IT Systemet 'ikke tilgængeligt'?")) {
                         return;
                     }
 
                     var payload: any = {};
                     payload.Disabled = true;
 
-                    var msg = notify.addInfoMessage("Deaktiverer IT System...", false);
+                    var msg = notify.addInfoMessage("Gør IT System 'ikke tilgængeligt'...", false);
                     $http.patch("odata/ItSystems(" + itSystem.id + ")", payload)
                         .then(function onSuccess(result) {
-                            msg.toSuccessMessage("IT System er deaktiveret!");
+                            msg.toSuccessMessage("IT Systemet er nu 'ikke tilgængeligt'!");
                             $state.reload();
                         }, function onError(result) {
-                            msg.toErrorMessage("Fejl! Kunne ikke deaktivere IT System!");
+                            msg.toErrorMessage("Fejl! Kunne ikke gøre IT Systemet 'ikke tilgængeligt'!");
                         });
                 }
 
                 function enableSystem() {
-                    if (!confirm("Er du sikker på du vil aktivere systemet?")) {
+                    if (!confirm("Er du sikker på, at du vil gøre IT Systemet tilgængeligt?")) {
                         return;
                     }
                     var payload: any = {};
                     payload.Disabled = false;
 
-                    var msg = notify.addInfoMessage("Aktiverer IT System...", false);
+                    var msg = notify.addInfoMessage("Gør IT Systemet tilgængeligt...", false);
                     $http.patch("odata/ItSystems(" + itSystem.id + ")", payload)
                         .then(function onSuccess(result) {
-                            msg.toSuccessMessage("IT System er aktiveret!");
+                            msg.toSuccessMessage("IT Systemet er tilgængeligt!");
                             $state.reload();
                         }, function onError(result) {
-                            msg.toErrorMessage("Fejl! Kunne ikke aktivere IT System!");
+                            msg.toErrorMessage("Fejl! Kunne ikke gøre IT Systemet tilgængeligt!");
                         });
                 }
 
@@ -101,7 +105,7 @@
                     $http.delete("api/itsystem/" + systemId + "?organizationId=" + user.currentOrganizationId)
                         .then(function onSuccess(result) {
                             msg.toSuccessMessage("IT System  er slettet!");
-                            $state.go("it-system.catalog");
+                            $state.go(Kitos.Constants.ApplicationStateId.SystemCatalog);
                         }, function onError(result) {
                             msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(result.status, result.data.response));
                         });

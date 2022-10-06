@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -91,9 +90,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractSupplierName", 0);
 
-            Property(x => x.HasMainContract)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HasMainContract", 0);
-
             Property(x => x.ArchiveDuty)
                .IsOptional()
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
@@ -116,7 +112,28 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.HostedAt)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HostedAt", 0);
 
+            Property(x => x.ActiveAccordingToValidityPeriod)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToValidityPeriod", 0);
 
+            Property(x => x.ActiveAccordingToLifeCycle)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToLifeCycle", 0);
+
+            Property(x => x.LifeCycleStatus)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LifeCycleStatus", 0);
+
+            Property(x => x.Concluded)
+                .IsOptional()
+                .HasIndexAnnotation("IX_Concluded");
+
+            Property(x => x.ExpirationDate)
+                .IsOptional()
+                .HasIndexAnnotation("IX_ExpirationDate");
+            Property(x => x.SystemActive)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_SystemActive", 0);
+
+
+            Property(x => x.LastChangedAt)
+                .HasIndexAnnotation("IX_LastChangedAt");
 
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();
@@ -126,8 +143,6 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LocalReferenceUrl).IsOptional();
 
             Property(x => x.SensitiveDataLevelsAsCsv).IsOptional();
-
-            Property(x => x.ItProjectNamesAsCsv).IsOptional();
 
             Property(x => x.RiskSupervisionDocumentationUrl).IsOptional();
             Property(x => x.LinkToDirectoryUrl).IsOptional();

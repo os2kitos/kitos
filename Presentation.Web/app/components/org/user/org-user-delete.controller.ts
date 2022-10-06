@@ -1,16 +1,20 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface IHasSelection {
-        selected: boolean;
-    }
-
-    interface IAssignedRightViewModel extends IHasSelection {
+    interface IAssignedRightViewModel extends Models.ViewModel.Organization.IHasSelection {
         right: Models.Users.IAssignedRightDTO;
     }
 
-    interface IAssignedAdminRoleViewModel extends IHasSelection {
+    interface IAssignedAdminRoleViewModel extends Models.ViewModel.Organization.IHasSelection {
         role: Models.OrganizationRole;
+    }
+
+    interface IRootAssignedRightsWithGroupSelectionViewModel extends Models.ViewModel.Organization.IHasSelection {
+        rights: IAssignedRightViewModel[];
+    }
+
+    interface IRootAssignedAdminRolesWithGroupSelectionViewModel extends Models.ViewModel.Organization.IHasSelection {
+        rights: IAssignedAdminRoleViewModel[];
     }
 
     type UpdateSourceCollection = (collection: Array<IAssignedRightViewModel>) => void;
@@ -18,12 +22,17 @@
 
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
-        vmOrgRights = new Array<IAssignedRightViewModel>();
-        vmProjectRights = new Array<IAssignedRightViewModel>();
-        vmAdminRights = new Array<IAssignedAdminRoleViewModel>();
-        vmSystemRights = new Array<IAssignedRightViewModel>();
-        vmContractRights = new Array<IAssignedRightViewModel>();
-        vmDprRights = new Array<IAssignedRightViewModel>();
+        vmOrgRoot: IRootAssignedRightsWithGroupSelectionViewModel;
+        vmContractRoot: IRootAssignedRightsWithGroupSelectionViewModel;
+        vmDprRoot: IRootAssignedRightsWithGroupSelectionViewModel;
+        vmSystemRoot: IRootAssignedRightsWithGroupSelectionViewModel;
+        vmAdminRoot: IRootAssignedAdminRolesWithGroupSelectionViewModel;
+
+        areAllOrgRightsSelected: boolean;
+        areAllAdminRightsSelected: boolean;
+        areAllSystemRightsSelected: boolean;
+        areAllContractRightsSelected: boolean;
+        areAllDprRightsSelected: boolean;
 
         vmGetUsers: any;
         vmUsersInOrganization: Array<Models.IUser>;
@@ -33,6 +42,7 @@
         disabled: boolean;
         noRights: boolean;
         anySelections = false;
+        allSelections = false;
         roleViewModelCallbacks: Users.IOrgUserRolesTableCallbacks<IAssignedRightViewModel>;
 
         readonly firstName: string;
@@ -65,18 +75,37 @@
             this.lastName = userToModify.LastName;
             this.email = userToModify.Email;
 
-            this.vmAdminRights = allRoles.administrativeAccessRoles.map(role => {
+            const vmAdminRights = allRoles.administrativeAccessRoles.map(role => {
                 return {
                     selected: false,
                     role: role
                 }
             });
+            const vmOrgRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.OrganizationUnit);
+            const vmContractRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItContract);
+            const vmDprRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.DataProcessingRegistration);
+            const vmSystemRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItSystemUsage);
 
-            this.vmOrgRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.OrganizationUnit);
-            this.vmContractRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItContract);
-            this.vmDprRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.DataProcessingRegistration);
-            this.vmProjectRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItProject);
-            this.vmSystemRights = this.createViewModel(allRoles.rights, Models.Users.BusinessRoleScope.ItSystemUsage);
+            this.vmOrgRoot = {
+                rights: vmOrgRights,
+                selected: false
+            }
+            this.vmContractRoot = {
+                rights: vmContractRights,
+                selected: false
+            }
+            this.vmDprRoot = {
+                rights: vmDprRights,
+                selected: false
+            }
+            this.vmSystemRoot = {
+                rights: vmSystemRights,
+                selected: false
+            }
+            this.vmAdminRoot = {
+                rights: vmAdminRights,
+                selected: false
+            }
 
             this.vmUsersInOrganization = usersInOrganization.filter(x => x.Id !== userToModify.Id);
 
@@ -85,18 +114,13 @@
             this.updateNoRights();
             this.roleViewModelCallbacks = {
                 delete: right => this.deleteRight(right),
-                selectionChanged: () => this.updateAnySelections()
+                selectionChanged: () => this.updateAnySelections(),
+                selectOrDeselectGroup: (rights: Models.ViewModel.Organization.IHasSelection[]) => this.selectOrDeselectGroup(rights)
             };
         }
 
         private updateNoRights() {
-            this.noRights =
-                this.vmOrgRights.length === 0 &&
-                this.vmContractRights.length === 0 &&
-                this.vmDprRights.length === 0 &&
-                this.vmProjectRights.length === 0 &&
-                this.vmSystemRights.length === 0 &&
-                this.vmAdminRights.length === 0;
+            this.noRights = this.getAllRoles().length === 0;
         }
 
         createViewModel = (fullCollection: Array<Models.Users.IAssignedRightDTO>, roleScope: Models.Users.BusinessRoleScope) => {
@@ -112,51 +136,57 @@
 
         updateAnySelections() {
             let anySelectionsFound = false;
-            if (this.collectSelectedAdminRoles().length > 0) {
+            let allSelectionsFound = false;
+
+            const numberOfSelectedAdminRoles = this.collectSelectedAdminRoles().length;
+            const selectedRoles = this.collectSelectedRoles();
+
+            const numberOfSelectedRoles = selectedRoles.reduce((acc, role) => acc + role.selectedModels.length, 0);
+
+            const totalRoles = this.getAllRoles().length;
+            const totalSelectedRoles = numberOfSelectedAdminRoles + numberOfSelectedRoles;
+
+            if (totalSelectedRoles > 0) {
                 anySelectionsFound = true;
             }
-            else if (this.collectSelectedRoles().filter(x => x.selectedModels.length > 0).length > 0) {
-                anySelectionsFound = true;
+            if (totalSelectedRoles === totalRoles) {
+                allSelectionsFound = true;
             }
+
+            this.updateGroupSelections();
             this.anySelections = anySelectionsFound;
+            this.allSelections = allSelectionsFound;
         }
 
         deleteRight(viewModel: IAssignedRightViewModel) {
             let snapshot: RoleSelectionSnapshot | null = null;
             switch (viewModel.right.scope) {
-                case Models.Users.BusinessRoleScope.ItProject:
-                    snapshot = {
-                        selectedModels: this.vmProjectRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmProjectRights,
-                        updateSourceCollection: (newValues) => this.vmProjectRights = newValues
-                    };
-                    break;
                 case Models.Users.BusinessRoleScope.ItContract:
                     snapshot = {
-                        selectedModels: this.vmContractRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmContractRights,
-                        updateSourceCollection: (newValues) => this.vmContractRights = newValues
+                        selectedModels: this.vmContractRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmContractRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmContractRoot.rights = newValues
                     };
                     break;
                 case Models.Users.BusinessRoleScope.DataProcessingRegistration:
                     snapshot = {
-                        selectedModels: this.vmDprRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmDprRights,
-                        updateSourceCollection: (newValues) => this.vmDprRights = newValues
+                        selectedModels: this.vmDprRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmDprRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmDprRoot.rights = newValues
                     };
                     break;
                 case Models.Users.BusinessRoleScope.ItSystemUsage:
                     snapshot = {
-                        selectedModels: this.vmSystemRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmSystemRights,
-                        updateSourceCollection: (newValues) => this.vmSystemRights = newValues
+                        selectedModels: this.vmSystemRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmSystemRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmSystemRoot.rights = newValues
                     };
                     break;
                 case Models.Users.BusinessRoleScope.OrganizationUnit:
                     snapshot = {
-                        selectedModels: this.vmOrgRights.filter(r => r.right.rightId === viewModel.right.rightId),
-                        sourceCollection: this.vmOrgRights,
-                        updateSourceCollection: (newValues) => this.vmOrgRights = newValues
+                        selectedModels: this.vmOrgRoot.rights.filter(r => r.right.rightId === viewModel.right.rightId),
+                        sourceCollection: this.vmOrgRoot.rights,
+                        updateSourceCollection: (newValues) => this.vmOrgRoot.rights = newValues
                     };
                     break;
             }
@@ -170,7 +200,7 @@
         }
 
         deleteAdminRole(role: Models.OrganizationRole) {
-            const selectedAdminRoles = this.vmAdminRights.filter(x => x.role === role);
+            const selectedAdminRoles = this.vmAdminRoot.rights.filter(x => x.role === role);
             if (selectedAdminRoles.length != 0) {
                 if (!confirm('Er du sikker på, at du vil slette rollen?')) {
                     return;
@@ -197,10 +227,10 @@
                             [])
                     }
                 ).then(success => {
-                        if (success) {
-                            this.updateViewModels(selectedRoles, selectedAdminRoles);
-                        }
+                    if (success) {
+                        this.updateViewModels(selectedRoles, selectedAdminRoles);
                     }
+                }
                 );
         }
 
@@ -232,7 +262,7 @@
         }
 
         updateViewModels(removedRoles: Array<RoleSelectionSnapshot>, removedAdminRoles: Array<IAssignedAdminRoleViewModel>) {
-            this.vmAdminRights = this.vmAdminRights.filter(vm => removedAdminRoles.indexOf(vm) === -1);
+            this.vmAdminRoot.rights = this.vmAdminRoot.rights.filter(vm => removedAdminRoles.indexOf(vm) === -1);
             for (var roles of removedRoles) {
                 roles.updateSourceCollection(
                     roles.sourceCollection.filter(vm => roles.selectedModels.indexOf(vm) === -1));
@@ -259,6 +289,53 @@
                 );
         }
 
+        selectOrDeselectGroup(rights: Models.ViewModel.Organization.IHasSelection[]) {
+            const areAllSelected = rights.filter(vm => !vm.selected).length < 1;
+            const targetSelectValue = !areAllSelected;
+            this.setSelectGroupToValue(rights, targetSelectValue);
+            this.updateAnySelections();
+        }
+
+        selectAll() {
+            this.changeAllSelections(true);
+            this.updateAnySelections();
+        }
+
+        deselectAll() {
+            this.changeAllSelections(false);
+            this.updateAnySelections();
+        }
+
+        selectOrDeselectAll() {
+        }
+
+        private getAllRoles(): Array<Models.ViewModel.Organization.IHasSelection> {
+            return []
+                .concat(this.vmAdminRoot.rights)
+                .concat(this.vmDprRoot.rights)
+                .concat(this.vmOrgRoot.rights)
+                .concat(this.vmSystemRoot.rights)
+                .concat(this.vmContractRoot.rights);
+        }
+
+        private setSelectGroupToValue(rights: Models.ViewModel.Organization.IHasSelection[], targetValue: boolean) {
+            rights.forEach(vm => {
+                vm.selected = targetValue;
+            });
+        }
+
+        private changeAllSelections(targetValue: boolean) {
+            this.changeGroupSelectionStatus(this.vmOrgRoot, targetValue);
+            this.changeGroupSelectionStatus(this.vmContractRoot, targetValue);
+            this.changeGroupSelectionStatus(this.vmDprRoot, targetValue);
+            this.changeGroupSelectionStatus(this.vmSystemRoot, targetValue);
+            this.changeGroupSelectionStatus(this.vmAdminRoot, targetValue);
+        }
+
+        private changeGroupSelectionStatus(groupRoot: IRootAssignedRightsWithGroupSelectionViewModel | IRootAssignedAdminRolesWithGroupSelectionViewModel, targetValue: boolean) {
+            this.setSelectGroupToValue(groupRoot.rights, targetValue);
+            groupRoot.selected = targetValue;
+        }
 
         private collectSelectedRolesFromSource(sourceCollection: Array<IAssignedRightViewModel>, updateSourceCollection: UpdateSourceCollection): RoleSelectionSnapshot {
             const selected = sourceCollection.filter(x => x.selected);
@@ -269,22 +346,54 @@
             };
         }
 
+        private updateGroupSelections() {
+
+            const roleGroups = [
+                this.vmContractRoot, this.vmSystemRoot, this.vmDprRoot, this.vmOrgRoot
+            ];
+            this.initiateGroupSelectionCheck(roleGroups);
+
+            const selectedAdminRights = this.collectSelectedAdminRoles();
+            if (selectedAdminRights.length < this.vmAdminRoot.rights.length) {
+                this.vmAdminRoot.selected = false;
+                return;
+            }
+
+            this.vmAdminRoot.selected = true;
+        }
+
+        private initiateGroupSelectionCheck(groups: IRootAssignedRightsWithGroupSelectionViewModel[]) {
+            groups.forEach(group => this.checkAndChangeGroupSelectionStatus(group));
+        }
+
+        private checkAndChangeGroupSelectionStatus(groupRoot: IRootAssignedRightsWithGroupSelectionViewModel) {
+            const rights =
+                this.collectSelectedRolesFromSource(groupRoot.rights, () => {/*lambda not used in this instance*/ });
+
+            if (rights.selectedModels.length < groupRoot.rights.length) {
+                groupRoot.selected = false;
+                return;
+            }
+
+            groupRoot.selected = true;
+        }
+
         private collectSelectedRoles(): Array<RoleSelectionSnapshot> {
 
             const result = new Array<RoleSelectionSnapshot>();
 
-            result.push(this.collectSelectedRolesFromSource(this.vmContractRights, (newRights) => this.vmContractRights = newRights));
-            result.push(this.collectSelectedRolesFromSource(this.vmProjectRights, (newRights) => this.vmProjectRights = newRights));
-            result.push(this.collectSelectedRolesFromSource(this.vmSystemRights, (newRights) => this.vmSystemRights = newRights));
-            result.push(this.collectSelectedRolesFromSource(this.vmDprRights, (newRights) => this.vmDprRights = newRights));
-            result.push(this.collectSelectedRolesFromSource(this.vmOrgRights, (newRights) => this.vmOrgRights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmContractRoot.rights, (newRights) => this.vmContractRoot.rights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmSystemRoot.rights, (newRights) => this.vmSystemRoot.rights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmDprRoot.rights, (newRights) => this.vmDprRoot.rights = newRights));
+            result.push(this.collectSelectedRolesFromSource(this.vmOrgRoot.rights, (newRights) => this.vmOrgRoot.rights = newRights));
 
             return result;
         }
 
         private collectSelectedAdminRoles(): Array<IAssignedAdminRoleViewModel> {
+            const selectedAdminRoles = this.vmAdminRoot.rights.filter(r => r.selected);
 
-            return this.vmAdminRights.filter(r => r.selected);
+            return selectedAdminRoles;
         }
     }
 

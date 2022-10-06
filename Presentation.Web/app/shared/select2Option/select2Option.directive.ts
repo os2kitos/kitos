@@ -4,7 +4,7 @@
     app.controller("select2OptionController", ["$scope", "entityMapper", "select2LoadingService", function ($scope, entityMapper, select2LoadingService) {
         var options = entityMapper.mapOptionToSelect2ViewModel($scope.options);
 
-        var foundSelectedInOptions = _.find(options, function (option: any) {
+        const foundSelectedInOptions = _.find(options, function (option: any) {
             if ($scope.selectedId === undefined || $scope.selectedId === null) {
                 return false;
             }
@@ -20,6 +20,8 @@
         }
 
         $scope.select2Config = select2LoadingService.select2LocalDataNoSearch(() => options, true);
+
+        $scope.isKeyDefined = !!$scope.helpTextKey;
     }]);
 
     app.directive("select2Option", [
@@ -36,7 +38,8 @@
                     autoSaveUrl: "@",
                     field: "@",
                     disabled: "=ngDisabled",
-                    required: "@"
+                    required: "@",
+                    helpTextKey: "@"
                 },
                 controller: "select2OptionController",
                 link: function (scope, element, attr, ctrl) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -26,17 +27,33 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
         [Fact]
         public void GetReadModelsMustUpdateToChangeActiveState_Returns_ReadModels_Where_Active_State_Is_Stale()
         {
+            var inactiveMainContract = new ItContractItSystemUsage
+            {
+                ItContract = new ItContract
+                {
+                    ExpirationDate = _now.Date.AddDays(-1)
+                }
+            };
+            var activeMainContract = new ItContractItSystemUsage
+            {
+                ItContract = new ItContract
+                {
+                    Active = true
+                }
+            };
+
             //Arrange - 1 that must expire and 1 that must be activated
-            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, false, _now.Date, _now.Date.AddDays(1));
-            var excludedSinceConcludedSinceExpired = CreateReadModel(false, false, _now.Date.AddDays(-2), _now.Date.AddDays(-1));
-            var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, false, _now.AddDays(-2), _now);
-            var includedSinceExpired = CreateReadModel(true, false, null, _now.AddDays(-1));
+            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1), null);
+            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1), inactiveMainContract);
+            var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, _now.AddDays(-2), _now, null);
+            var includedSinceMainContractIsActive= CreateReadModel(false, null, null, activeMainContract);
+
             _repositoryMock.Setup(x => x.AsQueryable()).Returns(new[]
             {
-                includedSinceExpired,
                 includedSinceConcludedHasPassedAndNotExpired,
                 excludedSinceConcludedSinceExpired,
-                excludedBecauseExpirationDateHasNotPassed
+                excludedBecauseExpirationDateHasNotPassed,
+                includedSinceMainContractIsActive
             }.AsQueryable());
 
             //Act
@@ -44,8 +61,8 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
 
             //Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains(includedSinceExpired, result);
             Assert.Contains(includedSinceConcludedHasPassedAndNotExpired, result);
+            Assert.Contains(includedSinceMainContractIsActive, result);
         }
     }
 }

@@ -42,7 +42,6 @@ module.exports = {
         npm("/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"),
         npm("/angular-ui-select2/src/select2.js"),
         npm("/angular-loading-bar/build/loading-bar.min.js"),
-        npm("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
         npm("/angular-confirm/angular-confirm.min.js"),
         npm("/angular-messages/angular-messages.min.js"),
         npm("/angular-ui-tree/dist/angular-ui-tree.min.js"),

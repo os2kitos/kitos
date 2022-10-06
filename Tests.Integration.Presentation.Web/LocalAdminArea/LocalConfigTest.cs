@@ -27,23 +27,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
         }
 
         [Fact]
-        public async Task Cannot_Set_If_Casing_Is_Wrong()
-        {
-            //Arrange
-            var body = new
-            {
-                showColumnUsage = true
-            };
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
-
-            //Act - perform the action with the actual role
-            using var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
-
-        [Fact]
         public async Task Can_Set_Column_Usage()
         {
             //Arrange
@@ -76,32 +59,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             var body = new
             {
                 ShowColumnTechnology = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-
-        [Fact]
-        public async Task Can_Set_It_Project_Prefix()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowItProjectPrefix = true
-            };
-
-            //Act + Assert
-            await Can_Set(body);
-        }
-
-        [Fact]
-        public async Task Can_Set_It_Project_Module()
-        {
-            //Arrange
-            var body = new
-            {
-                ShowItProjectModule = true
             };
 
             //Act + Assert
@@ -169,8 +126,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
                 ShowColumnUsage = A<bool>(),
                 ShowTabOverview = A<bool>(),
                 ShowColumnTechnology = A<bool>(),
-                ShowItProjectModule = A<bool>(),
-                ShowItProjectPrefix = A<bool>(),
                 ShowItSystemModule = A<bool>(),
                 ShowItSystemPrefix = A<bool>(),
                 ShowItContractModule = A<bool>(),
@@ -189,8 +144,6 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             Assert.Equal(body.ShowColumnUsage, config.ShowColumnUsage);
             Assert.Equal(body.ShowTabOverview, config.ShowTabOverview);
             Assert.Equal(body.ShowColumnTechnology, config.ShowColumnTechnology);
-            Assert.Equal(body.ShowItProjectModule, config.ShowItProjectModule);
-            Assert.Equal(body.ShowItProjectPrefix, config.ShowItProjectPrefix);
             Assert.Equal(body.ShowItSystemModule, config.ShowItSystemModule);
             Assert.Equal(body.ShowItSystemPrefix, config.ShowItSystemPrefix);
             Assert.Equal(body.ShowItContractModule, config.ShowItContractModule);

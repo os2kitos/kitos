@@ -1,6 +1,4 @@
 ﻿module Kitos.Helpers {
-    import IItProjectInactiveOverview = ItProject.OverviewInactive.IItProjectInactiveOverview;
-
     interface IStatusColor {
         danish: string;
         english: string;
@@ -62,59 +60,11 @@
             return ExcelExportHelper.noValueFallback;
         }
 
-        static renderProjectStatusColor(status: Models.ItProject.IItProjectStatusUpdate[]) {
-
-            const getColor = (statusArray: Array<string>) => {
-                var prioritizedColorOrder = [
-                    ExcelExportHelper.colors.red,
-                    ExcelExportHelper.colors.yellow,
-                    ExcelExportHelper.colors.green,
-                    ExcelExportHelper.colors.white
-                ];
-
-                const statusMap = _.reduce(statusArray, (acc: any, current) => {
-                    if (!!current) {
-                        acc[current.toLowerCase()] = true;
-                    }
-                    return acc;
-                }, <any>{});
-
-                for (let currentPrioritizedColor of prioritizedColorOrder) {
-                    if (statusMap.hasOwnProperty(currentPrioritizedColor.english.toLowerCase())) {
-                        return currentPrioritizedColor.danish;
-                    }
-                }
-
-                return ExcelExportHelper.noValueFallback;
-            };
-
-            if (status.length > 0) {
-                const latestStatus = status[0];
-
-                if (latestStatus.IsCombined) {
-                    return this.convertColorsToDanish(latestStatus.CombinedStatus);
-                }
-                else {
-                    const statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
-                    return getColor(statusArray);
-                }
-            }
-            else {
-                return ExcelExportHelper.noValueFallback;
-            }
-        }
-
         static renderDate(date: Date | string) {
             if (!!date && moment(date).format(Constants.DateFormat.DanishDateFormat) !== "01-01-0001") {
                 return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return ExcelExportHelper.noValueFallback;
-        }
-
-        static renderStatusColorWithStatus(dataItem: IItProjectInactiveOverview, status) {
-            const latestStatus = dataItem.ItProjectStatusUpdates[0];
-            const statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : status;
-            return ExcelExportHelper.convertColorsToDanish(statusToShow);
         }
 
         static convertColorsToDanish(color: string) {
@@ -132,24 +82,6 @@
                 return ExcelExportHelper.noValueFallback;
             }
             return this.convertColorsToDanish(goalStatus.toString());
-        }
-
-        static renderUserRoles(rights: any[], projectRoles) {
-            let result = "";
-            _.each(rights,
-                (right, index,) => {
-                    if (!_.find(projectRoles, (option: any) => (option.Id === parseInt(right.Role.Id, 10)))) {
-                        result += `${right.Role.Name} (udgået)`;
-                    } else {
-                        result += `${right.Role.Name}`;
-                    }
-
-                    if (index !== rights.length - 1) {
-                        result += ", ";
-                    }
-
-                });
-            return result;
         }
 
         static renderString(value: string) {
@@ -178,7 +110,7 @@
                 show: true,
                 id: Constants.ExcelExportDropdown.Id,
                 title: Constants.ExcelExportDropdown.DefaultTitle,
-                color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                color: Utility.KendoGrid.KendoToolbarButtonColor.None,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
                 margins: [Utility.KendoGrid.KendoToolbarMargin.Right],
@@ -193,7 +125,7 @@
 
                         mainGrid().saveAsExcel();
 
-                        jQuery(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                        jQuery(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.KendoDropdown.DataKey)
                             .value(Constants.ExcelExportDropdown.ChooseWhichExcelOptionId);
                     },
                     availableOptions: [

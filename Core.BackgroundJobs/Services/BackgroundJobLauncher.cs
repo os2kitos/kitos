@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 using Core.BackgroundJobs.Factories;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Model.ExternalLinks;
+using Core.BackgroundJobs.Model.Maintenance;
 using Core.BackgroundJobs.Model.ReadModels;
 using Infrastructure.Services.BackgroundJobs;
 using Serilog;
@@ -22,6 +23,10 @@ namespace Core.BackgroundJobs.Services
         private readonly IRebuildReadModelsJobFactory _rebuildReadModelsJobFactory;
         private readonly PurgeDuplicatePendingReadModelUpdates _purgeDuplicatePendingReadModelUpdates;
         private readonly ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState _scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive;
+        private readonly PurgeOrphanedHangfireJobs _purgeOrphanedHangfireJobs;
+        private readonly RebuildItContractOverviewReadModelsBatchJob _rebuildItContractOverviewReadModelsBatchJob;
+        private readonly ScheduleItContractOverviewReadModelUpdates _scheduleItContractOverviewReadModelUpdates;
+        private readonly ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState _contractOverviewReadModelsWhichChangesActiveState;
 
         public BackgroundJobLauncher(
             ILogger logger,
@@ -32,7 +37,11 @@ namespace Core.BackgroundJobs.Services
             ScheduleItSystemUsageOverviewReadModelUpdates scheduleItSystemUsageOverviewReadModelUpdates,
             IRebuildReadModelsJobFactory rebuildReadModelsJobFactory,
             PurgeDuplicatePendingReadModelUpdates purgeDuplicatePendingReadModelUpdates,
-            ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive)
+            ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive,
+            PurgeOrphanedHangfireJobs purgeOrphanedHangfireJobs, 
+            RebuildItContractOverviewReadModelsBatchJob rebuildItContractOverviewReadModelsBatchJob,
+            ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates, 
+            ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState contractOverviewReadModelsWhichChangesActiveState)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -43,6 +52,20 @@ namespace Core.BackgroundJobs.Services
             _rebuildReadModelsJobFactory = rebuildReadModelsJobFactory;
             _purgeDuplicatePendingReadModelUpdates = purgeDuplicatePendingReadModelUpdates;
             _scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive = scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive;
+            _purgeOrphanedHangfireJobs = purgeOrphanedHangfireJobs;
+            _rebuildItContractOverviewReadModelsBatchJob = rebuildItContractOverviewReadModelsBatchJob;
+            _scheduleItContractOverviewReadModelUpdates = scheduleItContractOverviewReadModelUpdates;
+            _contractOverviewReadModelsWhichChangesActiveState = contractOverviewReadModelsWhichChangesActiveState;
+        }
+
+        public async Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default)
+        {
+            await Launch(_rebuildItContractOverviewReadModelsBatchJob, token);
+        }
+
+        public async Task LaunchUpdateStaleContractRmAsync(CancellationToken token = default)
+        {
+            await Launch(_contractOverviewReadModelsWhichChangesActiveState, token);
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)
@@ -65,6 +88,11 @@ namespace Core.BackgroundJobs.Services
             await Launch(_scheduleItSystemUsageOverviewReadModelUpdates, token);
         }
 
+        public async Task LaunchScheduleItContractOverviewReadModelUpdates(CancellationToken token = default)
+        {
+            await Launch(_scheduleItContractOverviewReadModelUpdates, token);
+        }
+
         public async Task LaunchUpdateItSystemUsageOverviewReadModels(CancellationToken token = default)
         {
             await Launch(_rebuildItSystemUsageOverviewReadModels, token);
@@ -84,6 +112,11 @@ namespace Core.BackgroundJobs.Services
         public async Task LaunchUpdateStaleSystemUsageRmAsync(CancellationToken token = default)
         {
             await Launch(_scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive, token);
+        }
+
+        public async Task LaunchPurgeOrphanedHangfireJobs(CancellationToken token)
+        {
+            await Launch(_purgeOrphanedHangfireJobs, token);
         }
 
         private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)

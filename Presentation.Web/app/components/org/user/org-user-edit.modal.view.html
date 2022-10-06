@@ -49,9 +49,6 @@
                 <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserOrgAdmin">
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isOrgAdmin">Organisations admin</label>
                 </div>
-                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserProjectAdmin">
-                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isProjectAdmin">Projekt admin</label>
-                </div>
                 <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserSystemAdmin">
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isSystemAdmin">System admin</label>
                 </div>
@@ -88,6 +85,19 @@
                     <div class="checkbox">
                         <label><input ng-disabled="emailExists" type="checkbox" value="" data-ng-model="ctrl.vm.hasStakeHolderAccess">Interessentadgang</label>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-if="ctrl.isUserLocalAdmin || ctrl.isUserGlobalAdmin">
+            <label for="primaryStartUnit" class="col-xs-3 control-label">
+                Primær startenhed
+            </label>
+            <div id="primaryStartUnit" class="col-xs-8">
+                <div ng-repeat="startUnit in ctrl.primaryStartUnitOptions">
+                    <label class="radio-inline">
+                        <input type="radio" data-ng-model="ctrl.vm.primaryStartUnitId" name="inlineRadioOptions"
+                               id="{{::startUnit.htmlSafeId}}" value="{{::startUnit.id}}" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> {{::startUnit.name}}
+                    </label>
                 </div>
             </div>
         </div>

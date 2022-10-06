@@ -3,7 +3,6 @@ using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -21,6 +20,7 @@ using Microsoft.OData.UriParser;
 using System.Collections.Generic;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystemUsage.Read;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing.Conventions;
@@ -101,24 +101,11 @@ namespace Presentation.Web
 
             BindEntitySet<RelationFrequencyType, FrequencyTypesController>(builder);
 
-            BindEntitySet<GoalType, GoalTypesController>(builder);
-
             BindEntitySet<ItContractRight, ItContractRightsController>(builder);
 
             BindEntitySet<ItContractRole, ItContractRolesController>(builder);
 
-            BindEntitySet<ItProjectRight, ItProjectRightsController>(builder);
-
-            BindEntitySet<ItProjectRole, ItProjectRolesController>(builder);
-
             BindEntitySet<AttachedOption, AttachedOptionsController>(builder);
-
-            var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
-            itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
-
-            var itProject = builder.EntitySet<ItProject>(nameof(ItProjectsController).Replace(ControllerSuffix, string.Empty));
-            itProject.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
-            itProject.EntityType.HasKey(x => x.Id);
 
             BindEntitySet<DataType, DataTypesController>(builder);
 
@@ -166,7 +153,6 @@ namespace Presentation.Web
             orgUnits.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             orgUnits.EntityType.HasKey(x => x.Id);
             orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
-            orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
             //Add isActive to result form odata
             builder.StructuralTypes.First(t => t.ClrType == typeof(ItContract)).AddProperty(typeof(ItContract).GetProperty(nameof(ItContract.IsActive)));
 
@@ -201,6 +187,11 @@ namespace Presentation.Web
             contracts.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             contracts.HasRequiredBinding(o => o.Supplier, entitySetOrganizations);
 
+            //contract read models
+            BindEntitySet<ItContractOverviewReadModel, ItContractOverviewReadModelsController>(builder);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItContractOverviewReadModel)).RemoveProperty(typeof(ItContractOverviewReadModel).GetProperty(nameof(ItContractOverviewReadModel.SourceEntity)));
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItContractOverviewReadModel)).RemoveProperty(typeof(ItContractOverviewReadModel).GetProperty(nameof(ItContractOverviewReadModel.Organization)));
+
             BindEntitySet<InterfaceType, InterfaceTypesController>(builder);
 
             var itInterfaces = BindEntitySet<ItInterface, ItInterfacesController>(builder);
@@ -230,8 +221,6 @@ namespace Presentation.Web
             BindEntitySet<PriceRegulationType, PriceRegulationTypesController>(builder);
 
             BindEntitySet<ProcurementStrategyType, ProcurementStrategyTypesController>(builder);
-
-            BindEntitySet<ItProjectType, ItProjectTypesController>(builder);
 
             BindEntitySet<PurchaseFormType, PurchaseFormTypesController>(builder);
 
@@ -264,9 +253,6 @@ namespace Presentation.Web
             var localFrequencyType = BindEntitySet<LocalRelationFrequencyType, LocalFrequencyTypesController>(builder);
             localFrequencyType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localGoalType = BindEntitySet<LocalGoalType, LocalGoalTypesController>(builder);
-            localGoalType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
             var localInterfaceType = BindEntitySet<LocalInterfaceType, LocalInterfaceTypesController>(builder);
             localInterfaceType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
@@ -278,12 +264,6 @@ namespace Presentation.Web
 
             var localItContractType = BindEntitySet<LocalItContractType, LocalItContractTypesController>(builder);
             localItContractType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localItProjectRole = BindEntitySet<LocalItProjectRole, LocalItProjectRolesController>(builder);
-            localItProjectRole.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localItProjectType = BindEntitySet<LocalItProjectType, LocalItProjectTypesController>(builder);
-            localItProjectType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localItSystemRole = BindEntitySet<LocalItSystemRole, LocalItSystemRolesController>(builder);
             localItSystemRole.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
@@ -368,9 +348,6 @@ namespace Presentation.Web
 
             BindEntitySet<HelpText, HelpTextsController>(builder);
 
-            var itProjectStatusUpdates = BindEntitySet<ItProjectStatusUpdate, ItProjectStatusUpdatesController>(builder);
-            itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
-
             BindDataProcessingRegistrationModule(builder);
 
             return builder.GetEdmModel();
@@ -395,7 +372,7 @@ namespace Presentation.Web
                 builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
             builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsage))
-                .AddProperty(typeof(ItSystemUsage).GetProperty(nameof(ItSystemUsage.IsActive)));
+                .AddProperty(typeof(ItSystemUsage).GetProperty(nameof(ItSystemUsage.IsActiveAccordingToDateFields)));
 
             //read models
             BindEntitySet<ItSystemUsageOverviewReadModel, ItSystemUsageOverviewReadModelsController>(builder);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
@@ -11,7 +10,6 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
-using Core.DomainServices.Repositories.Organization;
 using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
@@ -82,9 +80,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentity(itSystemUsage.MainContract.ItContract, dto.General.MainContract);
             Assert.Equal(itSystemUsage.Concluded, dto.General.Validity.ValidFrom);
             Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity.ValidTo);
-            Assert.Equal(itSystemUsage.Active, dto.General.Validity.EnforcedValid);
-            Assert.Equal(itSystemUsage.IsActive, dto.General.Validity.Valid);
-            AssertIdentities(itSystemUsage.ItProjects, dto.General.AssociatedProjects);
+            Assert.Equal(itSystemUsage.LifeCycleStatus, dto.General.Validity.LifeCycleStatus?.ToLifeCycleStatusType());
+            Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.ValidAccordingToValidityPeriod);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToLifeCycle, dto.General.Validity.ValidAccordingToLifeCycle);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToMainContract, dto.General.Validity.ValidAccordingToMainContract);
+            Assert.Equal(itSystemUsage.CheckSystemValidity().Result, dto.General.Validity.Valid);
         }
 
         [Fact]
@@ -582,8 +582,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.Version = A<string>();
             itSystemUsage.ItSystemCategories = new ItSystemCategories { Name = A<string>(), Uuid = A<Guid>() };
             itSystemUsage.MainContract = new ItContractItSystemUsage { ItContract = new ItContract() { Name = A<string>(), Uuid = A<Guid>() } };
-            itSystemUsage.ItProjects = Many<string>().Select(name => new ItProject() { Name = name, Uuid = A<Guid>() }).ToList();
-            itSystemUsage.Active = A<bool>();
+            itSystemUsage.LifeCycleStatus = A<LifeCycleStatusType>();
             itSystemUsage.Concluded = A<DateTime>();
             itSystemUsage.ExpirationDate = A<DateTime>();
         }

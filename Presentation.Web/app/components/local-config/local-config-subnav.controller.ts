@@ -14,7 +14,6 @@
                     $rootScope.page.subnav = [
                         { state: 'local-config.current-org', text: user.currentOrganizationName },
                         { state: 'local-config.org', text: 'Organisation' },
-                        { state: 'local-config.project', text: 'IT Projekt' },
                         { state: 'local-config.system', text: 'IT System' },
                         { state: 'local-config.contract', text: 'IT Kontrakt' },
                         { state: 'local-config.data-processing', text: 'Databehandling' },

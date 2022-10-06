@@ -1,6 +1,5 @@
 ﻿class Constants {
     readonly kendoSystemNameObjects = "sysnameKendoObject";
-    readonly kendoProjectNameObjects = "projectNameKendoObject";
     readonly kendoSystemRightsOwnerObject = "belongstoKendoObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoDpaButtonCreate = "createDpaButton";
@@ -11,7 +10,6 @@
     readonly kendoButtonUseFilter = "useFilterButton";
     readonly kendoButtonDeleteFilter = "removeFilterButton";
     readonly kendoContractButtonCreateContract = "createContractButton";
-    readonly kendoProjectButtonCreateProject = "createProjectButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoInterfaceNameHeader = "interfaceNameHeader";
@@ -85,7 +83,6 @@
     readonly interfaceSelectTableDataType = "s2id_interface-data-type";
 
     readonly navigationOrganizationButton = "organizationButton";
-    readonly navigationProjectButton = "projectButton";
     readonly navigationSystemButton = "systemButton";
     readonly navigationRemoveSystemUsageButton = "removeSystemUsageButton";
     readonly navigationContractButton = "contractButton";
@@ -154,6 +151,7 @@
     readonly mainArchive = "archiveDuty";
     readonly mainUUID = "system-uuid";
     readonly mainUserCount = "s2id_numberOfUsers";
+    readonly mainLifeCycleStatus = "s2id_lifeCycleStatus_config";
 
     readonly relationDescriptionField = "relationDescription";
     readonly relationReferenceField = "relationReference";
@@ -214,11 +212,10 @@
 
     readonly dataProcessingRegistrationView = "dataProcessingRegistrationView";
 
-    readonly filterOrgButton = "filterOrgButton";
+    readonly localAdminDropdown = "combinedLocalAdminButtonsDropDownList";
 
     //Local admin
 
-    readonly itProjectIncludeModuleInput = "project-include";
     readonly dataProcessingCheckbox = "DataProcessingCheckbox";
 
 }

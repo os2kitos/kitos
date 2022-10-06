@@ -24,7 +24,7 @@ namespace Core.ApplicationServices.Tracking
 
         public IQueryable<LifeCycleTrackingEvent> QueryLifeCycleEvents(TrackedLifeCycleEventType? eventType = null, TrackedEntityType? trackedEntityType = null, DateTime? since = null)
         {
-            var query = QueryAllAvailable(eventType);
+            var query = QueryAllAvailable();
 
             if (eventType.HasValue)
             {
@@ -45,7 +45,7 @@ namespace Core.ApplicationServices.Tracking
             return query;
         }
 
-        private IQueryable<LifeCycleTrackingEvent> QueryAllAvailable(TrackedLifeCycleEventType? trackedLifeCycleEventType)
+        private IQueryable<LifeCycleTrackingEvent> QueryAllAvailable()
         {
             var query = _trackingEventsRepository.AsQueryable();
 

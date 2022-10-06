@@ -14,7 +14,6 @@ namespace Core.DomainModel.ItSystemUsage.Read
             RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
             ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
             SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
-            ItProjects = new List<ItSystemUsageOverviewItProjectReadModel>();
             ArchivePeriods = new List<ItSystemUsageOverviewArchivePeriodReadModel>();
             DataProcessingRegistrations = new List<ItSystemUsageOverviewDataProcessingRegistrationReadModel>();
             DependsOnInterfaces = new List<ItSystemUsageOverviewInterfaceReadModel>();
@@ -46,7 +45,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
                 return archivePeriodWithEarliestStartDate?.EndDate;
             }
         }
-
+        
         public int OrganizationId { get; set; }
         public Organization.Organization Organization { get; set; }
         public int Id { get; set; }
@@ -54,7 +53,10 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public ItSystemUsage SourceEntity { get; set; }
         public string SystemName { get; set; }
         public bool ItSystemDisabled { get; set; }
-        public bool IsActive { get; set; }
+        public bool ActiveAccordingToValidityPeriod { get; set; }
+        public bool ActiveAccordingToLifeCycle { get; set; }
+        public bool SystemActive { get; set; }
+        public string Note { get; set; }
         public string ParentItSystemName { get; set; }
         public int? ParentItSystemId { get; set; }
         public bool? ParentItSystemDisabled { get; set; }
@@ -75,50 +77,36 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string LocalReferenceDocumentId { get; set; }
         public string LocalReferenceUrl { get; set; }
         public string LocalReferenceTitle { get; set; }
-
         public int? ObjectOwnerId { get; set; }
         public string ObjectOwnerName { get; set; }
         public int? LastChangedById { get; set; }
         public string LastChangedByName { get; set; }
         public DateTime LastChangedAt { get; set; } //Notice - not using LastChanged since we don't want update-by-naming-convention to hit this field
         public DateTime? Concluded { get; set; }
-
+        public DateTime? ExpirationDate { get; set; }
         public int? MainContractId { get; set; }
         public int? MainContractSupplierId { get; set; }
         public string MainContractSupplierName { get; set; }
-        public bool? MainContractIsActive { get; set; }
-        public bool HasMainContract { get; set; }
-
+        public bool MainContractIsActive { get; set; }
         public string SensitiveDataLevelsAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; }
-
-        public string ItProjectNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewItProjectReadModel> ItProjects { get; set; } // Adding ItProjects as collection to enable indexed search
-
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool IsHoldingDocument { get; set; }
-
         public virtual ICollection<ItSystemUsageOverviewArchivePeriodReadModel> ArchivePeriods { get; set; }
-
         public string RiskSupervisionDocumentationName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string LinkToDirectoryName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
-
+        public LifeCycleStatusType? LifeCycleStatus { get; set; }
         public string DataProcessingRegistrationsConcludedAsCsv { get; set; }
         public string DataProcessingRegistrationNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; }
-
         public string GeneralPurpose { get; set; }
         public HostedAt HostedAt { get; set; }
-
         public string DependsOnInterfacesNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewInterfaceReadModel> DependsOnInterfaces { get; set; }
-
         public string IncomingRelatedItSystemUsagesNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel> IncomingRelatedItSystemUsages { get; set; }
-
-
         public string OutgoingRelatedItSystemUsagesNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewUsingSystemUsageReadModel> OutgoingRelatedItSystemUsages { get; set; }
     }

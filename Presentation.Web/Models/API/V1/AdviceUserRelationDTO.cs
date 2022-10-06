@@ -9,7 +9,6 @@ namespace Presentation.Web.Models.API.V1
         public RecipientType RecpientType { get; set; }
         public int? AdviceId { get; set; }
         public int? ItContractRoleId { get; set; }
-        public int? ItProjectRoleId { get; set; }
         public int? ItSystemRoleId { get; set; }
         public int? DataProcessingRegistrationRoleId { get; set; }
     }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Hangfire;
 using Hangfire.Annotations;
+using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
 
 namespace Core.ApplicationServices.ScheduledJobs
@@ -11,6 +13,11 @@ namespace Core.ApplicationServices.ScheduledJobs
         public JobList<ScheduledJobDto> GetScheduledJobs(int fromIndex, int maxResponseLength)
         {
             return JobStorage.Current.GetMonitoringApi().ScheduledJobs(fromIndex, maxResponseLength);
+        }
+
+        public List<RecurringJobDto> GetRecurringJobs()
+        {
+            return JobStorage.Current.GetConnection().GetRecurringJobs();
         }
 
         public void DeleteScheduledJob(string jobId)

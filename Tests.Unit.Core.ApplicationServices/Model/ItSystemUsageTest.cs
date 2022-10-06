@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -319,6 +320,113 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(expectedResult, _sut.UserCount);
         }
 
+        [Theory]
+        [MemberData(nameof(ValidationInvalidData))]
+        public void Invalid_When_LifeCycleStatus_Or_MainContract_Invalid(LifeCycleStatusType lifeCycleStatus, ItContractItSystemUsage mainContract, List<ItSystemUsageValidationError> expectedErrors)
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                LifeCycleStatus = lifeCycleStatus,
+                MainContract = mainContract
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.False(validity.Result);
+            Assert.Equal(expectedErrors, validity.ValidationErrors);
+        }
+
+        [Theory]
+        [MemberData(nameof(DateValidationInvalidData))]
+        public void Invalid_When_Dates_Invalid(DateTime startDate, DateTime endDate, List<ItSystemUsageValidationError> expectedErrors)
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                Concluded = startDate,
+                ExpirationDate = endDate
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.False(validity.Result);
+            Assert.Equal(expectedErrors, validity.ValidationErrors);
+        }
+        
+        [Theory]
+        [MemberData(nameof(ValidationValidData))]
+        public void Valid_When_All_Valid(LifeCycleStatusType lifeCycleStatus, DateTime concluded, DateTime expirationDate, ItContractItSystemUsage mainContract)
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                LifeCycleStatus = lifeCycleStatus,
+                Concluded = concluded,
+                ExpirationDate = expirationDate,
+                MainContract = mainContract
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+            Assert.True(validity.Result);
+        }
+
+        [Fact]
+        public void Valid_When_All_Null()
+        {
+            var itSystemUsage = new ItSystemUsage();
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.True(validity.Result);
+        }
+
+        public static readonly object[][] ValidationInvalidData =
+        {
+            new object[]
+            {
+                LifeCycleStatusType.NotInUse, null,
+                new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle }
+            },
+            new object[]
+            {
+                null, new ItContractItSystemUsage {ItContract = new ItContract {Terminated = DateTime.UtcNow.AddDays(-1)}},
+                new List<ItSystemUsageValidationError> {ItSystemUsageValidationError.MainContractNotActive}
+            },
+            new object[]
+            {
+                LifeCycleStatusType.NotInUse, new ItContractItSystemUsage {ItContract = new ItContract {Terminated = DateTime.UtcNow.AddDays(-1)}},
+                new List<ItSystemUsageValidationError> {ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, ItSystemUsageValidationError.MainContractNotActive}
+            },
+        };
+
+        public static readonly object[][] DateValidationInvalidData =
+        {
+            new object[]
+            {
+                DateTime.UtcNow.AddDays(-1), null,
+                new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.EndDatePassed }
+            },
+            new object[]
+            {
+                null, DateTime.UtcNow.AddDays(-1),
+                new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.EndDatePassed }
+            },
+            new object[]
+            {
+                DateTime.UtcNow.AddDays(1), null,
+                new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.StartDateNotPassed, ItSystemUsageValidationError.EndDatePassed }
+            }
+        };
+
+        public static readonly object[][] ValidationValidData =
+        {
+            new object[] {LifeCycleStatusType.Undecided, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
+            new object[] {LifeCycleStatusType.Operational, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
+            new object[] {LifeCycleStatusType.PhasingIn, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
+            new object[] {LifeCycleStatusType.PhasingOut, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
+            new object[] {null, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
+            new object[] {null, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
+            new object[] { LifeCycleStatusType.PhasingOut, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
+        };
+        
         private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);
@@ -327,5 +435,6 @@ namespace Tests.Unit.Core.Model
             Assert.True(operationError.Message.HasValue);
             Assert.Equal(message, operationError.Message.Value);
         }
+
     }
 }

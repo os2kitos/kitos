@@ -1,7 +1,6 @@
 using System.Data.Entity;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess.Mapping;
@@ -13,6 +12,7 @@ using Core.DomainModel.LocalOptions;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.KendoConfig;
@@ -44,19 +44,13 @@ namespace Infrastructure.DataAccess
         public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
         public DbSet<ArchiveTestLocation> ArchiveTestLocation { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
-        public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
         public DbSet<ItContractTemplateType> ItContractTemplateTypes { get; set; }
         public DbSet<ItContractType> ItContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
-        public DbSet<EconomyYear> EconomyYears { get; set; }
         public DbSet<EconomyStream> EconomyStrams { get; set; }
         public DbSet<RelationFrequencyType> RelationFrequencyTypes { get; set; }
-        public DbSet<Goal> Goals { get; set; }
-        public DbSet<GoalStatus> GoalStatus { get; set; }
-        public DbSet<GoalType> GoalTypes { get; set; }
-        public DbSet<Handover> Handovers { get; set; }
         public DbSet<CriticalityType> CriticalityTypes { get; set; }
         public DbSet<LocalCriticalityType> LocalCriticalityTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
@@ -65,12 +59,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
         public DbSet<ItContractRole> ItContractRoles { get; set; }
-        public DbSet<ItProject> ItProjects { get; set; }
-        public DbSet<ItProjectStatus> ItProjectStatuses { get; set; }
-        public DbSet<ItProjectStatusUpdate> ItProjectStatusUpdates { get; set; }
-        public DbSet<ItProjectRight> ItProjectRights { get; set; }
-        public DbSet<ItProjectRole> ItProjectRoles { get; set; }
-        public DbSet<ItProjectOrgUnitUsage> ItProjectOrgUnitUsages { get; set; }
         public DbSet<ItSystemUsageOrgUnitUsage> ItSystemUsageOrgUnitUsages { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
@@ -88,11 +76,8 @@ namespace Infrastructure.DataAccess
         public DbSet<PaymentModelType> PaymentModelTypes { get; set; }
         public DbSet<PriceRegulationType> PriceRegulationTypes { get; set; }
         public DbSet<ProcurementStrategyType> ProcurementStrategyTypes { get; set; }
-        public DbSet<ItProjectType> ItProjectTypes { get; set; }
         public DbSet<PurchaseFormType> PurchaseFormTypes { get; set; }
-        public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
-        public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<TerminationDeadlineType> TerminationDeadlineTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
@@ -106,13 +91,10 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalBusinessType> LocalBusinessTypes { get; set; }
         public DbSet<LocalDataType> LocalDataTypes { get; set; }
         public DbSet<LocalRelationFrequencyType> LocalRelationFrequencyTypes { get; set; }
-        public DbSet<LocalGoalType> LocalGoalTypes { get; set; }
         public DbSet<LocalInterfaceType> LocalInterfaceTypes { get; set; }
         public DbSet<LocalItContractRole> LocalItContractRoles { get; set; }
         public DbSet<LocalItContractTemplateType> LocalItContractTemplateTypes { get; set; }
         public DbSet<LocalItContractType> LocalItContractTypes { get; set; }
-        public DbSet<LocalItProjectRole> LocalItProjectRoles { get; set; }
-        public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
         public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
         public DbSet<LocalItSystemCategories> LocalItSystemCategories { get; set; }
         public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
@@ -160,7 +142,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOverviewRoleAssignmentReadModel> ItSystemUsageOverviewRoleAssignmentReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewTaskRefReadModel> ItSystemUsageOverviewTaskRefReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewSensitiveDataLevelReadModel> ItSystemUsageOverviewSensitiveDataLevelReadModels { get; set; }
-        public DbSet<ItSystemUsageOverviewItProjectReadModel> ItSystemUsageOverviewItProjectReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewArchivePeriodReadModel> ItSystemUsageOverviewArchivePeriodReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewDataProcessingRegistrationReadModel> ItSystemUsageOverviewDataProcessingRegistrationReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewInterfaceReadModel> ItSystemUsageOverviewInterfaceReadModels { get; set; }
@@ -172,7 +153,12 @@ namespace Infrastructure.DataAccess
         public DbSet<ItInterface> ItInterfaces { get; set; }
         public DbSet<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
         public DbSet<UIModuleCustomization> UIModuleCustomizations { get; set; }
-        public DbSet<CustomizedUINode> CustomizedUiNodes{ get; set; }
+        public DbSet<CustomizedUINode> CustomizedUiNodes { get; set; }
+        public DbSet<ItContractOverviewReadModel> ItContractOverviewReadModels { get; set; }
+        public DbSet<ItContractOverviewReadModelDataProcessingAgreement> ItContractOverviewReadModelDataProcessingAgreements { get; set; }
+        public DbSet<ItContractOverviewReadModelItSystemUsage> ItContractOverviewReadModelItSystemUsages { get; set; }
+        public DbSet<ItContractOverviewRoleAssignmentReadModel> ItContractOverviewRoleAssignmentReadModels { get; set; }
+        public DbSet<ItContractOverviewReadModelSystemRelation> ItContractOverviewReadModelSystemRelations { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -184,25 +170,17 @@ namespace Infrastructure.DataAccess
             // placed first because then we have the ability to override
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ComplexType<ItProjectPhase>();
-
             modelBuilder.Configurations.Add(new AdviceMap());
             modelBuilder.Configurations.Add(new AgreementElementTypeMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
             modelBuilder.Configurations.Add(new BusinessTypeMap());
-            modelBuilder.Configurations.Add(new CommunicationMap());
             modelBuilder.Configurations.Add(new ConfigMap());
             modelBuilder.Configurations.Add(new ItContractTemplateMap());
             modelBuilder.Configurations.Add(new ItContractTypeMap());
             modelBuilder.Configurations.Add(new DataTypeMap());
             modelBuilder.Configurations.Add(new DataRowMap());
             modelBuilder.Configurations.Add(new EconomyStreamMap());
-            modelBuilder.Configurations.Add(new EconomyYearMap());
             modelBuilder.Configurations.Add(new RelationFrequencyTypeMap());
-            modelBuilder.Configurations.Add(new GoalMap());
-            modelBuilder.Configurations.Add(new GoalStatusMap());
-            modelBuilder.Configurations.Add(new GoalTypeMap());
-            modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new CriticalityTypeMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
@@ -210,11 +188,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
-            modelBuilder.Configurations.Add(new ItProjectMap());
-            modelBuilder.Configurations.Add(new ItProjectStatusMap());
-            modelBuilder.Configurations.Add(new ItProjectRightMap());
-            modelBuilder.Configurations.Add(new ItProjectRoleMap());
-            modelBuilder.Configurations.Add(new ItProjectOrgUnitUsageMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOrgUnitUsageMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
@@ -227,12 +200,9 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationUnitRightMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
-            modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormTypeMap());
-            modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
-            modelBuilder.Configurations.Add(new StakeholderMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());
@@ -267,7 +237,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewRoleAssignmentReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewTaskRefReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewSensitiveDataLevelReadModelMap());
-            modelBuilder.Configurations.Add(new ItSystemUsageOverviewItProjectReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewArchivePeriodReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewDataProcessingRegistrationReadModelMap());
             modelBuilder.Configurations.Add(new PendingReadModelUpdateMap());
@@ -282,6 +251,11 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new UIModuleCustomizationMap());
             modelBuilder.Configurations.Add(new CustomizedUINodeMap());
             modelBuilder.Configurations.Add(new AdviceUserRelationMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewReadModelMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewReadModelDataProcessingAgreementMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewReadModelItSystemUsageMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewRoleAssignmentReadModelMap());
+            modelBuilder.Configurations.Add(new ItContractOverviewReadModelSystemRelationMap());
         }
     }
 }

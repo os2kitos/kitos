@@ -10,12 +10,13 @@
         private readonly optionId: number;
         private readonly localOptionService: Kitos.Services.LocalOptions.ILocalOptionService;
 
-        static $inject: string[] = ["$uibModalInstance", "$stateParams", "notify", "localOptionServiceFactory"];
+        static $inject: string[] = ["$uibModalInstance", "$stateParams", "notify", "localOptionServiceFactory","inMemoryCacheService"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private readonly $stateParams: ng.ui.IStateParamsService,
             private readonly notify,
             localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService
         ) {
             this.localOptionService = localOptionServiceFactory.create(this.$stateParams["optionType"]);
             this.optionId = this.$stateParams["id"];
@@ -44,6 +45,7 @@
                     if (isSuccess) {
                         this.$uibModalInstance.close();
                         this.notify.addSuccessMessage("Værdien blev redigeret.");
+                        this.inMemoryCacheService.clear();
                     } else {
                         this.notify.addErrorMessage("Værdien blev ikke redigeret.");
                     }
@@ -65,6 +67,7 @@
                         if (isSuccess) {
                             this.$uibModalInstance.close();
                             this.notify.addSuccessMessage("Værdien blev redigeret.");
+                            this.inMemoryCacheService.clear();
                         } else {
                             this.notify.addErrorMessage("Værdien blev ikke redigeret.");
                         }
@@ -81,20 +84,12 @@
                 urlSuffix: "edit-organisation-roles"
             },
             {
-                id: "local-config.project.edit-project-roles",
-                urlSuffix: "edit-project-roles"
-            },
-            {
                 id: "local-config.system.edit-system-roles",
                 urlSuffix: "edit-system-roles"
             },
             {
                 id: "local-config.contract.edit-contract-roles",
                 urlSuffix: "edit-contract-roles"
-            },
-            {
-                id: "local-config.project.edit-project-types",
-                urlSuffix: "edit-project-types"
             },
             {
                 id: "local-config.system.edit-system-types",

@@ -4,7 +4,6 @@ using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KendoConfig;
@@ -32,16 +31,6 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowModification(IEntity target)
         {
-            if (target is IHasRightsHolder withRightsHolder)
-            {
-                var rightsHolderOrganizationId = withRightsHolder.GetRightsHolderOrganizationId();
-                if (rightsHolderOrganizationId.Select(IsRightsHolder).GetValueOrFallback(false))
-                {
-                    // Rights holders bypass the regular rules
-                    return true;
-                }
-            }
-
             var possibleConditions = GetPossibleModificationConditions(target).ToList();
 
             if (possibleConditions.Any() == false)
@@ -67,8 +56,6 @@ namespace Core.ApplicationServices.Authorization.Policies
                 yield return IsContractModuleAdmin;
             if (target is User _ || target is IOrganizationModule _)
                 yield return IsOrganizationModuleAdmin;
-            if (target is IProjectModule _)
-                yield return IsProjectModuleAdmin;
             if (target is ISystemModule _)
                 yield return IsSystemModuleAdmin;
             if (target is IDataProcessingModule _)
@@ -120,14 +107,14 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return true;
             }
 
+            if (MatchType<KendoColumnConfiguration>(target))
+            {
+                return IsLocalAdmin(organizationId);
+            }
+
             if (MatchType<ItSystemUsage>(target))
             {
                 return IsSystemModuleAdmin(organizationId);
-            }
-
-            if (MatchType<ItProject>(target))
-            {
-                return IsProjectModuleAdmin(organizationId);
             }
 
             if (MatchType<ItContract>(target))
@@ -145,8 +132,7 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return IsSystemModuleAdmin(organizationId) || IsContractModuleAdmin(organizationId);
             }
 
-            //NOTE: Other types are yet to be restricted by this policy. In the end a child of e.g. Itsystem should not hit this policy since it is a modification to the root ..> it system
-            return true;
+            return false;
         }
 
         private bool IsRightsHolder(int organizationId)
@@ -162,11 +148,6 @@ namespace Core.ApplicationServices.Authorization.Policies
         private bool IsContractModuleAdmin(int organizationId)
         {
             return _userContext.HasRole(organizationId, OrganizationRole.ContractModuleAdmin);
-        }
-
-        private bool IsProjectModuleAdmin(int organizationId)
-        {
-            return _userContext.HasRole(organizationId, OrganizationRole.ProjectModuleAdmin);
         }
 
         private bool IsSystemModuleAdmin(int organizationId)
@@ -214,11 +195,6 @@ namespace Core.ApplicationServices.Authorization.Policies
         private bool IsSystemModuleAdmin(IEntity target)
         {
             return CheckRequiredRoleInRelationTo(target, OrganizationRole.SystemModuleAdmin);
-        }
-
-        private bool IsProjectModuleAdmin(IEntity target)
-        {
-            return CheckRequiredRoleInRelationTo(target, OrganizationRole.ProjectModuleAdmin);
         }
 
         private bool IsOrganizationModuleAdmin(IEntity target)

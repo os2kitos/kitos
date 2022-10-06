@@ -33,7 +33,9 @@
         SourceEntityId: number;
         SystemName: string;
         ItSystemDisabled: boolean;
-        IsActive: boolean;
+        ActiveAccordingToValidityPeriod: boolean;
+        ActiveAccordingToLifeCycle: boolean;
+        Note: string;
         ItSystemUuid: string;
         LocalSystemId: string | null;
         Version: string | null;
@@ -55,12 +57,12 @@
         LastChangedByName: string | null;
         LastChangedAt: Date | null;
         Concluded: Date | null;
+        ExpirationDate: Date | null;
         MainContractSupplierName: string | null;
         MainContractIsActive: boolean | null;
-        HasMainContract: boolean;
         SensitiveDataLevelsAsCsv: string | null;
-        ItProjectNamesAsCsv: string | null;
         ArchiveDuty: string | null;
+        LifeCycleStatus: string | null;
         IsHoldingDocument: boolean;
         ActiveArchivePeriodEndDate: Date | null;
         RiskSupervisionDocumentationName: string | null;

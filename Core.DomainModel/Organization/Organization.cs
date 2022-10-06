@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.DomainModel.Constants;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
-using Core.DomainModel.SSO;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
 
@@ -24,7 +22,7 @@ namespace Core.DomainModel.Organization
     /// <summary>
     /// Represents an Organization (such as a municipality, or a company).
     /// Holds local configuration and admin roles, as well as collections of
-    /// ItSystems, ItProjects, etc that was created in this organization.
+    /// ItSystems, etc that was created in this organization.
     /// </summary>
     public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasName, IIsPartOfOrganization, IHasUuid
     {
@@ -32,7 +30,6 @@ namespace Core.DomainModel.Organization
 
         public Organization()
         {
-            ItProjects = new List<ItProject.ItProject>();
             ItSystems = new List<ItSystem.ItSystem>();
             Supplier = new List<ItContract.ItContract>();
             ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
@@ -76,11 +73,6 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
         public virtual ICollection<LocalOptionEntity<Entity>> OrganizationOptions { get; set; }
-
-        /// <summary>
-        /// ItProjects created inside this organization
-        /// </summary>
-        public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
 
         //Systems that belongs to this organization (OIO term - think "produced by IRL")
         public virtual ICollection<ItSystem.ItSystem> BelongingSystems { get; set; }
@@ -140,6 +132,8 @@ namespace Core.DomainModel.Organization
         /// Determines if this is the "Default" organization in KITOS
         /// </summary>
         public bool? IsDefaultOrganization { get; set; }
+
+        public virtual ICollection<ItContractOverviewReadModel> ItContractOverviewReadModels { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

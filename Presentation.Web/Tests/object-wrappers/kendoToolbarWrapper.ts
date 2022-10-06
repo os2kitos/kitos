@@ -2,19 +2,14 @@ import CSSLocator = require("./CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 
 type HeaderButtons = {
-    resetFilter: protractor.ElementFinder,
-    saveFilter: protractor.ElementFinder,
-    useFilter: protractor.ElementFinder,
-    deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
-    createProject: protractor.ElementFinder,
     systemCatalogCreate: protractor.ElementFinder,
     createDpa: protractor.ElementFinder,
     editReference: protractor.ElementFinder,
-    deleteReference: protractor.ElementFinder,
     editSaveReference: protractor.ElementFinder,
     createReference: protractor.ElementFinder,
-    saveFilterToOrg: protractor.ElementFinder
+    deleteReference: protractor.ElementFinder,
+    localAdminDropdownReference: protractor.ElementFinder,
 };
 
 type InputFields =
@@ -39,7 +34,6 @@ type ColumnHeaders = {
 };
 
 type ColumnObjects = {
-    projectName: protractor.ElementArrayFinder,
     systemName: protractor.ElementArrayFinder,
     referenceName: protractor.ElementArrayFinder,
     referenceId: protractor.ElementArrayFinder,
@@ -65,18 +59,12 @@ class kendoToolbarWrapper {
         var buttons: HeaderButtons = {
             editReference: element(byDataElementType(consts.kendoReferenceEditButton)),
             editSaveReference: element(byDataElementType(consts.kendoReferenceEditSaveButton)),
-            resetFilter: element(byDataElementType(consts.kendoButtonResetFilter)),
-            saveFilter: element(byDataElementType(consts.kendoButtonSaveFilter)),
-            useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
-            deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
             createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
-            createProject: element(byDataElementType(consts.kendoProjectButtonCreateProject)),
             systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
             createDpa: element(byDataElementType(consts.kendoDpaButtonCreate)),
             createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
             deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton)),
-            saveFilterToOrg: element(byDataElementType(consts.filterOrgButton))
-
+            localAdminDropdownReference: element(byDataElementType(consts.localAdminDropdown))
         };
         return buttons;
     }
@@ -115,7 +103,6 @@ class kendoToolbarWrapper {
         var kendo = new kendoHelper();
 
         var columns: ColumnObjects = {
-            projectName: kendo.getColumnItemLinks(consts.kendoProjectNameObjects),
             systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
             contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
             catalogName: kendo.getColumnItemLinks(consts.kendoCatalogNameObjects),

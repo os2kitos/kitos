@@ -70,9 +70,6 @@
                                 case Models.UserNotification.RelatedEntityType.itSystemUsage:
                                     pathToItem = Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(`kendo-user-notification-rendering`, "it-system.usage.advice", dataItem.relatedEntityId, dataItem.name);
                                     break;
-                                case Models.UserNotification.RelatedEntityType.itProject:
-                                    pathToItem = Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(`kendo-user-notification-rendering`, "it-project.edit.advice-generic", dataItem.relatedEntityId, dataItem.name);
-                                    break;
                                 case Models.UserNotification.RelatedEntityType.dataProcessingRegistration:
                                     pathToItem = Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(`kendo-user-notification-rendering`, "data-processing.edit-registration.advice", dataItem.relatedEntityId, dataItem.name);
                                     break;
@@ -132,10 +129,6 @@
                 this.showItPrefix = this.user.currentConfig.showItSystemPrefix;
                 this.titleSuffix = "Systemer";
                 break;
-            case Models.UserNotification.RelatedEntityType.itProject:
-                this.showItPrefix = this.user.currentConfig.showItProjectPrefix;
-                this.titleSuffix = "Projekter";
-                break;
             case Models.UserNotification.RelatedEntityType.dataProcessingRegistration:
                 this.showItPrefix = false; //There is no IT prefix for DataProcessingRegistration
                 this.titleSuffix = "Databehandling";
@@ -181,10 +174,9 @@
                         '$scope', '$uibModal', 'userNotificationService', 'userService', function ($scope, $uibModal, userNotificationService: Services.UserNotification.IUserNotificationService, userService: Services.IUserService) {
 
                             $scope.$watch("stateName", function (newValue, oldValue) {
-                                if ($scope.stateName === Constants.SRef.ContractOverview ||
-                                    $scope.stateName === Constants.SRef.ProjectOverview ||
-                                    $scope.stateName === Constants.SRef.SystemUsageOverview ||
-                                    $scope.stateName === Constants.SRef.DataProcessingRegistrationOverview) {
+                                if ($scope.stateName === Constants.ApplicationStateId.ContractOverview ||
+                                    $scope.stateName === Constants.ApplicationStateId.SystemUsageOverview ||
+                                    $scope.stateName === Constants.ApplicationStateId.DataProcessingRegistrationOverview) {
 
                                     userService
                                         .getUser()
@@ -236,13 +228,11 @@
 
                             function resolveContextType(contextAsString: string): Models.UserNotification.RelatedEntityType {
                                 switch (contextAsString) {
-                                    case Constants.SRef.ContractOverview:
+                                    case Constants.ApplicationStateId.ContractOverview:
                                         return Models.UserNotification.RelatedEntityType.itContract;
-                                    case Constants.SRef.SystemUsageOverview:
+                                    case Constants.ApplicationStateId.SystemUsageOverview:
                                         return Models.UserNotification.RelatedEntityType.itSystemUsage;
-                                    case Constants.SRef.ProjectOverview:
-                                        return Models.UserNotification.RelatedEntityType.itProject;
-                                    case Constants.SRef.DataProcessingRegistrationOverview:
+                                    case Constants.ApplicationStateId.DataProcessingRegistrationOverview:
                                         return Models.UserNotification.RelatedEntityType.dataProcessingRegistration;
                                     default:
                                         return null;

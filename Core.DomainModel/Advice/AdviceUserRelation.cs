@@ -1,6 +1,5 @@
 ﻿using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.Advice
@@ -17,14 +16,12 @@ namespace Core.DomainModel.Advice
         USER = 1
     }
 
-    public class AdviceUserRelation : Entity, IProjectModule, ISystemModule, IContractModule
+    public class AdviceUserRelation : Entity, ISystemModule, IContractModule
     {
         public int? AdviceId { get; set; }
 
         public int? ItContractRoleId { get; set; }
         public virtual ItContractRole ItContractRole { get; set; }
-        public int? ItProjectRoleId { get; set; }
-        public virtual ItProjectRole ItProjectRole { get; set; }
         public int? ItSystemRoleId { get; set; }
         public virtual ItSystemRole ItSystemRole { get; set; }
         public int? DataProcessingRegistrationRoleId { get; set; }

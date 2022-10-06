@@ -215,11 +215,15 @@ namespace Core.ApplicationServices.Contract
         {
             return _repository
                 .GetContract(uuid)
-                .Match
-                (
-                    contract => _authorizationContext.AllowReads(contract) ? Result<ItContract, OperationError>.Success(contract) : new OperationError(OperationFailure.Forbidden),
-                    () => new OperationError(OperationFailure.NotFound)
-                );
+                .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
+        }
+
+        public Result<ItContract, OperationError> GetContract(int id)
+        {
+            return _repository
+                .GetById(id)
+                .FromNullable()
+                .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
         }
 
         public Result<bool, OperationError> CanCreateNewContractWithName(string name, int organizationId)
@@ -243,7 +247,7 @@ namespace Core.ApplicationServices.Contract
                     .GetById(contractId)
                     .FromNullable()
                     .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound))
-                    .Select(project => SearchByName(project.OrganizationId, name).ExceptEntitiesWithIds(contractId).Any())
+                    .Select(contract => SearchByName(contract.OrganizationId, name).ExceptEntitiesWithIds(contractId).Any())
                     .Match
                     (
                         overlapsFound =>
@@ -279,7 +283,7 @@ namespace Core.ApplicationServices.Contract
                     .ToList()
                     .Select(x => (x.ProcurementPlanYear.GetValueOrDefault(), x.ProcurementPlanQuarter.GetValueOrDefault()))
                     .ToList()
-                ); 
+                );
         }
 
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)

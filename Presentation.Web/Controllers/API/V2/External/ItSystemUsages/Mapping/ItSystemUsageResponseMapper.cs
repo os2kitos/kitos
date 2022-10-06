@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
@@ -9,11 +8,8 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
-using Core.DomainServices.Repositories.Organization;
-
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -170,13 +166,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Notes = systemUsage.Note,
                 MainContract = systemUsage.MainContract?.ItContract?.MapIdentityNamePairDTO(),
                 DataClassification = systemUsage.ItSystemCategories?.MapIdentityNamePairDTO(),
-                AssociatedProjects = systemUsage.ItProjects.Select(project => project.MapIdentityNamePairDTO()).ToList(),
                 NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
                 SystemVersion = systemUsage.Version,
-                Validity = new ValidityResponseDTO
+                Validity = new ItSystemUsageValidityResponseDTO
                 {
-                    EnforcedValid = systemUsage.Active,
-                    Valid = systemUsage.IsActive,
+                    Valid = systemUsage.CheckSystemValidity().Result,
+                    ValidAccordingToValidityPeriod = systemUsage.IsActiveAccordingToDateFields,
+                    ValidAccordingToLifeCycle = systemUsage.IsActiveAccordingToLifeCycle,
+                    ValidAccordingToMainContract = systemUsage.IsActiveAccordingToMainContract,
+                    LifeCycleStatus = MapLifeCycleStatus(systemUsage),
                     ValidFrom = systemUsage.Concluded,
                     ValidTo = systemUsage.ExpirationDate
                 }
@@ -220,6 +218,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)
         {
             return systemUsage.ArchiveDuty?.ToArchiveDutyChoice();
+        }
+
+        private static LifeCycleStatusChoice? MapLifeCycleStatus(ItSystemUsage systemUsage)
+        {
+            return systemUsage.LifeCycleStatus?.ToLifeCycleStatusChoice();
         }
 
         public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation systemRelation)

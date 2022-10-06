@@ -5,7 +5,6 @@ using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
@@ -31,7 +30,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>> _sensitiveDataLevelRepository;
-        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>> _itProjectReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>> _archivePeriodReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>> _dataProcessingReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>> _interfacesReadModelRepository;
@@ -44,7 +42,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _taskRefRepository = new Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>>();
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
-            _itProjectReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>>();
             _archivePeriodReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>>();
             _dataProcessingReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>>();
             _interfacesReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>>();
@@ -53,7 +50,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
                 _sensitiveDataLevelRepository.Object,
-                _itProjectReadModelRepository.Object,
                 _archivePeriodReadModelRepository.Object,
                 _dataProcessingReadModelRepository.Object,
                 _interfacesReadModelRepository.Object,
@@ -138,11 +134,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 Supplier = supplier
             };
-            var project = new ItProject
-            {
-                Id = A<int>(),
-                Name = A<string>()
-            };
             var dataProcessingRegistration = new DataProcessingRegistration()
             {
                 Id = A<int>(),
@@ -188,7 +179,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                Active = A<bool>(),
                 ExpirationDate = DateTime.Now.AddDays(-1),
                 Version = A<string>(),
                 LocalCallName = A<string>(),
@@ -210,10 +200,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
                 Concluded = A<DateTime>(),
-                ItProjects = new List<ItProject>
-                {
-                    project
-                },
                 ArchiveDuty = A<ArchiveDutyTypes>(),
                 Registertype = A<bool>(),
                 riskAssessment = DataOptions.YES,
@@ -234,7 +220,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 UsedByRelations = new List<SystemRelation>
                 {
                     incomingRelation
-                }
+                },
+                LifeCycleStatus = A<LifeCycleStatusType>()
             };
 
             // Add ResponsibleOrganizationUnit
@@ -295,7 +282,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //System usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(systemUsage.OrganizationId, readModel.OrganizationId);
-            Assert.Equal(systemUsage.IsActive, readModel.IsActive);
+            Assert.Equal(systemUsage.IsActiveAccordingToDateFields, readModel.ActiveAccordingToValidityPeriod);
+            Assert.Equal(systemUsage.IsActiveAccordingToLifeCycle, readModel.ActiveAccordingToLifeCycle);
+            Assert.Equal(systemUsage.CheckSystemValidity().Result, readModel.SystemActive);
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
@@ -303,8 +292,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.GetFullName(), readModel.ObjectOwnerName);
             Assert.Equal(user.Id, readModel.LastChangedById);
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
-            Assert.Equal(systemUsage.LastChanged, readModel.LastChangedAt);
-            Assert.Equal(systemUsage.Concluded, readModel.Concluded);
+            Assert.Equal(systemUsage.LastChanged.Date, readModel.LastChangedAt.Date);
+            Assert.Equal(systemUsage.LifeCycleStatus, readModel.LifeCycleStatus);
+            Assert.Equal(systemUsage.Concluded?.Date, readModel.Concluded?.Date);
+            Assert.Equal(systemUsage.ExpirationDate?.Date, readModel.ExpirationDate?.Date);
             Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
             Assert.Equal(systemUsage.Registertype, readModel.IsHoldingDocument);
             Assert.Equal(systemUsage.RiskSupervisionDocumentationUrlName, readModel.RiskSupervisionDocumentationName);
@@ -360,14 +351,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(contract.Id, readModel.MainContractId);
             Assert.Equal(contract.Supplier.Id, readModel.MainContractSupplierId);
             Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
-            Assert.Equal(contract.IsActive, readModel.MainContractIsActive.GetValueOrDefault(false));
-            Assert.True(readModel.HasMainContract);
-
-            //Projects
-            Assert.Equal(project.Name, readModel.ItProjectNamesAsCsv);
-            var rmProject = Assert.Single(readModel.ItProjects);
-            Assert.Equal(project.Id, rmProject.ItProjectId);
-            Assert.Equal(project.Name, rmProject.ItProjectName);
+            Assert.Equal(contract.IsActive, readModel.MainContractIsActive);
 
             //ArchivePeriods
             var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);
@@ -402,33 +386,33 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_IsActive_False_When_ExpirationDate_Is_Earlier_Than_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_False_When_ExpirationDate_Is_Earlier_Than_Today()
         {
             //Act
-            var readModel = Test_IsActive_Based_On_ExpirationDate(DateTime.Now.AddDays(-A<int>()));
+            var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now.AddDays(-A<int>()));
 
             //Assert
-            Assert.False(readModel.IsActive);
+            Assert.False(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_IsActive_False_When_ExpirationDate_Is_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_True_When_ExpirationDate_Is_Today()
         {
             //Act
-            var readModel = Test_IsActive_Based_On_ExpirationDate(DateTime.Now);
+            var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now);
 
             //Assert
-            Assert.False(readModel.IsActive);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
-        public void Apply_Generates_Read_Model_With_IsActive_False_When_ExpirationDate_Is_Later_Than_Today()
+        public void Apply_Generates_Read_Model_With_ActiveAccordingToValidityPeriod_True_When_ExpirationDate_Is_Later_Than_Today()
         {
             //Act
-            var readModel = Test_IsActive_Based_On_ExpirationDate(DateTime.Now.AddDays(A<int>()));
+            var readModel = Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime.Now.AddDays(A<int>()));
 
             //Assert
-            Assert.False(readModel.IsActive);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
         }
 
         [Fact]
@@ -651,7 +635,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(HostedAt.UNDECIDED, readModel.HostedAt);
         }
 
-        private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
+        private ItSystemUsageOverviewReadModel Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime expirationDate)
         {
             var system = new ItSystem
             {
@@ -663,8 +647,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                Active = false,
-                ExpirationDate = DateTime.Now.AddDays(-1),
+                ExpirationDate = expirationDate,
                 ObjectOwner = defaultTestUser,
                 LastChangedByUser = defaultTestUser,
                 LastChanged = A<DateTime>(),

@@ -12,7 +12,6 @@
         isGlobalAdmin: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
-        isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         hasApi: boolean;
@@ -50,14 +49,15 @@
         _user: Kitos.Services.IUser = null;
         _loadUserDeferred = null;
 
-        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_", "uiCustomizationStateCache"];
+        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_", "uiCustomizationStateCache","inMemoryCacheService"];
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly $q: ng.IQService,
             private readonly $rootScope,
             private readonly $uibModal: ng.ui.bootstrap.IModalService,
             private readonly _: _.LoDashStatic,
-            private readonly uiCustomizationStateService: Services.UICustomization.UiCustomizationStateCache) {
+            private readonly uiCustomizationStateService: Services.UICustomization.UiCustomizationStateCache,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
         }
 
         saveUser = (user, orgAndDefaultUnit) => {
@@ -72,10 +72,6 @@
 
             var isOrgAdmin = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
                 return userRight.role == Kitos.API.Models.OrganizationRole.OrganizationModuleAdmin && userRight.organizationId == currOrg.id;
-            });
-
-            var isProjectAdmin = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
-                return userRight.role == Kitos.API.Models.OrganizationRole.ProjectModuleAdmin && userRight.organizationId == currOrg.id;
             });
 
             var isSystemAdmin = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
@@ -114,12 +110,11 @@
                 phoneNumber: user.phoneNumber,
                 uuid: user.uuid,
                 hasApi: user.hasApi,
-                defaultUserStartPreference: user.defaultUserStartPreference || "index",
+                defaultUserStartPreference: user.defaultUserStartPreference || Kitos.Constants.ApplicationStateId.Index,
 
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
                 isOrgAdmin: isOrgAdmin,
-                isProjectAdmin: isProjectAdmin,
                 isSystemAdmin: isSystemAdmin,
                 isContractAdmin: isContractAdmin,
                 orgAndDefaultUnit: orgAndDefaultUnit,
@@ -220,6 +215,7 @@
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
             Services.UICustomization.purgeCache(this.uiCustomizationStateService); //Purge cache when a new user is authenticated or changes org
+            this.inMemoryCacheService.clear();
             this.saveUser(user, orgAndDefaultUnit);
         };
 

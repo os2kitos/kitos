@@ -3,7 +3,6 @@ import Constants = require("../Utility/Constants");
 
 type navigations = {
     organization: protractor.ElementFinder,
-    project: protractor.ElementFinder,
     system: protractor.ElementFinder,
     contract: protractor.ElementFinder,
     dataProcessingButton: protractor.ElementFinder,
@@ -23,7 +22,6 @@ class navigationBarWrapper {
 
     public headerNavigations: navigations = {
         organization: element(byDataElementType(consts.navigationOrganizationButton)),
-        project: element(byDataElementType(consts.navigationProjectButton)),
         system: element(byDataElementType(consts.navigationSystemButton)),
         contract: element(byDataElementType(consts.navigationContractButton)),
         dataProcessingButton: element(byDataElementType(consts.navigationDataProcessingButton)),

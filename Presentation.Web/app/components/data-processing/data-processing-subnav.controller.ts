@@ -18,13 +18,14 @@
             dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService) {
 
             this.$scope.page.title = "Databehandling - Overblik";
- 
+
             $rootScope.page.subnav = [
                 { state: "data-processing.overview", substate: "data-processing.edit-registration", text: "Overblik" }
             ];
             $rootScope.page.subnav.buttons = [
                 { func: remove, text: "Slet Registrering", style: "btn-danger", showWhen: "data-processing.edit-registration", dataElementType: 'removeDataProcessingRegistrationButton' }
             ];
+            $rootScope.page.subnav.showAnyButtons = (state) => Kitos.Helpers.SubNav.showAnyButtons($rootScope, state);
 
             $rootScope.subnavPositionCenter = false;
 
@@ -42,16 +43,16 @@
                 dataProcessingRegistrationService.delete(dataProcessingRegistrationId).then(
                     deleteResponse => {
                         msg.toSuccessMessage("Registreringen er slettet!");
-                            $state.go("data-processing.overview");
-                        },
+                        $state.go(Kitos.Constants.ApplicationStateId.DataProcessingRegistrationOverview);
+                    },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
-                        case Models.Api.ApiResponseErrorCategory.NotFound:
+                            case Models.Api.ApiResponseErrorCategory.NotFound:
                                 msg.toErrorMessage("Fejl! Kunne ikke finde og slette registreringen!");
-                            break;
-                        default:
+                                break;
+                            default:
                                 msg.toErrorMessage("Fejl! Kunne ikke slette registreringen!");
-                            break;
+                                break;
                         }
                     }
                 );

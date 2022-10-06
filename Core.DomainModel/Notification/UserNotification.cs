@@ -34,9 +34,6 @@ namespace Core.DomainModel.Notification
         public int OrganizationId { get; set; }
         public Organization.Organization Organization { get; set; }
 
-        public int? ItProject_Id { get; set; }
-        public virtual ItProject.ItProject ItProject { get; set; }
-
         public int? Itcontract_Id { get; set; }
         public virtual ItContract.ItContract ItContract { get; set; }
 
@@ -51,7 +48,6 @@ namespace Core.DomainModel.Notification
             return
                 ItSystemUsage ??
                 ItContract ??
-                ItProject ??
                 (IEntityWithUserNotification)DataProcessingRegistration;
         }
 
@@ -71,10 +67,6 @@ namespace Core.DomainModel.Notification
 
         private Maybe<(int, RelatedEntityType)> ResolveRelatedEntityInfo()
         {
-            if (ItProject_Id != null)
-            {
-                return Maybe<(int, RelatedEntityType)>.Some((ItProject_Id.Value, RelatedEntityType.itProject));
-            }
             if (Itcontract_Id != null)
             {
                 return Maybe<(int, RelatedEntityType)>.Some((Itcontract_Id.Value, RelatedEntityType.itContract));

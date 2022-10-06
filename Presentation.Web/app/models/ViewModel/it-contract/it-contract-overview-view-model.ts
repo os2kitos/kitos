@@ -1,17 +1,5 @@
 ﻿module Kitos.Models.ViewModel.ItContract {
-
-    export interface IItContractOverviewViewModel extends Models.ItContract.IItContract {
-        Acquisition: number;
-        Operation: number;
-        Other: number;
-        AuditDate: string;
-        status: {
-            max: number;
-            white: number;
-            red: number;
-            yellow: number;
-            green: number;
-        };
-        roles: Array<any>;
+    export interface ItContractOverviewViewModel extends Kitos.Models.ItContract.IItContractOverviewReadModel {
+        roles: { [key: number]: Array<{ name: string, email: string }> }
     }
 }

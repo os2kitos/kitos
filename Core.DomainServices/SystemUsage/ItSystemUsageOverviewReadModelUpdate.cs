@@ -22,7 +22,6 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> _sensitiveDataLevelRepository;
-        private readonly IGenericRepository<ItSystemUsageOverviewItProjectReadModel> _itProjectReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> _dataProcessingRegistrationReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> _dependsOnInterfaceReadModelRepository;
@@ -33,7 +32,6 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
             IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> taskRefRepository,
             IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelRepository,
-            IGenericRepository<ItSystemUsageOverviewItProjectReadModel> itProjectReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfaceReadModelRepository,
@@ -44,7 +42,6 @@ namespace Core.DomainServices.SystemUsage
             _roleAssignmentRepository = roleAssignmentRepository;
             _taskRefRepository = taskRefRepository;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
-            _itProjectReadModelRepository = itProjectReadModelRepository;
             _archivePeriodReadModelRepository = archivePeriodReadModelRepository;
             _dataProcessingRegistrationReadModelRepository = dataProcessingRegistrationReadModelRepository;
             _dependsOnInterfaceReadModelRepository = dependsOnInterfaceReadModelRepository;
@@ -59,7 +56,10 @@ namespace Core.DomainServices.SystemUsage
             destination.OrganizationId = source.OrganizationId;
             destination.SystemName = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
-            destination.IsActive = source.IsActive;
+            destination.ActiveAccordingToValidityPeriod = source.IsActiveAccordingToDateFields;
+            destination.ActiveAccordingToLifeCycle = source.IsActiveAccordingToLifeCycle;
+            destination.SystemActive = source.CheckSystemValidity().Result;
+            destination.Note = source.Note;
             destination.Version = source.Version;
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
@@ -68,13 +68,15 @@ namespace Core.DomainServices.SystemUsage
             destination.ObjectOwnerName = GetUserFullName(source.ObjectOwner);
             destination.LastChangedById = source.LastChangedByUserId;
             destination.LastChangedByName = GetUserFullName(source.LastChangedByUser);
-            destination.LastChangedAt = source.LastChanged;
-            destination.Concluded = source.Concluded;
+            destination.LastChangedAt = source.LastChanged.Date;
+            destination.Concluded = source.Concluded?.Date;
+            destination.ExpirationDate = source.ExpirationDate?.Date;
             destination.ArchiveDuty = source.ArchiveDuty;
             destination.IsHoldingDocument = source.Registertype.GetValueOrDefault(false);
             destination.LinkToDirectoryName = source.LinkToDirectoryUrlName;
             destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
             destination.HostedAt = source.HostedAt.GetValueOrDefault(HostedAt.UNDECIDED);
+            destination.LifeCycleStatus = source.LifeCycleStatus;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
@@ -85,7 +87,6 @@ namespace Core.DomainServices.SystemUsage
             PatchReference(source, destination);
             PatchMainContract(source, destination);
             PatchSensitiveDataLevels(source, destination);
-            PatchItProjects(source, destination);
             PatchArchivePeriods(source, destination);
             PatchRiskSupervisionDocumentation(source, destination);
             PatchDataProcessingRegistrations(source, destination);
@@ -310,39 +311,6 @@ namespace Core.DomainServices.SystemUsage
             }
         }
 
-        private void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
-        {
-            destination.ItProjectNamesAsCsv = string.Join(", ", source.ItProjects.Select(x => x.Name));
-
-            static string CreateItProjectKey(int id) => $"I:{id}";
-
-            var incomingItProjects = source.ItProjects.ToDictionary(x => CreateItProjectKey(x.Id));
-
-            // Remove It Projects which were removed
-            var itProjectsToBeRemoved =
-                destination.ItProjects
-                    .Where(x => incomingItProjects.ContainsKey(CreateItProjectKey(x.ItProjectId)) == false).ToList();
-
-            RemoveItProjects(destination, itProjectsToBeRemoved);
-
-            var existingItProjects = destination.ItProjects.ToDictionary(x => CreateItProjectKey(x.ItProjectId));
-            foreach (var incomingItProject in source.ItProjects.ToList())
-            {
-                if (!existingItProjects.TryGetValue(CreateItProjectKey(incomingItProject.Id), out var itProject))
-                {
-                    //Append the sensitive data levels if it is not already present
-                    itProject = new ItSystemUsageOverviewItProjectReadModel
-                    {
-                        Parent = destination
-                    };
-                    destination.ItProjects.Add(itProject);
-                }
-
-                itProject.ItProjectId = incomingItProject.Id;
-                itProject.ItProjectName = incomingItProject.Name;
-            }
-        }
-
         private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.SensitiveDataLevelsAsCsv = string.Join(", ", source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel.GetReadableName()));
@@ -375,8 +343,7 @@ namespace Core.DomainServices.SystemUsage
             destination.MainContractId = source.MainContract?.ItContractId;
             destination.MainContractSupplierId = source.MainContract?.ItContract?.Supplier?.Id;
             destination.MainContractSupplierName = source.MainContract?.ItContract?.Supplier?.Name;
-            destination.MainContractIsActive = source.MainContract?.ItContract?.IsActive;
-            destination.HasMainContract = source.MainContract?.ItContract != null;
+            destination.MainContractIsActive = source.IsActiveAccordingToMainContract;
         }
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -510,15 +477,6 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.SensitiveDataLevels.Remove(sensitiveDataLevelToBeRemoved);
                 _sensitiveDataLevelRepository.Delete(sensitiveDataLevelToBeRemoved);
-            });
-        }
-
-        private void RemoveItProjects(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewItProjectReadModel> itProjectsToBeRemoved)
-        {
-            itProjectsToBeRemoved.ForEach(itProjectToBeRemoved =>
-            {
-                destination.ItProjects.Remove(itProjectToBeRemoved);
-                _itProjectReadModelRepository.Delete(itProjectToBeRemoved);
             });
         }
 

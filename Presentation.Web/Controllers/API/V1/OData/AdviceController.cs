@@ -9,7 +9,6 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
@@ -91,9 +90,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 case ItSystemUsage root:
                     DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
                     break;
-                case ItProject root:
-                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(root));
-                    break;
                 case DataProcessingRegistration root:
                     DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
                     break;
@@ -155,7 +151,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             if (response.GetType() == typeof(CreatedODataResult<Advice>))
             {
                 var createdResponse = (CreatedODataResult<Advice>)response;
-                var name = "Advice: " + createdResponse.Entity.Id;
+                var name = Advice.CreateJobId(createdResponse.Entity.Id);
 
                 advice = createdResponse.Entity;
                 advice.JobId = name;

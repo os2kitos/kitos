@@ -12,7 +12,7 @@ class Select2Wrapper {
         this.elementSelector = cssLocator + " a.select2-choice";
         this.closeSelector = cssLocator + " .select2-search-choice-close";
 
-        this.element = $(this.cssSelector);
+        this.element = $cssSelector(this.cssSelector);
         this.options = element.all(by.css(".select2-results-dept-0"));
     }
 
@@ -81,7 +81,7 @@ class Select2Wrapper {
      * @return promise that resolves when close link is clicked
      */
     public deselect(): webdriver.promise.Promise<void> {
-        return $(this.closeSelector)
+        return $cssSelector(this.closeSelector)
             .click()
             .then(() => { return; }, err => {
                 throw new Error(`Can't deselect. Nothing is selected for select2 selector '${this.cssSelector}'`);
@@ -94,7 +94,7 @@ class Select2Wrapper {
      * @return promise that resolves to a boolean indicating whether the dropdown is disabled
      */
     public isDisabled(): webdriver.promise.Promise<boolean> {
-        return $(this.cssSelector + ".select2-container-disabled").isPresent();
+        return $cssSelector(this.cssSelector + ".select2-container-disabled").isPresent();
     }
 
     /**
@@ -109,7 +109,7 @@ class Select2Wrapper {
                     throw Error(`select2 element not found using selector '${this.cssSelector}'`);
                 }
             })
-            .then(() => $(this.elementSelector).isPresent())
+            .then(() => $cssSelector(this.elementSelector).isPresent())
             .then(present => {
                 if (!present) {
                     throw Error(`select2 element not found using selector '${this.cssSelector}'. Is the element select2 initialized?`);

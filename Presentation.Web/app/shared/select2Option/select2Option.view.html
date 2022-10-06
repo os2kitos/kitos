@@ -1,5 +1,6 @@
-﻿<label data-ng-if="label" for="{{ id }}" class="control-label small">{{ label }}</label>
-<input type="hidden" 
+﻿<label ng-if="label" for="{{ id }}" class="control-label small">{{ label }} <field-help-text ng-if="isKeyDefined" data-key="{{::helpTextKey}}"></field-help-text></label>
+
+<input type="hidden"
        id="{{ id }}"
        class="form-control input-sm"
        data-ui-select2="select2Config"

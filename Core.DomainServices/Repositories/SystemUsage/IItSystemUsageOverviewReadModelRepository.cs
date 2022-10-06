@@ -9,7 +9,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
     {
         IQueryable<ItSystemUsageOverviewReadModel> GetByOrganizationId(int organizationId);
         ItSystemUsageOverviewReadModel Add(ItSystemUsageOverviewReadModel newModel);
-        void Delete(ItSystemUsageOverviewReadModel readModel);
         void DeleteBySourceId(int sourceId);
         Maybe<ItSystemUsageOverviewReadModel> GetBySourceId(int sourceId);
         void Update(ItSystemUsageOverviewReadModel readModel);
@@ -18,7 +17,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         IQueryable<ItSystemUsageOverviewReadModel> GetByDependentOrganizationId(int organizationId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByBusinessTypeId(int businessTypeId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByContractId(int contractId);
-        IQueryable<ItSystemUsageOverviewReadModel> GetByProjectId(int projectId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByDataProcessingRegistrationId(int dataProcessingRegistrationId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByItInterfaceId(int interfaceId);
         IQueryable<ItSystemUsageOverviewReadModel> GetReadModelsMustUpdateToChangeActiveState();

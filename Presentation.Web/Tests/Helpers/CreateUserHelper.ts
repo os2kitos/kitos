@@ -6,7 +6,6 @@ class CreateUserHelper {
     private cssHelper = new CSSLocator();
     private pageCreateObject = new CreatePage();
     private pageObject = new HomePageObjects();
-
     private assertCheckboxState(email: string, checkbox: protractor.ElementFinder, expectedState: boolean) {
         return this.openEditUser(email)
             .then(() => {
@@ -60,7 +59,7 @@ class CreateUserHelper {
     private getUserRow(email: string) {
         const emailColumnElementType = "userEmailObject";
 
-        return this.pageObject.mainGridAllTableRows.filter((row, index) => {
+        return this.pageObject.mainGridAllTableRows.filter((row, index): protractor.promise.Promise<boolean> => {
             console.log("Searching for email column");
             var column = row.element(this.cssHelper.byDataElementType(emailColumnElementType));
             return column.isPresent()
@@ -72,7 +71,7 @@ class CreateUserHelper {
                                 return text === email;
                             });
                     }
-                    return false;
+                    return protractor.promise.fullyResolved(false);
                 });
         }).then(elements => {
             if (elements.length === 0) {
@@ -82,13 +81,19 @@ class CreateUserHelper {
         });
     }
 
-    private openEditUser(email: string) {
+    openEditUser(email: string) {
         return this.getUserRow(email)
             .then(row => {
                 expect(row).not.toBe(null);
                 return row.element(by.linkText("Redigér")).click();
             })
             .then(() => browser.waitForAngular());
+    }
+
+    assertAllPrimaryStartUnitsAvailable(): protractor.promise.Promise<any> {
+        return this.pageObject
+            .getPrimaryStartUnitElementIds()
+            .reduce<protractor.promise.Promise<any>>((previous, optionId) => previous.then(_ => expect(element(by.id(optionId)).isPresent()).toBe(true, "Failed to find:" + optionId)), protractor.promise.fullyResolved(true));
     }
 }
 export = CreateUserHelper;

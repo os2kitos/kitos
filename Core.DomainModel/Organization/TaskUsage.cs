@@ -7,7 +7,7 @@ namespace Core.DomainModel.Organization
     /// <see><cref>OrganizationUnit</cref></see>.
     /// Helper object which can hold comments and status property
     /// </summary>
-    public class TaskUsage : Entity, IHierarchy<TaskUsage>, IOrganizationModule
+    public class TaskUsage : Entity, IHierarchy<TaskUsage>, IOrganizationModule, ISupportsUserSpecificAccessControl
     {
         public TaskUsage()
         {
@@ -48,19 +48,9 @@ namespace Core.DomainModel.Organization
 
         public string Comment { get; set; }
 
-        /// <summary>
-        /// Determines whether a user has write access to this instance.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <returns>
-        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
-        /// </returns>
-        public override bool HasUserWriteAccess(User user)
+        public bool HasUserWriteAccess(User user)
         {
-            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user))
-                return true;
-
-            return base.HasUserWriteAccess(user);
+            return OrgUnit != null && OrgUnit.HasUserWriteAccess(user);
         }
     }
 }

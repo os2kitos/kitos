@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.Events;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
@@ -184,26 +182,12 @@ namespace Core.DomainServices.Repositories.KLE
             _logger.Debug($"Removals: {removals.Count}");
             foreach (var kleChange in removals)
             {
-                RemoveProjectTaskRefs(kleChange);
                 RemoveSystemTaskRefs(kleChange);
                 RemoveSystemUsageOptOutTaskRefs(kleChange);
             }
             RemoveSystemUsageTaskRefs(removals);
             RemoveTaskUsageTaskRef(removals);
             RemoveTaskRef(removals);
-        }
-
-        private void RemoveProjectTaskRefs(KLEChange kleChange)
-        {
-            var removedTaskRef = _existingTaskRefRepository
-                .GetWithReferencePreload(t => t.ItProjects)
-                .First(t => t.TaskKey == kleChange.TaskKey);
-
-            foreach (var itProject in removedTaskRef.ItProjects.ToList())
-            {
-                itProject.TaskRefs.Remove(removedTaskRef);
-                _domainEvents.Raise(new EntityUpdatedEvent<ItProject>(itProject));
-            }
         }
 
         private void RemoveSystemTaskRefs(KLEChange kleChange)

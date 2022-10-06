@@ -9,7 +9,6 @@ using Core.ApplicationServices.Model.Users;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -32,7 +31,6 @@ namespace Core.ApplicationServices.Rights
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _itContractRightService;
         private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _itSystemRightService;
-        private readonly IRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject> _itProjectRightService;
         private readonly IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit> _organizationUnitRightService;
         private readonly IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration> _dprRoleAssignmentsService;
         private readonly ITransactionManager _transactionManager;
@@ -47,7 +45,6 @@ namespace Core.ApplicationServices.Rights
             IOrganizationRightsService organizationRightsService,
             IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> itContractRightService,
             IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> itSystemRightService,
-            IRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject> itProjectRightService,
             IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit> organizationUnitRightService,
             IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration> dprRoleAssignmentsService,
             ITransactionManager transactionManager,
@@ -61,7 +58,6 @@ namespace Core.ApplicationServices.Rights
             _organizationRightsService = organizationRightsService;
             _itContractRightService = itContractRightService;
             _itSystemRightService = itSystemRightService;
-            _itProjectRightService = itProjectRightService;
             _organizationUnitRightService = organizationUnitRightService;
             _dprRoleAssignmentsService = dprRoleAssignmentsService;
             _transactionManager = transactionManager;
@@ -107,7 +103,6 @@ namespace Core.ApplicationServices.Rights
                         rights.dprRights.ToList(),
                         rights.systemRights.ToList(),
                         rights.contractRights.ToList(),
-                        rights.projectRights.ToList(),
                         rights.organizationUnitRights.ToList()
                     )
                 );
@@ -125,7 +120,6 @@ namespace Core.ApplicationServices.Rights
                         context.organization,
                         context.dprRights,
                         context.contractRights,
-                        context.projectRights,
                         context.systemRights,
                         context.organizationUnitRights,
                         context.rolesInOrganization
@@ -145,7 +139,6 @@ namespace Core.ApplicationServices.Rights
                         context.organization,
                         context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.Id)).ToList(),
                         context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.Id)).ToList(),
-                        context.projectRights.Where(right => parameters.ProjectRightIds.Contains(right.Id)).ToList(),
                         context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.Id)).ToList(),
                         context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.Id)).ToList(),
                         context.rolesInOrganization.Where(role => parameters.AdministrativeAccessRoles.Contains(role)).ToList()
@@ -170,7 +163,6 @@ namespace Core.ApplicationServices.Rights
                         toUserId,
                         context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.Id)).ToList(),
                         context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.Id)).ToList(),
-                        context.projectRights.Where(right => parameters.ProjectRightIds.Contains(right.Id)).ToList(),
                         context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.Id)).ToList(),
                         context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.Id)).ToList(),
                         context.rolesInOrganization.Where(role => parameters.AdministrativeAccessRoles.Contains(role)).ToList()
@@ -205,7 +197,7 @@ namespace Core.ApplicationServices.Rights
         private Maybe<OperationError> MutateUserRights(
           int userId,
           int organizationId,
-          Func<(Organization organization, User user, IEnumerable<DataProcessingRegistrationRight> dprRights, IEnumerable<ItContractRight> contractRights, List<ItProjectRight> projectRights, IEnumerable<ItSystemRight> systemRights, IEnumerable<OrganizationUnitRight> organizationUnitRights, IEnumerable<OrganizationRole> rolesInOrganization), Maybe<OperationError>> mutation)
+          Func<(Organization organization, User user, IEnumerable<DataProcessingRegistrationRight> dprRights, IEnumerable<ItContractRight> contractRights, IEnumerable<ItSystemRight> systemRights, IEnumerable<OrganizationUnitRight> organizationUnitRights, IEnumerable<OrganizationRole> rolesInOrganization), Maybe<OperationError>> mutation)
         {
             var transaction = _transactionManager.Begin();
             var uuidResult = _identityResolver.ResolveUuid<Organization>(organizationId);
@@ -237,14 +229,13 @@ namespace Core.ApplicationServices.Rights
                 .Select(orgAndUser =>
                 {
                     var (organization, user) = orgAndUser;
-                    var (dprRights, contractRights, projectRights, systemRights, organizationUnitRights, rolesInOrganization) = ExtractAllRightsInOrganization(user, organization.Uuid);
+                    var (dprRights, contractRights, systemRights, organizationUnitRights, rolesInOrganization) = ExtractAllRightsInOrganization(user, organization.Uuid);
                     return
                     (
                         organization,
                         user,
                         dprRights,
                         contractRights,
-                        projectRights,
                         systemRights,
                         organizationUnitRights,
                         rolesInOrganization
@@ -269,15 +260,14 @@ namespace Core.ApplicationServices.Rights
             return error;
         }
 
-        private static (List<DataProcessingRegistrationRight> dprRights, List<ItContractRight> contractRights, List<ItProjectRight> projectRights, List<ItSystemRight> systemRights, List<OrganizationUnitRight> organizationUnitRights, List<OrganizationRole> rolesInOrganization) ExtractAllRightsInOrganization(User user, Guid organizationUuid)
+        private static (List<DataProcessingRegistrationRight> dprRights, List<ItContractRight> contractRights, List<ItSystemRight> systemRights, List<OrganizationUnitRight> organizationUnitRights, List<OrganizationRole> rolesInOrganization) ExtractAllRightsInOrganization(User user, Guid organizationUuid)
         {
             var dprRights = user.GetDataProcessingRegistrationRights(organizationUuid).ToList();
             var contractRights = user.GetItContractRights(organizationUuid).ToList();
-            var projectRights = user.GetItProjectRights(organizationUuid).ToList();
             var systemRights = user.GetItSystemRights(organizationUuid).ToList();
             var organizationUnitRights = user.GetOrganizationUnitRights(organizationUuid).ToList();
             var rolesInOrganization = user.GetRolesInOrganization(organizationUuid).ToList();
-            return (dprRights, contractRights, projectRights, systemRights, organizationUnitRights, rolesInOrganization);
+            return (dprRights, contractRights, systemRights, organizationUnitRights, rolesInOrganization);
         }
 
         private Maybe<OperationError> RemoveRights(
@@ -285,7 +275,6 @@ namespace Core.ApplicationServices.Rights
             Organization organization,
             IEnumerable<DataProcessingRegistrationRight> dprRights,
             IEnumerable<ItContractRight> contractRights,
-            IEnumerable<ItProjectRight> projectRights,
             IEnumerable<ItSystemRight> systemRights,
             IEnumerable<OrganizationUnitRight> organizationUnitRights,
             IEnumerable<OrganizationRole> rolesInOrganization)
@@ -295,11 +284,6 @@ namespace Core.ApplicationServices.Rights
                 (
                     error => error,
                     () => RemoveBusinessRights(user, organization, contractRights, _itContractRightService)
-                )
-                .Match
-                (
-                    error => error,
-                    () => RemoveBusinessRights(user, organization, projectRights, _itProjectRightService)
                 )
                 .Match
                 (
@@ -324,7 +308,6 @@ namespace Core.ApplicationServices.Rights
             int toUserId,
             IEnumerable<DataProcessingRegistrationRight> dprRights,
             IEnumerable<ItContractRight> contractRights,
-            IEnumerable<ItProjectRight> projectRights,
             IEnumerable<ItSystemRight> systemRights,
             IEnumerable<OrganizationUnitRight> organizationUnitRights,
             IEnumerable<OrganizationRole> rolesInOrganization)
@@ -334,11 +317,6 @@ namespace Core.ApplicationServices.Rights
                 (
                     error => error,
                     () => TransferBusinessRights(fromUser, organization, toUserId, contractRights, _itContractRightService)
-                )
-                .Match
-                (
-                    error => error,
-                    () => TransferBusinessRights(fromUser, organization, toUserId, projectRights, _itProjectRightService)
                 )
                 .Match
                 (

@@ -18,14 +18,13 @@
                     localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
 
                     const stateNames = {
-                        itProjects: Kitos.Constants.SRef.ProjectOverview,
-                        itSystemUsages: Kitos.Constants.SRef.SystemUsageOverview,
-                        itContracts: Kitos.Constants.SRef.ContractOverview,
-                        dataProcessingRegistrations: Kitos.Constants.SRef.DataProcessingRegistrationOverview
+                        itSystemUsages: Kitos.Constants.ApplicationStateId.SystemUsageOverview,
+                        itContracts: Kitos.Constants.ApplicationStateId.ContractOverview,
+                        dataProcessingRegistrations: Kitos.Constants.ApplicationStateId.DataProcessingRegistrationOverview
                     };
 
                     $scope.$watch("stateName", (newValue, oldValue) => {
-                        if ($scope.stateName === stateNames.itProjects || $scope.stateName === stateNames.dataProcessingRegistrations || $scope.stateName === stateNames.itContracts || $scope.stateName === stateNames.itSystemUsages)
+                        if ($scope.stateName === stateNames.dataProcessingRegistrations || $scope.stateName === stateNames.itContracts || $scope.stateName === stateNames.itSystemUsages)
                             $scope.disableAdvisLink = false;
                         else
                             $scope.disableAdvisLink = true;
@@ -40,12 +39,6 @@
                                 var stateUrl = "";
                                 var moduleTypeFilter = "";
                                 let adviceType: Kitos.Models.Advice.AdviceType | null = null;
-                                if (parent.stateName === stateNames.itProjects) {
-                                    $scope.title = "IT advis - IT Projekter";
-                                    moduleTypeFilter = "Type eq 'itProject'";
-                                    stateUrl = $window.location.href.replace("overview", "edit");
-                                    adviceType = Kitos.Models.Advice.AdviceType.ItProject;
-                                }
                                 if (parent.stateName === stateNames.itContracts) {
                                     $scope.title = "IT advis - IT Kontrakter";
                                     moduleTypeFilter = "Type eq 'itContract'";

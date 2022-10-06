@@ -67,5 +67,18 @@
         static renderDate(date: Date | string | undefined | null) {
             return ExcelExportHelper.renderDate(date);
         }
+
+        static renderActiveNotActive(value: boolean) {
+            return value ? RenderFieldsHelper.texts.active : RenderFieldsHelper.texts.notActive;
+        }
+
+        static getTexts(): { active: string, notActive: string } {
+            return RenderFieldsHelper.texts;
+        }
+
+        private static readonly texts = {
+            active: "Aktivt",
+            notActive: "Ikke aktivt"
+        }
     }
 }

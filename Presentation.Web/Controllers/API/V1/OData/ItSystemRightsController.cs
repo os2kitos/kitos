@@ -44,7 +44,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return all.Where(x => orgIds.Contains(x.Object.OrganizationId));
         }
 
-        // GET /Users(1)/ItProjectRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItSystemRights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]

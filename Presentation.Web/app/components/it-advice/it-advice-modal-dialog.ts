@@ -285,10 +285,7 @@
                         convert_urls: false
                     };
 
-                    $scope.datepickerOptions = {
-                        format: "dd-MM-yyyy",
-                        parseFormats: ["yyyy-MM-dd"]
-                    };
+                    $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
                     $scope.formHasErrors = () => {
                         if ($scope.adviceTypeData != null &&
@@ -435,11 +432,6 @@
                         if (type === Models.Advice.AdviceType.ItContract) {
                             return localOptionServiceFactory
                                 .create(Services.LocalOptions.LocalOptionType.ItContractRoles)
-                                .getAll();
-                        }
-                        if (type === Models.Advice.AdviceType.ItProject) {
-                            return localOptionServiceFactory
-                                .create(Services.LocalOptions.LocalOptionType.ItProjectRoles)
                                 .getAll();
                         }
                         if (type === Models.Advice.AdviceType.DataProcessingRegistration) {

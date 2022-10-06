@@ -13,7 +13,9 @@
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly userService: IUserService,
-            private readonly routePrefix: string) {
+            private readonly routePrefix: string,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            private readonly $q: ng.IQService) {
         }
 
         private getBasePath() {
@@ -21,13 +23,23 @@
         }
 
         getAll(): ng.IPromise<Models.IOptionEntity[]> {
+
+            const cacheKey = "LOCALOPTIONS_" + this.getBasePath();
+            const result = this.inMemoryCacheService.getEntry<Models.IOptionEntity[]>(cacheKey);
+            if (result != null) {
+                return this.$q.resolve(result);
+            }
             return this
                 .userService
                 .getUser()
                 .then(user => this.$http.get(
                     `${this.getBasePath()
                     }?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=${user.currentOrganizationId}`))
-                .then(result => result.data.value as Models.IOptionEntity[]);
+                .then(result => {
+                    const val = result.data.value as Models.IOptionEntity[];
+                    this.inMemoryCacheService.setEntry(cacheKey, val, Kitos.Shared.Time.Offset.compute(Kitos.Shared.Time.TimeUnit.Minutes, 10));
+                    return val;
+                });
         }
 
 
@@ -47,6 +59,7 @@
                     `${this.getBasePath()}(${id})?organizationId=${user.currentOrganizationId}`, entity))
                 .then(result => {
                     if (result.status === 200) {
+                        this.inMemoryCacheService.clear();
                         return true;
                     } else {
                         return false;
@@ -58,7 +71,6 @@
     export enum LocalOptionType {
         ItSystemRoles,
         ItContractRoles,
-        ItProjectRoles,
         AgreementElementTypes,
         ArchiveLocations,
         ArchiveTestLocations,
@@ -66,11 +78,9 @@
         BusinessTypes,
         DataTypes,
         FrequencyTypes,
-        GoalTypes,
         InterfaceTypes,
         ItContractTemplateTypes,
         ItContractTypes,
-        ItProjectTypes,
         ItSystemCategories,
         OptionExtendTypes,
         OrganizationUnitRoles,
@@ -123,8 +133,6 @@
                     return "LocalItSystemRoles";
                 case LocalOptionType.ItContractRoles:
                     return "LocalItContractRoles";
-                case LocalOptionType.ItProjectRoles:
-                    return "LocalItProjectRoles";
                 case LocalOptionType.AgreementElementTypes:
                     return "LocalAgreementElementTypes";
                 case LocalOptionType.ArchiveLocations:
@@ -139,16 +147,12 @@
                     return "LocalDataTypes";
                 case LocalOptionType.FrequencyTypes:
                     return "LocalFrequencyTypes";
-                case LocalOptionType.GoalTypes:
-                    return "LocalGoalTypes";
                 case LocalOptionType.InterfaceTypes:
                     return "LocalInterfaceTypes";
                 case LocalOptionType.ItContractTemplateTypes:
                     return "LocalItContractTemplateTypes";
                 case LocalOptionType.ItContractTypes:
                     return "LocalItContractTypes";
-                case LocalOptionType.ItProjectTypes:
-                    return "LocalItProjectTypes";
                 case LocalOptionType.ItSystemCategories:
                     return "LocalItSystemCategories";
                 case LocalOptionType.OptionExtendTypes:
@@ -197,23 +201,24 @@
     }
 
     export class LocalOptionServiceFactory implements ILocalOptionServiceFactory {
-        static $inject = ["$http", "userService", "localOptionTypeMapper"];
+        static $inject = ["$http", "userService", "localOptionTypeMapper","inMemoryCacheService","$q"];
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly userService: IUserService,
-            private readonly localOptionTypeMapper: ILocalOptionTypeMapper) {
+            private readonly localOptionTypeMapper: ILocalOptionTypeMapper,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            private readonly $q: ng.IQService) {
         }
 
         create(type: LocalOptionType): ILocalOptionService {
-            return new LocalOptionService(this.$http, this.userService, this.localOptionTypeMapper.getOdataController(type));
+            return new LocalOptionService(this.$http, this.userService, this.localOptionTypeMapper.getOdataController(type), this.inMemoryCacheService, this.$q);
         }
     }
 
     const adviceTypeToUsedLocalRoleOptionTypeMap: Record<Models.Advice.AdviceType, LocalOptionType> = {
         dataProcessingRegistration: LocalOptionType.DataProcessingRegistrationRoles,
         itSystemUsage: LocalOptionType.ItSystemRoles,
-        itContract: LocalOptionType.ItContractTypes,
-        itProject: LocalOptionType.ItProjectRoles,
+        itContract: LocalOptionType.ItContractTypes
     };
 
     export function getLocalOptionTypeFromAdvisType(advisType: Models.Advice.AdviceType): LocalOptionType {

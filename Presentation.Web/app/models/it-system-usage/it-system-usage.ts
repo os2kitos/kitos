@@ -37,8 +37,6 @@
         UsedBy: Array<IItSystemUsageOrgUnitUsage>;
         /** Gets or sets the tasks this instance supports. */
         TaskRefs: Array<ITaskRef>;
-        /** Gets or sets the associated it projects. */
-        ItProjects: Array<ItProject.IItProject>;
 
         ArchivePeriods: ItSystem.IArchivePeriode[];
 

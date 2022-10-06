@@ -7,6 +7,6 @@
         ItInterface = 2,
         ItContract = 3,
         DataProcessingRegistration = 4,
-        ItProject = 5
+        //5 used to be ItProject
     }
 }

@@ -7,25 +7,40 @@
             resolve: {
                 systemCategories: [
                     "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemCategories).getAll()
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemCategories).getAll()
+                ],
+                itSystemUsage: [
+                    "itSystemUsageService", "$stateParams", (itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, $stateParams) => itSystemUsageService.getItSystemUsage($stateParams.id)
                 ]
             }
         });
     }]);
 
-    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus",
-        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus) => {
-            var itSystemUsage = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
+    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories",
+        "autofocus", "itSystemUsageService", "select2LoadingService", "uiState", "itSystemUsage",
+        ($rootScope, $scope, $http, notify, user, systemCategories, autofocus,
+            itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService,
+            select2LoadingService: Kitos.Services.ISelect2LoadingService,
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
+            itSystemUsage) => {
+            var itSystemUsageVm = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel(itSystemUsage);
+            $scope.usage = itSystemUsage;
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+
             $rootScope.page.title = "IT System - Anvendelse";
-            $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsage.id}`;
-            $scope.hasViewAccess = user.currentOrganizationId === itSystemUsage.organizationId;
+            $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsageVm.id}`;
+            $scope.hasViewAccess = user.currentOrganizationId === itSystemUsageVm.organizationId;
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
-            $scope.system = itSystemUsage.itSystem;
-            $scope.lastChangedBy = itSystemUsage.lastChangedBy;
-            $scope.lastChanged = itSystemUsage.lastChanged;
+            $scope.system = itSystemUsageVm.itSystem;
+            $scope.lastChangedBy = itSystemUsageVm.lastChangedBy;
+            $scope.lastChanged = itSystemUsageVm.lastChanged;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
+            const saveUrlWithOrgId = $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId;
+
+            $scope.showUsagePeriod = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.usagePeriod);
+            $scope.showLifeCycleStatus = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.lifeCycleStatus);
 
             $scope.numberOfUsersOptions = [
                 { id: "4", text: Kitos.Constants.Select2.EmptyField },
@@ -34,36 +49,27 @@
                 { id: "2", text: "50-100" },
                 { id: "3", text: ">100" }
             ];
+            
+            $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
-            $scope.datepickerOptions = {
-                format: "dd-MM-yyyy",
-                parseFormats: ["yyyy-MM-dd"]
-            };
+            bindLifeCycleStatusModel();
+            reloadValidationStatus();
 
             $scope.patchDate = (field, value) => {
-                var expirationDate = itSystemUsage.expirationDate;
-                var concluded = itSystemUsage.concluded;
-                var formatDateString = "YYYY-MM-DD";
-                var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf("day");
-                var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf("day");
-                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-                if (value === "" || value == undefined) {
+
+                var expirationDate = $scope.usage.expirationDate;
+                var concluded = $scope.usage.concluded;
+
+                if (!value) {
                     var payload = {};
                     payload[field] = null;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId);
-                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                    patch(payload, saveUrlWithOrgId);
                 }
-                else if (fromDate != null && endDate != null && fromDate >= endDate) {
-                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
-                }
-                else {
-                    checkIfActive();
-
-                    var dateString = date.format("YYYY-MM-DD");
+                else if (Kitos.Helpers.DateValidationHelper.validateValidityPeriod(concluded, expirationDate, notify, "Ibrugtagningsdato", "Slutdato for anvendelse")) {
+                    const dateString = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, Kitos.Constants.DateFormat.EnglishDateFormat]).format(Kitos.Constants.DateFormat.EnglishDateFormat);
                     var payload = {};
                     payload[field] = dateString;
-                    patch(payload, $scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId);
+                    patch(payload, saveUrlWithOrgId);
                 }
             }
 
@@ -73,30 +79,35 @@
                 $http({ method: "PATCH", url: url, data: payload })
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Feltet er opdateret.");
+                        reloadValidationStatus();
                     }, function onError(result) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                     });
             }
 
-            $scope.checkSystemValidity = () => {
-                checkIfActive();
+            function reloadValidationStatus() {
+                itSystemUsageService.getValidationDetails(itSystemUsageVm.id).then(newStatus => {
+                    $scope.validationStatus = newStatus;
+                });
             }
 
-            function checkIfActive() {
-                const today = moment();
+            function bindLifeCycleStatusModel() {
+                const lifeCycleStatusOptions = new Kitos.Models.ItSystemUsage.LifeCycleStatusOptions();
+                const options = lifeCycleStatusOptions.options;
+                const currentId = itSystemUsageVm.lifeCycleStatus ?? 0;
+                const optionsWithCurrentId = options.filter(x => x.id === currentId);
+                if (!optionsWithCurrentId)
+                    return;
 
-                if (today.isBetween(moment(itSystemUsage.concluded, Kitos.Constants.DateFormat.DanishDateFormat).startOf("day"), moment(itSystemUsage.expirationDate, Kitos.Constants.DateFormat.DanishDateFormat).endOf("day"), null, "[]") ||
-                    (today > moment(itSystemUsage.concluded, Kitos.Constants.DateFormat.DanishDateFormat).startOf("day") && itSystemUsage.expirationDate == null) ||
-                    (today < moment(itSystemUsage.expirationDate, Kitos.Constants.DateFormat.DanishDateFormat).endOf("day") && itSystemUsage.concluded == null) ||
-                    (itSystemUsage.expirationDate == null && itSystemUsage.concluded == null)) {
-                    itSystemUsage.isActive = true;
-                }
-                else {
-                    if (itSystemUsage.active) {
-                        itSystemUsage.isActive = true;
-                    }
-                    else {
-                        itSystemUsage.isActive = false;
+                const selectedElement = optionsWithCurrentId[0];
+
+                $scope.lifeCycleStatusModel = {
+                    selectedElement: selectedElement,
+                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, false),
+                    elementSelected: (newElement) => {
+                        $scope.usage.lifeCycleStatus = newElement.optionalObjectContext;
+                        const payload = { lifeCycleStatus: newElement.optionalObjectContext };
+                        patch(payload, saveUrlWithOrgId);
                     }
                 }
             }

@@ -43,7 +43,6 @@ namespace Core.DomainModel.ItSystemUsage
             TaskRefs = new List<TaskRef>();
             TaskRefsOptOut = new List<TaskRef>();
             UsedBy = new List<ItSystemUsageOrgUnitUsage>();
-            ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
@@ -54,35 +53,9 @@ namespace Core.DomainModel.ItSystemUsage
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
         }
 
-        public bool IsActive
-        {
-            get
-            {
-                if (!this.Active)
-                {
-                    var today = DateTime.UtcNow;
-                    var startDate = this.Concluded ?? today;
-                    var endDate = DateTime.MaxValue;
-
-                    if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
-                    {
-                        endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
-                    }
-
-                    // indgået-dato <= dags dato <= udløbs-dato
-                    return today >= startDate.Date && today <= endDate;
-                }
-                return this.Active;
-            }
-        }
-
-        /// <summary>
-        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActive"/>)
-        /// </summary>
-        /// <value>
-        ///   Active.
-        /// </value>
-        public bool Active { get; set; }
+        public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
+        public bool IsActiveAccordingToLifeCycle => CheckLifeCycleValidity().IsNone;
+        public bool IsActiveAccordingToMainContract=> CheckContractValidity().IsNone;
 
         /// <summary>
         ///     When the system began. (indgået)
@@ -131,6 +104,14 @@ namespace Core.DomainModel.ItSystemUsage
         /// The local call system.
         /// </value>
         public string LocalCallName { get; set; }
+        /// <summary>
+        /// Gets or sets the life cycle status of this system usage.
+        /// </summary>
+        /// <value>
+        /// The life cycle status type of the system.
+        /// </value>
+        public LifeCycleStatusType? LifeCycleStatus { get; set; }
+
         /// <summary>
         /// Organization Unit responsible for this system usage.
         /// </summary>
@@ -200,17 +181,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// Gets or sets the tasks that has been opted out from by an organization.
         /// </summary>
         public virtual ICollection<TaskRef> TaskRefsOptOut { get; set; }
-        /// <summary>
-        /// Gets or sets the associated it projects.
-        /// </summary>
-        /// <remarks>
-        /// <see cref="ItProject.ItProject"/> have a corresponding property linking back.
-        /// </remarks>
-        /// <value>
-        /// Associated it projects.
-        /// </value>
-        public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
-
 
         public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
@@ -604,26 +574,6 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
-        public void ResetProjectAssociations()
-        {
-            ItProjects.Clear();
-        }
-
-        public Maybe<OperationError> SetProjectAssociations(IEnumerable<ItProject.ItProject> projects)
-        {
-            var itProjects = projects.ToList();
-
-            if (itProjects.Select(x => x.Uuid).Distinct().Count() != itProjects.Count)
-                return new OperationError("projects must not contain duplicates", OperationFailure.BadInput);
-
-            if (itProjects.Any(project => project.OrganizationId != OrganizationId))
-                return new OperationError("All projects must belong to same organization as this system usage", OperationFailure.BadInput);
-
-            itProjects.MirrorTo(ItProjects, p => p.Uuid);
-
-            return Maybe<OperationError>.None;
-        }
-
         public Maybe<OperationError> UpdateSystemValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
         {
             var validFromDate = newValidFrom?.Date;
@@ -810,7 +760,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Result<ArchivePeriod, OperationError> AddArchivePeriod(DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
-            if(startDate.Date > endDate.Date)
+            if (startDate.Date > endDate.Date)
                 return new OperationError($"StartDate: {startDate.Date} cannot be before EndDate: {endDate.Date}", OperationFailure.BadInput);
 
             var newPeriod = new ArchivePeriod()
@@ -899,6 +849,65 @@ namespace Core.DomainModel.ItSystemUsage
         public void MarkAsDirty()
         {
             LastChanged = DateTime.UtcNow;
+        }
+
+        public ItSystemUsageValidationResult CheckSystemValidity()
+        {
+            var errors = new List<ItSystemUsageValidationError>();
+
+            var today = DateTime.UtcNow.Date;
+
+            var dateErrors = CheckDatesValidity(today).ToList();
+            var hasLifeCycleStatusValidationError = CheckLifeCycleValidity();
+            var hasContractValidityError = CheckContractValidity();
+
+            errors.AddRange(dateErrors);
+            if (hasLifeCycleStatusValidationError.HasValue)
+            {
+                errors.Add(hasLifeCycleStatusValidationError.Value);
+            }
+            if (hasContractValidityError.HasValue)
+            {
+                errors.Add(hasContractValidityError.Value);
+            }
+
+            return new ItSystemUsageValidationResult(errors);
+        }
+
+        private IEnumerable<ItSystemUsageValidationError> CheckDatesValidity(DateTime todayReference)
+        {
+            if (Concluded == null && ExpirationDate == null)
+                yield break;
+
+            var today = todayReference.Date;
+            var startDate = (Concluded ?? today).Date;
+            var endDate = (ExpirationDate ?? DateTime.MaxValue).Date;
+
+            //Valid yet?
+            if (today < startDate)
+            {
+                yield return ItSystemUsageValidationError.StartDateNotPassed;
+            }
+
+            //Expired?
+            if (today > endDate)
+            {
+                yield return ItSystemUsageValidationError.EndDatePassed;
+            }
+        }
+
+        private Maybe<ItSystemUsageValidationError> CheckLifeCycleValidity()
+        {
+            return LifeCycleStatus == LifeCycleStatusType.NotInUse
+                ? ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle
+                : Maybe<ItSystemUsageValidationError>.None;
+        }
+
+        private Maybe<ItSystemUsageValidationError> CheckContractValidity()
+        {
+            return MainContract?.ItContract?.IsActive == false
+                ? ItSystemUsageValidationError.MainContractNotActive
+                : Maybe<ItSystemUsageValidationError>.None;
         }
     }
 }

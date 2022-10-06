@@ -10,14 +10,12 @@ using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
-using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -47,7 +45,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IItsystemUsageRelationsService _systemUsageRelationsService;
         private readonly IEntityIdentityResolver _identityResolver;
         private readonly IItContractService _contractService;
-        private readonly IItProjectService _projectService;
         private readonly IKLEApplicationService _kleApplicationService;
         private readonly IReferenceService _referenceService;
         private readonly IDatabaseControl _databaseControl;
@@ -66,7 +63,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IAuthorizationContext authorizationContext,
             IOptionsService<ItSystemUsage, ItSystemCategories> systemCategoriesOptionsService,
             IItContractService contractService,
-            IItProjectService projectService,
             IKLEApplicationService kleApplicationService,
             IReferenceService referenceService,
             IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
@@ -89,7 +85,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _authorizationContext = authorizationContext;
             _systemCategoriesOptionsService = systemCategoriesOptionsService;
             _contractService = contractService;
-            _projectService = projectService;
             _kleApplicationService = kleApplicationService;
             _referenceService = referenceService;
             _databaseControl = databaseControl;
@@ -496,10 +491,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.Notes, (systemUsage, notes) => systemUsage.Note = notes))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.NumberOfExpectedUsersInterval, UpdateExpectedUsersInterval))
-                .Bind(usage => usage.WithOptionalUpdate(generalProperties.EnforceActive, (systemUsage, enforceActive) => systemUsage.Active = enforceActive.GetValueOrFallback(false)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.LifeCycleStatus, (systemUsage, lifeCycleStatus) => systemUsage.LifeCycleStatus = lifeCycleStatus))
                 .Bind(usage => UpdateValidityPeriod(usage, generalProperties))
-                .Bind(usage => usage.WithOptionalUpdate(generalProperties.MainContractUuid, UpdateMainContract))
-                .Bind(usage => usage.WithOptionalUpdate(generalProperties.AssociatedProjectUuids, UpdateProjectAssociations));
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.MainContractUuid, UpdateMainContract));
         }
 
         private static Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
@@ -511,28 +505,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var newValidTo = generalProperties.ValidTo.MapDateTimeOptionalChangeWithFallback(usage.ExpirationDate);
 
             return usage.UpdateSystemValidityPeriod(newValidFrom, newValidTo).Match<Result<ItSystemUsage, OperationError>>(error => error, () => usage);
-        }
-
-        private Result<ItSystemUsage, OperationError> UpdateProjectAssociations(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> projectUuids)
-        {
-            if (projectUuids.IsNone)
-            {
-                systemUsage.ResetProjectAssociations();
-                return systemUsage;
-            }
-
-            var itProjects = new List<ItProject>();
-            foreach (var uuid in projectUuids.Value)
-            {
-                var result = _projectService.GetProject(uuid);
-
-                if (result.Failed)
-                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
-
-                itProjects.Add(result.Value);
-            }
-
-            return systemUsage.SetProjectAssociations(itProjects).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
 
         private Result<ItSystemUsage, OperationError> UpdateMainContract(ItSystemUsage systemUsage, Maybe<Guid> contractId)

@@ -36,6 +36,7 @@
         customizationModel: Models.UICustomization.ICustomizedModuleUI | null = null;
         customizedModuleId: Models.UICustomization.CustomizableKitosModule;
         isOpen: boolean;
+        subtreeIsCompleteHelpText: string;
 
         static $inject: string[] = ["$scope", "uiCustomizationService"];
 
@@ -49,6 +50,8 @@
                 .then(customizationModel => {
                     this.customizationModel = customizationModel;
                 });
+
+            this.subtreeIsCompleteHelpText = Kitos.Models.UICustomization.Configs.helpTexts.subtreeIsCompleteHelpText;
         }
 
         toggleSetting(key : string) {

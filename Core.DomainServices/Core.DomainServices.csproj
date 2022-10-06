@@ -37,7 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.2.9.0\lib\net46\Serilog.dll</HintPath>
+      <HintPath>..\packages\Serilog.2.11.0\lib\net46\Serilog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -60,11 +60,12 @@
     <Compile Include="Context\FallbackUserResolver.cs" />
     <Compile Include="Context\IDefaultOrganizationResolver.cs" />
     <Compile Include="Context\IFallbackUserResolver.cs" />
+    <Compile Include="Contract\BuildItContractOverviewReadModelOnChangesHandler.cs" />
     <Compile Include="Contract\ContractDataProcessingRegistrationAssignmentService.cs" />
     <Compile Include="Contract\IContractDataProcessingRegistrationAssignmentService.cs" />
+    <Compile Include="Contract\ItContractOverviewReadModelUpdate.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
-    <Compile Include="Factories\ItProjectFactory.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationBasisForTransferAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationDataProcessorAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="Mapping\ReadModelMappingHelpers.cs" />
     <Compile Include="Model\StsOrganization\ResolveOrganizationTreeError.cs" />
     <Compile Include="Model\StsOrganization\StsOrganizationUnit.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
@@ -102,6 +104,8 @@
     <Compile Include="Queries\Contract\QueryByDataProcessingRegistrationUuid.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUuid.cs" />
+    <Compile Include="Queries\Contract\QueryReadModelsWhichShouldBecomeActive.cs" />
+    <Compile Include="Queries\Contract\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\DPR\QueryByAgreementConcluded.cs" />
     <Compile Include="Queries\DPR\QueryBySubDataProcessorUuid.cs" />
     <Compile Include="Queries\DPR\QueryByDataProcessorUuid.cs" />
@@ -135,6 +139,8 @@
     <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
+    <Compile Include="Repositories\Contract\IItContractOverviewReadModelRepository.cs" />
+    <Compile Include="Repositories\Contract\ItContractOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Notification\IUserNotificationRepository.cs" />
@@ -233,8 +239,6 @@
     <Compile Include="Repositories\KLE\KLEStatus.cs" />
     <Compile Include="Repositories\KLE\KLEUpdateStatus.cs" />
     <Compile Include="Time\OperationClock.cs" />
-    <Compile Include="Repositories\Project\IItProjectRepository.cs" />
-    <Compile Include="Repositories\Project\ItProjectRepository.cs" />
     <Compile Include="Repositories\Reference\IReferenceRepository.cs" />
     <Compile Include="Repositories\Reference\ReferenceRepository.cs" />
     <Compile Include="Repositories\SystemUsage\IItSystemUsageRepository.cs" />

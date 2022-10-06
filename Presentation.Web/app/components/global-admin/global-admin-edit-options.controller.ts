@@ -9,7 +9,7 @@
         description: string;
         buttonDisabled: boolean;
 
-        static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "user"];
+        static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "user","inMemoryCacheService"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private readonly $stateParams: ng.ui.IStateParamsService,
@@ -18,7 +18,8 @@
             private readonly user: Services.IUser,
             private readonly optionsUrl: string,
             private readonly optionId: number,
-            private readonly optionType: string) {
+            private readonly optionType: string,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
 
             this.optionsUrl = this.$stateParams["optionsUrl"];
             this.optionId = this.$stateParams["id"];
@@ -73,6 +74,7 @@
                     .then((response) => {
                         this.$uibModalInstance.close();
                         this.notify.addSuccessMessage("Værdien blev oprettet.");
+                        this.inMemoryCacheService.clear();
                     }).catch((response) => {
                         this.notify.addErrorMessage("Oprettelse mislykkedes.");
                     });
@@ -82,6 +84,7 @@
                     .then((response) => {
                         this.$uibModalInstance.close();
                         this.notify.addSuccessMessage("Værdien blev redigeret.");
+                        this.inMemoryCacheService.clear();
                     }).catch((response) => {
                         this.notify.addErrorMessage("Værdien blev ikke redigeret.");
                     });
@@ -103,11 +106,6 @@
                 isRole: true
             },
             {
-                id: "global-admin.project.edit-project-roles",
-                urlSuffix: "edit-project-roles",
-                isRole: true
-            },
-            {
                 id: "global-admin.system.edit-system-roles",
                 urlSuffix: "edit-system-roles",
                 isRole: true
@@ -116,11 +114,6 @@
                 id: "global-admin.contract.edit-contract-roles",
                 urlSuffix: "edit-contract-roles",
                 isRole: true
-            },
-            {
-                id: "global-admin.project.edit-project-types",
-                urlSuffix: "edit-project-types",
-                isRole: false
             },
             {
                 id: "global-admin.system.edit-system-types",

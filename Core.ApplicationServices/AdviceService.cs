@@ -1,6 +1,5 @@
 ﻿using Core.DomainModel.Advice;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System;
@@ -10,9 +9,12 @@ using System.Net.Mail;
 using System.Text;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.ScheduledJobs;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
@@ -28,10 +30,12 @@ namespace Core.ApplicationServices
     public class AdviceService : IAdviceService
     {
         private readonly IMailClient _mailClient;
+        private readonly IGenericRepository<DataProcessingRegistration> _dataProcessingRegistrationRepository;
+        private readonly IGenericRepository<ItContract> _contractRepository;
+        private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IGenericRepository<AdviceSent> _adviceSentRepository;
         private readonly IGenericRepository<ItContractRight> _itContractRights;
-        private readonly IGenericRepository<ItProjectRight> _itProjectRights;
         private readonly IGenericRepository<ItSystemRight> _itSystemRights;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _dataProcessingRegistrationRights;
         private readonly ILogger _logger;
@@ -43,26 +47,27 @@ namespace Core.ApplicationServices
         private readonly IAdviceRootResolution _adviceRootResolution;
 
         public AdviceService(
-            IMailClient mailClient, 
-            IGenericRepository<Advice> adviceRepository, 
-            IGenericRepository<AdviceSent> adviceSentRepository, 
-            IGenericRepository<ItContractRight> itContractRights, 
-            IGenericRepository<ItProjectRight> itProjectRights, 
-            IGenericRepository<ItSystemRight> itSystemRights, 
-            IGenericRepository<DataProcessingRegistrationRight> dataProcessingRegistrationRights, 
-            ILogger logger, 
-            ITransactionManager transactionManager, 
-            IOrganizationalUserContext organizationalUserContext, 
-            IHangfireApi hangfireApi, 
-            IOperationClock operationClock, 
-            IUserNotificationService userNotificationService, 
-            IAdviceRootResolution adviceRootResolution)
+            IMailClient mailClient,
+            IGenericRepository<Advice> adviceRepository,
+            IGenericRepository<AdviceSent> adviceSentRepository,
+            IGenericRepository<ItContractRight> itContractRights,
+            IGenericRepository<ItSystemRight> itSystemRights,
+            IGenericRepository<DataProcessingRegistrationRight> dataProcessingRegistrationRights,
+            ILogger logger,
+            ITransactionManager transactionManager,
+            IOrganizationalUserContext organizationalUserContext,
+            IHangfireApi hangfireApi,
+            IOperationClock operationClock,
+            IUserNotificationService userNotificationService,
+            IAdviceRootResolution adviceRootResolution,
+            IGenericRepository<DataProcessingRegistration> dataProcessingRegistrationRepository,
+            IGenericRepository<ItContract> contractRepository,
+            IGenericRepository<ItSystemUsage> systemUsageRepository)
         {
             _mailClient = mailClient;
             _adviceRepository = adviceRepository;
             _adviceSentRepository = adviceSentRepository;
             _itContractRights = itContractRights;
-            _itProjectRights = itProjectRights;
             _itSystemRights = itSystemRights;
             _dataProcessingRegistrationRights = dataProcessingRegistrationRights;
             _logger = logger;
@@ -72,6 +77,9 @@ namespace Core.ApplicationServices
             _operationClock = operationClock;
             _userNotificationService = userNotificationService;
             _adviceRootResolution = adviceRootResolution;
+            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
+            _contractRepository = contractRepository;
+            _systemUsageRepository = systemUsageRepository;
         }
 
         public void CreateAdvice(Advice advice)
@@ -83,8 +91,25 @@ namespace Core.ApplicationServices
 
         public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
         {
-            var result = _adviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
-            return result.AsQueryable();
+            var dprAdvices = GetAdvices(orgKey, RelatedEntityType.dataProcessingRegistration, _dataProcessingRegistrationRepository);
+            var contractAdvices = GetAdvices(orgKey, RelatedEntityType.itContract, _contractRepository);
+            var systemAdvices = GetAdvices(orgKey, RelatedEntityType.itSystemUsage, _systemUsageRepository);
+
+            return dprAdvices
+                .Union(contractAdvices)
+                .Union(systemAdvices);
+        }
+
+        private IQueryable<Advice> GetAdvices<T>(int orgKey, RelatedEntityType relatedEntityType, IGenericRepository<T> _entityRepository) where T : class, IHasId, IOwnedByOrganization
+        {
+            return _adviceRepository
+                .AsQueryable()
+                .Where(x => x.Type == relatedEntityType)
+                .Join(_entityRepository.AsQueryable().ByOrganizationId(orgKey),
+                    advice => advice.RelationId,
+                    entity => entity.Id,
+                    (advice, _) => advice
+                );
         }
 
         public IQueryable<Advice> GetAdvicesAccessibleToCurrentUser()
@@ -132,6 +157,11 @@ namespace Core.ApplicationServices
                     _adviceRepository.Save();
                     _adviceSentRepository.Save();
                     transaction.Commit();
+                }
+                else
+                {
+                    _logger.Warning("Unable to locate advice with id {id}. Removing it from HangFire", id);
+                    DeleteJobFromHangfire(id);
                 }
                 return true;
             }
@@ -201,7 +231,7 @@ namespace Core.ApplicationServices
             else
             {
                 var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
-                if(organizationIdOfRelatedEntityId.IsNone)
+                if (organizationIdOfRelatedEntityId.IsNone)
                 {
                     _logger?.Error($"Advis doesn't have valid/correct related entity (RelationId and Type mismatch). Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}");
                 }
@@ -238,17 +268,7 @@ namespace Core.ApplicationServices
                         && I.RoleId == r.ItContractRoleId);
                     foreach (var t in itContractRoles)
                     {
-                        if(t.User.Deleted) continue;
-                        mailAddressCollection.Add(t.User.Email);
-                    }
-
-                    break;
-                case RelatedEntityType.itProject:
-                    var projectRoles = _itProjectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                        && I.RoleId == r.ItProjectRoleId);
-                    foreach (var t in projectRoles)
-                    {
-                        if(t.User.Deleted) continue;
+                        if (t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -259,7 +279,7 @@ namespace Core.ApplicationServices
                                                                               && I.RoleId == r.ItSystemRoleId);
                     foreach (var t in systemRoles)
                     {
-                        if(t.User.Deleted) continue;
+                        if (t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -271,7 +291,7 @@ namespace Core.ApplicationServices
                         && I.RoleId == r.DataProcessingRegistrationRoleId);
                     foreach (var t in dpaRoles)
                     {
-                        if(t.User.Deleted) continue;
+                        if (t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -293,48 +313,14 @@ namespace Core.ApplicationServices
 
         private void DeleteJobFromHangfire(Advice advice)
         {
-            //Remove pending shcedules if any
-            var allScheduledJobs = _hangfireApi
-                .GetScheduledJobs(0, int.MaxValue)
-                .ToList();
+            var adviceEntityId = advice.Id;
 
-            //Remove all pending calls to CreateOrUpdateJob
-            var allScheduledCreateOrUpdate =
-                allScheduledJobs
-                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob))
-                    .ToList();
+            DeleteJobFromHangfire(adviceEntityId);
+        }
 
-            foreach (var j in allScheduledCreateOrUpdate)
-            {
-                var adviceIdAsString = j.Value.Job.Args[0].ToString();
-                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
-                {
-                    _hangfireApi.DeleteScheduledJob(j.Key);
-                    break;
-                }
-            }
-
-            //Remove all pending calls to CreateOrUpdateJob
-            var allScheduledDeactivations =
-                allScheduledJobs
-                    .Where(x => x.Value.Job.Method.Name == nameof(DeactivateById));
-
-            foreach (var j in allScheduledDeactivations)
-            {
-                var adviceIdAsString = j.Value.Job.Args[0].ToString();
-                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
-                {
-                    _hangfireApi.DeleteScheduledJob(j.Key);
-                    break;
-                }
-            }
-
-            //Remove the job by main job id + any partitions (max 12 - one pr. month)
-            _hangfireApi.RemoveRecurringJobIfExists(advice.JobId);
-            for (var i = 0; i < 12; i++)
-            {
-                _hangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(advice.JobId, i));
-            }
+        private void DeleteJobFromHangfire(int adviceEntityId)
+        {
+            _hangfireApi.DeleteAdviceFromHangfire(adviceEntityId);
         }
 
         public void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted)
@@ -418,11 +404,10 @@ namespace Core.ApplicationServices
 
             foreach (var adviceTrigger in adviceTriggers)
             {
-                var prefix = advice.JobId;
-                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
+                var jobId = adviceTrigger.PartitionId.Match(partitionId => Advice.CreatePartitionJobId(adviceId, partitionId), () => advice.JobId);
                 _hangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
             }
-            
+
             if (advice.StopDate.HasValue)
             {
                 //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
@@ -441,8 +426,8 @@ namespace Core.ApplicationServices
                     case Scheduling.Year:
                     case Scheduling.Quarter:
                     case Scheduling.Semiannual:
-                        var mustScheduleAdviceToday = 
-                            advice.AdviceSent.Where(x=>x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false && 
+                        var mustScheduleAdviceToday =
+                            advice.AdviceSent.Where(x => x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false &&
                             WillTriggerInvokeToday() == false;
                         if (mustScheduleAdviceToday)
                         {
@@ -462,14 +447,9 @@ namespace Core.ApplicationServices
         private bool WillTriggerInvokeToday()
         {
             var utcNow = _operationClock.Now.ToUniversalTime();
-            return 
-                utcNow.Hour < CronPatternDefaults.TriggerHourUTC || 
+            return
+                utcNow.Hour < CronPatternDefaults.TriggerHourUTC ||
                 (utcNow.Minute < CronPatternDefaults.TriggerMinute && utcNow.Hour == CronPatternDefaults.TriggerHourUTC);
-        }
-
-        private static string CreatePartitionJobId(string prefix, int partitionIndex)
-        {
-            return $"{prefix}_part_{partitionIndex}";
         }
 
         public Maybe<Advice> GetAdviceById(int id)

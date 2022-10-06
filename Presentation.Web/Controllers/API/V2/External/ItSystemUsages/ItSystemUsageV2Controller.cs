@@ -131,7 +131,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
         /// <summary>
         /// Deletes a system usage.
-        /// NOTE: this action also clears any incoming relation e.g. relations from other system usages, contracts, projects or data processing registrations.
+        /// NOTE: this action also clears any incoming relation e.g. relations from other system usages, contracts or data processing registrations.
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>

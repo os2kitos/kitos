@@ -298,7 +298,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignOversightOption(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
+        public HttpResponseMessage AssignDataProcessingRegistration(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
         {
             if (dataProcessingRegistrationId == null)
                 return BadRequest($"{nameof(dataProcessingRegistrationId)} must be provided");
@@ -314,7 +314,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveOversightOption(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
+        public HttpResponseMessage RemoveDataProcessingRegistration(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
         {
             if (dataProcessingRegistrationId == null)
                 return BadRequest($"{nameof(dataProcessingRegistrationId)} must be provided");
@@ -327,7 +327,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict, Description = "It Contract names must be unique within the organization")]
-        public HttpResponseMessage GetCanCreateNewProjectWithName(string checkname, int orgId)
+        public HttpResponseMessage GetCanCreateNewContractWithName(string checkname, int orgId)
         {
             try
             {
@@ -380,6 +380,20 @@ namespace Presentation.Web.Controllers.API.V1
             return _itContractService
                 .GetAppliedProcurementPlans(organizationId)
                 .Select(plans => plans.Select(ToProcurementPlanDTO).ToList())
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{contractId}/validation-details")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetValidationStatus(int contractId)
+        {
+            return _itContractService
+                .GetContract(contractId)
+                .Select(contract => contract.Validate())
+                .Select(details => new ContractValidationDetailsResponseDTO(details.Result, details.EnforcedValid, details.ValidationErrors))
                 .Match(Ok, FromOperationError);
         }
 

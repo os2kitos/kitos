@@ -48,7 +48,6 @@ namespace Tools.Test.Database.Model.Tasks
                 new CreateItSystemTask("DefaultTestItSystem",DefaultOrganizationName,null),
                 new CreateItSystemTask("SecondOrganizationDefaultTestItSystem",SecondOrganizationName,1),
                 new CreateItContractTask("DefaultTestItContract"),
-                new CreateItProjectTask("DefaultTestItProject"),
                 new CreateDataProcessingRegistrationTask("DefaultDpa"),
                 new CreateTaskRefTask(DefaultOrganizationName)
             }.AsReadOnly();

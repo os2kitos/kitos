@@ -19,8 +19,6 @@
         DefaultUsers: Array<IOrganizationRight>;
         /** This Organization Unit is using these IT Systems (Via ItSystemUsage) */
         Using: Array<IItSystemUsageOrgUnitUsage>;
-        /** This Organization Unit is using these IT projects */
-        ItProjects: Array<ItProject.IItProjectOrgUnitUsage>;
         /** This Organization Unit is responsible for these IT ItContracts */
         ItContracts: Array<ItContract.IItContract>;
         /** The Organization Unit is listed in these economy streams */

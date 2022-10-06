@@ -39,11 +39,6 @@
 
     <!-- extra info -->
     <div class="col-xs-1 text-center">
-        <span data-ng-if="usage.projects.length > 0" class="text-success" data-uib-tooltip="{{usage.projects | joinBy:', ':'name'}}" tooltip-class="nowrap">
-            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-        </span>
-    </div>
-    <div class="col-xs-1 text-center">
         <span data-ng-if="usage.systems.length > 0" class="text-success" data-uib-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}" tooltip-class="nowrap">
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
         </span>
@@ -89,11 +84,6 @@
         </div>
 
         <!-- extra info -->
-        <div class="col-xs-1 text-center">
-            <span data-ng-if="usage.projects.length > 0" class="text-success" data-uib-tooltip="{{ usage.projects | joinBy:', ':'name' }}" data-tooltip-class="nowrap">
-                <span class="glyphicon glyphicon-ok"></span>
-            </span>
-        </div>
         <div class="col-xs-1 text-center">
             <span data-ng-if="usage.systemUsages.length > 0" class="text-success" data-uib-tooltip="{{ usage.systemUsages | joinBy:', ':'itSystemName' }}" data-tooltip-class="nowrap">
                 <span class="glyphicon glyphicon-ok"></span>

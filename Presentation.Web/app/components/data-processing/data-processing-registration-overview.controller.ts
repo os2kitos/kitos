@@ -8,7 +8,6 @@
         mainGrid: IKendoGrid<Models.DataProcessing.IDataProcessingRegistration>;
         mainGridOptions: IKendoGridOptions<Models.DataProcessing.IDataProcessingRegistration>;
         canCreate: boolean;
-        projectIdToAccessLookup = {};
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -107,6 +106,9 @@
                             parameterMap.$filter = replaceNullOptionQuery(parameterMap.$filter);
 
                             parameterMap.$filter = replaceEmptyOptionQuery(parameterMap.$filter);
+
+                            //Cleanup broken queries due to stripping
+                            Helpers.OdataQueryHelper.cleanupModifiedKendoFilterConfig(parameterMap);
                         }
 
                         return parameterMap;
@@ -444,7 +446,7 @@
         .module("app")
         .config([
             "$stateProvider", $stateProvider => {
-                $stateProvider.state("data-processing.overview", {
+                $stateProvider.state(Kitos.Constants.ApplicationStateId.DataProcessingRegistrationOverview, {
                     url: "/overview",
                     templateUrl: "app/components/data-processing/data-processing-registration-overview.view.html",
                     controller: OverviewController,

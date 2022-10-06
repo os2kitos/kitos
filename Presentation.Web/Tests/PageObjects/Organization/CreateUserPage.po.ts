@@ -1,5 +1,4 @@
 ﻿import IPageObject = require("../IPageObject.po");
-import KendoToolbarHelper = require("../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper")
 import NavigationHelper = require("../../Utility/NavigationHelper");
 
@@ -11,7 +10,6 @@ class UsersPage implements IPageObject {
         return this.navigationHelper.getPage("/#/organization/user");
     }
 
-    public kendoToolbarHelper = new KendoToolbarHelper();
     public kendoToolbarWrapper = new KendoToolbarWrapper();
 
     public inputEmail = element(by.model("ctrl.vm.email"));

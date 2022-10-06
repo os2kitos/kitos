@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel.ItContract;
 using Core.DomainServices.Queries.SystemUsage;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -21,23 +22,39 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
         [Fact]
         public void Apply_Includes_Systems_Which_Are_Currently_Inactive_But_Should_Be_Active()
         {
-            //Arrange
-            var excludedSinceReadModelIsCurrentlyActive = CreateReadModel(true, false, null, null);
-            var includedSinceSourceEntityIsActiveOverride = CreateReadModel(false, true, null, null);
-            var excludedSinceConcludedHasNotYetPassed = CreateReadModel(false, false, _now.Date.AddDays(1), null);
-            var includedSinceConcludedHasPassedAndNoExpiration = CreateReadModel(false, false, _now.Date, null);
-            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, false, _now.Date, _now.Date.AddDays(1));
-            var excludedSinceConcludedSinceExpired = CreateReadModel(false, false, _now.Date.AddDays(-2), _now.Date.AddDays(-1));
+            var inactiveMainContract = new ItContractItSystemUsage
+            {
+                ItContract = new ItContract
+                {
+                    ExpirationDate = _now.Date.AddDays(-1)
+                }
+            };
+            var activeMainContract = new ItContractItSystemUsage
+            {
+                ItContract = new ItContract
+                {
+                    Active = true
+                }
+            };
 
+            //Arrange
+            var excludedSinceReadModelIsCurrentlyActive = CreateReadModel(true, null, null, null);
+            var excludedSinceConcludedHasNotYetPassed = CreateReadModel(false, _now.Date.AddDays(1), null, inactiveMainContract);
+            var includedSinceConcludedHasPassedAndNoExpiration = CreateReadModel(false, _now.Date, null, null);
+            var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1), null);
+            var includedSinceMainContractIsActive= CreateReadModel(false, null, null, activeMainContract);
+            var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1), inactiveMainContract);
+            var excludedSinceConcludedSinceContractExpired = CreateReadModel(false, _now.Date.AddDays(2), null, inactiveMainContract);
 
             var input = new[]
             {
                 excludedSinceReadModelIsCurrentlyActive,
-                includedSinceSourceEntityIsActiveOverride,
                 excludedSinceConcludedHasNotYetPassed,
                 includedSinceConcludedHasPassedAndNoExpiration,
                 includedSinceConcludedHasPassedAndNotExpired,
-                excludedSinceConcludedSinceExpired
+                includedSinceMainContractIsActive,
+                excludedSinceConcludedSinceExpired,
+                excludedSinceConcludedSinceContractExpired
             };
 
             //Act
@@ -45,9 +62,9 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
 
             //Assert
             Assert.Equal(3, result.Count);
-            Assert.Contains(includedSinceSourceEntityIsActiveOverride, result);
             Assert.Contains(includedSinceConcludedHasPassedAndNoExpiration, result);
             Assert.Contains(includedSinceConcludedHasPassedAndNotExpired, result);
+            Assert.Contains(includedSinceMainContractIsActive, result);
         }
     }
 }

@@ -105,7 +105,9 @@
         itSystem: ViewModel.ItSystem.ISystemViewModel;
         concluded;
         expirationDate;
-        isActive: boolean;
+        lifeCycleStatus: Models.ItSystemUsage.LifeCycleStatusType;
+        activeAccordingToValidityPeriod: boolean;
+        activeAccordingToLifeCycle: boolean;
         active: boolean;
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
@@ -133,7 +135,9 @@
         itSystem: ViewModel.ItSystem.ISystemViewModel;
         concluded: any;
         expirationDate: any;
-        isActive: boolean;
+        lifeCycleStatus: Models.ItSystemUsage.LifeCycleStatusType;
+        activeAccordingToValidityPeriod: boolean;
+        activeAccordingToLifeCycle: boolean;
         active: boolean;
         isBusinessCritical: DataOption;
         precautions: DataOption;
@@ -153,7 +157,8 @@
             this.itSystem = new ViewModel.ItSystem.SystemViewModel(itSystemUsage.itSystem);
             this.concluded = itSystemUsage.concluded;
             this.expirationDate = itSystemUsage.expirationDate;
-            this.isActive = itSystemUsage.isActive;
+            this.lifeCycleStatus = itSystemUsage.lifeCycleStatus;
+            this.activeAccordingToValidityPeriod = itSystemUsage.activeAccordingToValidityPeriod;
             this.active = itSystemUsage.active;
             this.lastChanged = Helpers.RenderFieldsHelper.renderDate(itSystemUsage.lastChanged);
             this.lastChangedBy = `${itSystemUsage.lastChangedByUserName} ${itSystemUsage.lastChangedByUserLastName}`;

@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
@@ -28,7 +27,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(GetAllInputPropertyNames<UpdateItSystemUsageRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.General).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<GeneralDataUpdateRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity)}.AsParameterMatch())).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity)}.AsParameterMatch())).Returns(GetAllInputPropertyNames<ItSystemUsageValidityWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.Archiving).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ArchivingWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.GDPR).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<GDPRWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<LocalKLEDeviationsRequestDTO>());
@@ -186,7 +185,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
-            AssertPropertyContainsResetDataChange(mappedGeneralSection.EnforceActive);
+
+            Assert.True(mappedGeneralSection.LifeCycleStatus.HasChange);
+            Assert.Null(mappedGeneralSection.LifeCycleStatus.NewValue);
             AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidFrom);
             AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidTo);
         }
@@ -204,21 +205,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
             AssertPropertyContainsResetDataChange(mappedGeneralSection.NumberOfExpectedUsersInterval);
-        }
-
-        [Fact]
-        public void Map_General_Data_Properties_Resets_AssociatedProjects_If_SourceValue_Not_Defined()
-        {
-            //Arrange
-            var input = A<GeneralDataUpdateRequestDTO>();
-            input.AssociatedProjectUuids = null;
-
-            //Act
-            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO { General = input });
-
-            //Assert
-            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
-            AssertPropertyContainsResetDataChange(mappedGeneralSection.AssociatedProjectUuids);
         }
 
         [Fact]
@@ -630,10 +616,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noNotes,
             bool noSystemVersion,
             bool noNumberOfExpectedUsers,
-            bool noEnforceActive,
+            bool noLifeCycleStatus,
             bool noValidFrom,
             bool noValidTo,
-            bool noAssociatedProjectUuids,
             bool noMainContractUuid)
         {
             //Arrange
@@ -645,10 +630,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noNotes,
                 noSystemVersion,
                 noNumberOfExpectedUsers,
-                noEnforceActive,
+                noLifeCycleStatus,
                 noValidFrom,
                 noValidTo,
-                noAssociatedProjectUuids,
                 noMainContractUuid);
 
             //Act
@@ -662,10 +646,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noNotes, generalSection.Notes.IsUnchanged);
             Assert.Equal(noSystemVersion, generalSection.SystemVersion.IsUnchanged);
             Assert.Equal(noNumberOfExpectedUsers, generalSection.NumberOfExpectedUsersInterval.IsUnchanged);
-            Assert.Equal(noEnforceActive, generalSection.EnforceActive.IsUnchanged);
+            Assert.Equal(noLifeCycleStatus, generalSection.LifeCycleStatus.IsUnchanged);
             Assert.Equal(noValidFrom, generalSection.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, generalSection.ValidTo.IsUnchanged);
-            Assert.Equal(noAssociatedProjectUuids, generalSection.AssociatedProjectUuids.IsUnchanged);
             Assert.Equal(noMainContractUuid, generalSection.MainContractUuid.IsUnchanged);
         }
 
@@ -679,10 +662,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noNotes,
             bool noSystemVersion,
             bool noNumberOfExpectedUsers,
-            bool noEnforceActive,
+            bool noLifeCycleStatus,
             bool noValidFrom,
             bool noValidTo,
-            bool noAssociatedProjectUuids,
             bool noMainContractUuid)
         {
             //Arrange
@@ -694,10 +676,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noNotes,
                 noSystemVersion,
                 noNumberOfExpectedUsers,
-                noEnforceActive,
+                noLifeCycleStatus,
                 noValidFrom,
                 noValidTo,
-                noAssociatedProjectUuids,
                 noMainContractUuid);
 
             //Act
@@ -711,10 +692,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(generalSection.Notes.HasChange);
             Assert.True(generalSection.SystemVersion.HasChange);
             Assert.True(generalSection.NumberOfExpectedUsersInterval.HasChange);
-            Assert.True(generalSection.EnforceActive.HasChange);
+            Assert.True(generalSection.LifeCycleStatus.HasChange);
             Assert.True(generalSection.ValidFrom.HasChange);
             Assert.True(generalSection.ValidTo.HasChange);
-            Assert.True(generalSection.AssociatedProjectUuids.HasChange);
             Assert.True(generalSection.MainContractUuid.HasChange);
         }
 
@@ -1073,7 +1053,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedGeneralSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(11);
+            return CreateGetUndefinedSectionsInput(10);
         }
 
         public static IEnumerable<object[]> GetUndefinedOrganizationUsageSectionsInput()
@@ -1207,10 +1187,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noNotes,
             bool noSystemVersion,
             bool noNumberOfExpectedUsers,
-            bool noEnforceActive,
+            bool noLifeCycleStatus,
             bool noValidFrom,
             bool noValidTo,
-            bool noAssociatedProjectUuids,
             bool noMainContractUuid)
         {
             var generalProperties = GetAllInputPropertyNames<GeneralDataUpdateRequestDTO>();
@@ -1220,13 +1199,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noNotes) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.Notes));
             if (noSystemVersion) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.SystemVersion));
             if (noNumberOfExpectedUsers) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.NumberOfExpectedUsers));
-            if (noAssociatedProjectUuids) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.AssociatedProjectUuids));
             if (noMainContractUuid) generalProperties.Remove(nameof(GeneralDataUpdateRequestDTO.MainContractUuid));
 
-            var validityProperties = GetAllInputPropertyNames<ValidityWriteRequestDTO>();
-            if (noEnforceActive) validityProperties.Remove(nameof(ValidityWriteRequestDTO.EnforcedValid));
-            if (noValidFrom) validityProperties.Remove(nameof(ValidityWriteRequestDTO.ValidFrom));
-            if (noValidTo) validityProperties.Remove(nameof(ValidityWriteRequestDTO.ValidTo));
+            var validityProperties = GetAllInputPropertyNames<ItSystemUsageValidityWriteRequestDTO>();
+            if (noLifeCycleStatus) validityProperties.Remove(nameof(ItSystemUsageValidityWriteRequestDTO.LifeCycleStatus));
+            if (noValidFrom) validityProperties.Remove(nameof(ItSystemUsageValidityWriteRequestDTO.ValidFrom));
+            if (noValidTo) validityProperties.Remove(nameof(ItSystemUsageValidityWriteRequestDTO.ValidTo));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.General).WrapAsEnumerable().AsParameterMatch())).Returns(generalProperties);
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity)}.AsParameterMatch())).Returns(validityProperties);
@@ -1260,12 +1238,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private static void AssertCommonGeneralDataWriteProperties(GeneralDataWriteRequestDTO input, UpdatedSystemUsageGeneralProperties output)
         {
+
             Assert.Equal(input.LocalCallName, AssertPropertyContainsDataChange(output.LocalCallName));
             Assert.Equal(input.LocalSystemId, AssertPropertyContainsDataChange(output.LocalSystemId));
             Assert.Equal(input.SystemVersion, AssertPropertyContainsDataChange(output.SystemVersion));
-            Assert.Equal(input.AssociatedProjectUuids, AssertPropertyContainsDataChange(output.AssociatedProjectUuids));
             Assert.Equal(input.DataClassificationUuid, AssertPropertyContainsDataChange(output.DataClassificationUuid));
-            Assert.Equal(input.Validity?.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceActive));
+            Assert.Equal(input.Validity?.LifeCycleStatus, AssertPropertyContainsDataChange(output.LifeCycleStatus)?.ToLifeCycleStatusChoice());
             Assert.Equal(input.Validity?.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
             Assert.Equal(input.Validity?.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.Notes));

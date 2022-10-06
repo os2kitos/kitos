@@ -1,9 +1,7 @@
 ﻿using Core.DomainModel;
-using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Organization;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,7 +9,6 @@ using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using System.Threading;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Xunit.Abstractions;
 
@@ -225,16 +222,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
         }
 
-        private static async Task WaitForReadModelQueueDepletion()
-        {
-            await WaitForAsync(
-                () =>
-                {
-                    return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
-                }, TimeSpan.FromSeconds(120));
-        }
-
         [Fact]
         [Description("Tests that child entities are removed from the read model when updated from the source model")]
         public async Task ReadModels_Update_When_Child_Entities_Are_Removed()
@@ -279,7 +266,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var organizationId = TestEnvironment.DefaultOrganizationId;
 
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
-            var (userId, _, cookie)= await HttpApi.CreateUserAndLogin(email, orgRole);
+            var (userId, _, cookie) = await HttpApi.CreateUserAndLogin(email, orgRole);
             using var response = await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(registration.Id, newName, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -294,19 +281,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(registration.Id, readModel.SourceEntityId);
             Assert.Equal(userId, readModel.LastChangedById);
         }
-
-        private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)
+        private static async Task WaitForReadModelQueueDepletion()
         {
-            bool conditionMet;
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            do
-            {
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
-                conditionMet = await check();
-            } while (conditionMet == false && stopwatch.Elapsed <= howLong);
-
-            Assert.True(conditionMet, $"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
+            await ReadModelTestTools.WaitForReadModelQueueDepletion();
         }
     }
 }

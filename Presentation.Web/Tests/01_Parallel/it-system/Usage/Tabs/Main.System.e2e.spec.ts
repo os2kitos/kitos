@@ -3,20 +3,27 @@ import ItSystemHelper = require("../../../../Helpers/SystemCatalogHelper");
 import ItSystemUsageHelper = require("../../../../Helpers/SystemUsageHelper");
 import ItSystemUsageMainPage = require("../../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageMain.po");
 import TestFixtureWrapper = require("../../../../Utility/TestFixtureWrapper");
-import LocalItProjectConfigPage = require("../../../../PageObjects/Local-admin/LocalProject.po");
 import ItSystemUsageCommon = require("../../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageCommon.po");
+import Constants = require("../../../../Utility/Constants");
 
 describe("User is able to view local it system main page information",
     () => {
+        const consts = new Constants();
+
         const userCountInputs = {
             DefaultNull: { text: "" },
             Undecided: { text: " " },
             TenToFifty: { text: "10-50" }
         };
 
+        const lifeCycleStatusInputs = {
+            DefaultNull: { text: "" },
+            Undecided: { text: " " },
+            Operational: { text: "Under udfasning" }
+        };
+
         var loginHelper = new login();
         var testFixture = new TestFixtureWrapper();
-        var localItProjectPage = new LocalItProjectConfigPage();
 
         var mainSystemName = createName("SystemUsageMain$");
 
@@ -45,29 +52,30 @@ describe("User is able to view local it system main page information",
                     .then(() => checkDefaultValues(mainSystemName));
             });
 
-        it("User cannot see 'IT Projekt' if disabled by local admin",
-            () => {
-                loginHelper.loginAsLocalAdmin()
-                    .then(() => localItProjectPage.getPage())
-                    .then(() => LocalItProjectConfigPage.getIncludeModuleInputElement().click())
-                    .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
-                    .then(() => checkItProjectHidden())
-                    // Re-enable It-projekt
-                    .then(() => localItProjectPage.getPage())
-                    .then(() => LocalItProjectConfigPage.getIncludeModuleInputElement().click());
-            });
-
         it("Change UserCount from null to 10-50, then change to undecided",
             () => {
                 loginHelper.loginAsGlobalAdmin()
                     .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
-                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.DefaultNull.text))
-                    .then(() => ItSystemUsageHelper.selectUserCount(userCountInputs.TenToFifty.text))
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.DefaultNull.text, consts.mainUserCount))
+                    .then(() => ItSystemUsageHelper.selectOption(userCountInputs.TenToFifty.text, consts.mainUserCount))
                     .then(() => browser.refresh())
-                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.TenToFifty.text))
-                    .then(() => ItSystemUsageHelper.selectUserCount(userCountInputs.Undecided.text))
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.TenToFifty.text, consts.mainUserCount))
+                    .then(() => ItSystemUsageHelper.selectOption(userCountInputs.Undecided.text, consts.mainUserCount))
                     .then(() => browser.refresh())
-                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.Undecided.text));
+                    .then(() => ItSystemUsageHelper.validateSelectData(userCountInputs.Undecided.text, consts.mainUserCount));
+            });
+
+        it("Change LifeCycleStatus from null to Operational, then change to undecided",
+            () => {
+                loginHelper.loginAsGlobalAdmin()
+                    .then(() => ItSystemUsageHelper.openLocalSystem(mainSystemName))
+                    .then(() => ItSystemUsageHelper.validateSelectData(lifeCycleStatusInputs.DefaultNull.text, consts.mainLifeCycleStatus))
+                    .then(() => ItSystemUsageHelper.selectOption(lifeCycleStatusInputs.Operational.text, consts.mainLifeCycleStatus))
+                    .then(() => browser.refresh())
+                    .then(() => ItSystemUsageHelper.validateSelectData(lifeCycleStatusInputs.Operational.text, consts.mainLifeCycleStatus))
+                    .then(() => ItSystemUsageHelper.selectOption(lifeCycleStatusInputs.Undecided.text, consts.mainLifeCycleStatus))
+                    .then(() => browser.refresh())
+                    .then(() => ItSystemUsageHelper.validateSelectData(lifeCycleStatusInputs.Undecided.text, consts.mainLifeCycleStatus));
             });
     }
 );
@@ -77,10 +85,6 @@ var itSystemUsageCommonPage = new ItSystemUsageCommon();
 
 function createName(prefix: string) {
     return `${prefix}_${new Date().getTime()}`;
-}
-
-function checkItProjectHidden() {
-    expect(itSystemUsageCommonPage.getSideNavigationItProject().isPresent()).toBeFalse();
 }
 
 function checkDefaultValues(mainSystemName: string) {

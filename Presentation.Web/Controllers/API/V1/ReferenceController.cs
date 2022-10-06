@@ -8,7 +8,6 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
@@ -45,6 +44,12 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(onSuccess: _ => Ok(), onFailure: FromOperationFailure);
         }
 
+        [NonAction]
+        public override HttpResponseMessage GetAll(PagingModel<ExternalReference> paging)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void RaiseUpdated(ExternalReference item)
         {
             var entityWithExternalReferences = item.GetOwner();
@@ -55,9 +60,6 @@ namespace Presentation.Web.Controllers.API.V1
                     break;
                 case ItContract itContract:
                     DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(itContract));
-                    break;
-                case ItProject itProject:
-                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(itProject));
                     break;
                 case ItSystem itSystem:
                     DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
@@ -107,9 +109,8 @@ namespace Presentation.Web.Controllers.API.V1
             return GetOwnerTypeAndIdOrFallback(ReferenceRootType.Contract, dto.ItContract_Id,
                 fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.System, dto.ItSystem_Id,
                     fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.SystemUsage, dto.ItSystemUsage_Id,
-                        fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.Project, dto.ItProject_Id,
                             fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.DataProcessingRegistration, dto.DataProcessingRegistration_Id,
-                                fallback: () => Maybe<KeyValuePair<ReferenceRootType, int>>.None)))));
+                                fallback: () => Maybe<KeyValuePair<ReferenceRootType, int>>.None))));
         }
 
         private static Maybe<KeyValuePair<ReferenceRootType, int>> GetOwnerTypeAndIdOrFallback(ReferenceRootType ownerType, int? ownerId, Func<Maybe<KeyValuePair<ReferenceRootType, int>>> fallback)

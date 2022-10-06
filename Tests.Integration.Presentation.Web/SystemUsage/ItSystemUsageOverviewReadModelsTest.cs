@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -69,12 +66,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemParentName = A<string>();
             var systemParentDisabled = A<bool>();
 
-            var systemUsageActive = A<bool>();
-            var systemUsageExpirationDate = DateTime.Now.AddDays(-1);
             var systemUsageVersion = A<string>();
             var systemUsageLocalCallName = A<string>();
             var systemUsageLocalSystemId = A<string>();
-            var concluded = A<DateTime>();
+            var concluded = DateTime.UtcNow.AddDays(-A<int>());
+            var systemUsageExpirationDate = DateTime.UtcNow.AddDays(A<int>());
             var archiveDuty = A<ArchiveDutyTypes>();
             var riskAssessment = A<DataOptions>();
             var linkToDirectoryUrl = A<string>();
@@ -85,8 +81,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var hostedAt = A<HostedAt>();
 
             var contractName = A<string>();
-
-            var projectName = A<string>();
 
             var dataProcessingRegistrationName = A<string>();
 
@@ -121,7 +115,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // System Usage changes
             var body = new
             {
-                Active = systemUsageActive,
                 ExpirationDate = systemUsageExpirationDate,
                 Version = systemUsageVersion,
                 LocalCallName = systemUsageLocalCallName,
@@ -140,7 +133,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
             var isHoldingDocument = A<bool>();
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
-
+             
             // Responsible Organization Unit
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId).DisposeAsync(); //Adding default organization as organization unit
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId).DisposeAsync(); //Using default organization as responsible organization unit
@@ -159,14 +152,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id).DisposeAsync();
 
-            // Project
-            var project = await ItProjectHelper.CreateProject(projectName, organizationId);
-            await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
-
             // ArchivePeriods
             var archivePeriodStartDate = DateTime.Now.AddDays(-1);
             var archivePeriodEndDate = DateTime.Now.AddDays(1);
-            var archivePeriod = await ItSystemUsageHelper.SendAddArchivePeriodRequestAsync(systemUsage.Id, archivePeriodStartDate, archivePeriodEndDate, organizationId);
+            await ItSystemUsageHelper.AddArchivePeriodAsync(systemUsage.Id, archivePeriodStartDate, archivePeriodEndDate, organizationId);
 
 
             // DataProcessingRegistrations
@@ -224,13 +213,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From System Usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(organizationId, readModel.OrganizationId);
-            Assert.Equal(systemUsageActive, readModel.IsActive);
             Assert.Equal(systemUsageVersion, readModel.Version);
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.ObjectOwnerName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
-            Assert.Equal(concluded, readModel.Concluded);
-            Assert.Equal(updatedSystemUsage.LastChanged, readModel.LastChangedAt);
+            Assert.Equal(concluded.Date, readModel.Concluded?.Date);
+            Assert.Equal(systemUsageExpirationDate.Date, readModel.ExpirationDate?.Date);
+            Assert.True(readModel.ActiveAccordingToValidityPeriod);
+            Assert.True(readModel.ActiveAccordingToLifeCycle);
+            Assert.True(readModel.SystemActive);
+            Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChangedAt.Date);
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
             Assert.Equal(linkToDirectoryUrlName, readModel.LinkToDirectoryName);
@@ -296,13 +288,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(organizationId, readModel.MainContractSupplierId);
             Assert.Equal(organizationName, readModel.MainContractSupplierName);
             Assert.True(readModel.MainContractIsActive);
-            Assert.True(readModel.HasMainContract);
-
-            // Project
-            Assert.Equal(projectName, readModel.ItProjectNamesAsCsv);
-            var rmProject = Assert.Single(readModel.ItProjects);
-            Assert.Equal(project.Id, rmProject.ItProjectId);
-            Assert.Equal(projectName, rmProject.ItProjectName);
 
             // ArchivePeriods
             Assert.Equal(archivePeriodEndDate, readModel.ActiveArchivePeriodEndDate);
@@ -332,42 +317,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmOutgoingRelatedItSystemUsage = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
             Assert.Equal(outgoingRelationSystemUsage.Id, rmOutgoingRelatedItSystemUsage.ItSystemUsageId);
             Assert.Equal(outgoingRelationSystemName, rmOutgoingRelatedItSystemUsage.ItSystemUsageName);
-        }
-
-        [Fact]
-        public async Task ReadModels_IsActive_Is_True_When_ExpirationDate_Is_Today()
-        {
-            //Act
-            var readModel = await Test_For_IsActive_Based_On_ExpirationDate(DateTime.Now);
-
-            //Assert
-            Assert.True(readModel.IsActive);
-        }
-
-        [Fact]
-        public async Task ReadModels_IsActive_Is_True_When_ExpirationDate_Is_After_Today()
-        {
-            //Arrange
-            var expirationDate = DateTime.Now.AddDays(A<int>());
-
-            //Act
-            var readModel = await Test_For_IsActive_Based_On_ExpirationDate(expirationDate);
-
-            //Assert
-            Assert.True(readModel.IsActive);
-        }
-
-        [Fact]
-        public async Task ReadModels_IsActive_Is_False_When_ExpirationDate_Is_Earlier_Than_Today()
-        {
-            //Arrange
-            var expirationDate = DateTime.Now.AddDays(-A<int>());
-
-            //Act
-            var readModel = await Test_For_IsActive_Based_On_ExpirationDate(expirationDate);
-
-            //Assert
-            Assert.False(readModel.IsActive);
         }
 
         [Fact]
@@ -575,81 +524,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Null(readModel.MainContractId);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
-            Assert.Null(readModel.MainContractIsActive);
-            Assert.False(readModel.HasMainContract);
-        }
-
-        [Fact]
-        public async Task ReadModels_ItProjects_Is_Updated_When_ItProject_Is_Deleted()
-        {
-            //Arrange
-            var systemName = A<string>();
-            var projectName = A<string>();
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
-
-            var project = await ItProjectHelper.CreateProject(projectName, organizationId);
-            await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
-
-
-            //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
-            Console.Out.WriteLine("Read models are up to date");
-
-            //Act 
-            await ItProjectHelper.SendDeleteProjectAsync(project.Id).DisposeAsync();
-
-            //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
-            Console.Out.WriteLine("Read models are up to date");
-            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
-
-            //Assert
-            var readModel = Assert.Single(readModels);
-            Console.Out.WriteLine("Read model found");
-
-            Assert.Equal("", readModel.ItProjectNamesAsCsv);
-            Assert.Empty(readModel.ItProjects);
-        }
-
-        [Fact]
-        public async Task ReadModels_ItProjects_Is_Updated_When_ItProject_Is_Changed()
-        {
-            //Arrange
-            var systemName = A<string>();
-            var projectName = A<string>();
-            var newProjectName = A<string>();
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
-
-            var project = await ItProjectHelper.CreateProject(projectName, organizationId);
-            await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
-
-
-            //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
-            Console.Out.WriteLine("Read models are up to date");
-
-            //Act 
-            await ItProjectHelper.SendChangeNameRequestAsync(project.Id, newProjectName, organizationId).DisposeAsync();
-
-            //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
-            Console.Out.WriteLine("Read models are up to date");
-            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
-
-            //Assert
-            var readModel = Assert.Single(readModels);
-            Console.Out.WriteLine("Read model found");
-
-            Assert.Equal(newProjectName, readModel.ItProjectNamesAsCsv);
-            var rmProject = Assert.Single(readModel.ItProjects);
-            Assert.Equal(project.Id, rmProject.ItProjectId);
-            Assert.Equal(newProjectName, rmProject.ItProjectName);
+            Assert.True(readModel.MainContractIsActive);
         }
 
         [Fact]
@@ -1067,7 +942,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Empty(readModel.RoleAssignments);
         }
 
-        private async Task<ItSystemUsageOverviewReadModel> Test_For_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
+        private async Task<ItSystemUsageOverviewReadModel> Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime expirationDate)
         {
             var systemName = A<string>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
@@ -1090,26 +965,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
         private static async Task WaitForReadModelQueueDepletion()
         {
-            await WaitForAsync(
-                () =>
-                {
-                    return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
-                }, TimeSpan.FromSeconds(120));
-        }
-
-        private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)
-        {
-            bool conditionMet;
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            do
-            {
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
-                conditionMet = await check();
-            } while (conditionMet == false && stopwatch.Elapsed <= howLong);
-
-            Assert.True(conditionMet, $"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
+            await ReadModelTestTools.WaitForReadModelQueueDepletion();
         }
     }
 }

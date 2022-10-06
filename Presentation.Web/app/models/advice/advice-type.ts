@@ -2,7 +2,6 @@
     export enum AdviceType {
         ItSystemUsage = "itSystemUsage",
         ItContract = "itContract",
-        ItProject = "itProject",
         DataProcessingRegistration = "dataProcessingRegistration"
     }
 
@@ -10,15 +9,13 @@
     const adviceTypeToRoleIdPropertyUsingOdataNaming: Record<AdviceType, string> = {
         dataProcessingRegistration: "DataProcessingRegistrationRoleId",
         itContract: "ItContractRoleId",
-        itSystemUsage: "ItSystemRoleId",
-        itProject: "ItProjectRoleId"
+        itSystemUsage: "ItSystemRoleId"
     };
 
     const adviceTypeToRolePropertyUsingOdataNaming: Record<AdviceType, string> = {
         dataProcessingRegistration: "DataProcessingRegistrationRole",
         itContract: "ItContractRole",
-        itSystemUsage: "ItSystemRole",
-        itProject: "ItProjectRole"
+        itSystemUsage: "ItSystemRole"
     };
 
     export function getAdviceTypeUserRelationRoleIdProperty(adviceType: AdviceType, regularApiProperty?: boolean) {

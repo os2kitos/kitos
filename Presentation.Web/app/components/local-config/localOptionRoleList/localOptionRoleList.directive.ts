@@ -37,13 +37,14 @@
         mainGrid: IKendoGrid<Models.IRoleEntity>;
         mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        static $inject: string[] = ["$", "$state", "$scope", "localOptionUrlResolver"];
+        static $inject: string[] = ["$", "$state", "$scope", "localOptionUrlResolver","inMemoryCacheService"];
 
         constructor(
             private readonly $: JQueryStatic,
             $state: ng.ui.IStateService,
             private $scope,
-            localOptionUrlResolver: Kitos.Services.LocalOptions.LocalOptionUrlResolver) {
+            localOptionUrlResolver: Kitos.Services.LocalOptions.LocalOptionUrlResolver,
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;
@@ -96,7 +97,7 @@
                         field: "IsLocallyAvailable", title: "Aktiv", width: 112,
                         persistId: "isLocallyAvailable", 
                         attributes: { "class": "text-center" },
-                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${localOptionUrlResolver.resolveAutosaveUrl(parseInt(this.optionType.toString()))}" data-field="OptionId"> # } #`,
+                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-ng-click="ctrl.onAvailableChanged()" data-global-option-id="{{ dataItem.Id }}" data-autosave="${localOptionUrlResolver.resolveAutosaveUrl(parseInt(this.optionType.toString()))}" data-field="OptionId"> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -152,6 +153,10 @@
                     noDataTemplate: ''
                 });
             }
+        }
+
+        onAvailableChanged() {
+            this.inMemoryCacheService.clear();
         }
 
         editOption = (e: JQueryEventObject) => {

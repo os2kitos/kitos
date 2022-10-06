@@ -8,12 +8,12 @@
         phoneNumber: string;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
-        isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         hasApi: boolean;
         isRightsHolder: boolean;
         hasStakeHolderAccess: boolean;
+        primaryStartUnitId: string;
     }
 
     class CreateOrganizationUserController {
@@ -23,10 +23,10 @@
         public isUserGlobalAdmin = false;
         public isUserLocalAdmin = false;
         public isUserOrgAdmin = false;
-        public isUserProjectAdmin = false;
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public hasApi = false;
+        public primaryStartUnitOptions: Array<Kitos.Models.ViewModel.User.IPreferredStartUnitChoice>;
 
         public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
 
@@ -34,7 +34,7 @@
             private $http: IHttpServiceWithCustomConfig,
             private $q: ng.IQService,
             private notify,
-            private autofocus,
+            autofocus,
             private user: Kitos.Services.IUser,
             private _: _.LoDashStatic) {
             if (!user.currentOrganizationId) {
@@ -45,10 +45,10 @@
             this.isUserGlobalAdmin = user.isGlobalAdmin;
             this.isUserLocalAdmin = user.isLocalAdmin;
             this.isUserOrgAdmin = user.isOrgAdmin;
-            this.isUserProjectAdmin = user.isProjectAdmin;
             this.isUserSystemAdmin = user.isSystemAdmin;
             this.isUserContractAdmin = user.isContractAdmin;
             this.hasApi = user.hasApi;
+            this.primaryStartUnitOptions = Kitos.Models.ViewModel.User.options;
 
             autofocus();
             this.busy = false;
@@ -64,8 +64,6 @@
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.LocalAdmin));
             if (this.vm.isOrgAdmin)
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.OrganizationModuleAdmin));
-            if (this.vm.isProjectAdmin)
-                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ProjectModuleAdmin));
             if (this.vm.isSystemAdmin)
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.SystemModuleAdmin));
             if (this.vm.isContractAdmin)
@@ -83,8 +81,8 @@
                     Email: this.vm.email,
                     PhoneNumber: this.vm.phoneNumber,
                     HasApiAccess: this.vm.hasApi,
-                    HasStakeHolderAccess: this.vm.hasStakeHolderAccess
-
+                    HasStakeHolderAccess: this.vm.hasStakeHolderAccess,
+                    DefaultUserStartPreference: this.vm.primaryStartUnitId
                 },
                 organizationId: this.user.currentOrganizationId,
                 sendMailOnCreation: sendMail
