@@ -23,6 +23,7 @@ namespace Core.DomainModel.Organization
             var uuid = Guid.NewGuid();
             Uuid = uuid;
             Origin = OrganizationUnitOrigin.Kitos;
+            Children = new List<OrganizationUnit>();
         }
 
         /// <summary>
@@ -121,6 +122,10 @@ namespace Core.DomainModel.Organization
 
         public Maybe<OperationError> ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin origin, ExternalOrganizationUnit importRoot)
         {
+            if (importRoot == null)
+            {
+                throw new ArgumentNullException(nameof(importRoot));
+            }
             if (Origin == origin)
             {
                 return new OperationError("Org unit already connected. Please do an update in stead", OperationFailure.BadState);

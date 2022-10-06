@@ -3,6 +3,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
@@ -19,6 +20,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IStsOrganizationService _stsOrganizationService;
         private readonly IDatabaseControl _databaseControl;
         private readonly ITransactionManager _transactionManager;
+        private readonly IDomainEvents _domainEvents;
         private readonly IAuthorizationContext _authorizationContext;
 
         public StsOrganizationSynchronizationService(
@@ -28,7 +30,8 @@ namespace Core.ApplicationServices.Organizations
             ILogger logger,
             IStsOrganizationService stsOrganizationService,
             IDatabaseControl databaseControl,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IDomainEvents domainEvents)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -36,6 +39,7 @@ namespace Core.ApplicationServices.Organizations
             _stsOrganizationService = stsOrganizationService;
             _databaseControl = databaseControl;
             _transactionManager = transactionManager;
+            _domainEvents = domainEvents;
             _authorizationContext = authorizationContext;
         }
 
@@ -75,6 +79,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude)
         {
+            using var transaction = _transactionManager.Begin();
             var organizationResult = GetOrganizationWithImportPermission(organizationId);
             if (organizationResult.Failed)
             {
@@ -85,12 +90,11 @@ namespace Core.ApplicationServices.Organizations
             var organization = organizationResult.Value;
 
             return LoadOrganizationUnits(organization)
-                .Match(root => CreateConnection(organization, root, levelsToInclude), error => error);
+                .Match(root => CreateConnection(organization, root, levelsToInclude, transaction), error => error);
         }
 
-        private Maybe<OperationError> CreateConnection(Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude)
+        private Maybe<OperationError> CreateConnection(Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude, IDatabaseTransaction transaction)
         {
-            using var transaction = _transactionManager.Begin();
 
             var error = organization.ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
             if (error.HasValue)
@@ -99,7 +103,7 @@ namespace Core.ApplicationServices.Organizations
                 transaction.Rollback();
                 return new OperationError("Failed to import sub tree", OperationFailure.UnknownError);
             }
-
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
             transaction.Commit();
             _databaseControl.SaveChanges();
 

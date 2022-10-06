@@ -189,6 +189,10 @@ namespace Core.DomainModel.Organization
 
         public Maybe<OperationError> ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
         {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
             //Pre-validate
             switch (origin)
             {
