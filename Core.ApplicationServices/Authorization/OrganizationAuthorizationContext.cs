@@ -249,7 +249,7 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = entity switch
                 {
-                    User user => (IsGlobalAdmin() || IsUserPartOfTheSameOrgAsLocalAdmin(user)) && EntityEqualsActiveUser(user) == false,
+                    User user => (IsGlobalAdmin() || IsUserOnlyPartOfTheSameOrgAsLocalAdmin(user)) && EntityEqualsActiveUser(user) == false,
                     ItInterface itInterface =>
                         //Even rightsholders are not allowed to delete interfaces
                         IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId),
@@ -266,7 +266,7 @@ namespace Core.ApplicationServices.Authorization
             return result;
         }
 
-        private bool IsUserPartOfTheSameOrgAsLocalAdmin(User user)
+        private bool IsUserOnlyPartOfTheSameOrgAsLocalAdmin(User user)
         {
             var userOrganizationIds = user.OrganizationRights.GroupBy(x => x.OrganizationId).Select(x => x.Key).ToList();
             if (userOrganizationIds.Count != 1)
