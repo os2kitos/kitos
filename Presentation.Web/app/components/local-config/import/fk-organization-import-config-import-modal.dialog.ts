@@ -22,7 +22,8 @@
                     "flow": [() => flow],
                     "orgUuid": [() => organizationUuid],
                     "synchronizationDepth": [() => synchronizationDepth]
-                }
+                },
+                backdrop: "static" //Make sure accidental click outside the modal does not close it during the import process
             });
         }
     }
@@ -43,20 +44,24 @@
         }
 
         cancel() {
-            this.$uibModalInstance.dismiss();
+            if (!this.busy) {
+                this.$uibModalInstance.dismiss();
+            }
         }
 
         performImport() {
-            this.busy = true;
-            this.stsOrganizationSyncService
-                .createConnection(this.organizationUuid, this.synchronizationDepth)
-                .then(() => {
-                    this.busy = false;
-                    this.$uibModalInstance.close();
-                }, error => {
-                    console.log("Error:", error);
-                    this.busy = false;
-                });
+            if (!this.busy) {
+                this.busy = true;
+                this.stsOrganizationSyncService
+                    .createConnection(this.organizationUuid, this.synchronizationDepth)
+                    .then(() => {
+                        this.busy = false;
+                        this.$uibModalInstance.close();
+                    }, error => {
+                        console.log("Error:", error);
+                        this.busy = false;
+                    });
+            }
         }
     }
 
