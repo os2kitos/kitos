@@ -2,7 +2,7 @@
 {
     using System;
     using System.Data.Entity.Migrations;
-
+    
     public partial class Add_Sts_Org_Import_Tables : DbMigration
     {
         public override void Up()
@@ -10,15 +10,15 @@
             CreateTable(
                 "dbo.StsOrganizationConnections",
                 c => new
-                {
-                    Id = c.Int(nullable: false),
-                    OrganizationId = c.Int(nullable: false),
-                    Connected = c.Boolean(nullable: false),
-                    SynchronizationDepth = c.Int(),
-                    ObjectOwnerId = c.Int(nullable: false),
-                    LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
-                    LastChangedByUserId = c.Int(nullable: false),
-                })
+                    {
+                        Id = c.Int(nullable: false),
+                        OrganizationId = c.Int(nullable: false),
+                        Connected = c.Boolean(nullable: false),
+                        SynchronizationDepth = c.Int(),
+                        ObjectOwnerId = c.Int(nullable: false),
+                        LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        LastChangedByUserId = c.Int(nullable: false),
+                    })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.User", t => t.LastChangedByUserId)
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
@@ -27,7 +27,7 @@
                 .Index(t => t.Connected)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-
+            
             AddColumn("dbo.OrganizationUnit", "Origin", c => c.Int(nullable: false));
             AddColumn("dbo.OrganizationUnit", "ExternalOriginUuid", c => c.Guid());
             CreateIndex("dbo.OrganizationUnit", "Origin", name: "IX_OrganizationUnit_Origin");
@@ -36,7 +36,7 @@
             //Initially all units' origin is "Kitos"
             Sql("UPDATE dbo.OrganizationUnit SET Origin = 0;");
         }
-
+        
         public override void Down()
         {
             DropForeignKey("dbo.StsOrganizationConnections", "Id", "dbo.Organization");
