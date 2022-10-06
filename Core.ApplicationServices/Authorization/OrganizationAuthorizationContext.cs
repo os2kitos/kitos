@@ -3,7 +3,6 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
-using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -250,7 +249,7 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = entity switch
                 {
-                    User user => (IsGlobalAdmin() || (IsUserPartOfTheSameOrgAsLocalAdmin(user) && HasUserOneOrganization(user))) && EntityEqualsActiveUser(user) == false,
+                    User user => (IsGlobalAdmin() || IsUserPartOfTheSameOrgAsLocalAdmin(user)) && EntityEqualsActiveUser(user) == false,
                     ItInterface itInterface =>
                         //Even rightsholders are not allowed to delete interfaces
                         IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId),
@@ -265,6 +264,16 @@ namespace Core.ApplicationServices.Authorization
             }
 
             return result;
+        }
+
+        private bool IsUserPartOfTheSameOrgAsLocalAdmin(User user)
+        {
+            var userOrganizationIds = user.OrganizationRights.GroupBy(x => x.OrganizationId).Select(x => x.Key).ToList();
+            if (userOrganizationIds.Count != 1)
+                return false;
+
+            var userOrganizationId = userOrganizationIds.FirstOrDefault();
+            return _activeUserContext.HasRoleInSameOrganizationAs(user) && _activeUserContext.HasRole(userOrganizationId, OrganizationRole.LocalAdmin);
         }
 
         private bool AllowAdministerOrganizationRight(OrganizationRight right)
@@ -367,16 +376,6 @@ namespace Core.ApplicationServices.Authorization
         private bool IsContractModuleAdmin(int organizationId)
         {
             return _activeUserContext.HasRole(organizationId, OrganizationRole.ContractModuleAdmin);
-        }
-        
-        private bool IsUserPartOfTheSameOrgAsLocalAdmin(IEntity user)
-        {
-            return _activeUserContext.HasSelectedRoleInSameOrganizationAs(user, OrganizationRole.LocalAdmin);
-        }
-
-        private static bool HasUserOneOrganization(User user)
-        {
-            return user.OrganizationRights.GroupBy(x => x.OrganizationId).Count() != 1;
         }
 
         #region PERMISSIONS

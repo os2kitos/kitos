@@ -20,5 +20,6 @@ namespace Core.ApplicationServices
         Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
         Maybe<OperationError> DeleteUserFromKitos(Guid userUuid);
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
+        Result<bool, OperationError> CanBeDeletedByLocalAdmin(int userId, int organizationId);
     }
 }

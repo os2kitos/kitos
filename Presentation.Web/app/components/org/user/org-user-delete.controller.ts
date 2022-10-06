@@ -59,7 +59,8 @@
             "text",
             "allRoles",
             "userRoleAdministrationService",
-            "userService"
+            "userService",
+            "canBeDeletedByLocalAdmin",
         ];
 
         constructor(
@@ -71,7 +72,8 @@
             text,
             allRoles: Models.Users.UserRoleAssigmentDTO,
             private readonly userRoleAdministrationService: Services.IUserRoleAdministrationService,
-            private readonly userService: Services.IUserService) {
+            private readonly userService: Services.IUserService,
+            private readonly canBeDeletedByLocalAdmin: boolean) {
 
             this.firstName = userToModify.Name;
             this.lastName = userToModify.LastName;
@@ -244,19 +246,22 @@
             if (!confirm('Er du sikker på, at du vil slette brugeren?')) {
                 return;
             }
-            this.userService.deleteUser(this.userToModify.Id)
+
+            if (this.canBeDeletedByLocalAdmin) {
+                this.userService.deleteUser(this.userToModify.Id)
+                    .then(success => {
+                        if (success) {
+                            this.$uibModalInstance.close();
+                        }
+                    });
+                 return;
+            }
+            this.userRoleAdministrationService.removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
                 .then(success => {
                     if (success) {
                         this.$uibModalInstance.close();
                     }
                 });
-
-            /* this.userRoleAdministrationService.removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
-                 .then(success => {
-                     if (success) {
-                         this.$uibModalInstance.close();
-                     }
-                 });*/
         }
 
         deleteSelectedRoles() {
@@ -454,7 +459,10 @@
                                     (userRoleAdministrationService: Services.IUserRoleAdministrationService, userService: Services.IUserService) =>
                                         userService.getUser().then(loggedInUser =>
                                             userRoleAdministrationService.getAssignedRoles(loggedInUser.currentOrganizationId, $stateParams["id"]))
-                                ]
+                                ],
+                                canBeDeletedByLocalAdmin: ["userService",
+                                    (userService: Services.IUserService) => 
+                                        userService.getUser().then(loggedInUser => userService.getCanBeDeletedByLocalAdmin($stateParams["id"], loggedInUser.currentOrganizationId))]
                             }
                         })
                             .result.then(() => {

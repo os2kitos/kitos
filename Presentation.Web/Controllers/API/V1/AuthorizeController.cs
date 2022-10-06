@@ -279,6 +279,15 @@ namespace Presentation.Web.Controllers.API.V1
             return response;
         }
 
+        [HttpGet]
+        [Route("api/authorize/canbedeleted/{userId}/{organizationId}")]
+        public HttpResponseMessage GetCanUserBeDeletedByLocalAdmin(int userId, int organizationId)
+        {
+            return _userService
+                .CanBeDeletedByLocalAdmin(userId, organizationId)
+                .Match(Ok, FromOperationError);
+        }
+
         private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto, AuthenticationScheme authenticationScheme)
         {
             if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))

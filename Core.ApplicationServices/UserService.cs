@@ -306,6 +306,18 @@ namespace Core.ApplicationServices
                 .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
 
+        public Result<bool, OperationError> CanBeDeletedByLocalAdmin(int userId, int organizationId)
+        {
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                return new OperationError(OperationFailure.Forbidden);
+            
+            var user = _userRepository.AsQueryable().ById(userId);
+            if (user == null)
+                return new OperationError(OperationFailure.NotFound);
+
+            return !user.IsGlobalAdmin && user.OrganizationRights.Any(x => x.OrganizationId != organizationId);
+        }
+
         public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)
         {
             using var transaction = _transactionManager.Begin();
@@ -315,8 +327,7 @@ namespace Core.ApplicationServices
                 return new OperationError(OperationFailure.NotFound);
             if(_organizationalUserContext.UserId == user.Id)
                 return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
-
-
+            
             if (!_authorizationContext.AllowDelete(user))
                 return new OperationError(OperationFailure.Forbidden);
             

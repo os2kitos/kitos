@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel;
 using Core.DomainServices.Authorization;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.Authorization
 {

@@ -44,6 +44,7 @@
         deleteUser(id: number): ng.IPromise<any>;
         searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
         getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
+        getCanBeDeletedByLocalAdmin(userId: number, organizationId: number): ng.IPromise<boolean>;
     }
 
     export class UserService implements IUserService {
@@ -526,6 +527,12 @@
         getUserOrganizations(userId: number) {
             return this.$http
                 .get<API.Models.IApiWrapper<Models.IOrganization[]>>(`api/authorize/GetOrganizations/${userId}`)
+                .then(result => result.data.response);
+        }
+
+        getCanBeDeletedByLocalAdmin(userId: number, organizationId: number): ng.IPromise<boolean> {
+            return this.$http
+                .get<API.Models.IApiWrapper<boolean>>(`api/authorize/canbedeleted/${userId}/${organizationId}`)
                 .then(result => result.data.response);
         }
     }
