@@ -25,7 +25,6 @@
 
         activeText: string | null = null;
         $onInit() {
-            console.log("showtext:", this.showText, "customText", this.customText);
             if (this.showText) {
                 this.activeText = this.customText ?? "Indlæser indhold...";
             }
