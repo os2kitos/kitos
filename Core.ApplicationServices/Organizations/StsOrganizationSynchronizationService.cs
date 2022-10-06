@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
@@ -106,29 +108,16 @@ namespace Core.ApplicationServices.Organizations
             currentRoot.ExternalOriginUuid = importRoot.Uuid;
             currentRoot.Name = importRoot.Name;
 
-            //TODO: Import the sub tree
-
             organization.StsOrganizationConnection ??= new StsOrganizationConnection();
             organization.StsOrganizationConnection.Connected = true;
             organization.StsOrganizationConnection.SynchronizationDepth = levelsToInclude.Match(levels => (int?)levels, () => default);
 
-            //TODO: Remove - just testing here
-            //TODO: This actually works..
-            //TODO: Introduce import strategy and change sts org unit to externalOrgUnit
-            currentRoot.Children.Add(new OrganizationUnit
+            //TODO: Belongs in domain
+            //TODO: Add an import strategy so that we can use either createNew/rejectexisting or mergeAndResolveConflicts
+            foreach (var organizationUnit in importRoot.Children.Select(child => child.ToOrganizationUnit(organization)).ToList())
             {
-                Name = "test",
-                Origin = OrganizationUnitOrigin.STS_Organisation,
-                ExternalOriginUuid = Guid.NewGuid(),
-                Organization = organization,
-                Children = new List<OrganizationUnit> { new()
-                {
-                    Name = "tes2",
-                    Origin = OrganizationUnitOrigin.STS_Organisation,
-                    ExternalOriginUuid = Guid.NewGuid(),
-                    Organization = organization
-                } }
-            });
+                currentRoot.Children.Add(organizationUnit);
+            }
 
             //TODO: We have to first insert the tree, then patch the ids.. we can flatten it and map the parent ids
 
