@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Organizations;
-using Core.DomainServices.Model.StsOrganization;
+using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
 
@@ -70,13 +70,12 @@ namespace Presentation.Web.Controllers.API.V1
 
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3313 adds the PUT (POST creates the connection)
 
-        private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(StsOrganizationUnit organizationUnit)
+        private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
         {
-            return new StsOrganizationOrgUnitDTO()
+            return new StsOrganizationOrgUnitDTO
             {
                 Uuid = organizationUnit.Uuid,
                 Name = organizationUnit.Name,
-                UserFacingKey = organizationUnit.UserFacingKey,
                 Children = organizationUnit.Children.Select(MapOrganizationUnitDTO).ToList()
             };
         }

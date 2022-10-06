@@ -186,5 +186,39 @@ namespace Core.DomainModel.Organization
 
             return moduleCustomization;
         }
+
+        public Maybe<OperationError> ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        {
+            //Pre-validate
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+                    if (StsOrganizationConnection?.Connected == true)
+                    {
+                        return new OperationError($"Already connected to {origin:G}", OperationFailure.Conflict);
+                    }
+                    break;
+                case OrganizationUnitOrigin.Kitos: //Intentional fallthrough.. Invalid argument type for this method. Kitos is internal
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
+            }
+
+            return GetRoot()
+                .FromNullable()
+                .Match
+                (
+                    currentOrgRoot => currentOrgRoot.ImportNewExternalOrganizationOrgTree(origin, root.Copy(levelsIncluded.Match(val => val, () => (int?)null))),
+                    () => new OperationError("Unable to load current root", OperationFailure.UnknownError)
+                ).Match
+                (error => error,
+                    () =>
+                    {
+                        StsOrganizationConnection ??= new StsOrganizationConnection();
+                        StsOrganizationConnection.Connected = true;
+                        StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
+                        return Maybe<OperationError>.None;
+                    }
+                );
+        }
     }
 }

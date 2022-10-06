@@ -37,7 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         protected override void OnFixtureCreated(Fixture fixture)
         {
             base.OnFixtureCreated(fixture);
-            fixture.Inject<IEnumerable<StsOrganizationUnit>>(Array.Empty<StsOrganizationUnit>()); //prevent endless loop when creating StsOrganizationUnit
+            fixture.Inject<IEnumerable<ExternalOrganizationUnit>>(Array.Empty<ExternalOrganizationUnit>()); //prevent endless loop when creating StsOrganizationUnit
         }
 
         [Fact]
@@ -46,8 +46,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Arrange
             var organizationId = A<Guid>();
             var organization = new Organization();
-            var children = Many<StsOrganizationUnit>();
-            var root = new StsOrganizationUnit(A<Guid>(), A<string>(), A<string>(), children);
+            var children = Many<ExternalOrganizationUnit>();
+            var root = new ExternalOrganizationUnit(A<Guid>(), A<string>(), A<Dictionary<string,string>>(), children);
             SetupGetOrganizationReturns(organizationId, organization);
             SetupResolveOrganizationTreeReturns(organization, root);
             SetupHasPermissionReturns(organization, true);
@@ -68,8 +68,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Arrange
             var organizationId = A<Guid>();
             var organization = new Organization();
-            var children = Many<StsOrganizationUnit>();
-            var root = new StsOrganizationUnit(A<Guid>(), A<string>(), A<string>(), children);
+            var children = Many<ExternalOrganizationUnit>();
+            var root = new ExternalOrganizationUnit(A<Guid>(), A<string>(), A<Dictionary<string,string>>(), children);
             SetupGetOrganizationReturns(organizationId, organization);
             SetupResolveOrganizationTreeReturns(organization, root);
             SetupHasPermissionReturns(organization, true);
@@ -90,8 +90,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Arrange
             var organizationId = A<Guid>();
             var organization = new Organization();
-            var children = Many<StsOrganizationUnit>();
-            var root = new StsOrganizationUnit(A<Guid>(), A<string>(), A<string>(), children);
+            var children = Many<ExternalOrganizationUnit>();
+            var root = new ExternalOrganizationUnit(A<Guid>(), A<string>(), A<Dictionary<string,string>>(), children);
             SetupGetOrganizationReturns(organizationId, organization);
             SetupResolveOrganizationTreeReturns(organization, root);
             SetupHasPermissionReturns(organization, true);
@@ -126,8 +126,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Arrange
             var organizationId = A<Guid>();
             var organization = new Organization();
-            var children = Many<StsOrganizationUnit>();
-            var root = new StsOrganizationUnit(A<Guid>(), A<string>(), A<string>(), children);
+            var children = Many<ExternalOrganizationUnit>();
+            var root = new ExternalOrganizationUnit(A<Guid>(), A<string>(), A<Dictionary<string,string>>(), children);
             SetupGetOrganizationReturns(organizationId, organization);
             SetupResolveOrganizationTreeReturns(organization, root);
             SetupHasPermissionReturns(organization, false);
@@ -159,7 +159,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(operationError.FailureType, result.Error.FailureType);
         }
 
-        private void SetupResolveOrganizationTreeReturns(Organization organization, Result<StsOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> root)
+        private void SetupResolveOrganizationTreeReturns(Organization organization, Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> root)
         {
             _stsOrganizationUnitService.Setup(x => x.ResolveOrganizationTree(organization)).Returns(root);
         }
@@ -176,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 .Returns(value);
         }
 
-        private static int CountMaxLevels(StsOrganizationUnit unit)
+        private static int CountMaxLevels(ExternalOrganizationUnit unit)
         {
             const int currentLevelContribution = 1;
             return unit
@@ -186,11 +186,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 .FirstOrDefault() + currentLevelContribution;
         }
 
-        private bool Compare(StsOrganizationUnit original, StsOrganizationUnit filtered, int levelsLeftToCompare)
+        private bool Compare(ExternalOrganizationUnit original, ExternalOrganizationUnit filtered, int levelsLeftToCompare)
         {
             Assert.Equal(original.Uuid, filtered.Uuid);
             Assert.Equal(original.Name, filtered.Name);
-            Assert.Equal(original.UserFacingKey, filtered.UserFacingKey);
+            Assert.Equal(original.MetaData, filtered.MetaData);
             if (levelsLeftToCompare > 0)
             {
                 levelsLeftToCompare--;

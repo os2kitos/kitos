@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
@@ -68,7 +65,7 @@ namespace Core.ApplicationServices.Organizations
             return _stsOrganizationService.ValidateConnection(organization);
         }
 
-        public Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<int> levelsToInclude)
+        public Result<ExternalOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<int> levelsToInclude)
         {
             return
                 GetOrganizationWithImportPermission(organizationId)
@@ -85,41 +82,23 @@ namespace Core.ApplicationServices.Organizations
                 return organizationResult.Error;
             }
 
-            //TODO: Move the business logic into the domain part
             var organization = organizationResult.Value;
-            if (organization.StsOrganizationConnection?.Connected == true)
-            {
-                return new OperationError("Already connected", OperationFailure.Conflict);
-            }
 
             return LoadOrganizationUnits(organization)
-                .Bind(root => FilterByRequestedLevels(root, levelsToInclude))
                 .Match(root => CreateConnection(organization, root, levelsToInclude), error => error);
         }
 
-        private Maybe<OperationError> CreateConnection(Organization organization, StsOrganizationUnit importRoot, Maybe<int> levelsToInclude)
+        private Maybe<OperationError> CreateConnection(Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude)
         {
             using var transaction = _transactionManager.Begin();
-            //TODO: Move into the domain
-            var currentRoot = organization.GetRoot();
 
-            //Switch the origin of the root
-            currentRoot.Origin = OrganizationUnitOrigin.STS_Organisation;
-            currentRoot.ExternalOriginUuid = importRoot.Uuid;
-            currentRoot.Name = importRoot.Name;
-
-            organization.StsOrganizationConnection ??= new StsOrganizationConnection();
-            organization.StsOrganizationConnection.Connected = true;
-            organization.StsOrganizationConnection.SynchronizationDepth = levelsToInclude.Match(levels => (int?)levels, () => default);
-
-            //TODO: Belongs in domain
-            //TODO: Add an import strategy so that we can use either createNew/rejectexisting or mergeAndResolveConflicts
-            foreach (var organizationUnit in importRoot.Children.Select(child => child.ToOrganizationUnit(organization)).ToList())
+            var error = organization.ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
+            if (error.HasValue)
             {
-                currentRoot.Children.Add(organizationUnit);
+                _logger.Error("Failed to import org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Value.FailureType, error.Value.Message.GetValueOrFallback(""));
+                transaction.Rollback();
+                return new OperationError("Failed to import sub tree", OperationFailure.UnknownError);
             }
-
-            //TODO: We have to first insert the tree, then patch the ids.. we can flatten it and map the parent ids
 
             transaction.Commit();
             _databaseControl.SaveChanges();
@@ -127,9 +106,9 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Result<StsOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
+        private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {
-            return _stsOrganizationUnitService.ResolveOrganizationTree(organization).Match<Result<StsOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
+            return _stsOrganizationUnitService.ResolveOrganizationTree(organization).Match<Result<ExternalOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
         }
 
         private Result<Organization, OperationError> GetOrganizationWithImportPermission(Guid organizationId)
@@ -148,7 +127,7 @@ namespace Core.ApplicationServices.Organizations
             return new OperationError($"The user does not have permission to use the STS Organization Sync functionality for the organization with uuid:{organization.Uuid}", OperationFailure.Forbidden);
         }
 
-        private static Result<StsOrganizationUnit, OperationError> FilterByRequestedLevels(StsOrganizationUnit root, Maybe<int> levelsToInclude)
+        private static Result<ExternalOrganizationUnit, OperationError> FilterByRequestedLevels(ExternalOrganizationUnit root, Maybe<int> levelsToInclude)
         {
             if (levelsToInclude.IsNone)
             {

@@ -93,7 +93,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Check property validity
             Assert.False(string.IsNullOrEmpty(unit.Name));
-            Assert.False(string.IsNullOrEmpty(unit.UserFacingKey));
             Assert.NotEqual(Guid.Empty, unit.Uuid);
             Assert.NotNull(unit.Children);
 

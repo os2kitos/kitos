@@ -66,7 +66,6 @@
     <Compile Include="Contract\ItContractOverviewReadModelUpdate.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
-    <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationBasisForTransferAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationDataProcessorAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
@@ -93,7 +92,6 @@
     <Compile Include="Mapping\ReadModelMappingHelpers.cs" />
     <Compile Include="Model\StsOrganization\CheckConnectionError.cs" />
     <Compile Include="Model\StsOrganization\ResolveOrganizationTreeError.cs" />
-    <Compile Include="Model\StsOrganization\StsOrganizationUnit.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
     <Compile Include="Notifications\UserNotificationService.cs" />
     <Compile Include="Organizations\IStsOrganizationCompanyLookupService.cs" />

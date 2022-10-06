@@ -36,5 +36,5 @@
 <div class="modal-footer">
     <span class="pull-left" ng-if="vm.busy"><progress-spinner data-show-text="true" data-custom-text="Synkroniserer..." /></span>
     <button type="submit" ng-disabled="vm.busy || (!!(importSettings.synchronizationDepth.$error.number || importSettings.synchronizationDepth.$error.pattern || importSettings.synchronizationDepth.$error.min))" id="btnAssign" class="btn btn-primary" data-ng-click="vm.performImport()">Gennemfør synkronisering</button>
-    <button type="submit" ng-disabled="vm.busy" class="btn btn-default" data-ng-click="vm.cancel()" data-disabled-on-busy>Annuller</button>
+    <button type="submit" ng-disabled="vm.busy" class="btn btn-danger" data-ng-click="vm.cancel()" data-disabled-on-busy>Annuller</button>
 </div>

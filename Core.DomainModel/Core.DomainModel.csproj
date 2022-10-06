@@ -53,6 +53,7 @@
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
+    <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Organization\OrganizationUnitOrigin.cs" />
     <Compile Include="Organization\StsOrganizationConnection.cs" />
+    <Compile Include="Organization\ExternalOrganizationUnit.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
