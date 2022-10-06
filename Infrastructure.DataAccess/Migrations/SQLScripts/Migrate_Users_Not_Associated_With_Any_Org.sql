@@ -36,22 +36,22 @@ BEGIN
 		IsGlobalAdmin = 0,
 		HasApiAccess = 0,
 		HasStakeHolderAccess = 0
-	WHERE Id IN (SELECT * FROM #get_userIds_to_delete);
+	WHERE Id IN (SELECT Id FROM #get_userIds_to_delete);
 
 	DELETE FROM DataProcessingRegistrationRights
-	WHERE UserId IN (SELECT * FROM #get_userIds_to_delete);
+	WHERE UserId IN (SELECT Id FROM #get_userIds_to_delete);
 
 	DELETE FROM ItContractRights
-	WHERE UserId IN (SELECT * FROM #get_userIds_to_delete);
+	WHERE UserId IN (SELECT Id FROM #get_userIds_to_delete);
 
 	DELETE FROM ItSystemRights
-	WHERE UserId IN (SELECT * FROM #get_userIds_to_delete);
+	WHERE UserId IN (SELECT Id FROM #get_userIds_to_delete);
 
 	DELETE FROM OrganizationUnitRights
-	WHERE UserId IN (SELECT * FROM #get_userIds_to_delete);
+	WHERE UserId IN (SELECT Id FROM #get_userIds_to_delete);
 
 	DELETE FROM SsoUserIdentities
-	WHERE User_Id IN (SELECT * FROM #get_userIds_to_delete);
+	WHERE User_Id IN (SELECT Id FROM #get_userIds_to_delete);
 
 	If(OBJECT_ID('tempdb..#get_userIds_to_delete') IS NOT NULL)
 	Begin
