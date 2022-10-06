@@ -13,10 +13,7 @@ BEGIN
 		LockedOutDate = GETDATE(),
 		Email = CONVERT(NVARCHAR(36), NEWID()) + '_deleted_user@kitos.dk',
 		PhoneNumber = null,
-		LastName = (CASE
-					WHEN LastName IS NULL THEN ''
-					ELSE LastName
-				   END) + ' (SLETTET)',
+		LastName = '',
 		DeletedDate = GETDATE(),
 		Deleted = 1,
 		IsGlobalAdmin = 0,
