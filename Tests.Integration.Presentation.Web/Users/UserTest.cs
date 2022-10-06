@@ -161,7 +161,7 @@ namespace Tests.Integration.Presentation.Web.Users
                 Assert.False(user.HasStakeHolderAccess);
 
                 Assert.Contains("_deleted_user@kitos.dk", user.Email);
-                Assert.Contains("(SLETTET)", user.LastName);
+                Assert.Empty(user.LastName);
                 Assert.Equal("Slettet bruger", user.Name);
                 Assert.NotNull(user.LockedOutDate);
                 Assert.NotNull(user.DeletedDate);
