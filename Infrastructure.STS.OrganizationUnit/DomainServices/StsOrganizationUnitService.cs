@@ -37,7 +37,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
             if (uuid.Failed)
             {
                 var error = uuid.Error;
-                _logger.Error("Loading sts organization uuid from org with id: {id} failed with {detailedError} {errorCode} {errorMessage}", organization.Id, error.Detail, error.FailureType, error.Message);
+                _logger.Error("Loading sts organization uuid from org with id: {id} failed with {detailedError} {errorCode} {errorMessage}", organization.Id, error.Detail, error.FailureType, error.Message.GetValueOrFallback(""));
                 return new DetailedOperationError<ResolveOrganizationTreeError>(error.FailureType, ResolveOrganizationTreeError.FailedResolvingUuid, $"{error.Detail}:{error.Message}");
             }
 

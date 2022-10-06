@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.ApplicationServices.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Organizations;
@@ -26,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
-        public async Task Can_GET_Organization_Snapshot_With_Filtered_Depth(uint levels)
+        public async Task Can_GET_Organization_Snapshot_With_Filtered_Depth(int levels)
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
@@ -66,6 +66,73 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(expectedError, root.AccessStatus.Error);
         }
 
+        [Fact]
+        public async Task Can_POST_Create_Connection()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int levels = 2;
+            DatabaseAccess.MutateEntitySet<StsOrganizationIdentity>(repo =>
+            {
+                var existingMapping = repo.AsQueryable().FirstOrDefault(x => x.Organization.Cvr == AuthorizedCvr);
+                if (existingMapping != null)
+                {
+                    repo.Delete(existingMapping);
+                }
+                repo.Save();
+            });
+            var postUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
+            var getUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/snapshot?levels={levels}");
+            using var getResponse = await HttpApi.GetWithCookieAsync(getUrl, cookie);
+            var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+
+            //Act
+            using var response = await HttpApi.PostWithCookieAsync(postUrl, cookie, new ConnectToStsOrganizationRequestDTO
+            {
+                SynchronizationDepth = levels
+            });
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            DatabaseAccess.MapFromEntitySet<Organization, bool>(orgs =>
+            {
+                var organization = orgs.AsQueryable().ByUuid(targetOrgUuid);
+                var dbRoot = organization.GetRoot();
+                Assert.NotNull(organization.StsOrganizationConnection);
+                Assert.True(organization.StsOrganizationConnection.Connected);
+                Assert.Equal(levels, organization.StsOrganizationConnection.SynchronizationDepth);
+                AssertImportedTree(expectedImport, dbRoot);
+                return true;
+            });
+
+        }
+
+        private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, int? remainingLevelsToImport = null)
+        {
+            Assert.Equal(treeToImport.Name, importedTree.Name);
+            Assert.Equal(treeToImport.Uuid, importedTree.ExternalOriginUuid);
+            Assert.Equal(OrganizationUnitOrigin.STS_Organisation, importedTree.Origin);
+
+            remainingLevelsToImport -= 1;
+
+            if (remainingLevelsToImport is < 1)
+            {
+                Assert.Empty(importedTree.Children); //if no more remaining levels were expected the imported subtree must be empty
+            }
+            else
+            {
+                var childrenToImport = treeToImport.Children.ToList();
+                var importedUnits = importedTree.Children.ToList();
+                Assert.Equal(childrenToImport.Count, importedUnits.Count);
+                for (var i = 0; i < childrenToImport.Count; i++)
+                {
+                    AssertImportedTree(childrenToImport[i], importedUnits[i], remainingLevelsToImport);
+                }
+            }
+        }
+
+
         private async Task<Guid> GetOrCreateOrgWithCvr(GetTokenResponseDTO token, string cvr)
         {
             Guid targetOrgUuid;
@@ -78,11 +145,16 @@ namespace Tests.Integration.Presentation.Web.Organizations
             }
             else
             {
-                var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, $"StsSync_{A<Guid>():N}", cvr, OrganizationTypeKeys.Kommune, AccessModifier.Public);
-                targetOrgUuid = org.Uuid;
+                targetOrgUuid = await CreateOrgWithCvr(cvr);
             }
 
             return targetOrgUuid;
+        }
+
+        private async Task<Guid> CreateOrgWithCvr(string cvr)
+        {
+            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, $"StsSync_{A<Guid>():N}", cvr, OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            return org.Uuid;
         }
 
         private static void AssertOrgTree(StsOrganizationOrgUnitDTO unit, HashSet<Guid> seenUuids)
@@ -103,7 +175,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             }
         }
 
-        private static uint CountMaxLevels(StsOrganizationOrgUnitDTO unit)
+        private static int CountMaxLevels(StsOrganizationOrgUnitDTO unit)
         {
             const int currentLevelContribution = 1;
             return unit
