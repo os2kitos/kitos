@@ -165,9 +165,9 @@ namespace Core.DomainModel.Organization
         public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, IEnumerable<CustomizedUINode> nodes)
         {
             if (string.IsNullOrEmpty(module))
-                throw new ArgumentNullException("Module parameter cannot be null");
+                throw new ArgumentNullException(nameof(module));
             if (nodes == null)
-                throw new ArgumentNullException("Nodes parameter cannot be null");
+                throw new ArgumentNullException(nameof(nodes));
 
             var uiNodes = nodes.ToList();
             var customizedUiNodes = uiNodes.ToList();
