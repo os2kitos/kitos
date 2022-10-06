@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.DomainModel.Organization
 {
@@ -22,17 +23,20 @@ namespace Core.DomainModel.Organization
             Children = children.ToList().AsReadOnly();
         }
 
-        public ExternalOrganizationUnit Copy(int? childLevelsToInclude = null)
+        public ExternalOrganizationUnit Copy(Maybe<int> childLevelsToInclude)
         {
             var children = new List<ExternalOrganizationUnit>();
-            var includeChildren = childLevelsToInclude is > 0 or null;
+            var includeChildren = childLevelsToInclude
+                .Select(levels=>levels > 0)
+                .GetValueOrFallback(true); //IF no levels defined, include all
+
             if (includeChildren)
             {
-                if (childLevelsToInclude.HasValue)
+                children = Children.Select(child =>
                 {
-                    childLevelsToInclude--;
-                }
-                children = Children.Select(child => child.Copy(childLevelsToInclude)).ToList();
+                    var levelsToInclude = childLevelsToInclude.Select(levels => levels - 1);
+                    return child.Copy(levelsToInclude);
+                }).ToList();
             }
 
             return new ExternalOrganizationUnit(Uuid, Name, MetaData, children);

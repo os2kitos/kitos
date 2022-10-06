@@ -207,7 +207,11 @@ namespace Core.DomainModel.Organization
                 .FromNullable()
                 .Match
                 (
-                    currentOrgRoot => currentOrgRoot.ImportNewExternalOrganizationOrgTree(origin, root.Copy(levelsIncluded.Match(val => val, () => (int?)null))),
+                    currentOrgRoot =>
+                    {
+                        var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //Subtract one since first level is the root
+                        return currentOrgRoot.ImportNewExternalOrganizationOrgTree(origin, root.Copy(childLevelsToInclude));
+                    },
                     () => new OperationError("Unable to load current root", OperationFailure.UnknownError)
                 ).Match
                 (error => error,

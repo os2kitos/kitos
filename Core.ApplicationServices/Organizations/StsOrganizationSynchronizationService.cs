@@ -134,14 +134,12 @@ namespace Core.ApplicationServices.Organizations
                 return root;
             }
 
-            var levels = levelsToInclude.Value;
-            if (levels < 1)
+            if (levelsToInclude.Value < 1)
             {
                 return new OperationError($"{nameof(levelsToInclude)} must be greater than or equal to 1", OperationFailure.BadInput);
             }
 
-            levels--;
-            return root.Copy(levels);
+            return root.Copy(levelsToInclude.Select(levels => levels - 1));
         }
     }
 }
