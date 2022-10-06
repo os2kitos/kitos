@@ -40,4 +40,5 @@ describe("Local admin IT Systems tests", () => {
             .then(() => pageObject.waitForKendoGrid())
             .then(() => expect(headerButtons.localAdminDropdownReference.isPresent()).toBe(false));
     });
+
 });

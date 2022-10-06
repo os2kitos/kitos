@@ -249,19 +249,11 @@
 
             if (this.canBeDeletedByLocalAdmin) {
                 this.userService.deleteUser(this.userToModify.Id)
-                    .then(success => {
-                        if (success) {
-                            this.$uibModalInstance.close();
-                        }
-                    });
+                    .then(success => this.closeModalOnSuccess(success));
                  return;
             }
             this.userRoleAdministrationService.removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
-                .then(success => {
-                    if (success) {
-                        this.$uibModalInstance.close();
-                    }
-                });
+                .then(success => this.closeModalOnSuccess(success));
         }
 
         deleteSelectedRoles() {
@@ -408,6 +400,12 @@
             const selectedAdminRoles = this.vmAdminRoot.rights.filter(r => r.selected);
 
             return selectedAdminRoles;
+        }
+
+        private closeModalOnSuccess(result) {
+            if (result) {
+                this.$uibModalInstance.close();
+            }
         }
     }
 
