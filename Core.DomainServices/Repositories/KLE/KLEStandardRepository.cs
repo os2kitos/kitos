@@ -23,7 +23,6 @@ namespace Core.DomainServices.Repositories.KLE
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<TaskRef> _existingTaskRefRepository;
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
-        private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
         private readonly IKLEParentHelper _kleParentHelper;
         private readonly IKLEConverterHelper _kleConverterHelper;
         private readonly ILogger _logger;
@@ -34,10 +33,9 @@ namespace Core.DomainServices.Repositories.KLE
             ITransactionManager transactionManager,
             IGenericRepository<TaskRef> existingTaskRefRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
-            IGenericRepository<TaskUsage> taskUsageRepository,
             IOperationClock clock,
             ILogger logger,
-            IDomainEvents domainEvents) : this(new KLEParentHelper(), new KLEConverterHelper(clock), taskUsageRepository)
+            IDomainEvents domainEvents) : this(new KLEParentHelper(), new KLEConverterHelper(clock))
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
@@ -47,11 +45,10 @@ namespace Core.DomainServices.Repositories.KLE
             _domainEvents = domainEvents;
         }
 
-        private KLEStandardRepository(IKLEParentHelper kleParentHelper, IKLEConverterHelper kleConverterHelper, IGenericRepository<TaskUsage> taskUsageRepository)
+        private KLEStandardRepository(IKLEParentHelper kleParentHelper, IKLEConverterHelper kleConverterHelper)
         {
             _kleParentHelper = kleParentHelper;
             _kleConverterHelper = kleConverterHelper;
-            _taskUsageRepository = taskUsageRepository;
         }
 
         public KLEStatus GetKLEStatus(Maybe<DateTime> lastUpdated)
@@ -186,7 +183,6 @@ namespace Core.DomainServices.Repositories.KLE
                 RemoveSystemUsageOptOutTaskRefs(kleChange);
             }
             RemoveSystemUsageTaskRefs(removals);
-            RemoveTaskUsageTaskRef(removals);
             RemoveTaskRef(removals);
         }
 
@@ -233,17 +229,6 @@ namespace Core.DomainServices.Repositories.KLE
                 }
                 _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
             }
-        }
-
-        private void RemoveTaskUsageTaskRef(IEnumerable<KLEChange> kleChanges)
-        {
-            var keys = kleChanges.Select(x => x.TaskKey).ToList();
-            var taskUsages = _taskUsageRepository
-                .GetWithReferencePreload(t => t.TaskRef)
-                .Where(t => keys.Contains(t.TaskRef.TaskKey))
-                .ToList();
-
-            _taskUsageRepository.RemoveRange(taskUsages);
         }
 
         private void RemoveTaskRef(IEnumerable<KLEChange> kleChanges)

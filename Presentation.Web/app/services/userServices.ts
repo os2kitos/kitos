@@ -26,6 +26,7 @@
 
         currentOrganization: string;
         currentOrganizationId: number;
+        currentOrganizationUuid: string;
         currentOrganizationName: string;
         currentConfig: any;
     }
@@ -124,6 +125,7 @@
                 defaultOrganizationUnitId: defaultOrgUnitId,
                 currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,
+                currentOrganizationUuid: currOrg.uuid,
                 currentOrganizationName: currOrg.name,
                 currentConfig: currOrg.config
             };

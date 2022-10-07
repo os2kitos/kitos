@@ -6,9 +6,6 @@
         ShowDataProcessing: boolean;
         ItSupportModuleNameId: number;
         ItSupportGuide: string;
-        ShowTabOverview: boolean;
-        ShowColumnTechnology: boolean;
-        ShowColumnUsage: boolean;
         Organization: IOrganization;
     }
 }

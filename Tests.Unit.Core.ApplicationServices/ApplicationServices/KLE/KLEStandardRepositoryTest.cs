@@ -25,7 +25,6 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private readonly Mock<ITransactionManager> _mockTransactionManager;
         private readonly Mock<ILogger> _mockLogger;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _mockSystemUsageRepository;
-        private readonly Mock<IGenericRepository<TaskUsage>> _mockTaskUsageRepository;
         private readonly Mock<IOperationClock> _mockClock;
         private readonly Mock<IDomainEvents> _mockDomainEvent;
         private readonly GenericRepositoryTaskRefStub _stubTaskRefRepository;
@@ -37,12 +36,11 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockTransactionManager = new Mock<ITransactionManager>();
             _mockLogger = new Mock<ILogger>();
             _mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
-            _mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
             _mockDomainEvent = new Mock<IDomainEvents>();
             _stubTaskRefRepository = new GenericRepositoryTaskRefStub();
             _mockClock = new Mock<IOperationClock>();
             _mockClock.Setup(c => c.Now).Returns(DateTime.Now);
-            _sut = new KLEStandardRepository(_mockKleDataBridge.Object, _mockTransactionManager.Object, _stubTaskRefRepository, _mockSystemUsageRepository.Object, _mockTaskUsageRepository.Object, _mockClock.Object, _mockLogger.Object, _mockDomainEvent.Object);
+            _sut = new KLEStandardRepository(_mockKleDataBridge.Object, _mockTransactionManager.Object, _stubTaskRefRepository, _mockSystemUsageRepository.Object, _mockClock.Object, _mockLogger.Object, _mockDomainEvent.Object);
         }
 
         [Theory]
@@ -212,30 +210,6 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
 
             //Assert
             Assert.False(itSystemUsage.TaskRefs.Contains(updateObjects.removedTaskRef));
-        }
-
-        [Fact]
-        public void UpdateKLE_Given_Summary_Updates_TaskUsage()
-        {
-            //Arrange
-            var updateObjects = SetupUpdateObjects();
-            const int taskUsageKey = 1;
-            var taskUsage = new TaskUsage
-            {
-                Id = taskUsageKey,
-                TaskRef = updateObjects.removedTaskRef
-            };
-            var taskUsages = new List<TaskUsage> { taskUsage };
-            _mockTaskUsageRepository
-                .Setup(s => s.GetWithReferencePreload(t => t.TaskRef))
-                .Returns(taskUsages.AsQueryable);
-            _mockTaskUsageRepository.Setup(s => s.RemoveRange(taskUsages));
-
-            //Act
-            _sut.UpdateKLE(0);
-
-            //Assert
-            _mockTaskUsageRepository.VerifyAll();
         }
 
         #region Helpers

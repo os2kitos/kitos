@@ -7,6 +7,7 @@ namespace Core.DomainServices.Organizations
 {
     public interface IStsOrganizationService
     {
+        Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Organization organization);
         Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveStsOrganizationUuid(Organization organization);
     }
 }

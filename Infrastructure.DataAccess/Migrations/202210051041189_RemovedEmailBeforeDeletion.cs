@@ -11,7 +11,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropColumn("dbo.User", "EmailBeforeDeletion");
             Sql(@"
                 UPDATE [User]
-                SET Name = 'Slettet bruger'
+                SET Name = 'Slettet bruger',
+                    LastName = ''
                 WHERE Deleted = 1;"
             );
             

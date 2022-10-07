@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+﻿using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Response.Organization
 {
@@ -9,10 +8,6 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// Optional Link to parent unit in the organizational hierarchy
         /// </summary>
         public IdentityNamePairResponseDTO ParentOrganizationUnit { get; set; }
-        /// <summary>
-        /// Kle relevant for the organization unit
-        /// </summary>
-        public IEnumerable<IdentityNamePairResponseDTO> Kle { get; set; }
         /// <summary>
         /// Optional EAN number for the organization unit.
         /// </summary>

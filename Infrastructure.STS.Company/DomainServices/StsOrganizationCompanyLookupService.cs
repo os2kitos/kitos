@@ -9,21 +9,24 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Company.ServiceReference;
+using Serilog;
 
 namespace Infrastructure.STS.Company.DomainServices
 {
     public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookupService
     {
+        private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
         private readonly string _serviceRoot;
 
-        public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration)
+        public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
+            _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Virksomhed/5";
         }
 
-        public Result<Guid, OperationError> ResolveStsOrganizationCompanyUuid(Organization organization)
+        public Result<Guid, DetailedOperationError<StsError>> ResolveStsOrganizationCompanyUuid(Organization organization)
         {
             if (organization == null)
             {
@@ -34,22 +37,43 @@ namespace Infrastructure.STS.Company.DomainServices
 
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
             var request = CreateSearchByCvrRequest(organization);
-            var response = channel.soeg(request);
 
-            var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
-            var stsError = statusResult.StatusKode.ParseStsError();
-            if (stsError.HasValue)
+            try
             {
-                return new OperationError($"Error resolving the organization company from STS:{statusResult.StatusKode}:{statusResult.FejlbeskedTekst}", OperationFailure.UnknownError);
-            }
+                var response = channel.soeg(request);
 
-            var ids = response.SoegResponse1.SoegOutput.IdListe;
-            if (ids.Length != 1)
+                var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
+                var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
+                if (stsError.HasValue)
+                {
+                    return new DetailedOperationError<StsError>(OperationFailure.UnknownError, stsError.Value, $"Error resolving the organization company from STS:{statusResult.StatusKode}:{statusResult.FejlbeskedTekst}");
+                }
+
+                var ids = response.SoegResponse1.SoegOutput.IdListe;
+                if (ids.Length != 1)
+                {
+                    return new DetailedOperationError<StsError>(OperationFailure.UnknownError, StsError.Unknown, $"Error resolving the organization company from STS. Expected a single UUID but got:{string.Join(",", ids)}");
+                }
+
+                return new Guid(ids.Single());
+            }
+            catch (FaultException<ServiceplatformFaultType> spFault)
             {
-                return new OperationError($"Error resolving the organization company from STS. Expected a single UUID but got:{string.Join(",", ids)}", OperationFailure.UnknownError);
-            }
+                var knownStsError = spFault.Detail.ErrorList.Select(error => error.ErrorCode.ParseStsFromErrorCode()).FirstOrDefault(x => x.HasValue);
+                var stsError = knownStsError.GetValueOrFallback(StsError.Unknown);
+                var operationFailure =
+                    stsError is StsError.MissingServiceAgreement or StsError.ExistingServiceAgreementIssue
+                        ? OperationFailure.Forbidden
+                        : OperationFailure.UnknownError;
 
-            return new Guid(ids.Single());
+                _logger.Error(spFault, "Service platform exception while finding company uuid from cvr {cvr} for organization with id {organizationId}", organization.Cvr, organization.Id);
+                return new DetailedOperationError<StsError>(operationFailure, stsError, $"STS Organisation threw and exception while searching for uuid by cvr:{organization.Cvr} for organization with id:{organization.Id}");
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Unknown Exception while finding company uuid from cvr {cvr} for organization with id {organizationId}", organization.Cvr, organization.Id);
+                return new DetailedOperationError<StsError>(OperationFailure.UnknownError, StsError.Unknown, $"STS Organisation threw and unknown exception while searching for uuid by cvr:{organization.Cvr} for organization with id:{organization.Id}");
+            }
         }
 
         private static soegRequest CreateSearchByCvrRequest(Organization organization)
@@ -62,7 +86,7 @@ namespace Infrastructure.STS.Company.DomainServices
                     {
                         MunicipalityCVR = organization.Cvr
                     },
-                    SoegInput = new SoegInputType1()
+                    SoegInput = new SoegInputType1
                     {
                         RelationListe = new RelationListeType(),
                         FoersteResultatReference = "0",
