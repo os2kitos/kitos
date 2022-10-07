@@ -655,6 +655,7 @@
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\helpText\inlineHelpText.view.html" />
     <Content Include="app\shared\helpText\field-help-text.view.html" />
+    <Content Include="app\shared\organization-tree\organization-tree.view.html" />
     <Content Include="app\shared\progress-spinner\progress-spinner.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
@@ -907,6 +908,7 @@
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
+    <TypeScriptCompile Include="app\shared\organization-tree\organization-tree.component.ts" />
     <TypeScriptCompile Include="app\shared\progress-spinner\progress-spinner.component.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
@@ -1422,7 +1424,6 @@
     <Content Include="app\components\local-config\local-config-system.view.html" />
     <Content Include="app\components\local-config\local-config-org.view.html" />
     <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
-    <Content Include="app\components\org\structure\org-structure-tree-unit.view.html" />
     <Content Include="app\components\org\structure\org-structure.view.html" />
     <Content Include="app\components\org\user\org-user-create.modal.view.html" />
     <Content Include="app\components\org\user\org-user-edit.modal.view.html" />
