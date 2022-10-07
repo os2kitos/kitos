@@ -13,6 +13,6 @@ BEGIN
         ON T0.Id = T1.UserId
     WHERE T0.Deleted = 0
         AND (T1.Role = 1
-        OR T1.Role = 7
+        OR T0.IsGlobalAdmin = 1
         OR T0.HasApiAccess = 1 AND T1.UserId IS NOT NULL)
 END
