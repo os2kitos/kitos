@@ -315,7 +315,7 @@ namespace Core.ApplicationServices
             if (user == null)
                 return new OperationError(OperationFailure.NotFound);
 
-            return !user.IsGlobalAdmin && user.OrganizationRights.Any(x => x.OrganizationId != organizationId);
+            return !user.IsGlobalAdmin && !user.OrganizationRights.Any(x => x.OrganizationId != organizationId);
         }
 
         public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)
