@@ -15,6 +15,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
+using Core.DomainModel.Users;
 using Infrastructure.Services.Cryptography;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -306,16 +307,13 @@ namespace Core.ApplicationServices
                 .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
 
-        public Result<bool, OperationError> CanBeDeletedByLocalAdmin(int userId, int organizationId)
+        public Result<UserDeletionStrategyType, OperationError> GetUserDeletionStrategy(int userId)
         {
-            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
-                return new OperationError(OperationFailure.Forbidden);
-            
             var user = _userRepository.AsQueryable().ById(userId);
             if (user == null)
                 return new OperationError(OperationFailure.NotFound);
 
-            return !user.IsGlobalAdmin && !user.OrganizationRights.Any(x => x.OrganizationId != organizationId);
+            return _authorizationContext.GetUserDeletionStrategy(user);
         }
 
         public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)

@@ -44,7 +44,7 @@
         deleteUser(id: number): ng.IPromise<any>;
         searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
         getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
-        getCanBeDeletedByLocalAdmin(userId: number, organizationId: number): ng.IPromise<boolean>;
+        getUserDeletionStrategy(userId: number): ng.IPromise<Models.Users.UserDeletionStrategyType>;
     }
 
     export class UserService implements IUserService {
@@ -530,9 +530,9 @@
                 .then(result => result.data.response);
         }
 
-        getCanBeDeletedByLocalAdmin(userId: number, organizationId: number): ng.IPromise<boolean> {
+        getUserDeletionStrategy(userId: number): ng.IPromise<Models.Users.UserDeletionStrategyType> {
             return this.$http
-                .get<API.Models.IApiWrapper<boolean>>(`api/authorize/canbedeleted/${userId}/${organizationId}`)
+                .get<API.Models.IApiWrapper<Models.Users.UserDeletionStrategyType>>(`api/authorize/deletionstrategy/${userId}`)
                 .then(result => result.data.response);
         }
     }

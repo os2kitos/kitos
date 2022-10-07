@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.Users;
 using Core.DomainServices.Authorization;
 
 namespace Core.ApplicationServices.Authorization
@@ -60,5 +61,12 @@ namespace Core.ApplicationServices.Authorization
         /// <param name="permission"></param>
         /// <returns></returns>
         bool HasPermission(Permission permission);
+
+        /// <summary>
+        /// Determines the deletion strategy for a user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public UserDeletionStrategyType GetUserDeletionStrategy(User user);
     }
 }

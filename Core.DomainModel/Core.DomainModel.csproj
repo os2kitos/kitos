@@ -263,6 +263,7 @@
     <Compile Include="User.cs" />
     <Compile Include="Users\AuthenticationScheme.cs" />
     <Compile Include="Users\UserConstraints.cs" />
+    <Compile Include="Users\UserDeletionStrategyType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

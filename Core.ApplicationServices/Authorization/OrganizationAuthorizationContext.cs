@@ -7,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Users;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
@@ -249,7 +250,7 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = entity switch
                 {
-                    User user => (IsGlobalAdmin() || IsUserOnlyPartOfTheSameOrgAsLocalAdmin(user)) && EntityEqualsActiveUser(user) == false,
+                    User user => (IsGlobalAdmin() || GetUserDeletionStrategy(user) == UserDeletionStrategyType.Global) && EntityEqualsActiveUser(user) == false,
                     ItInterface itInterface =>
                         //Even rightsholders are not allowed to delete interfaces
                         IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId),
@@ -266,14 +267,21 @@ namespace Core.ApplicationServices.Authorization
             return result;
         }
 
-        private bool IsUserOnlyPartOfTheSameOrgAsLocalAdmin(User user)
+        public UserDeletionStrategyType GetUserDeletionStrategy(User user)
         {
             var userOrganizationIds = user.OrganizationRights.GroupBy(x => x.OrganizationId).Select(x => x.Key).ToList();
             if (userOrganizationIds.Count != 1)
-                return false;
+                return UserDeletionStrategyType.Local;
 
             var userOrganizationId = userOrganizationIds.FirstOrDefault();
-            return _activeUserContext.HasRoleInSameOrganizationAs(user) && _activeUserContext.HasRole(userOrganizationId, OrganizationRole.LocalAdmin);
+            if (!_activeUserContext.HasRoleInSameOrganizationAs(user)) return UserDeletionStrategyType.Local;
+            
+            if(_activeUserContext.HasRole(userOrganizationId, OrganizationRole.LocalAdmin))
+            {
+                return user.IsGlobalAdmin ? UserDeletionStrategyType.Local : UserDeletionStrategyType.Global;
+            }
+
+            return _activeUserContext.HasRole(userOrganizationId, OrganizationRole.GlobalAdmin) ? UserDeletionStrategyType.Global : UserDeletionStrategyType.Local;
         }
 
         private bool AllowAdministerOrganizationRight(OrganizationRight right)

@@ -280,11 +280,11 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("api/authorize/canbedeleted/{userId}/{organizationId}")]
-        public HttpResponseMessage GetCanUserBeDeletedByLocalAdmin(int userId, int organizationId)
+        [Route("api/authorize/deletionstrategy/{userId}")]
+        public HttpResponseMessage GetUserDeletionStrategy(int userId)
         {
             return _userService
-                .CanBeDeletedByLocalAdmin(userId, organizationId)
+                .GetUserDeletionStrategy(userId)
                 .Match(Ok, FromOperationError);
         }
 

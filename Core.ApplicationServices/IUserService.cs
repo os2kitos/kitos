@@ -3,6 +3,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Users;
 using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices
@@ -20,6 +21,6 @@ namespace Core.ApplicationServices
         Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
         Maybe<OperationError> DeleteUserFromKitos(Guid userUuid);
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
-        Result<bool, OperationError> CanBeDeletedByLocalAdmin(int userId, int organizationId);
+        Result<UserDeletionStrategyType, OperationError> GetUserDeletionStrategy(int userId);
     }
 }

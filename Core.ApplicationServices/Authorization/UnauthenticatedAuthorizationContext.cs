@@ -1,5 +1,7 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.Users;
 using Core.DomainServices.Authorization;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.Authorization
 {
@@ -48,6 +50,11 @@ namespace Core.ApplicationServices.Authorization
         public bool HasPermission(Permission permission)
         {
             return false;
+        }
+
+        public UserDeletionStrategyType GetUserDeletionStrategy(User user)
+        {
+            return UserDeletionStrategyType.Local;
         }
     }
 }
