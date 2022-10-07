@@ -1594,7 +1594,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration.sql" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Users_Not_Associated_With_Any_Org.sql" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
   </ItemGroup>
