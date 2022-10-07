@@ -617,7 +617,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             if (hasManyOrganizations)
             {
-                AddNewOrganizationToUser(user, organizationId);
+                AddNewOrganizationToUser(user, A<int>());
             }
 
             ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
@@ -788,11 +788,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
             //Properties: OrganizationRole adminType, bool isUserForDeletionGlobalAdmin, bool isInSameOrganization, bool hasManyOrganizations, UserDeletionStrategyType expectedResult
             new object[]
             {
-                OrganizationRole.GlobalAdmin, false, false, true, UserDeletionStrategyType.Local
+                OrganizationRole.GlobalAdmin, false, true, true, UserDeletionStrategyType.Local
             },
             new object[]
             {
-                OrganizationRole.LocalAdmin, false, false, true, UserDeletionStrategyType.Local
+                OrganizationRole.LocalAdmin, false, true, true, UserDeletionStrategyType.Local
             },
             new object[]
             {
