@@ -405,8 +405,8 @@
             return selectedAdminRoles;
         }
 
-        private closeModalOnSuccess(result) {
-            if (result) {
+        private closeModalOnSuccess(isSuccessful) {
+            if (isSuccessful) {
                 this.$uibModalInstance.close();
             }
         }

@@ -11,6 +11,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Users;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
@@ -599,6 +600,38 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
+        [MemberData(nameof(UserDeletionStrategyMemberData))]
+        public void GetUserDeletionStrategy_Returns(
+            OrganizationRole adminType,
+            bool isUserForDeletionGlobalAdmin,
+            bool isInSameOrganization,
+            bool hasManyOrganizations,
+            UserDeletionStrategyType expectedResult)
+        {
+            //Arrange
+            var userId = A<int>();
+            var organizationId = A<int>();
+            var user = CreateUserEntity(userId) as User;
+            user.IsGlobalAdmin = isUserForDeletionGlobalAdmin;
+            AddNewOrganizationToUser(user, organizationId);
+
+            if (hasManyOrganizations)
+            {
+                AddNewOrganizationToUser(user, organizationId);
+            }
+
+            ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.GlobalAdmin, adminType == OrganizationRole.GlobalAdmin);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, adminType == OrganizationRole.LocalAdmin);
+
+            //Act
+            var deletionStrategy = _sut.GetUserDeletionStrategy(user);
+
+            //Assert
+            Assert.Equal(expectedResult, deletionStrategy);
+        }
+
+        [Theory]
         [InlineData(true, true)]
         [InlineData(false, false)]
         public void AllowSystemUsageMigration_Returns(bool globalAdmin, bool expectedResult)
@@ -696,7 +729,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             }
             return contract;
         }
-
+        
         private void ExpectHasRoleInSameOrganizationAsReturns(IEntity entity, bool value)
         {
             _userContextMock.Setup(x => x.HasRoleInSameOrganizationAs(entity)).Returns(value);
@@ -734,13 +767,58 @@ namespace Tests.Unit.Presentation.Web.Authorization
                 ExpectHasRoleReturns(organizationId, organizationRole, targetRoles.Contains(organizationRole));
             }
         }
+
         private void ExpectUserHasRoleInAnyOrganization(OrganizationRole role, bool val)
         {
             _userContextMock.Setup(x => x.HasRoleInAnyOrganization(role)).Returns(val);
         }
+
         private static IEntity CreateUserEntity(int id)
         {
             return new User() { Id = id };
         }
+
+        private static void AddNewOrganizationToUser(User user, int organizationId)
+        {
+            user.OrganizationRights.Add(new OrganizationRight() {OrganizationId = organizationId});
+        }
+
+        public static readonly object[][] UserDeletionStrategyMemberData =
+        {
+            //Properties: OrganizationRole adminType, bool isUserForDeletionGlobalAdmin, bool isInSameOrganization, bool hasManyOrganizations, UserDeletionStrategyType expectedResult
+            new object[]
+            {
+                OrganizationRole.GlobalAdmin, false, false, true, UserDeletionStrategyType.Local
+            },
+            new object[]
+            {
+                OrganizationRole.LocalAdmin, false, false, true, UserDeletionStrategyType.Local
+            },
+            new object[]
+            {
+                OrganizationRole.GlobalAdmin, false, false, false, UserDeletionStrategyType.Local
+            },
+            new object[]
+            {
+                OrganizationRole.LocalAdmin, false, false, false, UserDeletionStrategyType.Local
+            },
+            new object[]
+            {
+                OrganizationRole.GlobalAdmin, false, true, false, UserDeletionStrategyType.Global
+            },
+            new object[]
+            {
+                OrganizationRole.LocalAdmin, false, true, false, UserDeletionStrategyType.Global
+            },
+            new object[]
+            {
+                OrganizationRole.GlobalAdmin, true, true, false, UserDeletionStrategyType.Global
+            },
+            new object[]
+            {
+                OrganizationRole.LocalAdmin, true, true, false, UserDeletionStrategyType.Local
+            },
+        };
+
     }
 }

@@ -276,11 +276,9 @@ namespace Core.ApplicationServices.Authorization
             var userOrganizationId = userOrganizationIds.FirstOrDefault();
             if (!_activeUserContext.HasRoleInSameOrganizationAs(user)) return UserDeletionStrategyType.Local;
             
-            if(_activeUserContext.HasRole(userOrganizationId, OrganizationRole.LocalAdmin))
-            {
+            if(_activeUserContext.HasRole(userOrganizationId, OrganizationRole.LocalAdmin)) 
                 return user.IsGlobalAdmin ? UserDeletionStrategyType.Local : UserDeletionStrategyType.Global;
-            }
-
+            
             return _activeUserContext.HasRole(userOrganizationId, OrganizationRole.GlobalAdmin) ? UserDeletionStrategyType.Global : UserDeletionStrategyType.Local;
         }
 
