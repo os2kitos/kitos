@@ -599,8 +599,44 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, allowUpdates);
         }
 
+
+        public static readonly object[][] UserDeletionStrategyMemberData =
+        {
+            //Properties: OrganizationRole adminType, bool isUserForDeletionGlobalAdmin, bool isInSameOrganization, bool hasManyOrganizations, UserDeletionStrategyType expectedResult
+            new object[]
+            {
+            },
+            new object[]
+            {
+            },
+            new object[]
+            {
+            },
+            new object[]
+            {
+            },
+            new object[]
+            {
+            },
+            new object[]
+            {
+            },
+            new object[]
+            {
+            },
+            new object[]
+            {
+            },
+        };
         [Theory]
-        [MemberData(nameof(UserDeletionStrategyMemberData))]
+        [InlineData(OrganizationRole.GlobalAdmin, false, true, true, UserDeletionStrategyType.Local)]
+        [InlineData(OrganizationRole.LocalAdmin, false, true, true, UserDeletionStrategyType.Local)]
+        [InlineData(OrganizationRole.GlobalAdmin, false, false, false, UserDeletionStrategyType.Local)]
+        [InlineData(OrganizationRole.LocalAdmin, false, false, false, UserDeletionStrategyType.Local)]
+        [InlineData(OrganizationRole.GlobalAdmin, false, true, false, UserDeletionStrategyType.Global)]
+        [InlineData(OrganizationRole.LocalAdmin, false, true, false, UserDeletionStrategyType.Global)]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, false, UserDeletionStrategyType.Global)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, false, UserDeletionStrategyType.Local)]
         public void GetUserDeletionStrategy_Returns(
             OrganizationRole adminType,
             bool isUserForDeletionGlobalAdmin,
@@ -782,43 +818,5 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             user.OrganizationRights.Add(new OrganizationRight() {OrganizationId = organizationId});
         }
-
-        public static readonly object[][] UserDeletionStrategyMemberData =
-        {
-            //Properties: OrganizationRole adminType, bool isUserForDeletionGlobalAdmin, bool isInSameOrganization, bool hasManyOrganizations, UserDeletionStrategyType expectedResult
-            new object[]
-            {
-                OrganizationRole.GlobalAdmin, false, true, true, UserDeletionStrategyType.Local
-            },
-            new object[]
-            {
-                OrganizationRole.LocalAdmin, false, true, true, UserDeletionStrategyType.Local
-            },
-            new object[]
-            {
-                OrganizationRole.GlobalAdmin, false, false, false, UserDeletionStrategyType.Local
-            },
-            new object[]
-            {
-                OrganizationRole.LocalAdmin, false, false, false, UserDeletionStrategyType.Local
-            },
-            new object[]
-            {
-                OrganizationRole.GlobalAdmin, false, true, false, UserDeletionStrategyType.Global
-            },
-            new object[]
-            {
-                OrganizationRole.LocalAdmin, false, true, false, UserDeletionStrategyType.Global
-            },
-            new object[]
-            {
-                OrganizationRole.GlobalAdmin, true, true, false, UserDeletionStrategyType.Global
-            },
-            new object[]
-            {
-                OrganizationRole.LocalAdmin, true, true, false, UserDeletionStrategyType.Local
-            },
-        };
-
     }
 }
