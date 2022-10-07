@@ -22,7 +22,9 @@ BEGIN
 	FROM [User] T0 
 	LEFT JOIN  OrganizationRights T1 
 	ON T0.Id = T1.UserId
-	WHERE T1.Id IS NULL AND T0.Deleted = 0
+	WHERE 
+		T1.Id IS NULL AND T0.Deleted = 0 AND
+		T0.IsGlobalAdmin = 0;
 
 	UPDATE [User]
 	SET 
