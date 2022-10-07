@@ -104,8 +104,8 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError("Failed to import sub tree", OperationFailure.UnknownError);
             }
             _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
-            transaction.Commit();
             _databaseControl.SaveChanges();
+            transaction.Commit();
 
             return Maybe<OperationError>.None;
         }

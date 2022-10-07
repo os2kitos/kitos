@@ -23,6 +23,20 @@ namespace Tests.Integration.Presentation.Web.Organizations
         private const string UnAuthorizedCvr = "55133018"; //This one is Aarhus and we don't have a service agreement with them in STS Test environment
         private const string AuthorizedCvr = "58271713"; //This one is Ballerup and we have a service agreement with them in STS Test environment
 
+        public StsOrganizationSynchronizationApiTest()
+        {
+            //Reset the id mapping state to prevent constraint issues (one org owning the cvr)
+            DatabaseAccess.MutateEntitySet<StsOrganizationIdentity>(repo =>
+            {
+                var existingMapping = repo.AsQueryable().FirstOrDefault(x => x.Organization.Cvr == AuthorizedCvr);
+                if (existingMapping != null)
+                {
+                    repo.Delete(existingMapping);
+                }
+                repo.Save();
+            });
+        }
+
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
@@ -73,15 +87,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
             const int levels = 2;
-            DatabaseAccess.MutateEntitySet<StsOrganizationIdentity>(repo =>
-            {
-                var existingMapping = repo.AsQueryable().FirstOrDefault(x => x.Organization.Cvr == AuthorizedCvr);
-                if (existingMapping != null)
-                {
-                    repo.Delete(existingMapping);
-                }
-                repo.Save();
-            });
             var postUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
             var getUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/snapshot?levels={levels}");
             using var getResponse = await HttpApi.GetWithCookieAsync(getUrl, cookie);
