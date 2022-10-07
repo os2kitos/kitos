@@ -19,7 +19,6 @@
     "devDependencies": {
         "@types/angular-animate": "^1.5.11",
         "@types/angular-cookies": "^1.8.1",
-        "@types/angular-mocks": "^1.7.1",
         "@types/angular-resource": "^1.5.17",
         "@types/angular-ui-bootstrap": "^1.0.1",
         "@types/angular-ui-router": "^1.1.41",

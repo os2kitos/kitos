@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Organizations;
-using Core.DomainServices.Model.StsOrganization;
+using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
 
@@ -23,7 +23,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("snapshot")]
-        public HttpResponseMessage GetSnapshotFromStsOrganization(Guid organizationId, uint? levels = null)
+        public HttpResponseMessage GetSnapshotFromStsOrganization(Guid organizationId, int? levels = null)
         {
             return _stsOrganizationSynchronizationService
                 .GetStsOrganizationalHierarchy(organizationId, levels.FromNullableValueType())
@@ -33,32 +33,49 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("connection-status")]
-        public HttpResponseMessage GetConnectionStatus(Guid organizationId)
+        public HttpResponseMessage GetSynchronizationStatus(Guid organizationId)
         {
             return _stsOrganizationSynchronizationService
-                .ValidateConnection(organizationId)
-                .Match
-                (
-                    error => Ok(new CheckStsOrganizationConnectionResponseDTO
+                .GetSynchronizationDetails(organizationId)
+                .Select(details => new StsOrganizationSynchronizationDetailsResponseDTO
+                {
+                    Connected = details.Connected,
+                    SynchronizationDepth = details.SynchronizationDepth,
+                    CanCreateConnection = details.CanCreateConnection,
+                    CanDeleteConnection = details.CanDeleteConnection,
+                    CanUpdateConnection = details.CanUpdateConnection,
+                    AccessStatus = new StsOrganizationAccessStatusResponseDTO
                     {
-                        Error = error.Detail,
-                        Connected = false
-                    }),
-                    () => Ok(new CheckStsOrganizationConnectionResponseDTO()
-                    {
-                        Connected = true
-                    })
-                );
+                        AccessGranted = details.CheckConnectionError == null,
+                        Error = details.CheckConnectionError
+                    }
+                })
+                .Match(Ok, FromOperationError);
 
         }
 
-        private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(StsOrganizationUnit organizationUnit)
+        [HttpPost]
+        [Route("connection")]
+        public HttpResponseMessage CreateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
-            return new StsOrganizationOrgUnitDTO()
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return _stsOrganizationSynchronizationService
+                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .Match(FromOperationError, Ok);
+        }
+
+        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3313 adds the PUT (POST creates the connection)
+
+        private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
+        {
+            return new StsOrganizationOrgUnitDTO
             {
                 Uuid = organizationUnit.Uuid,
                 Name = organizationUnit.Name,
-                UserFacingKey = organizationUnit.UserFacingKey,
                 Children = organizationUnit.Children.Select(MapOrganizationUnitDTO).ToList()
             };
         }
