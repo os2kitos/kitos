@@ -44,7 +44,6 @@
         deleteUser(id: number, organizationId?: number): ng.IPromise<any>;
         searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
         getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
-        getUserDeletionStrategy(userId: number): ng.IPromise<Models.Users.UserDeletionStrategyType>;
     }
 
     export class UserService implements IUserService {
@@ -532,12 +531,6 @@
         getUserOrganizations(userId: number) {
             return this.$http
                 .get<API.Models.IApiWrapper<Models.IOrganization[]>>(`api/authorize/GetOrganizations/${userId}`)
-                .then(result => result.data.response);
-        }
-
-        getUserDeletionStrategy(userId: number): ng.IPromise<Models.Users.UserDeletionStrategyType> {
-            return this.$http
-                .get<API.Models.IApiWrapper<Models.Users.UserDeletionStrategyType>>(`api/authorize/deletionstrategy/${userId}`)
                 .then(result => result.data.response);
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
@@ -7,7 +6,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Users;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;

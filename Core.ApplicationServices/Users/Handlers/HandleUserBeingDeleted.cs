@@ -33,7 +33,7 @@ namespace Core.ApplicationServices.Users.Handlers
             ClearSsoIdentities(user);
         }
 
-        private void ClearSsoIdentities(DomainModel.User user)
+        private void ClearSsoIdentities(User user)
         {
             var roles = user.SsoIdentities;
             if (roles == null)

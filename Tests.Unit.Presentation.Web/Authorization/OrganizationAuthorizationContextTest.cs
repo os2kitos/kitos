@@ -598,37 +598,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
         }
-
-
-        public static readonly object[][] UserDeletionStrategyMemberData =
-        {
-            //Properties: OrganizationRole adminType, bool isUserForDeletionGlobalAdmin, bool isInSameOrganization, bool hasManyOrganizations, UserDeletionStrategy expectedResult
-            new object[]
-            {
-            },
-            new object[]
-            {
-            },
-            new object[]
-            {
-            },
-            new object[]
-            {
-            },
-            new object[]
-            {
-            },
-            new object[]
-            {
-            },
-            new object[]
-            {
-            },
-            new object[]
-            {
-            },
-        };
-       
+        
         [Theory]
         [InlineData(true, true)]
         [InlineData(false, false)]
@@ -757,7 +727,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             _userContextMock.Setup(x => x.HasRole(organizationId, role)).Returns(value);
         }
-
         private void ExpectUserHasRoles(int organizationId, params OrganizationRole[] targetRoles)
         {
             foreach (var organizationRole in Enum.GetValues(typeof(OrganizationRole)).Cast<OrganizationRole>())
@@ -765,12 +734,10 @@ namespace Tests.Unit.Presentation.Web.Authorization
                 ExpectHasRoleReturns(organizationId, organizationRole, targetRoles.Contains(organizationRole));
             }
         }
-
         private void ExpectUserHasRoleInAnyOrganization(OrganizationRole role, bool val)
         {
             _userContextMock.Setup(x => x.HasRoleInAnyOrganization(role)).Returns(val);
         }
-
         private static IEntity CreateUserEntity(int id)
         {
             return new User() { Id = id };

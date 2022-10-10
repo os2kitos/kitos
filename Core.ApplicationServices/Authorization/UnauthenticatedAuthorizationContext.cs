@@ -1,5 +1,4 @@
 ﻿using Core.DomainModel;
-using Core.DomainModel.Users;
 using Core.DomainServices.Authorization;
 
 namespace Core.ApplicationServices.Authorization

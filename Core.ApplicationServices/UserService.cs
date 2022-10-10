@@ -315,9 +315,11 @@ namespace Core.ApplicationServices
                 return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
 
             if (scopedToOrganizationId.HasValue && scopedToOrganizationId.Value != 0)
-                return DeleteUserFromOrganization(scopedToOrganizationId.Value, user);
+                return DeleteUserFromOrganizationOrKitos(scopedToOrganizationId.Value, user);
             
-            return _authorizationContext.AllowDelete(user) ? DeleteUser(user) : new OperationError(OperationFailure.Forbidden);
+            return _authorizationContext.AllowDelete(user) 
+                ? DeleteUser(user) 
+                : new OperationError(OperationFailure.Forbidden);
         }
 
         private Maybe<OperationError> DeleteUser(User user)
@@ -335,7 +337,7 @@ namespace Core.ApplicationServices
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> DeleteUserFromOrganization(int scopedToOrganizationId, User user)
+        private Maybe<OperationError> DeleteUserFromOrganizationOrKitos(int scopedToOrganizationId, User user)
         {
             var deletionStrategy = GetUserDeletionStrategy(scopedToOrganizationId, user);
             if (deletionStrategy.Failed)
@@ -345,7 +347,9 @@ namespace Core.ApplicationServices
             {
                 case UserDeletionStrategy.Global:
                     var organization = _orgRepository.AsQueryable().ById(scopedToOrganizationId);
-                    return _authorizationContext.AllowModify(organization) ? DeleteUser(user) : new OperationError(OperationFailure.Forbidden);
+                    return _authorizationContext.AllowModify(organization) 
+                        ? DeleteUser(user) 
+                        : new OperationError(OperationFailure.Forbidden);
                 case UserDeletionStrategy.Local:
                     _domainEvents.Raise(new EntityBeingRemovedEvent<User>(user, scopedToOrganizationId));
                     return Maybe<OperationError>.None;

@@ -279,16 +279,6 @@ namespace Presentation.Web.Controllers.API.V1
             return response;
         }
 
-        [HttpGet]
-        [Route("api/authorize/deletionstrategy/{userId}")]
-        public HttpResponseMessage GetUserDeletionStrategy(int userId)
-        {
-            return Ok(0);/*
-            return _userService
-                .GetUserDeletionStrategy(userId)
-                .Match(Ok, FromOperationError);*/
-        }
-
         private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto, AuthenticationScheme authenticationScheme)
         {
             if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
