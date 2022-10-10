@@ -8,6 +8,7 @@
         hasWriteAccess: boolean;
         description: string;
         buttonDisabled: boolean;
+        disableDescription: boolean;
 
         static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "user","inMemoryCacheService"];
 
@@ -25,6 +26,7 @@
             this.optionId = this.$stateParams["id"];
             this.optionType = this.$stateParams["optionType"];
             this.initModal(this.optionId, this.optionsUrl);
+            this.disableDescription = (this.$stateParams["disableDescription"] === "true");
             this.buttonDisabled = false;
         }
 
@@ -140,7 +142,7 @@
         states.forEach(currentStateConfig =>
             $stateProvider.state(currentStateConfig.id,
                 {
-                    url: `/{:optionsUrl}/{id:int}/{:optionType}/${currentStateConfig.urlSuffix}`,
+                    url: `/{:optionsUrl}/{id:int}/{:optionType}/{:disableDescription}/${currentStateConfig.urlSuffix}`,
                     onEnter: [
                         "$state", "$stateParams", "$uibModal",
                         ($state: ng.ui.IStateService,
