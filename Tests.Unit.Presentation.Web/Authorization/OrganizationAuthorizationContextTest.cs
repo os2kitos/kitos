@@ -597,6 +597,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
         }
+
         [Theory]
         [InlineData(true, true)]
         [InlineData(false, false)]
@@ -695,6 +696,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             }
             return contract;
         }
+
         private void ExpectHasRoleInSameOrganizationAsReturns(IEntity entity, bool value)
         {
             _userContextMock.Setup(x => x.HasRoleInSameOrganizationAs(entity)).Returns(value);
@@ -724,6 +726,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             _userContextMock.Setup(x => x.HasRole(organizationId, role)).Returns(value);
         }
+
         private void ExpectUserHasRoles(int organizationId, params OrganizationRole[] targetRoles)
         {
             foreach (var organizationRole in Enum.GetValues(typeof(OrganizationRole)).Cast<OrganizationRole>())

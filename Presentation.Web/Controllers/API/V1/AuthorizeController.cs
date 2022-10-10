@@ -36,6 +36,7 @@ namespace Presentation.Web.Controllers.API.V1
         private readonly IOrganizationService _organizationService;
         private readonly ICryptoService _cryptoService;
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
+
         public AuthorizeController(
             IUserRepository userRepository,
             IUserService userService,
