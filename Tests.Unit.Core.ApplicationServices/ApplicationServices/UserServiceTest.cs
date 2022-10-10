@@ -11,12 +11,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.Rights;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Core.DomainModel.Users;
+using Core.DomainServices.Extensions;
 
 namespace Tests.Unit.Core.ApplicationServices
 {
@@ -35,6 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IOrganizationalUserContext> _organizationalUserContextMock;
+        private readonly Mock<IUserRightsService> _userRightsService;
 
         public UserServiceTest()
         {
@@ -270,6 +274,130 @@ namespace Tests.Unit.Core.ApplicationServices
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, false, true, false)]
+        [InlineData(OrganizationRole.LocalAdmin, false, true, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, false)]
+        public void DeleteUserFromKitos_Raises_EntityBeingDeletedEvent(
+            OrganizationRole adminType,
+            bool isUserForDeletionGlobalAdmin,
+            bool isInSameOrganization,
+            bool hasManyOrganizations)
+        {
+            //Arrange
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+            var organizationId = A<int>();
+            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            var organization = ExpectOrgRepositoryByUuidReturns(organizationId);
+            user.IsGlobalAdmin = isUserForDeletionGlobalAdmin;
+            user.OrganizationRights = new List<OrganizationRight> {new() {OrganizationId = organizationId}};
+
+            if (hasManyOrganizations)
+            {
+                AddNewOrganizationToUser(user, A<int>());
+            }
+
+            var transaction = ExpectTransactionBeginReturns();
+            ExpectAuthorizationAllowModifyReturns(organization, true);
+            ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.GlobalAdmin, adminType == OrganizationRole.GlobalAdmin);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, adminType == OrganizationRole.LocalAdmin);
+
+            //Act
+            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+
+            //Assert
+            Assert.True(result.IsNone);
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<User>>(deleteEvent => deleteEvent.Entity.Id == user.Id)), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, false, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, false, true, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, false, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, false, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, false)]
+        public void DeleteUserFromKitos_Raises_EntityBeingRemovedEvent(
+            OrganizationRole adminType,
+            bool isUserForDeletionGlobalAdmin,
+            bool isInSameOrganization,
+            bool hasManyOrganizations)
+        {
+            //Arrange
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+            var organizationId = A<int>();
+            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            user.IsGlobalAdmin = isUserForDeletionGlobalAdmin;
+            user.OrganizationRights = new List<OrganizationRight> {new() {OrganizationId = organizationId}};
+
+            if (hasManyOrganizations)
+            {
+                AddNewOrganizationToUser(user, A<int>());
+            }
+
+            ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.GlobalAdmin, adminType == OrganizationRole.GlobalAdmin);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, adminType == OrganizationRole.LocalAdmin);
+
+            //Act
+            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+
+            //Assert
+            Assert.True(result.IsNone);
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingRemovedEvent<User>>(deleteEvent => deleteEvent.Entity.Id == user.Id)), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void DeleteUserFromKitos_Returns_BadInput(
+            bool isDeleted,
+            bool hasDifferentOrganization)
+        {
+            //Arrange
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+            var organizationId = A<int>();
+            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            user.Deleted = isDeleted;
+            if (!hasDifferentOrganization)
+            {
+                user.OrganizationRights = new List<OrganizationRight>{new(){OrganizationId = organizationId}};
+            }
+
+            //Act
+            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.BadInput,result.Value);
+        }
+
+        [Fact]
+        public void DeleteUserFromKitos_Returns_Forbidden()
+        {
+            //Arrange
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+            var organizationId = A<int>();
+            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            user.OrganizationRights = new List<OrganizationRight> { new() { OrganizationId = organizationId } };
+            
+            ExpectHasRoleInSameOrganizationAsReturns(user, true);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.GlobalAdmin, false);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, false);
+
+            //Act
+            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden,result.Value);
+        }
+
         private void ExpectGetOrganizationAccessReturns(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
             _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId))
@@ -302,6 +430,36 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ExpectAuthorizationAllowDeleteReturns(IEntity entity, bool result)
         {
             _authorizationContextMock.Setup(x => x.AllowDelete(entity)).Returns(result);
+        }
+
+        private void ExpectAuthorizationAllowModifyReturns(IEntity entity, bool result)
+        {
+            _authorizationContextMock.Setup(x => x.AllowModify(entity)).Returns(result);
+        }
+
+        private Organization ExpectOrgRepositoryByUuidReturns(int organizationId)
+        {
+            var organization = new Organization
+            {
+                Id = organizationId
+            };
+            _orgRepositoryMock.Setup(x => x.AsQueryable()).Returns(new List<Organization>{organization}.AsQueryable);
+            return organization;
+        }
+
+        private void ExpectHasRoleInSameOrganizationAsReturns(IEntity entity, bool value)
+        {
+            _organizationalUserContextMock.Setup(x => x.HasRoleInSameOrganizationAs(entity)).Returns(value);
+        }
+
+        private void ExpectHasRoleReturns(int organizationId, OrganizationRole role, bool value)
+        {
+            _organizationalUserContextMock.Setup(x => x.HasRole(organizationId, role)).Returns(value);
+        }
+
+        private static void AddNewOrganizationToUser(User user, int organizationId)
+        {
+            user.OrganizationRights.Add(new OrganizationRight() { OrganizationId = organizationId });
         }
     }
 }

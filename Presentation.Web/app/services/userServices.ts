@@ -41,7 +41,7 @@
         updateDefaultOrgUnit(newDefaultOrgUnitId: number): ng.IPromise<any>;
         getUsersWithRightsholderAccess(): ng.IPromise<Kitos.Models.Api.IUserWithOrganizationName[]>;
         getUsersWithCrossAccess(): ng.IPromise<Kitos.Models.Api.IUserWithCrossAccess[]>;
-        deleteUser(id: number): ng.IPromise<any>;
+        deleteUser(id: number, organizationId?: number): ng.IPromise<any>;
         searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
         getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
         getUserDeletionStrategy(userId: number): ng.IPromise<Models.Users.UserDeletionStrategyType>;
@@ -503,19 +503,24 @@
 
         getUsersWithRightsholderAccess() {
             return this.$http
-                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithOrganizationName[]>>("api/user/with-rightsholder-access")
+                .get<API.Models.IApiWrapper<Models.Api.IUserWithOrganizationName[]>>("api/user/with-rightsholder-access")
                 .then(result => result.data.response);
         }
 
         getUsersWithCrossAccess() {
             return this.$http
-                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/with-cross-organization-permissions")
+                .get<API.Models.IApiWrapper<Models.Api.IUserWithCrossAccess[]>>("api/user/with-cross-organization-permissions")
                 .then(result => result.data.response);
         }
 
-        deleteUser(id: number) {
+        deleteUser(id: number, organizationId?: number) {
+            const request = `api/user/${id}`;
+            if (organizationId) {
+                return this.$http
+                    .delete(request + `?organizationId=${organizationId}`);
+            }
             return this.$http
-                .delete(`api/user/${id}`);
+                .delete(request);
         }
 
         searchUsers(query: string) {

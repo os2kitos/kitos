@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API.V1
         private readonly IOrganizationService _organizationService;
         private readonly ICryptoService _cryptoService;
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
-
+        
         public AuthorizeController(
             IUserRepository userRepository,
             IUserService userService,
@@ -283,9 +283,10 @@ namespace Presentation.Web.Controllers.API.V1
         [Route("api/authorize/deletionstrategy/{userId}")]
         public HttpResponseMessage GetUserDeletionStrategy(int userId)
         {
+            return Ok(0);/*
             return _userService
                 .GetUserDeletionStrategy(userId)
-                .Match(Ok, FromOperationError);
+                .Match(Ok, FromOperationError);*/
         }
 
         private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto, AuthenticationScheme authenticationScheme)

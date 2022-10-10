@@ -19,8 +19,13 @@ namespace Core.ApplicationServices
         Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role);
         Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries);
         Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
-        Maybe<OperationError> DeleteUserFromKitos(Guid userUuid);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userUuid"></param>
+        /// <param name="scopedToOrganizationId">If provided the operation will be scoped to the organization identified by this parameter</param>
+        /// <returns></returns>
+        Maybe<OperationError> DeleteUserFromKitos(Guid userUuid, int? scopedToOrganizationId = null);
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
-        Result<UserDeletionStrategyType, OperationError> GetUserDeletionStrategy(int userId);
     }
 }

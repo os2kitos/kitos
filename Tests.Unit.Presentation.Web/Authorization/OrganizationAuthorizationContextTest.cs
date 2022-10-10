@@ -602,7 +602,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         public static readonly object[][] UserDeletionStrategyMemberData =
         {
-            //Properties: OrganizationRole adminType, bool isUserForDeletionGlobalAdmin, bool isInSameOrganization, bool hasManyOrganizations, UserDeletionStrategyType expectedResult
+            //Properties: OrganizationRole adminType, bool isUserForDeletionGlobalAdmin, bool isInSameOrganization, bool hasManyOrganizations, UserDeletionStrategy expectedResult
             new object[]
             {
             },
@@ -628,45 +628,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             {
             },
         };
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, false, true, true, UserDeletionStrategyType.Local)]
-        [InlineData(OrganizationRole.LocalAdmin, false, true, true, UserDeletionStrategyType.Local)]
-        [InlineData(OrganizationRole.GlobalAdmin, false, false, false, UserDeletionStrategyType.Local)]
-        [InlineData(OrganizationRole.LocalAdmin, false, false, false, UserDeletionStrategyType.Local)]
-        [InlineData(OrganizationRole.GlobalAdmin, false, true, false, UserDeletionStrategyType.Global)]
-        [InlineData(OrganizationRole.LocalAdmin, false, true, false, UserDeletionStrategyType.Global)]
-        [InlineData(OrganizationRole.GlobalAdmin, true, true, false, UserDeletionStrategyType.Global)]
-        [InlineData(OrganizationRole.LocalAdmin, true, true, false, UserDeletionStrategyType.Local)]
-        public void GetUserDeletionStrategy_Returns(
-            OrganizationRole adminType,
-            bool isUserForDeletionGlobalAdmin,
-            bool isInSameOrganization,
-            bool hasManyOrganizations,
-            UserDeletionStrategyType expectedResult)
-        {
-            //Arrange
-            var userId = A<int>();
-            var organizationId = A<int>();
-            var user = CreateUserEntity(userId) as User;
-            user.IsGlobalAdmin = isUserForDeletionGlobalAdmin;
-            AddNewOrganizationToUser(user, organizationId);
-
-            if (hasManyOrganizations)
-            {
-                AddNewOrganizationToUser(user, A<int>());
-            }
-
-            ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
-            ExpectHasRoleReturns(organizationId, OrganizationRole.GlobalAdmin, adminType == OrganizationRole.GlobalAdmin);
-            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, adminType == OrganizationRole.LocalAdmin);
-
-            //Act
-            var deletionStrategy = _sut.GetUserDeletionStrategy(user);
-
-            //Assert
-            Assert.Equal(expectedResult, deletionStrategy);
-        }
-
+       
         [Theory]
         [InlineData(true, true)]
         [InlineData(false, false)]
@@ -812,11 +774,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private static IEntity CreateUserEntity(int id)
         {
             return new User() { Id = id };
-        }
-
-        private static void AddNewOrganizationToUser(User user, int organizationId)
-        {
-            user.OrganizationRights.Add(new OrganizationRight() {OrganizationId = organizationId});
         }
     }
 }

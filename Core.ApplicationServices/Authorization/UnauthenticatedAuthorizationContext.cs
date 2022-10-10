@@ -50,10 +50,5 @@ namespace Core.ApplicationServices.Authorization
         {
             return false;
         }
-
-        public UserDeletionStrategyType GetUserDeletionStrategy(User user)
-        {
-            return UserDeletionStrategyType.Local;
-        }
     }
 }

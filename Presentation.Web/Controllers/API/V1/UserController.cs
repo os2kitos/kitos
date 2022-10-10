@@ -191,7 +191,7 @@ namespace Presentation.Web.Controllers.API.V1
             var uuid = _identityResolver.ResolveUuid<User>(id);
             return uuid.IsNone
                 ? NotFound()
-                : _userService.DeleteUserFromKitos(uuid.Value).Match(FromOperationError, Ok);
+                : _userService.DeleteUserFromKitos(uuid.Value, organizationId).Match(FromOperationError, Ok);
         }
         
 

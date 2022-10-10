@@ -107,7 +107,6 @@ using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Organizations.Handlers;
 using Core.ApplicationServices.Tracking;
 using Core.ApplicationServices.UIConfiguration;
-using Core.ApplicationServices.UIConfiguration.Handlers;
 using Core.BackgroundJobs.Model.Maintenance;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainServices.Repositories.UICustomization;
@@ -118,6 +117,7 @@ using Infrastructure.STS.OrganizationUnit.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
+using Core.ApplicationServices.Users.Handlers;
 using Infrastructure.Services.Types;
 
 namespace Presentation.Web.Ninject
@@ -367,6 +367,7 @@ namespace Presentation.Web.Ninject
             //Organization
             RegisterDomainEvents<HandleOrganizationBeingDeleted>(kernel);
             RegisterDomainEvents<HandleUserBeingDeleted>(kernel);
+            RegisterDomainEvents<HandleUserBeingRemoved>(kernel);
         }
 
         private void RegisterDomainEvents<THandler>(IKernel kernel)

@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.RightsHolder;
 using Core.ApplicationServices.Model.Users;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Users;
 
 namespace Core.ApplicationServices.Rights
 {

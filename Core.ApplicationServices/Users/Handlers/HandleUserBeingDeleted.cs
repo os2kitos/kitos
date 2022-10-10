@@ -5,7 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices.Repositories.SSO;
 
-namespace Core.ApplicationServices.UIConfiguration.Handlers
+namespace Core.ApplicationServices.Users.Handlers
 {
     public class HandleUserBeingDeleted : IDomainEventHandler<EntityBeingDeletedEvent<User>>
     {
@@ -33,7 +33,7 @@ namespace Core.ApplicationServices.UIConfiguration.Handlers
             ClearSsoIdentities(user);
         }
 
-        private void ClearSsoIdentities(User user)
+        private void ClearSsoIdentities(DomainModel.User user)
         {
             var roles = user.SsoIdentities;
             if (roles == null)

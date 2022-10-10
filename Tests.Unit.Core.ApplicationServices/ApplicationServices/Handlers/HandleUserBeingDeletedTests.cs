@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Rights;
-using Core.ApplicationServices.UIConfiguration.Handlers;
+using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;

@@ -244,19 +244,9 @@
             if (!confirm('Er du sikker på, at du vil slette brugeren?')) {
                 return;
             }
-
-            this.userService.getUserDeletionStrategy(this.userToModify.Id)
-                .then((response) => {
-                    if (response === Models.Users.UserDeletionStrategyType.Local) {
-                        this.userService.deleteUser(this.userToModify.Id)
-                            .then(success => this.closeModalOnSuccess(success));
-                        return;
-                    }
-
-                    this.userRoleAdministrationService
-                        .removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
-                        .then(success => this.closeModalOnSuccess(success));
-                });
+            
+            this.userService.deleteUser(this.userToModify.Id, this.loggedInUser.currentOrganizationId)
+                .then(success => this.closeModalOnSuccess(success));
         }
 
         deleteSelectedRoles() {

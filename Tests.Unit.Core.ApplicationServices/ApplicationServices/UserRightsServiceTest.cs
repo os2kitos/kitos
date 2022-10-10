@@ -24,6 +24,7 @@ using Serilog;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Core.DomainServices;
 
 namespace Tests.Unit.Core.ApplicationServices
 {
