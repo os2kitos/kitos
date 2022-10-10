@@ -306,7 +306,7 @@ namespace Core.ApplicationServices
                 .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
 
-        public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid, int? scopedToOrganizationId = null)
+        public Maybe<OperationError> InitiateUserDeletion(Guid userUuid, int? scopedToOrganizationId = null)
         {
             var user = _userRepository.AsQueryable().ByUuid(userUuid);
             if (user == null)
@@ -318,11 +318,11 @@ namespace Core.ApplicationServices
                 return DeleteUserFromOrganizationOrKitos(scopedToOrganizationId.Value, user);
             
             return _authorizationContext.AllowDelete(user) 
-                ? DeleteUser(user) 
+                ? DeleteUserFromKitos(user) 
                 : new OperationError(OperationFailure.Forbidden);
         }
 
-        private Maybe<OperationError> DeleteUser(User user)
+        private Maybe<OperationError> DeleteUserFromKitos(User user)
         {
             using var transaction = _transactionManager.Begin();
             
@@ -348,7 +348,7 @@ namespace Core.ApplicationServices
                 case UserDeletionStrategy.Global:
                     var organization = _orgRepository.AsQueryable().ById(scopedToOrganizationId);
                     return _authorizationContext.AllowModify(organization) 
-                        ? DeleteUser(user) 
+                        ? DeleteUserFromKitos(user) 
                         : new OperationError(OperationFailure.Forbidden);
                 case UserDeletionStrategy.Local:
                     _domainEvents.Raise(new EntityBeingRemovedEvent<User>(user, scopedToOrganizationId));

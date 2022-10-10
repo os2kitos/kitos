@@ -265,7 +265,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAuthorizationAllowDeleteReturns(user, isDeleteAllowed);
 
             //Act
-            var result = _sut.DeleteUserFromKitos(userUuid);
+            var result = _sut.InitiateUserDeletion(userUuid);
 
             //Assert
             Assert.True(result.IsNone);
@@ -305,7 +305,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, adminType == OrganizationRole.LocalAdmin);
 
             //Act
-            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+            var result = _sut.InitiateUserDeletion(user.Uuid, organizationId);
 
             //Assert
             Assert.True(result.IsNone);
@@ -343,7 +343,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, adminType == OrganizationRole.LocalAdmin);
 
             //Act
-            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+            var result = _sut.InitiateUserDeletion(user.Uuid, organizationId);
 
             //Assert
             Assert.True(result.IsNone);
@@ -369,7 +369,7 @@ namespace Tests.Unit.Core.ApplicationServices
             }
 
             //Act
-            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+            var result = _sut.InitiateUserDeletion(user.Uuid, organizationId);
 
             //Assert
             Assert.True(result.HasValue);
@@ -391,7 +391,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, false);
 
             //Act
-            var result = _sut.DeleteUserFromKitos(user.Uuid, organizationId);
+            var result = _sut.InitiateUserDeletion(user.Uuid, organizationId);
 
             //Assert
             Assert.True(result.HasValue);
