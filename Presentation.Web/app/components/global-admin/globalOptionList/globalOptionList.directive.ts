@@ -188,7 +188,7 @@
                     name: "editOption",
                     text: "Redigér",
                     template:
-                    `<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)' ng-show="${!this.disableEdit}"><i class='fa fa-pencil' aria-hidden='true'></i></button> 
+                    `<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)' ng-if="${!this.disableEdit}"><i class='fa fa-pencil' aria-hidden='true'></i></button> 
                      <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> 
                      <button type='button' class='btn btn-link' title='Gør type tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>`,
                     title: " ",
