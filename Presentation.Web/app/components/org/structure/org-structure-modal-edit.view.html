@@ -10,7 +10,7 @@
                     Overordnet enhed
                 </label>
                 <div class="col-xs-8">
-                    <single-select-select2 id="parent-select" ng-model="parentSelect" ng-disabled="!canChangeParent"/>
+                    <single-select-select2 id="parent-select" ng-model="parentSelect" ng-disabled="!canChangeParent" />
                 </div>
                 <div class="col-xs-8 col-xs-offset-3">
                     <p class="help-block" data-ng-show="canChangeParent">
@@ -44,6 +44,32 @@
                 </label>
                 <div class="col-xs-8">
                     <input type="text" name="localId" id="localid" data-ng-model="orgUnit.localId" class="form-control" tabindex="4">
+                </div>
+            </div>
+            <div class="form-group row center-block" style="text-align: center">
+                <div class="object-status-active-summary col-xs-10" style="margin: auto">
+                    <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isRegistrationDetailsExpanded = !isRegistrationDetailsExpanded">
+                        <span>Registrations</span>
+                        <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isRegistrationDetailsExpanded, 'fa-plus-square-o': !isRegistrationDetailsExpanded}"></i>
+                    </a>
+                    <table class="table table-hover" ng-if="isRegistrationDetailsExpanded">
+                        <thead>
+                            <tr>
+                                <th class="col-xs-1">
+                                    abc<!--<input type="checkbox" ng-model="model.selected" ng-checked="model.selected" ng-change="callbacks.selectOrDeselectGroup(model.rights)" />-->
+                                </th>
+                                <th class="col-xs-3">Name</th>
+                                <th class="col-xs-3">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="test1 in test">
+                            <tr>
+                                <td>abc<!--<input data-disabled-on-busy type="checkbox" ng-model="right.selected" ng-change="callbacks.selectionChanged()" />--></td>
+                                <td>{{test1.name}}</td>
+                                <td><button class="glyphicon glyphicon-trash" ng-click="delete()" data-disabled-on-busy></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </form>

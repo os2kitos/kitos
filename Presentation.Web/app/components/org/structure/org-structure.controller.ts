@@ -345,6 +345,7 @@
 
                             // edit or create-new mode
                             $modalScope.isNew = false;
+                            $modalScope.test = [{ name: "test" }, { name: "test2" }];
 
                             // holds a list of org units, which the user can select as the parent
                             const orgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[] = [];
