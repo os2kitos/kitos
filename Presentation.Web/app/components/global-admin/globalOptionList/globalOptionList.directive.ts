@@ -6,7 +6,8 @@
             scope: {
                 editState: "@state",
                 dirId: "@",
-                optionType: "@"
+                optionType: "@",
+                disableEdit: "@"
             },
             controller: GlobalOptionListDirective,
             controllerAs: "ctrl",
@@ -36,6 +37,7 @@
         public optionType: string;
         public mainGrid: IKendoGrid<Models.IOptionEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
+        public disableEdit: boolean;
 
         public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope","inMemoryCacheService"];
 
@@ -53,6 +55,7 @@
             this.editState = $scope.editState;
             this.dirId = $scope.dirId;
             this.optionType = $scope.optionType;
+            this.disableEdit = ($scope.disableEdit === "true");
         }
 
         $onInit() {
@@ -159,12 +162,15 @@
                             operator: "contains"
                         }
                     }
-                },
-                {
+                } as any
+            ];
+
+            if (!this.disableEdit) {
+                this.mainGridOptions.columns.push({
                     field: "Description",
                     title: "Beskrivelse",
                     width: 230,
-                    persistId: "description", 
+                    persistId: "description",
                     template: (dataItem) => dataItem.Description,
                     hidden: false,
                     filterable: {
@@ -175,15 +181,20 @@
                             operator: "contains"
                         }
                     }
-                },
-                {
+                });
+            }
+
+            this.mainGridOptions.columns.push({
                     name: "editOption",
                     text: "Redigér",
-                    template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>",
+                    template:
+                    `<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)' ng-show="${!this.disableEdit}"><i class='fa fa-pencil' aria-hidden='true'></i></button> 
+                     <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> 
+                     <button type='button' class='btn btn-link' title='Gør type tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>`,
                     title: " ",
                     width: 176
                 } as any
-            ];
+            );
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({

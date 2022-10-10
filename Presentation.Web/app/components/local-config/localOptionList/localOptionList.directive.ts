@@ -120,10 +120,15 @@
                                 operator: "contains"
                             }
                         }
-                    },
+                    } as any
+                ]
+            };
+
+            if (!this.disableEdit) {
+                this.mainGridOptions.columns.push(
                     {
                         field: "Description", title: "Beskrivelse", width: 230,
-                        persistId: "description", 
+                        persistId: "description",
                         template: (dataItem) => dataItem.Description,
                         hidden: false,
                         filterable: {
@@ -134,18 +139,15 @@
                                 operator: "contains"
                             }
                         }
+                    },
+                    {
+                        name: "editOption",
+                        text: "Redigér",
+                        template: `<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button>`,
+                        title: " ",
+                        width: 176
                     } as any
-                ]
-            };
-
-            if (!this.disableEdit) {
-                this.mainGridOptions.columns.push({
-                    name: "editOption",
-                    text: "Redigér",
-                    template: `<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button>`,
-                    title: " ",
-                    width: 176
-                } as any);
+                );
             }
 
             function customFilter(args) {
