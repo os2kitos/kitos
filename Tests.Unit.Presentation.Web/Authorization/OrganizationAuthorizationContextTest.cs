@@ -11,7 +11,6 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Users;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
@@ -598,7 +597,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
         }
-        
         [Theory]
         [InlineData(true, true)]
         [InlineData(false, false)]
@@ -697,7 +695,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             }
             return contract;
         }
-        
         private void ExpectHasRoleInSameOrganizationAsReturns(IEntity entity, bool value)
         {
             _userContextMock.Setup(x => x.HasRoleInSameOrganizationAs(entity)).Returns(value);
