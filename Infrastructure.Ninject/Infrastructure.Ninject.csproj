@@ -59,10 +59,6 @@
       <Project>{F0986888-8F35-4559-8FBA-428BC9EC9ADD}</Project>
       <Name>Core.ApplicationServices</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
-      <Name>Core.DomainModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>

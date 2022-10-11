@@ -146,6 +146,7 @@
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
+    <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
@@ -278,10 +279,6 @@
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
       <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
       <Name>Core.Abstractions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
-      <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>

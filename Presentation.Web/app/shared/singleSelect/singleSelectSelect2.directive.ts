@@ -11,6 +11,13 @@
                 appendurl: "@",
                 disabled: "=ngDisabled",
                 required: "@"
+            },
+            link(scope) {
+
+                scope.optionDescription = null;
+
+                scope.$watch("model.selectedElement",
+                    value => scope.optionDescription = value?.optionalObjectContext?.description);
             }
         })
     ]);
