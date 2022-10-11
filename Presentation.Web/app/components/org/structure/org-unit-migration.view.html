@@ -1,0 +1,20 @@
+﻿<div class="form-group">
+    <label for="selectedOrgId" class="col-xs-3">Assign to: &nbsp;</label>
+    <select id="selectedOrgId" ng-model="ctrl.selectedOrg" class="form-control col-xs-6" ng-options="org as org.name for org in ctrl.organizations">
+        {{org.name}}
+    </select>
+</div>
+
+<org-unit-migration-table title="Roles" options="ctrl.roles"></org-unit-migration-table>
+<org-unit-migration-table title="Payments" options="ctrl.payments"></org-unit-migration-table>
+<org-unit-migration-table title="Internal contract registrations" options="ctrl.internalContractRegistrations"></org-unit-migration-table>
+<org-unit-migration-table title="External contract registrations" options="ctrl.externalContractRegistrations"></org-unit-migration-table>
+<org-unit-migration-table title="Relevant system registrations" options="ctrl.relevantSystemRegistrations"></org-unit-migration-table>
+<org-unit-migration-table title="Responsible system registrations" options="ctrl.responsibleSystemRegistrations"></org-unit-migration-table>
+
+<button class="btn btn-default" data-ng-click="selectDeselectAll()">Select/Deselect all</button>
+<div class="pull-right">
+    <button class="btn btn-danger" ng-click="ctrl.deleteSelected()">Delete selected</button>
+    <button class="btn btn-danger" ng-click="ctrl.delete()">Delete unit</button>
+    <button class="btn btn-warning" ng-click="ctrl.transfer()">Transfer</button>
+</div>

@@ -1,0 +1,20 @@
+﻿<table class="table table-hover">
+    <thead>
+    <tr>
+        <th class="col-xs-1">
+            <input type="checkbox" ng-model="ctrl.allSelected" ng-checked="ctrl.allSelected" ng-change="ctrl.options.selectedUnitGroupChanged(ctrl.root)"/><!---->
+        </th>
+        <th class="col-xs-3">{{ctrl.title}}</th>
+        <th class="col-xs-3">Assigned to</th>
+        <th class="col-xs-3">Delete</th>
+    </tr>
+    </thead>
+    <tbody ng-repeat="unit in ctrl.root.children">
+    <tr>
+        <td><input data-disabled-on-busy type="checkbox" ng-model="selected" ng-change="ctrl.options.selectedUnitChanged(unit)"/></td>
+        <td>{{unit.text}}</td>
+        <td>{{unit.targetUnit}}</td>
+        <td><button class="glyphicon glyphicon-trash" data-disabled-on-busy></button></td>
+    </tr>
+    </tbody>
+</table>

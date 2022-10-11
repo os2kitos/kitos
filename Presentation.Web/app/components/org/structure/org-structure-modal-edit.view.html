@@ -46,36 +46,21 @@
                     <input type="text" name="localId" id="localid" data-ng-model="orgUnit.localId" class="form-control" tabindex="4">
                 </div>
             </div>
-            <div class="form-group row center-block" style="text-align: center">
-                <div class="object-status-active-summary col-xs-10" style="margin: auto">
-                    <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isRegistrationDetailsExpanded = !isRegistrationDetailsExpanded">
+            <div class="panel panel-default row" for="expand_collapse_registrations" style="margin-right: auto !important; margin-left: auto !important;">
+                <div class="panel-heading">
+                    <a id="expand_collapse_registrations" class="task-fold control-label" data-ng-click="isRegistrationDetailsExpanded = !isRegistrationDetailsExpanded">
                         <span>Registrations</span>
                         <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isRegistrationDetailsExpanded, 'fa-plus-square-o': !isRegistrationDetailsExpanded}"></i>
                     </a>
-                    <table class="table table-hover" ng-if="isRegistrationDetailsExpanded">
-                        <thead>
-                            <tr>
-                                <th class="col-xs-1">
-                                    abc<!--<input type="checkbox" ng-model="model.selected" ng-checked="model.selected" ng-change="callbacks.selectOrDeselectGroup(model.rights)" />-->
-                                </th>
-                                <th class="col-xs-3">Name</th>
-                                <th class="col-xs-3">Delete</th>
-                            </tr>
-                        </thead>
-                        <tbody ng-repeat="test1 in test">
-                            <tr>
-                                <td>abc<!--<input data-disabled-on-busy type="checkbox" ng-model="right.selected" ng-change="callbacks.selectionChanged()" />--></td>
-                                <td>{{test1.name}}</td>
-                                <td><button class="glyphicon glyphicon-trash" ng-click="delete()" data-disabled-on-busy></button></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                </div>
+                <div ng-if="isRegistrationDetailsExpanded" class="panel-body">
+                    <org-unit-migration organizationId="1"></org-unit-migration>
                 </div>
             </div>
         </form>
     </div>
 
-    <div class="modal-footer text-center">
+    <div class="modal-footer">
         <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" tabindex="5">
             <i class="glyphicon glyphicon-plus"></i>
             Opret ny underenhed

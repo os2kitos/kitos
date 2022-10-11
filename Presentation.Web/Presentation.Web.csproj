@@ -359,8 +359,11 @@
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config-import-modal.dialog.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\structure\org-unit-migration-table.component.ts" />
+    <TypeScriptCompile Include="app\components\org\structure\org-unit-migration.component.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
     <TypeScriptCompile Include="app\Configs\kendo-date-picker-options.ts" />
+    <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
@@ -649,6 +652,8 @@
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\components\local-config\ui-customization\local-ui-customization.view.html" />
+    <Content Include="app\components\org\structure\org-unit-migration.view.html" />
+    <Content Include="app\components\org\structure\org-unit-migration-table.view.html" />
     <Content Include="app\components\org\user\user-delete-directives\org-user-roles-table.view.html" />
     <Content Include="app\components\user-notification\user-notification-modal.view.html" />
     <Content Include="app\components\user-notification\user-notification.view.html" />
