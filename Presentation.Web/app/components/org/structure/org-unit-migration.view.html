@@ -1,6 +1,6 @@
 ﻿<div class="form-group">
     <label for="selectedOrgId" class="col-xs-3">Assign to: &nbsp;</label>
-    <select id="selectedOrgId" ng-model="ctrl.selectedOrg" class="form-control col-xs-6" ng-options="org as org.name for org in ctrl.organizations">
+    <select id="selectedOrgId" ng-model="ctrl.selectedOrg" ng-change="ctrl.setSelectedOrg()" class="form-control col-xs-6" ng-options="org as org.name for org in ctrl.organizations">
         {{org.name}}
     </select>
 </div>
@@ -12,9 +12,10 @@
 <org-unit-migration-table title="Relevant system registrations" options="ctrl.relevantSystemRegistrations"></org-unit-migration-table>
 <org-unit-migration-table title="Responsible system registrations" options="ctrl.responsibleSystemRegistrations"></org-unit-migration-table>
 
-<button class="btn btn-default" data-ng-click="selectDeselectAll()">Select/Deselect all</button>
+<button class="btn btn-default" ng-click="ctrl.selectAll()" ng-if="!ctrl.allSelections">Select all</button>
+<button class="btn btn-default" ng-click="ctrl.deselectAll()" ng-if="ctrl.allSelections">Deselect all</button>
 <div class="pull-right">
-    <button class="btn btn-danger" ng-click="ctrl.deleteSelected()">Delete selected</button>
-    <button class="btn btn-danger" ng-click="ctrl.delete()">Delete unit</button>
-    <button class="btn btn-warning" ng-click="ctrl.transfer()">Transfer</button>
+    <button class="btn btn-danger" ng-click="ctrl.deleteSelected()" ng-disabled="!ctrl.anySelections">Delete selected</button>
+    <button class="btn btn-danger" ng-click="ctrl.deleteUnit()">Delete unit</button>
+    <button class="btn btn-warning" ng-click="ctrl.transfer()" ng-disabled="!ctrl.anySelections">Transfer</button>
 </div>

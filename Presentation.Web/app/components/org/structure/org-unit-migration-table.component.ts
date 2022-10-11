@@ -27,14 +27,22 @@
             this.root = this.options.root;
         }
 
-        unitSelected(unit, event) {
-            const callback = this.options.selectedUnitChanged;
-
+        registrationSelected() {
+            const callback = this.options.selectedRegistrationChanged;
+            if (callback !== undefined) {
+                callback();
+            }
         }
 
-        unitGroupSelected(group, event) {
-            const callback = this.options.selectedUnitGroupChanged;
+        registrationGroupSelected(root) {
+            const callback = this.options.selectedRegistrationGroupChanged;
+            if (callback !== undefined) {
+                callback(root);
+            }
+        }
 
+        delete(registration) {
+            //TODO: delete registration
         }
     }
 
