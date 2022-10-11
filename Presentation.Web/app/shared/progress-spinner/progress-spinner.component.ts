@@ -15,12 +15,12 @@
 
     interface IProgressSpinnerComponentController extends ng.IComponentController {
         showText: boolean
-        customText: string | null | undefined;
+        customText: string | null | undefined
 
     }
 
     class ProgressSpinnerComponentController implements IProgressSpinnerComponentController {
-        showText: boolean
+        showText: boolean;
         customText: string | undefined;
 
         activeText: string | null = null;
