@@ -126,6 +126,7 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<UIModuleCustomization> UIModuleCustomizations { get; set; }
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ArchiveSupplierForItSystems { get; set; }
+        public virtual StsOrganizationConnection StsOrganizationConnection { get; set; }
 
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace Core.DomainModel.Organization
         {
             if (module == null)
                 throw new ArgumentNullException(nameof(module));
-            
+
             return UIModuleCustomizations
                 .SingleOrDefault(config => config.Module == module)
                 .FromNullable();
@@ -164,17 +165,17 @@ namespace Core.DomainModel.Organization
         public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, IEnumerable<CustomizedUINode> nodes)
         {
             if (string.IsNullOrEmpty(module))
-                throw new ArgumentNullException("Module parameter cannot be null");
+                throw new ArgumentNullException(nameof(module));
             if (nodes == null)
-                throw new ArgumentNullException("Nodes parameter cannot be null");
-            
+                throw new ArgumentNullException(nameof(nodes));
+
             var uiNodes = nodes.ToList();
             var customizedUiNodes = uiNodes.ToList();
-            
+
             var moduleCustomization = GetUiModuleCustomization(module).GetValueOrDefault();
             if (moduleCustomization == null)
             {
-                moduleCustomization = new UIModuleCustomization {Organization = this, Module = module};
+                moduleCustomization = new UIModuleCustomization { Organization = this, Module = module };
                 UIModuleCustomizations.Add(moduleCustomization);
             }
 
@@ -184,6 +185,48 @@ namespace Core.DomainModel.Organization
                 return nodeUpdateResult.Value;
 
             return moduleCustomization;
+        }
+
+        public Maybe<OperationError> ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+            //Pre-validate
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+                    if (StsOrganizationConnection?.Connected == true)
+                    {
+                        return new OperationError($"Already connected to {origin:G}", OperationFailure.Conflict);
+                    }
+                    break;
+                case OrganizationUnitOrigin.Kitos: //Intentional fallthrough.. Invalid argument type for this method. Kitos is internal
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
+            }
+
+            return GetRoot()
+                .FromNullable()
+                .Match
+                (
+                    currentOrgRoot =>
+                    {
+                        var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //Subtract one since first level is the root
+                        return currentOrgRoot.ImportNewExternalOrganizationOrgTree(origin, root.Copy(childLevelsToInclude));
+                    },
+                    () => new OperationError("Unable to load current root", OperationFailure.UnknownError)
+                ).Match
+                (error => error,
+                    () =>
+                    {
+                        StsOrganizationConnection ??= new StsOrganizationConnection();
+                        StsOrganizationConnection.Connected = true;
+                        StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
+                        return Maybe<OperationError>.None;
+                    }
+                );
         }
     }
 }

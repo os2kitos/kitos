@@ -4,7 +4,7 @@
     function setupComponent(): ng.IComponentOptions {
         return {
             bindings: {
-                currentOrganizationUuid: "="
+                currentOrganizationUuid: "<"
             },
             controller: FkOrganizationImportController,
             controllerAs: "ctrl",
@@ -12,51 +12,138 @@
         };
     }
 
+    enum CommandCategory {
+        Create = "create",
+        Update = "update",
+        Delete = "delete"
+    }
+
+    interface IFkOrganizationCommand {
+        id: string
+        text: string
+        onClick: () => void
+        enabled: boolean
+        category: CommandCategory
+    }
+
+    interface IFkOrganizationSynchronizationStatus {
+        connected: boolean
+        synchronizationDepth: number | null
+    }
+
     interface IFkOrganizationImportController extends ng.IComponentController {
         currentOrganizationUuid: string
+        accessGranted: boolean | null;
+        accessError: string | null
+        synchronizationStatus: IFkOrganizationSynchronizationStatus | null
+        commands: Array<IFkOrganizationCommand> | null;
     }
 
     class FkOrganizationImportController implements IFkOrganizationImportController {
         currentOrganizationUuid: string | null = null; //note set by bindings
-        connected: boolean | null = null;
-        connectionError: string | null = null;
+        accessGranted: boolean | null = null;
+        accessError: string | null = null;
+        synchronizationStatus: IFkOrganizationSynchronizationStatus | null = null;
+        commands: Array<IFkOrganizationCommand> | null = null;
 
-        static $inject: string[] = ["stsOrganizationSyncService"];
-        constructor(private readonly stsOrganizationSyncService: Kitos.Services.Organization.IStsOrganizationSyncService) {
+        static $inject: string[] = ["stsOrganizationSyncService", "fkOrganisationImportDialogFactory"];
+        constructor(
+            private readonly stsOrganizationSyncService: Kitos.Services.Organization.IStsOrganizationSyncService,
+            private readonly fkOrganisationImportDialogFactory: Kitos.LocalAdmin.FkOrganisation.Modals.IFKOrganisationImportDialogFactory) {
         }
 
         $onInit() {
             if (this.currentOrganizationUuid === null) {
                 console.error("missing attribute: 'currentOrganizationUuid'");
             } else {
-                this.stsOrganizationSyncService
-                    .getConnectionStatus(this.currentOrganizationUuid)
-                    .then(result => {
-                        if (result.connected) {
-                            this.connected = true;
-                        } else {
-                            this.connected = false;
-                            switch (result.error) {
-                                case Models.Api.Organization.CheckConnectionError.ExistingServiceAgreementIssue:
-                                    this.connectionError = "Der er problemer med den eksisterende serviceaftale, der giver KITOS adgang til data fra din kommune i FK Organisatoin. Kontakt venligst den KITOS ansvarlige i din kommune for hjælp."
-                                    break;
-                                case Models.Api.Organization.CheckConnectionError.InvalidCvrOnOrganization:
-                                    this.connectionError = "Der enten mangler eller er registreret et ugyldigt CVR nummer på din kommune i KITOS."
-                                    break;
-                                case Models.Api.Organization.CheckConnectionError.MissingServiceAgreement:
-                                    this.connectionError = "Din organisation mangler en gyldig serviceaftale der giver KITOS adgang til data fra din kommune i FK Organisation. Kontakt venligst den KITOS ansvarlige i din kommune for hjælp."
-                                    break;
-                                case Models.Api.Organization.CheckConnectionError.Unknown: //intended fallthrough
-                                default:
-                                    this.connectionError = "Der skete en ukendt fejl ifm. tjek for forbindelsen til FK Organisation. Genindlæs venligst siden for at prøve igen."
-                                    break;
-                            }
-                        }
-                    }, error => {
-                        console.error(error);
-                        this.connected = false;
-                        this.connectionError = "Der skete en fejl ifm. tjek for forbindelsen til FK Organisation. Genindlæs venligst siden for at prøve igen."
-                    });
+                this.loadState();
+            }
+        }
+
+        private loadState() {
+            this.stsOrganizationSyncService
+                .getConnectionStatus(this.currentOrganizationUuid)
+                .then(result => {
+                    this.bindAccessProperties(result);
+                    this.bindSynchronizationStatus(result);
+                    this.bindCommands(result);
+                }, error => {
+                    console.error(error);
+                    this.accessGranted = false;
+                    this.accessError = "Der skete en fejl ifm. tjek for forbindelsen til FK Organisation. Genindlæs venligst siden for at prøve igen.";
+                });
+        }
+
+        private bindCommands(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
+            const newCommands: Array<IFkOrganizationCommand> = [];
+            if (result.connected) {
+                newCommands.push({
+                    id: "updateSync",
+                    text: "Rediger",
+                    category: CommandCategory.Update,
+                    enabled: result.canUpdateConnection,
+                    onClick: () => {
+                        //TODO:Remember to rebind https://os2web.atlassian.net/browse/KITOSUDV-3313
+                        console.log("UPDATE");
+                    }
+                });
+                newCommands.push({
+                    id: "breakSync",
+                    text: "Afbryd",
+                    category: CommandCategory.Delete,
+                    enabled: result.canDeleteConnection,
+                    onClick: () => {
+                        //TODO:Remember to rebind https://os2web.atlassian.net/browse/KITOSUDV-3320
+                        console.log("DELETE");
+                    }
+                });
+            } else {
+                newCommands.push({
+                    id: "createSync",
+                    text: "Forbind",
+                    category: CommandCategory.Create,
+                    enabled: result.canCreateConnection,
+                    onClick: () => {
+                        this.fkOrganisationImportDialogFactory
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null)
+                            .closed.then(() => {
+                                //Reload state from backend if the dialog was closed 
+                                this.loadState();
+                            });
+                    }
+                });
+            }
+
+            this.commands = newCommands;
+        }
+
+        private bindSynchronizationStatus(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
+            this.synchronizationStatus = {
+                connected: result.connected,
+                synchronizationDepth: result.synchronizationDepth
+            };
+        }
+
+        private bindAccessProperties(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
+            if (result.accessStatus.accessGranted) {
+                this.accessGranted = true;
+            } else {
+                this.accessGranted = false;
+                switch (result.accessStatus.error) {
+                    case Models.Api.Organization.CheckConnectionError.ExistingServiceAgreementIssue:
+                        this.accessError = "Der er problemer med den eksisterende serviceaftale, der giver KITOS adgang til data fra din kommune i FK Organisatoin. Kontakt venligst den KITOS ansvarlige i din kommune for hjælp.";
+                        break;
+                    case Models.Api.Organization.CheckConnectionError.InvalidCvrOnOrganization:
+                        this.accessError = "Der enten mangler eller er registreret et ugyldigt CVR nummer på din kommune i KITOS.";
+                        break;
+                    case Models.Api.Organization.CheckConnectionError.MissingServiceAgreement:
+                        this.accessError = "Din organisation mangler en gyldig serviceaftale der giver KITOS adgang til data fra din kommune i FK Organisation. Kontakt venligst den KITOS ansvarlige i din kommune for hjælp.";
+                        break;
+                    case Models.Api.Organization.CheckConnectionError.Unknown: //intended fallthrough
+                    default:
+                        this.accessError = "Der skete en ukendt fejl ifm. tjek for forbindelsen til FK Organisation. Genindlæs venligst siden for at prøve igen.";
+                        break;
+                }
             }
         }
     }
