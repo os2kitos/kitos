@@ -83,8 +83,7 @@
                     category: CommandCategory.Update,
                     enabled: result.canUpdateConnection,
                     onClick: () => {
-                        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3313
-                        // NOTE: Remember to rebind
+                        //TODO:Remember to rebind https://os2web.atlassian.net/browse/KITOSUDV-3313
                         console.log("UPDATE");
                     }
                 });
@@ -94,8 +93,7 @@
                     category: CommandCategory.Delete,
                     enabled: result.canDeleteConnection,
                     onClick: () => {
-                        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3320
-                        // NOTE: Remember to rebind
+                        //TODO:Remember to rebind https://os2web.atlassian.net/browse/KITOSUDV-3320
                         console.log("DELETE");
                     }
                 });
@@ -124,10 +122,6 @@
                 connected: result.connected,
                 synchronizationDepth: result.synchronizationDepth
             };
-            //TODO: Bind the available commands
-            //TODO: Consider
-            // TODO: - Dialog or in-page flow?
-            // TODO: Buttons... same color or?..
         }
 
         private bindAccessProperties(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
