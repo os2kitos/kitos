@@ -1,6 +1,6 @@
-﻿<div class="form-group">
+﻿<div class="form-group mx-auto">
     <label for="selectedOrgId" class="col-xs-3">Assign to: &nbsp;</label>
-    <select id="selectedOrgId" ng-model="ctrl.selectedOrg" ng-change="ctrl.setSelectedOrg()" class="form-control col-xs-6" ng-options="org as org.name for org in ctrl.organizations">
+    <select id="selectedOrgId" ng-model="ctrl.selectedOrg" ng-change="ctrl.setSelectedOrg()" class="form-control " ng-options="org as org.name for org in ctrl.organizations">
         {{org.name}}
     </select>
 </div>

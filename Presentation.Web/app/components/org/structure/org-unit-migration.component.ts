@@ -47,13 +47,17 @@
         organizations: any;
         selectedOrg: any;
 
-        //TODO: inject data
+        //TODO: inject real data
         static $inject: string[] = [];
         constructor() {
 
         }
 
         $onInit() {
+            if (this.organizationId === null) {
+                console.error("missing attribute: 'organizationId'");
+            }
+            //TODO: remove "createOptions" method used for creating test data
             this.roles = this.createOptions();
             this.payments = this.createOptions();
             this.internalContractRegistrations = this.createOptions();

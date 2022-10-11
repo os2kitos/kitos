@@ -20,7 +20,7 @@
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
         title: string | null = null;
-        options: IOrganizationUnitMigrationOptions | null = null;
+        options: IOrganizationUnitMigrationOptions;
         root: IOrganizationUnitMigrationRoot;
 
         $onInit() {

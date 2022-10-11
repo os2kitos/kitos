@@ -46,7 +46,7 @@
                     <input type="text" name="localId" id="localid" data-ng-model="orgUnit.localId" class="form-control" tabindex="4">
                 </div>
             </div>
-            <div class="panel panel-default row" for="expand_collapse_registrations" style="margin-right: auto !important; margin-left: auto !important;">
+            <div class="panel panel-default row mx-auto" for="expand_collapse_registrations">
                 <div class="panel-heading">
                     <a id="expand_collapse_registrations" class="task-fold control-label" data-ng-click="isRegistrationDetailsExpanded = !isRegistrationDetailsExpanded">
                         <span>Registrations</span>
@@ -54,7 +54,7 @@
                     </a>
                 </div>
                 <div ng-if="isRegistrationDetailsExpanded" class="panel-body">
-                    <org-unit-migration organizationId="1"></org-unit-migration>
+                    <org-unit-migration organizationId="user.currentOrganizationId"></org-unit-migration>
                 </div>
             </div>
         </form>

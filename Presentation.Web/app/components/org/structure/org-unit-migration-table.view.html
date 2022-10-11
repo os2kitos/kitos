@@ -4,9 +4,9 @@
         <th class="col-xs-1">
             <input type="checkbox" ng-model="ctrl.root.selected" ng-change="ctrl.registrationGroupSelected(ctrl.root)"/>
         </th>
-        <th class="col-xs-3">{{ctrl.title}}</th>
-        <th class="col-xs-3">Assigned to</th>
-        <th class="col-xs-3">Delete</th>
+        <th class="col-xs-5">{{ctrl.title}}</th>
+        <th class="col-xs-5">Assigned to</th>
+        <th class="col-xs-1">Delete</th>
     </tr>
     </thead>
     <tbody ng-repeat="registration in ctrl.root.children">
@@ -14,7 +14,7 @@
         <td><input data-disabled-on-busy type="checkbox" ng-model="registration.selected" ng-change="ctrl.registrationSelected()"/></td>
         <td>{{registration.text}}</td>
         <td>{{registration.targetUnit.name}}</td>
-        <td><button class="glyphicon glyphicon-trash" data-disabled-on-busy ng-click="delete(registration)"></button></td>
+        <td class="pull-right"><button class="glyphicon glyphicon-trash" data-disabled-on-busy ng-click="delete(registration)"></button></td>
     </tr>
     </tbody>
 </table>
