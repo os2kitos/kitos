@@ -1,13 +1,20 @@
-﻿module Kitos.Shared.Components.Progress {
+﻿module Kitos.Shared.Components.Organization {
     "use strict";
 
-    //TODO: Move to another the models folder
+    export interface IOrganizationTreeNode {
+        name: string
+        id: string
+        nodes: Array<IOrganizationTreeNode>
+    }
+
+    interface IOrganizationTreeNodeViewModel extends IOrganizationTreeNode {
+        level: number
+    }
+
     export interface IOrganizationTreeComponentOptions {
-        nodes: any //TODO
+        root: IOrganizationTreeNode
         availableLevels: number | null
-        dragDropAllowed: boolean | null
-        hasWriteAccess: boolean | null
-        selectedNodeChanged?: (node: any | null) => void //TODO: Define the node    
+        selectedNodeChanged?: (node: IOrganizationTreeNode | null) => void
     }
 
     function setupComponent(): ng.IComponentOptions {
@@ -17,7 +24,7 @@
             },
             controller: OrganizationTreeComponentController,
             controllerAs: "ctrl",
-            templateUrl: `app/shared/progress-spinner/progress-spinner.view.html`
+            templateUrl: `app/shared/organization-tree/organization-tree.view.html`
         };
     }
 
@@ -27,24 +34,35 @@
 
     class OrganizationTreeComponentController implements IOrganizationTreeComponentController {
         options: IOrganizationTreeComponentOptions;
-        chosenNode: any | null = null; //TODO: Define the node
-
+        chosenNode: IOrganizationTreeNodeViewModel | null = null;
+        nodesVm: Array<IOrganizationTreeNodeViewModel> | null = null;
         $onInit() {
             if (!this.options) {
                 console.error("Missing options for OrganizationTreeComponentController");
             } else {
-                //TODO: Build the tree
-                //TODO: Register the callbacks
+                this.nodesVm = this.applyLevels([this.options.root], 1);
             }
         }
 
+        /**
+         * Applies level information used for quick filtering in the view
+         * @param nodes
+         * @param level
+         */
+        private applyLevels(nodes: IOrganizationTreeNode[], level: number): IOrganizationTreeNodeViewModel[] {
+            nodes.forEach(node => {
+                const vm = node as IOrganizationTreeNodeViewModel;
+                vm.level = level;
+                this.applyLevels(vm.nodes, level + 1);
+            });
+            return nodes as IOrganizationTreeNodeViewModel[];
+        }
+
         chooseOrgUnit(node, event) {
-            //TODO: Event filtering based on "event"
             const callback = this.options.selectedNodeChanged;
             if (this.chosenNode !== node) {
                 this.chosenNode = node;
                 if (callback != undefined) {
-                    //TODO: Selection filtering
                     callback(node);
                 }
             }

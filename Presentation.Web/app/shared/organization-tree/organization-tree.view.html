@@ -1,1 +1,7 @@
-﻿<img class="progress-spinner-img" src="/Content/img/loading-spinner.gif" alt="spinner"/><span ng-if="ctrl.activeText"> {{::ctrl.activeText}}</span>
+﻿<div>
+    <div ng-if="ctrl.nodesVm !== null" ui-tree="treeOptions" data-drag-enabled="false">
+        <ol ui-tree-nodes="" data-ng-model="ctrl.nodesVm" id="tree-root" class="nonDragable">
+            <li data-ng-repeat="node in ctrl.nodesVm" ui-tree-node ng-include="'app/shared/organization-tree/organization-tree-node.view.html'"></li>
+        </ol>
+    </div>
+</div>
