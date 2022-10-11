@@ -1,6 +1,7 @@
 ﻿<div data-ng-if="!createNew">
     <div class="modal-header">
-        <h3>Rediger {{ orgUnit.oldName }}</h3>
+        <h3>Rediger {{::orgUnit.oldName}}</h3>
+        <span class="help-block small" ng-if="supplementaryText !== null">{{::supplementaryText}}</span>
     </div>
     <div class="modal-body">
         <h4>Rediger info</h4>
@@ -10,14 +11,14 @@
                     Overordnet enhed
                 </label>
                 <div class="col-xs-8">
-                    <single-select-select2 id="parent-select" ng-model="parentSelect" ng-disabled="!canChangeParent"/>
+                    <single-select-select2 id="parent-select" ng-model="parentSelect" ng-disabled="!canChangeParent" />
                 </div>
                 <div class="col-xs-8 col-xs-offset-3">
-                    <p class="help-block" data-ng-show="canChangeParent">
-                        Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underenhed til {{orgUnit.oldName}}.
+                    <p class="help-block" ng-if="canChangeParent">
+                        Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underenhed til {{::orgUnit.oldName}}.
                     </p>
-                    <p class="help-block" data-ng-hide="canChangeParent">
-                        Du kan ikke ændre {{ orgUnit.oldName + 's' }} overordnet organisationsenhed.
+                    <p class="help-block" ng-if="!canChangeParent">
+                        Du kan ikke ændre {{ ::orgUnit.oldName + 's' }} overordnet organisationsenhed.
                         <span data-ng-show="!isAdmin">Kontakt en lokal administrator.</span>
                     </p>
                 </div>
@@ -27,7 +28,7 @@
                     Enhedens navn
                 </label>
                 <div class="col-xs-8">
-                    <input type="text" name="name" id="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" tabindex="2" data-autofocus="">
+                    <input ng-disabled="!canChangeName" type="text" name="name" id="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" tabindex="2" data-autofocus="">
                 </div>
             </div>
             <div class="form-group">
@@ -55,7 +56,7 @@
             Opret ny underenhed
         </button>
         <button class="btn btn-danger btn-sm pull-left"
-                data-ng-disabled="submitting"
+                data-ng-disabled="submitting || !canDelete"
                 data-confirmed-click="delete()"
                 data-confirm-click="Er du sikker på at du vil slette denne enhed? Dette vil også slette alle underenheder!" data-ng-hide="orgUnit.isRoot" tabindex="6">
             <i class="glyphicon glyphicon-trash"></i>

@@ -6,7 +6,7 @@
                 templateUrl: "app/components/org/structure/org-structure.view.html",
                 controller: "org.StructureCtrl",
                 resolve: {
-                    orgUnits: [
+                    rootNodeOfOrganization: [
                         "$http", "user", ($http: ng.IHttpService, user) => $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
                             return result.data.response;
                         })
@@ -33,8 +33,20 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
-        function ($scope, $http: ng.IHttpService, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService, inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
+        function ($scope,
+            $http: ng.IHttpService,
+            $modal,
+            $state,
+            notify,
+            rootNodeOfOrganization: Kitos.Models.Api.Organization.IOrganizationUnitDto,
+            localOrgUnitRoles,
+            orgUnitRoles,
+            user,
+            hasWriteAccess,
+            authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
+            select2LoadingService: Kitos.Services.ISelect2LoadingService,
+            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -110,7 +122,7 @@
             }
 
             function loadUnits() {
-                var rootNode = orgUnits;
+                var rootNode = rootNodeOfOrganization;
                 $scope.nodes = [rootNode];
 
                 flattenAndSave(rootNode, false, null);
@@ -336,6 +348,13 @@
                 $scope.rightSortBy = val;
             };
 
+            function getSupplementaryTextForEditDialog(unit: Kitos.Models.Api.Organization.IOrganizationUnitDto): string | null {
+                if (unit.origin === Kitos.Models.Api.Organization.OrganizationUnitOrigin.STS_Organisation) {
+                    return "Enheden synkroniseres fra FK Organisation og nogle felter kan derfor ikke redigeres i KITOS";
+                }
+                return null;
+            }
+
             $scope.editUnit = function (unit) {
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
@@ -364,7 +383,9 @@
                                         ean: node.ean,
                                         localId: node.localId,
                                         parentId: node.parentId,
-                                        organizationId: node.organizationId
+                                        organizationId: node.organizationId,
+                                        externalOriginUuid: node.externalOriginUuid,
+                                        origin: node.origin
                                     });
 
                                 _.each(node.children, filter);
@@ -381,7 +402,8 @@
                                 localId: unit.localId,
                                 newParent: unit.parentId,
                                 orgId: unit.organizationId,
-                                isRoot: unit.parentId == undefined
+                                isRoot: unit.parentId == undefined,
+                                isExternalUnit: unit.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                             } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
 
                             if ($modalScope.orgUnit.isRoot) {
@@ -392,7 +414,9 @@
                                         ean: unit.ean,
                                         localId: unit.localId,
                                         parentId: unit.parentId,
-                                        organizationId: unit.organizationId
+                                        organizationId: unit.organizationId,
+                                        externalOriginUuid: unit.externalOriginUuid,
+                                        origin: unit.origin
                                     });
                             }
 
@@ -400,7 +424,10 @@
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
-                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
+                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot && !$modalScope.orgUnit.isExternalUnit;
+                            $modalScope.canChangeName = $modalScope.isAdmin && !$modalScope.orgUnit.isExternalUnit;
+                            $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
+                            $modalScope.canDelete = $modalScope.isAdmin && !$modalScope.orgUnit.isExternalUnit;
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting
@@ -463,7 +490,8 @@
                                     "parentId": parent,
                                     "organizationId": orgId,
                                     "ean": ean,
-                                    "localId": localId
+                                    "localId": localId,
+                                    "origin": Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                                 };
 
                                 $modalScope.submitting = true;
@@ -495,7 +523,8 @@
                                 $modalScope.newOrgUnit = {
                                     name: "",
                                     parent: $modalScope.orgUnit.id,
-                                    orgId: $modalScope.orgUnit.orgId
+                                    orgId: $modalScope.orgUnit.orgId,
+                                    origin: Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                                 };
                             };
 
@@ -605,7 +634,7 @@
                         var msg = notify.addInfoMessage("Opdaterer...", false);
                         $http<Kitos.API.Models.IApiWrapper<any>>({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).then(() => {
                             msg.toSuccessMessage("Enheden er opdateret");
-                            $scope.chooseOrgUnit(orgUnits);
+                            $scope.chooseOrgUnit(rootNodeOfOrganization);
                         }, (error) => {
                             msg.toErrorMessage("Fejl!");
                         });

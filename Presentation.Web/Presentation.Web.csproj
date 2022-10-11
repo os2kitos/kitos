@@ -369,6 +369,7 @@
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-unit-origin.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-org-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-access-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-synchronization-status-response-dto.ts" />

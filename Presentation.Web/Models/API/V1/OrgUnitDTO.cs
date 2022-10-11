@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel.Organization;
+using System;
 using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V1
@@ -25,6 +26,8 @@ namespace Presentation.Web.Models.API.V1
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
         public Guid Uuid { get; set; }
+        public OrganizationUnitOrigin Origin { get; set; }
+        public Guid ExternalOriginUuid { get; set; }
     }
 
     public class OrgUnitSimpleDTO
