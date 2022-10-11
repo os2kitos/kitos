@@ -2,6 +2,7 @@
     export interface IStsOrganizationSyncService {
         getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>
         createConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void>
+        getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>
     }
 
     export class StsOrganizationSyncService implements IStsOrganizationSyncService {
@@ -18,16 +19,34 @@
             return `api/v1/organizations/${organizationUuid}/sts-organization-synchronization`;
         }
 
-        private getCacheKey(organizationUuid: string) {
+        private getStatusCacheKey(organizationUuid: string) {
             return `FK_CONNECTION_STATUS_${organizationUuid}`;
         }
 
+        private getHierarchyCacheKey(organizationUuid: string) {
+            return `FK_HIERARCHY_${organizationUuid}`;
+        }
+
         private purgeCache(organizationUuid: string) {
-            this.inMemoryCacheService.deleteEntry(this.getCacheKey(organizationUuid));
+            this.inMemoryCacheService.deleteEntry(this.getStatusCacheKey(organizationUuid));
+        }
+
+        getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO> {
+            const cacheKey = this.getHierarchyCacheKey(organizationUuid);
+            const result = this.inMemoryCacheService.getEntry<Models.Api.Organization.StsOrganizationOrgUnitDTO>(cacheKey);
+            if (result != null) {
+                return this.$q.resolve(result);
+            }
+            return this.genericApiWrapper
+                .getDataFromUrl<Models.Api.Organization.StsOrganizationOrgUnitDTO>(`${this.getBasePath(organizationUuid)}/snapshot`)
+                .then(root => {
+                    this.inMemoryCacheService.setEntry(cacheKey, root, Kitos.Shared.Time.Offset.compute(Kitos.Shared.Time.TimeUnit.Minutes, 10));
+                    return root;
+                });
         }
 
         getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO> {
-            const cacheKey = this.getCacheKey(organizationUuid);
+            const cacheKey = this.getStatusCacheKey(organizationUuid);
             const result = this.inMemoryCacheService.getEntry<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>(cacheKey);
             if (result != null) {
                 return this.$q.resolve(result);
