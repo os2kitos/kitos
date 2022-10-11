@@ -356,6 +356,7 @@
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config-import-modal.dialog.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
@@ -368,7 +369,8 @@
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
-    <TypeScriptCompile Include="app\models\Api\organization\check-sts-organization-connection-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\sts-organization-access-status-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\sts-organization-synchronization-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
@@ -402,7 +404,9 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\CheckStsOrganizationConnectionResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
     <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
@@ -640,6 +644,7 @@
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-config-import-modal.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
@@ -650,6 +655,7 @@
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\helpText\inlineHelpText.view.html" />
     <Content Include="app\shared\helpText\field-help-text.view.html" />
+    <Content Include="app\shared\progress-spinner\progress-spinner.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="app\shared\select2Option\select2MultipleOption.view.html" />
@@ -658,6 +664,7 @@
     <Content Include="app\shared\selectOrgUnit\select2OrgUnit.view.html" />
     <Content Include="app\shared\selectRole\selectRole.view.html" />
     <Content Include="app\shared\selectSimple\selectSimple.view.html" />
+    <Content Include="Content\img\loading-spinner.gif" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -900,6 +907,7 @@
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
+    <TypeScriptCompile Include="app\shared\progress-spinner\progress-spinner.component.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />

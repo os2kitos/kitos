@@ -99,6 +99,7 @@
         createDeletion<T>(objectName: string, change: ApiCall<T>): AsyncApiChangeUseCase<T>;
         createAssignmentRemoval<T>(apiCall: ApiCall<T>): AsyncApiChangeUseCase<T>;
         createAssignmentCreation<T>(apiCall: ApiCall<T>): AsyncApiChangeUseCase<T>;
+        createCreation<T>(objectName: string, change: ApiCall<T>): AsyncApiChangeUseCase<T>;
     }
 
     export class ApiUseCaseFactory implements IApiUseCaseFactory {
@@ -106,6 +107,13 @@
         static $inject = ["notify"];
         constructor(private readonly notify) {
 
+        }
+
+        createCreation<T>(objectName: string, change: ApiCall<T>): AsyncApiChangeUseCase<T> {
+            if (!change) {
+                throw new Error("apiCall must be defined");
+            }
+            return new AsyncApiChangeUseCase<T>(this.notify, change, objectName, ChangeType.Creation);
         }
 
         createDeletion<T>(objectName: string, change: () => angular.IPromise<T>): AsyncApiChangeUseCase<T> {

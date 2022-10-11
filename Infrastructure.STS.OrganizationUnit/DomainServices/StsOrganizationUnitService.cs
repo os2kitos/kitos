@@ -30,14 +30,14 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/OrganisationEnhed/5";
         }
 
-        public Result<StsOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
+        public Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
         {
             //Resolve the org uuid
             var uuid = _organizationService.ResolveStsOrganizationUuid(organization);
             if (uuid.Failed)
             {
                 var error = uuid.Error;
-                _logger.Error("Loading sts organization uuid from org with id: {id} failed with {detailedError} {errorCode} {errorMessage}", organization.Id, error.Detail, error.FailureType, error.Message);
+                _logger.Error("Loading sts organization uuid from org with id: {id} failed with {detailedError} {errorCode} {errorMessage}", organization.Id, error.Detail, error.FailureType, error.Message.GetValueOrFallback(""));
                 return new DetailedOperationError<ResolveOrganizationTreeError>(error.FailureType, ResolveOrganizationTreeError.FailedResolvingUuid, $"{error.Detail}:{error.Message}");
             }
 
@@ -108,8 +108,8 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
             }
 
             // Process the tree info from sts org in order to generate the import tree
-            var parentIdToConvertedChildren = new Dictionary<Guid, List<StsOrganizationUnit>>();
-            var idToConvertedChildren = new Dictionary<Guid, StsOrganizationUnit>();
+            var parentIdToConvertedChildren = new Dictionary<Guid, List<ExternalOrganizationUnit>>();
+            var idToConvertedChildren = new Dictionary<Guid, ExternalOrganizationUnit>();
             var root = roots.Single();
 
             var processingStack = CreateOrgUnitConversionStack(root, unitsByParent);
@@ -121,7 +121,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
                 var egenskabType = unit.Item2.AttributListe.Egenskab.First(x => string.IsNullOrEmpty(x.EnhedNavn) == false);
                 var unitUuid = unit.Item1;
-                var organizationUnit = new StsOrganizationUnit(unitUuid, egenskabType.EnhedNavn, egenskabType.BrugervendtNoegleTekst, parentIdToConvertedChildren.ContainsKey(unitUuid) ? parentIdToConvertedChildren[unitUuid] : new List<StsOrganizationUnit>(0));
+                var organizationUnit = new ExternalOrganizationUnit(unitUuid, egenskabType.EnhedNavn, new Dictionary<string, string>(){{ "UserFacingKey", egenskabType.BrugervendtNoegleTekst } }, parentIdToConvertedChildren.ContainsKey(unitUuid) ? parentIdToConvertedChildren[unitUuid] : new List<ExternalOrganizationUnit>(0));
                 idToConvertedChildren[organizationUnit.Uuid] = organizationUnit;
                 var parentUnit = unit.Item2.RelationListe.Overordnet;
                 if (parentUnit != null)
@@ -129,7 +129,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
                     var parentId = new Guid(parentUnit.ReferenceID.Item);
                     if (!parentIdToConvertedChildren.TryGetValue(parentId, out var parentToChildrenList))
                     {
-                        parentToChildrenList = new List<StsOrganizationUnit>();
+                        parentToChildrenList = new List<ExternalOrganizationUnit>();
                         parentIdToConvertedChildren[parentId] = parentToChildrenList;
                     }
                     parentToChildrenList.Add(organizationUnit);

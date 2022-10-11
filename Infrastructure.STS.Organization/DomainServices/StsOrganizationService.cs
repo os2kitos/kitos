@@ -69,7 +69,7 @@ namespace Infrastructure.STS.Organization.DomainServices
             var companyUuid = ResolveExternalUuid(organization);
 
             if (companyUuid.Failed)
-                return companyUuid.Value;
+                return companyUuid.Error;
 
             //Search for the organization based on the resolved company (all organizations are tied to a company)
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
