@@ -33,7 +33,7 @@ namespace Core.DomainModel.Organization
         /// <summary>
         /// Determines the optional external origin-specific uuid
         /// </summary>
-        public Guid ExternalOriginUuid { get; set; }
+        public Guid? ExternalOriginUuid { get; set; }
 
         public string LocalId { get; set; }
 
