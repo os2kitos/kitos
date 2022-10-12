@@ -9,7 +9,6 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Configuration;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Rights;
@@ -19,8 +18,6 @@ using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using Core.DomainModel.Users;
-using Core.DomainServices.Extensions;
 
 namespace Tests.Unit.Core.ApplicationServices
 {

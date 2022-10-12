@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -17,7 +13,6 @@ namespace Presentation.Web.Controllers.API.V1
     [RoutePrefix("api/v1/user/delete")]
     public class UserDeletionController : BaseApiController
     {
-
         private readonly IUserService _userService;
         private readonly IEntityIdentityResolver _identityResolver;
 

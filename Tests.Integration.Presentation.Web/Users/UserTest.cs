@@ -14,7 +14,6 @@ using Tests.Integration.Presentation.Web.Tools.External.Rights;
 using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using System.Xml.Linq;
 
 namespace Tests.Integration.Presentation.Web.Users
 {

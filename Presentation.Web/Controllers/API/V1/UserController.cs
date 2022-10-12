@@ -179,7 +179,7 @@ namespace Presentation.Web.Controllers.API.V1
         [NonAction]
         public override HttpResponseMessage Delete(int id, int organizationId = 0)
         {
-            throw new NotSupportedException("");
+            throw new NotSupportedException();
         }
         
 
