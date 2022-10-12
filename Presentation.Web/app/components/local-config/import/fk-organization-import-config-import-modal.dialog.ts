@@ -59,6 +59,7 @@
             return {
                 id: stsNode.uuid,
                 name: stsNode.name,
+                origin: Kitos.Models.Api.Organization.OrganizationUnitOrigin.STS_Organisation,
                 nodes: stsNode.children.map(child => this.createNodeVm(child))
             };
         }

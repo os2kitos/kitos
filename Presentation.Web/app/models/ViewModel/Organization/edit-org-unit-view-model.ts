@@ -9,6 +9,6 @@
         localId: number,
         orgId: number,
         isRoot: boolean,
-        isExternalUnit: boolean
+        isFkOrganizationUnit: boolean
     }
 }

@@ -70,6 +70,7 @@
             _.each(localOrgUnitRoles, function (orgRole: { Id }) {
                 $scope.orgRoles[orgRole.Id] = orgRole;
             });
+            $scope.showDifferenceBetweenOrgUnitOrigin = user.isGlobalAdmin || user.isLocalAdmin;
 
 
             function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit) {
@@ -403,7 +404,7 @@
                                 newParent: unit.parentId,
                                 orgId: unit.organizationId,
                                 isRoot: unit.parentId == undefined,
-                                isExternalUnit: unit.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
+                                isFkOrganizationUnit: unit.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                             } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
 
                             if ($modalScope.orgUnit.isRoot) {
@@ -424,10 +425,10 @@
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
-                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot && !$modalScope.orgUnit.isExternalUnit;
-                            $modalScope.canChangeName = $modalScope.isAdmin && !$modalScope.orgUnit.isExternalUnit;
+                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot && !$modalScope.orgUnit.isFkOrganizationUnit;
+                            $modalScope.canChangeName = $modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
                             $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
-                            $modalScope.canDelete = $modalScope.isAdmin && !$modalScope.orgUnit.isExternalUnit;
+                            $modalScope.canDelete = $modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting

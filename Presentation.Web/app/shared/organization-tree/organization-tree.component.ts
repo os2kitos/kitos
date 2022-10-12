@@ -5,6 +5,7 @@
         name: string
         id: string
         nodes: Array<IOrganizationTreeNode>
+        origin: Kitos.Models.Api.Organization.OrganizationUnitOrigin
     }
 
     interface IOrganizationTreeNodeViewModel extends IOrganizationTreeNode {
