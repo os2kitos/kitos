@@ -47,6 +47,14 @@
                         <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
                     </ol>
                 </div>
+                <div class="org-structure-legend" ng-if="showDifferenceBetweenOrgUnitOrigin">
+                    <div>
+                        <span class="org-structure-legend-color org-structure-legend-color-native-unit"></span> Enheder oprettet i KITOS
+                    </div>
+                    <div>
+                        <span class="org-structure-legend-color org-structure-legend-color-fk-org-unit"></span> Enheder synkroniseret fra FK Organisation
+                    </div>
+                </div>
             </div>
         </div>
     </div>

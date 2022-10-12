@@ -70,7 +70,11 @@
             _.each(localOrgUnitRoles, function (orgRole: { Id }) {
                 $scope.orgRoles[orgRole.Id] = orgRole;
             });
-            $scope.showDifferenceBetweenOrgUnitOrigin = user.isGlobalAdmin || user.isLocalAdmin;
+            $scope.showDifferenceBetweenOrgUnitOrigin =
+                // User is an admin with edit rights to the hierarchy
+                (user.isGlobalAdmin || user.isLocalAdmin) && 
+                // Hierarchy root has been synced from a different source than KITOS
+                rootNodeOfOrganization.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos;
 
 
             function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit) {
