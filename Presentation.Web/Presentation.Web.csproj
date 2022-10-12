@@ -400,6 +400,7 @@
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
+    <Compile Include="Controllers\API\V1\UserDeletionController.cs" />
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />

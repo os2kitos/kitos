@@ -367,7 +367,7 @@ namespace Presentation.Web.Ninject
             //Organization
             RegisterDomainEvents<HandleOrganizationBeingDeleted>(kernel);
             RegisterDomainEvents<HandleUserBeingDeleted>(kernel);
-            RegisterDomainEvents<HandleUserBeingRemoved>(kernel);
+            RegisterDomainEvents<HandleUserBeingRemovedFromOrganization>(kernel);
         }
 
         private void RegisterDomainEvents<THandler>(IKernel kernel)

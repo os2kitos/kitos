@@ -3,7 +3,6 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Users;
 using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices
@@ -25,7 +24,7 @@ namespace Core.ApplicationServices
         /// <param name="userUuid"></param>
         /// <param name="scopedToOrganizationId">If provided the operation will be scoped to the organization identified by this parameter</param>
         /// <returns></returns>
-        Maybe<OperationError> InitiateUserDeletion(Guid userUuid, int? scopedToOrganizationId = null);
+        Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null);
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
     }
 }

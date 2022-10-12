@@ -273,7 +273,7 @@
     <Compile Include="UIConfiguration\IUIModuleCustomizationService.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
     <Compile Include="UserService.cs" />
-    <Compile Include="Users\Handlers\HandleUserBeingRemoved.cs" />
+    <Compile Include="Users\Handlers\HandleUserBeingRemovedFromOrganization.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">

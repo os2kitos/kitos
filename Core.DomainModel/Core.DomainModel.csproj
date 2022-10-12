@@ -53,7 +53,7 @@
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
-    <Compile Include="Events\EntityBeingRemovedEvent.cs" />
+    <Compile Include="Events\UserBeingRemovedFromOrganizationEvent.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
@@ -268,7 +268,7 @@
     <Compile Include="User.cs" />
     <Compile Include="Users\AuthenticationScheme.cs" />
     <Compile Include="Users\UserConstraints.cs" />
-    <Compile Include="Users\UserDeletionStrategy.cs" />
+    <Compile Include="Users\OrganizationalUserDeletionStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

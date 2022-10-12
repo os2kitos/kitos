@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.Users
 {
-    public enum UserDeletionStrategy
+    public enum OrganizationalUserDeletionStrategy
     {
         Local = 0,
         Global = 1

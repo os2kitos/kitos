@@ -58,8 +58,7 @@
             "_",
             "text",
             "allRoles",
-            "userRoleAdministrationService",
-            "userService"
+            "userRoleAdministrationService"
         ];
 
         constructor(
@@ -70,8 +69,7 @@
             private readonly _: ILoDashWithMixins,
             text,
             allRoles: Models.Users.UserRoleAssigmentDTO,
-            private readonly userRoleAdministrationService: Services.IUserRoleAdministrationService,
-            private readonly userService: Services.IUserService) {
+            private readonly userRoleAdministrationService: Services.IUserRoleAdministrationService) {
 
             this.firstName = userToModify.Name;
             this.lastName = userToModify.LastName;
@@ -245,7 +243,7 @@
                 return;
             }
             
-            this.userService.deleteUser(this.userToModify.Id, this.loggedInUser.currentOrganizationId)
+            this.userRoleAdministrationService.removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
                 .then(success => this.closeModalOnSuccess(success));
         }
 

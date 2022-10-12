@@ -535,13 +535,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
         }
 
-        public static async Task DeleteUserAsync(int id)
-        {
-            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await DeleteWithCookieAsync(TestEnvironment.CreateUrl("api/user/" + id), cookie);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
         public static readonly string OdataDateTimeFormat = "O"; //ISO 8601
     }
 }

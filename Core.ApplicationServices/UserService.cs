@@ -306,20 +306,23 @@ namespace Core.ApplicationServices
                 .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
 
-        public Maybe<OperationError> InitiateUserDeletion(Guid userUuid, int? scopedToOrganizationId = null)
+        public Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null)
         {
+            var hasOrganizationIdValue = scopedToOrganizationId.HasValue;
+
+            if (!(hasOrganizationIdValue && _organizationalUserContext.HasRole(scopedToOrganizationId.Value, OrganizationRole.LocalAdmin)) 
+                && !_organizationalUserContext.IsGlobalAdmin())
+                return new OperationError(OperationFailure.Forbidden);
+
             var user = _userRepository.AsQueryable().ByUuid(userUuid);
             if (user == null)
-                return new OperationError(OperationFailure.NotFound);
+                return new OperationError($"User with Uuid {userUuid} was not found", OperationFailure.NotFound);
             if(_organizationalUserContext.UserId == user.Id)
                 return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
-
-            if (scopedToOrganizationId.HasValue && scopedToOrganizationId.Value != 0)
-                return DeleteUserFromOrganizationOrKitos(scopedToOrganizationId.Value, user);
             
-            return _authorizationContext.AllowDelete(user) 
-                ? DeleteUserFromKitos(user) 
-                : new OperationError(OperationFailure.Forbidden);
+            return hasOrganizationIdValue
+                ? DeleteUserFromOrganizationOrKitos(scopedToOrganizationId.Value, user) 
+                : DeleteUserFromKitos(user);
         }
 
         private Maybe<OperationError> DeleteUserFromKitos(User user)
@@ -339,19 +342,16 @@ namespace Core.ApplicationServices
 
         private Maybe<OperationError> DeleteUserFromOrganizationOrKitos(int scopedToOrganizationId, User user)
         {
-            var deletionStrategy = GetUserDeletionStrategy(scopedToOrganizationId, user);
+            var deletionStrategy = GetOrganizationalUserDeletionStrategy(scopedToOrganizationId, user);
             if (deletionStrategy.Failed)
                 return deletionStrategy.Error;
 
             switch (deletionStrategy.Value)
             {
-                case UserDeletionStrategy.Global:
-                    var organization = _orgRepository.AsQueryable().ById(scopedToOrganizationId);
-                    return _authorizationContext.AllowModify(organization) 
-                        ? DeleteUserFromKitos(user) 
-                        : new OperationError(OperationFailure.Forbidden);
-                case UserDeletionStrategy.Local:
-                    _domainEvents.Raise(new EntityBeingRemovedEvent<User>(user, scopedToOrganizationId));
+                case OrganizationalUserDeletionStrategy.Global:
+                    return DeleteUserFromKitos(user);
+                case OrganizationalUserDeletionStrategy.Local:
+                    _domainEvents.Raise(new UserBeingRemovedFromOrganizationEvent<User>(user, scopedToOrganizationId));
                     return Maybe<OperationError>.None;
                 default:
                     return new OperationError(OperationFailure.Forbidden);
@@ -372,25 +372,20 @@ namespace Core.ApplicationServices
             user.HasStakeHolderAccess = false;
         }
 
-        private Result<UserDeletionStrategy, OperationError> GetUserDeletionStrategy(int orgId, User user)
+        private Result<OrganizationalUserDeletionStrategy, OperationError> GetOrganizationalUserDeletionStrategy(int orgId, User user)
         {
             if (user.Deleted)
-                return new OperationError(OperationFailure.BadInput);
-            if (user.OrganizationRights.Any(x => x.OrganizationId == orgId) == false)
-                return new OperationError(OperationFailure.BadInput);
+                return new OperationError("User is already deleted", OperationFailure.BadState);
+            var organizationIds = user.GetOrganizationIds().ToList();
+            if (organizationIds.Any(x => x == orgId) == false)
+                return new OperationError("User is part of the current organization", OperationFailure.BadInput);
 
-            if (user.OrganizationRights.Any(x => x.OrganizationId != orgId))
-                return UserDeletionStrategy.Local;
-            if (!_organizationalUserContext.HasRoleInSameOrganizationAs(user))
-                return UserDeletionStrategy.Local;
-            if (_organizationalUserContext.HasRole(orgId, OrganizationRole.LocalAdmin))
-                return user.IsGlobalAdmin
-                    ? UserDeletionStrategy.Local
-                    : UserDeletionStrategy.Global;
+            if (organizationIds.Any(x => x != orgId))
+                return OrganizationalUserDeletionStrategy.Local;
 
-            return _organizationalUserContext.HasRole(orgId, OrganizationRole.GlobalAdmin)
-                ? UserDeletionStrategy.Global
-                : new OperationError(OperationFailure.Forbidden);
+            return user.IsGlobalAdmin
+                ? OrganizationalUserDeletionStrategy.Local
+                : OrganizationalUserDeletionStrategy.Global;
         }
     }
 }
