@@ -145,6 +145,8 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
+    <Compile Include="Model\Organizations\OrganizationRegistrationDetails.cs" />
+    <Compile Include="Model\Organizations\OrganizationRegistrationsRoot.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
@@ -180,7 +182,9 @@
     <Compile Include="Notification\IUserNotificationApplicationService.cs" />
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
     <Compile Include="Organizations\Handlers\HandleOrganizationBeingDeleted.cs" />
+    <Compile Include="Organizations\IOrganizationRegistrationService.cs" />
     <Compile Include="Organizations\IStsOrganizationSynchronizationService.cs" />
+    <Compile Include="Organizations\OrganizationRegistrationService.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationService.cs" />
     <Compile Include="RightsHolders\BaseRightsHolderService.cs" />
     <Compile Include="RightsHolders\IItInterfaceRightsHolderService.cs" />
