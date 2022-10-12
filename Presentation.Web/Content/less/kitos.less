@@ -2,7 +2,8 @@
 @fkorg-orgunit-color: #a9e38f;
 @fkorg-orgunit-color_selected: #4f8438;
 @fkorg-orgunit-hover: #a4db8c;
-@fkorg-orgunit_font-color: white;
+@fkorg-orgunit_font-color: #345925;
+@ui-tree-selected_font-color: white;
 
 /* Disable responsiveness */
 .container {
@@ -925,20 +926,6 @@ div.searchbox-wrapper {
 
 .angular-ui-tree-handle.org-unit-origin-fk-org {
     background-color: @fkorg-orgunit-color !important;
-    /*color: @fkorg-orgunit_font-color !important;*/
-
-    /*.glyphicon {
-        color: @fkorg-orgunit_font-color;
-    }*/
-}
-
-div.angular-ui-tree-handle.selected {
-    background-color: rgb(55, 96, 146) !important;
-    color: white !important;
-}
-
-div.angular-ui-tree-handle.selected.org-unit-origin-fk-org {
-    background-color: @fkorg-orgunit-color_selected !important;
     color: @fkorg-orgunit_font-color !important;
 
     .glyphicon {
@@ -946,8 +933,22 @@ div.angular-ui-tree-handle.selected.org-unit-origin-fk-org {
     }
 }
 
+div.angular-ui-tree-handle.selected {
+    background-color: rgb(55, 96, 146) !important;
+    color: @ui-tree-selected_font-color !important;
+}
+
+div.angular-ui-tree-handle.selected.org-unit-origin-fk-org {
+    background-color: @fkorg-orgunit-color_selected !important;
+    color: @ui-tree-selected_font-color !important;
+
+    .glyphicon {
+        color: @ui-tree-selected_font-color;
+    }
+}
+
 div.angular-ui-tree-handle.selected a span {
-    color: white !important;
+    color: @ui-tree-selected_font-color !important;
 }
 
 .angular-ui-tree-handle:hover {
@@ -958,11 +959,11 @@ div.angular-ui-tree-handle.selected a span {
 
 .angular-ui-tree-handle:hover.org-unit-origin-fk-org {
     background-color: @fkorg-orgunit-hover !important;
-    /*color: @fkorg-orgunit_font-color !important;*/
+    color: @fkorg-orgunit_font-color !important;
 
-    /*.glyphicon {
+    .glyphicon {
         color: @fkorg-orgunit_font-color;
-    }*/
+    }
 }
 
 .angular-ui-tree-placeholder {
