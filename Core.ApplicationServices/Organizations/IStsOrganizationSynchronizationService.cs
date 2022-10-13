@@ -27,5 +27,11 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="levelsToInclude"></param>
         /// <returns></returns>
         Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude);
+        /// <summary>
+        /// Disconnect the KITOS organization from STS Organisation
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <returns></returns>
+        Maybe<OperationError> Disconnect(Guid organizationId);
     }
 }
