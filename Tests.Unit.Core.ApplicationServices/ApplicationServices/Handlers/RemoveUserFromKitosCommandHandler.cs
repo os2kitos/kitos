@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Rights;
-using Core.ApplicationServices.UIConfiguration.Handlers;
+using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -16,35 +17,35 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.Handlers
 {
-    public class HandleUserBeingDeletedTests : WithAutoFixture
+    public class RemoveUserFromKitosCommandHandlerTest : WithAutoFixture
     {
         private readonly Mock<ISsoUserIdentityRepository> _ssoUserIdentityRepository;
-        private readonly HandleUserBeingDeleted _sut;
-        private readonly Mock<IUserRightsService> _userRightsServiceMock;
+        private readonly RemoveUserFromKitosCommandHandler _sut;
+        private readonly Mock<ICommandBus> _commandBusMock;
 
-        public HandleUserBeingDeletedTests()
+        public RemoveUserFromKitosCommandHandlerTest()
         {
             _ssoUserIdentityRepository = new Mock<ISsoUserIdentityRepository>();
 
-            _userRightsServiceMock = new Mock<IUserRightsService>();
-            _sut = new HandleUserBeingDeleted(_ssoUserIdentityRepository.Object, _userRightsServiceMock.Object);
+            _commandBusMock = new Mock<ICommandBus>();
+            _sut = new RemoveUserFromKitosCommandHandler(_ssoUserIdentityRepository.Object, _commandBusMock.Object, Mock.Of<IDomainEvents>());
         }
 
         [Fact]
-        public void Handle_Deletes_All_User_Rights()
+        public void Execute_Deletes_All_User_Rights()
         {
             //Arrange
-            var roleId = A<int>();
-            var organizationRole = A<OrganizationRole>();
-            var user = SetupUser(roleId, organizationRole);
+            var user = SetupUser();
 
             foreach (var organizationId in user.GetOrganizationIds())
             {
-                _userRightsServiceMock.Setup(x => x.RemoveAllRights(user.Id, organizationId)).Returns(Maybe<OperationError>.None);
+                _commandBusMock.Setup(x =>
+                    x.Execute<RemoveUserFromOrganizationCommand, Maybe<OperationError>>(
+                        It.Is<RemoveUserFromOrganizationCommand>(c => c.User == user && c.OrganizationId == organizationId))).Returns(Maybe<OperationError>.None);
             }
 
             //act
-            _sut.Handle(new EntityBeingDeletedEvent<User>(user));
+            _sut.Execute(new RemoveUserFromKitosCommand(user));
 
             //assert
             _ssoUserIdentityRepository.Verify(x => x.DeleteIdentitiesForUser(user), Times.AtLeastOnce);
@@ -52,17 +53,17 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
 
             foreach (var organizationId in user.GetOrganizationIds())
             {
-                _userRightsServiceMock.Verify(x => x.RemoveAllRights(user.Id, organizationId), Times.Once);
+                _commandBusMock.Verify(x => x.Execute<RemoveUserFromOrganizationCommand, Maybe<OperationError>>(It.Is<RemoveUserFromOrganizationCommand>(c => c.User == user && c.OrganizationId == organizationId)), Times.Once);
             }
         }
 
-        private User SetupUser(int roleId, OrganizationRole organizationRole)
+        private User SetupUser()
         {
             var user = new User
             {
                 Id = A<int>(),
                 DataProcessingRegistrationRights = new List<DataProcessingRegistrationRight>(),
-                OrganizationRights = new List<OrganizationRight>(),
+                OrganizationRights = Many<int>().Distinct().Select(orgId => new OrganizationRight() { Organization = new Organization() { Id = orgId }, OrganizationId = orgId }).ToList(),
                 ItContractRights = new List<ItContractRight>(),
                 ItSystemRights = new List<ItSystemRight>(),
                 OrganizationUnitRights = new List<OrganizationUnitRight>(),

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
@@ -32,20 +31,17 @@ namespace Presentation.Web.Controllers.API.V1
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
         private readonly IUserRightsService _userRightsService;
-        private readonly IEntityIdentityResolver _identityResolver;
 
         public UserController(
             IGenericRepository<User> repository,
             IUserService userService,
             IOrganizationService organizationService,
-            IUserRightsService userRightsService,
-            IEntityIdentityResolver identityResolver)
+            IUserRightsService userRightsService)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
             _userRightsService = userRightsService;
-            _identityResolver = identityResolver;
         }
 
         [NonAction]
@@ -180,19 +176,10 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
-        /// <summary>
-        /// Deletes user from the system
-        /// </summary>
-        /// <param name="id">The id of the user to be deleted</param>
-        /// <param name="organizationId">Not used in this case. Should remain empty</param>
-        /// <returns></returns>
+        [NonAction]
         public override HttpResponseMessage Delete(int id, int organizationId = 0)
         {
-            // NOTE: Only exists to apply optional param for org id
-            var uuid = _identityResolver.ResolveUuid<User>(id);
-            return uuid.IsNone
-                ? NotFound()
-                : _userService.DeleteUserFromKitos(uuid.Value).Match(FromOperationError, Ok);
+            throw new NotSupportedException();
         }
         
 

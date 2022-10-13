@@ -1,9 +1,9 @@
-﻿namespace Core.DomainModel.Events
+﻿namespace Core.DomainModel.Commands
 {
     /// <summary>
     /// Marker interface
     /// </summary>
-    public interface IDomainEvent
+    public interface ICommand
     {
     }
 }

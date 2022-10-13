@@ -193,7 +193,7 @@
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
-    <Compile Include="ApplicationServices\Handlers\HandleUserBeingDeletedTests.cs" />
+    <Compile Include="ApplicationServices\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
     <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
@@ -287,7 +287,7 @@
       <Name>Core.BackgroundJobs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">

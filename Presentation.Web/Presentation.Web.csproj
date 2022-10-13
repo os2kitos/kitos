@@ -382,6 +382,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\users\user-deletion-strategy-type.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\feature-toggle\feature-toggle-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
@@ -400,6 +401,7 @@
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
+    <Compile Include="Controllers\API\V1\UserDeletionController.cs" />
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
@@ -1618,7 +1620,7 @@
       <Name>Core.BackgroundJobs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
