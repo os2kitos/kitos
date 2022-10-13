@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel.Organization;
+using System;
 using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V1
@@ -17,14 +18,13 @@ namespace Presentation.Web.Models.API.V1
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
 
-        public string ObjectOwnerFullName
-        {
-            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
-        }
+        public string ObjectOwnerFullName => $"{ObjectOwnerName} {ObjectOwnerLastName}";
 
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
         public Guid Uuid { get; set; }
+        public OrganizationUnitOrigin Origin { get; set; }
+        public Guid? ExternalOriginUuid { get; set; }
     }
 
     public class OrgUnitSimpleDTO
@@ -34,10 +34,7 @@ namespace Presentation.Web.Models.API.V1
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
 
-        public string QualifiedName
-        {
-            get { return Name + ", " + OrganizationName; }
-        }
+        public string QualifiedName => $"{Name}, {OrganizationName}";
     }
 
     public class SimpleOrgUnitDTO
