@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationServices\NinjectIOptionResolver.cs" />
+    <Compile Include="DomainServices\NinjectCommandBusAdapter.cs" />
     <Compile Include="DomainServices\NinjectDomainEventsAdapter.cs" />
     <Compile Include="DomainServices\NinjectEntityIdentityResolver.cs" />
     <Compile Include="DomainServices\NinjectEntityResolver.cs" />

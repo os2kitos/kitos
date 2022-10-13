@@ -269,11 +269,11 @@
     <Compile Include="References\ReferenceService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
-    <Compile Include="Users\Handlers\HandleUserBeingDeleted.cs" />
+    <Compile Include="Users\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="UIConfiguration\IUIModuleCustomizationService.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
     <Compile Include="UserService.cs" />
-    <Compile Include="Users\Handlers\HandleUserBeingRemovedFromOrganization.cs" />
+    <Compile Include="Users\Handlers\RemoveUserFromOrganizationCommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">

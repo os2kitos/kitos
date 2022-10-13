@@ -52,8 +52,12 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\ICommandHandler.cs" />
+    <Compile Include="Commands\ICommandBus.cs" />
+    <Compile Include="Commands\RemoveUserFromKitosCommand.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
-    <Compile Include="Events\UserBeingRemovedFromOrganizationEvent.cs" />
+    <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />

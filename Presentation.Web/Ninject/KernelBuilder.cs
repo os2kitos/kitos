@@ -118,6 +118,7 @@ using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
 using Core.ApplicationServices.Users.Handlers;
+using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
 
 namespace Presentation.Web.Ninject
@@ -186,6 +187,7 @@ namespace Presentation.Web.Ninject
         public void RegisterServices(IKernel kernel)
         {
             RegisterDomainEventsEngine(kernel);
+            RegisterDomainCommandsEngine(kernel);
             RegisterDataAccess(kernel);
             kernel.Bind<IObjectCache>().To<AspNetObjectCache>().InSingletonScope();
             kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
@@ -324,7 +326,7 @@ namespace Presentation.Web.Ninject
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
             kernel.Bind<IDomainEvents>().To<NinjectDomainEventsAdapter>().InCommandScope(Mode);
-            
+
             //Auth cache
             RegisterDomainEvents<ClearCacheOnAdministrativeAccessRightsChangedHandler>(kernel);
 
@@ -366,8 +368,6 @@ namespace Presentation.Web.Ninject
 
             //Organization
             RegisterDomainEvents<HandleOrganizationBeingDeleted>(kernel);
-            RegisterDomainEvents<HandleUserBeingDeleted>(kernel);
-            RegisterDomainEvents<HandleUserBeingRemovedFromOrganization>(kernel);
         }
 
         private void RegisterDomainEvents<THandler>(IKernel kernel)
@@ -376,6 +376,24 @@ namespace Presentation.Web.Ninject
             typeof(THandler)
                 .GetInterfaces()
                 .Where(tType => tType.IsImplementationOfGenericType(typeof(IDomainEventHandler<>)))
+                .ToList()
+                .ForEach(tHandlerInterface => kernel.Bind(tHandlerInterface).To<THandler>().InCommandScope(Mode));
+        }
+
+        private void RegisterDomainCommandsEngine(IKernel kernel)
+        {
+            kernel.Bind<ICommandBus>().To<NinjectCommandBusAdapter>().InCommandScope(Mode);
+
+            RegisterCommands<RemoveUserFromOrganizationCommandHandler>(kernel);
+            RegisterCommands<RemoveUserFromKitosCommandHandler>(kernel);
+        }
+
+        private void RegisterCommands<THandler>(IKernel kernel)
+        {
+            //Register all exposed handlers
+            typeof(THandler)
+                .GetInterfaces()
+                .Where(tType => tType.IsImplementationOfGenericType(typeof(ICommandHandler<,>)))
                 .ToList()
                 .ForEach(tHandlerInterface => kernel.Bind(tHandlerInterface).To<THandler>().InCommandScope(Mode));
         }

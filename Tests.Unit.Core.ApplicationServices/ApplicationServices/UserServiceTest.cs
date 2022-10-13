@@ -12,6 +12,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Rights;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices.Queries;
@@ -37,6 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IOrganizationalUserContext> _organizationalUserContextMock;
         private readonly Mock<IUserRightsService> _userRightsService;
+        private readonly Mock<ICommandBus> _commandBusMock;
 
         public UserServiceTest()
         {
@@ -52,6 +54,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _organizationalUserContextMock = new Mock<IOrganizationalUserContext>();
 
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _commandBusMock = new Mock<ICommandBus>();
             _sut = new UserService(
                 TimeSpan.Zero,
                 "",
@@ -68,7 +71,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _repositoryMock.Object,
                 _organizationServiceMock.Object,
                 _transactionManagerMock.Object,
-                _organizationalUserContextMock.Object);
+                _organizationalUserContextMock.Object,
+                _commandBusMock.Object);
         }
 
         [Fact]
@@ -346,7 +350,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result.IsNone);
-            _domainEventsMock.Verify(x => x.Raise(It.Is<UserBeingRemovedFromOrganizationEvent<User>>(deleteEvent => deleteEvent.Entity.Id == user.Id)), Times.Once);
+            _commandBusMock.Verify(x => x.Execute<RemoveUserFromOrganizationCommand,Maybe<OperationError>>(It.Is<RemoveUserFromOrganizationCommand>(command => command.User.Id == user.Id)), Times.Once);
         }
 
         [Fact]

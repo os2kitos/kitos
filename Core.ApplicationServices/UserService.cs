@@ -12,6 +12,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainModel.Users;
@@ -43,6 +44,7 @@ namespace Core.ApplicationServices
         private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
         private readonly IOrganizationalUserContext _organizationalUserContext;
+        private readonly ICommandBus _commandBus;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
         private const string KitosManualsLink = "https://os2.eu/Kitosvejledning";
 
@@ -61,7 +63,8 @@ namespace Core.ApplicationServices
             IUserRepository repository,
             IOrganizationService organizationService,
             ITransactionManager transactionManager,
-            IOrganizationalUserContext organizationalUserContext)
+            IOrganizationalUserContext organizationalUserContext,
+            ICommandBus commandBus)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -79,6 +82,7 @@ namespace Core.ApplicationServices
             _organizationService = organizationService;
             _transactionManager = transactionManager;
             _organizationalUserContext = organizationalUserContext;
+            _commandBus = commandBus;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -310,81 +314,84 @@ namespace Core.ApplicationServices
         {
             var hasOrganizationIdValue = scopedToOrganizationId.HasValue;
 
-            if (!(hasOrganizationIdValue && _organizationalUserContext.HasRole(scopedToOrganizationId.Value, OrganizationRole.LocalAdmin)) 
-                && !_organizationalUserContext.IsGlobalAdmin())
-                return new OperationError(OperationFailure.Forbidden);
+            var allowByGlobalAdminRights = _organizationalUserContext.IsGlobalAdmin();
+            var allowByLocalAdminRights = hasOrganizationIdValue && _organizationalUserContext.HasRole(scopedToOrganizationId.Value, OrganizationRole.LocalAdmin);
 
-            var user = _userRepository.AsQueryable().ByUuid(userUuid);
-            if (user == null)
-                return new OperationError($"User with Uuid {userUuid} was not found", OperationFailure.NotFound);
-            if(_organizationalUserContext.UserId == user.Id)
-                return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
-            
-            return hasOrganizationIdValue
-                ? DeleteUserFromOrganizationOrKitos(scopedToOrganizationId.Value, user) 
-                : DeleteUserFromKitos(user);
+            if (allowByGlobalAdminRights || allowByLocalAdminRights)
+            {
+                var user = _userRepository.AsQueryable().ByUuid(userUuid);
+                if (user == null)
+                {
+                    return new OperationError($"User with Uuid {userUuid} was not found", OperationFailure.NotFound);
+                }
+
+                if (_organizationalUserContext.UserId == user.Id)
+                {
+                    return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
+                }
+
+                using var transaction = _transactionManager.Begin();
+                var result = hasOrganizationIdValue
+                    ? DeleteUser(scopedToOrganizationId.Value, user)
+                    : DeleteUserFromKitos(user);
+
+                if (result.HasValue)
+                {
+                    transaction.Rollback();
+                }
+                else
+                {
+                    _userRepository.Save();
+                    transaction.Commit();
+
+                    _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
+                }
+
+                return result;
+            }
+
+            return new OperationError(OperationFailure.Forbidden);
         }
 
         private Maybe<OperationError> DeleteUserFromKitos(User user)
         {
-            using var transaction = _transactionManager.Begin();
-            
-            _domainEvents.Raise(new EntityBeingDeletedEvent<User>(user));
-
-            Delete(user);
-            _userRepository.Save();
-            transaction.Commit();
-
-            _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
-
-            return Maybe<OperationError>.None;
+            return _commandBus.Execute<RemoveUserFromKitosCommand, Maybe<OperationError>>(new RemoveUserFromKitosCommand(user));
         }
 
-        private Maybe<OperationError> DeleteUserFromOrganizationOrKitos(int scopedToOrganizationId, User user)
+        private Maybe<OperationError> DeleteUser(int scopedToOrganizationId, User user)
         {
             var deletionStrategy = GetOrganizationalUserDeletionStrategy(scopedToOrganizationId, user);
+
             if (deletionStrategy.Failed)
                 return deletionStrategy.Error;
 
-            switch (deletionStrategy.Value)
+            return deletionStrategy.Value switch
             {
-                case OrganizationalUserDeletionStrategy.Global:
-                    return DeleteUserFromKitos(user);
-                case OrganizationalUserDeletionStrategy.Local:
-                    _domainEvents.Raise(new UserBeingRemovedFromOrganizationEvent<User>(user, scopedToOrganizationId));
-                    return Maybe<OperationError>.None;
-                default:
-                    return new OperationError(OperationFailure.Forbidden);
-            }
+                OrganizationalUserDeletionStrategy.Global =>
+                    DeleteUserFromKitos(user),
+                OrganizationalUserDeletionStrategy.Local => _commandBus
+                    .Execute<RemoveUserFromOrganizationCommand, Maybe<OperationError>>(new RemoveUserFromOrganizationCommand(user, scopedToOrganizationId)),
+                _ =>
+                    new OperationError(OperationFailure.Forbidden)
+            };
         }
 
-        private static void Delete(User user)
-        {
-            user.LockedOutDate = DateTime.Now;
-            user.Name = "Slettet bruger";
-            user.Email = $"{Guid.NewGuid()}_deleted_user@kitos.dk";
-            user.PhoneNumber = null;
-            user.LastName = "";
-            user.DeletedDate = DateTime.Now;
-            user.Deleted = true;
-            user.IsGlobalAdmin = false;
-            user.HasApiAccess = false;
-            user.HasStakeHolderAccess = false;
-        }
-
-        private Result<OrganizationalUserDeletionStrategy, OperationError> GetOrganizationalUserDeletionStrategy(int orgId, User user)
+        private static Result<OrganizationalUserDeletionStrategy, OperationError> GetOrganizationalUserDeletionStrategy(int orgId, User user)
         {
             if (user.Deleted)
                 return new OperationError("User is already deleted", OperationFailure.BadState);
             var organizationIds = user.GetOrganizationIds().ToList();
-            if (organizationIds.Any(x => x == orgId) == false)
+
+            var memberOfTargetOrganization = organizationIds.Contains(orgId);
+            if (!memberOfTargetOrganization)
                 return new OperationError("User is part of the current organization", OperationFailure.BadInput);
 
-            if (organizationIds.Any(x => x != orgId))
+            var memberOfMoreOrganizations = organizationIds.Count > 1;
+            if (memberOfMoreOrganizations)
                 return OrganizationalUserDeletionStrategy.Local;
 
             return user.IsGlobalAdmin
-                ? OrganizationalUserDeletionStrategy.Local
+                ? OrganizationalUserDeletionStrategy.Local //Global admins are not automatically removed from kitos when removed from the last organization
                 : OrganizationalUserDeletionStrategy.Global;
         }
     }

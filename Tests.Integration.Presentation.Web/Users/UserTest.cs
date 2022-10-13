@@ -136,9 +136,9 @@ namespace Tests.Integration.Presentation.Web.Users
             var name = A<string>();
 
             await AssignRolesToUser(userId, organization.Id, name);
-            await AssignSsoIdentityToUser(userId);
+            AssignSsoIdentityToUser(userId);
             
-            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
+            using var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
 
             AssertUserIsDeleted(userId);
@@ -151,7 +151,7 @@ namespace Tests.Integration.Presentation.Web.Users
 
             var (cookie, userId, _, _) = await CreatePrerequisitesAsync(userRole);
 
-            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId, cookie);
+            using var deleteResponse = await UserHelper.SendDeleteUserAsync(userId, cookie);
             Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
         }
 
@@ -195,7 +195,7 @@ namespace Tests.Integration.Presentation.Web.Users
             var userRole = OrganizationRole.User;
             var (_, userId, org, _) = await CreatePrerequisitesAsync(userRole);
 
-            var response = await OrganizationHelper.SendGetUserOrganizationsRequestAsync(userId);
+            using var response = await OrganizationHelper.SendGetUserOrganizationsRequestAsync(userId);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var organizations = await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<OrganizationSimpleDTO>>();
@@ -215,21 +215,21 @@ namespace Tests.Integration.Presentation.Web.Users
             var (userId, _, _) = await HttpApi.CreateUserAndLogin(CreateEmail(), userRole, organization1.Id);
 
             var organization2 = await CreateOrganizationAsync();
-            var assignRoleResponse2 = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.User, organization2.Id);
+            using var assignRoleResponse2 = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.User, organization2.Id);
             Assert.Equal(HttpStatusCode.Created, assignRoleResponse2.StatusCode);
 
             var name = A<string>();
             await AssignRolesToUser(userId, organization1.Id, name);
             await AssignRolesToUser(userId, organization2.Id, name);
 
-            await AssignSsoIdentityToUser(userId);
+            AssignSsoIdentityToUser(userId);
 
-            var deleteResponse1 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization2.Id);
+            using var deleteResponse1 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization2.Id);
             Assert.Equal(HttpStatusCode.OK, deleteResponse1.StatusCode);
 
             AssertUserIsRemovedOnlyFromDesignatedOrganization(userId, organization2.Id, organization1.Id);
 
-            var deleteResponse2 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization1.Id);
+            using var deleteResponse2 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization1.Id);
             Assert.Equal(HttpStatusCode.OK, deleteResponse2.StatusCode);
 
             AssertUserIsDeleted(userId);
@@ -241,27 +241,27 @@ namespace Tests.Integration.Presentation.Web.Users
             var (testCookie, localAdminId, organization1, _) = await CreatePrerequisitesAsync(OrganizationRole.LocalAdmin);
 
             var organization2 = await CreateOrganizationAsync();
-            var assignLocalAdminRoleResponse1 = await HttpApi.SendAssignRoleToUserAsync(localAdminId, OrganizationRole.LocalAdmin, organization2.Id);
+            using var assignLocalAdminRoleResponse1 = await HttpApi.SendAssignRoleToUserAsync(localAdminId, OrganizationRole.LocalAdmin, organization2.Id);
             Assert.Equal(HttpStatusCode.Created, assignLocalAdminRoleResponse1.StatusCode);
 
             var userRole = OrganizationRole.User;
             var (userId, _, _) = await HttpApi.CreateUserAndLogin(CreateEmail(), userRole, organization1.Id);
 
-            var assignRoleResponse2 = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.User, organization2.Id);
+            using var assignRoleResponse2 = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.User, organization2.Id);
             Assert.Equal(HttpStatusCode.Created, assignRoleResponse2.StatusCode);
 
             var name = A<string>();
             await AssignRolesToUser(userId, organization1.Id, name);
             await AssignRolesToUser(userId, organization2.Id, name);
 
-            await AssignSsoIdentityToUser(userId);
+            AssignSsoIdentityToUser(userId);
 
-            var deleteResponse1 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization2.Id);
+            using var deleteResponse1 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization2.Id);
             Assert.Equal(HttpStatusCode.OK, deleteResponse1.StatusCode);
 
             AssertUserIsRemovedOnlyFromDesignatedOrganization(userId, organization2.Id, organization1.Id);
 
-            var deleteResponse2 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization1.Id);
+            using var deleteResponse2 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization1.Id);
             Assert.Equal(HttpStatusCode.OK, deleteResponse2.StatusCode);
 
             AssertUserIsDeleted(userId);
@@ -275,7 +275,7 @@ namespace Tests.Integration.Presentation.Web.Users
             await RightsHelper.AddDprRoleToUser(userId, orgId, name);
         }
 
-        private async Task AssignSsoIdentityToUser(int userId)
+        private void AssignSsoIdentityToUser(int userId)
         {
             SsoIdentityHelper.AddSsoIdentityToUser(userId);
         }

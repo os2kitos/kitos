@@ -117,7 +117,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             };
-            await UserHelper.SendDeleteUserAsync(createdUserId);
+            await UserHelper.SendDeleteUserAsync(createdUserId).DisposeAsync();
         }
 
         private static string CreateEmail()

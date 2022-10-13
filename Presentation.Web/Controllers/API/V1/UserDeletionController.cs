@@ -36,13 +36,11 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage Delete(int id)
         {
             var uuid = _identityResolver.ResolveUuid<User>(id);
-            return uuid.IsNone
-                ? NotFound()
-                : _userService.DeleteUser(uuid.Value).Match(FromOperationError, Ok);
+            return uuid.Match(val => _userService.DeleteUser(val).Match(FromOperationError, Ok), NotFound);
         }
 
         /// <summary>
-        /// Deletes user from the organization or the system
+        /// Deletes user from the organization
         /// </summary>
         /// <param name="id">The id of the user to be deleted</param>
         /// <param name="organizationId">The id of the current organization from which the user is to be deleted</param>
@@ -56,9 +54,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage Delete(int id, int organizationId)
         {
             var uuid = _identityResolver.ResolveUuid<User>(id);
-            return uuid.IsNone
-                ? NotFound()
-                : _userService.DeleteUser(uuid.Value, organizationId).Match(FromOperationError, Ok);
+            return uuid.Match(val => _userService.DeleteUser(val, organizationId).Match(FromOperationError, Ok), NotFound);
         }
     }
 }
