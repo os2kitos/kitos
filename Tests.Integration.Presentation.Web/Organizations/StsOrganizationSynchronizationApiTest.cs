@@ -107,17 +107,51 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 Assert.NotNull(organization.StsOrganizationConnection);
                 Assert.True(organization.StsOrganizationConnection.Connected);
                 Assert.Equal(levels, organization.StsOrganizationConnection.SynchronizationDepth);
-                AssertImportedTree(expectedImport, dbRoot);
+                AssertImportedTree(expectedImport, dbRoot, OrganizationUnitOrigin.STS_Organisation);
                 return true;
             });
 
         }
 
-        private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, int? remainingLevelsToImport = null)
+        [Fact]
+        public async Task Can_DELETE_Connection()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int levels = 2;
+            var connectionUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
+            var getUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/snapshot?levels={levels}");
+            using var getResponse = await HttpApi.GetWithCookieAsync(getUrl, cookie);
+            var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            using var response = await HttpApi.PostWithCookieAsync(connectionUrl, cookie, new ConnectToStsOrganizationRequestDTO
+            {
+                SynchronizationDepth = levels
+            });
+            //Act
+            using var deleteResponse = await HttpApi.DeleteWithCookieAsync(connectionUrl, cookie);
+
+            //Assert
+            DatabaseAccess.MapFromEntitySet<Organization, bool>(orgs =>
+            {
+                var organization = orgs.AsQueryable().ByUuid(targetOrgUuid);
+                var dbRoot = organization.GetRoot();
+                Assert.NotNull(organization.StsOrganizationConnection);
+                Assert.False(organization.StsOrganizationConnection.Connected);
+                Assert.Null(organization.StsOrganizationConnection.SynchronizationDepth);
+
+                //Assert that the imported stuff is till there - just converted to kitos units
+                AssertImportedTree(expectedImport, dbRoot, OrganizationUnitOrigin.Kitos);
+                return true;
+            });
+
+        }
+
+        private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)
         {
             Assert.Equal(treeToImport.Name, importedTree.Name);
-            Assert.Equal(treeToImport.Uuid, importedTree.ExternalOriginUuid);
-            Assert.Equal(OrganizationUnitOrigin.STS_Organisation, importedTree.Origin);
+            Assert.Equal(expectedOrganizationUnitOrigin, importedTree.Origin);
+            Assert.Equal(expectedOrganizationUnitOrigin == OrganizationUnitOrigin.Kitos ? null : treeToImport.Uuid, importedTree.ExternalOriginUuid);
 
             remainingLevelsToImport -= 1;
 
@@ -132,7 +166,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 Assert.Equal(childrenToImport.Count, importedUnits.Count);
                 for (var i = 0; i < childrenToImport.Count; i++)
                 {
-                    AssertImportedTree(childrenToImport[i], importedUnits[i], remainingLevelsToImport);
+                    AssertImportedTree(childrenToImport[i], importedUnits[i], expectedOrganizationUnitOrigin, remainingLevelsToImport);
                 }
             }
         }

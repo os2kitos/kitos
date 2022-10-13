@@ -345,7 +345,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                     Connected = true,
                     SynchronizationDepth = A<int>(),
                 },
-                OrgUnits = new List<OrganizationUnit>()
+                OrgUnits = new List<OrganizationUnit>
                 {
                     unaffectedUnit ,
                     affectedUnit1,
@@ -363,6 +363,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
             transaction.Verify(x => x.Commit(), Times.Once());
             _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());
+            Assert.False(organization.StsOrganizationConnection.Connected);
+            Assert.Null(organization.StsOrganizationConnection.SynchronizationDepth);
             foreach (var organizationUnit in organization.OrgUnits)
             {
                 Assert.Equal(OrganizationUnitOrigin.Kitos, organizationUnit.Origin);
