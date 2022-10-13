@@ -325,7 +325,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
-            kernel.Bind<IDomainEvents>().To<NinjectDomainEventsAdapter>().InCommandScope(Mode);
+            kernel.Bind<IDomainEvents>().To<NinjectDomainEventHandlerMediator>().InCommandScope(Mode);
 
             //Auth cache
             RegisterDomainEvents<ClearCacheOnAdministrativeAccessRightsChangedHandler>(kernel);
@@ -382,7 +382,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterDomainCommandsEngine(IKernel kernel)
         {
-            kernel.Bind<ICommandBus>().To<NinjectCommandBusAdapter>().InCommandScope(Mode);
+            kernel.Bind<ICommandBus>().To<NinjectCommandHandlerMediator>().InCommandScope(Mode);
 
             RegisterCommands<RemoveUserFromOrganizationCommandHandler>(kernel);
             RegisterCommands<RemoveUserFromKitosCommandHandler>(kernel);

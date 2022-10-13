@@ -23,7 +23,7 @@ namespace Tests.Unit.Core.Infrastructure
             var resultHolder = new ResultHolder();
             _kernel.Bind<IResultHolder>().ToConstant(resultHolder);
             _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().To<MyHandler>().InThreadScope();
-            var sut = new NinjectDomainEventsAdapter(_kernel);
+            var sut = new NinjectDomainEventHandlerMediator(_kernel);
 
             // Act
             sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });
@@ -41,7 +41,7 @@ namespace Tests.Unit.Core.Infrastructure
             var secondHandlerResult = new ResultHolder();
             _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(firstHandlerResult)).InThreadScope();
             _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(secondHandlerResult)).InThreadScope();
-            var sut = new NinjectDomainEventsAdapter(_kernel);
+            var sut = new NinjectDomainEventHandlerMediator(_kernel);
 
             // Act
             sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });

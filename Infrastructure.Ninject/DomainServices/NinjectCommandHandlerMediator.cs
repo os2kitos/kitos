@@ -3,7 +3,7 @@ using Ninject;
 
 namespace Infrastructure.Ninject.DomainServices
 {
-    public class NinjectCommandBusAdapter : ICommandBus
+    public class NinjectCommandHandlerMediator : ICommandBus
     {
         public TResult Execute<TCommand, TResult>(TCommand args) where TCommand : ICommand
         {
@@ -12,7 +12,7 @@ namespace Infrastructure.Ninject.DomainServices
 
         private readonly IKernel _kernel;
 
-        public NinjectCommandBusAdapter(IKernel kernel)
+        public NinjectCommandHandlerMediator(IKernel kernel)
         {
             _kernel = kernel;
         }
