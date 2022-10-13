@@ -4,6 +4,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel;
 using Core.DomainModel.Commands;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -27,7 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             _ssoUserIdentityRepository = new Mock<ISsoUserIdentityRepository>();
 
             _commandBusMock = new Mock<ICommandBus>();
-            _sut = new RemoveUserFromKitosCommandHandler(_ssoUserIdentityRepository.Object, _commandBusMock.Object);
+            _sut = new RemoveUserFromKitosCommandHandler(_ssoUserIdentityRepository.Object, _commandBusMock.Object, Mock.Of<IDomainEvents>());
         }
 
         [Fact]

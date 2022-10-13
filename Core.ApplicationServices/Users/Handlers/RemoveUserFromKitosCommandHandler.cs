@@ -3,6 +3,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Commands;
+using Core.DomainModel.Events;
 using Core.DomainServices.Repositories.SSO;
 
 namespace Core.ApplicationServices.Users.Handlers
@@ -11,11 +12,16 @@ namespace Core.ApplicationServices.Users.Handlers
     {
         private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
         private readonly ICommandBus _commandBus;
+        private readonly IDomainEvents _domainEvents;
 
-        public RemoveUserFromKitosCommandHandler(ISsoUserIdentityRepository ssoUserIdentityRepository, ICommandBus commandBus)
+        public RemoveUserFromKitosCommandHandler(
+            ISsoUserIdentityRepository ssoUserIdentityRepository,
+            ICommandBus commandBus,
+            IDomainEvents domainEvents)
         {
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
             _commandBus = commandBus;
+            _domainEvents = domainEvents;
         }
 
         private void ClearSsoIdentities(User user)
@@ -31,6 +37,8 @@ namespace Core.ApplicationServices.Users.Handlers
         public Maybe<OperationError> Execute(RemoveUserFromKitosCommand command)
         {
             var user = command.User;
+
+            _domainEvents.Raise(new EntityBeingDeletedEvent<User>(user));
 
             var organizationIds = user.GetOrganizationIds().ToList();
 

@@ -353,14 +353,14 @@ namespace Core.ApplicationServices
             return new OperationError(OperationFailure.Forbidden);
         }
 
-        private Maybe<OperationError> DeleteUserFromKitos(User user)
+        private Maybe<OperationError> DeleteUserFromKitos(User userToDelete)
         {
-            return _commandBus.Execute<RemoveUserFromKitosCommand, Maybe<OperationError>>(new RemoveUserFromKitosCommand(user));
+            return _commandBus.Execute<RemoveUserFromKitosCommand, Maybe<OperationError>>(new RemoveUserFromKitosCommand(userToDelete));
         }
 
-        private Maybe<OperationError> DeleteUser(int scopedToOrganizationId, User user)
+        private Maybe<OperationError> DeleteUser(int scopedToOrganizationId, User userToDelete)
         {
-            var deletionStrategy = GetOrganizationalUserDeletionStrategy(scopedToOrganizationId, user);
+            var deletionStrategy = GetOrganizationalUserDeletionStrategy(scopedToOrganizationId, userToDelete);
 
             if (deletionStrategy.Failed)
                 return deletionStrategy.Error;
@@ -368,19 +368,19 @@ namespace Core.ApplicationServices
             return deletionStrategy.Value switch
             {
                 OrganizationalUserDeletionStrategy.Global =>
-                    DeleteUserFromKitos(user),
+                    DeleteUserFromKitos(userToDelete),
                 OrganizationalUserDeletionStrategy.Local => _commandBus
-                    .Execute<RemoveUserFromOrganizationCommand, Maybe<OperationError>>(new RemoveUserFromOrganizationCommand(user, scopedToOrganizationId)),
+                    .Execute<RemoveUserFromOrganizationCommand, Maybe<OperationError>>(new RemoveUserFromOrganizationCommand(userToDelete, scopedToOrganizationId)),
                 _ =>
                     new OperationError(OperationFailure.Forbidden)
             };
         }
 
-        private static Result<OrganizationalUserDeletionStrategy, OperationError> GetOrganizationalUserDeletionStrategy(int orgId, User user)
+        private static Result<OrganizationalUserDeletionStrategy, OperationError> GetOrganizationalUserDeletionStrategy(int orgId, User userToDelete)
         {
-            if (user.Deleted)
+            if (userToDelete.Deleted)
                 return new OperationError("User is already deleted", OperationFailure.BadState);
-            var organizationIds = user.GetOrganizationIds().ToList();
+            var organizationIds = userToDelete.GetOrganizationIds().ToList();
 
             var memberOfTargetOrganization = organizationIds.Contains(orgId);
             if (!memberOfTargetOrganization)
@@ -390,7 +390,7 @@ namespace Core.ApplicationServices
             if (memberOfMoreOrganizations)
                 return OrganizationalUserDeletionStrategy.Local;
 
-            return user.IsGlobalAdmin
+            return userToDelete.IsGlobalAdmin
                 ? OrganizationalUserDeletionStrategy.Local //Global admins are not automatically removed from kitos when removed from the last organization
                 : OrganizationalUserDeletionStrategy.Global;
         }
