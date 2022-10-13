@@ -33,10 +33,11 @@
 
     interface IFkOrganizationImportController extends ng.IComponentController {
         currentOrganizationUuid: string
-        accessGranted: boolean | null;
+        accessGranted: boolean | null
         accessError: string | null
         synchronizationStatus: IFkOrganizationSynchronizationStatus | null
-        commands: Array<IFkOrganizationCommand> | null;
+        commands: Array<IFkOrganizationCommand> | null
+        busy: boolean
     }
 
     class FkOrganizationImportController implements IFkOrganizationImportController {
@@ -45,6 +46,7 @@
         accessError: string | null = null;
         synchronizationStatus: IFkOrganizationSynchronizationStatus | null = null;
         commands: Array<IFkOrganizationCommand> | null = null;
+        busy: boolean = false;
 
         static $inject: string[] = ["stsOrganizationSyncService", "fkOrganisationImportDialogFactory"];
         constructor(
@@ -60,7 +62,16 @@
             }
         }
 
+        private resetState() {
+            this.accessGranted = null;
+            this.accessError = null;
+            this.synchronizationStatus = null;
+            this.commands = null;
+            this.busy = false;
+        }
+
         private loadState() {
+            this.resetState();
             this.stsOrganizationSyncService
                 .getConnectionStatus(this.currentOrganizationUuid)
                 .then(result => {
@@ -93,8 +104,20 @@
                     category: CommandCategory.Delete,
                     enabled: result.canDeleteConnection,
                     onClick: () => {
-                        //TODO:Remember to rebind https://os2web.atlassian.net/browse/KITOSUDV-3320
-                        console.log("DELETE");
+                        if (confirm("Afbryd forbindelsen til FK Organisation? Ved afbrydelse af forbindelsen, konverteres alle organisationsenheder til KITOS enheder, hvorefter de frit kan redigeres.")) {
+                            this.busy = true;
+                            this.stsOrganizationSyncService
+                                .disconnect(this.currentOrganizationUuid)
+                                .then(success => {
+                                    if (success) {
+                                        this.loadState();
+                                    } else {
+                                        this.busy = false;
+                                    }
+                                }, _ => {
+                                    this.busy = false;
+                                });
+                        }
                     }
                 });
             } else {

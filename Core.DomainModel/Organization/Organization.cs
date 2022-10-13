@@ -202,9 +202,10 @@ namespace Core.DomainModel.Organization
                         return new OperationError($"Already connected to {origin:G}", OperationFailure.Conflict);
                     }
                     break;
-                case OrganizationUnitOrigin.Kitos: //Intentional fallthrough.. Invalid argument type for this method. Kitos is internal
+                case OrganizationUnitOrigin.Kitos:
+                    return new OperationError("Kitos is not an external source",OperationFailure.BadInput);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
+                    throw new ArgumentOutOfRangeException();
             }
 
             return GetRoot()
@@ -227,6 +228,29 @@ namespace Core.DomainModel.Organization
                         return Maybe<OperationError>.None;
                     }
                 );
+        }
+
+        public Result<DisconnectOrganizationFromOriginResult, OperationError> DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin origin)
+        {
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+
+                    if (StsOrganizationConnection?.Connected != true)
+                    {
+                        return new OperationError("Not connected", OperationFailure.BadState);
+                    }
+
+                    var organizationUnits = OrgUnits.Where(x => x.Origin == origin).ToList();
+                    organizationUnits.ForEach(unit => unit.ConvertToKitosUnit());
+                    StsOrganizationConnection.Disconnect();
+                    return new DisconnectOrganizationFromOriginResult(organizationUnits);
+                    break;
+                case OrganizationUnitOrigin.Kitos:
+                    return new OperationError("Kitos is not an external source and cannot be disconnected", OperationFailure.BadInput);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

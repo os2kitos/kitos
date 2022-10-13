@@ -15,5 +15,10 @@
         public int? SynchronizationDepth { get; set; }
         //TODO https://os2web.atlassian.net/browse/KITOSUDV-3317 adds the change logs here
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3312 adds automatic subscription here
+        public void Disconnect()
+        {
+            Connected = false;
+            SynchronizationDepth = null;
+        }
     }
 }

@@ -3,6 +3,7 @@
         getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>
         createConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void>
         getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>
+        disconnect(organizationUuidid: string): ng.IPromise<boolean>
     }
 
     export class StsOrganizationSyncService implements IStsOrganizationSyncService {
@@ -29,6 +30,7 @@
 
         private purgeCache(organizationUuid: string) {
             this.inMemoryCacheService.deleteEntry(this.getStatusCacheKey(organizationUuid));
+            this.inMemoryCacheService.deleteEntry(this.getHierarchyCacheKey(organizationUuid));
         }
 
         getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO> {
@@ -67,6 +69,16 @@
             }).executeAsync(() => {
                 //Clear cache after
                 this.purgeCache(organizationUuidid);
+            });
+        }
+
+        disconnect(organizationUuidid: string): ng.IPromise<boolean> {
+            return this.apiUseCaseFactory.createDeletion("Forbindelse til FK Organisation", () => {
+                return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuidid)}/connection`);
+            }).executeAsync((result) => {
+                //Clear cache after
+                this.purgeCache(organizationUuidid);
+                return result;
             });
         }
     }

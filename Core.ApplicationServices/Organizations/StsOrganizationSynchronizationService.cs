@@ -95,14 +95,36 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> Disconnect(Guid organizationId)
         {
-            /*
-             *  1: Get org with permission
-             *  2: Delete using domain (response contains converted units in the disconnectionresult)
-             *  3: Change events for all units that changed
-             *  4: Events for org changed
-             *  5: Save and commit
-             */
-            throw new NotImplementedException();
+            return
+                GetOrganizationWithImportPermission(organizationId)
+                    .Select(Disconnect)
+                    .Match
+                    (
+                        disconnectionResult => disconnectionResult,
+                        error => error
+                    );
+        }
+
+        private Maybe<OperationError> Disconnect(Organization organization)
+        {
+            using var transaction = _transactionManager.Begin();
+            var result = organization.DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin.STS_Organisation);
+            if (result.Failed)
+            {
+                transaction.Rollback();
+                return result.Error;
+            }
+
+            var disconnectionResult = result.Value;
+            foreach (var convertedUnit in disconnectionResult.ConvertedUnits)
+            {
+                _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(convertedUnit));
+            }
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
+            _databaseControl.SaveChanges();
+            transaction.Commit();
+            return Maybe<OperationError>.None;
+
         }
 
         private Maybe<OperationError> CreateConnection(Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude, IDatabaseTransaction transaction)
