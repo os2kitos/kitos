@@ -1,17 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Core.ApplicationServices.Model.Organizations
 {
     public class OrganizationRegistrationsRoot
     {
-        public List<OrganizationRegistrationDetails> Roles { get; set; }
-        public List<OrganizationRegistrationDetails> Payments { get; set; }
-        public List<OrganizationRegistrationDetails> InternalContractRegistrations { get; set; }
-        public List<OrganizationRegistrationDetails> ExternalContractRegistrations { get; set; }
-        public List<OrganizationRegistrationDetails> RelevantSystemRegistrations { get; set; }
+        public OrganizationRegistrationsRoot()
+        {
+            Roles = new List<OrganizationRegistrationDetails>();
+            InternalPayments = new List<OrganizationRegistrationContractPayment>();
+            ExternalPayments = new List<OrganizationRegistrationContractPayment>();
+            ContractRegistrations = new List<OrganizationRegistrationDetails>();
+            RelevantSystemRegistrations = new List<OrganizationRegistrationDetailsWithObjectData>();
+        }
+
+        public IEnumerable<OrganizationRegistrationDetails> Roles { get; set; }
+        public IEnumerable<OrganizationRegistrationContractPayment> InternalPayments { get; set; }
+        public IEnumerable<OrganizationRegistrationContractPayment> ExternalPayments { get; set; }
+        public IEnumerable<OrganizationRegistrationDetails> ContractRegistrations { get; set; }
+        public IEnumerable<OrganizationRegistrationDetailsWithObjectData> RelevantSystemRegistrations { get; set; }
+        public IEnumerable<OrganizationRegistrationDetails> ResponsibleSystemRegistrations { get; set; }
     }
 }

@@ -146,8 +146,10 @@
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
     <Compile Include="Model\Organizations\OrganizationRegistrationDetails.cs" />
+    <Compile Include="Model\Organizations\OrganizationRegistrationDetailsWithObjectData.cs" />
     <Compile Include="Model\Organizations\OrganizationRegistrationsRoot.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
+    <Compile Include="Model\Organizations\OrganizationRegistrationContractPayment.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />

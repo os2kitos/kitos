@@ -372,6 +372,7 @@
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-registration-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-access-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-synchronization-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
@@ -399,7 +400,7 @@
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
-    <Compile Include="Controllers\API\V1\OrganizationUnitRegistrationController.cs" />
+    <Compile Include="Controllers\API\V1\OrganizationRegistrationController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
@@ -888,6 +889,7 @@
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\it-contract\it-contract-service.ts" />
     <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
+    <TypeScriptCompile Include="app\services\Organization\organization-registrations-service.ts" />
     <TypeScriptCompile Include="app\services\sts-organization-sync-service.ts" />
     <TypeScriptCompile Include="app\services\user-role-administration.service.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />

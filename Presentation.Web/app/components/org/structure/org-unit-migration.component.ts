@@ -48,8 +48,8 @@
         selectedOrg: any;
 
         //TODO: inject real data
-        static $inject: string[] = [];
-        constructor() {
+        static $inject: string[] = ["organizationRegistrationsService"];
+        constructor(private readonly organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
 
         }
 
@@ -57,6 +57,7 @@
             if (this.organizationId === null) {
                 console.error("missing attribute: 'organizationId'");
             }
+            this.organizationRegistrationsService.getRegistrations(this.organizationId);
             //TODO: remove "createOptions" method used for creating test data
             this.roles = this.createOptions();
             this.payments = this.createOptions();
