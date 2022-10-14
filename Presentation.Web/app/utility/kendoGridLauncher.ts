@@ -989,7 +989,10 @@ module Kitos.Utility.KendoGrid {
                     //Saved indexes must be applied after rendering since the map only contains values for visible columns. sorting beforehand will move all currently invisible columns out of the original order, and that will affect the filter menu.
                     this.postCreationActions.push(access => {
                         const createdColumns = access.mainGrid.columns;
-                        settingsToBeLoadedAfterRendering.columnOrder.forEach(savedColumnOrder => {
+                        settingsToBeLoadedAfterRendering
+                            .columnOrder
+                            .sort((a, b) => a.columnIndex - b.columnIndex) //ascending order - otherwise reordering will nor work as expected
+                            .forEach(savedColumnOrder => {
                             var columnIndex = this._.findIndex(createdColumns, column => {
                                 if (!column.hasOwnProperty("persistId")) {
                                     console.error(`Unable to find persistId property in grid column with field=${column.field}`);
