@@ -68,6 +68,15 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(FromOperationError, Ok);
         }
 
+        [HttpDelete]
+        [Route("connection")]
+        public HttpResponseMessage Disconnect(Guid organizationId)
+        {
+            return _stsOrganizationSynchronizationService
+                .Disconnect(organizationId)
+                .Match(FromOperationError, Ok);
+        }
+
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3313 adds the PUT (POST creates the connection)
 
         private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)

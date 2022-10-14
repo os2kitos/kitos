@@ -143,5 +143,16 @@ namespace Core.DomainModel.Organization
 
             return Maybe<OperationError>.None;
         }
+
+        public void ConvertToKitosUnit()
+        {
+            if (Origin == OrganizationUnitOrigin.Kitos)
+            {
+                throw new InvalidOperationException("Alrady a kitos unit");
+            }
+
+            Origin = OrganizationUnitOrigin.Kitos;
+            ExternalOriginUuid = null;
+        }
     }
 }
