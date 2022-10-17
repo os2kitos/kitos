@@ -5,7 +5,8 @@
         return {
             bindings: {
                 title: "@",
-                options: "="
+                options: "=",
+                configuration: "="
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -13,17 +14,30 @@
         }
     }
 
+    export interface IMigrationTableColumn{
+        title: string;
+        property: string;
+    }
+
     interface IOrganizationUnitMigrationTableController extends ng.IComponentController {
         title: string;
         options: IOrganizationUnitMigrationOptions;
+        configuration: IMigrationTableColumn[];
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
         title: string | null = null;
         options: IOrganizationUnitMigrationOptions;
+        configuration: IMigrationTableColumn[] | null = null;
         root: IOrganizationUnitMigrationRoot;
 
         $onInit() {
+            /*if (this.configuration === null) {
+                console.error("missing migration table attribute: 'configuration'");
+            }*/
+            if (this.title === null) {
+                console.error("missing migration table attribute: 'title'");
+            }
             this.root = this.options.root;
         }
 

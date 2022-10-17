@@ -410,6 +410,8 @@
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ObjectIdAndParentIdDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\RemoveOrganizationRegistrationsRequest.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />

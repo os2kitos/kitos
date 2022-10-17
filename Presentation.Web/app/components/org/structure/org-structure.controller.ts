@@ -398,6 +398,7 @@
 
                             bindParentSelect($modalScope.orgUnit, orgUnits);
 
+                            $modalScope.organizationId = unit.organizationId
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
                             $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;

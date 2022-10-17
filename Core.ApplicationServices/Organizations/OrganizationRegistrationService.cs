@@ -142,23 +142,16 @@ namespace Core.ApplicationServices.Organizations
 
         private static IEnumerable<OrganizationRegistrationDetailsWithObjectData> GetRelevantSystemRegistrations(ItSystemUsage systemUsage)
         {
-            var result = new List<OrganizationRegistrationDetailsWithObjectData>();
-            var index = 1;
-            foreach (var item in systemUsage.UsedBy)
-            {
-                result.Add(ToDetailsWithObjectData(item.OrganizationUnitId, item.OrganizationUnit.Name, systemUsage.Id, systemUsage.LocalCallName));
-                index++;
-            }
-
-            return result;
+            return systemUsage.UsedBy.Select(item => ToDetailsWithObjectData(item.OrganizationUnitId, item.OrganizationUnit.Name, systemUsage.Id, systemUsage.LocalCallName)).ToList();
         }
 
-        private static OrganizationRegistrationDetails ToDetails(int id, string text)
+        private static OrganizationRegistrationDetails ToDetails(int id, string text, string key = null)
         {
             return new OrganizationRegistrationDetails
             {
                 Id = id,
-                Text = text
+                Text = text,
+                Key = key
             };
         }
 
@@ -178,7 +171,7 @@ namespace Core.ApplicationServices.Organizations
             return new OrganizationRegistrationContractPayment
             {
                 Id = economyStream.Id,
-                Text = $"{economyStream.AuditDate}, {economyStream.AuditStatus}",
+                Text = $"Acquisition: {economyStream.Acquisition}, Operation: {economyStream.Operation}", //TODO: How should it look like?
                 PaymentIndex = index,
                 ObjectId = contract.Id,
                 ObjectName = contract.Name,

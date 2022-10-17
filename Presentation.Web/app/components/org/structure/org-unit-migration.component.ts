@@ -4,7 +4,8 @@
     function setupComponent(): ng.IComponentOptions {
         return{
             bindings: {
-                organizationId: "<"
+                organizationId: "<",
+                unitId: "<"
             },
             controller: OrganizationUnitMigrationController,
             controllerAs: "ctrl",
@@ -14,6 +15,8 @@
 
     export interface IOrganizationUnitMigrationOptions {
         root: IOrganizationUnitMigrationRoot;
+        hasExtraDataColumn?: boolean;
+        hasExtraIndexColumn?: boolean;
         selectedRegistrationChanged?: () => void;
         selectedRegistrationGroupChanged?: (root: IOrganizationUnitMigrationRoot) => void;
     }
@@ -25,29 +28,42 @@
     export interface IOrganizationUnitRegistration extends Models.ViewModel.Organization.IHasSelection {
         id: number;
         text: string;
-        targetUnit?: Models.Generic.NamedEntity.NamedEntityDTO;
+        objectId?: number;
+        objectName?: string;
+        index?: number;
+
+        targetUnitId?: number;
+        targetUnitName?: string;
         optionalObjectContext?: any;
     }
 
     interface IOrganizationUnitMigrationController extends ng.IComponentController {
         organizationId: number;
+        unitId: number;
     }
 
     class OrganizationUnitMigrationController implements IOrganizationUnitMigrationController {
         organizationId: number | null = null;
+        unitId: number | null = null;
         anySelections = false;
         allSelections = false;
 
         roles: IOrganizationUnitMigrationOptions;
-        payments: IOrganizationUnitMigrationOptions;
-        internalContractRegistrations: IOrganizationUnitMigrationOptions;
-        externalContractRegistrations: IOrganizationUnitMigrationOptions;
+        internalPayments: IOrganizationUnitMigrationOptions;
+        externalPayments: IOrganizationUnitMigrationOptions;
+        contractRegistrations: IOrganizationUnitMigrationOptions;
         relevantSystemRegistrations: IOrganizationUnitMigrationOptions;
         responsibleSystemRegistrations: IOrganizationUnitMigrationOptions;
         organizations: any;
         selectedOrg: any;
 
-        //TODO: inject real data
+        rolesTableConfig: IMigrationTableColumn[];
+        internalPaymentTableConfig: IMigrationTableColumn[];
+        externalPaymentTableConfig: IMigrationTableColumn[];
+        contractTableConfig: IMigrationTableColumn[];
+        relevantSystemTableConfig: IMigrationTableColumn[];
+        responsibleSystemTableConfig: IMigrationTableColumn[];
+        
         static $inject: string[] = ["organizationRegistrationsService"];
         constructor(private readonly organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
 
@@ -57,14 +73,31 @@
             if (this.organizationId === null) {
                 console.error("missing attribute: 'organizationId'");
             }
-            this.organizationRegistrationsService.getRegistrations(this.organizationId);
-            //TODO: remove "createOptions" method used for creating test data
+            if (this.unitId === null) {
+                console.error("missing attribute: 'unitId'");
+            }
+
+            this.createTableConfigurations();
+
             this.roles = this.createOptions();
-            this.payments = this.createOptions();
-            this.internalContractRegistrations = this.createOptions();
-            this.externalContractRegistrations = this.createOptions();
-            this.relevantSystemRegistrations = this.createOptions();
+            this.internalPayments = this.createOptions(true, true);
+            this.externalPayments = this.createOptions(true, true);
+            this.contractRegistrations = this.createOptions();
+            this.relevantSystemRegistrations = this.createOptions(true);
             this.responsibleSystemRegistrations = this.createOptions();
+
+            this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
+                this.roles.root.children = this.mapOrganizationRegistrationsToOptions(response.roles);
+                this.internalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.internalPayments);
+                this.externalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.externalPayments);
+                this.contractRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.contractRegistrations);
+                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsWithDataToOptions(response.relevantSystemRegistrations);
+                this.responsibleSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.responsibleSystemRegistrations);
+            }, error => {
+                console.error(error);
+            });
+
+            //TODO: get orgs from the api
             this.organizations = [{ id: 1, name: "Organization1" }, { id: 2, name: "Organization2" }];
             this.selectedOrg = {};
         }
@@ -83,7 +116,10 @@
 
         setSelectedOrg() {
             const selectedRegistrations = this.collectSelectedRegistrations();
-            selectedRegistrations.forEach(registration => registration.targetUnit = this.selectedOrg);
+            selectedRegistrations.forEach(registration => {
+                registration.targetUnitId = this.selectedOrg.id;
+                registration.targetUnitName = this.selectedOrg.name;
+            });
         }
 
         selectAll() {
@@ -154,7 +190,6 @@
             roots.forEach(root => {
                 const res = this.collectSelectedRegistrationsFromSource(root.children);
                 result = result.concat(res);
-                console.log("");
             });
 
             return result;
@@ -168,22 +203,89 @@
             const array = [] as IOrganizationUnitMigrationRoot[];
             return array
                 .concat(this.roles.root)
-                .concat(this.payments.root)
-                .concat(this.internalContractRegistrations.root)
-                .concat(this.externalContractRegistrations.root)
+                .concat(this.internalPayments.root)
+                .concat(this.externalPayments.root)
+                .concat(this.contractRegistrations.root)
                 .concat(this.relevantSystemRegistrations.root)
                 .concat(this.responsibleSystemRegistrations.root);
         }
-
-        private createOptions(): IOrganizationUnitMigrationOptions {
+        
+        private createOptions(hasExtraDataColumn: boolean = false, hasExtraIndexColumn: boolean = false): IOrganizationUnitMigrationOptions {
             return {
                 root: {
                     selected: false,
-                    children: [{ text: "test" }, { text: "test2" }]
+                    children: []
                 },
+                hasExtraDataColumn: hasExtraDataColumn,
+                hasExtraIndexColumn: hasExtraIndexColumn,
                 selectedRegistrationChanged: () => this.updateAnySelections(),
                 selectedRegistrationGroupChanged: (root: IOrganizationUnitMigrationRoot) => this.changeRegistrationGroupStatus(root)
             } as IOrganizationUnitMigrationOptions;
+        }
+
+        private mapOrganizationRegistrationsToOptions(registrations: Models.Api.Organization.OrganizationRegistrationDetailsDto[]): IOrganizationUnitRegistration[]{
+            return registrations.map(res => {
+                return {
+                    id: res.id,
+                    text: res.text,
+                } as IOrganizationUnitRegistration;
+            });
+        }
+
+        private mapOrganizationRegistrationsWithDataToOptions(registrations: Models.Api.Organization.OrganizationRegistrationDetailsWithObjectDataDto[]): IOrganizationUnitRegistration[]{
+            return registrations.map(res => {
+                return {
+                    id: res.id,
+                    text: res.text,
+                    objectId: res.objectId,
+                    objectName: res.objectName
+                } as IOrganizationUnitRegistration;
+            });
+        }
+
+        private mapOrganizationRegistrationsPaymentsToOptions(registrations: Models.Api.Organization.OrganizationRegistrationContractPaymentDto[]): IOrganizationUnitRegistration[]{
+            return registrations.map(res => {
+                return {
+                    id: res.id,
+                    text: res.text,
+                    objectId: res.objectId,
+                    objectName: res.objectName,
+                    index: res.paymentIndex
+                } as IOrganizationUnitRegistration;
+            });
+        }
+
+        private createTableConfigurations() {
+            this.rolesTableConfig = this.createStandardTableConfig("Roles");
+            this.internalPaymentTableConfig = this.createPaymentTableConfig("Internal payments");
+            this.externalPaymentTableConfig = this.createPaymentTableConfig("External payments");
+            this.contractTableConfig = this.createStandardTableConfig("Contract registrations");
+            this.relevantSystemTableConfig = this.createTableWithExtraColumnConfig("Relevant systems");
+            this.responsibleSystemTableConfig = this.createStandardTableConfig("Responsible systems");
+        }
+
+        private createStandardTableConfig(title: string): IMigrationTableColumn[] {
+            return [
+                { title: title, property: "text" },
+                { title: "Assigned to", property: "targetUnitName" }
+            ] as IMigrationTableColumn[];
+        }
+
+        private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
+            return [
+                { title: "Index", property: "index" },
+                { title: title, property: "text" },
+                { title: "Assigned to", property: "targetUnitName" },
+                { title: "Organization name", property: "objectName" }
+            ] as IMigrationTableColumn[];
+        }
+
+        private createTableWithExtraColumnConfig(title: string): IMigrationTableColumn[] {
+            return [
+                { title: title, property: "text" },
+                { title: "Assigned to", property: "targetUnitName" },
+                { title: "Organization name", property: "objectName" }
+            ] as IMigrationTableColumn[];
         }
     }
 

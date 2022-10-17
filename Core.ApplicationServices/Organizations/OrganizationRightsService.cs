@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Users;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
@@ -73,6 +74,24 @@ namespace Core.ApplicationServices.Organizations
             var right = _organizationRightRepository.GetByKey(rightId);
 
             return RemoveRight(right);
+        }
+
+        public Maybe<OperationError> RemoveRights(int userId, int organizationId, UserRightsChangeParameters parameters)
+        {
+            return MutateUserRights(
+                organizationId,
+                context =>
+                    RemoveRights
+                    (
+                        context.user,
+                        context.organization,
+                        context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.Id)).ToList(),
+                        context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.Id)).ToList(),
+                        context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.Id)).ToList(),
+                        context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.Id)).ToList(),
+                        context.rolesInOrganization.Where(role => parameters.AdministrativeAccessRoles.Contains(role)).ToList()
+                    )
+            );
         }
 
         private Result<OrganizationRight, OperationFailure> RemoveRight(OrganizationRight right)

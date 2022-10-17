@@ -5,12 +5,12 @@
     </select>
 </div>
 
-<org-unit-migration-table title="Roles" options="ctrl.roles"></org-unit-migration-table>
-<org-unit-migration-table title="Payments" options="ctrl.payments"></org-unit-migration-table>
-<org-unit-migration-table title="Internal contract registrations" options="ctrl.internalContractRegistrations"></org-unit-migration-table>
-<org-unit-migration-table title="External contract registrations" options="ctrl.externalContractRegistrations"></org-unit-migration-table>
-<org-unit-migration-table title="Relevant system registrations" options="ctrl.relevantSystemRegistrations"></org-unit-migration-table>
-<org-unit-migration-table title="Responsible system registrations" options="ctrl.responsibleSystemRegistrations"></org-unit-migration-table>
+<org-unit-migration-table ng-if="ctrl.roles.root.children.length > 0" title="Roles" options="ctrl.roles" configuration="ctrl.rolesTableConfig"></org-unit-migration-table>
+<org-unit-migration-table ng-if="ctrl.internalPayments.root.children.length > 0" title="Internal payments" options="ctrl.internalPayments" configuration="ctrl.internalPaymentTableConfig"></org-unit-migration-table>
+<org-unit-migration-table ng-if="ctrl.externalPayments.root.children.length > 0" title="External payments" options="ctrl.externalPayments" configuration="ctrl.externalPaymentTableConfig"></org-unit-migration-table>
+<org-unit-migration-table ng-if="ctrl.contractRegistrations.root.children.length > 0" title="Contract registrations" options="ctrl.contractRegistrations" configuration="ctrl.contractTableConfig"></org-unit-migration-table>
+<org-unit-migration-table ng-if="ctrl.relevantSystemRegistrations.root.children.length > 0" title="Relevant system registrations" options="ctrl.relevantSystemRegistrations" configuration="ctrl.relevantSystemTableConfig"></org-unit-migration-table>
+<org-unit-migration-table ng-if="ctrl.responsibleSystemRegistrations.root.children.length > 0" title="Responsible system registrations" options="ctrl.responsibleSystemRegistrations" configuration="ctrl.responsibleSystemTableConfig"></org-unit-migration-table>
 
 <button class="btn btn-default" ng-click="ctrl.selectAll()" ng-if="!ctrl.allSelections">Select all</button>
 <button class="btn btn-default" ng-click="ctrl.deselectAll()" ng-if="ctrl.allSelections">Deselect all</button>

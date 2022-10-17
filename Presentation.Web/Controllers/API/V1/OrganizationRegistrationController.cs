@@ -4,12 +4,13 @@ using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V1.Organizations;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [PublicApi]
-    [RoutePrefix("api/v1/unit-registrations")]
+    [RoutePrefix("api/v1/organization-registrations")]
 
     public class OrganizationRegistrationController: BaseApiController
     {
@@ -45,7 +46,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveSelectedUnitRegistrations(int unitId)
+        public HttpResponseMessage RemoveSelectedUnitRegistrations(int unitId, [FromBody] RemoveOrganizationRegistrationsRequest request)
         {
             return Ok();
         }

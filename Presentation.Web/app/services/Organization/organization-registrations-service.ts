@@ -9,7 +9,7 @@
         getRegistrations(orgId: number): ng.IPromise<Models.Api.Organization.OrganizationRegistrationRootDto> {
             return this
                 .$http
-                .get<API.Models.IApiWrapper<any>>(`unit-registrations/${orgId}`)
+                .get<API.Models.IApiWrapper<any>>(`api/v1/organization-registrations/${orgId}`)
                 .then(
                     result => {
                         var response = result.data as { response: Models.Api.Organization.OrganizationRegistrationRootDto }
@@ -26,4 +26,6 @@
             this.apiWrapper = new Services.Generic.ApiWrapper($http);
         }
     }
+
+    app.service("organizationRegistrationsService", OrganizationRegistrationsService);
 }

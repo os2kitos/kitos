@@ -8,6 +8,6 @@
         newParent: number,
         localId: number,
         orgId: number,
-        isRoot: boolean,
+        isRoot: boolean
     }
 }

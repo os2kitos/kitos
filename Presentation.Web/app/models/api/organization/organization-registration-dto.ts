@@ -19,6 +19,6 @@
     }
 
     export class OrganizationRegistrationContractPaymentDto extends OrganizationRegistrationDetailsWithObjectDataDto{
-        index: number;
+        paymentIndex: number;
     }
 }
