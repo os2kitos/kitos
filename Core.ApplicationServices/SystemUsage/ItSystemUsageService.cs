@@ -287,6 +287,25 @@ namespace Core.ApplicationServices.SystemUsage
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
         }
 
+        public Result<ItSystemUsage, OperationError> RemoveResponsibleUsage(int id)
+        {
+            return Modify(id, system =>
+            {
+                system.ResponsibleUsage = null;
+                return Result<ItSystemUsage, OperationError>.Success(system);
+            });
+        }
+
+        public Result<ItSystemUsage, OperationError> RemoveRelevantUnits(int id, IEnumerable<int> unitIds)
+        {
+            return Modify(id, system =>
+            {
+                var unitsToRemove = system.UsedBy.Where(x => unitIds.Contains(x.OrganizationUnitId)).ToList();
+                unitsToRemove.ForEach(x => system.UsedBy.Remove(x));
+                return Result<ItSystemUsage, OperationError>.Success(system);
+            });
+        }
+
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)
         {
             return _authorizationContext.AllowReads(usage) ? Result<ItSystemUsage, OperationError>.Success(usage) : new OperationError(OperationFailure.Forbidden);

@@ -1,7 +1,10 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Web.Http;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
@@ -48,7 +51,18 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage RemoveSelectedUnitRegistrations(int unitId, [FromBody] RemoveOrganizationRegistrationsRequest request)
         {
-            return Ok();
+            var changeParameters = new OrganizationRegistrationsChangeParameters
+            {
+                RoleIds = request.Roles,
+                InternalPaymentIds = request.InternalPayments,
+                ExternalPaymentIds = request.ExternalPayments,
+                ContractWithRegistrationIds = request.ContractRegistrations,
+                ResponsibleSystemIds = request.ResponsibleSystems,
+                RelevantSystems = request.RelevantSystems.Select(x => new OrganizationRelevantSystem(x.SystemId, x.RelevantUnitIds)).ToList()
+            };
+
+            return _organizationRegistrationService.DeleteSelectedOrganizationRegistrations(changeParameters)
+                .Match(_ => BadRequest(), Ok);
         }
 
         [HttpPut]

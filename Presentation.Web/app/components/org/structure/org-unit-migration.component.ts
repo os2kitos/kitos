@@ -78,24 +78,8 @@
             }
 
             this.createTableConfigurations();
-
-            this.roles = this.createOptions();
-            this.internalPayments = this.createOptions(true, true);
-            this.externalPayments = this.createOptions(true, true);
-            this.contractRegistrations = this.createOptions();
-            this.relevantSystemRegistrations = this.createOptions(true);
-            this.responsibleSystemRegistrations = this.createOptions();
-
-            this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
-                this.roles.root.children = this.mapOrganizationRegistrationsToOptions(response.roles);
-                this.internalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.internalPayments);
-                this.externalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.externalPayments);
-                this.contractRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.contractRegistrations);
-                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsWithDataToOptions(response.relevantSystemRegistrations);
-                this.responsibleSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.responsibleSystemRegistrations);
-            }, error => {
-                console.error(error);
-            });
+            this.createNewOptions();
+            this.getData();
 
             //TODO: get orgs from the api
             this.organizations = [{ id: 1, name: "Organization1" }, { id: 2, name: "Organization2" }];
@@ -103,14 +87,36 @@
         }
 
         deleteSelected() {
-            //TODO: delete selected registrations
+            if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
+                return;
+            }
+
+            const request = new Models.Api.Organization.OrganizationRegistrationDeleteRequest();
+
+            request.roles = this.roles.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.internalPayments = this.internalPayments.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.externalPayments = this.externalPayments.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.contractRegistrations = this.contractRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.responsibleSystems = this.responsibleSystemRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.relevantSystems = this.getSelectedRelevantSystems();
+
+            this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
+                .then(() => this.getData());
         }
 
         deleteUnit() {
+            if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
+                return;
+            }
+
             //TODO: delete unit
         }
 
         transfer() {
+            if (!confirm('Er du sikker på, at du vil INSERT REST OF THE TEXT?')) {
+                return;
+            }
+
             //TODO: transfer registrations
         }
 
@@ -264,6 +270,28 @@
             this.responsibleSystemTableConfig = this.createStandardTableConfig("Responsible systems");
         }
 
+        private createNewOptions() {
+            this.roles = this.createOptions();
+            this.internalPayments = this.createOptions(true, true);
+            this.externalPayments = this.createOptions(true, true);
+            this.contractRegistrations = this.createOptions();
+            this.relevantSystemRegistrations = this.createOptions(true);
+            this.responsibleSystemRegistrations = this.createOptions();
+        }
+
+        getData() {
+            this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
+                this.roles.root.children = this.mapOrganizationRegistrationsToOptions(response.roles);
+                this.internalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.internalPayments);
+                this.externalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.externalPayments);
+                this.contractRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.contractRegistrations);
+                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsWithDataToOptions(response.relevantSystemRegistrations);
+                this.responsibleSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.responsibleSystemRegistrations);
+            }, error => {
+                console.error(error);
+            });
+        }
+
         private createStandardTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: title, property: "text" },
@@ -286,6 +314,22 @@
                 { title: "Assigned to", property: "targetUnitName" },
                 { title: "Organization name", property: "objectName" }
             ] as IMigrationTableColumn[];
+        }
+
+        private getSelectedRelevantSystems(): Models.Api.Organization.IRelevantSystem[] {
+
+            const selectedRegistrations = this.relevantSystemRegistrations.root.children.filter(x => x.selected);
+            const uniqueSystems = selectedRegistrations.map(item => item.objectId)
+                .filter((value, index, self) => self.indexOf(value) === index);
+
+            var relevantSystems = [] as Models.Api.Organization.IRelevantSystem[];
+
+            uniqueSystems.forEach(systemId => {
+                var relevantIds = selectedRegistrations.filter(x => x.objectId === systemId).map(item => item.id);
+                relevantSystems.push({ systemId: systemId, relevantUnitIds: relevantIds });
+            });
+
+            return relevantSystems;
         }
     }
 

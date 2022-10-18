@@ -7,11 +7,11 @@ namespace Presentation.Web.Models.API.V1.Organizations
     public class RemoveOrganizationRegistrationsRequest
     {
         [Required]
-        public IEnumerable<AssignedRightDTO> Roles { get; set; }
-        public IEnumerable<ObjectIdAndParentIdDTO> InternalPayments{ get; set; }
-        public IEnumerable<ObjectIdAndParentIdDTO> ExternalPayments{ get; set; }
-        public IEnumerable<ObjectIdAndParentIdDTO> ContractRegistrations{ get; set; }
-        public IEnumerable<ObjectIdAndParentIdDTO> ResponsibleSystems{ get; set; }
-        public IEnumerable<ObjectIdAndParentIdDTO> RelevantSystems{ get; set; }
+        public IEnumerable<int> Roles { get; set; }
+        public IEnumerable<int> InternalPayments{ get; set; }
+        public IEnumerable<int> ExternalPayments{ get; set; }
+        public IEnumerable<int> ContractRegistrations{ get; set; }
+        public IEnumerable<int> ResponsibleSystems{ get; set; }
+        public IEnumerable<OrganizationRelevantSystemDTO> RelevantSystems{ get; set; }
     }
 }

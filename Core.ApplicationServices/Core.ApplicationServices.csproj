@@ -103,6 +103,8 @@
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Contract\EconomyStreamService.cs" />
+    <Compile Include="Contract\IEconomyStreamService.cs" />
     <Compile Include="Contract\ReadModels\IItContractOverviewReadModelsService.cs" />
     <Compile Include="Contract\ReadModels\ItContractOverviewReadModelsService.cs" />
     <Compile Include="Contract\Write\IItContractWriteService.cs" />
@@ -150,6 +152,7 @@
     <Compile Include="Model\Organizations\OrganizationRegistrationRemoval.cs" />
     <Compile Include="Model\Organizations\OrganizationRegistrationsChangeParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationRegistrationsRoot.cs" />
+    <Compile Include="Model\Organizations\OrganizationRelevantSystem.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\OrganizationRegistrationContractPayment.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
