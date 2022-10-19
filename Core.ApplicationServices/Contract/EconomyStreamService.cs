@@ -67,21 +67,21 @@ namespace Core.ApplicationServices.Contract
 
         public IEnumerable<EconomyStream> GetEconomyStreams(ItContract contract)
         {
-            return GetExternalEconomyStreams(contract)
-                .Concat(GetInternalEconomyStreams(contract));
+            return contract.ExternEconomyStreams.ToList()
+                .Concat(contract.InternEconomyStreams.ToList());
         }
 
-        public IEnumerable<EconomyStream> GetInternalEconomyStreams(ItContract contract)
-        {
-            return contract
-                .ExternEconomyStreams
-                .ToList();
-        }
-
-        public IEnumerable<EconomyStream> GetExternalEconomyStreams(ItContract contract)
+        public IEnumerable<EconomyStream> GetInternalEconomyStreamsByUnitId(ItContract contract, int unitId)
         {
             return contract
                 .InternEconomyStreams
+                .ToList();
+        }
+
+        public IEnumerable<EconomyStream> GetExternalEconomyStreamsByUnitId(ItContract contract, int unitId)
+        {
+            return contract
+                .ExternEconomyStreams
                 .ToList();
         }
 

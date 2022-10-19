@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
@@ -58,10 +57,10 @@ namespace Presentation.Web.Controllers.API.V1
                 ExternalPaymentIds = request.ExternalPayments,
                 ContractWithRegistrationIds = request.ContractRegistrations,
                 ResponsibleSystemIds = request.ResponsibleSystems,
-                RelevantSystems = request.RelevantSystems.Select(x => new OrganizationRelevantSystem(x.SystemId, x.RelevantUnitIds)).ToList()
+                RelevantSystems = request.RelevantSystems
             };
 
-            return _organizationRegistrationService.DeleteSelectedOrganizationRegistrations(changeParameters)
+            return _organizationRegistrationService.DeleteSelectedOrganizationRegistrations(unitId, changeParameters)
                 .Match(_ => BadRequest(), Ok);
         }
 

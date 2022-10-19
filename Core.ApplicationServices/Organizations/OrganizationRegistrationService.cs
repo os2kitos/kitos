@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Core.Abstractions.Types;
@@ -92,7 +93,7 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            return _organizationRightsService.RemoveSelectedUnitRights(parameters.RoleIds)
+            var res = _organizationRightsService.RemoveSelectedUnitRights(parameters.RoleIds)
                 .Match
                 (
                     error => error,
@@ -116,8 +117,9 @@ namespace Core.ApplicationServices.Organizations
                 .Match
                 (
                     error => error,
-                    () => RemoveSystemRelevantUnits(parameters.RelevantSystems)
+                    () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unitId)
                 );
+            return res;
         }
 
         public Maybe<OperationError> TransferSelectedOrganizationRegistrations()
@@ -132,16 +134,16 @@ namespace Core.ApplicationServices.Organizations
 
         private void GetContractRegistrations(OrganizationRegistrationsRoot root, int unitId)
         {
-            var contracts = _contractRepository.AsQueryable().ByOrganizationId(unitId).ToList();
+            var contracts = _contractService.GetContractsByResponsibleUnitId(unitId);
             var externalPayments = new List<OrganizationRegistrationContractPayment>();
             var internalPayments = new List<OrganizationRegistrationContractPayment>();
             var responsibleOrganizationUnits = new List<OrganizationRegistrationDetails>();
 
             foreach (var itContract in contracts)
             {
-                externalPayments.AddRange(GetPayments(itContract, _economyStreamService.GetExternalEconomyStreams(itContract)));
-                internalPayments.AddRange(GetPayments(itContract, _economyStreamService.GetInternalEconomyStreams(itContract)));
-                GetResponsibleOrganizationUnit(itContract, responsibleOrganizationUnits);
+                externalPayments.AddRange(GetPayments(itContract, _economyStreamService.GetExternalEconomyStreamsByUnitId(itContract, unitId)));
+                internalPayments.AddRange(GetPayments(itContract, _economyStreamService.GetInternalEconomyStreamsByUnitId(itContract, unitId)));
+                responsibleOrganizationUnits.Add(ToDetails(itContract.Id, itContract.Name));
             }
 
             root.ExternalPayments = externalPayments;
@@ -151,18 +153,15 @@ namespace Core.ApplicationServices.Organizations
 
         private void GetSystemRegistrations(OrganizationRegistrationsRoot root, int unitId)
         {
-            var systems = _systemUsageRepository.AsQueryable().ByOrganizationId(unitId).ToList();
-            var responsibleSystems = new List<OrganizationRegistrationDetails>();
-            var relevantSystems = new List<OrganizationRegistrationDetailsWithObjectData>();
+            var responsibleSystems = _usageService.GetSystemsByResponsibleUnitId(unitId);
+            var relevantSystems = _usageService.GetSystemsByRelevantUnitId(unitId);
 
-            foreach (var system in systems)
-            {
-                relevantSystems.AddRange(GetRelevantSystemRegistrations(system));
-                GetResponsibleSystemOrganizationUnit(system, responsibleSystems);
-            }
+            //TODO: What to use as a name?
+            var responsibleSystemRegistrations = responsibleSystems.Select(system => ToDetails(system.Id, system.LocalCallName)).ToList();
+            var relevantSystemRegistrations = relevantSystems.Select(system => ToDetails(system.Id, system.LocalCallName)).ToList();
 
-            root.RelevantSystemRegistrations = relevantSystems;
-            root.ResponsibleSystemRegistrations = responsibleSystems;
+            root.RelevantSystemRegistrations = relevantSystemRegistrations;
+            root.ResponsibleSystemRegistrations = responsibleSystemRegistrations;
         }
 
         private static IEnumerable<OrganizationRegistrationContractPayment> GetPayments(ItContract contract, IEnumerable<EconomyStream> payments)
@@ -178,28 +177,6 @@ namespace Core.ApplicationServices.Organizations
             return result;
         }
 
-        private static void GetResponsibleOrganizationUnit(ItContract contract, ICollection<OrganizationRegistrationDetails> responsibleOrgsList)
-        {
-            if (contract.ResponsibleOrganizationUnit == null)
-                return;
-
-            responsibleOrgsList.Add(ToDetails(contract.Id, contract.ResponsibleOrganizationUnit.Name));
-        }
-
-        private static void GetResponsibleSystemOrganizationUnit(ItSystemUsage system, ICollection<OrganizationRegistrationDetails> responsibleOrgsList)
-        {
-            if (system.ResponsibleUsage == null)
-                return;
-
-            responsibleOrgsList.Add(ToDetails(system.ResponsibleUsage.OrganizationUnit.Id, system.ResponsibleUsage.OrganizationUnit.Name));
-        }
-
-        private static IEnumerable<OrganizationRegistrationDetailsWithObjectData> GetRelevantSystemRegistrations(ItSystemUsage systemUsage)
-        {
-            //TODO: What should I use as a name for the system in which the relevant units are located
-            return systemUsage.UsedBy.Select(item => ToDetailsWithObjectData(item.OrganizationUnit.Id, item.OrganizationUnit.Name, systemUsage.Id, systemUsage.LocalCallName)).ToList();
-        }
-
         private Maybe<OperationError> RemoveContractRegistrations(IEnumerable<int> contractIds)
         {
             foreach (var contractId in contractIds)
@@ -212,11 +189,11 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> RemoveSystemRelevantUnits(IEnumerable<OrganizationRelevantSystem> relevantSystems)
+        private Maybe<OperationError> RemoveSystemRelevantUnits(IEnumerable<int> systemIds, int unitId)
         {
-            foreach (var system in relevantSystems)
+            foreach (var systemId in systemIds)
             {
-                var deleteResult = _usageService.RemoveRelevantUnits(system.SystemId, system.RelevantUnitIds);
+                var deleteResult = _usageService.RemoveRelevantUnit(systemId, unitId);
                 if (deleteResult.Failed)
                     return deleteResult.Error;
             }

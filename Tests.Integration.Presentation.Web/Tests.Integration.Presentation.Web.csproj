@@ -211,6 +211,7 @@
     <Compile Include="Tools\Model\RightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
     <Compile Include="Tools\OrganizationHelper.cs" />
+    <Compile Include="Tools\OrganizationRegistrationHelper.cs" />
     <Compile Include="Tools\OrganizationUnitHelper.cs" />
     <Compile Include="Tools\ReadModelTestTools.cs" />
     <Compile Include="Tools\ReferencesHelper.cs" />

@@ -28,5 +28,6 @@ namespace Core.ApplicationServices.Contract
         Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId);
         Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlans(int organizationId);
         Result<ItContract, OperationError> RemoveContractResponsibleUnit(int contractId);
+        IEnumerable<ItContract> GetContractsByResponsibleUnitId(int unitId);
     }
 }

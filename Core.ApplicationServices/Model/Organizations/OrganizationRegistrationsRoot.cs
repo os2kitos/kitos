@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Model.Organizations
         public IEnumerable<OrganizationRegistrationContractPayment> InternalPayments { get; set; }
         public IEnumerable<OrganizationRegistrationContractPayment> ExternalPayments { get; set; }
         public IEnumerable<OrganizationRegistrationDetails> ContractRegistrations { get; set; }
-        public IEnumerable<OrganizationRegistrationDetailsWithObjectData> RelevantSystemRegistrations { get; set; }
+        public IEnumerable<OrganizationRegistrationDetails> RelevantSystemRegistrations { get; set; }
         public IEnumerable<OrganizationRegistrationDetails> ResponsibleSystemRegistrations { get; set; }
     }
 }

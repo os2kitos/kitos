@@ -288,6 +288,11 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
+        public IEnumerable<ItContract> GetContractsByResponsibleUnitId(int unitId)
+        {
+            return _repository.AsQueryable().Where(x => x.ResponsibleOrganizationUnitId == unitId).ToList();
+        }
+
         public Result<ItContract, OperationError> RemoveContractResponsibleUnit(int contractId)
         {
             return Modify(contractId, contract =>

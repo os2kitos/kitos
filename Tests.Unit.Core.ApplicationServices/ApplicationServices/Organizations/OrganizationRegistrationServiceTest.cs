@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Organizations;
@@ -14,7 +11,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Tests.Toolkit.Patterns;
 using Moq;
 using Xunit;
@@ -72,27 +68,28 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             
             var contract = CreateContract(unit.Id);
             var contractList = new List<ItContract>() { contract };
-            var internalEconomyStream = new EconomyStream { Id = A<int>() };
-            var externalEconomyStream = new EconomyStream { Id = A<int>() };
+            var internalEconomyStream = new EconomyStream { Id = A<int>(), OrganizationUnitId = unit.Id };
+            var externalEconomyStream = new EconomyStream { Id = A<int>(), OrganizationUnitId = unit.Id };
             contract.ExternEconomyStreams = new List<EconomyStream> { externalEconomyStream };
             contract.InternEconomyStreams = new List<EconomyStream> { internalEconomyStream };
-            contract.ResponsibleOrganizationUnit = CreateOrganizationUnit();
+            contract.ResponsibleOrganizationUnit = unit;
 
             var system = CreateSystem(unit.Id);
-            var systemList = new List<ItSystemUsage>() { system };
-            var relevantSystem = CreateItSystemUsageOrgUnitUsage(unit.Id);
+            var systemList = new List<ItSystemUsage> { system };
+            var relevantSystem = CreateItSystemUsageOrgUnitUsage(unit, system);
             system.UsedBy = new List<ItSystemUsageOrgUnitUsage> { relevantSystem };
-            system.ResponsibleUsage = CreateItSystemUsageOrgUnitUsage(unit.Id);
+            system.ResponsibleUsage = CreateItSystemUsageOrgUnitUsage(unit, system);
 
             ExpectResolveUuidReturns(unit.Id, unitUuid);
             ExpectGetOrganizationUnitReturns(unitUuid, unit);
             ExpectAllowReadsReturns(unit, true);
 
-            ExpectContractRepositoryByOrganizationIdReturns(contractList.AsQueryable());
-            ExpectGetExternalEconomyStreamsReturns(contract, contract.ExternEconomyStreams);
-            ExpectGetInternalEconomyStreamsReturns(contract, contract.InternEconomyStreams);
-
-            ExpectSystemUsageRepositoryByOrganizationIdReturns(systemList.AsQueryable());
+            ExpectGetContractsByResponsibleUnitIdReturns(unit.Id, contractList.AsQueryable());
+            ExpectGetExternalEconomyStreamsReturns(contract, unit.Id, contract.ExternEconomyStreams);
+            ExpectGetInternalEconomyStreamsReturns(contract, unit.Id, contract.InternEconomyStreams);
+            
+            ExpectGetSystemsByResponsibleUnitIdReturns(unit.Id, systemList);
+            ExpectGetSystemsByRelevantUnitIdReturns(unit.Id, systemList);
 
             var result = _sut.GetOrganizationRegistrations(unit.Id);
 
@@ -110,13 +107,13 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Contains(internalEconomyStream.Id, registrations.InternalPayments.Select(x => x.Id));
 
             Assert.Contains(contract.Id, registrations.ContractRegistrations.Select(x => x.Id));
-            Assert.Contains(contract.ResponsibleOrganizationUnit.Name, registrations.ContractRegistrations.Select(x => x.Text));
+            Assert.Contains(contract.Name, registrations.ContractRegistrations.Select(x => x.Text));
 
-            Assert.Contains(system.ResponsibleUsage.OrganizationUnit.Id, registrations.ResponsibleSystemRegistrations.Select(x => x.Id));
-            Assert.Contains(system.ResponsibleUsage.OrganizationUnit.Name, registrations.ResponsibleSystemRegistrations.Select(x => x.Text));
+            Assert.Contains(system.Id, registrations.ResponsibleSystemRegistrations.Select(x => x.Id));
+            Assert.Contains(system.LocalCallName, registrations.ResponsibleSystemRegistrations.Select(x => x.Text));
 
-            Assert.Contains(relevantSystem.OrganizationUnit.Id, registrations.RelevantSystemRegistrations.Select(x => x.Id));
-            Assert.Contains(relevantSystem.OrganizationUnit.Name, registrations.RelevantSystemRegistrations.Select(x => x.Text));
+            Assert.Contains(system.Id, registrations.RelevantSystemRegistrations.Select(x => x.Id));
+            Assert.Contains(system.LocalCallName, registrations.RelevantSystemRegistrations.Select(x => x.Text));
         }
 
         private OrganizationUnit CreateOrganizationUnit()
@@ -154,7 +151,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             return new ItContract
             {
                 Id = A<int>(),
-                OrganizationId = unitId,
+                ResponsibleOrganizationUnitId = unitId,
                 Name = A<string>()
             };
         }
@@ -164,15 +161,19 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             return new ItSystemUsage
             {
                 Id = A<int>(),
-                OrganizationId = unitId
+                OrganizationId = unitId,
+                LocalCallName = A<string>()
             };
         }
 
-        private ItSystemUsageOrgUnitUsage CreateItSystemUsageOrgUnitUsage(int unitId)
+        private ItSystemUsageOrgUnitUsage CreateItSystemUsageOrgUnitUsage(OrganizationUnit unit, ItSystemUsage system)
         {
             return new ItSystemUsageOrgUnitUsage
             {
-                OrganizationUnit = CreateOrganizationUnit(),
+                OrganizationUnit = unit,
+                OrganizationUnitId = unit.Id,
+                ItSystemUsage = system,
+                ItSystemUsageId = system.Id
             };
         }
 
@@ -201,24 +202,29 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _authorizationContextMock.Setup(x => x.AllowModify(unit)).Returns(result);
         }
 
-        private void ExpectContractRepositoryByOrganizationIdReturns(IQueryable<ItContract> result)
+        private void ExpectGetContractsByResponsibleUnitIdReturns(int unitId, IEnumerable<ItContract> result)
         {
-            _contractRepositoryMock.Setup(x => x.AsQueryable()).Returns(result);
+            _contractServiceMock.Setup(x => x.GetContractsByResponsibleUnitId(unitId)).Returns(result);
         }
 
-        private void ExpectGetExternalEconomyStreamsReturns(ItContract contract, IEnumerable<EconomyStream> result)
+        private void ExpectGetExternalEconomyStreamsReturns(ItContract contract, int unitId, IEnumerable<EconomyStream> result)
         {
-            _economyStreamServiceMock.Setup(x => x.GetExternalEconomyStreams(contract)).Returns(result);
+            _economyStreamServiceMock.Setup(x => x.GetExternalEconomyStreamsByUnitId(contract, unitId)).Returns(result);
         }
 
-        private void ExpectGetInternalEconomyStreamsReturns(ItContract contract, IEnumerable<EconomyStream> result)
+        private void ExpectGetInternalEconomyStreamsReturns(ItContract contract, int unitId, IEnumerable<EconomyStream> result)
         {
-            _economyStreamServiceMock.Setup(x => x.GetInternalEconomyStreams(contract)).Returns(result);
+            _economyStreamServiceMock.Setup(x => x.GetInternalEconomyStreamsByUnitId(contract, unitId)).Returns(result);
         }
 
-        private void ExpectSystemUsageRepositoryByOrganizationIdReturns(IQueryable<ItSystemUsage> result)
+        private void ExpectGetSystemsByRelevantUnitIdReturns(int unitId, IEnumerable<ItSystemUsage> result)
         {
-            _systemUsageRepositoryMock.Setup(x => x.AsQueryable()).Returns(result);
+            _usageServiceMock.Setup(x => x.GetSystemsByRelevantUnitId(unitId)).Returns(result);
+        }
+
+        private void ExpectGetSystemsByResponsibleUnitIdReturns(int unitId, IEnumerable<ItSystemUsage> result)
+        {
+            _usageServiceMock.Setup(x => x.GetSystemsByResponsibleUnitId(unitId)).Returns(result);
         }
     }
 }

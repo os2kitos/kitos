@@ -65,7 +65,7 @@
         responsibleSystemTableConfig: IMigrationTableColumn[];
         
         static $inject: string[] = ["organizationRegistrationsService"];
-        constructor(private readonly organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
+        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService) {
 
         }
 
@@ -98,7 +98,7 @@
             request.externalPayments = this.externalPayments.root.children.filter(x => x.selected).map(result => { return result.id });
             request.contractRegistrations = this.contractRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
             request.responsibleSystems = this.responsibleSystemRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
-            request.relevantSystems = this.getSelectedRelevantSystems();
+            request.relevantSystems = this.relevantSystemRegistrations.root.children.filter(x => x.selected).map(result => {return result.id });
 
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
                 .then(() => this.getData());
@@ -238,17 +238,6 @@
             });
         }
 
-        private mapOrganizationRegistrationsWithDataToOptions(registrations: Models.Api.Organization.OrganizationRegistrationDetailsWithObjectDataDto[]): IOrganizationUnitRegistration[]{
-            return registrations.map(res => {
-                return {
-                    id: res.id,
-                    text: res.text,
-                    objectId: res.objectId,
-                    objectName: res.objectName
-                } as IOrganizationUnitRegistration;
-            });
-        }
-
         private mapOrganizationRegistrationsPaymentsToOptions(registrations: Models.Api.Organization.OrganizationRegistrationContractPaymentDto[]): IOrganizationUnitRegistration[]{
             return registrations.map(res => {
                 return {
@@ -266,7 +255,7 @@
             this.internalPaymentTableConfig = this.createPaymentTableConfig("Internal payments");
             this.externalPaymentTableConfig = this.createPaymentTableConfig("External payments");
             this.contractTableConfig = this.createStandardTableConfig("Contract registrations");
-            this.relevantSystemTableConfig = this.createTableWithExtraColumnConfig("Relevant systems");
+            this.relevantSystemTableConfig = this.createStandardTableConfig("Relevant systems");
             this.responsibleSystemTableConfig = this.createStandardTableConfig("Responsible systems");
         }
 
@@ -285,7 +274,7 @@
                 this.internalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.internalPayments);
                 this.externalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(response.externalPayments);
                 this.contractRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.contractRegistrations);
-                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsWithDataToOptions(response.relevantSystemRegistrations);
+                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.relevantSystemRegistrations);
                 this.responsibleSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.responsibleSystemRegistrations);
             }, error => {
                 console.error(error);
@@ -308,15 +297,7 @@
             ] as IMigrationTableColumn[];
         }
 
-        private createTableWithExtraColumnConfig(title: string): IMigrationTableColumn[] {
-            return [
-                { title: title, property: "text" },
-                { title: "Assigned to", property: "targetUnitName" },
-                { title: "Organization name", property: "objectName" }
-            ] as IMigrationTableColumn[];
-        }
-
-        private getSelectedRelevantSystems(): Models.Api.Organization.IRelevantSystem[] {
+        /*private getSelectedRelevantSystems(): Models.Api.Organization.IRelevantSystem[] {
 
             const selectedRegistrations = this.relevantSystemRegistrations.root.children.filter(x => x.selected);
             const uniqueSystems = selectedRegistrations.map(item => item.objectId)
@@ -330,7 +311,7 @@
             });
 
             return relevantSystems;
-        }
+        }*/
     }
 
     angular.module("app")

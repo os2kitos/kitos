@@ -8,6 +8,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -18,6 +19,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Core.DomainServices.Repositories.SystemUsage;
 
 
 namespace Core.ApplicationServices.SystemUsage
@@ -287,22 +289,37 @@ namespace Core.ApplicationServices.SystemUsage
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
         }
 
+        public IEnumerable<ItSystemUsage> GetSystemsByResponsibleUnitId(int unitId)
+        {
+            return _usageRepository.AsQueryable().Where(x => x.ResponsibleUsage.OrganizationUnitId == unitId).ToList();
+        }
+
+        public IEnumerable<ItSystemUsage> GetSystemsByRelevantUnitId(int unitId)
+        {
+            return _usageRepository.AsQueryable().Where(x => x.UsedBy.Select(usedBy => usedBy.OrganizationUnitId).Contains(unitId)).ToList();
+        }
+
         public Result<ItSystemUsage, OperationError> RemoveResponsibleUsage(int id)
         {
             return Modify(id, system =>
             {
+                // WARNING: force loading so setting it to null will be tracked
+                var forceLoad = system.ResponsibleUsage;
                 system.ResponsibleUsage = null;
                 return Result<ItSystemUsage, OperationError>.Success(system);
             });
         }
 
-        public Result<ItSystemUsage, OperationError> RemoveRelevantUnits(int id, IEnumerable<int> unitIds)
+        public Result<ItSystemUsage, OperationError> RemoveRelevantUnit(int id, int unitId)
         {
             return Modify(id, system =>
             {
-                var unitsToRemove = system.UsedBy.Where(x => unitIds.Contains(x.OrganizationUnitId)).ToList();
-                unitsToRemove.ForEach(x => system.UsedBy.Remove(x));
-                return Result<ItSystemUsage, OperationError>.Success(system);
+                var relevantUnit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
+                if (relevantUnit == null)
+                    return new OperationError("Organization unit not found", OperationFailure.NotFound);
+
+                system.UsedBy.Remove(relevantUnit);
+                return  Result<ItSystemUsage, OperationError>.Success(system);
             });
         }
 

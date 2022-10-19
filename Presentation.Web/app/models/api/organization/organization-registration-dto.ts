@@ -1,14 +1,10 @@
 ﻿module Kitos.Models.Api.Organization {
-    export interface IRelevantSystem {
-        systemId: number;
-        relevantUnitIds: number[];
-    }
     export class OrganizationRegistrationRootDto {
         roles: Array<OrganizationRegistrationDetailsDto>;
         internalPayments: Array<OrganizationRegistrationContractPaymentDto>;
         externalPayments: Array<OrganizationRegistrationContractPaymentDto>;
         contractRegistrations: Array<OrganizationRegistrationDetailsDto>;
-        relevantSystemRegistrations: Array<OrganizationRegistrationDetailsWithObjectDataDto>;
+        relevantSystemRegistrations: Array<OrganizationRegistrationDetailsDto>;
         responsibleSystemRegistrations: Array<OrganizationRegistrationDetailsDto>;
     }
 
@@ -17,12 +13,9 @@
         text: string;
     }
 
-    export class OrganizationRegistrationDetailsWithObjectDataDto extends OrganizationRegistrationDetailsDto{
+    export class OrganizationRegistrationContractPaymentDto extends OrganizationRegistrationDetailsDto {
         objectId: number;
         objectName: string;
-    }
-
-    export class OrganizationRegistrationContractPaymentDto extends OrganizationRegistrationDetailsWithObjectDataDto{
         paymentIndex: number;
     }
 
@@ -32,6 +25,6 @@
         internalPayments: number[];
         contractRegistrations: number[];
         responsibleSystems: number[];
-        relevantSystems: IRelevantSystem[];
+        relevantSystems: number[];
     }
 }
