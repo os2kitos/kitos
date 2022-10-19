@@ -66,7 +66,6 @@
         
         static $inject: string[] = ["organizationRegistrationsService"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService) {
-
         }
 
         $onInit() {
@@ -102,14 +101,6 @@
 
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
                 .then(() => this.getData());
-        }
-
-        deleteUnit() {
-            if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
-                return;
-            }
-
-            //TODO: delete unit
         }
 
         transfer() {

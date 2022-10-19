@@ -364,7 +364,7 @@
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
+                        "$scope", "$uibModalInstance", "autofocus", "organizationApiService", function ($modalScope, $modalInstance, autofocus, organizationApiService: Kitos.Services.IOrganizationApiService) {
                             autofocus();
 
                             // edit or create-new mode
@@ -560,6 +560,14 @@
 
                             $modalScope.cancel = function () {
                                 $modalInstance.dismiss("cancel");
+                            };
+
+                            $modalScope.deleteUnit = function () {
+                                if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
+                                    return;
+                                }
+
+                                organizationApiService.deleteOrganizationUnit(unit.id, this.organizationId);
                             };
 
                             function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {

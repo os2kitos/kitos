@@ -908,7 +908,7 @@
     <TypeScriptCompile Include="app\services\ItSystemUsage\it-system-usage-service.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
-    <TypeScriptCompile Include="app\services\OrganizationApiService.ts" />
+    <TypeScriptCompile Include="app\services\organization-api-service.ts" />
     <TypeScriptCompile Include="app\services\referenceService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
