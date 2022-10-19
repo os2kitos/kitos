@@ -195,6 +195,7 @@
     <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
     <Compile Include="ApplicationServices\Handlers\HandleUserBeingDeletedTests.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
+    <Compile Include="ApplicationServices\Organizations\OrganizationRegistrationServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
     <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />

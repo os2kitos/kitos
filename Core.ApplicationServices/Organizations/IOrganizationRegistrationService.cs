@@ -11,7 +11,7 @@ namespace Core.ApplicationServices.Organizations
     public interface IOrganizationRegistrationService
     {
         public Result<OrganizationRegistrationsRoot, OperationError> GetOrganizationRegistrations(int organizationId);
-        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(OrganizationRegistrationsChangeParameters parameters);
+        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationsChangeParameters parameters);
         public Maybe<OperationError> TransferSelectedOrganizationRegistrations();
     }
 }

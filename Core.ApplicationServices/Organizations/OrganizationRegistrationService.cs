@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
@@ -24,6 +26,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IEconomyStreamService _economyStreamService;
         private readonly IItContractService _contractService;
         private readonly IItSystemUsageService _usageService;
+        private readonly IAuthorizationContext _authorizationContext;
 
         public OrganizationRegistrationService(IEntityIdentityResolver identityResolver, 
             IOrganizationService organizationService,
@@ -32,7 +35,8 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationRightsService organizationRightsService, 
             IEconomyStreamService economyStreamService, 
             IItContractService contractService,
-            IItSystemUsageService usageService)
+            IItSystemUsageService usageService, 
+            IAuthorizationContext authorizationContext)
         {
             _organizationService = organizationService;
             _contractRepository = contractRepository;
@@ -41,26 +45,53 @@ namespace Core.ApplicationServices.Organizations
             _economyStreamService = economyStreamService;
             _contractService = contractService;
             _usageService = usageService;
+            _authorizationContext = authorizationContext;
             _identityResolver = identityResolver;
         }
 
         public Result<OrganizationRegistrationsRoot, OperationError> GetOrganizationRegistrations(int unitId)
         {
+            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
+            if (unitUuid.IsNone)
+            {
+                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
+            }
+            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            if (unit.Failed)
+            {
+                return new OperationError("Organization not found", OperationFailure.NotFound);
+            }
+            if (!_authorizationContext.AllowReads(unit.Value))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
             var registrationsRoot = new OrganizationRegistrationsRoot();
-            var organizationUnitRights = GetApplicableUnitRights(unitId);
-
-            if (organizationUnitRights.Failed)
-                return organizationUnitRights.Error;
-
-            registrationsRoot.Roles = organizationUnitRights.Value.ToList();
+            
+            GetApplicableUnitRights(registrationsRoot, unit.Value);
             GetContractRegistrations(registrationsRoot, unitId);
             GetSystemRegistrations(registrationsRoot, unitId);
 
             return registrationsRoot;
         }
 
-        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(OrganizationRegistrationsChangeParameters parameters)
+        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationsChangeParameters parameters)
         {
+            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
+            if (unitUuid.IsNone)
+            {
+                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
+            }
+            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            if (unit.Failed)
+            {
+                return new OperationError("Organization not found", OperationFailure.NotFound);
+            }
+            if (!_authorizationContext.AllowDelete(unit.Value))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
             return _organizationRightsService.RemoveSelectedUnitRights(parameters.RoleIds)
                 .Match
                 (
@@ -94,18 +125,9 @@ namespace Core.ApplicationServices.Organizations
             throw new NotImplementedException();
         }
 
-        private Result<IEnumerable<OrganizationRegistrationDetails>, OperationError> GetApplicableUnitRights(int unitId)
-        {
-            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
-            if (unitUuid.IsNone)
-            {
-                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
-            }
-
-            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
-            return unit.Match<Result<IEnumerable<OrganizationRegistrationDetails>, OperationError>>(
-                val => val.Rights.Select(x => ToDetails(x.Id, x.Role.Name)).ToList(),
-                err => err);
+        private static void GetApplicableUnitRights(OrganizationRegistrationsRoot root, OrganizationUnit unit)
+        { 
+            root.Roles = unit.Rights.Select(x => ToDetails(x.Id, x.Role.Name)).ToList();
         }
 
         private void GetContractRegistrations(OrganizationRegistrationsRoot root, int unitId)
@@ -169,13 +191,13 @@ namespace Core.ApplicationServices.Organizations
             if (system.ResponsibleUsage == null)
                 return;
 
-            responsibleOrgsList.Add(ToDetails(system.ResponsibleUsage.OrganizationUnitId, system.ResponsibleUsage.OrganizationUnit.Name));
+            responsibleOrgsList.Add(ToDetails(system.ResponsibleUsage.OrganizationUnit.Id, system.ResponsibleUsage.OrganizationUnit.Name));
         }
 
         private static IEnumerable<OrganizationRegistrationDetailsWithObjectData> GetRelevantSystemRegistrations(ItSystemUsage systemUsage)
         {
             //TODO: What should I use as a name for the system in which the relevant units are located
-            return systemUsage.UsedBy.Select(item => ToDetailsWithObjectData(item.OrganizationUnitId, item.OrganizationUnit.Name, systemUsage.Id, systemUsage.LocalCallName)).ToList();
+            return systemUsage.UsedBy.Select(item => ToDetailsWithObjectData(item.OrganizationUnit.Id, item.OrganizationUnit.Name, systemUsage.Id, systemUsage.LocalCallName)).ToList();
         }
 
         private Maybe<OperationError> RemoveContractRegistrations(IEnumerable<int> contractIds)

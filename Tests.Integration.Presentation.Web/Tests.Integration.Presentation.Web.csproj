@@ -134,6 +134,7 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
+    <Compile Include="Organizations\OrganizationRegistrationTests.cs" />
     <Compile Include="Organizations\OrganizationSequentialTests.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />

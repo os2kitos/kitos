@@ -16,6 +16,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly OrganizationRightsService _sut;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IGenericRepository<OrganizationRight>> _organizationRightRepository;
+        private readonly Mock<IGenericRepository<OrganizationUnitRight>> _organizationUnitRightRepository;
         private readonly Mock<IOrganizationalUserContext> _organizationUserContext;
 
         public OrganizationRightsServiceTest()
@@ -23,8 +24,14 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext = new Mock<IAuthorizationContext>();
             _organizationRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _organizationUserContext = new Mock<IOrganizationalUserContext>();
+            _organizationUnitRightRepository = new Mock<IGenericRepository<OrganizationUnitRight>>();
+
             _sut = new OrganizationRightsService(_authorizationContext.Object,
-                _organizationRightRepository.Object, _organizationUserContext.Object,Mock.Of<IDomainEvents>(), Mock.Of<ILogger>());
+                _organizationRightRepository.Object,
+                _organizationUserContext.Object,
+                Mock.Of<IDomainEvents>(), 
+                Mock.Of<ILogger>(),
+                _organizationUnitRightRepository.Object);
         }
 
         [Fact]
