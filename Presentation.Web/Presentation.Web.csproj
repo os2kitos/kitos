@@ -372,6 +372,8 @@
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-unit-origin.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\sts-organization-org-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-registration-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-access-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-synchronization-status-response-dto.ts" />
@@ -384,6 +386,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\users\user-deletion-strategy-type.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\feature-toggle\feature-toggle-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-has-selection.ts" />
@@ -403,6 +406,7 @@
     <Compile Include="Controllers\API\V1\OrganizationRegistrationController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
+    <Compile Include="Controllers\API\V1\UserDeletionController.cs" />
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
@@ -664,6 +668,8 @@
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\helpText\inlineHelpText.view.html" />
     <Content Include="app\shared\helpText\field-help-text.view.html" />
+    <Content Include="app\shared\organization-tree\organization-tree-node.view.html" />
+    <Content Include="app\shared\organization-tree\organization-tree.view.html" />
     <Content Include="app\shared\progress-spinner\progress-spinner.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
@@ -917,6 +923,7 @@
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
+    <TypeScriptCompile Include="app\shared\organization-tree\organization-tree.component.ts" />
     <TypeScriptCompile Include="app\shared\progress-spinner\progress-spinner.component.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
@@ -1432,7 +1439,6 @@
     <Content Include="app\components\local-config\local-config-system.view.html" />
     <Content Include="app\components\local-config\local-config-org.view.html" />
     <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
-    <Content Include="app\components\org\structure\org-structure-tree-unit.view.html" />
     <Content Include="app\components\org\structure\org-structure.view.html" />
     <Content Include="app\components\org\user\org-user-create.modal.view.html" />
     <Content Include="app\components\org\user\org-user-edit.modal.view.html" />
@@ -1624,7 +1630,7 @@
       <Name>Core.BackgroundJobs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">

@@ -1,3 +1,11 @@
+/** Variables */
+@fkorg-orgunit-color: #a9e38f;
+@fkorg-orgunit-color_selected: #4f8438;
+@fkorg-orgunit-hover: #a4db8c;
+@fkorg-orgunit_font-color: #345925;
+@ui-tree-selected_font-color: white;
+@ui-tee-default-color: #b1cff3;
+
 /* Disable responsiveness */
 .container {
     width: @container-desktop !important;
@@ -913,26 +921,50 @@ div.searchbox-wrapper {
     font-weight: normal;
     line-height: 20px;
     color: #376092 !important;
-    background: #b1cff3 !important;
+    background: @ui-tee-default-color !important;
     border: 1px solid #dae2ea;
+}
+
+.angular-ui-tree-handle.org-unit-origin-fk-org {
+    background-color: @fkorg-orgunit-color !important;
+    color: @fkorg-orgunit_font-color !important;
+
+    .glyphicon {
+        color: @fkorg-orgunit_font-color;
+    }
 }
 
 div.angular-ui-tree-handle.selected {
     background-color: rgb(55, 96, 146) !important;
+    color: @ui-tree-selected_font-color !important;
+}
+
+div.angular-ui-tree-handle.selected.org-unit-origin-fk-org {
+    background-color: @fkorg-orgunit-color_selected !important;
+    color: @ui-tree-selected_font-color !important;
+
+    .glyphicon {
+        color: @ui-tree-selected_font-color;
+    }
 }
 
 div.angular-ui-tree-handle.selected a span {
-    color: white !important;
-}
-
-div.angular-ui-tree-handle.selected {
-    color: white !important;
+    color: @ui-tree-selected_font-color !important;
 }
 
 .angular-ui-tree-handle:hover {
     color: #438eb9;
     background: #f4f6f7;
     border-color: #dce2e8;
+}
+
+.angular-ui-tree-handle:hover.org-unit-origin-fk-org {
+    background-color: @fkorg-orgunit-hover !important;
+    color: @fkorg-orgunit_font-color !important;
+
+    .glyphicon {
+        color: @fkorg-orgunit_font-color;
+    }
 }
 
 .angular-ui-tree-placeholder {
@@ -1606,6 +1638,26 @@ tbody.bordered > tr > td {
 
 .width-fit-content {
     width: fit-content !important;
+}
+
+.org-structure-legend {
+    margin-top: 25px;
+    margin-left: 7px;
+
+    .org-structure-legend-color {
+        display: inline-block;
+        width: 25px;
+        height: 9px;
+    }
+
+    .org-structure-legend-color-native-unit {
+        background-color: @ui-tee-default-color;
+    }
+
+    .org-structure-legend-color-fk-org-unit {
+        background-color: @fkorg-orgunit-color;
+    }
+}
 }
 
 .mx-auto {

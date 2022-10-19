@@ -243,7 +243,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             //Assert
             Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.Forbidden,error.Value.FailureType);
+            Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
             Assert.Null(organization.StsOrganizationConnection);
             VerifyChangesNotSaved(transaction, organization);
         }
@@ -266,6 +266,113 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(error.HasValue);
             Assert.Null(organization.StsOrganizationConnection);
             VerifyChangesNotSaved(transaction, organization);
+        }
+
+        [Fact]
+        public void Disconnect_Returns_Fails_If_GetOrganization_Returns_Error()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var getOrganizationError = A<OperationError>();
+            SetupGetOrganizationReturns(organizationId, getOrganizationError);
+
+            //Act
+            var error = _sut.Disconnect(organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(getOrganizationError, error.Value);
+        }
+
+        [Fact]
+        public void Disconnect_Returns_Fails_UnAuthorized_To_Disconnect()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, false);
+
+            //Act
+            var error = _sut.Disconnect(organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void Disconnect_Returns_Fails_Organization_Is_Not_Connected()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            var transaction = ExpectTransaction();
+
+            //Act
+            var error = _sut.Disconnect(organizationId);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
+            transaction.Verify(x => x.Rollback(), Times.Once());
+        }
+
+        [Fact]
+        public void Disconnect_Succeeds_And_Converts_All_Imported_Org_Units_To_Kitos_Units()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var unaffectedUnit = new OrganizationUnit();
+            var affectedUnit1 = new OrganizationUnit()
+            {
+                Parent = unaffectedUnit,
+                Origin = OrganizationUnitOrigin.STS_Organisation,
+                ExternalOriginUuid = A<Guid>()
+            };
+            var affectedUnit2 = new OrganizationUnit()
+            {
+                Parent = unaffectedUnit,
+                Origin = OrganizationUnitOrigin.STS_Organisation,
+                ExternalOriginUuid = A<Guid>()
+            };
+            var organization = new Organization
+            {
+                StsOrganizationConnection = new StsOrganizationConnection
+                {
+                    Connected = true,
+                    SynchronizationDepth = A<int>(),
+                },
+                OrgUnits = new List<OrganizationUnit>
+                {
+                    unaffectedUnit ,
+                    affectedUnit1,
+                    affectedUnit2
+                }
+            };
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            var transaction = ExpectTransaction();
+
+            //Act
+            var error = _sut.Disconnect(organizationId);
+
+            //Assert
+            Assert.False(error.HasValue);
+            transaction.Verify(x => x.Commit(), Times.Once());
+            _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());
+            Assert.False(organization.StsOrganizationConnection.Connected);
+            Assert.Null(organization.StsOrganizationConnection.SynchronizationDepth);
+            foreach (var organizationUnit in organization.OrgUnits)
+            {
+                Assert.Equal(OrganizationUnitOrigin.Kitos, organizationUnit.Origin);
+                Assert.Null(organizationUnit.ExternalOriginUuid);
+            }
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == affectedUnit1)), Times.Once());
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == affectedUnit2)), Times.Once());
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == unaffectedUnit)), Times.Never());
         }
 
         private void VerifyChangesSaved(Mock<IDatabaseTransaction> transaction, Organization organization)

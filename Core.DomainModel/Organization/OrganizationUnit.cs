@@ -33,7 +33,7 @@ namespace Core.DomainModel.Organization
         /// <summary>
         /// Determines the optional external origin-specific uuid
         /// </summary>
-        public Guid ExternalOriginUuid { get; set; }
+        public Guid? ExternalOriginUuid { get; set; }
 
         public string LocalId { get; set; }
 
@@ -142,6 +142,17 @@ namespace Core.DomainModel.Organization
             }
 
             return Maybe<OperationError>.None;
+        }
+
+        public void ConvertToKitosUnit()
+        {
+            if (Origin == OrganizationUnitOrigin.Kitos)
+            {
+                throw new InvalidOperationException("Alrady a kitos unit");
+            }
+
+            Origin = OrganizationUnitOrigin.Kitos;
+            ExternalOriginUuid = null;
         }
     }
 }

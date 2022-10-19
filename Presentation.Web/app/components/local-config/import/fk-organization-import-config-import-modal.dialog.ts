@@ -31,16 +31,37 @@
     class FKOrganisationImportController {
         static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance"];
         busy: boolean = false;
+        loadingHierarchy: boolean | null;
+        fkOrgHierarchy: Kitos.Shared.Components.Organization.IOrganizationTreeComponentOptions | null = null;
         constructor(
             readonly flow: FKOrganisationImportFlow,
             private readonly organizationUuid: string,
-            private readonly synchronizationDepth: number | null,
+            initialImportDepth: number | null,
             private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
+            this.fkOrgHierarchy = {
+                availableLevels: initialImportDepth,
+                root: null
+            }
         }
 
         $onInit() {
-            //TODO: Use this to begin load of the hierarchy from FK Organization so that it is ready for preview! https://os2web.atlassian.net/browse/KITOSUDV-3310
+            this.loadingHierarchy = true;
+            this.stsOrganizationSyncService
+                .getSnapshot(this.organizationUuid)
+                .then(root => {
+                    this.fkOrgHierarchy.root = this.createNodeVm(root);
+                    this.loadingHierarchy = false;
+                });
+        }
+
+        private createNodeVm(stsNode: Kitos.Models.Api.Organization.StsOrganizationOrgUnitDTO): Kitos.Shared.Components.Organization.IOrganizationTreeNode {
+            return {
+                id: stsNode.uuid,
+                name: stsNode.name,
+                origin: Kitos.Models.Api.Organization.OrganizationUnitOrigin.STS_Organisation,
+                nodes: stsNode.children.map(child => this.createNodeVm(child))
+            };
         }
 
         cancel() {
@@ -53,7 +74,7 @@
             if (!this.busy) {
                 this.busy = true;
                 this.stsOrganizationSyncService
-                    .createConnection(this.organizationUuid, this.synchronizationDepth)
+                    .createConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
                     .then(() => {
                         this.busy = false;
                         this.$uibModalInstance.close();

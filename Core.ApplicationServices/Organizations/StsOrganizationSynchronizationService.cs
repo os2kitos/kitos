@@ -93,6 +93,40 @@ namespace Core.ApplicationServices.Organizations
                 .Match(root => CreateConnection(organization, root, levelsToInclude, transaction), error => error);
         }
 
+        public Maybe<OperationError> Disconnect(Guid organizationId)
+        {
+            return
+                GetOrganizationWithImportPermission(organizationId)
+                    .Select(Disconnect)
+                    .Match
+                    (
+                        disconnectionResult => disconnectionResult,
+                        error => error
+                    );
+        }
+
+        private Maybe<OperationError> Disconnect(Organization organization)
+        {
+            using var transaction = _transactionManager.Begin();
+            var result = organization.DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin.STS_Organisation);
+            if (result.Failed)
+            {
+                transaction.Rollback();
+                return result.Error;
+            }
+
+            var disconnectionResult = result.Value;
+            foreach (var convertedUnit in disconnectionResult.ConvertedUnits)
+            {
+                _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(convertedUnit));
+            }
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
+            _databaseControl.SaveChanges();
+            transaction.Commit();
+            return Maybe<OperationError>.None;
+
+        }
+
         private Maybe<OperationError> CreateConnection(Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude, IDatabaseTransaction transaction)
         {
 

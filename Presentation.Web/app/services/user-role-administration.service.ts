@@ -68,7 +68,7 @@
 
         removeUser(organizationId: number, userId: number): angular.IPromise<boolean> {
             return this.apiUseCaseFactory
-                .createDeletion("Brugeren", () => this.genericApiWrapper.delete(this.getBaseUri(organizationId, userId)))
+                .createDeletion("Brugeren", () => this.genericApiWrapper.delete(`api/v1/user/delete/${userId}/${organizationId}`))
                 .executeAsync();
         }
 

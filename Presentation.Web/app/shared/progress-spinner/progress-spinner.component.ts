@@ -4,7 +4,7 @@
     function setupComponent(): ng.IComponentOptions {
         return {
             bindings: {
-                showText: "@",
+                showText: "<",
                 customText: "@"
             },
             controller: ProgressSpinnerComponentController,
@@ -15,17 +15,17 @@
 
     interface IProgressSpinnerComponentController extends ng.IComponentController {
         showText: boolean
-        customText: string | null | undefined;
+        customText: string | null | undefined
 
     }
 
     class ProgressSpinnerComponentController implements IProgressSpinnerComponentController {
-        showText: boolean
+        showText: boolean;
         customText: string | undefined;
 
         activeText: string | null = null;
         $onInit() {
-            if (this.showText) {
+            if (this.showText === true) {
                 this.activeText = this.customText ?? "Indlæser indhold...";
             }
         }

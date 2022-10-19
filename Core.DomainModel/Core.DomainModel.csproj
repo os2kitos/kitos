@@ -52,7 +52,12 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\ICommandHandler.cs" />
+    <Compile Include="Commands\ICommandBus.cs" />
+    <Compile Include="Commands\RemoveUserFromKitosCommand.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
+    <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
@@ -83,6 +88,7 @@
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
+    <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
     <Compile Include="Organization\OrganizationUnitOrigin.cs" />
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />
@@ -267,6 +273,7 @@
     <Compile Include="User.cs" />
     <Compile Include="Users\AuthenticationScheme.cs" />
     <Compile Include="Users\UserConstraints.cs" />
+    <Compile Include="Users\OrganizationalUserDeletionStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
