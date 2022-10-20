@@ -9,8 +9,15 @@
             },
             controller: OrganizationUnitMigrationController,
             controllerAs: "ctrl",
-            templateUrl: "app/components/org/structure/org-unit-migration.view.html"
+            templateUrl: "app/components/org/structure/org-unit-migration.view.html",
         }
+    }
+
+    export interface IDropdownUnit {
+        id: number;
+        name: string;
+        text: string;
+        level: number;
     }
 
     export interface IOrganizationUnitMigrationOptions {
@@ -54,7 +61,7 @@
         contractRegistrations: IOrganizationUnitMigrationOptions;
         relevantSystemRegistrations: IOrganizationUnitMigrationOptions;
         responsibleSystemRegistrations: IOrganizationUnitMigrationOptions;
-        organizations: any;
+        organizations: IDropdownUnit[];
         selectedOrg: any;
 
         rolesTableConfig: IMigrationTableColumn[];
@@ -64,8 +71,10 @@
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
         
-        static $inject: string[] = ["organizationRegistrationsService"];
-        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService) {
+        static $inject: string[] = ["organizationRegistrationsService", "organizationUnitOdataService", "_"];
+        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
+            private readonly organizationUnitOdataService: Services.Organization.IOrganizationUnitOdataService,
+            private readonly _) {
         }
 
         $onInit() {
@@ -81,8 +90,27 @@
             this.getData();
 
             //TODO: get orgs from the api
-            this.organizations = [{ id: 1, name: "Organization1" }, { id: 2, name: "Organization2" }];
+            this.organizations = [];
             this.selectedOrg = {};
+            var self = this;
+
+            this.organizationUnitOdataService
+                .getOrganizationUnits()
+                .then(result => {
+                    self._.addHierarchyLevelOnFlatAndSort(result, "Id", "ParentId");
+                    var resultWithLevels = result as any;
+                    self.organizations = self.organizations.concat(
+                        resultWithLevels.map(
+                            item => {
+                                 return {
+                                     id: item.Id,
+                                     name: item.Name,
+                                     level: item.$level,
+                                     text: "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(item.$level) + item.Name
+                                 }
+                            }));
+                    console.log(self.organizations);
+                });
         }
 
         deleteSelected() {
@@ -90,15 +118,7 @@
                 return;
             }
 
-            const request = new Models.Api.Organization.OrganizationRegistrationDeleteRequest();
-
-            request.roles = this.roles.root.children.filter(x => x.selected).map(result => { return result.id });
-            request.internalPayments = this.internalPayments.root.children.filter(x => x.selected).map(result => { return result.id });
-            request.externalPayments = this.externalPayments.root.children.filter(x => x.selected).map(result => { return result.id });
-            request.contractRegistrations = this.contractRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
-            request.responsibleSystems = this.responsibleSystemRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
-            request.relevantSystems = this.relevantSystemRegistrations.root.children.filter(x => x.selected).map(result => {return result.id });
-
+            const request = this.createChangeRequest();
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
                 .then(() => this.getData());
         }
@@ -108,7 +128,10 @@
                 return;
             }
 
-            //TODO: transfer registrations
+            const request = this.createChangeRequest();
+            this.organizationRegistrationsService.transferSelectedRegistrations(this.unitId, this.selectedOrg.id, request)
+                .then(() => this.getData())
+                .then(() => this.updateAnySelections());
         }
 
         setSelectedOrg() {
@@ -275,7 +298,6 @@
         private createStandardTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: title, property: "text" },
-                { title: "Assigned to", property: "targetUnitName" }
             ] as IMigrationTableColumn[];
         }
 
@@ -283,26 +305,22 @@
             return [
                 { title: "Index", property: "index" },
                 { title: title, property: "text" },
-                { title: "Assigned to", property: "targetUnitName" },
-                { title: "Organization name", property: "objectName" }
+                { title: "Contract name", property: "objectName" }
             ] as IMigrationTableColumn[];
         }
 
-        /*private getSelectedRelevantSystems(): Models.Api.Organization.IRelevantSystem[] {
+        private createChangeRequest(): Models.Api.Organization.OrganizationRegistrationChangeRequest {
+            const request = new Models.Api.Organization.OrganizationRegistrationChangeRequest();
 
-            const selectedRegistrations = this.relevantSystemRegistrations.root.children.filter(x => x.selected);
-            const uniqueSystems = selectedRegistrations.map(item => item.objectId)
-                .filter((value, index, self) => self.indexOf(value) === index);
+            request.roles = this.roles.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.internalPayments = this.internalPayments.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.externalPayments = this.externalPayments.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.contractRegistrations = this.contractRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.responsibleSystems = this.responsibleSystemRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
+            request.relevantSystems = this.relevantSystemRegistrations.root.children.filter(x => x.selected).map(result => { return result.id });
 
-            var relevantSystems = [] as Models.Api.Organization.IRelevantSystem[];
-
-            uniqueSystems.forEach(systemId => {
-                var relevantIds = selectedRegistrations.filter(x => x.objectId === systemId).map(item => item.id);
-                relevantSystems.push({ systemId: systemId, relevantUnitIds: relevantIds });
-            });
-
-            return relevantSystems;
-        }*/
+            return request;
+        }
     }
 
     angular.module("app")

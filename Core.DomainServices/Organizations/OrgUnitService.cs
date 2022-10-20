@@ -15,7 +15,8 @@ namespace Core.DomainServices.Organizations
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _itSystemUsageOrgUnitUsageRepository;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, 
+            IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository)
         {
             _orgUnitRepository = orgUnitRepository;
             _itSystemUsageOrgUnitUsageRepository = itSystemUsageOrgUnitUsageRepository;

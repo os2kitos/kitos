@@ -108,6 +108,37 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
+        public Maybe<OperationError> TransferSelectedUnitRights(int targetUnitId, IEnumerable<int> rightIds)
+        {
+            var userIds = new List<int>();
+            foreach (var rightId in rightIds)
+            {
+                var unitRight = _unitRightRepository.GetByKey(rightId);
+                if (unitRight == null)
+                {
+                    return new OperationError(OperationFailure.NotFound);
+                }
+
+                if (!_authorizationContext.AllowModify(unitRight))
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+
+                unitRight.ObjectId = targetUnitId;
+
+                userIds.Add(unitRight.UserId);
+                _unitRightRepository.Update(unitRight);
+            }
+            _unitRightRepository.Save();
+
+            foreach (var userId in userIds.Distinct())
+            {
+                _domainEvents.Raise(new AdministrativeAccessRightsChanged(userId));
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
         private Result<OrganizationRight, OperationFailure> RemoveRight(OrganizationRight right)
         {
             if (right == null)

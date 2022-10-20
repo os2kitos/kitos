@@ -23,36 +23,33 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
-        private readonly Mock<IGenericRepository<ItContract>> _contractRepositoryMock;
-        private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepositoryMock;
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
         private readonly Mock<IEconomyStreamService> _economyStreamServiceMock;
         private readonly Mock<IItContractService> _contractServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
+        private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
 
         public OrganizationRegistrationServiceTest()
         {
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _contractRepositoryMock = new Mock<IGenericRepository<ItContract>>();
-            _systemUsageRepositoryMock = new Mock<IGenericRepository<ItSystemUsage>>();
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
             _economyStreamServiceMock = new Mock<IEconomyStreamService>();
             _contractServiceMock = new Mock<IItContractService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
+            _orgUnitServiceMock = new Mock<IOrgUnitService>();
 
             _sut = new OrganizationRegistrationService(
                 _identityResolverMock.Object,
                 _organizationServiceMock.Object,
-                _contractRepositoryMock.Object,
-                _systemUsageRepositoryMock.Object,
                 _organizationRightsServiceMock.Object,
                 _economyStreamServiceMock.Object,
                 _contractServiceMock.Object,
                 _usageServiceMock.Object,
-                _authorizationContextMock.Object);
+                _authorizationContextMock.Object,
+                _orgUnitServiceMock.Object);
         }
 
         [Fact]

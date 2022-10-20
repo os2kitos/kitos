@@ -2,7 +2,9 @@
 
     export interface IOrganizationRegistrationsService {
         getRegistrations(orgId: number): ng.IPromise<Models.Api.Organization.OrganizationRegistrationRootDto>;
-        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationDeleteRequest): angular.IPromise<boolean>;
+        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<boolean>;
+        deleteOrganizationUnit(unitId: number): angular.IPromise<boolean>;
+        transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<void>;
     }
 
     export class OrganizationRegistrationsService implements IOrganizationRegistrationsService {
@@ -20,10 +22,21 @@
                 );
         }
 
-        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationDeleteRequest): angular.IPromise<boolean> {
+        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<boolean> {
             return this.apiUseCaseFactory
                 .createDeletion("Organization unit",
                     () => this.apiWrapper.delete(`api/v1/organization-registrations/${orgId}`, body))
+                .executeAsync();
+        }
+
+        deleteOrganizationUnit(unitId: number): angular.IPromise<boolean> {
+            return this.apiWrapper.delete(`api/v1/organization-registrations/unit/${unitId}`);
+        }
+
+        transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<void> {
+            return this.apiUseCaseFactory
+                .createUpdate("Organization unit",
+                    () => this.apiWrapper.put(`api/v1/organization-registrations/${orgId}/${targetUnitId}`, body))
                 .executeAsync();
         }
 

@@ -5,7 +5,6 @@
         getOrganization(id: number): angular.IPromise<Models.Api.Organization.Organization>;
         getOrganizationDeleteConflicts(uuid: string) : angular.IPromise<Models.Api.Organization.OrganizationDeleteConflicts>;
         deleteOrganization(uuid: string, enforce: boolean): angular.IPromise<boolean>;
-        deleteOrganizationUnit(unitId: number, orgId: number): angular.IPromise<boolean>;
     }
 
     export class OrganizationApiService implements IOrganizationApiService {
@@ -20,10 +19,6 @@
 
         deleteOrganization(uuid: string, enforce : boolean): angular.IPromise<boolean> {
             return this.apiWrapper.delete(`api/v1/organizations/${uuid}/deletion?enforce=${enforce}`);
-        }
-
-        deleteOrganizationUnit(unitId: number, orgId: number): angular.IPromise<boolean> {
-            return this.apiWrapper.delete(`api/organizationunit/${unitId}?organizationId=${orgId}`);
         }
 
         static $inject: string[] = ["$http"];

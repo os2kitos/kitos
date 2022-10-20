@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.Generic;
 
 namespace Core.ApplicationServices.Organizations
@@ -21,32 +16,29 @@ namespace Core.ApplicationServices.Organizations
     {
         private readonly IEntityIdentityResolver _identityResolver;
         private readonly IOrganizationService _organizationService;
-        private readonly IGenericRepository<ItContract> _contractRepository;
-        private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IEconomyStreamService _economyStreamService;
         private readonly IItContractService _contractService;
         private readonly IItSystemUsageService _usageService;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IOrgUnitService _orgUnitService;
 
         public OrganizationRegistrationService(IEntityIdentityResolver identityResolver, 
             IOrganizationService organizationService,
-            IGenericRepository<ItContract> contractRepository, 
-            IGenericRepository<ItSystemUsage> systemUsageRepository, 
             IOrganizationRightsService organizationRightsService, 
             IEconomyStreamService economyStreamService, 
             IItContractService contractService,
             IItSystemUsageService usageService, 
-            IAuthorizationContext authorizationContext)
+            IAuthorizationContext authorizationContext, 
+            IOrgUnitService orgUnitService)
         {
             _organizationService = organizationService;
-            _contractRepository = contractRepository;
-            _systemUsageRepository = systemUsageRepository;
             _organizationRightsService = organizationRightsService;
             _economyStreamService = economyStreamService;
             _contractService = contractService;
             _usageService = usageService;
             _authorizationContext = authorizationContext;
+            _orgUnitService = orgUnitService;
             _identityResolver = identityResolver;
         }
 
@@ -93,7 +85,7 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            var res = _organizationRightsService.RemoveSelectedUnitRights(parameters.RoleIds)
+            return _organizationRightsService.RemoveSelectedUnitRights(parameters.RoleIds)
                 .Match
                 (
                     error => error,
@@ -119,12 +111,79 @@ namespace Core.ApplicationServices.Organizations
                     error => error,
                     () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unitId)
                 );
-            return res;
         }
 
-        public Maybe<OperationError> TransferSelectedOrganizationRegistrations()
+        public Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId)
         {
-            throw new NotImplementedException();
+            var deleteRegistrationsResult = GetOrganizationRegistrations(unitId)
+                .Match(val => DeleteSelectedOrganizationRegistrations(unitId, ToChangeParametersFromRegistrationDetails(val)),
+                    error => error);
+            if(deleteRegistrationsResult.HasValue)
+                return deleteRegistrationsResult.Value;
+
+            _orgUnitService.Delete(unitId);
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, OrganizationRegistrationsChangeParameters parameters)
+        {
+            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
+            if (unitUuid.IsNone)
+            {
+                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
+            }
+            var targetUnitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId);
+            if (targetUnitUuid.IsNone)
+            {
+                return new OperationError("Target organization id is invalid", OperationFailure.BadInput);
+            }
+
+            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            if (unit.Failed)
+            {
+                return new OperationError("Organization not found", OperationFailure.NotFound);
+            }
+            var targetUnit = _organizationService.GetOrganizationUnit(targetUnitUuid.Value);
+            if (targetUnit.Failed)
+            {
+                return new OperationError("Target organization not found", OperationFailure.NotFound);
+            }
+
+            if (!_authorizationContext.AllowModify(unit.Value))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            if (!_authorizationContext.AllowModify(targetUnit.Value))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return _organizationRightsService.TransferSelectedUnitRights(targetUnitId, parameters.RoleIds)
+                .Match
+                (
+                    error => error,
+                    () => _economyStreamService.TransferRange(targetUnit.Value, parameters.ExternalPaymentIds)
+                )
+                .Match
+                (
+                    error => error,
+                    () => _economyStreamService.TransferRange(targetUnit.Value, parameters.InternalPaymentIds)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferContractRegistrations(targetUnitId, parameters.ContractWithRegistrationIds)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferSystemRelevantRegistrations(unitId, targetUnitId, parameters.ResponsibleSystemIds)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferSystemResponsibleRegistrations(targetUnitId, parameters.RelevantSystems)
+                );
         }
 
         private static void GetApplicableUnitRights(OrganizationRegistrationsRoot root, OrganizationUnit unit)
@@ -177,6 +236,18 @@ namespace Core.ApplicationServices.Organizations
             return result;
         }
 
+        private Maybe<OperationError> TransferContractRegistrations(int targetUnitId, IEnumerable<int> contractIds)
+        {
+            foreach (var contractId in contractIds)
+            {
+                var deleteResult = _contractService.TransferContractResponsibleUnit(targetUnitId, contractId);
+                if (deleteResult.Failed)
+                    return deleteResult.Error;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
         private Maybe<OperationError> RemoveContractRegistrations(IEnumerable<int> contractIds)
         {
             foreach (var contractId in contractIds)
@@ -194,6 +265,30 @@ namespace Core.ApplicationServices.Organizations
             foreach (var systemId in systemIds)
             {
                 var deleteResult = _usageService.RemoveRelevantUnit(systemId, unitId);
+                if (deleteResult.Failed)
+                    return deleteResult.Error;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> TransferSystemResponsibleRegistrations(int targetUnitId, IEnumerable<int> systemIds)
+        {
+            foreach (var systemId in systemIds)
+            {
+                var deleteResult = _usageService.TransferResponsibleUsage(targetUnitId, systemId);
+                if (deleteResult.Failed)
+                    return deleteResult.Error;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> TransferSystemRelevantRegistrations(int unitId, int targetUnitId, IEnumerable<int> systemIds)
+        {
+            foreach (var systemId in systemIds)
+            {
+                var deleteResult = _usageService.TransferRelevantUsage(unitId, targetUnitId, systemId);
                 if (deleteResult.Failed)
                     return deleteResult.Error;
             }
@@ -242,6 +337,20 @@ namespace Core.ApplicationServices.Organizations
                 PaymentIndex = index,
                 ObjectId = contract.Id,
                 ObjectName = contract.Name,
+            };
+        }
+
+        private static OrganizationRegistrationsChangeParameters ToChangeParametersFromRegistrationDetails(
+            OrganizationRegistrationsRoot root)
+        {
+            return new OrganizationRegistrationsChangeParameters()
+            {
+                ContractWithRegistrationIds = root.ContractRegistrations.Select(x => x.Id).ToList(),
+                ExternalPaymentIds = root.ExternalPayments.Select(x => x.Id).ToList(),
+                InternalPaymentIds = root.InternalPayments.Select(x => x.Id).ToList(),
+                RelevantSystems = root.RelevantSystemRegistrations.Select(x => x.Id).ToList(),
+                ResponsibleSystemIds = root.ResponsibleSystemRegistrations.Select(x => x.Id).ToList(),
+                RoleIds = root.Roles.Select(x => x.Id).ToList()
             };
         }
     }

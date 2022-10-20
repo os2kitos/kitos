@@ -1,13 +1,10 @@
-﻿using Presentation.Web.Models.API.V1.Users;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Web.Security;
+﻿using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
-    public class RemoveOrganizationRegistrationsRequest
+    public class ChangeOrganizationRegistrationsRequest
     {
-        public RemoveOrganizationRegistrationsRequest()
+        public ChangeOrganizationRegistrationsRequest()
         {
 
             Roles = new List<int>();

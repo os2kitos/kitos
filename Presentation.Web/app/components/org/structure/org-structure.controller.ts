@@ -364,7 +364,7 @@
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", "organizationApiService", function ($modalScope, $modalInstance, autofocus, organizationApiService: Kitos.Services.IOrganizationApiService) {
+                        "$scope", "$uibModalInstance", "autofocus", "organizationRegistrationsService", function ($modalScope, $modalInstance, autofocus, organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
                             autofocus();
 
                             // edit or create-new mode
@@ -540,10 +540,8 @@
 
                                 $modalScope.submitting = true;
 
-                                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" +
-                                    unit.id +
-                                    "?organizationId=" +
-                                    user.currentOrganizationId).then((result) => {
+                                organizationRegistrationsService.deleteOrganizationUnit(unit.id)
+                                    .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();
                                         $modalInstance.close();
@@ -559,15 +557,7 @@
                             };
 
                             $modalScope.cancel = function () {
-                                $modalInstance.dismiss("cancel");
-                            };
-
-                            $modalScope.deleteUnit = function () {
-                                if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
-                                    return;
-                                }
-
-                                organizationApiService.deleteOrganizationUnit(unit.id, this.organizationId);
+                                $modalInstance.close("cancel");
                             };
 
                             function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {

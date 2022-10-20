@@ -4,8 +4,8 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.Contract
 {
@@ -29,6 +29,29 @@ namespace Core.ApplicationServices.Contract
             var economyStream = _economyRepository.GetByKey(id);
 
             DeleteEconomyStream(economyStream);
+            _economyRepository.Save();
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> TransferRange(OrganizationUnit targetUnit, IEnumerable<int> ids)
+        {
+            foreach (var id in ids)
+            {
+                var economyStream = _economyRepository.GetByKey(id);
+                if (economyStream == null)
+                {
+                    return new OperationError(OperationFailure.NotFound);
+                }
+                if (!_authorizationContext.AllowModify(economyStream))
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+
+                economyStream.OrganizationUnit = targetUnit;
+                economyStream.OrganizationUnitId = targetUnit.Id;
+                _economyRepository.Update(economyStream);
+            }
             _economyRepository.Save();
 
             return Maybe<OperationError>.None;
@@ -75,13 +98,17 @@ namespace Core.ApplicationServices.Contract
         {
             return contract
                 .InternEconomyStreams
+                .Where(x => x.OrganizationUnitId == unitId)
                 .ToList();
         }
 
         public IEnumerable<EconomyStream> GetExternalEconomyStreamsByUnitId(ItContract contract, int unitId)
         {
+            var external = contract
+                .ExternEconomyStreams.ToList();
             return contract
                 .ExternEconomyStreams
+                .Where(x => x.OrganizationUnitId == unitId)
                 .ToList();
         }
 

@@ -12,6 +12,7 @@ namespace Core.ApplicationServices.Organizations
     {
         public Result<OrganizationRegistrationsRoot, OperationError> GetOrganizationRegistrations(int organizationId);
         public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationsChangeParameters parameters);
-        public Maybe<OperationError> TransferSelectedOrganizationRegistrations();
+        public Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId);
+        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, OrganizationRegistrationsChangeParameters parameters);
     }
 }

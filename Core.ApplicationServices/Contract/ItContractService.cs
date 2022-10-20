@@ -293,6 +293,15 @@ namespace Core.ApplicationServices.Contract
             return _repository.AsQueryable().Where(x => x.ResponsibleOrganizationUnitId == unitId).ToList();
         }
 
+        public Result<ItContract, OperationError> TransferContractResponsibleUnit(int targetUnitId, int contractId)
+        {
+            return Modify(contractId, contract =>
+            {
+                contract.ResponsibleOrganizationUnitId = targetUnitId;
+                return Result<ItContract, OperationError>.Success(contract);
+            });
+        }
+
         public Result<ItContract, OperationError> RemoveContractResponsibleUnit(int contractId)
         {
             return Modify(contractId, contract =>

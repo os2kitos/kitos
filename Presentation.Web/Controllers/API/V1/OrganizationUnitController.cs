@@ -18,16 +18,13 @@ namespace Presentation.Web.Controllers.API.V1
     public class OrganizationUnitController : GenericHierarchyApiController<OrganizationUnit, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
-        private readonly IGenericRepository<TaskRef> _taskRepository;
 
         public OrganizationUnitController(
             IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService,
-            IGenericRepository<TaskRef> taskRepository)
+            IOrgUnitService orgUnitService)
             : base(repository)
         {
             _orgUnitService = orgUnitService;
-            _taskRepository = taskRepository;
         }
 
         public HttpResponseMessage Post(OrgUnitDTO dto) => base.Post(dto.OrganizationId, dto);
@@ -145,7 +142,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [NonAction]
         public override HttpResponseMessage Put(int id, int organizationId, JObject jObject) => throw new NotSupportedException();
-
+        
         protected override void DeleteQuery(OrganizationUnit entity)
         {
             _orgUnitService.Delete(entity.Id);

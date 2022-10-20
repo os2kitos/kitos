@@ -5,6 +5,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -12,6 +13,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -297,6 +299,50 @@ namespace Core.ApplicationServices.SystemUsage
         public IEnumerable<ItSystemUsage> GetSystemsByRelevantUnitId(int unitId)
         {
             return _usageRepository.AsQueryable().Where(x => x.UsedBy.Select(usedBy => usedBy.OrganizationUnitId).Contains(unitId)).ToList();
+        }
+
+        public Result<ItSystemUsage, OperationError> TransferResponsibleUsage(int targetUnitId, int id)
+        {
+            return Modify(id, system =>
+            {
+                var targetUnit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == targetUnitId);
+                if (targetUnit == null)
+                {
+                    targetUnit = new ItSystemUsageOrgUnitUsage
+                    {
+                        ItSystemUsageId = system.Id,
+                        OrganizationUnitId = targetUnitId
+                    };
+                    system.UsedBy.Add(targetUnit);
+                }
+
+                system.ResponsibleUsage = targetUnit;
+                return Result<ItSystemUsage, OperationError>.Success(system);
+            });
+        }
+
+        public Result<ItSystemUsage, OperationError> TransferRelevantUsage(int unitId, int targetUnitId, int id)
+        {
+            return Modify(id, system =>
+            {
+                var unit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
+                if (unit != null)
+                {
+                    system.UsedBy.Remove(unit);
+                }
+
+                var targetUnit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == targetUnitId);
+                if (targetUnit != null) 
+                    return Result<ItSystemUsage, OperationError>.Success(system);
+
+                targetUnit = new ItSystemUsageOrgUnitUsage
+                {
+                    ItSystemUsageId = system.Id,
+                    OrganizationUnitId = targetUnitId
+                };
+                system.UsedBy.Add(targetUnit);
+                return Result<ItSystemUsage, OperationError>.Success(system);
+            });
         }
 
         public Result<ItSystemUsage, OperationError> RemoveResponsibleUsage(int id)

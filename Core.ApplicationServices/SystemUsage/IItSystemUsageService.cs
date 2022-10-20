@@ -38,6 +38,8 @@ namespace Core.ApplicationServices.SystemUsage
         Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId);
         Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved);
         Result<ItSystemUsage, OperationError> GetItSystemUsageById(int usageId);
+        Result<ItSystemUsage, OperationError> TransferResponsibleUsage(int targetUnitId, int id);
+        Result<ItSystemUsage, OperationError> TransferRelevantUsage(int unitId, int targetUnitId, int id);
         Result<ItSystemUsage, OperationError> RemoveResponsibleUsage(int id);
         Result<ItSystemUsage, OperationError> RemoveRelevantUnit(int id, int unitId);
 

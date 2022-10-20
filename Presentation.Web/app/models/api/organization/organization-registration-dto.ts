@@ -19,7 +19,7 @@
         paymentIndex: number;
     }
 
-    export class OrganizationRegistrationDeleteRequest {
+    export class OrganizationRegistrationChangeRequest {
         roles: number[];
         externalPayments: number[];
         internalPayments: number[];
