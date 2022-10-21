@@ -4,7 +4,7 @@
     export interface IOrganizationApiService {
         getOrganization(id: number): angular.IPromise<Models.Api.Organization.Organization>;
         getOrganizationDeleteConflicts(uuid: string) : angular.IPromise<Models.Api.Organization.OrganizationDeleteConflicts>;
-        deleteOrganization(uuid: string, enforce: boolean): angular.IPromise<boolean>;
+        deleteOrganization(uuid: string, enforce : boolean): angular.IPromise<boolean>;
     }
 
     export class OrganizationApiService implements IOrganizationApiService {

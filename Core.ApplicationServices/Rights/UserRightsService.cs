@@ -169,7 +169,7 @@ namespace Core.ApplicationServices.Rights
                     )
             );
         }
-        
+
         private Result<IEnumerable<UserRoleAssociationDTO>, OperationError> MapOrganizationalRightsHolderRelation(IQueryable<User> users, OrganizationRole role)
         {
             var result = new List<UserRoleAssociationDTO>();
