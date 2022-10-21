@@ -10,9 +10,10 @@ namespace Core.ApplicationServices.Organizations
 {
     public interface IOrganizationRegistrationService
     {
-        public Result<OrganizationRegistrationsRoot, OperationError> GetOrganizationRegistrations(int organizationId);
-        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationsChangeParameters parameters);
-        public Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId);
-        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, OrganizationRegistrationsChangeParameters parameters);
+        Result<IEnumerable<OrganizationRegistrationDetails>, OperationError> GetOrganizationRegistrations(int unitId);
+        Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, IEnumerable<OrganizationRegistrationChangeParameters> parameters);
+        Maybe<OperationError> DeleteSingleOrganizationRegistration(int unitId, OrganizationRegistrationChangeParameters parameters);
+        Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId);
+        Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, IEnumerable<OrganizationRegistrationChangeParameters> parameters);
     }
 }

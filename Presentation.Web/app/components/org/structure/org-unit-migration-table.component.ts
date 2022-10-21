@@ -6,7 +6,8 @@
             bindings: {
                 title: "@",
                 options: "=",
-                configuration: "="
+                configuration: "=",
+                unitId: "<"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -23,21 +24,34 @@
         title: string;
         options: IOrganizationUnitMigrationOptions;
         configuration: IMigrationTableColumn[];
+        unitId: number;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
         title: string | null = null;
-        options: IOrganizationUnitMigrationOptions;
+        options: IOrganizationUnitMigrationOptions | null;
         configuration: IMigrationTableColumn[] | null = null;
+        unitId: number | null = null;
         root: IOrganizationUnitMigrationRoot;
 
+        static $inject: string[] = ["organizationRegistrationsService"];
+        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService) {
+        }
+
         $onInit() {
-            /*if (this.configuration === null) {
-                console.error("missing migration table attribute: 'configuration'");
-            }*/
             if (this.title === null) {
                 console.error("missing migration table attribute: 'title'");
             }
+            if (this.options === null) {
+                console.error("missing migration table attribute: 'options'");
+            }
+            if (this.configuration === null) {
+                console.error("missing migration table attribute: 'configuration'");
+            }
+            if (this.unitId === null) {
+                console.error("missing migration table attribute: 'unitId'");
+            }
+
             this.root = this.options.root;
         }
 
@@ -56,7 +70,17 @@
         }
 
         delete(registration) {
-            //TODO: delete registration
+            if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
+                return;
+            }
+
+            const request = {
+                id: registration.id,
+                type: registration.type
+            } as Models.Api.Organization.OrganizationRegistrationDetailsDto;
+
+            this.organizationRegistrationsService.deleteSingleRegistration(this.unitId, request)
+                .then(() => this.options.refreshData());
         }
     }
 

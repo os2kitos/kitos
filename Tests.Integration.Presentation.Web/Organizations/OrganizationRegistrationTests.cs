@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
@@ -35,21 +36,30 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var (_, _, _, _, _, unit) = await SetupRegistrations(organizationId);
 
-            var registrationsRoot = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
-            var selectedRegistrations = new ChangeOrganizationRegistrationsRequest
-            {
-                Roles = registrationsRoot.Roles.Select(x => x.Id).ToList(),
-                ContractRegistrations = registrationsRoot.ContractRegistrations.Select(x => x.Id).ToList(),
-                ExternalPayments = registrationsRoot.ExternalPayments.Select(x => x.Id).ToList(),
-                InternalPayments = registrationsRoot.InternalPayments.Select(x => x.Id).ToList(),
-                RelevantSystems = registrationsRoot.RelevantSystemRegistrations.Select(x => x.Id).ToList(),
-                ResponsibleSystems = registrationsRoot.ResponsibleSystemRegistrations.Select(x => x.Id).ToList()
-            };
+            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
 
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await CheckCanDeleteByType(unit.Id, OrganizationRegistrationType.Roles, registrations);
+            await CheckCanDeleteByType(unit.Id, OrganizationRegistrationType.InternalPayments, registrations);
+            await CheckCanDeleteByType(unit.Id, OrganizationRegistrationType.ExternalPayments, registrations);
+            await CheckCanDeleteByType(unit.Id, OrganizationRegistrationType.ContractRegistrations, registrations);
+            await CheckCanDeleteByType(unit.Id, OrganizationRegistrationType.ResponsibleSystems, registrations);
+            await CheckCanDeleteByType(unit.Id, OrganizationRegistrationType.RelevantSystems, registrations);
+        }
 
-            var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
-            AssertAllRegistrationsAreEmpty(registrationsRootAfterDeletion);
+        [Fact]
+        public async Task Can_Delete_Single_Registration()
+        {
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var (_, _, _, _, _, unit) = await SetupRegistrations(organizationId);
+
+            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+
+            await CheckCanDeleteSingleByType(unit.Id, OrganizationRegistrationType.Roles, registrations);
+            await CheckCanDeleteSingleByType(unit.Id, OrganizationRegistrationType.InternalPayments, registrations);
+            await CheckCanDeleteSingleByType(unit.Id, OrganizationRegistrationType.ExternalPayments, registrations);
+            await CheckCanDeleteSingleByType(unit.Id, OrganizationRegistrationType.ContractRegistrations, registrations);
+            await CheckCanDeleteSingleByType(unit.Id, OrganizationRegistrationType.ResponsibleSystems, registrations);
+            await CheckCanDeleteSingleByType(unit.Id, OrganizationRegistrationType.RelevantSystems, registrations);
         }
 
         [Fact]
@@ -74,24 +84,99 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var (right, contract, externalEconomyStream, internalEconomyStream, usage, unit1) = await SetupRegistrations(organizationId);
             var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
 
-            var registrationsRoot = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
-            var selectedRegistrations = new ChangeOrganizationRegistrationsRequest
+            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+
+            await CheckCanTransferByType(unit1.Id, unit2.Id, right, OrganizationRegistrationType.Roles, registrations);
+            await CheckCanTransferByType(unit1.Id, unit2.Id, contract, OrganizationRegistrationType.ContractRegistrations, registrations);
+            await CheckCanTransferByType(unit1.Id, unit2.Id, internalEconomyStream, OrganizationRegistrationType.InternalPayments, registrations);
+            await CheckCanTransferByType(unit1.Id, unit2.Id, externalEconomyStream, OrganizationRegistrationType.ExternalPayments, registrations);
+            await CheckCanTransferByType(unit1.Id, unit2.Id, usage, OrganizationRegistrationType.RelevantSystems, registrations);
+            await CheckCanTransferByType(unit1.Id, unit2.Id, usage, OrganizationRegistrationType.ResponsibleSystems, registrations);
+        }
+
+        private static async Task CheckCanDeleteByType(int unitId, OrganizationRegistrationType type, IEnumerable<OrganizationRegistrationDetails> registrations)
+        {
+            var selectedRegistrations = ToChangeParametersList(type, registrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unitId, selectedRegistrations);
+
+            var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unitId);
+            Assert.Empty(registrationsRootAfterDeletion.Where(x => x.Type == type));
+        }
+
+        private static async Task CheckCanDeleteSingleByType(int unitId, OrganizationRegistrationType type, IEnumerable<OrganizationRegistrationDetails> registration)
+        {
+            var registrationsByType = registration.Where(x => x.Type == type).ToList();
+            Assert.Single(registrationsByType);
+
+            var singleRegistration = registrationsByType.FirstOrDefault();
+            Assert.NotNull(singleRegistration);
+
+            var selectedRegistrations = ToChangeParameters(singleRegistration);
+            await OrganizationRegistrationHelper.DeleteSingleRegistrationAsync(unitId, selectedRegistrations);
+
+            var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unitId);
+            Assert.Empty(registrationsRootAfterDeletion.Where(x => x.Type == type));
+        }
+
+        private static async Task CheckCanTransferByType(int unitId, int targetUnitId, IHasId expectedObject, OrganizationRegistrationType type, IEnumerable<OrganizationRegistrationDetails> registrations)
+        {
+            var selectedRegistrations = ToChangeParametersList(type, registrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unitId, targetUnitId, selectedRegistrations);
+
+            var registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unitId);
+            var res = registrationsUnit1.Where(x => x.Type == type).ToList();
+            Assert.Empty(res);
+
+            var registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(targetUnitId);
+            AssertRegistrationIsValid(type, expectedObject, registrationsUnit2);
+        }
+
+        private static void AssertRegistrationIsValid(OrganizationRegistrationType type, IHasId expectedObject,
+            IEnumerable<OrganizationRegistrationDetails> registrations)
+        {
+            var registrationsByType = registrations.Where(x => x.Type == type).ToList();
+            Assert.Single(registrationsByType);
+            Assert.Contains(expectedObject.Id, registrationsByType.Select(x => x.Id));
+        }
+        private static void AssertRegistrationsAreValid(OrganizationUnitRight right, ItContract contract,
+            EconomyStream externalEconomyStream, EconomyStream internalEconomyStream, ItSystemUsage usage, IEnumerable<OrganizationRegistrationDetails> registrations)
+        {
+            Assert.NotNull(registrations);
+
+            var registrationList = registrations.ToList();
+            AssertRegistrationIsValid(OrganizationRegistrationType.Roles, right, registrationList);
+            AssertRegistrationIsValid(OrganizationRegistrationType.ExternalPayments, externalEconomyStream, registrationList);
+            AssertRegistrationIsValid(OrganizationRegistrationType.InternalPayments, internalEconomyStream, registrationList);
+            AssertRegistrationIsValid(OrganizationRegistrationType.ContractRegistrations, contract, registrationList);
+            AssertRegistrationIsValid(OrganizationRegistrationType.ResponsibleSystems, usage, registrationList);
+            AssertRegistrationIsValid(OrganizationRegistrationType.RelevantSystems, usage, registrationList);
+        }
+
+        private static EconomyStream CreateEconomyStream(int unitId)
+        {
+            var economy = new EconomyStream
             {
-                Roles = registrationsRoot.Roles.Select(x => x.Id).ToList(),
-                //ContractRegistrations = registrationsRoot.ContractRegistrations.Select(x => x.Id).ToList(),
-                ExternalPayments = registrationsRoot.ExternalPayments.Select(x => x.Id).ToList(),
-                InternalPayments = registrationsRoot.InternalPayments.Select(x => x.Id).ToList(),
-                RelevantSystems = registrationsRoot.RelevantSystemRegistrations.Select(x => x.Id).ToList(),
-                ResponsibleSystems = registrationsRoot.ResponsibleSystemRegistrations.Select(x => x.Id).ToList()
+                OrganizationUnitId = unitId
             };
+            AssignOwnership(economy);
 
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
-            
-            var registrationsUnit1= await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
-            AssertAllRegistrationsAreEmpty(registrationsUnit1);
+            return economy;
+        }
 
-            var registrationsUnit2= await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
-            AssertRegistrationsAreValid(right, contract, externalEconomyStream, internalEconomyStream, usage, registrationsUnit2);
+        private static void AssignOwnership(IEntity entity)
+        {
+            entity.ObjectOwnerId = TestEnvironment.DefaultUserId;
+            entity.LastChangedByUserId = TestEnvironment.DefaultUserId;
+        }
+
+        private static IEnumerable<ChangeOrganizationRegistrationRequest> ToChangeParametersList(OrganizationRegistrationType type, IEnumerable<OrganizationRegistrationDetails> registrations)
+        {
+            return registrations.Where(x => x.Type == type).Select(ToChangeParameters);
+        }
+
+        private static ChangeOrganizationRegistrationRequest ToChangeParameters(OrganizationRegistrationDetails registration)
+        {
+            return new ChangeOrganizationRegistrationRequest(registration.Id, registration.Type.ToOrganizationRegistrationOption());
         }
 
         private async Task<(OrganizationUnitRight right, ItContract contract, EconomyStream externalEconomyStream, EconomyStream internalEconomyStream, ItSystemUsage usage, OrgUnitDTO unitDto)> SetupRegistrations(int organizationId)
@@ -115,7 +200,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             var internalEconomyStream = CreateEconomyStream(unit.Id);
             var externalEconomyStream = CreateEconomyStream(unit.Id);
-            
+
             var contract = new ItContract
             {
                 OrganizationId = organizationId,
@@ -169,53 +254,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
             });
 
             return (right, contract, externalEconomyStream, internalEconomyStream, usage, unit);
-        }
-
-        private static void AssertRegistrationsAreValid(OrganizationUnitRight right, ItContract contract,
-            EconomyStream externalEconomyStream, EconomyStream internalEconomyStream, ItSystemUsage usage, OrganizationRegistrationsRoot registrationsRoot)
-        {
-            Assert.NotNull(registrationsRoot);
-
-            Assert.Single(registrationsRoot.Roles);
-            //Assert.Single(registrationsRoot.ContractRegistrations);
-            Assert.Single(registrationsRoot.InternalPayments);
-            Assert.Single(registrationsRoot.ExternalPayments);
-            Assert.Single(registrationsRoot.RelevantSystemRegistrations);
-            Assert.Single(registrationsRoot.ResponsibleSystemRegistrations);
-
-            Assert.Contains(right.Id, registrationsRoot.Roles.Select(x => x.Id));
-            //Assert.Contains(contract.Id, registrationsRoot.ContractRegistrations.Select(x => x.Id));
-            Assert.Contains(internalEconomyStream.Id, registrationsRoot.InternalPayments.Select(x => x.Id));
-            Assert.Contains(externalEconomyStream.Id, registrationsRoot.ExternalPayments.Select(x => x.Id));
-            Assert.Contains(usage.Id, registrationsRoot.RelevantSystemRegistrations.Select(x => x.Id));
-            Assert.Contains(usage.Id, registrationsRoot.ResponsibleSystemRegistrations.Select(x => x.Id));
-        }
-
-        private static void AssertAllRegistrationsAreEmpty(OrganizationRegistrationsRoot registrationsRoot)
-        {
-            Assert.Empty(registrationsRoot.Roles);
-            //Assert.Empty(registrationsRoot.ContractRegistrations);
-            Assert.Empty(registrationsRoot.ExternalPayments);
-            Assert.Empty(registrationsRoot.InternalPayments);
-            Assert.Empty(registrationsRoot.RelevantSystemRegistrations);
-            Assert.Empty(registrationsRoot.ResponsibleSystemRegistrations);
-        }
-
-        private static EconomyStream CreateEconomyStream(int unitId)
-        {
-            var economy = new EconomyStream
-            {
-                OrganizationUnitId = unitId
-            };
-            AssignOwnership(economy);
-
-            return economy;
-        }
-
-        private static void AssignOwnership(IEntity entity)
-        {
-            entity.ObjectOwnerId = TestEnvironment.DefaultUserId;
-            entity.LastChangedByUserId = TestEnvironment.DefaultUserId;
         }
     }
 }

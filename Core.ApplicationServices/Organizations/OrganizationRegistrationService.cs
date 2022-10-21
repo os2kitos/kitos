@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.Organizations
             _identityResolver = identityResolver;
         }
 
-        public Result<OrganizationRegistrationsRoot, OperationError> GetOrganizationRegistrations(int unitId)
+        public Result<IEnumerable<OrganizationRegistrationDetails>, OperationError> GetOrganizationRegistrations(int unitId)
         {
             var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
             if (unitUuid.IsNone)
@@ -59,16 +59,15 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            var registrationsRoot = new OrganizationRegistrationsRoot();
-            
-            GetApplicableUnitRights(registrationsRoot, unit.Value);
-            GetContractRegistrations(registrationsRoot, unitId);
-            GetSystemRegistrations(registrationsRoot, unitId);
+            var registrations = new List<OrganizationRegistrationDetails>();
+            registrations.AddRange(GetApplicableUnitRights(unit.Value));
+            registrations.AddRange(GetContractRegistrations(unitId));
+            registrations.AddRange(GetSystemRegistrations(unitId));
 
-            return registrationsRoot;
+            return registrations;
         }
 
-        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationsChangeParameters parameters)
+        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, IEnumerable<OrganizationRegistrationChangeParameters> parameters)
         {
             var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
             if (unitUuid.IsNone)
@@ -85,32 +84,65 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            return _organizationRightsService.RemoveSelectedUnitRights(parameters.RoleIds)
+            var parametersList = parameters.ToList();
+            return _organizationRightsService.RemoveSelectedUnitRights(GetParametersByType(OrganizationRegistrationType.Roles, parametersList))
                 .Match
                 (
                     error => error,
-                () => _economyStreamService.DeleteRange(parameters.ExternalPaymentIds)
+                () => _economyStreamService.DeleteRange(GetParametersByType(OrganizationRegistrationType.ExternalPayments, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => _economyStreamService.DeleteRange(parameters.InternalPaymentIds)
+                    () => _economyStreamService.DeleteRange(GetParametersByType(OrganizationRegistrationType.InternalPayments, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => RemoveContractRegistrations(parameters.ContractWithRegistrationIds)
+                    () => RemoveContractRegistrations(GetParametersByType(OrganizationRegistrationType.ContractRegistrations, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => RemoveSystemResponsibleRegistrations(parameters.ResponsibleSystemIds)
+                    () => RemoveSystemResponsibleRegistrations(GetParametersByType(OrganizationRegistrationType.ResponsibleSystems, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unitId)
+                    () => RemoveSystemRelevantUnits(GetParametersByType(OrganizationRegistrationType.RelevantSystems, parametersList), unitId)
                 );
+        }
+
+        public Maybe<OperationError> DeleteSingleOrganizationRegistration(int unitId, OrganizationRegistrationChangeParameters parameters)
+        {
+            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
+            if (unitUuid.IsNone)
+            {
+                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
+            }
+            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            if (unit.Failed)
+            {
+                return new OperationError("Organization not found", OperationFailure.NotFound);
+            }
+            if (!_authorizationContext.AllowDelete(unit.Value))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return parameters.Type switch
+            {
+                OrganizationRegistrationType.Roles => _organizationRightsService.RemoveUnitRole(parameters.Id),
+                OrganizationRegistrationType.ExternalPayments or OrganizationRegistrationType.InternalPayments => 
+                    _economyStreamService.Delete(parameters.Id),
+                OrganizationRegistrationType.ContractRegistrations => _contractService.RemoveContractResponsibleUnit(parameters.Id)
+                    .Match(val => Maybe<OperationError>.None, error => error),
+                OrganizationRegistrationType.ResponsibleSystems => _usageService.RemoveResponsibleUsage(parameters.Id)
+                    .Match(val => Maybe<OperationError>.None, error => error),
+                OrganizationRegistrationType.RelevantSystems => _usageService.RemoveRelevantUnit(parameters.Id, unitId)
+                    .Match(val => Maybe<OperationError>.None, error => error),
+                _ => new OperationError("Incorrect OrganizationRegistrationType", OperationFailure.BadInput)
+            };
         }
 
         public Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId)
@@ -118,6 +150,7 @@ namespace Core.ApplicationServices.Organizations
             var deleteRegistrationsResult = GetOrganizationRegistrations(unitId)
                 .Match(val => DeleteSelectedOrganizationRegistrations(unitId, ToChangeParametersFromRegistrationDetails(val)),
                     error => error);
+
             if(deleteRegistrationsResult.HasValue)
                 return deleteRegistrationsResult.Value;
 
@@ -125,7 +158,7 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, OrganizationRegistrationsChangeParameters parameters)
+        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, IEnumerable<OrganizationRegistrationChangeParameters> parameters)
         {
             var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
             if (unitUuid.IsNone)
@@ -158,78 +191,76 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            return _organizationRightsService.TransferSelectedUnitRights(targetUnitId, parameters.RoleIds)
+            var parametersList = parameters.ToList();
+            return _organizationRightsService.TransferSelectedUnitRights(targetUnitId, GetParametersByType(OrganizationRegistrationType.Roles, parametersList))
                 .Match
                 (
                     error => error,
-                    () => _economyStreamService.TransferRange(targetUnit.Value, parameters.ExternalPaymentIds)
+                    () => _economyStreamService.TransferRange(targetUnit.Value, GetParametersByType(OrganizationRegistrationType.ExternalPayments, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => _economyStreamService.TransferRange(targetUnit.Value, parameters.InternalPaymentIds)
+                    () => _economyStreamService.TransferRange(targetUnit.Value, GetParametersByType(OrganizationRegistrationType.InternalPayments, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => TransferContractRegistrations(targetUnitId, parameters.ContractWithRegistrationIds)
+                    () => TransferContractRegistrations(targetUnitId, GetParametersByType(OrganizationRegistrationType.ContractRegistrations, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => TransferSystemRelevantRegistrations(unitId, targetUnitId, parameters.ResponsibleSystemIds)
+                    () => TransferSystemRelevantRegistrations(unitId, targetUnitId, GetParametersByType(OrganizationRegistrationType.RelevantSystems, parametersList))
                 )
                 .Match
                 (
                     error => error,
-                    () => TransferSystemResponsibleRegistrations(targetUnitId, parameters.RelevantSystems)
+                    () => TransferSystemResponsibleRegistrations(targetUnitId, GetParametersByType(OrganizationRegistrationType.ResponsibleSystems, parametersList))
                 );
         }
 
-        private static void GetApplicableUnitRights(OrganizationRegistrationsRoot root, OrganizationUnit unit)
+        private static IEnumerable<OrganizationRegistrationDetails> GetApplicableUnitRights(OrganizationUnit unit)
         { 
-            root.Roles = unit.Rights.Select(x => ToDetails(x.Id, x.Role.Name)).ToList();
+            return unit.Rights.Select(x => ToDetails(x.Id, x.Role.Name, OrganizationRegistrationType.Roles)).ToList();
         }
 
-        private void GetContractRegistrations(OrganizationRegistrationsRoot root, int unitId)
+        private IEnumerable<OrganizationRegistrationDetails> GetContractRegistrations(int unitId)
         {
             var contracts = _contractService.GetContractsByResponsibleUnitId(unitId);
-            var externalPayments = new List<OrganizationRegistrationContractPayment>();
-            var internalPayments = new List<OrganizationRegistrationContractPayment>();
-            var responsibleOrganizationUnits = new List<OrganizationRegistrationDetails>();
+            var contractRegistrations = new List<OrganizationRegistrationDetails>();
 
             foreach (var itContract in contracts)
             {
-                externalPayments.AddRange(GetPayments(itContract, _economyStreamService.GetExternalEconomyStreamsByUnitId(itContract, unitId)));
-                internalPayments.AddRange(GetPayments(itContract, _economyStreamService.GetInternalEconomyStreamsByUnitId(itContract, unitId)));
-                responsibleOrganizationUnits.Add(ToDetails(itContract.Id, itContract.Name));
+                contractRegistrations.AddRange(GetPayments(itContract, _economyStreamService.GetExternalEconomyStreamsByUnitId(itContract, unitId), OrganizationRegistrationType.ExternalPayments));
+                contractRegistrations.AddRange(GetPayments(itContract, _economyStreamService.GetInternalEconomyStreamsByUnitId(itContract, unitId), OrganizationRegistrationType.InternalPayments));
+                contractRegistrations.Add(ToDetails(itContract.Id, itContract.Name, OrganizationRegistrationType.ContractRegistrations));
             }
 
-            root.ExternalPayments = externalPayments;
-            root.InternalPayments = internalPayments;
-            root.ContractRegistrations = responsibleOrganizationUnits;
+            return contractRegistrations;
         }
 
-        private void GetSystemRegistrations(OrganizationRegistrationsRoot root, int unitId)
+        private IEnumerable<OrganizationRegistrationDetails> GetSystemRegistrations(int unitId)
         {
             var responsibleSystems = _usageService.GetSystemsByResponsibleUnitId(unitId);
             var relevantSystems = _usageService.GetSystemsByRelevantUnitId(unitId);
 
             //TODO: What to use as a name?
-            var responsibleSystemRegistrations = responsibleSystems.Select(system => ToDetails(system.Id, system.LocalCallName)).ToList();
-            var relevantSystemRegistrations = relevantSystems.Select(system => ToDetails(system.Id, system.LocalCallName)).ToList();
+            var result = new List<OrganizationRegistrationDetails>();
+            result.AddRange(responsibleSystems.Select(system => ToDetails(system.Id, system.LocalCallName, OrganizationRegistrationType.ResponsibleSystems)).ToList());
+            result.AddRange(relevantSystems.Select(system => ToDetails(system.Id, system.LocalCallName, OrganizationRegistrationType.RelevantSystems)).ToList());
 
-            root.RelevantSystemRegistrations = relevantSystemRegistrations;
-            root.ResponsibleSystemRegistrations = responsibleSystemRegistrations;
+            return result;
         }
 
-        private static IEnumerable<OrganizationRegistrationContractPayment> GetPayments(ItContract contract, IEnumerable<EconomyStream> payments)
+        private static IEnumerable<OrganizationRegistrationDetails> GetPayments(ItContract contract, IEnumerable<EconomyStream> payments, OrganizationRegistrationType type)
         {
-            var result = new List<OrganizationRegistrationContractPayment>();
+            var result = new List<OrganizationRegistrationDetails>();
             var index = 1;
             foreach (var item in payments)
             {
-                result.Add(ToContractPaymentFromEconomyStream(index, item, contract));
+                var text = $"Acquisition: {item.Acquisition}, Operation: {item.Operation}"; //TODO: How should it look like?
+                result.Add(ToDetails(item.Id, text, type, contract.Id, contract.Name, index));
                 index++;
             }
 
@@ -308,50 +339,29 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private static OrganizationRegistrationDetails ToDetails(int id, string text)
+        private static IEnumerable<int> GetParametersByType(OrganizationRegistrationType type,
+            IEnumerable<OrganizationRegistrationChangeParameters> parameters)
+        {
+            return parameters.Where(x => x.Type == type).Select(x => x.Id);
+        }
+
+        private static OrganizationRegistrationDetails ToDetails(int id, string text, OrganizationRegistrationType type, int? objectId = null, string objectName = "", int? index = null)
         {
             return new OrganizationRegistrationDetails
             {
                 Id = id,
-                Text = text
-            };
-        }
-
-        private static OrganizationRegistrationDetailsWithObjectData ToDetailsWithObjectData(int id, string text, int objectId, string objectName)
-        {
-            return new OrganizationRegistrationDetailsWithObjectData
-            {
-                Id = id,
                 Text = text,
-                ObjectId = objectId,
-                ObjectName = objectName,
-            };
-        }
-
-        private static OrganizationRegistrationContractPayment ToContractPaymentFromEconomyStream(int index, EconomyStream economyStream, ItContract contract)
-        {
-            return new OrganizationRegistrationContractPayment
-            {
-                Id = economyStream.Id,
-                Text = $"Acquisition: {economyStream.Acquisition}, Operation: {economyStream.Operation}", //TODO: How should it look like?
+                Type = type,
                 PaymentIndex = index,
-                ObjectId = contract.Id,
-                ObjectName = contract.Name,
+                ObjectId = objectId,
+                ObjectName = objectName
             };
         }
 
-        private static OrganizationRegistrationsChangeParameters ToChangeParametersFromRegistrationDetails(
-            OrganizationRegistrationsRoot root)
+        private static IEnumerable<OrganizationRegistrationChangeParameters> ToChangeParametersFromRegistrationDetails(
+            IEnumerable<OrganizationRegistrationDetails> registrations)
         {
-            return new OrganizationRegistrationsChangeParameters()
-            {
-                ContractWithRegistrationIds = root.ContractRegistrations.Select(x => x.Id).ToList(),
-                ExternalPaymentIds = root.ExternalPayments.Select(x => x.Id).ToList(),
-                InternalPaymentIds = root.InternalPayments.Select(x => x.Id).ToList(),
-                RelevantSystems = root.RelevantSystemRegistrations.Select(x => x.Id).ToList(),
-                ResponsibleSystemIds = root.ResponsibleSystemRegistrations.Select(x => x.Id).ToList(),
-                RoleIds = root.Roles.Select(x => x.Id).ToList()
-            };
+            return registrations.Select(x => new OrganizationRegistrationChangeParameters(x.Id, x.Type));
         }
     }
 }

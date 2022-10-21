@@ -79,24 +79,30 @@ namespace Core.ApplicationServices.Organizations
             return RemoveRight(right);
         }
 
+        public Maybe<OperationError> RemoveUnitRole(int rightId)
+        {
+            var unitRight = _unitRightRepository.GetByKey(rightId);
+            var result = RemoveUnitRight(unitRight);
+            if (result.HasValue)
+                return result.Value;
+
+            _organizationRightRepository.Save();
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(unitRight.UserId));
+
+            return Maybe<OperationError>.None;
+        }
+
         public Maybe<OperationError> RemoveSelectedUnitRights(IEnumerable<int> rightIds)
         {
             var userIds = new List<int>();
             foreach (var rightId in rightIds)
             {
                 var unitRight = _unitRightRepository.GetByKey(rightId);
-                if (unitRight == null)
-                {
-                    return new OperationError(OperationFailure.NotFound);
-                }
+                var result = RemoveUnitRight(unitRight);
+                if (result.HasValue)
+                    return result.Value;
 
-                if (!_authorizationContext.AllowDelete(unitRight))
-                {
-                    return new OperationError(OperationFailure.Forbidden);
-                }
                 userIds.Add(unitRight.UserId);
-
-                _unitRightRepository.Delete(unitRight);
             }
             _unitRightRepository.Save();
 
@@ -162,6 +168,22 @@ namespace Core.ApplicationServices.Organizations
             _domainEvents.Raise(new AdministrativeAccessRightsChanged(right.UserId));
 
             return right;
+        }
+
+        private Maybe<OperationError> RemoveUnitRight(OrganizationUnitRight right)
+        {
+            if (right == null)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+
+            if (!_authorizationContext.AllowDelete(right))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            _unitRightRepository.DeleteByKey(right.Id);
+            return Maybe<OperationError>.None;
         }
     }
 }

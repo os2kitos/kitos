@@ -104,8 +104,6 @@ namespace Core.ApplicationServices.Contract
 
         public IEnumerable<EconomyStream> GetExternalEconomyStreamsByUnitId(ItContract contract, int unitId)
         {
-            var external = contract
-                .ExternEconomyStreams.ToList();
             return contract
                 .ExternEconomyStreams
                 .Where(x => x.OrganizationUnitId == unitId)
