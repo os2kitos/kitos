@@ -26,7 +26,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
-        private readonly Mock<IEconomyStreamService> _economyStreamServiceMock;
         private readonly Mock<IItContractService> _contractServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
@@ -37,7 +36,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
-            _economyStreamServiceMock = new Mock<IEconomyStreamService>();
             _contractServiceMock = new Mock<IItContractService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
@@ -47,7 +45,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _identityResolverMock.Object,
                 _organizationServiceMock.Object,
                 _organizationRightsServiceMock.Object,
-                _economyStreamServiceMock.Object,
                 _contractServiceMock.Object,
                 _usageServiceMock.Object,
                 _authorizationContextMock.Object,

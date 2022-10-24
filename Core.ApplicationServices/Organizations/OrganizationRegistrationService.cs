@@ -16,7 +16,6 @@ namespace Core.ApplicationServices.Organizations
         private readonly IEntityIdentityResolver _identityResolver;
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationRightsService _organizationRightsService;
-        private readonly IEconomyStreamService _economyStreamService;
         private readonly IItContractService _contractService;
         private readonly IItSystemUsageService _usageService;
         private readonly IAuthorizationContext _authorizationContext;
@@ -25,7 +24,6 @@ namespace Core.ApplicationServices.Organizations
         public OrganizationRegistrationService(IEntityIdentityResolver identityResolver, 
             IOrganizationService organizationService,
             IOrganizationRightsService organizationRightsService, 
-            IEconomyStreamService economyStreamService, 
             IItContractService contractService,
             IItSystemUsageService usageService, 
             IAuthorizationContext authorizationContext, 
@@ -33,7 +31,6 @@ namespace Core.ApplicationServices.Organizations
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;
-            _economyStreamService = economyStreamService;
             _contractService = contractService;
             _usageService = usageService;
             _authorizationContext = authorizationContext;
