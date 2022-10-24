@@ -84,7 +84,7 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
             
-            return _organizationRightsService.RemoveSelectedUnitRights(parameters.OrganizationUnitRights)
+            return _organizationRightsService.RemoveUnitRightsByIds(parameters.OrganizationUnitRights)
                 .Match
                 (
                     error => error,
@@ -155,7 +155,7 @@ namespace Core.ApplicationServices.Organizations
 
             return Maybe<OperationError>.None;
             /*var parametersList = parameters.ToList();
-            return _organizationRightsService.TransferSelectedUnitRights(targetUnitId, GetParametersByType(OrganizationRegistrationType.Roles, parametersList))
+            return _organizationRightsService.TransferUnitRightsByIds(targetUnitId, GetParametersByType(OrganizationRegistrationType.Roles, parametersList))
                 .Match
                 (
                     error => error,
@@ -188,8 +188,8 @@ namespace Core.ApplicationServices.Organizations
             foreach (var contractId in contractIds)
             {
                 var deleteResult = _contractService.TransferContractResponsibleUnit(targetUnitId, contractId);
-                if (deleteResult.Failed)
-                    return deleteResult.Error;
+                if (deleteResult.HasValue)
+                    return deleteResult.Value;
             }
 
             return Maybe<OperationError>.None;
@@ -216,8 +216,8 @@ namespace Core.ApplicationServices.Organizations
             foreach (var contractId in contractIds)
             {
                 var deleteResult = _contractService.RemoveContractResponsibleUnit(contractId);
-                if (deleteResult.Failed)
-                    return deleteResult.Error;
+                if (deleteResult.HasValue)
+                    return deleteResult.Value;
             }
 
             return Maybe<OperationError>.None;

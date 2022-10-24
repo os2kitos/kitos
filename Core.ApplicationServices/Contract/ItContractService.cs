@@ -123,35 +123,24 @@ namespace Core.ApplicationServices.Contract
 
         public Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds)
         {
-            //TODO: Use the "Modify" helper to save som space checking access and loading from db
-            //TODO: Add transaction
-            var contract = _repository.GetById(contractId);
-
-            if (contract == null)
+            return Modify(contractId, contract =>
             {
-                return new OperationError(OperationFailure.NotFound);
-            }
+                var economyStreamsToDelete = new List<EconomyStream>();
+                foreach (var paymentId in paymentIds)
+                {
+                    var result = contract.RemoveEconomyStream(paymentId, isInternal);
+                    if (result.Failed)
+                        return result.Error;
 
-            if (!_authorizationContext.AllowModify(contract))
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
+                    economyStreamsToDelete.Add(result.Value);
+                }
 
-            var economyStreamsToDelete = new List<EconomyStream>();
-            foreach (var paymentId in paymentIds)
-            {
-                var result = contract.RemoveEconomyStream(paymentId, isInternal);
-                if(result.Failed)
-                    return result.Error;
+                _economyStreamRepository.RemoveRange(economyStreamsToDelete);
+                _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
 
-                economyStreamsToDelete.Add(result.Value);
-            }
-
-            _economyStreamRepository.RemoveRange(economyStreamsToDelete);
-            _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
-            _economyStreamRepository.Save();
-
-            return Maybe<OperationError>.None;
+                return Result<ItContract, OperationError>.Success(contract);
+            }).Match(_ => Maybe<OperationError>.None,
+                err => err);
         }
 
         public Result<ItContract, OperationFailure> Delete(int id)
@@ -174,7 +163,7 @@ namespace Core.ApplicationServices.Contract
                 //Delete the economy streams to prevent them from being orphaned
                 foreach (var economyStream in contract.GetAllPayments())
                 {
-                    DeleteEconomyStream(economyStream);
+                    _economyStreamRepository.DeleteWithReferencePreload(economyStream);
                 }
                 _economyStreamRepository.Save();
                 
@@ -324,28 +313,23 @@ namespace Core.ApplicationServices.Contract
             return _repository.AsQueryable().Where(x => x.ResponsibleOrganizationUnitId == unitId).ToList();
         }
 
-        public Result<ItContract, OperationError> TransferContractResponsibleUnit(int targetUnitId, int contractId)
+        public Maybe<OperationError> TransferContractResponsibleUnit(int targetUnitId, int contractId)
         {
             return Modify(contractId, contract =>
             {
                 contract.ResponsibleOrganizationUnitId = targetUnitId;
                 return Result<ItContract, OperationError>.Success(contract);
-            });
+            }).Match(_ => Maybe<OperationError>.None, 
+                err => err);
         }
-        //TODO: Change result to Maybe<OperationError>
-        public Result<ItContract, OperationError> RemoveContractResponsibleUnit(int contractId)
+        public Maybe<OperationError> RemoveContractResponsibleUnit(int contractId)
         {
             return Modify(contractId, contract =>
             {
                 contract.ResetResponsibleOrganizationUnit();
                 return Result<ItContract, OperationError>.Success(contract);
-            });
-        }
-
-        private void DeleteEconomyStream(EconomyStream economyStream)
-        {
-            //TODO: Call it directly in the code - only used one place
-            _economyStreamRepository.DeleteWithReferencePreload(economyStream);
+            }).Match(_ => Maybe<OperationError>.None,
+                err => err);
         }
 
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)

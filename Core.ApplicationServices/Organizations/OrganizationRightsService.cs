@@ -3,11 +3,13 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DataAccess;
 using Serilog;
 
 namespace Core.ApplicationServices.Organizations
@@ -20,12 +22,14 @@ namespace Core.ApplicationServices.Organizations
         private readonly IOrganizationalUserContext _userContext;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
+        private readonly ITransactionManager _transactionManager;
 
         public OrganizationRightsService(IAuthorizationContext authorizationContext,
             IGenericRepository<OrganizationRight> organizationRightRepository,
             IOrganizationalUserContext userContext,
             IDomainEvents domainEvents, ILogger logger,
-            IGenericRepository<OrganizationUnitRight> unitRightRepository)
+            IGenericRepository<OrganizationUnitRight> unitRightRepository,
+            ITransactionManager transactionManager)
         {
             _authorizationContext = authorizationContext;
             _organizationRightRepository = organizationRightRepository;
@@ -33,6 +37,7 @@ namespace Core.ApplicationServices.Organizations
             _domainEvents = domainEvents;
             _logger = logger;
             _unitRightRepository = unitRightRepository;
+            _transactionManager = transactionManager;
         }
 
         public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
@@ -82,47 +87,41 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> RemoveUnitRole(int rightId)
         {
-            //var unitRight = _unitRightRepository.GetByKey(rightId);
-            //var result = RemoveUnitRight(unitRight);
-            //if (result.HasValue)
-            //    return result.Value;
-
-            //_organizationRightRepository.Save();
-            //_domainEvents.Raise(new AdministrativeAccessRightsChanged(unitRight.UserId));
-
-            //return Maybe<OperationError>.None;
-            return RemoveSelectedUnitRights(rightId.WrapAsEnumerable());
+            return RemoveUnitRightsByIds(rightId.WrapAsEnumerable());
         }
-        //TODO: The "selected" word makes no sense here
-        public Maybe<OperationError> RemoveSelectedUnitRights(IEnumerable<int> rightIds)
+
+        public Maybe<OperationError> RemoveUnitRightsByIds(IEnumerable<int> rightIds)
         {
-            //TODO: Missin transactions
-            var userIds = new List<int>();
+            using var transaction = _transactionManager.Begin();
+            var rightsToDelete = new List<OrganizationUnitRight>();
             foreach (var rightId in rightIds)
             {
                 var unitRight = _unitRightRepository.GetByKey(rightId);
-                //TODO: Check for null before calling remove unit right
-                var result = RemoveUnitRight(unitRight);
+                if (unitRight == null)
+                    return new OperationError($"Unit right with id: {rightId} not found", OperationFailure.NotFound);
+                if (!_authorizationContext.AllowDelete(unitRight))
+                    return new OperationError("User is not allowed to perform this operation", OperationFailure.Forbidden);
+                
 
-                if (result.HasValue)
-                    return result.Value;
-
-                userIds.Add(unitRight.UserId);
+                rightsToDelete.Add(unitRight);
             }
-            _unitRightRepository.Save();
+            var userIds = rightsToDelete.Select(x => x.UserId).ToList();
 
+            _unitRightRepository.RemoveRange(rightsToDelete);
             foreach (var userId in userIds.Distinct())
             {
                 _domainEvents.Raise(new AdministrativeAccessRightsChanged(userId));
             }
+            _unitRightRepository.Save();
+
+
+            transaction.Commit();
 
             return Maybe<OperationError>.None;
         }
 
-        //TODO: The "selected" word makes no sense here
-        public Maybe<OperationError> TransferSelectedUnitRights(int targetUnitId, IEnumerable<int> rightIds)
+        public Maybe<OperationError> TransferUnitRightsByIds(int targetUnitId, IEnumerable<int> rightIds)
         {
-            //TODO: Missing auth
             var userIds = new List<int>();
             foreach (var rightId in rightIds)
             {
@@ -175,22 +174,6 @@ namespace Core.ApplicationServices.Organizations
             _domainEvents.Raise(new AdministrativeAccessRightsChanged(right.UserId));
 
             return right;
-        }
-
-        private Maybe<OperationError> RemoveUnitRight(OrganizationUnitRight right)
-        {
-            if (right == null)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }//TODO: At this stage it would be an exception
-
-            if (!_authorizationContext.AllowDelete(right))
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
-            //TODO: Raise the domain event here
-            _unitRightRepository.DeleteByKey(right.Id); //TODO: Merge contents of method into the main method and use deleterange
-            return Maybe<OperationError>.None;
         }
     }
 }
