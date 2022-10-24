@@ -43,7 +43,6 @@
         index?: number;
 
         targetUnitId?: number;
-        targetUnitName?: string;
         optionalObjectContext?: any;
     }
 
@@ -67,6 +66,7 @@
         relevantSystemRegistrations: IOrganizationUnitMigrationOptions;
         responsibleSystemRegistrations: IOrganizationUnitMigrationOptions;
         organizations: IDropdownUnit[];
+        orgUnits: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[];
         selectedOrg: any;
 
         rolesTableConfig: IMigrationTableColumn[];
@@ -76,10 +76,9 @@
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
         
-        static $inject: string[] = ["organizationRegistrationsService", "organizationUnitOdataService", "_"];
+        static $inject: string[] = ["organizationRegistrationsService", "organizationApiService"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
-            private readonly organizationUnitOdataService: Services.Organization.IOrganizationUnitOdataService,
-            private readonly _) {
+            private readonly organizationApiService: Services.IOrganizationApiService) {
         }
 
         $onInit() {
@@ -95,30 +94,15 @@
             this.getData();
 
             this.organizations = [];
-            this.selectedOrg = {};
-            var self = this;
+            this.orgUnits = [];
 
-            this.organizationUnitOdataService
-                .getOrganizationUnits()
-                .then(result => {
-                    self._.addHierarchyLevelOnFlatAndSort(result, "Id", "ParentId");
-                    var resultWithLevels = result as any;
-                    self.organizations = self.organizations.concat(
-                        resultWithLevels.map(
-                            item => {
-                                 return {
-                                     id: item.Id,
-                                     name: item.Name,
-                                     level: item.$level,
-                                     text: "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(item.$level) + item.Name
-                                 }
-                            }));
-                    console.log(self.organizations);
-                });
+            this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
+                this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
+            });
         }
 
         deleteSelected() {
-            if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
+            if (!confirm('Er du sikker på, at du vil slette de valgte registreringer?')) {
                 return;
             }
 
@@ -128,7 +112,9 @@
         }
 
         transfer() {
-            if (!confirm('Er du sikker på, at du vil INSERT REST OF THE TEXT?')) {
+            if (!this.selectedOrg)
+                return;
+            if (!confirm(`Er du sikker på, at du vil overføre de valgte registreringer til "${this.selectedOrg.text}"?`)) {
                 return;
             }
 
@@ -139,10 +125,12 @@
         }
 
         setSelectedOrg() {
+            if (!this.selectedOrg.id)
+                return;
+
             const selectedRegistrations = this.collectSelectedRegistrations();
             selectedRegistrations.forEach(registration => {
                 registration.targetUnitId = this.selectedOrg.id;
-                registration.targetUnitName = this.selectedOrg.name;
             });
 
             this.checkShouldTransferBtnBeEnabled();

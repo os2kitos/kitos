@@ -35,7 +35,8 @@
                     autoSaveUrl: "@",
                     field: "@",
                     disabled: "=ngDisabled",
-                    allowClear: "="
+                    allowClear: "=",
+                    onChange: "&"
                 },
                 controller: "select2OrgUnitController",
                 link: function (scope, element, attr, ctrl) {

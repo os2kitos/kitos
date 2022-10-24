@@ -5,8 +5,8 @@
         return {
             bindings: {
                 title: "@",
-                options: "=",
-                configuration: "=",
+                options: "<",
+                configuration: "<",
                 unitId: "<"
             },
             controller: OrganizationUnitMigrationTableController,
@@ -70,7 +70,7 @@
         }
 
         delete(registration) {
-            if (!confirm('Er du sikker på, at du vil slette INSERT REST OF THE TEXT?')) {
+            if (!confirm('Er du sikker på, at du vil slette registreringen?')) {
                 return;
             }
 

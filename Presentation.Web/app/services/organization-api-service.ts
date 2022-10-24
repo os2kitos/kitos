@@ -4,6 +4,7 @@
     export interface IOrganizationApiService {
         getOrganization(id: number): angular.IPromise<Models.Api.Organization.Organization>;
         getOrganizationDeleteConflicts(uuid: string) : angular.IPromise<Models.Api.Organization.OrganizationDeleteConflicts>;
+        getOrganizationUnit(organizationId: number): angular.IPromise<Models.Api.Organization.OrganizationUnit>;
         deleteOrganization(uuid: string, enforce : boolean): angular.IPromise<boolean>;
     }
 
@@ -15,6 +16,10 @@
 
         getOrganization(id: number): angular.IPromise<Models.Api.Organization.Organization> {
             return this.apiWrapper.getDataFromUrl<Models.Api.Organization.Organization>(`api/organization/${id}`);
+        }
+
+        getOrganizationUnit(organizationId: number): angular.IPromise<Models.Api.Organization.OrganizationUnit> {
+            return this.apiWrapper.getDataFromUrl<Models.Api.Organization.OrganizationUnit>(`api/organizationUnit?organization=${organizationId}`);
         }
 
         deleteOrganization(uuid: string, enforce : boolean): angular.IPromise<boolean> {
