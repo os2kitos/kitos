@@ -90,6 +90,7 @@ namespace Core.DomainServices.Organizations
 
         public void Delete(int id)
         {
+            //TODO: Add "DeleteOrganizationUnit" to Organization and in that make sure only KITOS units are allowed to be deleted. If "deleteOrganization succeeds, delete the unit from the repo
             // Remove OrgUnit from ItSystemUsages
             var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId == id);
             foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)

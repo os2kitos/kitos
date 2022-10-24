@@ -340,7 +340,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return Result<ItSystemUsage, OperationError>.Success(system);
             });
         }
-
+        //TODO: Return _Maybe<operationerror>
         public Result<ItSystemUsage, OperationError> RemoveResponsibleUsage(int id)
         {
             return Modify(id, system =>
@@ -350,6 +350,7 @@ namespace Core.ApplicationServices.SystemUsage
             });
         }
 
+        //TODO: Return _Maybe<operationerror>
         public Result<ItSystemUsage, OperationError> RemoveRelevantUnit(int id, int unitId)
         {
             return Modify(id, system =>

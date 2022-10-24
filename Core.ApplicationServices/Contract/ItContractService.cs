@@ -123,6 +123,8 @@ namespace Core.ApplicationServices.Contract
 
         public Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds)
         {
+            //TODO: Use the "Modify" helper to save som space checking access and loading from db
+            //TODO: Add transaction
             var contract = _repository.GetById(contractId);
 
             if (contract == null)
@@ -330,7 +332,7 @@ namespace Core.ApplicationServices.Contract
                 return Result<ItContract, OperationError>.Success(contract);
             });
         }
-
+        //TODO: Change result to Maybe<OperationError>
         public Result<ItContract, OperationError> RemoveContractResponsibleUnit(int contractId)
         {
             return Modify(contractId, contract =>
@@ -342,6 +344,7 @@ namespace Core.ApplicationServices.Contract
 
         private void DeleteEconomyStream(EconomyStream economyStream)
         {
+            //TODO: Call it directly in the code - only used one place
             _economyStreamRepository.DeleteWithReferencePreload(economyStream);
         }
 
