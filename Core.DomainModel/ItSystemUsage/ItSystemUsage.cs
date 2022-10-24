@@ -628,6 +628,7 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
+        //TODO: Could be an extension method but this is also ok
         public Maybe<OperationError> RemoveOrganizationalUsage()
         {
             return UpdateOrganizationalUsage(GetUsedByOrganizationUnits(), Maybe<OrganizationUnit>.None);
@@ -641,7 +642,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             UsedBy.Remove(selectedUnit);
             var relevantUnits = GetUsedByOrganizationUnits();
-            return UpdateOrganizationalUsage(relevantUnits, ResponsibleUsage.OrganizationUnit);
+            return UpdateOrganizationalUsage(relevantUnits, ResponsibleUsage.OrganizationUnit); //TODO: Better just call the method and modify the parameters because this order of things breaks the code if the current responsible is removed as relevant.
         }
 
         public Maybe<OperationError> UpdateKLEDeviations(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)

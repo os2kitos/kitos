@@ -858,7 +858,7 @@ namespace Core.DomainModel.ItContract
         {
             var stream = economyStreams.FirstOrDefault(x => x.Id == id);
             if (stream == null)
-                return new OperationError(OperationFailure.NotFound);
+                return new OperationError(OperationFailure.NotFound); //TODO: Also a message here
 
             economyStreams.Remove(stream);
             return stream;
