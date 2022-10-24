@@ -10,6 +10,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -344,9 +345,7 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                // WARNING: force loading so setting it to null will be tracked
-                var forceLoad = system.ResponsibleUsage;
-                system.ResponsibleUsage = null;
+                system.RemoveOrganizationalUsage();
                 return Result<ItSystemUsage, OperationError>.Success(system);
             });
         }
@@ -355,11 +354,7 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var relevantUnit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
-                if (relevantUnit == null)
-                    return new OperationError("Organization unit not found", OperationFailure.NotFound);
-
-                system.UsedBy.Remove(relevantUnit);
+                system.RemoveUsedByUnit(unitId);
                 return  Result<ItSystemUsage, OperationError>.Success(system);
             });
         }

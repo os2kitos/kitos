@@ -44,7 +44,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IOptionsService<ItContract, PaymentFreqencyType>> _paymentFreqencyOptionsServiceMock;
         private readonly Mock<IOptionsService<ItContract, OptionExtendType>> _optionExtendOptionsServiceMock;
         private readonly Mock<IOptionsService<ItContract, TerminationDeadlineType>> _terminationDeadlineOptionsServiceMock;
-        private readonly Mock<IEconomyStreamService> _economyStreamServiceMock;
+        private readonly Mock<IGenericRepository<EconomyStream>> _economyStreamRepositoryMock;
 
         public ItContractServiceTest()
         {
@@ -65,7 +65,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
             _optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
             _terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
-            _economyStreamServiceMock = new Mock<IEconomyStreamService>();
+            _economyStreamRepositoryMock = new Mock<IGenericRepository<EconomyStream>>();
 
             _sut = new ItContractService(
                 _contractRepository.Object,
@@ -85,7 +85,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _paymentFreqencyOptionsServiceMock.Object,
                 _optionExtendOptionsServiceMock.Object,
                 _terminationDeadlineOptionsServiceMock.Object,
-                _economyStreamServiceMock.Object);
+                _economyStreamRepositoryMock.Object);
         }
 
         [Fact]
@@ -139,8 +139,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectAllowDeleteReturns(itContract, true);
 
             var economyStreams = itContract.ExternEconomyStreams.Concat(itContract.InternEconomyStreams).ToList();
-            _economyStreamServiceMock.Setup(x => x.GetEconomyStreams(itContract)).Returns(economyStreams);
-            _economyStreamServiceMock.Setup(x => x.DeleteRange(economyStreams)).Returns(Maybe<OperationError>.None);
+            //_economyStreamServiceMock.Setup(x => x.GetEconomyStreams(itContract)).Returns(economyStreams);
+            //_economyStreamServiceMock.Setup(x => x.DeleteRange(economyStreams)).Returns(Maybe<OperationError>.None);
 
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _referenceService.Setup(x => x.DeleteByContractId(contractId)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new List<ExternalReference>()));
@@ -150,7 +150,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Ok);
-            _economyStreamServiceMock.Verify(x => x.DeleteRange(economyStreams), Times.Once);
+            //_economyStreamServiceMock.Verify(x => x.DeleteRange(economyStreams), Times.Once);
             _contractRepository.Verify(x => x.DeleteContract(itContract), Times.Once);
             _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<ItContract>>(cd => cd.Entity == itContract)), Times.Once);
             _referenceService.Verify(x => x.DeleteByContractId(contractId), Times.Once);
@@ -598,11 +598,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private void ExpectGetContractReturns(int contractId, ItContract itContract)
         {
             _contractRepository.Setup(x => x.GetById(contractId)).Returns(itContract);
-        }
-
-        private void ExpectGetEconomyStreamsReturns(ItContract itContract, IEnumerable<EconomyStream> economyStreams)
-        {
-            _economyStreamServiceMock.Setup(x => x.GetEconomyStreams(itContract)).Returns(economyStreams);
         }
 
         /// <summary>

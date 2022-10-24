@@ -41,7 +41,7 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, PaymentFreqencyType> _paymentFrequencyOptionsService;
         private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
         private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
-        private readonly IEconomyStreamService _economyStreamService;
+        private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
 
         public ItContractService(
             IItContractRepository repository,
@@ -61,7 +61,7 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
             IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
             IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService, 
-            IEconomyStreamService economyStreamService)
+            IGenericRepository<EconomyStream> economyStreamRepository)
         {
             _repository = repository;
             _referenceService = referenceService;
@@ -80,7 +80,7 @@ namespace Core.ApplicationServices.Contract
             _paymentFrequencyOptionsService = paymentFrequencyOptionsService;
             _optionExtendOptionsService = optionExtendOptionsService;
             _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
-            _economyStreamService = economyStreamService;
+            _economyStreamRepository = economyStreamRepository;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -121,6 +121,37 @@ namespace Core.ApplicationServices.Contract
             return Result<IQueryable<ItContract>, OperationError>.Success(contracts);
         }
 
+        public Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds)
+        {
+            var contract = _repository.GetById(contractId);
+
+            if (contract == null)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+
+            if (!_authorizationContext.AllowModify(contract))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            var economyStreamsToDelete = new List<EconomyStream>();
+            foreach (var paymentId in paymentIds)
+            {
+                var result = contract.RemoveEconomyStream(paymentId, isInternal);
+                if(result.Failed)
+                    return result.Error;
+
+                economyStreamsToDelete.Add(result.Value);
+            }
+
+            _economyStreamRepository.RemoveRange(economyStreamsToDelete);
+            _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
+            _economyStreamRepository.Save();
+
+            return Maybe<OperationError>.None;
+        }
+
         public Result<ItContract, OperationFailure> Delete(int id)
         {
             var contract = _repository.GetById(id);
@@ -139,14 +170,12 @@ namespace Core.ApplicationServices.Contract
             try
             {
                 //Delete the economy streams to prevent them from being orphaned
-                var economyStreams = _economyStreamService.GetEconomyStreams(contract);
-                var deleteEconomyStreamsResult = _economyStreamService.DeleteRange(economyStreams);
-                if (deleteEconomyStreamsResult.HasValue)
+                foreach (var economyStream in contract.GetAllPayments())
                 {
-                    transaction.Rollback();
-                    return deleteEconomyStreamsResult.Value.FailureType;
+                    DeleteEconomyStream(economyStream);
                 }
-
+                _economyStreamRepository.Save();
+                
                 //Delete the contract
                 var deleteByContractId = _referenceService.DeleteByContractId(id);
                 if (deleteByContractId.Failed)
@@ -306,10 +335,14 @@ namespace Core.ApplicationServices.Contract
         {
             return Modify(contractId, contract =>
             {
-                contract.ResponsibleOrganizationUnit = null;
-                contract.ResponsibleOrganizationUnitId = null;
+                contract.ResetResponsibleOrganizationUnit();
                 return Result<ItContract, OperationError>.Success(contract);
             });
+        }
+
+        private void DeleteEconomyStream(EconomyStream economyStream)
+        {
+            _economyStreamRepository.DeleteWithReferencePreload(economyStream);
         }
 
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)

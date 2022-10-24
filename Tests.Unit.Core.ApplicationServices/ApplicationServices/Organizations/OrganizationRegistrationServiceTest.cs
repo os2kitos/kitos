@@ -84,8 +84,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectAllowReadsReturns(unit, true);
 
             ExpectGetContractsByResponsibleUnitIdReturns(unit.Id, contractList.AsQueryable());
-            ExpectGetExternalEconomyStreamsReturns(contract, unit.Id, contract.ExternEconomyStreams);
-            ExpectGetInternalEconomyStreamsReturns(contract, unit.Id, contract.InternEconomyStreams);
             
             ExpectGetSystemsByResponsibleUnitIdReturns(unit.Id, systemList);
             ExpectGetSystemsByRelevantUnitIdReturns(unit.Id, systemList);
@@ -93,8 +91,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var result = _sut.GetOrganizationRegistrations(unit.Id);
 
             Assert.False(result.Failed);
-            var registrations = result.Value.ToList();
-            var roles = registrations.Where(x => x.Type == OrganizationRegistrationType.Roles).ToList();
+            var registrations = result.Value;
+            /*var roles = registrations.Where(x => x.Type == OrganizationRegistrationType.Roles).ToList();
             var externalPayments = registrations.Where(x => x.Type == OrganizationRegistrationType.ExternalPayments).ToList();
             var internalPayments = registrations.Where(x => x.Type == OrganizationRegistrationType.InternalPayments).ToList();
             var contractRegistrations = registrations.Where(x => x.Type == OrganizationRegistrationType.ContractRegistrations).ToList();
@@ -121,7 +119,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             Assert.Single(relevantSystems);
             Assert.Contains(system.Id, relevantSystems.Select(x => x.Id));
-            Assert.Contains(system.LocalCallName, relevantSystems.Select(x => x.Text));
+            Assert.Contains(system.LocalCallName, relevantSystems.Select(x => x.Text));*/
         }
 
         [Fact]
@@ -176,7 +174,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             ExpectResolveUuidReturns(unitId, Maybe<Guid>.None);
 
-            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new List<OrganizationRegistrationChangeParameters>());
+            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new OrganizationRegistrationChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
             Assert.Equal("Organization id is invalid", result.Value.Message);
@@ -192,7 +190,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectResolveUuidReturns(unitId, unitUuid);
             ExpectGetOrganizationUnitReturns(unitUuid, operationError);
 
-            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new List<OrganizationRegistrationChangeParameters>());
+            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new OrganizationRegistrationChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
             Assert.Equal(operationError.Message, result.Value.Message);
@@ -209,52 +207,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectGetOrganizationUnitReturns(unitUuid, unit);
             ExpectAllowDeleteReturns(unit, false);
 
-            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new List<OrganizationRegistrationChangeParameters>());
-            Assert.True(result.HasValue);
-            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
-        }
-
-        [Fact]
-        public void DeleteSingleOrganizationRegistration_Returns_BadInput()
-        {
-            var unitId = A<int>();
-
-            ExpectResolveUuidReturns(unitId, Maybe<Guid>.None);
-
-            var result = _sut.DeleteSingleOrganizationRegistration(unitId, new OrganizationRegistrationChangeParameters(A<int>(), A<OrganizationRegistrationType>()));
-            Assert.True(result.HasValue);
-            Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
-            Assert.Equal("Organization id is invalid", result.Value.Message);
-        }
-
-        [Fact]
-        public void DeleteSingleOrganizationRegistration_Returns_NotFound()
-        {
-            var unitId = A<int>();
-            var unitUuid = A<Guid>();
-            var operationError = new OperationError("Organization not found", OperationFailure.NotFound);
-
-            ExpectResolveUuidReturns(unitId, unitUuid);
-            ExpectGetOrganizationUnitReturns(unitUuid, operationError);
-
-            var result = _sut.DeleteSingleOrganizationRegistration(unitId, new OrganizationRegistrationChangeParameters(A<int>(), A<OrganizationRegistrationType>()));
-            Assert.True(result.HasValue);
-            Assert.Equal(operationError.FailureType, result.Value.FailureType);
-            Assert.Equal(operationError.Message, result.Value.Message);
-        }
-
-        [Fact]
-        public void DeleteSingleOrganizationRegistration_Returns_Forbidden()
-        {
-            var unitId = A<int>();
-            var unitUuid = A<Guid>();
-            var unit = new OrganizationUnit() {Id = unitId, Uuid = unitUuid};
-
-            ExpectResolveUuidReturns(unitId, unitUuid);
-            ExpectGetOrganizationUnitReturns(unitUuid, unit);
-            ExpectAllowDeleteReturns(unit, false);
-
-            var result = _sut.DeleteSingleOrganizationRegistration(unitId, new OrganizationRegistrationChangeParameters(A<int>(), A<OrganizationRegistrationType>()));
+            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new OrganizationRegistrationChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
@@ -270,7 +223,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectResolveUuidReturns(unitId, isUnitValid ? A<Guid>() :Maybe<Guid>.None);
             ExpectResolveUuidReturns(targetUnitId, isTargetUnitValid ? A<Guid>() : Maybe<Guid>.None);
 
-            var result = _sut.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, new List<OrganizationRegistrationChangeParameters>());
+            var result = _sut.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, new OrganizationRegistrationChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
             Assert.Equal(expectedMessage, result.Value.Message);
@@ -304,7 +257,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 throw new Exception("Invalid data");
             }
             
-            var result = _sut.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, new List<OrganizationRegistrationChangeParameters>());
+            var result = _sut.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, new OrganizationRegistrationChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
             Assert.Equal(operationError.Message, result.Value.Message);
@@ -428,16 +381,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void ExpectGetContractsByResponsibleUnitIdReturns(int unitId, IEnumerable<ItContract> result)
         {
             _contractServiceMock.Setup(x => x.GetContractsByResponsibleUnitId(unitId)).Returns(result);
-        }
-
-        private void ExpectGetExternalEconomyStreamsReturns(ItContract contract, int unitId, IEnumerable<EconomyStream> result)
-        {
-            _economyStreamServiceMock.Setup(x => x.GetExternalEconomyStreamsByUnitId(contract, unitId)).Returns(result);
-        }
-
-        private void ExpectGetInternalEconomyStreamsReturns(ItContract contract, int unitId, IEnumerable<EconomyStream> result)
-        {
-            _economyStreamServiceMock.Setup(x => x.GetInternalEconomyStreamsByUnitId(contract, unitId)).Returns(result);
         }
 
         private void ExpectGetSystemsByRelevantUnitIdReturns(int unitId, IEnumerable<ItSystemUsage> result)

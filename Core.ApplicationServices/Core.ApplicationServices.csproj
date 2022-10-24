@@ -151,6 +151,8 @@
     <Compile Include="Model\Organizations\OrganizationRegistrationChangeParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationRegistrationType.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
+    <Compile Include="Model\Organizations\PaymentChangeParameters.cs" />
+    <Compile Include="Model\Organizations\PaymentRegistrationDetails.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />

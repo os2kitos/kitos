@@ -11,6 +11,7 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
+using System.Diagnostics.Contracts;
 
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -829,6 +830,38 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> AddExternalEconomyStream(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
         {
             return AddEconomyStream(optionalOrganizationUnitUuid, acquisition, operation, other, accountingEntry, auditStatus, auditDate, note, false);
+        }
+
+        public IEnumerable<EconomyStream> GetAllPayments()
+        {
+            return ExternEconomyStreams.ToList().Concat(InternEconomyStreams.ToList());
+        }
+
+        public IEnumerable<EconomyStream> GetInternalPaymentsForUnit(int unitId)
+        {
+            return InternEconomyStreams.Where(x => x.OrganizationUnitId == unitId).ToList();
+        }
+
+        public IEnumerable<EconomyStream> GetExternalPaymentsForUnit(int unitId)
+        {
+            return ExternEconomyStreams.Where(x => x.OrganizationUnitId == unitId).ToList();
+        }
+
+        public Result<EconomyStream, OperationError> RemoveEconomyStream(int id, bool isInternal)
+        {
+            return isInternal 
+                ? RemoveSelectedEconomyStream(id, InternEconomyStreams) 
+                : RemoveSelectedEconomyStream(id, ExternEconomyStreams);
+        }
+
+        private static Result<EconomyStream, OperationError> RemoveSelectedEconomyStream(int id, ICollection<EconomyStream> economyStreams)
+        {
+            var stream = economyStreams.FirstOrDefault(x => x.Id == id);
+            if (stream == null)
+                return new OperationError(OperationFailure.NotFound);
+
+            economyStreams.Remove(stream);
+            return stream;
         }
 
         private Maybe<OperationError> AddEconomyStream(

@@ -11,12 +11,12 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class OrganizationRegistrationHelper
     {
-        public static async Task<List<OrganizationRegistrationDetails>> GetRegistrationsAsync(int unitId, Cookie optionalLogin = null)
+        public static async Task<OrganizationRegistrationDTO> GetRegistrationsAsync(int unitId, Cookie optionalLogin = null)
         {
             using var response = await SendGetRegistrationsAsync(unitId, optionalLogin);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsKitosApiResponseAsync<List<OrganizationRegistrationDetails>>();
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<OrganizationRegistrationDTO>();
         }
         public static async Task<HttpResponseMessage> SendGetRegistrationsAsync(int unitId, Cookie optionalLogin = null)
         {
@@ -26,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
         }
 
-        public static async Task DeleteSelectedRegistrationsAsync(int unitId, IEnumerable<ChangeOrganizationRegistrationRequest> body, Cookie optionalLogin = null)
+        public static async Task DeleteSelectedRegistrationsAsync(int unitId, ChangeOrganizationRegistrationRequest body, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organization-registrations/{unitId}");

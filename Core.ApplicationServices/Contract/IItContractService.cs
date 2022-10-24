@@ -30,5 +30,6 @@ namespace Core.ApplicationServices.Contract
         Result<ItContract, OperationError> TransferContractResponsibleUnit(int targetUnitId, int contractId);
         Result<ItContract, OperationError> RemoveContractResponsibleUnit(int contractId);
         IEnumerable<ItContract> GetContractsByResponsibleUnitId(int unitId);
+        Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds);
     }
 }

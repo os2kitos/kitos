@@ -628,6 +628,22 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
+        public Maybe<OperationError> RemoveOrganizationalUsage()
+        {
+            return UpdateOrganizationalUsage(GetUsedByOrganizationUnits(), Maybe<OrganizationUnit>.None);
+        }
+
+        public Maybe<OperationError> RemoveUsedByUnit(int unitId)
+        {
+            var selectedUnit = UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
+            if (selectedUnit == null)
+                return new OperationError(OperationFailure.NotFound);
+
+            UsedBy.Remove(selectedUnit);
+            var relevantUnits = GetUsedByOrganizationUnits();
+            return UpdateOrganizationalUsage(relevantUnits, ResponsibleUsage.OrganizationUnit);
+        }
+
         public Maybe<OperationError> UpdateKLEDeviations(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)
         {
             if (additions == null)
@@ -872,6 +888,11 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             return new ItSystemUsageValidationResult(errors);
+        }
+
+        private IEnumerable<OrganizationUnit> GetUsedByOrganizationUnits()
+        {
+            return UsedBy.Select(x => x.OrganizationUnit).ToList();
         }
 
         private IEnumerable<ItSystemUsageValidationError> CheckDatesValidity(DateTime todayReference)

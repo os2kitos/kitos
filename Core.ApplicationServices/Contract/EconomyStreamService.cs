@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -28,7 +29,15 @@ namespace Core.ApplicationServices.Contract
         {
             var economyStream = _economyRepository.GetByKey(id);
 
-            DeleteEconomyStream(economyStream);
+            if (economyStream == null)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+            if (!_authorizationContext.AllowDelete(economyStream))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            _economyRepository.DeleteWithReferencePreload(economyStream);
             _economyRepository.Save();
 
             return Maybe<OperationError>.None;
@@ -86,28 +95,6 @@ namespace Core.ApplicationServices.Contract
             _economyRepository.Save();
 
             return Maybe<OperationError>.None;
-        }
-
-        public IEnumerable<EconomyStream> GetEconomyStreams(ItContract contract)
-        {
-            return contract.ExternEconomyStreams.ToList()
-                .Concat(contract.InternEconomyStreams.ToList());
-        }
-
-        public IEnumerable<EconomyStream> GetInternalEconomyStreamsByUnitId(ItContract contract, int unitId)
-        {
-            return contract
-                .InternEconomyStreams
-                .Where(x => x.OrganizationUnitId == unitId)
-                .ToList();
-        }
-
-        public IEnumerable<EconomyStream> GetExternalEconomyStreamsByUnitId(ItContract contract, int unitId)
-        {
-            return contract
-                .ExternEconomyStreams
-                .Where(x => x.OrganizationUnitId == unitId)
-                .ToList();
         }
 
         private Maybe<OperationError> DeleteEconomyStream(EconomyStream entity)
