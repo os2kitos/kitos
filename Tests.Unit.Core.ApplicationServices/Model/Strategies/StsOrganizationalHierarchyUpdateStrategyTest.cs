@@ -163,7 +163,32 @@ namespace Tests.Unit.Core.Model.Strategies
         [Fact]
         public void ComputeUpdate_Detects_Renamed_OrganizationUnits()
         {
-            throw new NotImplementedException("yet");
+            //Arrange
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var randomItemToRename = root
+                .FlattenHierarchy()
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .RandomItem();
+
+            var externalTree = ConvertToExternalTree(root);
+
+            var expectedNewName = randomItemToRename.Name; //as converted
+            var expectedOldNAme = A<string>();
+            randomItemToRename.Name = expectedOldNAme; //Rename the local item to enforce name change detection
+
+            //Act
+            var consequences = _sut.ComputeUpdate(externalTree);
+
+            //Assert
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+            var (affectedUnit, oldName, newName) = Assert.Single(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Same(randomItemToRename, affectedUnit);
+            Assert.Equal(expectedOldNAme, oldName);
+            Assert.Equal(expectedNewName, newName);
         }
 
         [Fact]
