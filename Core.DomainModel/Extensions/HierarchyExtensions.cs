@@ -7,8 +7,21 @@ namespace Core.DomainModel.Extensions
 {
     public static class HierarchyExtensions
     {
+
+        public static bool IsLeaf<TEntity>(this TEntity entity)
+            where TEntity : class, IHierarchy<TEntity>
+        {
+            return entity.Children.Any() == false;
+        }
+
+        public static bool IsRoot<TEntity>(this TEntity entity)
+            where TEntity : class, IHierarchy<TEntity>
+        {
+            return entity.Parent == null;
+        }
+
         /// <summary>
-        /// Based on the current root, returns a collection containing the current root as well as nodes in the entire subtree and the encestry
+        /// Based on the current root, returns a collection containing the current root as well as nodes in the entire subtree and the ancestry
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
@@ -56,14 +69,15 @@ namespace Core.DomainModel.Extensions
             //Continue until the root has been located
             while (true)
             {
-                if (currentRoot.Parent == null)
+                var currentParent = currentRoot.Parent;
+                if (currentParent == null)
                 {
                     yield break;
                 }
 
-                yield return currentRoot.Parent;
+                yield return currentParent;
 
-                currentRoot = currentRoot.Parent;
+                currentRoot = currentParent;
             }
         }
 
@@ -74,17 +88,18 @@ namespace Core.DomainModel.Extensions
             //Continue until the root has been located
             while (true)
             {
-                if (currentRoot.Parent == null)
+                var currentParent = currentRoot.Parent;
+                if (currentParent == null)
                 {
                     return Maybe<TEntity>.None;
                 }
 
-                if (condition(currentRoot.Parent))
+                if (condition(currentParent))
                 {
-                    return currentRoot.Parent;
+                    return currentParent;
                 }
 
-                currentRoot = currentRoot.Parent;
+                currentRoot = currentParent;
             }
         }
     }

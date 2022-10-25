@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.DomainModel.Extensions;
@@ -26,7 +27,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
         private int GetNewOrgUnitId() => _nextOrgUnitId++;
 
-        public void PrepareConnectedOrganization()
+        private void PrepareConnectedOrganization()
         {
             _organization.StsOrganizationConnection = new StsOrganizationConnection
             {
@@ -75,7 +76,7 @@ namespace Tests.Unit.Core.Model.Strategies
             return unit;
         }
 
-        [Fact]
+        [Fact, Description("Since it is an update strategy it is a programmers error to invoke it on an unconnected organization")]
         public void ComputeUpdate_Throws_If_Organization_Is_Not_Connected()
         {
             //Arrange
@@ -85,7 +86,7 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Throws<InvalidOperationException>(() => _sut.ComputeUpdate(externalOrganizationUnit));
         }
 
-        [Fact]
+        [Fact, Description("Ensures that change sets that contain no changes will not impact kitos")]
         public void ComputeUpdate_Detects_No_External_Changes()
         {
             //Arrange
@@ -105,7 +106,7 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
         }
 
-        [Fact]
+        [Fact, Description("Verifies that additions in the external hierarchy is detected correctly")]
         public void ComputeUpdate_Detects_New_OrganizationUnits()
         {
             //Arrange
@@ -191,13 +192,59 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(expectedNewName, newName);
         }
 
-        [Fact]
+        [Fact, Description("Verifies if we detect if an existing unit has been moved to another existing unit")]
         public void ComputeUpdate_Detects_Units_Moved_To_Existing_Parent()
         {
-            throw new NotImplementedException("yet");
+            //Arrange
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var randomLeafWhichMustBeMovedToRoot = root
+                .FlattenHierarchy()
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .Where(x => x.IsLeaf())
+                .RandomItem();
+
+            var expectedSubTree = CreateOrganizationUnit(
+                OrganizationUnitOrigin.STS_Organisation,
+                new[]
+                {
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                }
+            );
+
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                if (current == randomLeafWhichMustBeMovedToRoot.Parent)
+                {
+                    //Remove from the current parent
+                    return currentChildren.Where(child => child != randomLeafWhichMustBeMovedToRoot).ToList();
+                }
+
+                if (current.IsRoot())
+                {
+                    //Move to the root
+                    return currentChildren.Append(randomLeafWhichMustBeMovedToRoot).ToList();
+                }
+
+                return currentChildren;
+            });
+
+            //Act
+            var consequences = _sut.ComputeUpdate(externalTree);
+
+            //Assert
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+
+            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
+            Assert.Equal(randomLeafWhichMustBeMovedToRoot, movedUnit);
+            Assert.Equal(movedUnit.Parent, oldParent);
+            Assert.Equal(externalTree, newParent);
         }
 
-        [Fact]
+        [Fact, Description("Verifies if we detect if an existing unit has been moved one of the new units")]
         public void ComputeUpdate_Detects_Units_Moved_To_Newly_Added_Parent()
         {
             throw new NotImplementedException("yet");

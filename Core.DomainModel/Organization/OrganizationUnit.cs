@@ -150,7 +150,7 @@ namespace Core.DomainModel.Organization
         {
             if (Origin == OrganizationUnitOrigin.Kitos)
             {
-                throw new InvalidOperationException("Alrady a kitos unit");
+                throw new InvalidOperationException("Already a KITOS unit");
             }
 
             Origin = OrganizationUnitOrigin.Kitos;
