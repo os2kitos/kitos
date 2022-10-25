@@ -213,7 +213,9 @@ namespace Core.DomainModel.Organization
                     throw new ArgumentOutOfRangeException();
             }
 
-            return strategy.ComputeUpdate(root, levelsIncluded);
+            var filteredTree = root.Copy(levelsIncluded);
+
+            return strategy.ComputeUpdate(filteredTree);
         }
 
         public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)

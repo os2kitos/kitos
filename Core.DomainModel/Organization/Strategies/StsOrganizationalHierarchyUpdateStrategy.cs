@@ -1,5 +1,4 @@
-﻿using Core.Abstractions.Types;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Extensions;
@@ -15,7 +14,7 @@ namespace Core.DomainModel.Organization.Strategies
             _organization = organization;
         }
 
-        public OrganizationTreeUpdateConsequences ComputeUpdate(ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        public OrganizationTreeUpdateConsequences ComputeUpdate(ExternalOrganizationUnit root)
         {
             var currentTreeByUuid = _organization
                 .OrgUnits
@@ -28,7 +27,6 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             var importedTreeByUuid = root
-                .Copy(levelsIncluded)
                 .Flatten()
                 .ToDictionary(x => x.Uuid);
 
@@ -61,7 +59,7 @@ namespace Core.DomainModel.Organization.Strategies
 
                 //Moving parent
                 var importedParent = importedTreeToParent[commonKey];
-                if (importedParent.Uuid != current.Parent?.ExternalOriginUuid.GetValueOrDefault())
+                if (importedParent?.Uuid != current.Parent?.ExternalOriginUuid.GetValueOrDefault())
                 {
                     parentChanges.Add((current, current.Parent, importedParent));
                 }
@@ -134,7 +132,7 @@ namespace Core.DomainModel.Organization.Strategies
                 parentChanges);
         }
       
-        public OrganizationTreeUpdateConsequences PerformUpdate(ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        public OrganizationTreeUpdateConsequences PerformUpdate(ExternalOrganizationUnit root)
         {
             throw new System.NotImplementedException();
         }

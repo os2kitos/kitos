@@ -1,10 +1,8 @@
-﻿using Core.Abstractions.Types;
-
-namespace Core.DomainModel.Organization.Strategies
+﻿namespace Core.DomainModel.Organization.Strategies
 {
     public interface IExternalOrganizationalHierarchyUpdateStrategy
     {
-        OrganizationTreeUpdateConsequences ComputeUpdate(ExternalOrganizationUnit root, Maybe<int> levelsIncluded);
-        OrganizationTreeUpdateConsequences PerformUpdate(ExternalOrganizationUnit root, Maybe<int> levelsIncluded);
+        OrganizationTreeUpdateConsequences ComputeUpdate(ExternalOrganizationUnit root);
+        OrganizationTreeUpdateConsequences PerformUpdate(ExternalOrganizationUnit root);
     }
 }
