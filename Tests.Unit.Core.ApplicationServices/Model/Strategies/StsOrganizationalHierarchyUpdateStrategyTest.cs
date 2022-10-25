@@ -204,14 +204,6 @@ namespace Tests.Unit.Core.Model.Strategies
                 .Where(x => x.IsLeaf())
                 .RandomItem();
 
-            var expectedSubTree = CreateOrganizationUnit(
-                OrganizationUnitOrigin.STS_Organisation,
-                new[]
-                {
-                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
-                }
-            );
-
             var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
             {
                 if (current == randomLeafWhichMustBeMovedToRoot.Parent)
@@ -247,7 +239,64 @@ namespace Tests.Unit.Core.Model.Strategies
         [Fact, Description("Verifies if we detect if an existing unit has been moved one of the new units")]
         public void ComputeUpdate_Detects_Units_Moved_To_Newly_Added_Parent()
         {
-            throw new NotImplementedException("yet");
+            //Arrange
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var randomLeafMovedToNewlyImportedItem = root
+                .FlattenHierarchy()
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .Where(x => x.IsLeaf())
+                .RandomItem();
+
+            var newItem = CreateOrganizationUnit(
+                OrganizationUnitOrigin.STS_Organisation,
+                new[]
+                {
+                    //NOTE: Make a copy to not modify the existing object (children in the list will get the parent in scope and this affects detection)
+                    new OrganizationUnit
+                    {
+                        Id = randomLeafMovedToNewlyImportedItem.Id,
+                        Organization = _organization,
+                        Origin = randomLeafMovedToNewlyImportedItem.Origin,
+                        ExternalOriginUuid = randomLeafMovedToNewlyImportedItem.ExternalOriginUuid,
+                        Name = randomLeafMovedToNewlyImportedItem.Name
+                    }
+                }
+            );
+            newItem.Parent = root;
+
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                if (current == randomLeafMovedToNewlyImportedItem.Parent)
+                {
+                    //Remove from the current parent
+                    return currentChildren.Where(child => child != randomLeafMovedToNewlyImportedItem).ToList();
+                }
+
+                if (current.IsRoot())
+                {
+                    //Add the new item to the root and the new item contains the moved item
+                    return currentChildren.Append(newItem).ToList();
+                }
+
+                return currentChildren;
+            });
+
+            //Act
+            var consequences = _sut.ComputeUpdate(externalTree);
+
+            //Assert
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            var (unitToAdd, parent) = Assert.Single(consequences.AddedExternalOrganizationUnits);
+            Assert.Equal(newItem.ExternalOriginUuid.GetValueOrDefault(), unitToAdd.Uuid);
+            Assert.Equal(root.ExternalOriginUuid.GetValueOrDefault(), parent.Uuid);
+
+            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
+            Assert.Equal(randomLeafMovedToNewlyImportedItem, movedUnit);
+            Assert.Equal(movedUnit.Parent, oldParent);
+            Assert.Equal(unitToAdd.Uuid, newParent.Uuid);
         }
 
         [Fact]
@@ -270,7 +319,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
         private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>> customChildren = null)
         {
-            customChildren = customChildren ?? ((unit, existingChildren) => existingChildren);
+            customChildren ??= ((unit, existingChildren) => existingChildren);
 
             return new ExternalOrganizationUnit(
                 root.ExternalOriginUuid.GetValueOrDefault(),
