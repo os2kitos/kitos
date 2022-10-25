@@ -9,6 +9,7 @@ using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
 using Serilog;
+using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -79,70 +80,46 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude)
         {
-            using var transaction = _transactionManager.Begin();
-            var organizationResult = GetOrganizationWithImportPermission(organizationId);
-            if (organizationResult.Failed)
+            return Modify(organizationId, organization =>
             {
-                _logger.Warning("Failed while loading import org ({uuid}) with import permission. {errorCode}:{errorMessage}", organizationId, organizationResult.Error.FailureType, organizationResult.Error.Message.GetValueOrFallback("no-error"));
-                return organizationResult.Error;
-            }
+                return LoadOrganizationUnits(organization)
+                    .Match
+                    (
+                        importRoot =>
+                        {
+                            var error = organization.ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
+                            if (error.HasValue)
+                            {
+                                _logger.Error("Failed to import org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Value.FailureType, error.Value.Message.GetValueOrFallback(""));
+                                return new OperationError("Failed to import sub tree", OperationFailure.UnknownError);
+                            }
 
-            var organization = organizationResult.Value;
-
-            return LoadOrganizationUnits(organization)
-                .Match(root => CreateConnection(organization, root, levelsToInclude, transaction), error => error);
+                            return Maybe<OperationError>.None;
+                        },
+                        error => error
+                    );
+            });
         }
 
         public Maybe<OperationError> Disconnect(Guid organizationId)
         {
-            return
-                GetOrganizationWithImportPermission(organizationId)
-                    .Select(Disconnect)
-                    .Match
-                    (
-                        disconnectionResult => disconnectionResult,
-                        error => error
-                    );
+            return Modify(organizationId, organization =>
+            {
+                var result = organization.DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin.STS_Organisation);
+                if (result.Failed)
+                {
+                    return result.Error;
+                }
+
+                var disconnectionResult = result.Value;
+                foreach (var convertedUnit in disconnectionResult.ConvertedUnits)
+                {
+                    _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(convertedUnit));
+                }
+                return Maybe<OperationError>.None;
+            });
         }
 
-        private Maybe<OperationError> Disconnect(Organization organization)
-        {
-            using var transaction = _transactionManager.Begin();
-            var result = organization.DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin.STS_Organisation);
-            if (result.Failed)
-            {
-                transaction.Rollback();
-                return result.Error;
-            }
-
-            var disconnectionResult = result.Value;
-            foreach (var convertedUnit in disconnectionResult.ConvertedUnits)
-            {
-                _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(convertedUnit));
-            }
-            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
-            _databaseControl.SaveChanges();
-            transaction.Commit();
-            return Maybe<OperationError>.None;
-
-        }
-
-        private Maybe<OperationError> CreateConnection(Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude, IDatabaseTransaction transaction)
-        {
-
-            var error = organization.ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
-            if (error.HasValue)
-            {
-                _logger.Error("Failed to import org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Value.FailureType, error.Value.Message.GetValueOrFallback(""));
-                transaction.Rollback();
-                return new OperationError("Failed to import sub tree", OperationFailure.UnknownError);
-            }
-            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
-            _databaseControl.SaveChanges();
-            transaction.Commit();
-
-            return Maybe<OperationError>.None;
-        }
 
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {
@@ -178,6 +155,32 @@ namespace Core.ApplicationServices.Organizations
             }
 
             return root.Copy(levelsToInclude.Select(levels => levels - 1));
+        }
+
+        private Maybe<OperationError> Modify(Guid organizationUuid, Func<Organization, Maybe<OperationError>> mutate)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            var organizationResult = GetOrganizationWithImportPermission(organizationUuid);
+            if (organizationResult.Failed)
+            {
+                _logger.Warning("Failed while loading import org ({uuid}) with import permission. {errorCode}:{errorMessage}", organizationUuid, organizationResult.Error.FailureType, organizationResult.Error.Message.GetValueOrFallback("no-error"));
+                return organizationResult.Error;
+            }
+
+            var organization = organizationResult.Value;
+            var mutationError = mutate(organization);
+            if (mutationError.HasValue)
+            {
+                transaction.Rollback();
+                return mutationError;
+            }
+
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
+            _databaseControl.SaveChanges();
+            transaction.Commit();
+
+            return Maybe<OperationError>.None;
         }
     }
 }
