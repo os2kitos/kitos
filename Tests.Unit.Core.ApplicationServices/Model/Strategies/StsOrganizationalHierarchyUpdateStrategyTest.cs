@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.Strategies;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -103,22 +105,60 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
         }
 
-        //[Fact]
-        //public void ComputeUpdate_Detects_New_OrganizationUnits()
-        //{
-        //    //Arrange
-        //    PrepareConnectedOrganization();
-        //    var root = _organization.GetRoot();
+        [Fact]
+        public void ComputeUpdate_Detects_New_OrganizationUnits()
+        {
+            //Arrange
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var randomParentOfNewSubTree = root
+                .FlattenHierarchy()
+                .Skip(1) // Skip the root
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .RandomItem();
 
-        //    var externalTree = ConvertToExternalTree(root);
+            var expectedSubTree = CreateOrganizationUnit(
+                OrganizationUnitOrigin.STS_Organisation,
+                new[]
+                {
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                }
+            );
+            var expectedNewUnits = expectedSubTree.FlattenHierarchy().ToList();
+            var expectedChild = expectedNewUnits.Skip(1).Single();
 
-        //    //TODO: Convert all external units to
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                //Add the new sub tree if this is the parent of the new sub tree we expect
+                if (current == randomParentOfNewSubTree)
+                {
+                    return expectedSubTree
+                        .WrapAsEnumerable()
+                        .Concat(currentChildren);
+                }
 
-        //    var externalOrganizationUnit = new ExternalOrganizationUnit(A<Guid>(), A<string>(), new Dictionary<string, string>(), Array.Empty<ExternalOrganizationUnit>());
+                return currentChildren;
+            });
 
-        //    //Act + Assert
-        //    Assert.Throws<InvalidOperationException>(() => _sut.ComputeUpdate(externalOrganizationUnit));
-        //}
+            //Act
+            var consequences = _sut.ComputeUpdate(externalTree);
+
+            //Assert
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+
+            var addedUnits = consequences.AddedExternalOrganizationUnits.ToList();
+            Assert.Equal(2, addedUnits.Count);
+            Assert.Contains(addedUnits, unit => expectedNewUnits.Any(x => x.ExternalOriginUuid.GetValueOrDefault() == unit.unitToAdd.Uuid));
+
+            var addedRoot = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedSubTree.ExternalOriginUuid.GetValueOrDefault()));
+            Assert.Equal(randomParentOfNewSubTree.ExternalOriginUuid.GetValueOrDefault(), addedRoot.parent.Uuid);
+            var addedChild = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedChild.ExternalOriginUuid.GetValueOrDefault()));
+            Assert.Equal(addedRoot.unitToAdd, addedChild.parent);
+
+        }
 
         [Fact]
         public void ComputeUpdate_Detects_Renamed_OrganizationUnits()
@@ -156,8 +196,10 @@ namespace Tests.Unit.Core.Model.Strategies
             throw new NotImplementedException("yet");
         }
 
-        private ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root)
+        private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>> customChildren = null)
         {
+            customChildren = customChildren ?? ((unit, existingChildren) => existingChildren);
+
             return new ExternalOrganizationUnit(
                 root.ExternalOriginUuid.GetValueOrDefault(),
                 root.Name,
@@ -165,7 +207,8 @@ namespace Tests.Unit.Core.Model.Strategies
                 root
                     .Children
                     .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
-                    .Select(ConvertToExternalTree)
+                    .Transform(filteredChildren => customChildren(root, filteredChildren))
+                    .Select(child => ConvertToExternalTree(child, customChildren))
                     .ToList()
                 );
         }
