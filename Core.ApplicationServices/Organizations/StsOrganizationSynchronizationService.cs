@@ -87,7 +87,7 @@ namespace Core.ApplicationServices.Organizations
                     (
                         importRoot =>
                         {
-                            var error = organization.ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
+                            var error = organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
                             if (error.HasValue)
                             {
                                 _logger.Error("Failed to import org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Value.FailureType, error.Value.Message.GetValueOrFallback(""));

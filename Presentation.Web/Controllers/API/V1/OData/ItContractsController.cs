@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -9,7 +8,6 @@ using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Repositories.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -19,12 +17,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
     [PublicApi]
     public class ItContractsController : BaseEntityController<ItContract>
     {
-        private readonly IOrganizationUnitRepository _organizationUnitRepository;
-
-        public ItContractsController(IGenericRepository<ItContract> repository, IOrganizationUnitRepository organizationUnitRepository)
+        public ItContractsController(IGenericRepository<ItContract> repository)
             : base(repository)
         {
-            _organizationUnitRepository = organizationUnitRepository;
         }
 
         /// <summary>
@@ -60,29 +55,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
 
             var result = Repository.AsQueryable().ByOrganizationId(key);
-
-            return Ok(result);
-        }
-
-        [EnableQuery(MaxExpansionDepth = 3)]
-        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItContract>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
-        {
-            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(orgKey);
-            if (organizationDataReadAccessLevel < OrganizationDataReadAccessLevel.Public)
-            {
-                return Forbidden();
-            }
-
-            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey).ToList();
-
-            var result = Repository
-                .AsQueryable()
-                .ByOrganizationId(orgKey)
-                .Where(usage => usage.ResponsibleOrganizationUnitId != null && orgUnitTreeIds.Contains(usage.ResponsibleOrganizationUnitId.Value));
 
             return Ok(result);
         }
