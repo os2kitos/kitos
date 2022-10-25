@@ -23,11 +23,11 @@ namespace Presentation.Web.Controllers.API.V1
 
     public class OrganizationRegistrationController: BaseApiController
     {
-        private readonly IOrganizationRegistrationService _organizationRegistrationService;
+        private readonly IOrganizationUnitService _organizationUnitService;
 
-        public OrganizationRegistrationController(IOrganizationRegistrationService organizationRegistrationService)
+        public OrganizationRegistrationController(IOrganizationUnitService organizationUnitService)
         {
-            _organizationRegistrationService = organizationRegistrationService;
+            _organizationUnitService = organizationUnitService;
         }
 
         [HttpGet]
@@ -37,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetUnitRegistrations(int unitId)
         {
-            return _organizationRegistrationService.GetOrganizationRegistrations(unitId)
+            return _organizationUnitService.GetOrganizationRegistrations(unitId)
                 .Match
                 (
                     value => Ok(ToRegistrationDto(value)),
@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage RemoveSelectedUnitRegistrations(int unitId, [FromBody] ChangeOrganizationRegistrationRequest request)
         {
             var changeParameters = ToChangeParameters(request);
-            return _organizationRegistrationService.DeleteSelectedOrganizationRegistrations(unitId, changeParameters)
+            return _organizationUnitService.DeleteSelectedOrganizationRegistrations(unitId, changeParameters)
                 .Match(error => error.FailureType switch
                 {
                     OperationFailure.NotFound => NotFound(),
@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage RemoveSingleUnitRegistration(int unitId, [FromBody] ChangeOrganizationRegistrationRequest request)
         {
             var changeParameters = ToChangeParameters(request);
-            return _organizationRegistrationService.DeleteSingleOrganizationRegistration(unitId, changeParameters)
+            return _organizationUnitService.DeleteSingleOrganizationRegistration(unitId, changeParameters)
                 .Match(error => error.FailureType switch
                 {
                     OperationFailure.NotFound => NotFound(),
@@ -97,7 +97,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage DeleteUnitWithRegistrations(int unitId)
         {
-            return _organizationRegistrationService.DeleteUnitWithOrganizationRegistrations(unitId)
+            return _organizationUnitService.DeleteUnitWithOrganizationRegistrations(unitId)
                 .Match(error =>error.FailureType switch
                         {
                             OperationFailure.NotFound => NotFound(),
@@ -116,7 +116,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage TransferSelectedUnitRegistrations(int unitId, int targetUnitId, [FromBody] ChangeOrganizationRegistrationRequest request)
         {
             var changeParameters = ToChangeParameters(request);
-            return _organizationRegistrationService.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, changeParameters)
+            return _organizationUnitService.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, changeParameters)
                 .Match(error => error.FailureType switch
                 {
                     OperationFailure.NotFound => NotFound(),
@@ -143,7 +143,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return new PaymentRegistrationDTO()
             {
-                ContractId = details.ItContract.Id,
+                ItContract = details.ItContract.MapToNamedEntityDTO(),
                 InternalPayments = details.InternalPayments.Select(MapPaymentToNamedEntityDto).ToList(),
                 ExternalPayments = details.ExternalPayments.Select(MapPaymentToNamedEntityDto).ToList()
             };

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItContract
@@ -98,6 +99,12 @@ namespace Core.DomainModel.ItContract
         public EconomyStream()
         {
             
+        }
+
+        public void TransferEconomyStream(OrganizationUnit targetUnit)
+        {
+            OrganizationUnitId = targetUnit.Id;
+            OrganizationUnit = targetUnit;
         }
 
         public static EconomyStream CreateInternalEconomyStream(ItContract contract, OrganizationUnit optionalOrganizationUnit, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)

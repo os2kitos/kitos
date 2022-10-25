@@ -1,24 +1,29 @@
 ﻿module Kitos.Models.Api.Organization {
     export class OrganizationRegistrationDetailsDto {
-        id: number;
-        text: string;
-        type: OrganizationRegistrationOption;
-        objectId?: number;
-        objectName: string;
-        paymentIndex?: number;
+        itContractRegistrations: Generic.NamedEntity.NamedEntityDTO[];
+        organizationUnitRights: Generic.NamedEntity.NamedEntityDTO[];
+        payments: PaymentRegistrationDetailsDto[];
+        relevantSystems: Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
+        responsibleSystems: Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
+    }
+
+    export class PaymentRegistrationDetailsDto {
+        itContract: Generic.NamedEntity.NamedEntityDTO;
+        externalPayments: Generic.NamedEntity.NamedEntityDTO[];
+        internalPayments: Generic.NamedEntity.NamedEntityDTO[];
     }
 
     export class OrganizationRegistrationChangeRequest {
-        id: number;
-        type: OrganizationRegistrationOption;
+        itContractRegistrations: number[];
+        organizationUnitRights: number[];
+        paymentRegistrationDetails: PaymentRegistrationChangeRequest[];
+        relevantSystems: number[];
+        responsibleSystems: number[];
     }
 
-    export enum OrganizationRegistrationOption {
-        Roles = 0,
-        InternalPayments = 1,
-        ExternalPayments = 2,
-        ContractRegistrations = 3,
-        ResponsibleSystems = 4,
-        RelevantSystems = 5
+    export class PaymentRegistrationChangeRequest {
+        itContractId: number;
+        externalPayments: number[];
+        internalPayments: number[];
     }
 }

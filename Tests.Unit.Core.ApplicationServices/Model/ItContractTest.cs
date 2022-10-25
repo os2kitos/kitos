@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
@@ -844,6 +845,224 @@ namespace Tests.Unit.Core.Model
             Assert.True(result.Result);//If not enforced valid we expect the value to be false
             Assert.Equal(enforceValid, result.EnforcedValid);
             Assert.Empty(result.ValidationErrors);
+        }
+
+        [Fact]
+        public void Can_Get_All_Payments()
+        {
+            var externalEconomyId = A<int>();
+            var internalEconomyId = A<int>();
+            var contract = new ItContract()
+            {
+                ExternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = externalEconomyId
+                    }
+                },
+                InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = internalEconomyId
+                    }
+                }
+            };
+            const int expectedNumberOfPayments = 2;
+
+            var result = contract.GetAllPayments().ToList();
+
+            Assert.Equal(expectedNumberOfPayments, result.Count);
+            Assert.Contains(externalEconomyId, result.Select(x => x.Id));
+            Assert.Contains(internalEconomyId, result.Select(x => x.Id));
+        }
+
+        [Fact]
+        public void Can_Get_Internal_Payments_By_UnitId()
+        {
+            var internalEconomyId = A<int>();
+            var unitId = A<int>();
+            var contract = new ItContract()
+            {
+                InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = internalEconomyId,
+                        OrganizationUnitId = unitId
+                    },
+                    new()
+                    {
+                        Id = A<int>(),
+                        OrganizationUnitId = A<int>()
+                    }
+                }
+            };
+
+            var result = contract.GetInternalPaymentsForUnit(unitId).ToList();
+
+            Assert.Single(result);
+            Assert.Contains(internalEconomyId, result.Select(x => x.Id));
+            Assert.Contains(unitId, result.Select(x => x.OrganizationUnitId));
+        }
+
+        [Fact]
+        public void Can_Get_External_Payments_By_UnitId()
+        {
+            var externalEconomyId = A<int>();
+            var unitId = A<int>();
+            var contract = new ItContract()
+            {
+                ExternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = externalEconomyId,
+                        OrganizationUnitId = unitId
+                    },
+                    new()
+                    {
+                        Id = A<int>(),
+                        OrganizationUnitId = A<int>()
+                    }
+                }
+            };
+
+            var result = contract.GetExternalPaymentsForUnit(unitId).ToList();
+
+            Assert.Single(result);
+            Assert.Contains(externalEconomyId, result.Select(x => x.Id));
+            Assert.Contains(unitId, result.Select(x => x.OrganizationUnitId));
+        }
+
+        [Fact]
+        public void Can_Get_ExternalPayment_By_Id()
+        {
+            var id = A<int>();
+            var contract = new ItContract
+            {
+                ExternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = id,
+                    },
+                    new()
+                    {
+                        Id = A<int>(),
+                    }
+                }
+            };
+
+            var result = contract.GetPaymentById(id);
+
+            Assert.True(result.Ok);
+            Assert.Equal(id, result.Value.Id);
+        }
+
+        [Fact]
+        public void Can_Get_InternalPayment_By_Id()
+        {
+            var id = A<int>();
+            var contract = new ItContract
+            {
+                InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = id,
+                    },
+                    new()
+                    {
+                        Id = A<int>(),
+                    }
+                }
+            };
+
+            var result = contract.GetPaymentById(id);
+
+            Assert.True(result.Ok);
+            Assert.Equal(id, result.Value.Id);
+        }
+
+        [Fact]
+        public void Get_Payment_By_Id_Returns_NotFound()
+        {
+            var id = A<int>();
+            var contract = new ItContract
+            {
+                InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = A<int>(),
+                    }
+                },
+                ExternEconomyStreams= new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = A<int>(),
+                    }
+                }
+            };
+            var expectedErrorMessage = $"Payment with id: {id} not found";
+
+            var result = contract.GetPaymentById(id);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Assert.Equal(expectedErrorMessage, result.Error.Message);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Remove_EconomyStream(bool isInternal)
+        {
+            var id = A<int>();
+            var contract = new ItContract();
+            if (isInternal)
+            {
+                contract.InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = id,
+                    }
+                };
+            }
+            else
+            {
+                contract.ExternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = id,
+                    }
+                };
+            }
+
+            var result = contract.RemoveEconomyStream(id, isInternal);
+
+            Assert.True(result.Ok);
+            Assert.DoesNotContain(id, contract.ExternEconomyStreams.Select(x => x.Id));
+            Assert.DoesNotContain(id, contract.InternEconomyStreams.Select(x => x.Id));
+        }
+
+        [Fact]
+        public void Remove_EconomyStream_Returns_NotFound()
+        {
+            var id = A<int>();
+            var contract = new ItContract();
+            var expectedErrorMessage = $"EconomyStream with id: {id} was not found";
+
+            var result = contract.RemoveEconomyStream(id, A<bool>());
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Assert.Equal(expectedErrorMessage, result.Error.Message);
         }
     }
 }

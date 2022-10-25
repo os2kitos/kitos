@@ -185,9 +185,9 @@
     <Compile Include="Notification\IUserNotificationApplicationService.cs" />
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
     <Compile Include="Organizations\Handlers\HandleOrganizationBeingDeleted.cs" />
-    <Compile Include="Organizations\IOrganizationRegistrationService.cs" />
+    <Compile Include="Organizations\IOrganizationUnitService.cs" />
     <Compile Include="Organizations\IStsOrganizationSynchronizationService.cs" />
-    <Compile Include="Organizations\OrganizationRegistrationService.cs" />
+    <Compile Include="Organizations\OrganizationUnitService.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationService.cs" />
     <Compile Include="RightsHolders\BaseRightsHolderService.cs" />
     <Compile Include="RightsHolders\IItInterfaceRightsHolderService.cs" />

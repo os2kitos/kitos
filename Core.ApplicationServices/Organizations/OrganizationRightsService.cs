@@ -102,7 +102,6 @@ namespace Core.ApplicationServices.Organizations
                 if (!_authorizationContext.AllowDelete(unitRight))
                     return new OperationError("User is not allowed to perform this operation", OperationFailure.Forbidden);
                 
-
                 rightsToDelete.Add(unitRight);
             }
             var userIds = rightsToDelete.Select(x => x.UserId).ToList();
@@ -113,8 +112,6 @@ namespace Core.ApplicationServices.Organizations
                 _domainEvents.Raise(new AdministrativeAccessRightsChanged(userId));
             }
             _unitRightRepository.Save();
-
-
             transaction.Commit();
 
             return Maybe<OperationError>.None;
@@ -122,7 +119,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> TransferUnitRightsByIds(int targetUnitId, IEnumerable<int> rightIds)
         {
-            var userIds = new List<int>();
+            using var transaction = _transactionManager.Begin();
             foreach (var rightId in rightIds)
             {
                 var unitRight = _unitRightRepository.GetByKey(rightId);
@@ -138,16 +135,11 @@ namespace Core.ApplicationServices.Organizations
 
                 unitRight.ObjectId = targetUnitId;
 
-                userIds.Add(unitRight.UserId);
                 _unitRightRepository.Update(unitRight);
+                _domainEvents.Raise(new AdministrativeAccessRightsChanged(unitRight.UserId));
             }
             _unitRightRepository.Save();
-
-            foreach (var userId in userIds.Distinct())
-            {
-                _domainEvents.Raise(new AdministrativeAccessRightsChanged(userId));
-            }
-
+            transaction.Commit();
             return Maybe<OperationError>.None;
         }
 

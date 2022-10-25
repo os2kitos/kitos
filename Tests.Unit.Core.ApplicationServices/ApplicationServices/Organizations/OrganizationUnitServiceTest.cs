@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
@@ -8,8 +6,6 @@ using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Core.DomainServices;
@@ -19,106 +15,34 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.Organizations
 {
-    public class OrganizationRegistrationServiceTest : WithAutoFixture
+    public class OrganizationUnitServiceTest : WithAutoFixture
     {
-        private readonly OrganizationRegistrationService _sut;
+        private readonly OrganizationUnitService _sut;
 
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
-        private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
-        private readonly Mock<IItContractService> _contractServiceMock;
-        private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
-        private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
 
-        public OrganizationRegistrationServiceTest()
+        public OrganizationUnitServiceTest()
         {
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
-            _contractServiceMock = new Mock<IItContractService>();
-            _usageServiceMock = new Mock<IItSystemUsageService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
-            _orgUnitServiceMock = new Mock<IOrgUnitService>();
+            var organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
+            var contractServiceMock = new Mock<IItContractService>();
+            var usageServiceMock = new Mock<IItSystemUsageService>();
+            var orgUnitServiceMock = new Mock<IOrgUnitService>();
 
-            _sut = new OrganizationRegistrationService(
+            _sut = new OrganizationUnitService(
                 _identityResolverMock.Object,
                 _organizationServiceMock.Object,
-                _organizationRightsServiceMock.Object,
-                _contractServiceMock.Object,
-                _usageServiceMock.Object,
+                organizationRightsServiceMock.Object,
+                contractServiceMock.Object,
+                usageServiceMock.Object,
                 _authorizationContextMock.Object,
-                _orgUnitServiceMock.Object);
+                orgUnitServiceMock.Object);
         }
-
-        [Fact]
-        public void GetOrganizationRegistrations_Returns_Registrations()
-        {
-            var unit = CreateOrganizationUnit();
-            var unitUuid = A<Guid>();
-            var right = CreateOrganizationUnitRight(unit.Id);
-            right.Role = CreateOrganizationUnitRole();
-
-            var rights = new List<OrganizationUnitRight> { right };
-            unit.Rights = rights;
-            
-            var contract = CreateContract(unit.Id);
-            var contractList = new List<ItContract>() { contract };
-            var internalEconomyStream = new EconomyStream { Id = A<int>(), OrganizationUnitId = unit.Id };
-            var externalEconomyStream = new EconomyStream { Id = A<int>(), OrganizationUnitId = unit.Id };
-            contract.ExternEconomyStreams = new List<EconomyStream> { externalEconomyStream };
-            contract.InternEconomyStreams = new List<EconomyStream> { internalEconomyStream };
-            contract.ResponsibleOrganizationUnit = unit;
-
-            var system = CreateSystem(unit.Id);
-            var systemList = new List<ItSystemUsage> { system };
-            var relevantSystem = CreateItSystemUsageOrgUnitUsage(unit, system);
-            system.UsedBy = new List<ItSystemUsageOrgUnitUsage> { relevantSystem };
-            system.ResponsibleUsage = CreateItSystemUsageOrgUnitUsage(unit, system);
-
-            ExpectResolveUuidReturns(unit.Id, unitUuid);
-            ExpectGetOrganizationUnitReturns(unitUuid, unit);
-            ExpectAllowReadsReturns(unit, true);
-
-            ExpectGetContractsByResponsibleUnitIdReturns(unit.Id, contractList.AsQueryable());
-            
-            ExpectGetSystemsByResponsibleUnitIdReturns(unit.Id, systemList);
-            ExpectGetSystemsByRelevantUnitIdReturns(unit.Id, systemList);
-
-            var result = _sut.GetOrganizationRegistrations(unit.Id);
-
-            Assert.False(result.Failed);
-            var registrations = result.Value;
-            /*var roles = registrations.Where(x => x.Type == OrganizationRegistrationType.Roles).ToList();
-            var externalPayments = registrations.Where(x => x.Type == OrganizationRegistrationType.ExternalPayments).ToList();
-            var internalPayments = registrations.Where(x => x.Type == OrganizationRegistrationType.InternalPayments).ToList();
-            var contractRegistrations = registrations.Where(x => x.Type == OrganizationRegistrationType.ContractRegistrations).ToList();
-            var responsibleSystems = registrations.Where(x => x.Type == OrganizationRegistrationType.ResponsibleSystems).ToList();
-            var relevantSystems = registrations.Where(x => x.Type == OrganizationRegistrationType.RelevantSystems).ToList();
-
-            Assert.Single(roles);
-            Assert.Contains(right.Id, roles.Select(x => x.Id));
-            Assert.Contains(right.Role.Name, roles.Select(x => x.Text));
-
-            Assert.Single(externalPayments);
-            Assert.Contains(externalEconomyStream.Id, externalPayments.Select(x => x.Id));
-
-            Assert.Single(internalPayments);
-            Assert.Contains(internalEconomyStream.Id, internalPayments.Select(x => x.Id));
-
-            Assert.Single(contractRegistrations);
-            Assert.Contains(contract.Id, contractRegistrations.Select(x => x.Id));
-            Assert.Contains(contract.Name, contractRegistrations.Select(x => x.Text));
-
-            Assert.Single(responsibleSystems);
-            Assert.Contains(system.Id, responsibleSystems.Select(x => x.Id));
-            Assert.Contains(system.LocalCallName, responsibleSystems.Select(x => x.Text));
-
-            Assert.Single(relevantSystems);
-            Assert.Contains(system.Id, relevantSystems.Select(x => x.Id));
-            Assert.Contains(system.LocalCallName, relevantSystems.Select(x => x.Text));*/
-        }
-
+        
         [Fact]
         public void GetOrganizationRegistrations_Returns_BadInput()
         {
@@ -284,67 +208,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
-        private OrganizationUnit CreateOrganizationUnit()
-        {
-            return new OrganizationUnit
-            {
-                Id = A<int>(),
-                Name = A<string>()
-            };
-        }
-
-        private OrganizationUnitRight CreateOrganizationUnitRight(int unitId)
-        {
-            return new OrganizationUnitRight
-            {
-                Id = A<int>(),
-                ObjectId = unitId,
-                Role = new OrganizationUnitRole
-                {
-                    Name = A<string>()
-                }
-            };
-        }
-
-        private OrganizationUnitRole CreateOrganizationUnitRole()
-        {
-            return new OrganizationUnitRole
-            {
-                Name = A<string>()
-            };
-        }
-
-        private ItContract CreateContract(int unitId)
-        {
-            return new ItContract
-            {
-                Id = A<int>(),
-                ResponsibleOrganizationUnitId = unitId,
-                Name = A<string>()
-            };
-        }
-
-        private ItSystemUsage CreateSystem(int unitId)
-        {
-            return new ItSystemUsage
-            {
-                Id = A<int>(),
-                OrganizationId = unitId,
-                LocalCallName = A<string>()
-            };
-        }
-
-        private ItSystemUsageOrgUnitUsage CreateItSystemUsageOrgUnitUsage(OrganizationUnit unit, ItSystemUsage system)
-        {
-            return new ItSystemUsageOrgUnitUsage
-            {
-                OrganizationUnit = unit,
-                OrganizationUnitId = unit.Id,
-                ItSystemUsage = system,
-                ItSystemUsageId = system.Id
-            };
-        }
-
         private void ExpectResolveUuidReturns(int id, Maybe<Guid> result)
         {
             _identityResolverMock.Setup(x => x.ResolveUuid<OrganizationUnit>(id)).Returns(result);
@@ -373,21 +236,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void ExpectAllowModifyReturns(IEntity unit, bool result)
         {
             _authorizationContextMock.Setup(x => x.AllowModify(unit)).Returns(result);
-        }
-
-        private void ExpectGetContractsByResponsibleUnitIdReturns(int unitId, IEnumerable<ItContract> result)
-        {
-            _contractServiceMock.Setup(x => x.GetContractsByResponsibleUnitId(unitId)).Returns(result);
-        }
-
-        private void ExpectGetSystemsByRelevantUnitIdReturns(int unitId, IEnumerable<ItSystemUsage> result)
-        {
-            _usageServiceMock.Setup(x => x.GetSystemsByRelevantUnitId(unitId)).Returns(result);
-        }
-
-        private void ExpectGetSystemsByResponsibleUnitIdReturns(int unitId, IEnumerable<ItSystemUsage> result)
-        {
-            _usageServiceMock.Setup(x => x.GetSystemsByResponsibleUnitId(unitId)).Returns(result);
         }
     }
 }

@@ -137,11 +137,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var transaction = new Mock<IDatabaseTransaction>();
             ExpectGetContractReturns(contractId, itContract);
             ExpectAllowDeleteReturns(itContract, true);
-
-            var economyStreams = itContract.ExternEconomyStreams.Concat(itContract.InternEconomyStreams).ToList();
-            //_economyStreamServiceMock.Setup(x => x.GetEconomyStreams(itContract)).Returns(economyStreams);
-            //_economyStreamServiceMock.Setup(x => x.DeleteRange(economyStreams)).Returns(Maybe<OperationError>.None);
-
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _referenceService.Setup(x => x.DeleteByContractId(contractId)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new List<ExternalReference>()));
 
@@ -149,8 +144,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var result = _sut.Delete(contractId);
 
             //Assert
-            Assert.True(result.Ok);
-            //_economyStreamServiceMock.Verify(x => x.DeleteRange(economyStreams), Times.Once);
+            Assert.True(result.Ok); 
+            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(It.IsAny<EconomyStream>()), Times.Exactly(4));
+            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(externEconomyStream1), Times.Once);
+            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(externEconomyStream2), Times.Once);
+            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(internEconomyStream1), Times.Once);
+            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(internEconomyStream2), Times.Once);
             _contractRepository.Verify(x => x.DeleteContract(itContract), Times.Once);
             _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<ItContract>>(cd => cd.Entity == itContract)), Times.Once);
             _referenceService.Verify(x => x.DeleteByContractId(contractId), Times.Once);

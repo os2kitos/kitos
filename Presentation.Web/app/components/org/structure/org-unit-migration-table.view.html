@@ -11,7 +11,11 @@
     <tbody ng-repeat="registration in ctrl.root.children">
         <tr>
             <td><input data-disabled-on-busy type="checkbox" ng-model="registration.selected" ng-change="ctrl.registrationSelected()" /></td>
-            <td ng-repeat="header in ctrl.configuration">{{ registration[header.property] }}</td>
+            <td ng-repeat="header in ctrl.configuration">
+                <div class="{{header.cssClass}}">
+                    {{ registration[header.property] }}
+                </div>
+            </td>
             <td class="pull-right"><button class="glyphicon glyphicon-trash" data-disabled-on-busy ng-click="ctrl.delete(registration)"></button></td>
         </tr>
     </tbody>

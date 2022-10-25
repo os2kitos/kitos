@@ -53,7 +53,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        public static async Task TransferRegistrationsAsync(int unitId, int targetUnitId, IEnumerable<ChangeOrganizationRegistrationRequest> body, Cookie optionalLogin = null)
+        public static async Task TransferRegistrationsAsync(int unitId, int targetUnitId, ChangeOrganizationRegistrationRequest body, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organization-registrations/{unitId}/{targetUnitId}");

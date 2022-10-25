@@ -9,6 +9,9 @@ using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
@@ -138,6 +141,25 @@ namespace Core.ApplicationServices.Contract
                 _economyStreamRepository.RemoveRange(economyStreamsToDelete);
                 _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
 
+                return Result<ItContract, OperationError>.Success(contract);
+            }).Match(_ => Maybe<OperationError>.None,
+                err => err);
+        }
+
+        public Maybe<OperationError> TransferPayments(int contractId, OrganizationUnit targetUnit, IEnumerable<int> paymentIds)
+        {
+            return Modify(contractId, contract =>
+            {
+                foreach (var paymentId in paymentIds)
+                {
+                    var payment = contract.GetPaymentById(paymentId);
+                    if (payment.Failed)
+                        return payment.Error;
+
+                    payment.Value.TransferEconomyStream(targetUnit);
+                }
+
+                _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
                 return Result<ItContract, OperationError>.Success(contract);
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);
@@ -313,15 +335,18 @@ namespace Core.ApplicationServices.Contract
             return _repository.AsQueryable().Where(x => x.ResponsibleOrganizationUnitId == unitId).ToList();
         }
 
-        public Maybe<OperationError> TransferContractResponsibleUnit(int targetUnitId, int contractId)
+        public Maybe<OperationError> TransferContractResponsibleUnit(Guid targetUnitUuid, int contractId)
         {
             return Modify(contractId, contract =>
             {
-                contract.ResponsibleOrganizationUnitId = targetUnitId;
-                return Result<ItContract, OperationError>.Success(contract);
+                var result = contract.SetResponsibleOrganizationUnit(targetUnitUuid);
+                return result.HasValue
+                ? result.Value
+                    : Result<ItContract, OperationError>.Success(contract);
             }).Match(_ => Maybe<OperationError>.None, 
                 err => err);
         }
+
         public Maybe<OperationError> RemoveContractResponsibleUnit(int contractId)
         {
             return Modify(contractId, contract =>

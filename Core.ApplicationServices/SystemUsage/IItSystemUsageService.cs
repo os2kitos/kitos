@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.SystemUsage
@@ -38,10 +39,10 @@ namespace Core.ApplicationServices.SystemUsage
         Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId);
         Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved);
         Result<ItSystemUsage, OperationError> GetItSystemUsageById(int usageId);
-        Result<ItSystemUsage, OperationError> TransferResponsibleUsage(int targetUnitId, int id);
-        Result<ItSystemUsage, OperationError> TransferRelevantUsage(int unitId, int targetUnitId, int id);
-        Result<ItSystemUsage, OperationError> RemoveResponsibleUsage(int id);
-        Result<ItSystemUsage, OperationError> RemoveRelevantUnit(int id, int unitId);
+        Maybe<OperationError> TransferResponsibleUsage(OrganizationUnit targetUnit, int id);
+        Maybe<OperationError> TransferRelevantUsage(int unitId, OrganizationUnit targetUnit, int id);
+        Maybe<OperationError> RemoveResponsibleUsage(int id);
+        Maybe<OperationError> RemoveRelevantUnit(int id, int unitId);
 
         IEnumerable<ItSystemUsage> GetSystemsByResponsibleUnitId(int unitId);
         IEnumerable<ItSystemUsage> GetSystemsByRelevantUnitId(int unitId);

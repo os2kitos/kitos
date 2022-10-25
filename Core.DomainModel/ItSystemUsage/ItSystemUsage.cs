@@ -639,10 +639,35 @@ namespace Core.DomainModel.ItSystemUsage
             var selectedUnit = UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
             if (selectedUnit == null)
                 return new OperationError(OperationFailure.NotFound);
+            
+            var relevantUnits = GetUsedByOrganizationUnits().Where(x => x.Id != unitId);
+            var responsibleUnit = ResponsibleUsage?.OrganizationUnit ?? Maybe<OrganizationUnit>.None;
+            return UpdateOrganizationalUsage(relevantUnits, responsibleUnit);
+        }
 
-            UsedBy.Remove(selectedUnit);
-            var relevantUnits = GetUsedByOrganizationUnits();
-            return UpdateOrganizationalUsage(relevantUnits, ResponsibleUsage.OrganizationUnit); //TODO: Better just call the method and modify the parameters because this order of things breaks the code if the current responsible is removed as relevant.
+        public Maybe<OperationError> TransferOrganizationalUsage(OrganizationUnit targetUnit)
+        {
+            return UpdateOrganizationalUsage(GetUsedByOrganizationUnits(), targetUnit);
+        }
+
+        public Maybe<OperationError> TransferUsedByUnit(int unitId, OrganizationUnit targetUnit)
+        {
+            var selectedUnit = UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
+            if (selectedUnit == null)
+                return new OperationError($"Organization with Id: {unitId} was not found", OperationFailure.NotFound);
+
+            var relevantUnits = GetUsedByOrganizationUnits().Where(x => x.Id != unitId).ToList();
+            if (relevantUnits.All(x => x.Id != targetUnit.Id))
+            {
+                relevantUnits.Add(targetUnit);
+            }
+
+            if (ResponsibleUsage?.OrganizationUnit == null || relevantUnits.All(x => x.Id != ResponsibleUsage?.OrganizationUnit.Id))
+            {
+                return UpdateOrganizationalUsage(relevantUnits, Maybe<OrganizationUnit>.None);
+            }
+
+            return UpdateOrganizationalUsage(relevantUnits, ResponsibleUsage.OrganizationUnit);
         }
 
         public Maybe<OperationError> UpdateKLEDeviations(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)

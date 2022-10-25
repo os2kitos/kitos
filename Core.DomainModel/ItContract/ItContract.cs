@@ -847,6 +847,15 @@ namespace Core.DomainModel.ItContract
             return ExternEconomyStreams.Where(x => x.OrganizationUnitId == unitId).ToList();
         }
 
+        public Result<EconomyStream, OperationError> GetPaymentById(int id)
+        {
+            var economy = ExternEconomyStreams.FirstOrDefault(x => x.Id == id) ?? InternEconomyStreams.FirstOrDefault(x => x.Id == id);
+
+            return economy != null
+                ? economy
+                : new OperationError($"Payment with id: {id} not found", OperationFailure.NotFound);
+        }
+
         public Result<EconomyStream, OperationError> RemoveEconomyStream(int id, bool isInternal)
         {
             return isInternal 

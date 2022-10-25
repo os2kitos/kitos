@@ -18,6 +18,7 @@
     export interface IMigrationTableColumn{
         title: string;
         property: string;
+        cssClass?: string;
     }
 
     interface IOrganizationUnitMigrationTableController extends ng.IComponentController {
@@ -69,18 +70,52 @@
             }
         }
 
-        delete(registration) {
+        delete(registration: Models.Organization.IOrganizationUnitRegistration) {
             if (!confirm('Er du sikker på, at du vil slette registreringen?')) {
                 return;
             }
 
-            const request = {
-                id: registration.id,
-                type: registration.type
-            } as Models.Api.Organization.OrganizationRegistrationDetailsDto;
+            registration.selected = true;
+            const request = this.createChangeRequest(registration);
+            registration.selected = false;
 
-            this.organizationRegistrationsService.deleteSingleRegistration(this.unitId, request)
+            this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
                 .then(() => this.options.refreshData());
+        }
+
+        createChangeRequest(request: Models.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequest {
+
+            const roles = new Array<Models.Organization.IOrganizationUnitRegistration>();
+            const contractRegistration = new Array<Models.Organization.IOrganizationUnitRegistration>();
+            const internalPayments = new Array<Models.Organization.IOrganizationUnitRegistration>();
+            const externalPayments = new Array<Models.Organization.IOrganizationUnitRegistration>();
+            const responsibleSystems = new Array<Models.Organization.IOrganizationUnitRegistration>();
+            const relevantSystems = new Array<Models.Organization.IOrganizationUnitRegistration>();
+
+            switch (this.options.type) {
+                case Models.Organization.OrganizationRegistrationOption.Roles:
+                    roles.push(request);
+                    break;
+                case Models.Organization.OrganizationRegistrationOption.ContractRegistrations:
+                    contractRegistration.push(request);
+                    break;
+                case Models.Organization.OrganizationRegistrationOption.InternalPayments:
+                    internalPayments.push(request);
+                    break;
+                case Models.Organization.OrganizationRegistrationOption.ExternalPayments:
+                    externalPayments.push(request);
+                    break;
+                case Models.Organization.OrganizationRegistrationOption.RelevantSystems:
+                    responsibleSystems.push(request);
+                    break;
+                case Models.Organization.OrganizationRegistrationOption.ResponsibleSystems:
+                    relevantSystems.push(request);
+                    break;
+                default:
+                    throw `Wrong OrganizationRegistrationOption: ${this.options.type}`;
+            }
+
+            return Helpers.OrganizationRegistrationHelper.createChangeRequest(contractRegistration, externalPayments, internalPayments, roles, relevantSystems, responsibleSystems);
         }
     }
 

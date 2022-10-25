@@ -4,7 +4,7 @@ using Core.ApplicationServices.Model.Organizations;
 
 namespace Core.ApplicationServices.Organizations
 {
-    public interface IOrganizationRegistrationService
+    public interface IOrganizationUnitService
     {
         Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int unitId);
         Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationChangeParameters parameters);

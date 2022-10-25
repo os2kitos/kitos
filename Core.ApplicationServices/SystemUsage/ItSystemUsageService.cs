@@ -297,67 +297,52 @@ namespace Core.ApplicationServices.SystemUsage
             return _usageRepository.AsQueryable().Where(x => x.UsedBy.Select(usedBy => usedBy.OrganizationUnitId).Contains(unitId)).ToList();
         }
 
-        public Result<ItSystemUsage, OperationError> TransferResponsibleUsage(int targetUnitId, int id)
+        public Maybe<OperationError> TransferResponsibleUsage(OrganizationUnit targetUnit, int id)
         {
             return Modify(id, system =>
             {
-                var targetUnit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == targetUnitId);
-                if (targetUnit == null)
-                {
-                    targetUnit = new ItSystemUsageOrgUnitUsage
-                    {
-                        ItSystemUsageId = system.Id,
-                        OrganizationUnitId = targetUnitId
-                    };
-                    system.UsedBy.Add(targetUnit);
-                }
-
-                system.ResponsibleUsage = targetUnit;
-                return Result<ItSystemUsage, OperationError>.Success(system);
-            });
+                var result = system.TransferOrganizationalUsage(targetUnit);
+                return result.HasValue 
+                    ? result.Value 
+                    : Result<ItSystemUsage, OperationError>.Success(system);
+            }).Match(_ => Maybe<OperationError>.None,
+                err => err);
         }
 
-        public Result<ItSystemUsage, OperationError> TransferRelevantUsage(int unitId, int targetUnitId, int id)
+        public Maybe<OperationError> TransferRelevantUsage(int unitId, OrganizationUnit targetUnit, int id)
         {
             return Modify(id, system =>
             {
-                var unit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
-                if (unit != null)
-                {
-                    system.UsedBy.Remove(unit);
-                }
-
-                var targetUnit = system.UsedBy.FirstOrDefault(x => x.OrganizationUnitId == targetUnitId);
-                if (targetUnit != null) 
-                    return Result<ItSystemUsage, OperationError>.Success(system);
-
-                targetUnit = new ItSystemUsageOrgUnitUsage
-                {
-                    ItSystemUsageId = system.Id,
-                    OrganizationUnitId = targetUnitId
-                };
-                system.UsedBy.Add(targetUnit);
-                return Result<ItSystemUsage, OperationError>.Success(system);
-            });
-        }
-        //TODO: Return _Maybe<operationerror>
-        public Result<ItSystemUsage, OperationError> RemoveResponsibleUsage(int id)
-        {
-            return Modify(id, system =>
-            {
-                system.RemoveOrganizationalUsage();
-                return Result<ItSystemUsage, OperationError>.Success(system);
-            });
+                var result = system.TransferUsedByUnit(unitId, targetUnit);
+                return result.HasValue
+                    ? result.Value
+                    : Result<ItSystemUsage, OperationError>.Success(system);
+            }).Match(_ => Maybe<OperationError>.None,
+                err => err);
         }
 
-        //TODO: Return _Maybe<operationerror>
-        public Result<ItSystemUsage, OperationError> RemoveRelevantUnit(int id, int unitId)
+        public Maybe<OperationError> RemoveResponsibleUsage(int id)
         {
             return Modify(id, system =>
             {
-                system.RemoveUsedByUnit(unitId);
-                return  Result<ItSystemUsage, OperationError>.Success(system);
-            });
+                var result = system.RemoveOrganizationalUsage();
+                return result.HasValue 
+                    ? result.Value 
+                    : Result<ItSystemUsage, OperationError>.Success(system);
+            }).Match(_ => Maybe<OperationError>.None,
+                err => err);
+        }
+        
+        public Maybe<OperationError> RemoveRelevantUnit(int id, int unitId)
+        {
+            return Modify(id, system =>
+            {
+                var result = system.RemoveUsedByUnit(unitId);
+                return result.HasValue
+                    ? result.Value
+                    : Result<ItSystemUsage, OperationError>.Success(system);
+            }).Match(_ => Maybe<OperationError>.None,
+                err => err);
         }
 
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)

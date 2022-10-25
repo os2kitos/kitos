@@ -13,37 +13,16 @@
         }
     }
 
-    export interface IDropdownUnit {
-        id: number;
-        name: string;
-        text: string;
-        level: number;
-    }
-
     export interface IOrganizationUnitMigrationOptions {
         root: IOrganizationUnitMigrationRoot;
-        hasExtraDataColumn?: boolean;
-        hasExtraIndexColumn?: boolean;
         selectedRegistrationChanged?: () => void;
         selectedRegistrationGroupChanged?: (root: IOrganizationUnitMigrationRoot) => void;
         refreshData: () => void;
+        type: Models.Organization.OrganizationRegistrationOption;
     }
 
     export interface IOrganizationUnitMigrationRoot extends Models.ViewModel.Organization.IHasSelection {
-        children: IOrganizationUnitRegistration[];
-        type: Models.Api.Organization.OrganizationRegistrationOption;
-    }
-
-    export interface IOrganizationUnitRegistration extends Models.ViewModel.Organization.IHasSelection {
-        id: number;
-        text: string;
-        type: Models.Api.Organization.OrganizationRegistrationOption;
-        objectId?: number;
-        objectName?: string;
-        index?: number;
-
-        targetUnitId?: number;
-        optionalObjectContext?: any;
+        children: Models.Organization.IOrganizationUnitRegistration[];
     }
 
     interface IOrganizationUnitMigrationController extends ng.IComponentController {
@@ -65,7 +44,6 @@
         contractRegistrations: IOrganizationUnitMigrationOptions;
         relevantSystemRegistrations: IOrganizationUnitMigrationOptions;
         responsibleSystemRegistrations: IOrganizationUnitMigrationOptions;
-        organizations: IDropdownUnit[];
         orgUnits: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[];
         selectedOrg: any;
 
@@ -93,7 +71,6 @@
             this.setupOptions();
             this.getData();
 
-            this.organizations = [];
             this.orgUnits = [];
 
             this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
@@ -120,12 +97,13 @@
 
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.transferSelectedRegistrations(this.unitId, this.selectedOrg.id, request)
+                .then(() => this.selectedOrg = null)
                 .then(() => this.getData())
                 .then(() => this.updateAnySelections());
         }
 
         setSelectedOrg() {
-            if (!this.selectedOrg.id)
+            if (!this.selectedOrg?.id)
                 return;
 
             const selectedRegistrations = this.collectSelectedRegistrations();
@@ -216,9 +194,9 @@
             groupRoot.selected = true;
         }
 
-        private collectSelectedRegistrations(): Array<IOrganizationUnitRegistration> {
+        private collectSelectedRegistrations(): Array<Models.Organization.IOrganizationUnitRegistration> {
 
-            var result = [] as IOrganizationUnitRegistration[];
+            var result = [] as Models.Organization.IOrganizationUnitRegistration[];
 
             const roots = this.getAllRoots();
             roots.forEach(root => {
@@ -229,7 +207,7 @@
             return result;
         }
 
-        private collectSelectedRegistrationsFromSource(sourceCollection: Array<IOrganizationUnitRegistration>): Array<IOrganizationUnitRegistration> {
+        private collectSelectedRegistrationsFromSource(sourceCollection: Array<Models.Organization.IOrganizationUnitRegistration>): Array<Models.Organization.IOrganizationUnitRegistration> {
             return sourceCollection.filter(x => x.selected);
         }
 
@@ -254,37 +232,44 @@
         }
 
         private setupOptions() {
-            this.roles = this.createSingleOptions(Models.Api.Organization.OrganizationRegistrationOption.Roles);
-            this.internalPayments = this.createSingleOptions(Models.Api.Organization.OrganizationRegistrationOption.InternalPayments, true, true);
-            this.externalPayments = this.createSingleOptions(Models.Api.Organization.OrganizationRegistrationOption.ExternalPayments, true, true);
-            this.contractRegistrations = this.createSingleOptions(Models.Api.Organization.OrganizationRegistrationOption.ContractRegistrations);
-            this.relevantSystemRegistrations = this.createSingleOptions(Models.Api.Organization.OrganizationRegistrationOption.RelevantSystems, true);
-            this.responsibleSystemRegistrations = this.createSingleOptions(Models.Api.Organization.OrganizationRegistrationOption.ResponsibleSystems);
+            this.roles = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.Roles);
+            this.internalPayments = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.InternalPayments);
+            this.externalPayments = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.ExternalPayments);
+            this.contractRegistrations = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.ContractRegistrations);
+            this.relevantSystemRegistrations = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.RelevantSystems);
+            this.responsibleSystemRegistrations = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.ResponsibleSystems);
         }
 
-        private createSingleOptions(type: Models.Api.Organization.OrganizationRegistrationOption, hasExtraDataColumn: boolean = false, hasExtraIndexColumn: boolean = false): IOrganizationUnitMigrationOptions {
+        private createChangeRequest(): Models.Api.Organization.OrganizationRegistrationChangeRequest {
+            return Helpers.OrganizationRegistrationHelper.createChangeRequest(
+                this.contractRegistrations.root.children,
+                this.externalPayments.root.children,
+                this.internalPayments.root.children,
+                this.roles.root.children,
+                this.relevantSystemRegistrations.root.children,
+                this.responsibleSystemRegistrations.root.children);
+        }
+
+        private createBaseOptions(type: Models.Organization.OrganizationRegistrationOption): IOrganizationUnitMigrationOptions {
             return {
                 root: {
                     selected: false,
-                    type: type,
                     children: []
                 },
-                hasExtraDataColumn: hasExtraDataColumn,
-                hasExtraIndexColumn: hasExtraIndexColumn,
+                type: type,
                 selectedRegistrationChanged: () => this.updateAnySelections(),
                 selectedRegistrationGroupChanged: (root: IOrganizationUnitMigrationRoot) => this.changeRegistrationGroupStatus(root),
                 refreshData: () => this.getData()
             } as IOrganizationUnitMigrationOptions;
         }
 
-        getData() {
+        private getData() {
             this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
-                this.roles.root.children = this.mapOrganizationRegistrationsToOptions(Models.Api.Organization.OrganizationRegistrationOption.Roles, response);
-                this.internalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(Models.Api.Organization.OrganizationRegistrationOption.InternalPayments, response);
-                this.externalPayments.root.children = this.mapOrganizationRegistrationsPaymentsToOptions(Models.Api.Organization.OrganizationRegistrationOption.ExternalPayments, response);
-                this.contractRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(Models.Api.Organization.OrganizationRegistrationOption.ContractRegistrations, response);
-                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(Models.Api.Organization.OrganizationRegistrationOption.RelevantSystems, response);
-                this.responsibleSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(Models.Api.Organization.OrganizationRegistrationOption.ResponsibleSystems, response);
+                this.roles.root.children = this.mapOrganizationRegistrationsToOptions(response.organizationUnitRights);
+                this.getPaymentOptions(response.payments);
+                this.contractRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.itContractRegistrations);
+                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.relevantSystems);
+                this.responsibleSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.responsibleSystems);
             }, error => {
                 console.error(error);
             });
@@ -300,38 +285,42 @@
             return [
                 { title: "Index", property: "index" },
                 { title: title, property: "text" },
-                { title: "Contract name", property: "objectName" }
+                { title: "Contract name", property: "objectText" }
             ] as IMigrationTableColumn[];
         }
 
-        private createChangeRequest(): Array<Models.Api.Organization.OrganizationRegistrationChangeRequest> {
-            return this.roles.root.children.filter(x => x.selected)
-                .map(item => {
-                    return{
-                        id: item.id,
-                        type: item.type
-                    } as Models.Api.Organization.OrganizationRegistrationChangeRequest;
-                });
+        private mapSelectedOptionsToIds(options: Models.Organization.IOrganizationUnitRegistration[]): number[] {
+            return options.filter(x => x.selected)
+                .map(item => item.id);
         }
 
-        private mapOrganizationRegistrationsToOptions(type: Models.Api.Organization.OrganizationRegistrationOption, registrations: Models.Api.Organization.OrganizationRegistrationDetailsDto[]): IOrganizationUnitRegistration[] {
-            return registrations.filter(x => x.type === type).map(res => {
+        private mapOrganizationRegistrationsToOptions(registrations: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
+            return registrations.map(res => {
                 return {
                     id: res.id,
-                    text: res.text,
-                } as IOrganizationUnitRegistration;
+                    text: res.name,
+                } as Models.Organization.IOrganizationUnitRegistration;
             });
         }
 
-        private mapOrganizationRegistrationsPaymentsToOptions(type: Models.Api.Organization.OrganizationRegistrationOption, registrations: Models.Api.Organization.OrganizationRegistrationDetailsDto[]): IOrganizationUnitRegistration[] {
-            return registrations.filter(x => x.type === type).map(res => {
+        private getPaymentOptions(payments: Models.Api.Organization.PaymentRegistrationDetailsDto[]) {
+            this.internalPayments.root.children = [];
+            this.externalPayments.root.children = [];
+            payments.forEach(payment => {
+                this.internalPayments.root.children = this.internalPayments.root.children.concat(this.mapPaymentsToOptions(payment.itContract, payment.internalPayments));
+                this.externalPayments.root.children = this.externalPayments.root.children.concat(this.mapPaymentsToOptions(payment.itContract, payment.externalPayments));
+            });
+        }
+
+        private mapPaymentsToOptions(contract: Models.Generic.NamedEntity.NamedEntityDTO, payments: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
+            return payments.map((element, index) => {
                 return {
-                    id: res.id,
-                    text: res.text,
-                    objectId: res.objectId,
-                    objectName: res.objectName,
-                    index: res.paymentIndex
-                } as IOrganizationUnitRegistration;
+                    id: element.id,
+                    text: element.name,
+                    objectText: contract.name,
+                    index: index,
+                    optionalObjectContext: contract
+                } as Models.Organization.IOrganizationUnitRegistration;
             });
         }
     }
