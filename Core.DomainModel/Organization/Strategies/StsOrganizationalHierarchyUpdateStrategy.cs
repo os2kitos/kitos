@@ -17,28 +17,29 @@ namespace Core.DomainModel.Organization.Strategies
 
         public OrganizationTreeUpdateConsequences ComputeUpdate(ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
         {
-            var currentTree = _organization
+            var currentTreeByUuid = _organization
                 .OrgUnits
                 .Where(unit => unit.Origin == OrganizationUnitOrigin.STS_Organisation)
-                .ToList();
+                .ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
 
-            if (currentTree.Count == 0)
+            if (currentTreeByUuid.Count == 0)
             {
                 throw new InvalidOperationException("No organization units from STS Organisation found in the current hierarchy");
             }
 
-            var currentTreeByUuid = currentTree.ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
-
-            var importedTree = root
+            var importedTreeByUuid = root
                 .Copy(levelsIncluded)
                 .Flatten()
-                .ToList();
+                .ToDictionary(x => x.Uuid);
 
-            var importedTreeByUuid = importedTree.ToDictionary(x => x.Uuid);
-            var importedTreeToParent = importedTree
+            var importedTreeToParent = importedTreeByUuid
+                .Values
                 .SelectMany(parent => parent.Children.Select(child => (child, parent)))
                 .ToDictionary(x => x.child.Uuid, x => x.parent);
+
             importedTreeToParent.Add(root.Uuid, null); //Add the root as that will not be part of the collection
+
+            //TODO: optimize for less iterations
 
             //Keys in both collections
             var commonKeys = currentTreeByUuid.Keys.Intersect(importedTreeByUuid.Keys).ToList();
@@ -77,36 +78,62 @@ namespace Core.DomainModel.Organization.Strategies
             //Compute which of the potential removals that will result in removal and which will result in migration
             var candidatesForRemovalByUuid = currentTreeByUuid
                 .Keys
-                .Except(importedTreeByUuid.Keys)
+                .Except(commonKeys)
                 .Select(uuid => currentTreeByUuid[uuid])
-                .ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
+                .ToDictionary(x => x.Id);
 
+            var removedExternalUnitsWhichMustBeConverted = new List<OrganizationUnit>();
+            var removedExternalUnitsWhichMustBeRemoved = new List<OrganizationUnit>();
 
-            /*
-             * TODO:Get the sub tree
-             * - Remove all items that will be either REMOVED or MOVED away to ANOTHER sub tree
-             * - If any org units remain in the subtree except self, it will be conversion
-             * - If only the current org unit remains and ANY registrations on that remains THEN it will be a conversion
-             */
+            foreach (var candidateForRemoval in candidatesForRemovalByUuid)
+            {
+                var organizationUnit = candidateForRemoval.Value;
+                var hierarchyById = organizationUnit
+                    .FlattenHierarchy()
+                    .ToDictionary(x => x.Id);
 
-            //TODO: Maintain a "to be" tree so we can determine if some units are to be removed completely e.g.
-            /*
-             *TODO: Scenarios
-             * - Removed hence if no registrations exist and no remaining registrations in sub tree (to be) and no native kitos units (requires two pass processing)
-             * - - If condition above fails, the unit will be converted
-             * - [DONE] Renamed
-             *
-             * - [DONE] Added to existing parent
-             * - [DONE] Added to non-existing parent
-             *
-             * - [DONE] Moved to existing parent
-             * - [DONE] Moved to non-existing parent
-             */
+                var partsOfSubtreeWhichAreMoved = parentChanges
+                    .Where(x => hierarchyById.ContainsKey(x.movedUnit.Id))
+                    .SelectMany(x => x.movedUnit.FlattenHierarchy())
+                    .ToList();
 
-            //TODO: Import
-            throw new System.NotImplementedException();
+                //Remove all "moved" parts of the sub tree
+                foreach (var movedUnit in partsOfSubtreeWhichAreMoved)
+                {
+                    hierarchyById.Remove(movedUnit.Id);
+                }
+
+                //Remove all "removed" parts of the sub tree
+                foreach (var removedItem in candidatesForRemovalByUuid.Where(x => x.Key != candidateForRemoval.Key).ToList())
+                {
+                    hierarchyById.Remove(removedItem.Key);
+                }
+
+                if (hierarchyById.Count != 1)
+                {
+                    //Anything left except the candidate, then we must convert the unit to a KITOS-unit?
+                    removedExternalUnitsWhichMustBeConverted.Add(organizationUnit);
+                }
+                else if (organizationUnit.IsUsed())
+                {
+                    //If there is still registrations, we must convert it
+                    removedExternalUnitsWhichMustBeConverted.Add(organizationUnit);
+                }
+                else
+                {
+                    //Safe to remove since there is no remaining sub tree and no remaining registrations tied to it
+                    removedExternalUnitsWhichMustBeRemoved.Add(organizationUnit);
+                }
+            }
+
+            return new OrganizationTreeUpdateConsequences(
+                removedExternalUnitsWhichMustBeConverted,
+                removedExternalUnitsWhichMustBeRemoved,
+                additions,
+                renamedUnits.Select(x => (x.current, x.current.Name, x.imported.Name)).ToList(),
+                parentChanges);
         }
-
+      
         public OrganizationTreeUpdateConsequences PerformUpdate(ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
         {
             throw new System.NotImplementedException();

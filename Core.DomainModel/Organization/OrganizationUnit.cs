@@ -24,6 +24,8 @@ namespace Core.DomainModel.Organization
             Uuid = uuid;
             Origin = OrganizationUnitOrigin.Kitos;
             Children = new List<OrganizationUnit>();
+            ResponsibleForItContracts = new List<ItContract.ItContract>();
+            EconomyStreams = new List<EconomyStream>();
         }
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace Core.DomainModel.Organization
         /// <value>
         /// The delegated system usages.
         /// </value>
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; } //TODO: What is this? - is it used?
 
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.
@@ -153,6 +155,11 @@ namespace Core.DomainModel.Organization
 
             Origin = OrganizationUnitOrigin.Kitos;
             ExternalOriginUuid = null;
+        }
+
+        public bool IsUsed()
+        {
+            return Using.Any() || EconomyStreams.Any() || ResponsibleForItContracts.Any() || Rights.Any();
         }
     }
 }
