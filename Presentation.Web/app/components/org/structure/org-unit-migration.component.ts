@@ -289,11 +289,6 @@
             ] as IMigrationTableColumn[];
         }
 
-        private mapSelectedOptionsToIds(options: Models.Organization.IOrganizationUnitRegistration[]): number[] {
-            return options.filter(x => x.selected)
-                .map(item => item.id);
-        }
-
         private mapOrganizationRegistrationsToOptions(registrations: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
             return registrations.map(res => {
                 return {
@@ -318,7 +313,7 @@
                     id: element.id,
                     text: element.name,
                     objectText: contract.name,
-                    index: index,
+                    index: index + 1,
                     optionalObjectContext: contract
                 } as Models.Organization.IOrganizationUnitRegistration;
             });
