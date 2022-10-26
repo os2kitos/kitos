@@ -1,22 +1,32 @@
-﻿<table class="table table-hover">
-    <thead>
-        <tr>
-            <th class="col-xs-1">
-                <input type="checkbox" ng-model="ctrl.root.selected" ng-change="ctrl.registrationGroupSelected(ctrl.root)" />
-            </th>
-            <th ng-repeat="header in ctrl.configuration">{{header.title}}</th>
-            <th class="col-xs-1">Delete</th>
-        </tr>
-    </thead>
-    <tbody ng-repeat="registration in ctrl.root.children">
-        <tr>
-            <td><input data-disabled-on-busy type="checkbox" ng-model="registration.selected" ng-change="ctrl.registrationSelected()" /></td>
-            <td ng-repeat="header in ctrl.configuration">
-                <div class="{{header.cssClass}}">
-                    {{ registration[header.property] }}
-                </div>
-            </td>
-            <td class="pull-right"><button class="glyphicon glyphicon-trash" data-disabled-on-busy ng-click="ctrl.delete(registration)"></button></td>
-        </tr>
-    </tbody>
-</table>
+﻿<div class="panel panel-default">
+    <div class="panel-heading">
+        <a id="expand_collapse_registrations" class="task-fold control-label" data-ng-click="isHidden = !isHidden">
+            <span>{{ctrl.title}}</span>
+            <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': !isHidden, 'fa-plus-square-o': isHidden}"></i>
+        </a>
+    </div>
+    <div ng-if="!isHidden" class="panel-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th class="col-xs-1">
+                        <input type="checkbox" ng-model="ctrl.root.selected" ng-change="ctrl.registrationGroupSelected(ctrl.root)" />
+                    </th>
+                    <th ng-repeat="header in ctrl.configuration">{{header.title}}</th>
+                    <th class="col-xs-1">Delete</th>
+                </tr>
+            </thead>
+            <tbody ng-repeat="registration in ctrl.root.children">
+                <tr>
+                    <td><input data-disabled-on-busy type="checkbox" ng-model="registration.selected" ng-change="ctrl.registrationSelected()" /></td>
+                    <td ng-repeat="header in ctrl.configuration">
+                        <div class="{{header.cssClass}}">
+                            {{ registration[header.property] }}
+                        </div>
+                    </td>
+                    <td class="pull-right"><button class="glyphicon glyphicon-trash" data-disabled-on-busy ng-click="ctrl.delete(registration)"></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
