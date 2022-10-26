@@ -37,8 +37,6 @@ namespace Core.DomainModel.Organization.Strategies
 
             importedTreeToParent.Add(root.Uuid, null); //Add the root as that will not be part of the collection
 
-            //TODO: optimize for less iterations
-
             //Keys in both collections
             var commonKeys = currentTreeByUuid.Keys.Intersect(importedTreeByUuid.Keys).ToList();
 

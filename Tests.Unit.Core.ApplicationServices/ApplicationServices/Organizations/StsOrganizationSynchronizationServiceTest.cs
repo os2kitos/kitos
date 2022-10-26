@@ -245,7 +245,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(error.HasValue);
             Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
             Assert.Null(organization.StsOrganizationConnection);
-            VerifyChangesNotSaved(transaction, organization);
+            VerifyChangesNotSaved(transaction, organization, false);
         }
 
         [Fact]
@@ -265,7 +265,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Assert
             Assert.True(error.HasValue);
             Assert.Null(organization.StsOrganizationConnection);
-            VerifyChangesNotSaved(transaction, organization);
+            VerifyChangesNotSaved(transaction, organization, false);
         }
 
         [Fact]
@@ -338,13 +338,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Origin = OrganizationUnitOrigin.STS_Organisation,
                 ExternalOriginUuid = A<Guid>()
             };
+            var stsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = true,
+                SynchronizationDepth = A<int>(),
+            };
             var organization = new Organization
             {
-                StsOrganizationConnection = new StsOrganizationConnection
-                {
-                    Connected = true,
-                    SynchronizationDepth = A<int>(),
-                },
+                StsOrganizationConnection = stsOrganizationConnection,
                 OrgUnits = new List<OrganizationUnit>
                 {
                     unaffectedUnit ,
@@ -352,6 +353,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                     affectedUnit2
                 }
             };
+            stsOrganizationConnection.Organization = organization;
+
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             var transaction = ExpectTransaction();
@@ -379,14 +382,15 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         {
             _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());
             transaction.Verify(x => x.Commit(), Times.Once());
+            transaction.Verify(x => x.Rollback(), Times.Never());
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<Organization>>(org => org.Entity == organization)));
         }
 
-        private void VerifyChangesNotSaved(Mock<IDatabaseTransaction> transaction, Organization organization)
+        private void VerifyChangesNotSaved(Mock<IDatabaseTransaction> transaction, Organization organization, bool expectRollback = true)
         {
             _dbControlMock.Verify(x => x.SaveChanges(), Times.Never());
             transaction.Verify(x => x.Commit(), Times.Never());
-            transaction.Verify(x => x.Rollback(), Times.Never());
+            transaction.Verify(x => x.Rollback(), expectRollback ? Times.Once() : Times.Never());
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<Organization>>(org => org.Entity == organization)), Times.Never());
         }
 
