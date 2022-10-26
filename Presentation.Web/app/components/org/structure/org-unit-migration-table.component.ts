@@ -106,10 +106,10 @@
                     externalPayments.push(request);
                     break;
                 case Models.Organization.OrganizationRegistrationOption.RelevantSystems:
-                    responsibleSystems.push(request);
+                    relevantSystems.push(request);
                     break;
                 case Models.Organization.OrganizationRegistrationOption.ResponsibleSystems:
-                    relevantSystems.push(request);
+                    responsibleSystems.push(request);
                     break;
                 default:
                     throw `Wrong OrganizationRegistrationOption: ${this.options.type}`;

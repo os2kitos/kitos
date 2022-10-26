@@ -257,7 +257,7 @@
                 type: type,
                 selectedRegistrationChanged: () => this.updateAnySelections(),
                 selectedRegistrationGroupChanged: (root: IOrganizationUnitMigrationRoot) => this.changeRegistrationGroupStatus(root),
-                refreshData: () => this.getData()
+                refreshData: () => this.refreshData()
             } as IOrganizationUnitMigrationOptions;
         }
 
