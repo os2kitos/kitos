@@ -213,14 +213,14 @@ namespace Core.DomainModel.Organization
                     throw new ArgumentOutOfRangeException();
             }
 
-            var filteredTree = root.Copy(levelsIncluded);
+            var childLevelsToInclude = levelsIncluded.Select(levels=>levels-1); //subtract the root level before copying
+            var filteredTree = root.Copy(childLevelsToInclude);
 
             return strategy.ComputeUpdate(filteredTree);
         }
 
         public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
         {
-            //TODO: Get the import strategy based on the connection
             if (root == null)
             {
                 throw new ArgumentNullException(nameof(root));

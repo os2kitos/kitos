@@ -31,7 +31,9 @@
     class FKOrganisationImportController {
         static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance"];
         busy: boolean = false;
+        updating: boolean = false;
         loadingHierarchy: boolean | null;
+        consequencesAwaitingApproval: Array<Models.Api.Organization.ConnectionUpdateOrganizationUnitConsequenceDTO> | null = null;
         fkOrgHierarchy: Kitos.Shared.Components.Organization.IOrganizationTreeComponentOptions | null = null;
         constructor(
             readonly flow: FKOrganisationImportFlow,
@@ -47,6 +49,7 @@
 
         $onInit() {
             this.loadingHierarchy = true;
+            this.consequencesAwaitingApproval = null;
             this.stsOrganizationSyncService
                 .getSnapshot(this.organizationUuid)
                 .then(root => {
@@ -73,16 +76,67 @@
         performImport() {
             if (!this.busy) {
                 this.busy = true;
-                this.stsOrganizationSyncService
-                    .createConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
-                    .then(() => {
-                        this.busy = false;
-                        this.$uibModalInstance.close();
-                    }, error => {
-                        console.log("Error:", error);
-                        this.busy = false;
-                    });
+                if (this.flow === FKOrganisationImportFlow.Create) {
+                    this.createConnection();
+                } else if (this.flow === FKOrganisationImportFlow.Update) {
+                    this.updateConnection();
+                }
             }
+        }
+
+        acceptConsequences() {
+            this.performUpdate();
+        }
+
+        rejectConsequences() {
+            this.updating = false;
+            this.consequencesAwaitingApproval = null;
+        }
+
+        private performUpdate() {
+            this.updating = true;
+            this.busy = true;
+            this.closeDialog(); //TODO: As a "then"
+            //TODO
+            //this.requireConsequencesApproval = false;
+            //TODO: Close
+        }
+
+        private createConnection() {
+            this.stsOrganizationSyncService
+                .createConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+                .then(() => {
+                    this.closeDialog();
+                }, error => {
+                    console.error("Error:", error);
+                    this.busy = false;
+                });
+        }
+
+        private closeDialog() {
+            this.busy = false;
+            this.$uibModalInstance.close();
+        }
+
+        private updateConnection() {
+            this.stsOrganizationSyncService
+                .getConnectionUpdateConsequences(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+                .then(consequences => {
+                    if (consequences.consequences.length > 0) {
+                        this.consequencesAwaitingApproval = consequences.consequences;
+                        this.busy = false;
+                    } else {
+                        this.performUpdate();
+                    }
+                })
+            /*
+                TODO: Get consequences
+                TODO: if no consequences, just do the PUT
+                TODO: if consequences, lock the sync level input and show the consequences
+                TODO: await approval
+                TODO: if approved, perform the update
+                TODO: if not, change state, remoload view with current settings
+             */
         }
     }
 
