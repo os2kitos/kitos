@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
@@ -36,24 +38,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
 
-            //----Check UnitRights deletion----
-            var roleRegistrations = new OrganizationRegistrationDTO
-            {
-                OrganizationUnitRights = registrations.OrganizationUnitRights,
-                Payments = registrations.Payments
-                    .Select(x =>
-                        new PaymentRegistrationDTO
-                        {
-                            ItContract = x.ItContract,
-                            InternalPayments = x.InternalPayments,
-                            ExternalPayments = x.ExternalPayments
-                        }),
-                ItContractRegistrations = registrations.ItContractRegistrations,
-                ResponsibleSystems = registrations.ResponsibleSystems,
-                RelevantSystems = registrations.RelevantSystems
-            };
-
-            var selectedRegistrations = ToChangeParametersList(roleRegistrations);
+            var selectedRegistrations = ToChangeParametersList(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
@@ -73,28 +58,14 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
 
             //----Check UnitRights deletion----
-            var roleRegistrations = new OrganizationRegistrationDTO
-            {
-                OrganizationUnitRights = registrations.OrganizationUnitRights
-            };
-            var selectedRegistrations = ToChangeParametersList(roleRegistrations);
+            var selectedRegistrations = CreateChangeParametersWithOnlyUnitRegistrations(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.OrganizationUnitRights);
 
             //----Check Internal Payment deletion----
-            var internalPaymentRegistrations = new OrganizationRegistrationDTO()
-            {
-                Payments = registrations.Payments
-                    .Select(x => 
-                        new PaymentRegistrationDTO
-                        {
-                            ItContract = x.ItContract,
-                            InternalPayments = x.InternalPayments
-                        })
-            };
-            selectedRegistrations = ToChangeParametersList(internalPaymentRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyInternalPayment(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
@@ -103,17 +74,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Empty(payment.InternalPayments);
 
             //----Check External Payment deletion----
-            var externalPaymentRegistrations = new OrganizationRegistrationDTO
-            {
-                Payments = registrations.Payments
-                    .Select(x =>
-                        new PaymentRegistrationDTO
-                        {
-                            ItContract= x.ItContract,
-                            ExternalPayments = x.ExternalPayments
-                        })
-            };
-            selectedRegistrations = ToChangeParametersList(externalPaymentRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyExternalPayment(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
@@ -122,33 +83,21 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Empty(payment.ExternalPayments);
 
             //----Check Contract registrations deletion----
-            var contractRegistrations = new OrganizationRegistrationDTO
-            {
-                ItContractRegistrations = registrations.ItContractRegistrations
-            };
-            selectedRegistrations = ToChangeParametersList(contractRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyContractRegistrations(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.ItContractRegistrations);
             
             //----Check Responsible unit deletion----
-            var responsibleRegistrations = new OrganizationRegistrationDTO
-            {
-                ResponsibleSystems = registrations.ResponsibleSystems
-            };
-            selectedRegistrations = ToChangeParametersList(responsibleRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyResponsibleSystems(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.ResponsibleSystems);
 
             //----Check Relevant unit deletion----
-            var relevantRegistrations = new OrganizationRegistrationDTO
-            {
-                RelevantSystems = registrations.RelevantSystems
-            };
-            selectedRegistrations = ToChangeParametersList(relevantRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
@@ -180,11 +129,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
 
             //----Org unit rights----
-            var roleRegistrations = new OrganizationRegistrationDTO
-            {
-                OrganizationUnitRights = registrations.OrganizationUnitRights
-            };
-            var selectedRegistrations = ToChangeParametersList(roleRegistrations);
+            var selectedRegistrations = CreateChangeParametersWithOnlyUnitRegistrations(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
 
             var registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
@@ -195,39 +140,15 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //----First transfer payments and contractRegistration, than assert----
             //----Internal payments----
-            var internalPaymentRegistrations = new OrganizationRegistrationDTO()
-            {
-                Payments = registrations.Payments
-                    .Select(x =>
-                        new PaymentRegistrationDTO
-                        {
-                            ItContract = x.ItContract,
-                            InternalPayments = x.InternalPayments
-                        })
-            };
-            selectedRegistrations = ToChangeParametersList(internalPaymentRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyInternalPayment(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
 
             //----External payments----
-            var externalPaymentRegistrations = new OrganizationRegistrationDTO
-            {
-                Payments = registrations.Payments
-                    .Select(x =>
-                        new PaymentRegistrationDTO
-                        {
-                            ItContract = x.ItContract,
-                            ExternalPayments = x.ExternalPayments
-                        })
-            };
-            selectedRegistrations = ToChangeParametersList(externalPaymentRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyExternalPayment(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
 
             //----Contract registrations----
-            var contractRegistrations = new OrganizationRegistrationDTO
-            {
-                ItContractRegistrations = registrations.ItContractRegistrations
-            };
-            selectedRegistrations = ToChangeParametersList(contractRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyContractRegistrations(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
 
             registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
@@ -243,11 +164,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertRegistrationIsValid(internalEconomyStream, targetPayment.InternalPayments);
 
             //----Relevant systems----
-            var relevantRegistrations = new OrganizationRegistrationDTO
-            {
-                RelevantSystems = registrations.RelevantSystems
-            };
-            selectedRegistrations = ToChangeParametersList(relevantRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
 
             registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
@@ -257,11 +174,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertRegistrationIsValid(usage, registrationsUnit2.RelevantSystems);
 
             //----Responsible systems----
-            var responsibleRegistrations = new OrganizationRegistrationDTO
-            {
-                ResponsibleSystems = registrations.ResponsibleSystems
-            };
-            selectedRegistrations = ToChangeParametersList(responsibleRegistrations);
+            selectedRegistrations = CreateChangeParametersWithOnlyResponsibleSystems(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
 
             registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
@@ -338,6 +251,78 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 RelevantSystems = registrations.RelevantSystems.Select(x => x.Id),
                 ResponsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id),
             };
+        }
+
+        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyUnitRegistrations(
+            OrganizationRegistrationDTO registrations)
+        {
+            var dto = new OrganizationRegistrationDTO
+            {
+                OrganizationUnitRights = registrations.OrganizationUnitRights
+            };
+            return ToChangeParametersList(dto);
+        }
+
+        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyInternalPayment(
+            OrganizationRegistrationDTO registrations)
+        {
+            var dto = new OrganizationRegistrationDTO()
+            {
+                Payments = registrations.Payments
+                    .Select(x =>
+                        new PaymentRegistrationDTO
+                        {
+                            ItContract = x.ItContract,
+                            InternalPayments = x.InternalPayments
+                        })
+            };
+            return ToChangeParametersList(dto);
+        }
+
+        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyExternalPayment(
+            OrganizationRegistrationDTO registrations)
+        {
+            var dto = new OrganizationRegistrationDTO()
+            {
+                Payments = registrations.Payments
+                    .Select(x =>
+                        new PaymentRegistrationDTO
+                        {
+                            ItContract = x.ItContract,
+                            ExternalPayments = x.ExternalPayments
+                        })
+            };
+            return ToChangeParametersList(dto);
+        }
+
+        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyContractRegistrations(
+            OrganizationRegistrationDTO registrations)
+        {
+            var dto = new OrganizationRegistrationDTO
+            {
+                ItContractRegistrations = registrations.ItContractRegistrations
+            };
+            return ToChangeParametersList(dto);
+        }
+
+        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyResponsibleSystems(
+            OrganizationRegistrationDTO registrations)
+        {
+            var dto = new OrganizationRegistrationDTO
+            {
+                ResponsibleSystems = registrations.ResponsibleSystems
+            };
+            return ToChangeParametersList(dto);
+        }
+
+        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyRelevantSystems(
+            OrganizationRegistrationDTO registrations)
+        {
+            var dto = new OrganizationRegistrationDTO
+            {
+                RelevantSystems = registrations.RelevantSystems
+            };
+            return ToChangeParametersList(dto);
         }
 
         private async Task<(OrganizationUnitRight right, ItContract contract, EconomyStream externalEconomyStream, EconomyStream internalEconomyStream, ItSystemUsage usage, OrgUnitDTO unitDto)> SetupRegistrations(int organizationId)

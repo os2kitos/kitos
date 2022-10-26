@@ -72,7 +72,6 @@
             this.getData();
 
             this.orgUnits = [];
-
             this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
                 this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
             });
@@ -89,7 +88,7 @@
         }
 
         transfer() {
-            if (!this.selectedOrg)
+            if (!this.selectedOrg?.id)
                 return;
             if (!confirm(`Er du sikker på, at du vil overføre de valgte registreringer til "${this.selectedOrg.text}"?`)) {
                 return;

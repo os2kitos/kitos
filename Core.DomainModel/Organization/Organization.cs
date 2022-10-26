@@ -245,12 +245,27 @@ namespace Core.DomainModel.Organization
                     organizationUnits.ForEach(unit => unit.ConvertToKitosUnit());
                     StsOrganizationConnection.Disconnect();
                     return new DisconnectOrganizationFromOriginResult(organizationUnits);
-                    break;
                 case OrganizationUnitOrigin.Kitos:
                     return new OperationError("Kitos is not an external source and cannot be disconnected", OperationFailure.BadInput);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public Result<OrganizationUnit, OperationError> RemoveOrganizationUnit(int unitId)
+        {
+            var unit = OrgUnits.FirstOrDefault(x => x.Id == unitId);
+            if (unit == null)
+                return new OperationError("Unit doesn't exist in the organization", OperationFailure.NotFound);
+            if (unit.Origin != OrganizationUnitOrigin.Kitos)
+                return new OperationError("Only a KITOS unit can be deleted", OperationFailure.BadState);
+            if (unit.Using.Any() || unit.Rights.Any() || unit.EconomyStreams.Any() ||
+                unit.ResponsibleForItContracts.Any() || unit.DelegatedSystemUsages.Any())
+                return new OperationError("Unit has assigned registrations", OperationFailure.BadState);
+
+            OrgUnits.Remove(unit);
+
+            return unit;
         }
     }
 }

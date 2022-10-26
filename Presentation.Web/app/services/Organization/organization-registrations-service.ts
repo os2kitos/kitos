@@ -3,7 +3,7 @@
     export interface IOrganizationRegistrationsService {
         getRegistrations(orgId: number): ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto>;
         deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<boolean>;
-        deleteOrganizationUnit(unitId: number): angular.IPromise<boolean>;
+        deleteOrganizationUnit(unitId: number, organizationId: number): angular.IPromise<boolean>;
         transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<void>;
     }
 
@@ -29,8 +29,8 @@
                 .executeAsync();
         }
 
-        deleteOrganizationUnit(unitId: number): angular.IPromise<boolean> {
-            return this.apiWrapper.delete(`api/v1/organization-registrations/unit/${unitId}`);
+        deleteOrganizationUnit(unitId: number, organizationId: number): angular.IPromise<boolean> {
+            return this.apiWrapper.delete(`api/v1/organization-registrations/unit/${unitId}/${organizationId}`);
         }
 
         transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<void> {

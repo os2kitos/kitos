@@ -1,7 +1,5 @@
-﻿using Core.ApplicationServices.Model.Organizations;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1.Organizations;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;

@@ -108,7 +108,7 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
-        public Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId)
+        public Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId, int organizationId)
         {
             var deleteRegistrationsResult = GetOrganizationRegistrations(unitId)
                 .Match(val => DeleteSelectedOrganizationRegistrations(unitId, ToChangeParametersFromRegistrationDetails(val)),
@@ -117,7 +117,7 @@ namespace Core.ApplicationServices.Organizations
             if (deleteRegistrationsResult.HasValue)
                 return deleteRegistrationsResult.Value;
 
-            _orgUnitService.Delete(unitId);
+            _orgUnitService.Delete(unitId, organizationId);
             return Maybe<OperationError>.None;
         }
 

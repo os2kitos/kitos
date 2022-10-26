@@ -16,7 +16,7 @@ namespace Core.DomainServices
 
         bool IsAncestorOf(OrganizationUnit unitA, OrganizationUnit unitB);
         bool IsAncestorOf(int unitIdA, int unitIdB);
-        void Delete(int id);
+        void Delete(int id, int organizationId);
         IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization);
         Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid);
     }

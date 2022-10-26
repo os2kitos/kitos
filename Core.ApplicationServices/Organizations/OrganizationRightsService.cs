@@ -3,7 +3,6 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;

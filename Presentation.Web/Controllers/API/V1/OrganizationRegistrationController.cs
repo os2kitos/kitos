@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Types;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.ItContract;
@@ -71,31 +68,13 @@ namespace Presentation.Web.Controllers.API.V1
                 }, Ok);
         }
 
-        /*[HttpDelete]
-        [Route("single/{unitId}")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveSingleUnitRegistration(int unitId, [FromBody] ChangeOrganizationRegistrationRequest request)
-        {
-            var changeParameters = ToChangeParameters(request);
-            return _organizationUnitService.DeleteSingleOrganizationRegistration(unitId, changeParameters)
-                .Match(error => error.FailureType switch
-                {
-                    OperationFailure.NotFound => NotFound(),
-                    OperationFailure.BadInput => BadRequest(error.Message.GetValueOrDefault()),
-                    OperationFailure.BadState => BadRequest(error.Message.GetValueOrDefault()),
-                    OperationFailure.Forbidden => Forbidden(),
-                }, Ok);
-        }*/
-
         [HttpDelete]
-        [Route("unit/{unitId}")]
+        [Route("unit/{unitId}/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage DeleteUnitWithRegistrations(int unitId)
+        public HttpResponseMessage DeleteUnitWithRegistrations(int unitId, int organizationId)
         {
             return _organizationUnitService.DeleteUnitWithOrganizationRegistrations(unitId)
                 .Match(error =>error.FailureType switch

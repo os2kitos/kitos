@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItContract

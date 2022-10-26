@@ -628,7 +628,6 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
-        //TODO: Could be an extension method but this is also ok
         public Maybe<OperationError> RemoveOrganizationalUsage()
         {
             return UpdateOrganizationalUsage(GetUsedByOrganizationUnits(), Maybe<OrganizationUnit>.None);

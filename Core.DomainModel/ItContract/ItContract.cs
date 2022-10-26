@@ -11,7 +11,6 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
-using System.Diagnostics.Contracts;
 
 
 // ReSharper disable VirtualMemberCallInConstructor

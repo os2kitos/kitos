@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DataAccess;
 
 
 namespace Core.DomainServices.Organizations
@@ -13,13 +14,19 @@ namespace Core.DomainServices.Organizations
     public class OrgUnitService : IOrgUnitService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IGenericRepository<Organization> _organizationRepository;
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _itSystemUsageOrgUnitUsageRepository;
+        private readonly ITransactionManager _transactionManager;
 
         public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository)
+            IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository, 
+            ITransactionManager transactionManager, 
+            IGenericRepository<Organization> organizationRepository)
         {
             _orgUnitRepository = orgUnitRepository;
             _itSystemUsageOrgUnitUsageRepository = itSystemUsageOrgUnitUsageRepository;
+            _transactionManager = transactionManager;
+            _organizationRepository = organizationRepository;
         }
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
@@ -88,9 +95,17 @@ namespace Core.DomainServices.Organizations
             return IsAncestorOf(unit, ancestor);
         }
 
-        public void Delete(int id)
+        public void Delete(int id, int organizationId)
         {
-            //TODO: Add "DeleteOrganizationUnit" to Organization and in that make sure only KITOS units are allowed to be deleted. If "deleteOrganization succeeds, delete the unit from the repo
+            using var transaction = _transactionManager.Begin();
+
+            var organization = _organizationRepository.GetByKey(organizationId);
+            var result = organization.RemoveOrganizationUnit(id);
+            if (result.Failed)
+                throw new ArgumentException(result.Error.Message.GetValueOrDefault());
+
+            var orgUnit = result.Value;
+
             // Remove OrgUnit from ItSystemUsages
             var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId == id);
             foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)
@@ -105,8 +120,6 @@ namespace Core.DomainServices.Organizations
             }
             _itSystemUsageOrgUnitUsageRepository.Save();
 
-            var orgUnit = _orgUnitRepository.GetByKey(id);
-
             // attach children to parent of this instance to avoid orphans
             // parent id will never be null because users aren't allowed to delete the root node
             foreach (var child in orgUnit.Children)
@@ -116,6 +129,7 @@ namespace Core.DomainServices.Organizations
 
             _orgUnitRepository.DeleteWithReferencePreload(orgUnit);
             _orgUnitRepository.Save();
+            transaction.Commit();
         }
 
         public IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization)
