@@ -5,6 +5,7 @@ using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
+using Ninject.Activation;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
 
@@ -77,7 +78,23 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(FromOperationError, Ok);
         }
 
-        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3313 adds the PUT (POST creates the connection)
+        [HttpGet]
+        [Route("connection/update")]
+        public HttpResponseMessage GetUpdateConsequences(Guid organizationId, int? synchronizationDepth = null)
+        {
+            if (synchronizationDepth is < 1)
+            {
+                return BadRequest($"{nameof(synchronizationDepth)} must greater than 0");
+            }
+            throw new NotImplementedException("yet");
+        }
+
+        [HttpPut]
+        [Route("connection")]
+        public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
+        {
+            throw new NotImplementedException("yet");
+        }
 
         private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
         {
