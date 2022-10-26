@@ -124,19 +124,30 @@
                 .then(consequences => {
                     if (consequences.consequences.length > 0) {
                         this.consequencesAwaitingApproval = consequences.consequences;
+                        //TODO: Expand/collapse on the outer panel
+                        //TODO: Add "WithArrayDataSource" to kendo launcher
+                        //TODO: Add WithStandardToolbars(array of wanted toolbars - if none selected, you get them all)
+                        //TODO: Without paging
+                        //TODO: Make dialog wider when displaying the grid
+                        //TODO: Embed it all in a component and in that init, it will not need a timeout to render it -> we can do it like we always do!
+                        setTimeout(() => {
+                            $("#consequencesAwaitingApprovalGrid").kendoGrid({
+                                columns: [
+                                    { field: "name" },
+                                    { field: "category" },
+                                    { field: "description" }
+                                ],
+                                // The dataSource configuration is a simple array with no additional configurations.
+                                dataSource: {
+                                    data: this.consequencesAwaitingApproval
+                                }
+                            }); //TODO: Rewrite in the kendo launcher
+                        }, 1000);
                         this.busy = false;
                     } else {
                         this.performUpdate();
                     }
                 })
-            /*
-                TODO: Get consequences
-                TODO: if no consequences, just do the PUT
-                TODO: if consequences, lock the sync level input and show the consequences
-                TODO: await approval
-                TODO: if approved, perform the update
-                TODO: if not, change state, remoload view with current settings
-             */
         }
     }
 
