@@ -76,7 +76,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage DeleteUnitWithRegistrations(int unitId, int organizationId)
         {
-            return _organizationUnitService.DeleteUnitWithOrganizationRegistrations(unitId)
+            return _organizationUnitService.DeleteUnitWithOrganizationRegistrations(unitId, organizationId)
                 .Match(error =>error.FailureType switch
                         {
                             OperationFailure.NotFound => NotFound(),
