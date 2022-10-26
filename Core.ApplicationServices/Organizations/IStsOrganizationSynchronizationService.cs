@@ -33,5 +33,12 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="organizationId"></param>
         /// <returns></returns>
         Maybe<OperationError> Disconnect(Guid organizationId);
+        /// <summary>
+        /// Retrieves a view of the consequences of updating the synchronized hierarchy from that which exists in STS Organization
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="levelsToInclude"></param>
+        /// <returns></returns>
+        Result<OrganizationTreeUpdateConsequences, OperationError> GetConnectionExternalHierarchyUpdateConsequences(Guid organizationId, Maybe<int> levelsToInclude);
     }
 }

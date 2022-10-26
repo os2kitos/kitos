@@ -5,7 +5,6 @@ using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
-using Ninject.Activation;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
 
@@ -86,6 +85,8 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 return BadRequest($"{nameof(synchronizationDepth)} must greater than 0");
             }
+
+            //TODO: Define consequences DTO - Consider exposing it using odata???????
             throw new NotImplementedException("yet");
         }
 

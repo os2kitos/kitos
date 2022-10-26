@@ -120,6 +120,18 @@ namespace Core.ApplicationServices.Organizations
             });
         }
 
+        public Result<OrganizationTreeUpdateConsequences, OperationError> GetConnectionExternalHierarchyUpdateConsequences(Guid organizationId, Maybe<int> levelsToInclude)
+        {
+            return GetOrganizationWithImportPermission(organizationId)
+                .Match(organization =>
+                        LoadOrganizationUnits(organization)
+                            .Bind(root => organization
+                                .ComputeExternalOrganizationHierarchyUpdateConsequences(
+                                    OrganizationUnitOrigin.STS_Organisation, root, levelsToInclude))
+                    ,
+                    error => error
+                );
+        }
 
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {
