@@ -9,7 +9,7 @@ namespace Core.ApplicationServices.Organizations
         Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId);
         Result<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole rightId);
         Result<OrganizationRight, OperationFailure> RemoveRole(int rightId);
-        Maybe<OperationError> RemoveUnitRole(int rightId);
+        Maybe<OperationError> RemoveOrganizationUnitRight(int rightId);
         Maybe<OperationError> RemoveUnitRightsByIds(IEnumerable<int> rightIds);
         Maybe<OperationError> TransferUnitRightsByIds(int targetUnitId, IEnumerable<int> rightIds);
     }

@@ -84,7 +84,7 @@ namespace Core.ApplicationServices.Organizations
             return RemoveRight(right);
         }
 
-        public Maybe<OperationError> RemoveUnitRole(int rightId)
+        public Maybe<OperationError> RemoveOrganizationUnitRight(int rightId)
         {
             return RemoveUnitRightsByIds(rightId.WrapAsEnumerable());
         }
