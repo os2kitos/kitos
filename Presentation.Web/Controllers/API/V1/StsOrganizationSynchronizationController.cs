@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
@@ -86,8 +87,10 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest($"{nameof(synchronizationDepth)} must greater than 0");
             }
 
-            //TODO: Define consequences DTO - Consider exposing it using odata???????
-            throw new NotImplementedException("yet");
+            return _stsOrganizationSynchronizationService
+                .GetConnectionExternalHierarchyUpdateConsequences(organizationId, synchronizationDepth.FromNullableValueType())
+                .Select(MapDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPut]
@@ -95,6 +98,100 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
             throw new NotImplementedException("yet");
+        }
+
+        #region DTO Mapping
+        private static ConnectionUpdateConsequencesResponseDTO MapDTO(OrganizationTreeUpdateConsequences consequences)
+        {
+            var dtos = new List<ConnectionUpdateOrganizationUnitConsequenceDTO>();
+            dtos.AddRange(MapAddedOrganizationUnits(consequences));
+            dtos.AddRange(MapRenamedOrganizationUnits(consequences));
+            dtos.AddRange(MapMovedOrganizationUnits(consequences));
+            dtos.AddRange(MapRemovedOrganizationUnits(consequences));
+            dtos.AddRange(MapConvertedOrganizationUnits(consequences));
+            return new ConnectionUpdateConsequencesResponseDTO
+            {
+                Consequences = dtos
+            };
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .DeletedExternalUnitsBeingConvertedToNativeUnits
+                .Select(converted => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                {
+                    Name = converted.Name,
+                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Converted,
+                    Uuid = converted.ExternalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{converted.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .DeletedExternalUnitsBeingDeleted
+                .Select(deleted => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                {
+                    Name = deleted.Name,
+                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Deleted,
+                    Uuid = deleted.ExternalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{deleted.Name}' slettes."
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .OrganizationUnitsBeingMoved
+                .Select(moved =>
+                {
+                    var (movedUnit, oldParent, newParent) = moved;
+                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
+                    {
+                        Name = movedUnit.Name,
+                        Category = ConnectionUpdateOrganizationUnitChangeCategory.Moved,
+                        Uuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        Description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
+                    };
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .OrganizationUnitsBeingRenamed
+                .Select(renamed =>
+                {
+                    var (affectedUnit, oldName, newName) = renamed;
+                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
+                    {
+                        Name = oldName,
+                        Category = ConnectionUpdateOrganizationUnitChangeCategory.Renamed,
+                        Uuid = affectedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        Description = $"'{oldName}' omdøbes til '{newName}'"
+                    };
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .AddedExternalOrganizationUnits
+                .Select(added => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                {
+                    Name = added.unitToAdd.Name,
+                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Added,
+                    Uuid = added.unitToAdd.Uuid,
+                    Description = $"'{added.unitToAdd.Name}' tilføjes som underenhed til '{added.parent.Name}'"
+                }
+                )
+                .ToList();
         }
 
         private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
@@ -106,5 +203,6 @@ namespace Presentation.Web.Controllers.API.V1
                 Children = organizationUnit.Children.Select(MapOrganizationUnitDTO).ToList()
             };
         }
+        #endregion DTO Mapping
     }
 }
