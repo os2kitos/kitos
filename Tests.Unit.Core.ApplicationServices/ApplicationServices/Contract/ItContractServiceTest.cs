@@ -28,23 +28,13 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
     {
         private readonly ItContractService _sut;
         private readonly Mock<IItContractRepository> _contractRepository;
+        private readonly Mock<IGenericRepository<EconomyStream>> _economyStreamRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IReferenceService> _referenceService;
-        private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
-        private readonly Mock<IOptionsService<ItContract, CriticalityType>> _criticalityOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, ItContractType>> _contractTypeOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, ItContractTemplateType>> _contractTemplateOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, PurchaseFormType>> _purchaseFromOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, ProcurementStrategyType>> _procurementStrategyOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, PaymentModelType>> _paymentModelOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, PaymentFreqencyType>> _paymentFreqencyOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, OptionExtendType>> _optionExtendOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, TerminationDeadlineType>> _terminationDeadlineOptionsServiceMock;
-        private readonly Mock<IGenericRepository<EconomyStream>> _economyStreamRepositoryMock;
 
         public ItContractServiceTest()
         {
@@ -53,19 +43,19 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _domainEvents = new Mock<IDomainEvents>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _referenceService = new Mock<IReferenceService>();
-            _logger = new Mock<ILogger>();
+            var logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
-            _criticalityOptionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
-            _contractTypeOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractType>>();
-            _contractTemplateOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractTemplateType>>();
-            _purchaseFromOptionsServiceMock = new Mock<IOptionsService<ItContract, PurchaseFormType>>();
-            _procurementStrategyOptionsServiceMock = new Mock<IOptionsService<ItContract, ProcurementStrategyType>>();
-            _paymentModelOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentModelType>>();
-            _paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
-            _optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
-            _terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
-            _economyStreamRepositoryMock = new Mock<IGenericRepository<EconomyStream>>();
+            var criticalityOptionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
+            var contractTypeOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractType>>();
+            var contractTemplateOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractTemplateType>>();
+            var purchaseFromOptionsServiceMock = new Mock<IOptionsService<ItContract, PurchaseFormType>>();
+            var procurementStrategyOptionsServiceMock = new Mock<IOptionsService<ItContract, ProcurementStrategyType>>();
+            var paymentModelOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentModelType>>();
+            var paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
+            var optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
+            var terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
+            _economyStreamRepository = new Mock<IGenericRepository<EconomyStream>>();
 
             _sut = new ItContractService(
                 _contractRepository.Object,
@@ -73,19 +63,19 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _transactionManager.Object,
                 _domainEvents.Object,
                 _authorizationContext.Object,
-                _logger.Object,
+                logger.Object,
                 _contractDataProcessingRegistrationAssignmentService.Object,
                 _userContextMock.Object,
-                _criticalityOptionsServiceMock.Object,
-                _contractTypeOptionsServiceMock.Object,
-                _contractTemplateOptionsServiceMock.Object,
-                _purchaseFromOptionsServiceMock.Object,
-                _procurementStrategyOptionsServiceMock.Object,
-                _paymentModelOptionsServiceMock.Object,
-                _paymentFreqencyOptionsServiceMock.Object,
-                _optionExtendOptionsServiceMock.Object,
-                _terminationDeadlineOptionsServiceMock.Object,
-                _economyStreamRepositoryMock.Object);
+                criticalityOptionsServiceMock.Object,
+                contractTypeOptionsServiceMock.Object,
+                contractTemplateOptionsServiceMock.Object,
+                purchaseFromOptionsServiceMock.Object,
+                procurementStrategyOptionsServiceMock.Object,
+                paymentModelOptionsServiceMock.Object,
+                paymentFreqencyOptionsServiceMock.Object,
+                optionExtendOptionsServiceMock.Object,
+                terminationDeadlineOptionsServiceMock.Object,
+                _economyStreamRepository.Object);
         }
 
         [Fact]
@@ -145,11 +135,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Ok); 
-            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(It.IsAny<EconomyStream>()), Times.Exactly(4));
-            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(externEconomyStream1), Times.Once);
-            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(externEconomyStream2), Times.Once);
-            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(internEconomyStream1), Times.Once);
-            _economyStreamRepositoryMock.Verify(x => x.DeleteWithReferencePreload(internEconomyStream2), Times.Once);
+            _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(It.IsAny<EconomyStream>()), Times.Exactly(4));
+            _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(externEconomyStream1), Times.Once);
+            _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(externEconomyStream2), Times.Once);
+            _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream1), Times.Once);
+            _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream2), Times.Once);
             _contractRepository.Verify(x => x.DeleteContract(itContract), Times.Once);
             _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<ItContract>>(cd => cd.Entity == itContract)), Times.Once);
             _referenceService.Verify(x => x.DeleteByContractId(contractId), Times.Once);

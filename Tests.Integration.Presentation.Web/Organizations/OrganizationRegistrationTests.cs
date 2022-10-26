@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
@@ -78,9 +76,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
 
             registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
-            Assert.Single(registrationsRootAfterDeletion.Payments);
-            payment = registrationsRootAfterDeletion.Payments.FirstOrDefault();
-            Assert.Empty(payment.ExternalPayments);
+            Assert.Empty(registrationsRootAfterDeletion.Payments);
 
             //----Check Contract registrations deletion----
             selectedRegistrations = CreateChangeParametersWithOnlyContractRegistrations(registrations);
@@ -110,7 +106,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var (_, _, _, _, _, unit) = await SetupRegistrations(organizationId);
 
-            await OrganizationRegistrationHelper.DeleteUnitWithRegistrationsAsync(unit.Id);
+            await OrganizationRegistrationHelper.DeleteUnitWithRegistrationsAsync(unit.Id, organizationId);
 
             var rootOrganizationUnit = await OrganizationUnitHelper.GetOrganizationUnitsAsync(organizationId);
             Assert.DoesNotContain(unit.Id, rootOrganizationUnit.Children.Select(x => x.Id));
@@ -138,14 +134,31 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
             AssertRegistrationIsValid(right, registrationsUnit2.OrganizationUnitRights);
 
-            //----First transfer payments and contractRegistration, than assert----
             //----Internal payments----
             selectedRegistrations = CreateChangeParametersWithOnlyInternalPayment(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
 
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            Assert.Single(registrationsUnit1.Payments);
+            var payment = registrationsUnit1.Payments.FirstOrDefault();
+            Assert.Empty(payment.InternalPayments);
+
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            Assert.Single(registrationsUnit2.Payments);
+            var targetPayment = registrationsUnit2.Payments.FirstOrDefault();
+            AssertRegistrationIsValid(internalEconomyStream, targetPayment.InternalPayments);
+
             //----External payments----
             selectedRegistrations = CreateChangeParametersWithOnlyExternalPayment(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
+
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            Assert.Empty(registrationsUnit1.Payments);
+
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            Assert.Single(registrationsUnit2.Payments);
+            targetPayment = registrationsUnit2.Payments.FirstOrDefault();
+            AssertRegistrationIsValid(externalEconomyStream, targetPayment.ExternalPayments);
 
             //----Contract registrations----
             selectedRegistrations = CreateChangeParametersWithOnlyContractRegistrations(registrations);
@@ -158,10 +171,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
             registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
             AssertRegistrationIsValid(contract, registrationsUnit2.ItContractRegistrations);
 
-            Assert.Single(registrationsUnit2.Payments);
-            var targetPayment = registrationsUnit2.Payments.FirstOrDefault();
-            AssertRegistrationIsValid(externalEconomyStream, targetPayment.ExternalPayments);
-            AssertRegistrationIsValid(internalEconomyStream, targetPayment.InternalPayments);
 
             //----Relevant systems----
             selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);

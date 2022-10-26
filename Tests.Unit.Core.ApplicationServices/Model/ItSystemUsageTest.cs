@@ -342,14 +342,14 @@ namespace Tests.Unit.Core.Model
             var targetUnit = new OrganizationUnit {Id = A<int>()};
             var usage = new ItSystemUsage
             {
-                UsedBy = new List<ItSystemUsageOrgUnitUsage> { responsibleUsage, new() { OrganizationUnit = targetUnit, OrganizationUnitId = targetUnit.Id } },
+                UsedBy = new List<ItSystemUsageOrgUnitUsage> { responsibleUsage },
                 ResponsibleUsage = responsibleUsage,
             };
 
             var result = usage.TransferOrganizationalUsage(targetUnit);
 
             Assert.False(result.HasValue);
-            Assert.Equal(targetUnit.Id, usage.ResponsibleUsage.OrganizationUnitId);
+            Assert.Equal(targetUnit.Id, usage.ResponsibleUsage.OrganizationUnit.Id);
         }
 
         [Fact]

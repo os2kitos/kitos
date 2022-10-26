@@ -60,10 +60,11 @@ namespace Core.ApplicationServices.Organizations
             {
                 OrganizationUnitRights = unit.Value.Rights,
                 ItContractRegistrations = _contractService.GetContractsByResponsibleUnitId(unitId).ToList(),
+                PaymentRegistrationDetails = _contractService.GetContractsWhereUnitIsResponsibleForPayment(unitId)
+                    .Select(itContract => new PaymentRegistrationDetails(unitId, itContract)).ToList(),
                 ResponsibleSystems = _usageService.GetSystemsByResponsibleUnitId(unitId).ToList(),
                 RelevantSystems = _usageService.GetSystemsByRelevantUnitId(unitId).ToList()
             };
-            details.PaymentRegistrationDetails = details.ItContractRegistrations.ToList().Select(itContract => new PaymentRegistrationDetails(unitId, itContract)).ToList();
 
             return details;
         }

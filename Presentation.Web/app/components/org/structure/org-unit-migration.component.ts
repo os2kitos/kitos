@@ -84,7 +84,7 @@
 
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
-                .then(() => this.getData());
+                .then(() => this.refreshData());
         }
 
         transfer() {
@@ -97,8 +97,7 @@
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.transferSelectedRegistrations(this.unitId, this.selectedOrg.id, request)
                 .then(() => this.selectedOrg = null)
-                .then(() => this.getData())
-                .then(() => this.updateAnySelections());
+                .then(() => this.refreshData());
         }
 
         setSelectedOrg() {
@@ -262,8 +261,8 @@
             } as IOrganizationUnitMigrationOptions;
         }
 
-        private getData() {
-            this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
+        private getData(): ng.IPromise<void> {
+            return this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
                 this.roles.root.children = this.mapOrganizationDtoToOptions(response.organizationUnitRights);
                 this.getPaymentOptions(response.payments);
                 this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);
@@ -272,6 +271,12 @@
             }, error => {
                 console.error(error);
             });
+        }
+
+        private refreshData() {
+            this.setupOptions();
+            this.getData()
+                .then(() => this.updateAnySelections());
         }
 
         private createStandardTableConfig(title: string): IMigrationTableColumn[] {
@@ -315,8 +320,6 @@
         }
 
         private getPaymentOptions(payments: Models.Api.Organization.PaymentRegistrationDetailsDto[]) {
-            this.internalPayments.root.children = [];
-            this.externalPayments.root.children = [];
             payments.forEach(payment => {
                 this.internalPayments.root.children = this.internalPayments.root.children.concat(this.mapPaymentsToOptions(payment.itContract, payment.internalPayments));
                 this.externalPayments.root.children = this.externalPayments.root.children.concat(this.mapPaymentsToOptions(payment.itContract, payment.externalPayments));

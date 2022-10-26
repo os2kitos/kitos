@@ -637,16 +637,23 @@ namespace Core.DomainModel.ItSystemUsage
         {
             var selectedUnit = UsedBy.FirstOrDefault(x => x.OrganizationUnitId == unitId);
             if (selectedUnit == null)
-                return new OperationError(OperationFailure.NotFound);
+                return new OperationError($"Unit with id: {unitId} was not found", OperationFailure.NotFound);
             
             var relevantUnits = GetUsedByOrganizationUnits().Where(x => x.Id != unitId);
             var responsibleUnit = ResponsibleUsage?.OrganizationUnit ?? Maybe<OrganizationUnit>.None;
+            if (responsibleUnit.HasValue && responsibleUnit.Value.Id == unitId)
+                responsibleUnit = Maybe<OrganizationUnit>.None;
+
             return UpdateOrganizationalUsage(relevantUnits, responsibleUnit);
         }
 
         public Maybe<OperationError> TransferOrganizationalUsage(OrganizationUnit targetUnit)
         {
-            return UpdateOrganizationalUsage(GetUsedByOrganizationUnits(), targetUnit);
+            var usedByOrganizations = GetUsedByOrganizationUnits().ToList();
+            if(usedByOrganizations.All(x => x.Id != targetUnit.Id))
+                usedByOrganizations.Add(targetUnit);
+
+            return UpdateOrganizationalUsage(usedByOrganizations, targetUnit);
         }
 
         public Maybe<OperationError> TransferUsedByUnit(int unitId, OrganizationUnit targetUnit)
@@ -661,7 +668,7 @@ namespace Core.DomainModel.ItSystemUsage
                 relevantUnits.Add(targetUnit);
             }
 
-            if (ResponsibleUsage?.OrganizationUnit == null || relevantUnits.All(x => x.Id != ResponsibleUsage?.OrganizationUnit.Id))
+            if (ResponsibleUsage?.OrganizationUnit == null || relevantUnits.All(x => x.Id != ResponsibleUsage?.OrganizationUnit.Id || x.Id == unitId))
             {
                 return UpdateOrganizationalUsage(relevantUnits, Maybe<OrganizationUnit>.None);
             }

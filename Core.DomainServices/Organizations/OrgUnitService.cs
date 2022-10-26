@@ -118,7 +118,6 @@ namespace Core.DomainServices.Organizations
                 _itSystemUsageOrgUnitUsageRepository.Delete(itSystemUsage);
 
             }
-            _itSystemUsageOrgUnitUsageRepository.Save();
 
             // attach children to parent of this instance to avoid orphans
             // parent id will never be null because users aren't allowed to delete the root node
@@ -128,7 +127,9 @@ namespace Core.DomainServices.Organizations
             }
 
             _orgUnitRepository.DeleteWithReferencePreload(orgUnit);
+            _itSystemUsageOrgUnitUsageRepository.Save();
             _orgUnitRepository.Save();
+
             transaction.Commit();
         }
 

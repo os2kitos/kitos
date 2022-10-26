@@ -9,8 +9,6 @@ using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -333,6 +331,18 @@ namespace Core.ApplicationServices.Contract
         public IEnumerable<ItContract> GetContractsByResponsibleUnitId(int unitId)
         {
             return _repository.AsQueryable().Where(x => x.ResponsibleOrganizationUnitId == unitId).ToList();
+        }
+
+        public IEnumerable<ItContract> GetContractsWhereUnitIsResponsibleForPayment(int unitId)
+        {
+            return _repository.AsQueryable().Where(x => 
+                x.InternEconomyStreams
+                    .Select(internEconomy => internEconomy.OrganizationUnitId)
+                    .Contains(unitId) 
+                || x.ExternEconomyStreams
+                    .Select(externEconomy => externEconomy.OrganizationUnitId)
+                    .Contains(unitId))
+                .ToList();
         }
 
         public Maybe<OperationError> TransferContractResponsibleUnit(Guid targetUnitUuid, int contractId)

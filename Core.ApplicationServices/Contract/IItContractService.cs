@@ -31,6 +31,7 @@ namespace Core.ApplicationServices.Contract
         Maybe<OperationError> TransferContractResponsibleUnit(Guid targetUnitUuid, int contractId);
         Maybe<OperationError> RemoveContractResponsibleUnit(int contractId);
         IEnumerable<ItContract> GetContractsByResponsibleUnitId(int unitId);
+        IEnumerable<ItContract> GetContractsWhereUnitIsResponsibleForPayment(int unitId);
         Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds);
         Maybe<OperationError> TransferPayments(int contractId, OrganizationUnit targetUnit, IEnumerable<int> paymentIds);
     }

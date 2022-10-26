@@ -42,10 +42,10 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        public static async Task DeleteUnitWithRegistrationsAsync(int unitId, Cookie optionalLogin = null)
+        public static async Task DeleteUnitWithRegistrationsAsync(int unitId, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organization-registrations/unit/{unitId}");
+            var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organization-registrations/unit/{unitId}/{organizationId}");
 
             using var response = await HttpApi.DeleteWithCookieAsync(orgUnitUrl, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
