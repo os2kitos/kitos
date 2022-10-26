@@ -74,7 +74,7 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Compute which of the potential removals that will result in removal and which will result in migration
-            var candidatesForRemovalByUuid = currentTreeByUuid
+            var candidatesForRemovalById = currentTreeByUuid
                 .Keys
                 .Except(commonKeys)
                 .Select(uuid => currentTreeByUuid[uuid])
@@ -83,31 +83,34 @@ namespace Core.DomainModel.Organization.Strategies
             var removedExternalUnitsWhichMustBeConverted = new List<OrganizationUnit>();
             var removedExternalUnitsWhichMustBeRemoved = new List<OrganizationUnit>();
 
-            foreach (var candidateForRemoval in candidatesForRemovalByUuid)
+            foreach (var candidateForRemoval in candidatesForRemovalById)
             {
                 var organizationUnit = candidateForRemoval.Value;
-                var hierarchyById = organizationUnit
+                var removedSubtreeIds = organizationUnit
                     .FlattenHierarchy()
-                    .ToDictionary(x => x.Id);
+                    .Select(x=>x.Id)
+                    .ToHashSet();
 
                 var partsOfSubtreeWhichAreMoved = parentChanges
-                    .Where(x => hierarchyById.ContainsKey(x.movedUnit.Id))
+                    .Where(x => removedSubtreeIds.Contains(x.movedUnit.Id))
                     .SelectMany(x => x.movedUnit.FlattenHierarchy())
                     .ToList();
 
                 //Remove all "moved" parts of the sub tree
                 foreach (var movedUnit in partsOfSubtreeWhichAreMoved)
                 {
-                    hierarchyById.Remove(movedUnit.Id);
+                    removedSubtreeIds.Remove(movedUnit.Id);
                 }
 
                 //Remove all "removed" parts of the sub tree
-                foreach (var removedItem in candidatesForRemovalByUuid.Where(x => x.Key != candidateForRemoval.Key).ToList())
+                bool IsNotCurrentCandidate(KeyValuePair<int, OrganizationUnit> keyValuePair) => keyValuePair.Key != candidateForRemoval.Key;
+                var otherRemovals = candidatesForRemovalById.Where(IsNotCurrentCandidate).ToList();
+                foreach (var removedItem in otherRemovals)
                 {
-                    hierarchyById.Remove(removedItem.Key);
+                    removedSubtreeIds.Remove(removedItem.Key);
                 }
 
-                if (hierarchyById.Count != 1)
+                if (removedSubtreeIds.Count != 1)
                 {
                     //Anything left except the candidate, then we must convert the unit to a KITOS-unit?
                     removedExternalUnitsWhichMustBeConverted.Add(organizationUnit);
