@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _stsOrganizationSynchronizationService
                 .GetConnectionExternalHierarchyUpdateConsequences(organizationId, synchronizationDepth.FromNullableValueType())
-                .Select(MapDTO)
+                .Select(MapUpdateConsequencesResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         #region DTO Mapping
-        private static ConnectionUpdateConsequencesResponseDTO MapDTO(OrganizationTreeUpdateConsequences consequences)
+        private static ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
         {
             var dtos = new List<ConnectionUpdateOrganizationUnitConsequenceDTO>();
             dtos.AddRange(MapAddedOrganizationUnits(consequences));
