@@ -41,6 +41,10 @@ namespace Tests.Unit.Core.Model.Strategies
                 OrganizationUnitOrigin.STS_Organisation, new[]
                 {
                     CreateOrganizationUnit(OrganizationUnitOrigin.Kitos),
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,new []
+                    {
+                        CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                    }),
                     CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, new[]
                     {
                         CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation),
@@ -406,7 +410,62 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.OrganizationUnitsBeingMoved);
         }
 
-        //TODO: Check that item moved from deleted parent is not marked as deleted
+        [Fact]
+        public void ComputeUpdate_Detects_Removed_Nodes_Where_Leafs_Are_Moved_To_Removed_UnitsParent()
+        {
+            //Arrange
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var expectedRemovedUnit = root
+                .FlattenHierarchy()
+                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
+                    x != root &&
+                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
+                    !x.IsLeaf() &&
+                    x.FlattenHierarchy().All(c => c.Origin == OrganizationUnitOrigin.STS_Organisation))
+                .RandomItem();
+
+            var expectedParentChanges = expectedRemovedUnit.Children;
+
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                if (current == expectedRemovedUnit.Parent)
+                {
+                    return currentChildren
+                        .Where(child => child != expectedRemovedUnit)
+                        //Move the children of the removed item to the removed item's parent
+                        .Concat(expectedParentChanges.Select(x => new OrganizationUnit
+                        {
+                            Id = x.Id,
+                            Organization = _organization,
+                            ExternalOriginUuid = x.ExternalOriginUuid,
+                            Origin = x.Origin,
+                            Children = x.Children,
+                            Name = x.Name
+                        })).ToList();
+                }
+                return currentChildren;
+            });
+
+            //Act
+            var consequences = _sut.ComputeUpdate(externalTree);
+
+            //Assert
+            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Same(expectedRemovedUnit, removedUnit);
+            var movedUnits = consequences.OrganizationUnitsBeingMoved.ToList();
+            Assert.Equal(expectedParentChanges.Count, movedUnits.Count);
+            foreach (var (movedUnit, oldParent, newParent) in movedUnits)
+            {
+                Assert.Equal(removedUnit, oldParent);
+                Assert.Equal(removedUnit.Parent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
+                Assert.Contains(movedUnit, expectedParentChanges);
+            }
+
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+        }
 
         private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>> customChildren = null)
         {

@@ -394,7 +394,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<Organization>>(org => org.Entity == organization)), Times.Never());
         }
 
-
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
             var transaction = new Mock<IDatabaseTransaction>();
