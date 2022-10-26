@@ -227,8 +227,8 @@
             this.internalPaymentTableConfig = this.createPaymentTableConfig("Internal payments");
             this.externalPaymentTableConfig = this.createPaymentTableConfig("External payments");
             this.contractTableConfig = this.createStandardTableConfig("Contract registrations");
-            this.relevantSystemTableConfig = this.createStandardTableConfig("Relevant systems");
-            this.responsibleSystemTableConfig = this.createStandardTableConfig("Responsible systems");
+            this.relevantSystemTableConfig = this.createSystemTableConfig("Relevant systems");
+            this.responsibleSystemTableConfig = this.createSystemTableConfig("Responsible systems");
         }
 
         private setupOptions() {
@@ -265,11 +265,11 @@
 
         private getData() {
             this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
-                this.roles.root.children = this.mapOrganizationRegistrationsToOptions(response.organizationUnitRights);
+                this.roles.root.children = this.mapOrganizationDtoToOptions(response.organizationUnitRights);
                 this.getPaymentOptions(response.payments);
-                this.contractRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.itContractRegistrations);
-                this.relevantSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.relevantSystems);
-                this.responsibleSystemRegistrations.root.children = this.mapOrganizationRegistrationsToOptions(response.responsibleSystems);
+                this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);
+                this.relevantSystemRegistrations.root.children = this.mapOrganizationDtoWithEnabledToOptions(response.relevantSystems);
+                this.responsibleSystemRegistrations.root.children = this.mapOrganizationDtoWithEnabledToOptions(response.responsibleSystems);
             }, error => {
                 console.error(error);
             });
@@ -281,6 +281,13 @@
             ] as IMigrationTableColumn[];
         }
 
+        private createSystemTableConfig(title: string): IMigrationTableColumn[] {
+            return [
+                { title: title, property: "text" },
+                { title: "Status", property: "objectText" },
+            ] as IMigrationTableColumn[];
+        }
+
         private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: "Index", property: "index" },
@@ -289,12 +296,22 @@
             ] as IMigrationTableColumn[];
         }
 
-        private mapOrganizationRegistrationsToOptions(registrations: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
+        private mapOrganizationDtoToOptions(registrations: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
             return registrations.map(res => {
                 return {
                     id: res.id,
                     text: res.name,
                 } as Models.Organization.IOrganizationUnitRegistration;
+            });
+        }
+
+        private mapOrganizationDtoWithEnabledToOptions(registrations: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
+            return registrations.map(res => {
+                return {
+                    id: res.id,
+                    text: res.name,
+                    objectText: res.disabled ? "Ikke aktivt" : "Aktivt" 
+            } as Models.Organization.IOrganizationUnitRegistration;
             });
         }
 
