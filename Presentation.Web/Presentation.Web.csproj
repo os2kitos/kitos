@@ -401,7 +401,6 @@
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V1\Mapping\OrganizationRegistrationMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
@@ -420,7 +419,6 @@
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangeOrganizationRegistrationRequest.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationOption.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
