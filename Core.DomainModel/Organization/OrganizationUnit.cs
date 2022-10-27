@@ -24,6 +24,8 @@ namespace Core.DomainModel.Organization
             Uuid = uuid;
             Origin = OrganizationUnitOrigin.Kitos;
             Children = new List<OrganizationUnit>();
+            ResponsibleForItContracts = new List<ItContract.ItContract>();
+            EconomyStreams = new List<EconomyStream>();
         }
 
         /// <summary>
@@ -60,14 +62,7 @@ namespace Core.DomainModel.Organization
         /// Local tasks that was created in this unit
         /// </summary>
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
-        /// <summary>
-        /// Gets or sets the delegated system usages.
-        /// </summary>
-        /// <value>
-        /// The delegated system usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
-
+        
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.
         /// </summary>
@@ -148,11 +143,16 @@ namespace Core.DomainModel.Organization
         {
             if (Origin == OrganizationUnitOrigin.Kitos)
             {
-                throw new InvalidOperationException("Alrady a kitos unit");
+                throw new InvalidOperationException("Already a KITOS unit");
             }
 
             Origin = OrganizationUnitOrigin.Kitos;
             ExternalOriginUuid = null;
+        }
+
+        public bool IsUsed()
+        {
+            return Using.Any() || EconomyStreams.Any() || ResponsibleForItContracts.Any() || Rights.Any();
         }
     }
 }

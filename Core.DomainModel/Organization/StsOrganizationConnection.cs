@@ -1,4 +1,7 @@
-﻿namespace Core.DomainModel.Organization
+﻿using System.Linq;
+using Core.DomainModel.Organization.Strategies;
+
+namespace Core.DomainModel.Organization
 {
 
     /// <summary>
@@ -15,10 +18,19 @@
         public int? SynchronizationDepth { get; set; }
         //TODO https://os2web.atlassian.net/browse/KITOSUDV-3317 adds the change logs here
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3312 adds automatic subscription here
-        public void Disconnect()
+        public DisconnectOrganizationFromOriginResult Disconnect()
         {
+            var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
+            organizationUnits.ForEach(unit => unit.ConvertToKitosUnit());
+
             Connected = false;
             SynchronizationDepth = null;
+            return new DisconnectOrganizationFromOriginResult(organizationUnits);
+        }
+
+        public IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy()
+        {
+            return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
     }
 }

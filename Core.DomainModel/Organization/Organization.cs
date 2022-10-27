@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
+using Core.DomainModel.Organization.Strategies;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
 
@@ -187,7 +189,37 @@ namespace Core.DomainModel.Organization
             return moduleCustomization;
         }
 
-        public Maybe<OperationError> ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        public Result<OrganizationTreeUpdateConsequences, OperationError> ComputeExternalOrganizationHierarchyUpdateConsequences(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+
+            IExternalOrganizationalHierarchyUpdateStrategy strategy;
+            //Pre-validate
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+                    if (StsOrganizationConnection?.Connected != true)
+                    {
+                        return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.Conflict);
+                    }
+                    strategy = StsOrganizationConnection.GetUpdateStrategy();
+                    break;
+                case OrganizationUnitOrigin.Kitos:
+                    return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var childLevelsToInclude = levelsIncluded.Select(levels=>levels-1); //subtract the root level before copying
+            var filteredTree = root.Copy(childLevelsToInclude);
+
+            return strategy.ComputeUpdate(filteredTree);
+        }
+
+        public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
         {
             if (root == null)
             {
@@ -203,7 +235,7 @@ namespace Core.DomainModel.Organization
                     }
                     break;
                 case OrganizationUnitOrigin.Kitos:
-                    return new OperationError("Kitos is not an external source",OperationFailure.BadInput);
+                    return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -240,12 +272,7 @@ namespace Core.DomainModel.Organization
                     {
                         return new OperationError("Not connected", OperationFailure.BadState);
                     }
-
-                    var organizationUnits = OrgUnits.Where(x => x.Origin == origin).ToList();
-                    organizationUnits.ForEach(unit => unit.ConvertToKitosUnit());
-                    StsOrganizationConnection.Disconnect();
-                    return new DisconnectOrganizationFromOriginResult(organizationUnits);
-                    break;
+                    return StsOrganizationConnection.Disconnect();
                 case OrganizationUnitOrigin.Kitos:
                     return new OperationError("Kitos is not an external source and cannot be disconnected", OperationFailure.BadInput);
                 default:

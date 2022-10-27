@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
@@ -40,51 +41,18 @@ namespace Core.DomainServices.Organizations
         {
             var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
 
-            return GetSubTree(orgUnit);
+            return orgUnit.FlattenHierarchy().ToList();
         }
 
-        public ICollection<OrganizationUnit> GetSubTree(OrganizationUnit unit)
+        public bool DescendsFrom(int descendantUnitId, int ancestorUnitId)
         {
-            var unreached = new Queue<OrganizationUnit>();
-            var reached = new List<OrganizationUnit>();
-
-            unreached.Enqueue(unit);
-            while (unreached.Count > 0)
+            var unit = _orgUnitRepository.GetByKey(descendantUnitId);
+            if (unit == null)
             {
-                var orgUnit = unreached.Dequeue();
-
-                reached.Add(orgUnit);
-
-                foreach (var child in orgUnit.Children)
-                {
-                    unreached.Enqueue(child);
-                }
+                throw new ArgumentException($"Invalid org unit id:{descendantUnitId}");
             }
 
-            return reached;
-        }
-
-        public bool IsAncestorOf(OrganizationUnit unit, OrganizationUnit ancestor)
-        {
-            if (unit == null || ancestor == null) return false;
-
-            do
-            {
-                if (unit.Id == ancestor.Id) return true;
-
-                unit = unit.Parent;
-
-            } while (unit != null);
-
-            return false;
-        }
-
-        public bool IsAncestorOf(int unitId, int ancestorId)
-        {
-            var unit = _orgUnitRepository.GetByKey(unitId);
-            var ancestor = _orgUnitRepository.GetByKey(ancestorId);
-
-            return IsAncestorOf(unit, ancestor);
+            return unit.SearchAncestry(ancestor => ancestor.Id == ancestorUnitId).HasValue;
         }
 
         public void Delete(int id)

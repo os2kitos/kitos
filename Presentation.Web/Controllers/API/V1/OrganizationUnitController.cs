@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -56,9 +57,7 @@ namespace Presentation.Web.Controllers.API.V1
                 var userId = UserId;
                 var orgUnits = Repository
                     .Get(x => x.Rights.Any(y => y.UserId == userId) && x.OrganizationId == organizationId)
-                    .SelectNestedChildren(x => x.Children).ToList();
-
-                orgUnits = orgUnits
+                    .SelectMany(unit => unit.FlattenHierarchy())
                     .Distinct()
                     .ToList();
 
@@ -129,7 +128,7 @@ namespace Presentation.Web.Controllers.API.V1
                     var parentId = jtoken.Value<int>();
 
                     //if the new parent is actually a descendant of the item, don't update - this would create a loop!
-                    if (_orgUnitService.IsAncestorOf(parentId, id))
+                    if (_orgUnitService.DescendsFrom(parentId, id))
                     {
                         return Conflict("OrgUnit loop detected");
                     }

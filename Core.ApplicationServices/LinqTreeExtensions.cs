@@ -7,34 +7,6 @@ using System.Text;
 
 namespace Core.ApplicationServices
 {
-    public static class LinqTreeExtension
-    {
-       public static IEnumerable<T> SelectNestedChildren<T>
-            (this IEnumerable<T> source, Func<T, IEnumerable<T>> selector)
-        {
-            foreach (var item in source)
-            {
-                yield return item;
-                foreach (var subItem in SelectNestedChildren(selector(item), selector))
-                {
-                    yield return subItem;
-                }
-            }
-        }
-
-        public static IEnumerable<T> SelectNestedParents<T>
-            (this T source, Func<T, T> selector)
-            where T : class
-        {
-            var current = selector(source);
-            while (current != null)
-            {
-                yield return current;
-                current = selector(current);
-            }
-        }
-    }
-
     public static class QueryableExtension
     {
         public static IQueryable<T> OrderByField<T>(this IQueryable<T> q, string sortField, bool descending = false)
