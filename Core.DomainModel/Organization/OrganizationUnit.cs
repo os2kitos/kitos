@@ -157,7 +157,7 @@ namespace Core.DomainModel.Organization
 
         public bool CanBeDeleted()
         {
-            return Origin == OrganizationUnitOrigin.Kitos;
+            return Parent != null && Origin == OrganizationUnitOrigin.Kitos;
         }
     }
 }

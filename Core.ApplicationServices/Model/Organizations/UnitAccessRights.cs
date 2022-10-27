@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.ApplicationServices.Model.Organizations
+﻿namespace Core.ApplicationServices.Model.Organizations
 {
     public class UnitAccessRights
     {
-        public UnitAccessRights(bool canBeRead, bool canBeModified, bool canBeDeleted)
+        public UnitAccessRights(bool canBeRead, bool canBeModified, bool canNameBeModified, bool canBeRearranged, bool canBeDeleted)
         {
             CanBeRead = canBeRead;
             CanBeModified = canBeModified;
+            CanNameBeModified = canNameBeModified;
+            CanBeRearranged = canBeRearranged;
             CanBeDeleted = canBeDeleted;
         }
 
         public bool CanBeRead { get; set; }
         public bool CanBeModified { get; set; }
+        public bool CanNameBeModified { get; set; }
+        public bool CanBeRearranged{ get; set; }
         public bool CanBeDeleted { get; set; }
     }
 }

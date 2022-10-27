@@ -257,8 +257,8 @@ namespace Core.DomainModel.Organization
             var unit = OrgUnits.FirstOrDefault(x => x.Id == unitId);
             if (unit == null)
                 return new OperationError("Unit doesn't exist in the organization", OperationFailure.NotFound);
-            if (unit.Origin != OrganizationUnitOrigin.Kitos)
-                return new OperationError("Only a KITOS unit can be deleted", OperationFailure.BadState);
+            if (!unit.CanBeDeleted())
+                return new OperationError("Unit cannot be deleted", OperationFailure.BadState);
             if (unit.Using.Any() || unit.Rights.Any() || unit.EconomyStreams.Any() ||
                 unit.ResponsibleForItContracts.Any() || unit.DelegatedSystemUsages.Any())
                 return new OperationError("Unit has assigned registrations", OperationFailure.BadState);

@@ -364,7 +364,7 @@
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", "organizationRegistrationsService", function ($modalScope, $modalInstance, autofocus, organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
+                        "$scope", "$uibModalInstance", "autofocus", "organizationUnitService", function ($modalScope, $modalInstance, autofocus, organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
                             autofocus();
 
                             // edit or create-new mode
@@ -539,7 +539,7 @@
 
                                 $modalScope.submitting = true;
 
-                                organizationRegistrationsService.deleteOrganizationUnit(unit.id, unit.organizationId)
+                                organizationUnitService.deleteOrganizationUnit(unit.id, unit.organizationId)
                                     .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();

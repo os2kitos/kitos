@@ -35,8 +35,8 @@
         unitId: number | null = null;
         root: IOrganizationUnitMigrationRoot;
 
-        static $inject: string[] = ["organizationRegistrationsService"];
-        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService) {
+        static $inject: string[] = ["organizationUnitService"];
+        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService) {
         }
 
         $onInit() {
@@ -79,7 +79,7 @@
             const request = this.createChangeRequest(registration);
             registration.selected = false;
 
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
+            this.organizationUnitService.deleteSelectedRegistrations(this.unitId, request)
                 .then(() => this.options.refreshData());
         }
 

@@ -54,8 +54,8 @@
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
         
-        static $inject: string[] = ["organizationRegistrationsService", "organizationApiService"];
-        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
+        static $inject: string[] = ["organizationUnitService", "organizationApiService"];
+        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
             private readonly organizationApiService: Services.IOrganizationApiService) {
         }
 
@@ -83,7 +83,7 @@
             }
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
+            this.organizationUnitService.deleteSelectedRegistrations(this.unitId, request)
                 .then(() => this.refreshData());
         }
 
@@ -95,7 +95,7 @@
             }
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.transferSelectedRegistrations(this.unitId, this.selectedOrg.id, request)
+            this.organizationUnitService.transferSelectedRegistrations(this.unitId, this.selectedOrg.id, request)
                 .then(() => this.selectedOrg = null)
                 .then(() => this.refreshData());
         }
@@ -262,7 +262,7 @@
         }
 
         private getData(): ng.IPromise<void> {
-            return this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
+            return this.organizationUnitService.getRegistrations(this.unitId).then(response => {
                 this.roles.root.children = this.mapOrganizationDtoToOptions(response.organizationUnitRights);
                 this.getPaymentOptions(response.payments);
                 this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);

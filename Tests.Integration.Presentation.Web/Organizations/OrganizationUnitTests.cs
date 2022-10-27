@@ -15,8 +15,53 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations
 {
-    public class OrganizationRegistrationTests: WithAutoFixture
+    public class OrganizationUnitTests: WithAutoFixture
     {
+        [Fact]
+        public async Task GlobalAdmin_Has_All_AccessRights()
+        {
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var email = CreateEmail();
+            var (userId, credentials, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organizationId);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
+
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(unit.Id, cookie);
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public async Task LocalAdmin_From_Organization_Has_All_AccessRights()
+        {
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organizationId);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
+
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(unit.Id, cookie);
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public async Task User_From_Organization_Has_Only_Read_Access()
+        {
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organizationId);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
+
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(unit.Id, cookie);
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
         [Fact]
         public async Task Can_Get_Registrations()
         {
@@ -332,6 +377,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 RelevantSystems = registrations.RelevantSystems
             };
             return ToChangeParametersList(dto);
+        }
+
+        private string CreateEmail()
+        {
+            return $"{nameof(OrganizationUnitTests)}{A<string>()}@test.dk";
         }
 
         private async Task<(OrganizationUnitRight right, ItContract contract, EconomyStream externalEconomyStream, EconomyStream internalEconomyStream, ItSystemUsage usage, OrgUnitDTO unitDto)> SetupRegistrations(int organizationId)

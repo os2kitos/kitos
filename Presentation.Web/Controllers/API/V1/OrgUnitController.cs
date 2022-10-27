@@ -16,13 +16,12 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API.V1
 {
     [PublicApi]
-    [RoutePrefix("api/v1/organization-registrations")]
-
-    public class OrganizationRegistrationController: BaseApiController
+    [RoutePrefix("api/v1/organization-units")]
+    public class OrgUnitController: BaseApiController
     {
         private readonly IOrganizationUnitService _organizationUnitService;
 
-        public OrganizationRegistrationController(IOrganizationUnitService organizationUnitService)
+        public OrgUnitController(IOrganizationUnitService organizationUnitService)
         {
             _organizationUnitService = organizationUnitService;
         }
@@ -106,6 +105,23 @@ namespace Presentation.Web.Controllers.API.V1
                 }, Ok);
         }
 
+        [HttpGet]
+        [Route("access-rights/{unitId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetUnitAccessRights(int unitId)
+        {
+            return _organizationUnitService.GetUnitAccessRightsByUnitId(unitId)
+                .Match(value => Ok(ToAccessRightsDto(value)),
+                    error => error.FailureType switch
+                {
+                    OperationFailure.NotFound => NotFound(),
+                    OperationFailure.BadInput => BadRequest(error.Message.GetValueOrDefault()),
+                    _ => BadRequest()
+                });
+        }
+
         private static OrganizationRegistrationDTO ToRegistrationDto(OrganizationRegistrationDetails details)
         {
             return new OrganizationRegistrationDTO
@@ -158,6 +174,12 @@ namespace Presentation.Web.Controllers.API.V1
                 RelevantSystems = request.RelevantSystems,
                 ResponsibleSystems = request.ResponsibleSystems
             };
+        }
+
+        private static UnitAccessRightsDTO ToAccessRightsDto(
+            UnitAccessRights accessRights)
+        {
+            return new UnitAccessRightsDTO(accessRights.CanBeRead, accessRights.CanBeModified, accessRights.CanBeDeleted);
         }
     }
 }

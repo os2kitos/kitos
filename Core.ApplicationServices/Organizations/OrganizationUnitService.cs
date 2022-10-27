@@ -41,21 +41,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<UnitAccessRights, OperationError> GetUnitAccessRightsByUnitId(int unitId)
         {
-            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
-            if (unitUuid.IsNone)
-            {
-                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
-            }
-            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
-            if (unit.Failed)
-            {
-                return new OperationError("Organization not found", OperationFailure.NotFound);
-            }
-
-            var canBeRead = _authorizationContext.AllowReads(unit.Value);
-            var canBeModified = _authorizationContext.AllowModify(unit.Value);
-            var canBeDeleted = _authorizationContext.AllowDelete(unit.Value) && unit.Value.CanBeDeleted();
-            return new UnitAccessRights(canBeRead, canBeModified, canBeDeleted);
+            return GetOrganziationUnit(unitId).Select(GetUnitAccessRights);
         }
 
         public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int unitId)
@@ -182,25 +168,18 @@ namespace Core.ApplicationServices.Organizations
         private Result<OrganizationUnit, OperationError> GetOrganziationUnit(int unitId)
         {
             var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
-            if (unitUuid.IsNone)
-            {
-                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
-            }
-            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
-            if (unit.Failed)
-            {
-                return new OperationError("Organization not found", OperationFailure.NotFound);
-            }
-
-            return unit.Value;
+            return unitUuid.IsNone 
+                ? new OperationError("Organization id is invalid", OperationFailure.BadInput) 
+                : _organizationService.GetOrganizationUnit(unitUuid.Value);
         }
 
         private UnitAccessRights GetUnitAccessRights(OrganizationUnit unit)
         {
-            var canBeRead = _authorizationContext.AllowReads(unit);
             var canBeModified = _authorizationContext.AllowModify(unit);
+            var canNameBeModified = unit.;
+            var canBeRearranged = unit.;
             var canBeDeleted = _authorizationContext.AllowDelete(unit) && unit.CanBeDeleted();
-            return new UnitAccessRights(canBeRead, canBeModified, canBeDeleted);
+            return new UnitAccessRights(canBeRead: true, canBeModified, canNameBeModified, canBeRearranged,  canBeDeleted);
         }
 
         private Maybe<OperationError> RemovePayments(IEnumerable<PaymentChangeParameters> payments)

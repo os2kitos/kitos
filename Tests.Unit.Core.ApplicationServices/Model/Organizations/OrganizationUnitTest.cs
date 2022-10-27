@@ -32,7 +32,7 @@ namespace Tests.Unit.Core.Model.Organizations
             var unit = SetupOrganizationUnit(unitId, origin);
             var org = new Organization { OrgUnits = new List<OrganizationUnit> { unit } };
             
-            const string expectedErrorMessage = "Only a KITOS unit can be deleted";
+            const string expectedErrorMessage = "Unit cannot be deleted";
 
             var result = org.RemoveOrganizationUnit(unitId);
 
@@ -62,6 +62,32 @@ namespace Tests.Unit.Core.Model.Organizations
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
             Assert.Equal(expectedErrorMessage, result.Error.Message);
+        }
+
+        [Theory]
+        [InlineData(OrganizationUnitOrigin.STS_Organisation, null)]
+        [InlineData(OrganizationUnitOrigin.Kitos, 1)]
+        public void CanBeDeleted_Returns_False(OrganizationUnitOrigin origin, int? parentId)
+        {
+            var unitId = A<int>();
+            var unit = SetupOrganizationUnit(unitId, origin);
+            unit.ParentId = parentId;
+
+            var result = unit.CanBeDeleted();
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void CanBeDeleted_Returns_True()
+        {
+            var unitId = A<int>();
+            var origin = OrganizationUnitOrigin.Kitos;
+            var unit = SetupOrganizationUnit(unitId, origin);
+
+            var result = unit.CanBeDeleted();
+
+            Assert.True(result);
         }
 
         [Fact]
