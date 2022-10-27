@@ -62,14 +62,7 @@ namespace Core.DomainModel.Organization
         /// Local tasks that was created in this unit
         /// </summary>
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
-        /// <summary>
-        /// Gets or sets the delegated system usages.
-        /// </summary>
-        /// <value>
-        /// The delegated system usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; } //TODO: What is this? - is it used?
-
+        
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.
         /// </summary>
