@@ -41,16 +41,12 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int unitId)
         {
-            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
-            if (unitUuid.IsNone)
-            {
-                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
-            }
-            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            var unit = GetOrganziationUnit(unitId);
             if (unit.Failed)
             {
-                return new OperationError("Organization not found", OperationFailure.NotFound);
+                return unit.Error;
             }
+
             if (!_authorizationContext.AllowReads(unit.Value))
             {
                 return new OperationError(OperationFailure.Forbidden);
@@ -71,16 +67,12 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationChangeParameters parameters)
         {
-            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
-            if (unitUuid.IsNone)
-            {
-                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
-            }
-            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            var unit = GetOrganziationUnit(unitId);
             if (unit.Failed)
             {
-                return new OperationError("Organization not found", OperationFailure.NotFound);
+                return unit.Error;
             }
+
             if (!_authorizationContext.AllowDelete(unit.Value))
             {
                 return new OperationError(OperationFailure.Forbidden);
@@ -124,26 +116,16 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, OrganizationRegistrationChangeParameters parameters)
         {
-            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
-            if (unitUuid.IsNone)
-            {
-                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
-            }
-            var targetUnitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId);
-            if (targetUnitUuid.IsNone)
-            {
-                return new OperationError("Target organization id is invalid", OperationFailure.BadInput);
-            }
-
-            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            var unit = GetOrganziationUnit(unitId);
             if (unit.Failed)
             {
-                return new OperationError("Organization not found", OperationFailure.NotFound);
+                return unit.Error;
             }
-            var targetUnit = _organizationService.GetOrganizationUnit(targetUnitUuid.Value);
+
+            var targetUnit = GetOrganziationUnit(targetUnitId);
             if (targetUnit.Failed)
             {
-                return new OperationError("Target organization not found", OperationFailure.NotFound);
+                return targetUnit.Error;
             }
 
             if (!_authorizationContext.AllowModify(unit.Value))
@@ -164,7 +146,7 @@ namespace Core.ApplicationServices.Organizations
                 .Match
                 (
                     error => error,
-                    () => TransferContractRegistrations(targetUnitUuid.Value, parameters.ItContractRegistrations)
+                    () => TransferContractRegistrations(targetUnit.Value.Uuid, parameters.ItContractRegistrations)
                 )
                 .Match
                 (
@@ -176,6 +158,22 @@ namespace Core.ApplicationServices.Organizations
                     error => error,
                     () => TransferSystemResponsibleRegistrations(targetUnit.Value, parameters.ResponsibleSystems)
                 );
+        }
+
+        private Result<OrganizationUnit, OperationError> GetOrganziationUnit(int unitId)
+        {
+            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
+            if (unitUuid.IsNone)
+            {
+                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
+            }
+            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            if (unit.Failed)
+            {
+                return new OperationError("Organization not found", OperationFailure.NotFound);
+            }
+
+            return unit.Value;
         }
 
         private Maybe<OperationError> RemovePayments(IEnumerable<PaymentChangeParameters> payments)

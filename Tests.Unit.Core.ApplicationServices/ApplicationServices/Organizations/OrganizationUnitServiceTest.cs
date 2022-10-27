@@ -134,15 +134,19 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(false, true, "Organization id is invalid")]
-        [InlineData(true, false, "Target organization id is invalid")]
-        public void TransferSelectedOrganizationRegistrations_Returns_BadInput(bool isUnitValid, bool isTargetUnitValid, string expectedMessage)
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void TransferSelectedOrganizationRegistrations_Returns_BadInput(bool isUnitValid, bool isTargetUnitValid)
         {
             var unitId = A<int>();
+            var unitUuid = isUnitValid ? A<Guid>() : Maybe<Guid>.None;
             var targetUnitId = A<int>();
+            const string expectedMessage = "Organization id is invalid";
 
-            ExpectResolveUuidReturns(unitId, isUnitValid ? A<Guid>() :Maybe<Guid>.None);
+            ExpectResolveUuidReturns(unitId, unitUuid);
             ExpectResolveUuidReturns(targetUnitId, isTargetUnitValid ? A<Guid>() : Maybe<Guid>.None);
+            if(isUnitValid)
+                ExpectGetOrganizationUnitReturns(unitUuid.Value, new OrganizationUnit());
 
             var result = _sut.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, new OrganizationRegistrationChangeParameters());
             Assert.True(result.HasValue);
@@ -151,14 +155,15 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(false, true, "Organization not found")]
-        [InlineData(true, false, "Target organization not found")]
-        public void TransferSelectedOrganizationRegistrations_Returns_NotFound(bool isUnitValid, bool isTargetUnitValid, string expectedMessage)
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void TransferSelectedOrganizationRegistrations_Returns_NotFound(bool isUnitValid, bool isTargetUnitValid)
         {
             var unitId = A<int>();
             var targetUnitId = A<int>();
             var unitUuid = A<Guid>();
             var targetUnitIdUuid = A<Guid>();
+            var expectedMessage = "Organization not found";
             var operationError = new OperationError(expectedMessage, OperationFailure.NotFound);
 
             ExpectResolveUuidReturns(unitId, unitUuid);
