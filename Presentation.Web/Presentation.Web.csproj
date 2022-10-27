@@ -357,6 +357,7 @@
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config-import-modal.dialog.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-consequences-log.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
@@ -654,6 +655,7 @@
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-consequences-log.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config-import-modal.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
@@ -857,6 +859,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\Generic\option-type-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\edit-org-unit-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\OrganizationDeletionConflictsViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\connection-update-organization-unit-change-category-options.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />

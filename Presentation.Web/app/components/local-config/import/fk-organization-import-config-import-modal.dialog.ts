@@ -14,7 +14,7 @@
 
         open(flow: FKOrganisationImportFlow, organizationUuid: string, synchronizationDepth: number | null): ng.ui.bootstrap.IModalInstanceService {
             return this.$uibModal.open({
-                windowClass: "modal fade in",
+                windowClass: "modal fade in wide-modal",
                 templateUrl: "app/components/local-config/import/fk-organization-import-config-import-modal.view.html",
                 controller: FKOrganisationImportController,
                 controllerAs: "vm",
@@ -23,13 +23,15 @@
                     "orgUuid": [() => organizationUuid],
                     "synchronizationDepth": [() => synchronizationDepth]
                 },
-                backdrop: "static" //Make sure accidental click outside the modal does not close it during the import process
+                backdrop: "static", //Make sure accidental click outside the modal does not close it during the import process
             });
         }
     }
 
     class FKOrganisationImportController {
-        static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance"];
+        static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance", "notify"];
+        isConsequencesCollapsed: boolean = false;
+        isHierarchyCollapsed: boolean = false;
         busy: boolean = false;
         updating: boolean = false;
         loadingHierarchy: boolean | null;
@@ -40,7 +42,8 @@
             private readonly organizationUuid: string,
             initialImportDepth: number | null,
             private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService,
-            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
+            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+            private readonly notify) {
             this.fkOrgHierarchy = {
                 availableLevels: initialImportDepth,
                 root: null
@@ -49,12 +52,16 @@
 
         $onInit() {
             this.loadingHierarchy = true;
+            this.isConsequencesCollapsed = this.isHierarchyCollapsed = false;
             this.consequencesAwaitingApproval = null;
             this.stsOrganizationSyncService
                 .getSnapshot(this.organizationUuid)
                 .then(root => {
                     this.fkOrgHierarchy.root = this.createNodeVm(root);
                     this.loadingHierarchy = false;
+                }, error => {
+                    console.error(error);
+                    this.notify.addErrorMessage("Fejl i indlæsning af hierarkiet fra FK Organisation. Genindlæs siden og prøv igen.");
                 });
         }
 
@@ -91,15 +98,17 @@
         rejectConsequences() {
             this.updating = false;
             this.consequencesAwaitingApproval = null;
+            this.isHierarchyCollapsed = false;
         }
 
         private performUpdate() {
+            /*
+             TODO: https://os2web.atlassian.net/browse/KITOSUDV-3524
+                    Once completed do the stuff below in the success "then". If errror, display an error with notify and disable busy and updating
+             */
             this.updating = true;
             this.busy = true;
-            this.closeDialog(); //TODO: As a "then"
-            //TODO
-            //this.requireConsequencesApproval = false;
-            //TODO: Close
+            this.closeDialog();
         }
 
         private createConnection() {
@@ -110,6 +119,7 @@
                 }, error => {
                     console.error("Error:", error);
                     this.busy = false;
+                    this.notify.addErrorMessage("Fejl ifm. oprettelse af forbindelsen. Prøv igen.");
                 });
         }
 
@@ -119,35 +129,21 @@
         }
 
         private updateConnection() {
+            this.isConsequencesCollapsed = false;
             this.stsOrganizationSyncService
                 .getConnectionUpdateConsequences(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
                 .then(consequences => {
                     if (consequences.consequences.length > 0) {
                         this.consequencesAwaitingApproval = consequences.consequences;
-                        //TODO: Expand/collapse on the outer panel
-                        //TODO: Add "WithArrayDataSource" to kendo launcher
-                        //TODO: Add WithStandardToolbars(array of wanted toolbars - if none selected, you get them all)
-                        //TODO: Without paging
-                        //TODO: Make dialog wider when displaying the grid
-                        //TODO: Embed it all in a component and in that init, it will not need a timeout to render it -> we can do it like we always do!
-                        setTimeout(() => {
-                            $("#consequencesAwaitingApprovalGrid").kendoGrid({
-                                columns: [
-                                    { field: "name" },
-                                    { field: "category" },
-                                    { field: "description" }
-                                ],
-                                // The dataSource configuration is a simple array with no additional configurations.
-                                dataSource: {
-                                    data: this.consequencesAwaitingApproval
-                                }
-                            }); //TODO: Rewrite in the kendo launcher
-                        }, 1000);
                         this.busy = false;
                     } else {
                         this.performUpdate();
                     }
-                })
+                }, error => {
+                    console.error(error);
+                    this.busy = false;
+                    this.notify.addErrorMessage("Fejl ifm. oprettelse af opdateringen. Prøv igen.");
+                });
         }
     }
 

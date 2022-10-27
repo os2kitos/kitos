@@ -58,13 +58,16 @@
             <div class="col-xs-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Forhåndsvisning
+                        <a id="expand_collapse_consequences" class="task-fold" data-ng-click="vm.isConsequencesCollapsed = !vm.isConsequencesCollapsed">
+                            Ændringer
+                            <i ng-if="!vm.loadingHierarchy" class="faded-gray fa pull-right" ng-class="{'fa-minus-square-o': !vm.isConsequencesCollapsed, 'fa-plus-square-o': vm.isConsequencesCollapsed}"></i>
+                        </a>
                         <span class="help-block small">
-                            Viser konsekvenser af opdateringen
+                            Viser konsekvenser <strong>({{vm.consequencesAwaitingApproval.length}})</strong> af opdateringen for organisationshierarkiet i KITOS
                         </span>
                     </div>
-                    <div class="panel-body">
-                        <div id="consequencesAwaitingApprovalGrid"></div>
+                    <div class="panel-body" ng-show="!vm.isConsequencesCollapsed">
+                        <fk-orgnization-import-consequences-log data-consequences="vm.consequencesAwaitingApproval" />
                     </div>
                 </div>
             </div>
