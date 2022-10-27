@@ -39,6 +39,25 @@ namespace Core.ApplicationServices.Organizations
             _identityResolver = identityResolver;
         }
 
+        public Result<UnitAccessRights, OperationError> GetUnitAccessRightsByUnitId(int unitId)
+        {
+            var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
+            if (unitUuid.IsNone)
+            {
+                return new OperationError("Organization id is invalid", OperationFailure.BadInput);
+            }
+            var unit = _organizationService.GetOrganizationUnit(unitUuid.Value);
+            if (unit.Failed)
+            {
+                return new OperationError("Organization not found", OperationFailure.NotFound);
+            }
+
+            var canBeRead = _authorizationContext.AllowReads(unit.Value);
+            var canBeModified = _authorizationContext.AllowModify(unit.Value);
+            var canBeDeleted = _authorizationContext.AllowDelete(unit.Value) && unit.Value.CanBeDeleted();
+            return new UnitAccessRights(canBeRead, canBeModified, canBeDeleted);
+        }
+
         public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int unitId)
         {
             var unitUuid = _identityResolver.ResolveUuid<OrganizationUnit>(unitId);
@@ -176,6 +195,14 @@ namespace Core.ApplicationServices.Organizations
                     error => error,
                     () => TransferSystemResponsibleRegistrations(targetUnit.Value, parameters.ResponsibleSystems)
                 );
+        }
+
+        private UnitAccessRights GetUnitAccessRights(OrganizationUnit unit)
+        {
+            var canBeRead = _authorizationContext.AllowReads(unit);
+            var canBeModified = _authorizationContext.AllowModify(unit);
+            var canBeDeleted = _authorizationContext.AllowDelete(unit) && unit.CanBeDeleted();
+            return new UnitAccessRights(canBeRead, canBeModified, canBeDeleted);
         }
 
         private Maybe<OperationError> RemovePayments(IEnumerable<PaymentChangeParameters> payments)

@@ -154,5 +154,10 @@ namespace Core.DomainModel.Organization
             Origin = OrganizationUnitOrigin.Kitos;
             ExternalOriginUuid = null;
         }
+
+        public bool CanBeDeleted()
+        {
+            return Origin == OrganizationUnitOrigin.Kitos;
+        }
     }
 }
