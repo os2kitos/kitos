@@ -221,12 +221,12 @@
         }
 
         private createTableConfigurations() {
-            this.rolesTableConfig = this.createStandardTableConfig("Roles");
-            this.internalPaymentTableConfig = this.createPaymentTableConfig("Internal payments");
-            this.externalPaymentTableConfig = this.createPaymentTableConfig("External payments");
-            this.contractTableConfig = this.createStandardTableConfig("Contract registrations");
-            this.relevantSystemTableConfig = this.createSystemTableConfig("Relevant systems");
-            this.responsibleSystemTableConfig = this.createSystemTableConfig("Responsible systems");
+            this.rolesTableConfig = this.createStandardTableConfig("Rolle");
+            this.internalPaymentTableConfig = this.createPaymentTableConfig("Betaling (Anskaffelse,Drift,Andet)");
+            this.externalPaymentTableConfig = this.createPaymentTableConfig("Betaling (Anskaffelse,Drift,Andet)");
+            this.contractTableConfig = this.createStandardTableConfig("Kontraktnavn");
+            this.relevantSystemTableConfig = this.createSystemTableConfig("Systemnavn");
+            this.responsibleSystemTableConfig = this.createSystemTableConfig("Systemnavn");
         }
 
         private setupOptions() {
@@ -274,7 +274,6 @@
         }
 
         private refreshData() {
-            this.setupOptions();
             this.getData()
                 .then(() => this.updateAnySelections());
         }
@@ -295,8 +294,8 @@
         private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: "Index", property: "index" },
-                { title: title, property: "text" },
-                { title: "Contract name", property: "objectText" }
+                { title: "Kontaktnavn", property: "objectText" },
+                { title: title, property: "text" }
             ] as IMigrationTableColumn[];
         }
 
@@ -320,10 +319,16 @@
         }
 
         private getPaymentOptions(payments: Models.Api.Organization.PaymentRegistrationDetailsDto[]) {
+            var internalPayments: Models.Organization.IOrganizationUnitRegistration[] = [];
+            var externalPayments: Models.Organization.IOrganizationUnitRegistration[] = [];
+
             payments.forEach(payment => {
-                this.internalPayments.root.children = this.internalPayments.root.children.concat(this.mapPaymentsToOptions(payment.itContract, payment.internalPayments));
-                this.externalPayments.root.children = this.externalPayments.root.children.concat(this.mapPaymentsToOptions(payment.itContract, payment.externalPayments));
+                internalPayments = internalPayments.concat(this.mapPaymentsToOptions(payment.itContract, payment.internalPayments));
+                externalPayments = externalPayments.concat(this.mapPaymentsToOptions(payment.itContract, payment.externalPayments));
             });
+
+            this.internalPayments.root.children = internalPayments;
+            this.externalPayments.root.children = externalPayments;
         }
 
         private mapPaymentsToOptions(contract: Models.Generic.NamedEntity.NamedEntityDTO, payments: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {

@@ -142,7 +142,7 @@ namespace Presentation.Web.Controllers.API.V1
             return new NamedEntityDTO
             {
                 Id = payment.Id,
-                Name = $"Acquisition: {payment.Acquisition}, Operation: {payment.Operation}"
+                Name = $"{payment.Acquisition}, {payment.Operation}, {payment.Other}"
             };
         }
 
