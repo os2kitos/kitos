@@ -89,7 +89,9 @@
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
+    <Compile Include="Organization\OrganizationRegistrationDetails.cs" />
     <Compile Include="Organization\OrganizationUnitOrigin.cs" />
+    <Compile Include="Organization\PaymentRegistrationDetails.cs" />
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />

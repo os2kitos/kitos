@@ -16,8 +16,8 @@ namespace Core.ApplicationServices.Model.Organizations
             ExternalPayments = externalPaymentIds;
         }
 
-        public int ItContractId { get; set; }
-        public IEnumerable<int> InternalPayments { get; set; }
-        public IEnumerable<int> ExternalPayments { get; set; }
+        public int ItContractId { get; }
+        public IEnumerable<int> InternalPayments { get; }
+        public IEnumerable<int> ExternalPayments { get; }
     }
 }

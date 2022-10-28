@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -8,7 +7,9 @@ using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Generic;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -21,6 +22,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IItSystemUsageService _usageService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrgUnitService _orgUnitService;
+        private readonly ITransactionManager _transactionManager;
 
         public OrganizationUnitService(IEntityIdentityResolver identityResolver, 
             IOrganizationService organizationService,
@@ -28,7 +30,8 @@ namespace Core.ApplicationServices.Organizations
             IItContractService contractService,
             IItSystemUsageService usageService, 
             IAuthorizationContext authorizationContext, 
-            IOrgUnitService orgUnitService)
+            IOrgUnitService orgUnitService,
+            ITransactionManager transactionManager)
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;
@@ -36,37 +39,37 @@ namespace Core.ApplicationServices.Organizations
             _usageService = usageService;
             _authorizationContext = authorizationContext;
             _orgUnitService = orgUnitService;
+            _transactionManager = transactionManager;
             _identityResolver = identityResolver;
         }
 
-        public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int unitId)
+        public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int unitId, int organizationId)
         {
-            var unit = GetOrganziationUnit(unitId);
-            if (unit.Failed)
+            var unitResult = _identityResolver.ResolveUuid<Organization>(organizationId)
+                .Select(x => _organizationService.GetOrganization(x, OrganizationDataReadAccessLevel.All))
+                .GetValueOrDefault()
+                .Match
+                (
+                    _ => GetOrganziationUnit(unitId),
+                    error => error
+                );
+            if (unitResult.Failed)
             {
-                return unit.Error;
+                return unitResult.Error;
             }
 
-            if (!_authorizationContext.AllowReads(unit.Value))
+            var unit = unitResult.Value;
+            if (!_authorizationContext.AllowReads(unit))
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            var details = new OrganizationRegistrationDetails
-            {
-                OrganizationUnitRights = unit.Value.Rights,
-                ItContractRegistrations = _contractService.GetContractsByResponsibleUnitId(unitId).ToList(),
-                PaymentRegistrationDetails = _contractService.GetContractsWhereUnitIsResponsibleForPayment(unitId)
-                    .Select(itContract => new PaymentRegistrationDetails(unitId, itContract)).ToList(),
-                ResponsibleSystems = _usageService.GetSystemsByResponsibleUnitId(unitId).ToList(),
-                RelevantSystems = _usageService.GetSystemsByRelevantUnitId(unitId).ToList()
-            };
-
-            return details;
+            return unit.GetUnitRegistrations();
         }
 
-        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, OrganizationRegistrationChangeParameters parameters)
+        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int unitId, int organizationId, OrganizationRegistrationChangeParameters parameters)
         {
+            using var transaction = _transactionManager.Begin();
             var unit = GetOrganziationUnit(unitId);
             if (unit.Failed)
             {
@@ -78,7 +81,7 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
             
-            return _organizationRightsService.RemoveUnitRightsByIds(parameters.OrganizationUnitRights)
+            var result =  _organizationRightsService.RemoveUnitRightsByIds(organizationId, parameters.OrganizationUnitRights)
                 .Match
                 (
                     error => error,
@@ -99,23 +102,37 @@ namespace Core.ApplicationServices.Organizations
                     error => error,
                     () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unitId)
                 );
+
+            if (result.HasValue)
+            {
+                return result.Value;;
+            }
+
+            transaction.Commit();
+            return Maybe<OperationError>.None;
         }
 
         public Maybe<OperationError> DeleteUnitWithOrganizationRegistrations(int unitId, int organizationId)
         {
-            var deleteRegistrationsResult = GetOrganizationRegistrations(unitId)
-                .Match(val => DeleteSelectedOrganizationRegistrations(unitId, ToChangeParametersFromRegistrationDetails(val)),
+            using var transaction = _transactionManager.Begin();
+            
+            var deleteRegistrationsResult = GetOrganizationRegistrations(organizationId, unitId)
+                .Match(val => DeleteSelectedOrganizationRegistrations(unitId, organizationId, ToChangeParametersFromRegistrationDetails(val)),
                     error => error);
 
             if (deleteRegistrationsResult.HasValue)
                 return deleteRegistrationsResult.Value;
 
             _orgUnitService.Delete(unitId, organizationId);
+            transaction.Commit();
+
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, OrganizationRegistrationChangeParameters parameters)
+        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int unitId, int targetUnitId, int organizationId, OrganizationRegistrationChangeParameters parameters)
         {
+            using var transaction = _transactionManager.Begin();
+
             var unit = GetOrganziationUnit(unitId);
             if (unit.Failed)
             {
@@ -137,27 +154,35 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            return _organizationRightsService.TransferUnitRightsByIds(targetUnitId, parameters.OrganizationUnitRights)
+            var result = _organizationRightsService.TransferUnitRightsByIds(organizationId, targetUnitId, parameters.OrganizationUnitRights)
                 .Match
                 (
                     error => error,
-                    () => TransferPayments(targetUnit.Value, parameters.PaymentRegistrationDetails)
+                    () => TransferPayments(unitId, parameters.PaymentRegistrationDetails)
                 )
                 .Match
                 (
                     error => error,
-                    () => TransferContractRegistrations(targetUnit.Value.Uuid, parameters.ItContractRegistrations)
+                    () => TransferContractRegistrations(unitId, parameters.ItContractRegistrations)
+                )
+                .Match
+                (
+                    error => error,
+                    () => TransferSystemResponsibleRegistrations(unitId, parameters.ResponsibleSystems)
                 )
                 .Match
                 (
                     error => error,
                     () => TransferSystemRelevantRegistrations(unitId, targetUnit.Value, parameters.RelevantSystems)
-                )
-                .Match
-                (
-                    error => error,
-                    () => TransferSystemResponsibleRegistrations(targetUnit.Value, parameters.ResponsibleSystems)
                 );
+
+            if (result.HasValue)
+            {
+                return result.Value;
+            }
+
+            transaction.Commit();
+            return Maybe<OperationError>.None;
         }
 
         private Result<OrganizationUnit, OperationError> GetOrganziationUnit(int unitId)
@@ -228,15 +253,15 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> TransferPayments(OrganizationUnit targetUnit, IEnumerable<PaymentChangeParameters> payments)
+        private Maybe<OperationError> TransferPayments(int targetUnitId, IEnumerable<PaymentChangeParameters> payments)
         {
             foreach (var payment in payments)
             {
-                var transferInternalPaymentsResult = _contractService.TransferPayments(payment.ItContractId, targetUnit, payment.InternalPayments);
+                var transferInternalPaymentsResult = _contractService.TransferPayments(payment.ItContractId, targetUnitId, true, payment.InternalPayments);
                 if (transferInternalPaymentsResult.HasValue)
                     return transferInternalPaymentsResult.Value;
 
-                var transferExternalPaymentsResult = _contractService.TransferPayments(payment.ItContractId, targetUnit, payment.ExternalPayments);
+                var transferExternalPaymentsResult = _contractService.TransferPayments(payment.ItContractId, targetUnitId, false, payment.ExternalPayments);
                 if (transferExternalPaymentsResult.HasValue)
                     return transferExternalPaymentsResult.Value;
             }
@@ -244,11 +269,11 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> TransferSystemResponsibleRegistrations(OrganizationUnit targetUnit, IEnumerable<int> systemIds)
+        private Maybe<OperationError> TransferSystemResponsibleRegistrations(int targetUnitId, IEnumerable<int> systemIds)
         {
             foreach (var systemId in systemIds)
             {
-                var transferResult = _usageService.TransferResponsibleUsage(targetUnit, systemId);
+                var transferResult = _usageService.TransferResponsibleUsage(targetUnitId, systemId);
                 if (transferResult.HasValue)
                     return transferResult.Value;
             }
@@ -256,11 +281,11 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> TransferContractRegistrations(Guid targetUnitUuid, IEnumerable<int> contractIds)
+        private Maybe<OperationError> TransferContractRegistrations(int targetUnitId, IEnumerable<int> contractIds)
         {
             foreach (var contractId in contractIds)
             {
-                var transferResult = _contractService.TransferContractResponsibleUnit(targetUnitUuid, contractId);
+                var transferResult = _contractService.SetContractResponsibleUnit(contractId, targetUnitId);
                 if (transferResult.HasValue)
                     return transferResult.Value;
             }
@@ -283,22 +308,21 @@ namespace Core.ApplicationServices.Organizations
         private static OrganizationRegistrationChangeParameters ToChangeParametersFromRegistrationDetails(
             OrganizationRegistrationDetails registrations)
         {
-            return new OrganizationRegistrationChangeParameters()
-            {
-                ItContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id),
-                OrganizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id),
-                PaymentRegistrationDetails = registrations.PaymentRegistrationDetails.Select
-                (x =>
-                    new PaymentChangeParameters
-                    (
-                        x.ItContract.Id,
-                        x.InternalPayments.Select(ip => ip.Id),
-                        x.ExternalPayments.Select(ep => ep.Id)
-                    )
-                ),
-                RelevantSystems = registrations.RelevantSystems.Select(x => x.Id),
-                ResponsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id)
-            };
+            var itContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id);
+            var organizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id);
+            var paymentRegistrationDetails = registrations.PaymentRegistrationDetails.Select
+            (x =>
+                new PaymentChangeParameters
+                (
+                    x.ItContract.Id,
+                    x.InternalPayments.Select(ip => ip.Id),
+                    x.ExternalPayments.Select(ep => ep.Id)
+                )
+            );
+            var relevantSystems = registrations.RelevantSystems.Select(x => x.Id);
+            var responsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id);
+
+            return new OrganizationRegistrationChangeParameters(itContractRegistrations, organizationUnitRights, paymentRegistrationDetails, responsibleSystems,relevantSystems);
         }
     }
 }

@@ -7,19 +7,24 @@ namespace Core.ApplicationServices.Model.Organizations
 {
     public class OrganizationRegistrationChangeParameters
     {
-        public OrganizationRegistrationChangeParameters()
+        public OrganizationRegistrationChangeParameters(
+            IEnumerable<int> organizationUnitRights, 
+            IEnumerable<int> itContractRegistrations, 
+            IEnumerable<PaymentChangeParameters> paymentRegistrationDetails, 
+            IEnumerable<int> responsibleSystems, 
+            IEnumerable<int> relevantSystems)
         {
-            OrganizationUnitRights = new List<int>();
-            ItContractRegistrations = new List<int>();
-            PaymentRegistrationDetails = new List<PaymentChangeParameters>();
-            ResponsibleSystems = new List<int>();
-            RelevantSystems = new List<int>();
+            OrganizationUnitRights = organizationUnitRights;
+            ItContractRegistrations = itContractRegistrations;
+            PaymentRegistrationDetails = paymentRegistrationDetails;
+            ResponsibleSystems = responsibleSystems;
+            RelevantSystems = relevantSystems;
         }
 
-        public IEnumerable<int> OrganizationUnitRights { get; set; }
-        public IEnumerable<int> ItContractRegistrations { get; set; }
-        public IEnumerable<PaymentChangeParameters> PaymentRegistrationDetails { get; set; }
-        public IEnumerable<int> ResponsibleSystems { get; set; }
-        public IEnumerable<int> RelevantSystems { get; set; }
+        public IEnumerable<int> OrganizationUnitRights { get; }
+        public IEnumerable<int> ItContractRegistrations { get; }
+        public IEnumerable<PaymentChangeParameters> PaymentRegistrationDetails { get; }
+        public IEnumerable<int> ResponsibleSystems { get; }
+        public IEnumerable<int> RelevantSystems { get; }
     }
 }

@@ -28,13 +28,13 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("{unitId}")]
+        [Route("{unitId}/{organziationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetUnitRegistrations(int unitId)
+        public HttpResponseMessage GetUnitRegistrations(int unitId, int organizationId)
         {
-            return _organizationUnitService.GetOrganizationRegistrations(unitId)
+            return _organizationUnitService.GetOrganizationRegistrations(unitId, organizationId)
                 .Match
                 (
                     value => Ok(ToRegistrationDto(value)),
@@ -150,14 +150,14 @@ namespace Presentation.Web.Controllers.API.V1
             ChangeOrganizationRegistrationRequest request)
         {
             return new OrganizationRegistrationChangeParameters
-            {
-                ItContractRegistrations = request.ItContractRegistrations,
-                OrganizationUnitRights = request.OrganizationUnitRights,
-                PaymentRegistrationDetails = request.PaymentRegistrationDetails.Select(x =>
+            (
+                request.OrganizationUnitRights,
+                request.ItContractRegistrations,
+                request.PaymentRegistrationDetails.Select(x =>
                     new PaymentChangeParameters(x.ItContractId, x.InternalPayments, x.ExternalPayments)),
-                RelevantSystems = request.RelevantSystems,
-                ResponsibleSystems = request.ResponsibleSystems
-            };
+                request.RelevantSystems,
+                request.ResponsibleSystems
+            );
         }
     }
 }

@@ -154,5 +154,26 @@ namespace Core.DomainModel.Organization
             Origin = OrganizationUnitOrigin.Kitos;
             ExternalOriginUuid = null;
         }
+
+        public OrganizationRegistrationDetails GetUnitRegistrations()
+        {
+            return new OrganizationRegistrationDetails
+            (
+                Rights,
+                ResponsibleForItContracts,
+                GetUnitPayments(),
+                Using.Where(x => x.OrganizationUnit.Id == Id).Select(x => x.ItSystemUsage),
+                Using.Select(x => x.ItSystemUsage)
+            );
+        }
+
+        private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
+        {
+            var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();
+            var externContracts = EconomyStreams.Where(x => x.ExternPaymentFor != null).Select(x => x.ExternPaymentFor).ToList();
+            var contracts = internContracts.Concat(externContracts).ToList();
+
+            return contracts.Select(itContract => new PaymentRegistrationDetails(Id, itContract));
+        }
     }
 }

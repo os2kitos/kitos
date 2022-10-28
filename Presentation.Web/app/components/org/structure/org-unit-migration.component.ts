@@ -74,6 +74,7 @@
             this.orgUnits = [];
             this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
                 this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
+                $(`#selectedOrgId>option[value='${this.unitId}']`).attr('disabled', 'disabled');
             });
         }
 
@@ -103,7 +104,10 @@
         setSelectedOrg() {
             if (!this.selectedOrg?.id)
                 return;
-
+            if (this.selectedOrg.id === this.unitId) {
+                this.selectedOrg = null;
+                return;
+            }
             const selectedRegistrations = this.collectSelectedRegistrations();
             selectedRegistrations.forEach(registration => {
                 registration.targetUnitId = this.selectedOrg.id;
@@ -336,7 +340,11 @@
                 return {
                     id: element.id,
                     text: element.name,
-                    objectText: contract.name,
+                    objectText: Helpers.RenderFieldsHelper.renderInternalReference(
+                        "payment-contract",
+                        "it-contract.edit.main",
+                        contract.id,
+                        contract.name),
                     index: index + 1,
                     optionalObjectContext: contract
                 } as Models.Organization.IOrganizationUnitRegistration;
@@ -346,4 +354,28 @@
 
     angular.module("app")
         .component("orgUnitMigration", setupComponent());
+
+
+    angular.module('app')
+        .directive('compile', ['$compile', function ($compile) {
+            return function (scope, element, attrs) {
+                scope.$watch(
+                    function (scope) {
+                        // watch the 'compile' expression for changes
+                        return scope.$eval(attrs.compile);
+                    },
+                    function (value) {
+                        // when the 'compile' expression changes
+                        // assign it into the current DOM
+                        element.html(value);
+
+                        // compile the new DOM and link it to the current
+                        // scope.
+                        // NOTE: we only compile .childNodes so that
+                        // we don't get into infinite loop compiling ourselves
+                        $compile(element.contents())(scope);
+                    }
+                );
+            };
+        }]);
 }
