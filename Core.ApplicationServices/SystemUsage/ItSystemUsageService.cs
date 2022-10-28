@@ -301,7 +301,7 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var result = system.TransferOrganizationalUsage(targetUnit);
+                var result = system.TransferResponsibleOrganizationalUnit(targetUnit);
                 return result.HasValue 
                     ? result.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);
@@ -325,7 +325,7 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var result = system.RemoveResponsibleUsage();
+                var result = system.RemoveResponsibleOrganizationUnit();
                 return result.HasValue 
                     ? result.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);

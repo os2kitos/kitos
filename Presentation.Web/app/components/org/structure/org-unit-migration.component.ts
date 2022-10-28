@@ -298,7 +298,7 @@
         private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: "Index", property: "index" },
-                { title: "Kontaktnavn", property: "objectText" },
+                { title: "Kontraktnavn", property: "objectText" },
                 { title: title, property: "text" }
             ] as IMigrationTableColumn[];
         }

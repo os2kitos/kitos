@@ -313,7 +313,7 @@ namespace Tests.Unit.Core.Model
                 ResponsibleUsage = responsibleUsage,
             };
 
-            var result = usage.RemoveResponsibleUsage();
+            var result = usage.RemoveResponsibleOrganizationUnit();
 
             Assert.False(result.HasValue);
             Assert.Null(usage.ResponsibleUsage);
@@ -346,7 +346,7 @@ namespace Tests.Unit.Core.Model
                 ResponsibleUsage = responsibleUsage,
             };
 
-            var result = usage.TransferOrganizationalUsage(targetUnit);
+            var result = usage.TransferResponsibleOrganizationalUnit(targetUnit);
 
             Assert.False(result.HasValue);
             Assert.Equal(targetUnit.Id, usage.ResponsibleUsage.OrganizationUnit.Id);
