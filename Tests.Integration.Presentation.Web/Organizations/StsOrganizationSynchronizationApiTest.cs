@@ -283,6 +283,50 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Moved, c.Category));
         }
 
+        [Fact]
+        public async Task Can_GET_UPDATE_Consequences_With_Conversion_Consequences()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int firstRequestLevels = 2;
+            const int secondRequestLevels = 1;
+            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, firstRequestLevels);
+            var expectedConvertedUnit = Guid.Empty;
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                var leaf = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation && !x.Children.Any())
+                    .ToList()
+                    .RandomItem();
+                
+                expectedConvertedUnit = leaf.ExternalOriginUuid.GetValueOrDefault();
+
+                //Add a kitos-unit as a child to a
+                var newUnit = new OrganizationUnit()
+                {
+                    OrganizationId = leaf.OrganizationId,
+                    ParentId = leaf.Id,
+                    ObjectOwnerId = leaf.ObjectOwnerId,
+                    Name = "Test",
+                    LastChangedByUserId = leaf.LastChangedByUserId
+                };
+                repo.Insert(newUnit);
+            });
+
+            //Act
+            using var consequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
+            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            Assert.NotEmpty(consequences.Consequences);
+            var conversion = Assert.Single(consequences.Consequences.Where(x=>x.Category == ConnectionUpdateOrganizationUnitChangeCategory.Converted));
+            Assert.Equal(expectedConvertedUnit,conversion.Uuid);
+            //TODO: Check that a conversion exists
+        }
+
         private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)
         {
             Assert.Equal(treeToImport.Name, importedTree.Name);
