@@ -131,7 +131,7 @@ namespace Core.ApplicationServices.Contract
             {
                 foreach (var paymentId in paymentIds)
                 {
-                    var result = contract.RemoveEconomyStream(paymentId, isInternal);
+                    var result = contract.ResetEconomyStreamOrganizationUnit(paymentId, isInternal);
                     if (result.HasValue)
                         return result.Value;
                 }

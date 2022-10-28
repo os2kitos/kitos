@@ -1044,9 +1044,9 @@ namespace Tests.Unit.Core.Model
                 };
             }
 
-            var result = contract.RemoveEconomyStream(id, isInternal);
+            var result = contract.ResetEconomyStreamOrganizationUnit(id, isInternal);
 
-            Assert.True(result.Ok);
+            Assert.True(result.IsNone);
             Assert.DoesNotContain(id, contract.ExternEconomyStreams.Select(x => x.Id));
             Assert.DoesNotContain(id, contract.InternEconomyStreams.Select(x => x.Id));
         }
@@ -1058,11 +1058,11 @@ namespace Tests.Unit.Core.Model
             var contract = new ItContract();
             var expectedErrorMessage = $"EconomyStream with id: {id} was not found";
 
-            var result = contract.RemoveEconomyStream(id, A<bool>());
+            var result = contract.ResetEconomyStreamOrganizationUnit(id, A<bool>());
 
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-            Assert.Equal(expectedErrorMessage, result.Error.Message);
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+            Assert.Equal(expectedErrorMessage, result.Value.Message);
         }
     }
 }

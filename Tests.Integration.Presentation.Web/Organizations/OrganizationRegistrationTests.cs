@@ -245,13 +245,13 @@ namespace Tests.Integration.Presentation.Web.Organizations
             entity.LastChangedByUserId = TestEnvironment.DefaultUserId;
         }
 
-        private static ChangeOrganizationRegistrationRequest ToChangeParametersList(OrganizationRegistrationDTO registrations)
+        private static ChangeOrganizationRegistrationRequestDTO ToChangeParametersList(OrganizationRegistrationDTO registrations)
         {
-            return new ChangeOrganizationRegistrationRequest()
+            return new ChangeOrganizationRegistrationRequestDTO()
             {
                 ItContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id),
                 OrganizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id),
-                PaymentRegistrationDetails = registrations.Payments.Select(x => new ChangePaymentRegistraitonRequest
+                PaymentRegistrationDetails = registrations.Payments.Select(x => new ChangePaymentRegistraitonRequestDTO
                 {
                     ItContractId = x.ItContract.Id,
                     InternalPayments = x.InternalPayments.Select(x => x.Id),
@@ -262,7 +262,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             };
         }
 
-        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyUnitRegistrations(
+        private static ChangeOrganizationRegistrationRequestDTO CreateChangeParametersWithOnlyUnitRegistrations(
             OrganizationRegistrationDTO registrations)
         {
             var dto = new OrganizationRegistrationDTO
@@ -272,7 +272,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return ToChangeParametersList(dto);
         }
 
-        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyInternalPayment(
+        private static ChangeOrganizationRegistrationRequestDTO CreateChangeParametersWithOnlyInternalPayment(
             OrganizationRegistrationDTO registrations)
         {
             var dto = new OrganizationRegistrationDTO()
@@ -288,7 +288,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return ToChangeParametersList(dto);
         }
 
-        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyExternalPayment(
+        private static ChangeOrganizationRegistrationRequestDTO CreateChangeParametersWithOnlyExternalPayment(
             OrganizationRegistrationDTO registrations)
         {
             var dto = new OrganizationRegistrationDTO()
@@ -304,7 +304,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return ToChangeParametersList(dto);
         }
 
-        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyContractRegistrations(
+        private static ChangeOrganizationRegistrationRequestDTO CreateChangeParametersWithOnlyContractRegistrations(
             OrganizationRegistrationDTO registrations)
         {
             var dto = new OrganizationRegistrationDTO
@@ -314,7 +314,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return ToChangeParametersList(dto);
         }
 
-        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyResponsibleSystems(
+        private static ChangeOrganizationRegistrationRequestDTO CreateChangeParametersWithOnlyResponsibleSystems(
             OrganizationRegistrationDTO registrations)
         {
             var dto = new OrganizationRegistrationDTO
@@ -324,7 +324,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return ToChangeParametersList(dto);
         }
 
-        private static ChangeOrganizationRegistrationRequest CreateChangeParametersWithOnlyRelevantSystems(
+        private static ChangeOrganizationRegistrationRequestDTO CreateChangeParametersWithOnlyRelevantSystems(
             OrganizationRegistrationDTO registrations)
         {
             var dto = new OrganizationRegistrationDTO

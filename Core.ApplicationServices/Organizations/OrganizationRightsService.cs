@@ -23,17 +23,13 @@ namespace Core.ApplicationServices.Organizations
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
         private readonly ITransactionManager _transactionManager;
-        private readonly IEntityIdentityResolver _identityResolver;
-        private readonly IOrganizationService _organizationService;
 
         public OrganizationRightsService(IAuthorizationContext authorizationContext,
             IGenericRepository<OrganizationRight> organizationRightRepository,
             IOrganizationalUserContext userContext,
             IDomainEvents domainEvents, ILogger logger,
             IGenericRepository<OrganizationUnitRight> unitRightRepository,
-            ITransactionManager transactionManager, 
-            IEntityIdentityResolver identityResolver, 
-            IOrganizationService organizationService)
+            ITransactionManager transactionManager)
         {
             _authorizationContext = authorizationContext;
             _organizationRightRepository = organizationRightRepository;
@@ -42,8 +38,6 @@ namespace Core.ApplicationServices.Organizations
             _logger = logger;
             _unitRightRepository = unitRightRepository;
             _transactionManager = transactionManager;
-            _identityResolver = identityResolver;
-            _organizationService = organizationService;
         }
 
         public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
@@ -95,11 +89,11 @@ namespace Core.ApplicationServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var result = CanModifyOrganization(organizationId);
-            if (result.Failed || result.Value == false)
-            {
-                return new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden);
-            }
+            //var result = CanModifyOrganization(organizationId);
+            //if (result.Failed || result.Value == false)
+            //{
+            //    return new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden);
+            //}
 
             var rightsToDelete = new List<OrganizationUnitRight>();
             foreach (var rightId in rightIds)
@@ -129,11 +123,11 @@ namespace Core.ApplicationServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var result = CanModifyOrganization(organizationId);
-            if (result.Failed || result.Value == false)
-            {
-                return new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden);
-            }
+            //var result = CanModifyOrganization(organizationId);
+            //if (result.Failed || result.Value == false)
+            //{
+            //    return new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden);
+            //}
 
             foreach (var rightId in rightIds)
             {
@@ -147,6 +141,7 @@ namespace Core.ApplicationServices.Organizations
                 {
                     return new OperationError(OperationFailure.Forbidden);
                 }
+                
 
                 unitRight.ObjectId = targetUnitId;
 
@@ -158,7 +153,7 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Result<bool, OperationError> CanModifyOrganization(int id)
+        /*private Result<bool, OperationError> CanModifyOrganization(int id)
         {
             return _identityResolver.ResolveUuid<Organization>(id)
                 .Select(x => _organizationService.GetOrganization(x, OrganizationDataReadAccessLevel.All))
@@ -168,7 +163,7 @@ namespace Core.ApplicationServices.Organizations
                     organization => Result<bool, OperationError>.Success(_authorizationContext.AllowModify(organization)),
                     error => error
                 );
-        }
+        }*/
 
         private Result<OrganizationRight, OperationFailure> RemoveRight(OrganizationRight right)
         {

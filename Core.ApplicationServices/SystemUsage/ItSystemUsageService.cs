@@ -325,7 +325,7 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var result = system.RemoveOrganizationalUsage();
+                var result = system.RemoveResponsibleUsage();
                 return result.HasValue 
                     ? result.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);

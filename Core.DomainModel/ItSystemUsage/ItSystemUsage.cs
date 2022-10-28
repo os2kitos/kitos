@@ -628,7 +628,7 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> RemoveOrganizationalUsage()
+        public Maybe<OperationError> RemoveResponsibleUsage()
         {
             return UpdateOrganizationalUsage(GetUsedByOrganizationUnits(), Maybe<OrganizationUnit>.None);
         }

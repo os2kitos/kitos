@@ -167,6 +167,10 @@
       <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
       <Name>Core.Abstractions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
       <Name>Core.DomainServices</Name>

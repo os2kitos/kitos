@@ -313,7 +313,7 @@ namespace Tests.Unit.Core.Model
                 ResponsibleUsage = responsibleUsage,
             };
 
-            var result = usage.RemoveOrganizationalUsage();
+            var result = usage.RemoveResponsibleUsage();
 
             Assert.False(result.HasValue);
             Assert.Null(usage.ResponsibleUsage);

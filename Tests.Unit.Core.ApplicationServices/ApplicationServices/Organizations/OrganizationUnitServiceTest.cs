@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
@@ -9,6 +10,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Core.DomainServices;
+using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
 using Moq;
 using Xunit;
@@ -22,6 +24,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
+        private readonly Mock<ITransactionManager> _transactionManagerMock;
 
         public OrganizationUnitServiceTest()
         {
@@ -32,7 +35,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var contractServiceMock = new Mock<IItContractService>();
             var usageServiceMock = new Mock<IItSystemUsageService>();
             var orgUnitServiceMock = new Mock<IOrgUnitService>();
-
+            _transactionManagerMock = new Mock<ITransactionManager>();
+            
             _sut = new OrganizationUnitService(
                 _identityResolverMock.Object,
                 _organizationServiceMock.Object,
@@ -40,17 +44,19 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 contractServiceMock.Object,
                 usageServiceMock.Object,
                 _authorizationContextMock.Object,
-                orgUnitServiceMock.Object);
+                orgUnitServiceMock.Object,
+                _transactionManagerMock.Object);
         }
         
         [Fact]
         public void GetOrganizationRegistrations_Returns_BadInput()
         {
             var unitId = A<int>();
+            var orgId = A<int>();
 
             ExpectResolveUuidReturns(unitId, Maybe<Guid>.None);
 
-            var result = _sut.GetOrganizationRegistrations(unitId);
+            var result = _sut.GetOrganizationRegistrations(orgId, unitId);
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
             Assert.Equal("Organization id is invalid", result.Error.Message);
@@ -60,13 +66,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void GetOrganizationRegistrations_Returns_NotFound()
         {
             var unitId = A<int>();
+            var orgId = A<int>();
             var unitUuid = A<Guid>();
             var operationError = new OperationError("Organization not found", OperationFailure.NotFound);
 
             ExpectResolveUuidReturns(unitId, unitUuid);
             ExpectGetOrganizationUnitReturns(unitUuid, operationError);
 
-            var result = _sut.GetOrganizationRegistrations(unitId);
+            var result = _sut.GetOrganizationRegistrations(orgId, unitId);
             Assert.True(result.Failed);
             Assert.Equal(operationError.FailureType, result.Error.FailureType);
             Assert.Equal(operationError.Message, result.Error.Message);
@@ -76,6 +83,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void GetOrganizationRegistrations_Returns_Forbidden()
         {
             var unitId = A<int>();
+            var orgId = A<int>();
             var unitUuid = A<Guid>();
             var unit = new OrganizationUnit() {Id = unitId, Uuid = unitUuid};
 
@@ -83,7 +91,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectGetOrganizationUnitReturns(unitUuid, unit);
             ExpectAllowReadsReturns(unit, false);
 
-            var result = _sut.GetOrganizationRegistrations(unitId);
+            var result = _sut.GetOrganizationRegistrations(orgId, unitId);
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
@@ -92,10 +100,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void DeleteSelectedOrganizationRegistrations_Returns_BadInput()
         {
             var unitId = A<int>();
+            var orgId = A<int>();
 
             ExpectResolveUuidReturns(unitId, Maybe<Guid>.None);
 
-            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new OrganizationRegistrationChangeParameters());
+            var result = _sut.DeleteSelectedOrganizationRegistrations(orgId, unitId, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
             Assert.Equal("Organization id is invalid", result.Value.Message);
@@ -105,13 +114,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void DeleteSelectedOrganizationRegistrations_Returns_NotFound()
         {
             var unitId = A<int>();
+            var orgId = A<int>();
             var unitUuid = A<Guid>();
             var operationError = new OperationError("Organization not found", OperationFailure.NotFound);
 
             ExpectResolveUuidReturns(unitId, unitUuid);
             ExpectGetOrganizationUnitReturns(unitUuid, operationError);
 
-            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new OrganizationRegistrationChangeParameters());
+            var result = _sut.DeleteSelectedOrganizationRegistrations(orgId, unitId, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
             Assert.Equal(operationError.Message, result.Value.Message);
@@ -121,6 +131,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void DeleteSelectedOrganizationRegistrations_Returns_Forbidden()
         {
             var unitId = A<int>();
+            var orgId = A<int>();
             var unitUuid = A<Guid>();
             var unit = new OrganizationUnit() {Id = unitId, Uuid = unitUuid};
 
@@ -128,7 +139,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectGetOrganizationUnitReturns(unitUuid, unit);
             ExpectAllowDeleteReturns(unit, false);
 
-            var result = _sut.DeleteSelectedOrganizationRegistrations(unitId, new OrganizationRegistrationChangeParameters());
+            var result = _sut.DeleteSelectedOrganizationRegistrations(orgId, unitId, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
@@ -139,6 +150,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void TransferSelectedOrganizationRegistrations_Returns_BadInput(bool isUnitValid, bool isTargetUnitValid)
         {
             var unitId = A<int>();
+            var orgId = A<int>();
             var unitUuid = isUnitValid ? A<Guid>() : Maybe<Guid>.None;
             var targetUnitId = A<int>();
             const string expectedMessage = "Organization id is invalid";
@@ -148,7 +160,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             if(isUnitValid)
                 ExpectGetOrganizationUnitReturns(unitUuid.Value, new OrganizationUnit());
 
-            var result = _sut.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, new OrganizationRegistrationChangeParameters());
+            var result = _sut.TransferSelectedOrganizationRegistrations(orgId, unitId, targetUnitId, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
             Assert.Equal(expectedMessage, result.Value.Message);
@@ -160,6 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void TransferSelectedOrganizationRegistrations_Returns_NotFound(bool isUnitValid, bool isTargetUnitValid)
         {
             var unitId = A<int>();
+            var orgId = A<int>();
             var targetUnitId = A<int>();
             var unitUuid = A<Guid>();
             var targetUnitIdUuid = A<Guid>();
@@ -183,7 +196,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 throw new Exception("Invalid data");
             }
             
-            var result = _sut.TransferSelectedOrganizationRegistrations(unitId, targetUnitId, new OrganizationRegistrationChangeParameters());
+            var result = _sut.TransferSelectedOrganizationRegistrations(orgId, unitId, targetUnitId, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
             Assert.Equal(operationError.Message, result.Value.Message);
@@ -195,6 +208,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void TransferSelectedOrganizationRegistrations_Returns_Forbidden(bool isUnitValid, bool isTargetUnitValid)
         {
             var unitId = A<int>();
+            var orgId = A<int>();
             var targetUnitId = A<int>();
             var unitUuid = A<Guid>();
             var targetUnitIdUuid = A<Guid>();
@@ -208,7 +222,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectAllowModifyReturns(unit, isUnitValid);
             ExpectAllowModifyReturns(targetUnit, isTargetUnitValid);
 
-            var result = _sut.GetOrganizationRegistrations(unitId);
+            var result = _sut.GetOrganizationRegistrations(orgId,unitId);
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
@@ -241,6 +255,16 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void ExpectAllowModifyReturns(IEntity unit, bool result)
         {
             _authorizationContextMock.Setup(x => x.AllowModify(unit)).Returns(result);
+        }
+
+        private static OrganizationRegistrationChangeParameters CreateEmptyChangeParameters()
+        {
+            return new OrganizationRegistrationChangeParameters(
+                new List<int>(), 
+                new List<int>(),
+                new List<PaymentChangeParameters>(), 
+                new List<int>(), 
+                new List<int>());
         }
     }
 }

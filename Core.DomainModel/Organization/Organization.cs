@@ -287,9 +287,8 @@ namespace Core.DomainModel.Organization
                 return new OperationError("Unit doesn't exist in the organization", OperationFailure.NotFound);
             if (unit.Origin != OrganizationUnitOrigin.Kitos)
                 return new OperationError("Only a KITOS unit can be deleted", OperationFailure.BadState);
-            if (unit.Using.Any() || unit.Rights.Any() || unit.EconomyStreams.Any() ||
-                unit.ResponsibleForItContracts.Any() || unit.DelegatedSystemUsages.Any())
-                return new OperationError("Unit has assigned registrations", OperationFailure.BadState);
+            if (unit.IsUsed())
+                return new OperationError("Unit is being used", OperationFailure.BadState);
 
             OrgUnits.Remove(unit);
 

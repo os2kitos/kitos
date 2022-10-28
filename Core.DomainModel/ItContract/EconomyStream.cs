@@ -99,13 +99,6 @@ namespace Core.DomainModel.ItContract
         {
             
         }
-
-        public void TransferEconomyStream(OrganizationUnit targetUnit)
-        {
-            OrganizationUnitId = targetUnit.Id;
-            OrganizationUnit = targetUnit;
-        }
-
         public static EconomyStream CreateInternalEconomyStream(ItContract contract, OrganizationUnit optionalOrganizationUnit, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
         {
             if (contract == null)

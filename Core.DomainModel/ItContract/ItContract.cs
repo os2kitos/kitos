@@ -855,20 +855,20 @@ namespace Core.DomainModel.ItContract
                 : new OperationError($"Payment with id: {id} not found", OperationFailure.NotFound);
         }
 
-        public Maybe<OperationError> RemoveEconomyStream(int id, bool isInternal)
+        public Maybe<OperationError> ResetEconomyStreamOrganizationUnit(int id, bool isInternal)
         {
             return isInternal 
-                ? RemoveSelectedEconomyStream(id, InternEconomyStreams) 
-                : RemoveSelectedEconomyStream(id, ExternEconomyStreams);
+                ? ResetEconomyStreamOrganizationUnit(id, InternEconomyStreams) 
+                : ResetEconomyStreamOrganizationUnit(id, ExternEconomyStreams);
         }
 
-        private static Maybe<OperationError> RemoveSelectedEconomyStream(int id, ICollection<EconomyStream> economyStreams)
+        private static Maybe<OperationError> ResetEconomyStreamOrganizationUnit(int id, IEnumerable<EconomyStream> economyStreams)
         {
             var stream = economyStreams.FirstOrDefault(x => x.Id == id);
             if (stream == null)
                 return new OperationError($"EconomyStream with id: {id} was not found", OperationFailure.NotFound);
 
-            economyStreams.Remove(stream);
+            stream.OrganizationUnit = null;
 
             return Maybe<OperationError>.None;
         }
@@ -890,7 +890,7 @@ namespace Core.DomainModel.ItContract
             if (stream == null)
                 return new OperationError($"EconomyStream with id: {id} was not found", OperationFailure.NotFound);
 
-            stream.TransferEconomyStream(targetUnit);
+            stream.OrganizationUnit = targetUnit;
             return Maybe<OperationError>.None;
         }
 

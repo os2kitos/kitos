@@ -144,7 +144,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         protected override void DeleteQuery(OrganizationUnit entity)
         {
-            _orgUnitService.Delete(entity.Id, entity.OrganizationId);
+            _orgUnitService.Delete(entity.OrganizationId, entity.Id);
         }
     }
 }

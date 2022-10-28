@@ -1,11 +1,13 @@
-﻿<div class="form-group mx-auto">
-    <select2-org-unit data-id="selectedOrgId"
-                      data-label="Overfør til"
-                      data-placeholder="Vælg organisationsenhed"
-                      data-options="ctrl.orgUnits"
-                      data-ng-model="ctrl.selectedOrg"
-                      data-on-change="ctrl.setSelectedOrg()">
-    </select2-org-unit>
+﻿<div class="container">
+    <div class="col-xs-12 form-group">
+        <select2-org-unit data-id="selectedOrgId"
+                          data-label="Overfør til"
+                          data-placeholder="Vælg organisationsenhed"
+                          data-options="ctrl.orgUnits"
+                          data-ng-model="ctrl.selectedOrg"
+                          data-on-change="ctrl.setSelectedOrg()">
+        </select2-org-unit>
+    </div>
 </div>
 
 <org-unit-migration-table ng-if="ctrl.roles.root.children.length > 0" title="Roller" options="ctrl.roles" configuration="ctrl.rolesTableConfig" unit-id="ctrl.unitId"></org-unit-migration-table>
