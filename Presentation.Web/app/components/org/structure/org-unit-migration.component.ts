@@ -18,11 +18,11 @@
         selectedRegistrationChanged?: () => void;
         selectedRegistrationGroupChanged?: (root: IOrganizationUnitMigrationRoot) => void;
         refreshData: () => void;
-        type: Models.Organization.OrganizationRegistrationOption;
+        type: Models.ViewModel.Organization.OrganizationRegistrationOption;
     }
 
     export interface IOrganizationUnitMigrationRoot extends Models.ViewModel.Organization.IHasSelection {
-        children: Models.Organization.IOrganizationUnitRegistration[];
+        children: Models.ViewModel.Organization.IOrganizationUnitRegistration[];
     }
 
     interface IOrganizationUnitMigrationController extends ng.IComponentController {
@@ -53,7 +53,9 @@
         contractTableConfig: IMigrationTableColumn[];
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
-        
+
+        private isBusy = false;
+
         static $inject: string[] = ["organizationRegistrationsService", "organizationApiService"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
             private readonly organizationApiService: Services.IOrganizationApiService) {
@@ -79,26 +81,41 @@
         }
 
         deleteSelected() {
+            if (this.isBusy) {
+                return;
+            }
             if (!confirm('Er du sikker på, at du vil slette de valgte registreringer?')) {
                 return;
             }
+            this.isBusy = true;
 
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
-                .then(() => this.refreshData());
+                .then(() => this.refreshData(),
+                    error => console.error(error));
+
+            this.isBusy = false;
         }
 
         transfer() {
+            if (this.isBusy) {
+                return;
+            }
             if (!this.selectedOrg?.id)
                 return;
             if (!confirm(`Er du sikker på, at du vil overføre de valgte registreringer til "${this.selectedOrg.text}"?`)) {
                 return;
             }
+            this.isBusy = true;
 
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.transferSelectedRegistrations(this.unitId, this.selectedOrg.id, request)
-                .then(() => this.selectedOrg = null)
-                .then(() => this.refreshData());
+                .then(() => {
+                    this.selectedOrg = null;
+                    this.refreshData();
+                }, error => console.log(error));
+
+            this.isBusy = false;
         }
 
         setSelectedOrg() {
@@ -196,9 +213,9 @@
             groupRoot.selected = true;
         }
 
-        private collectSelectedRegistrations(): Array<Models.Organization.IOrganizationUnitRegistration> {
+        private collectSelectedRegistrations(): Array<Models.ViewModel.Organization.IOrganizationUnitRegistration> {
 
-            var result = [] as Models.Organization.IOrganizationUnitRegistration[];
+            var result = [] as Models.ViewModel.Organization.IOrganizationUnitRegistration[];
 
             const roots = this.getAllRoots();
             roots.forEach(root => {
@@ -209,7 +226,7 @@
             return result;
         }
 
-        private collectSelectedRegistrationsFromSource(sourceCollection: Array<Models.Organization.IOrganizationUnitRegistration>): Array<Models.Organization.IOrganizationUnitRegistration> {
+        private collectSelectedRegistrationsFromSource(sourceCollection: Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>): Array<Models.ViewModel.Organization.IOrganizationUnitRegistration> {
             return sourceCollection.filter(x => x.selected);
         }
 
@@ -234,15 +251,15 @@
         }
 
         private setupOptions() {
-            this.roles = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.Roles);
-            this.internalPayments = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.InternalPayments);
-            this.externalPayments = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.ExternalPayments);
-            this.contractRegistrations = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.ContractRegistrations);
-            this.relevantSystemRegistrations = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.RelevantSystems);
-            this.responsibleSystemRegistrations = this.createBaseOptions(Models.Organization.OrganizationRegistrationOption.ResponsibleSystems);
+            this.roles = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.Roles);
+            this.internalPayments = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.InternalPayments);
+            this.externalPayments = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ExternalPayments);
+            this.contractRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ContractRegistrations);
+            this.relevantSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.RelevantSystems);
+            this.responsibleSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems);
         }
 
-        private createChangeRequest(): Models.Api.Organization.OrganizationRegistrationChangeRequest {
+        private createChangeRequest(): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
             return Helpers.OrganizationRegistrationHelper.createChangeRequest(
                 this.contractRegistrations.root.children,
                 this.externalPayments.root.children,
@@ -252,7 +269,7 @@
                 this.responsibleSystemRegistrations.root.children);
         }
 
-        private createBaseOptions(type: Models.Organization.OrganizationRegistrationOption): IOrganizationUnitMigrationOptions {
+        private createBaseOptions(type: Models.ViewModel.Organization.OrganizationRegistrationOption): IOrganizationUnitMigrationOptions {
             return {
                 root: {
                     selected: false,
@@ -303,28 +320,28 @@
             ] as IMigrationTableColumn[];
         }
 
-        private mapOrganizationDtoToOptions(registrations: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
+        private mapOrganizationDtoToOptions(registrations: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
             return registrations.map(res => {
                 return {
                     id: res.id,
                     text: res.name,
-                } as Models.Organization.IOrganizationUnitRegistration;
+                } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
             });
         }
 
-        private mapOrganizationDtoWithEnabledToOptions(registrations: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
+        private mapOrganizationDtoWithEnabledToOptions(registrations: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
             return registrations.map(res => {
                 return {
                     id: res.id,
                     text: res.name,
                     objectText: res.disabled ? "Ikke aktivt" : "Aktivt" 
-            } as Models.Organization.IOrganizationUnitRegistration;
+            } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
             });
         }
 
         private getPaymentOptions(payments: Models.Api.Organization.PaymentRegistrationDetailsDto[]) {
-            var internalPayments: Models.Organization.IOrganizationUnitRegistration[] = [];
-            var externalPayments: Models.Organization.IOrganizationUnitRegistration[] = [];
+            var internalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[] = [];
+            var externalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[] = [];
 
             payments.forEach(payment => {
                 internalPayments = internalPayments.concat(this.mapPaymentsToOptions(payment.itContract, payment.internalPayments));
@@ -335,7 +352,7 @@
             this.externalPayments.root.children = externalPayments;
         }
 
-        private mapPaymentsToOptions(contract: Models.Generic.NamedEntity.NamedEntityDTO, payments: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.Organization.IOrganizationUnitRegistration[] {
+        private mapPaymentsToOptions(contract: Models.Generic.NamedEntity.NamedEntityDTO, payments: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
             return payments.map((element, index) => {
                 return {
                     id: element.id,
@@ -347,7 +364,7 @@
                         contract.name),
                     index: index + 1,
                     optionalObjectContext: contract
-                } as Models.Organization.IOrganizationUnitRegistration;
+                } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
             });
         }
     }

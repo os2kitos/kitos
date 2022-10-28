@@ -70,7 +70,7 @@
             }
         }
 
-        delete(registration: Models.Organization.IOrganizationUnitRegistration) {
+        delete(registration: Models.ViewModel.Organization.IOrganizationUnitRegistration) {
             if (!confirm('Er du sikker på, at du vil slette registreringen?')) {
                 return;
             }
@@ -83,32 +83,32 @@
                 .then(() => this.options.refreshData());
         }
 
-        createChangeRequest(request: Models.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequest {
+        createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
 
-            const roles = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const contractRegistration = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const internalPayments = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const externalPayments = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const responsibleSystems = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const relevantSystems = new Array<Models.Organization.IOrganizationUnitRegistration>();
+            const roles = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const contractRegistration = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const internalPayments = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const externalPayments = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const responsibleSystems = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const relevantSystems = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
 
             switch (this.options.type) {
-                case Models.Organization.OrganizationRegistrationOption.Roles:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.Roles:
                     roles.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.ContractRegistrations:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.ContractRegistrations:
                     contractRegistration.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.InternalPayments:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.InternalPayments:
                     internalPayments.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.ExternalPayments:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.ExternalPayments:
                     externalPayments.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.RelevantSystems:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.RelevantSystems:
                     relevantSystems.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.ResponsibleSystems:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems:
                     responsibleSystems.push(request);
                     break;
                 default:

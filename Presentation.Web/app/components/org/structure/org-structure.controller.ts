@@ -553,8 +553,7 @@
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();
                                         $modalInstance.close();
-                                    },
-                                        (error) => {
+                                    }, (error) => {
                                             $modalScope.submitting = false;
 
                                             notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />

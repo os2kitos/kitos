@@ -2,9 +2,9 @@
 
     export interface IOrganizationRegistrationsService {
         getRegistrations(orgId: number): ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto>;
-        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<boolean>;
+        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<boolean>;
         deleteOrganizationUnit(unitId: number, organizationId: number): angular.IPromise<boolean>;
-        transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<void>;
+        transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<void>;
     }
 
     export class OrganizationRegistrationsService implements IOrganizationRegistrationsService {
@@ -22,20 +22,23 @@
                 );
         }
 
-        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<boolean> {
+        deleteSelectedRegistrations(orgId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<boolean> {
             return this.apiUseCaseFactory
-                .createDeletion("Organization unit",
+                .createDeletion("Registreringer",
                     () => this.apiWrapper.delete(`api/v1/organization-registrations/${orgId}`, body))
                 .executeAsync();
         }
 
         deleteOrganizationUnit(unitId: number, organizationId: number): angular.IPromise<boolean> {
-            return this.apiWrapper.delete(`api/v1/organization-registrations/unit/${unitId}/${organizationId}`);
+            return this.apiUseCaseFactory
+                .createDeletion("Organisationsenhed",
+                () => this.apiWrapper.delete(`api/v1/organization-registrations/unit/${unitId}/${organizationId}`))
+                .executeAsync();
         }
 
-        transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequest): angular.IPromise<void> {
+        transferSelectedRegistrations(orgId: number, targetUnitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<void> {
             return this.apiUseCaseFactory
-                .createUpdate("Organization unit",
+                .createUpdate("Registreringer",
                     () => this.apiWrapper.put(`api/v1/organization-registrations/${orgId}/${targetUnitId}`, body))
                 .executeAsync();
         }

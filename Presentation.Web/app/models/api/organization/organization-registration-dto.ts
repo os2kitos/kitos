@@ -13,15 +13,15 @@
         internalPayments: Generic.NamedEntity.NamedEntityDTO[];
     }
 
-    export class OrganizationRegistrationChangeRequest {
+    export class OrganizationRegistrationChangeRequestDto {
         itContractRegistrations: number[];
         organizationUnitRights: number[];
-        paymentRegistrationDetails: PaymentRegistrationChangeRequest[];
+        paymentRegistrationDetails: PaymentRegistrationChangeRequestDto[];
         relevantSystems: number[];
         responsibleSystems: number[];
     }
 
-    export class PaymentRegistrationChangeRequest {
+    export class PaymentRegistrationChangeRequestDto {
         itContractId: number;
         externalPayments: number[];
         internalPayments: number[];
