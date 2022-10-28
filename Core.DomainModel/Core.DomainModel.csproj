@@ -58,6 +58,8 @@
     <Compile Include="Commands\RemoveUserFromKitosCommand.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
+    <Compile Include="Extensions\ExternalOrganizationUnitExtensions.cs" />
+    <Compile Include="Extensions\HierarchyExtensions.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
@@ -89,8 +91,11 @@
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
+    <Compile Include="Organization\OrganizationTreeUpdateConsequences.cs" />
     <Compile Include="Organization\OrganizationRegistrationDetails.cs" />
     <Compile Include="Organization\OrganizationUnitOrigin.cs" />
+    <Compile Include="Organization\Strategies\IExternalOrganizationalHierarchyUpdateStrategy.cs" />
+    <Compile Include="Organization\Strategies\StsOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\PaymentRegistrationDetails.cs" />
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />

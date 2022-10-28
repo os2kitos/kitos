@@ -94,8 +94,12 @@
                     category: CommandCategory.Update,
                     enabled: result.canUpdateConnection,
                     onClick: () => {
-                        //TODO:Remember to rebind https://os2web.atlassian.net/browse/KITOSUDV-3313
-                        console.log("UPDATE");
+                        this.fkOrganisationImportDialogFactory
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Update, this.currentOrganizationUuid, this.synchronizationStatus.synchronizationDepth)
+                            .closed.then(() => {
+                                //Reload state from backend if the dialog was closed 
+                                this.loadState();
+                            });
                     }
                 });
                 newCommands.push({

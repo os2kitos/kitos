@@ -11,6 +11,7 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.OrganizationUnit.ServiceReference;
+using Polly;
 using Serilog;
 
 namespace Infrastructure.STS.OrganizationUnit.DomainServices
@@ -43,20 +44,20 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
             //Search for org units by org uuid
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
 
-            var channel = client.ChannelFactory.CreateChannel();
-
-            const int pageSize = 100;
+            const int pageSize = 500;
             var totalIds = new List<string>();
             var totalResults = new List<(Guid, RegistreringType1)>();
             var currentPage = new List<string>();
             var organizationStsUuid = uuid.Value;
+
+            using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
+            var channel = client.ChannelFactory.CreateChannel();
             do
             {
                 currentPage.Clear();
                 var searchRequest = CreateSearchOrgUnitsByOrgUuidRequest(organization.Cvr, organizationStsUuid, pageSize, totalIds.Count);
-                var searchResponse = channel.soeg(searchRequest);
+                var searchResponse = SearchOrganizationUnits(channel, searchRequest);
 
                 var searchStatusResult = searchResponse.SoegResponse1.SoegOutput.StandardRetur;
                 var stsError = searchStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
@@ -71,8 +72,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
                 totalIds.AddRange(currentPage);
 
                 var listRequest = CreateListOrgUnitsRequest(organization.Cvr, currentPage.ToArray());
-                var listResponse = channel.list(listRequest);
-
+                var listResponse = LoadOrganizationUnits(channel, listRequest);
 
                 var listStatusResult = listResponse.ListResponse1.ListOutput.StandardRetur;
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
@@ -121,7 +121,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
                 var egenskabType = unit.Item2.AttributListe.Egenskab.First(x => string.IsNullOrEmpty(x.EnhedNavn) == false);
                 var unitUuid = unit.Item1;
-                var organizationUnit = new ExternalOrganizationUnit(unitUuid, egenskabType.EnhedNavn, new Dictionary<string, string>(){{ "UserFacingKey", egenskabType.BrugervendtNoegleTekst } }, parentIdToConvertedChildren.ContainsKey(unitUuid) ? parentIdToConvertedChildren[unitUuid] : new List<ExternalOrganizationUnit>(0));
+                var organizationUnit = new ExternalOrganizationUnit(unitUuid, egenskabType.EnhedNavn, new Dictionary<string, string>() { { "UserFacingKey", egenskabType.BrugervendtNoegleTekst } }, parentIdToConvertedChildren.ContainsKey(unitUuid) ? parentIdToConvertedChildren[unitUuid] : new List<ExternalOrganizationUnit>(0));
                 idToConvertedChildren[organizationUnit.Uuid] = organizationUnit;
                 var parentUnit = unit.Item2.RelationListe.Overordnet;
                 if (parentUnit != null)
@@ -138,6 +138,24 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
             return idToConvertedChildren[root.Item1];
 
+        }
+
+        private static soegResponse SearchOrganizationUnits(OrganisationEnhedPortType channel, soegRequest searchRequest)
+        {
+            //This call is unstable, so we add some retries
+            return Policy
+                .Handle<Exception>()
+                .WaitAndRetry(new double[] { 1, 3, 5, 10 }.Select(TimeSpan.FromSeconds))
+                .Execute(() => channel.soeg(searchRequest));
+        }
+
+        private static listResponse LoadOrganizationUnits(OrganisationEnhedPortType channel, listRequest listRequest)
+        {
+            //This call is unstable, so we add some retries
+            return Policy
+                .Handle<Exception>()
+                .WaitAndRetry(new double[] { 1, 3, 5, 10 }.Select(TimeSpan.FromSeconds))
+                .Execute(() => channel.list(listRequest));
         }
 
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType1) root, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)

@@ -951,6 +951,10 @@
     <Compile Include="Migrations\202210060603461_Add_Sts_Org_Import_Tables.designer.cs">
       <DependentUpon>202210060603461_Add_Sts_Org_Import_Tables.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.cs" />
+    <Compile Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.designer.cs">
+      <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -974,10 +978,6 @@
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
       <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
       <Name>Core.Abstractions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
-      <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
@@ -1587,6 +1587,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202210060603461_Add_Sts_Org_Import_Tables.resx">
       <DependentUpon>202210060603461_Add_Sts_Org_Import_Tables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.resx">
+      <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

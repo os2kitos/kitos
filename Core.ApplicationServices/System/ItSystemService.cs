@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -8,12 +7,12 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -149,40 +148,12 @@ namespace Core.ApplicationServices.System
 
         public IEnumerable<ItSystem> GetHierarchy(int systemId)
         {
-            var result = new List<ItSystem>();
             var system = _itSystemRepository.GetSystem(systemId);
 
             if (system == null)
                 throw new ArgumentException("Invalid system id");
 
-            result.Add(system);
-            result.AddRange(GetHierarchyChildren(system));
-            result.AddRange(GetHierarchyParents(system));
-
-            return result;
-        }
-
-        private static IEnumerable<ItSystem> GetHierarchyChildren(ItSystem itSystem)
-        {
-            var systems = new List<ItSystem>();
-            systems.AddRange(itSystem.Children);
-            foreach (var child in itSystem.Children)
-            {
-                var children = GetHierarchyChildren(child);
-                systems.AddRange(children);
-            }
-            return systems;
-        }
-
-        private static IEnumerable<ItSystem> GetHierarchyParents(ItSystem itSystem)
-        {
-            var parents = new List<ItSystem>();
-            if (itSystem.Parent != null)
-            {
-                parents.Add(itSystem.Parent);
-                parents.AddRange(GetHierarchyParents(itSystem.Parent));
-            }
-            return parents;
+            return system.FlattenCompleteHierarchy().ToList();
         }
 
         public SystemDeleteResult Delete(int id, bool breakBindings = false)
@@ -204,7 +175,7 @@ namespace Core.ApplicationServices.System
             {
                 if (breakBindings)
                 {
-                    var failedUsageDeletion = system.Usages.ToList().Select(usage=>_systemUsageService.Delete(usage.Id)).FirstOrDefault(x=>x.Failed);
+                    var failedUsageDeletion = system.Usages.ToList().Select(usage => _systemUsageService.Delete(usage.Id)).FirstOrDefault(x => x.Failed);
                     if (failedUsageDeletion != null)
                     {
                         _logger.Error("Failed to delete system with id {id} because deleting usages failed", id);
@@ -246,11 +217,11 @@ namespace Core.ApplicationServices.System
                     var failedUpdate = system
                         .ItInterfaceExhibits
                         .ToList()
-                        .Select(exhibit=>_interfaceService.UpdateExposingSystem(exhibit.ItInterface.Id,null))
-                        .FirstOrDefault(x=>x.Failed);
+                        .Select(exhibit => _interfaceService.UpdateExposingSystem(exhibit.ItInterface.Id, null))
+                        .FirstOrDefault(x => x.Failed);
                     if (failedUpdate != null)
                     {
-                        _logger.Error("Failed to delete system with id {id} because deleting interface exposures failed",id);
+                        _logger.Error("Failed to delete system with id {id} because deleting interface exposures failed", id);
                         return SystemDeleteResult.UnknownError;
                     }
                     system.ItInterfaceExhibits.Clear();

@@ -266,6 +266,7 @@
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
     <Compile Include="Model\EventHandlers\SystemUsageDeletedHandlerTest.cs" />
     <Compile Include="Model\SSO\StsPersonDataTest.cs" />
+    <Compile Include="Model\Strategies\StsOrganizationalHierarchyUpdateStrategyTest.cs" />
     <Compile Include="Model\UserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -287,10 +288,6 @@
     <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
       <Project>{7f765808-5258-4e41-8b27-6e7d4667aa24}</Project>
       <Name>Core.BackgroundJobs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
-      <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
