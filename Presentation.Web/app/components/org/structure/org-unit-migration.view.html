@@ -1,25 +1,29 @@
-﻿<div class="container">
-    <div class="col-xs-12 form-group">
-        <select2-org-unit data-id="selectedOrgId"
-                          data-label="Overfør til"
-                          data-placeholder="Vælg organisationsenhed"
-                          data-options="ctrl.orgUnits"
-                          data-ng-model="ctrl.selectedOrg"
-                          data-on-change="ctrl.setSelectedOrg()">
-        </select2-org-unit>
+﻿<div ng-if="ctrl.isAnyDataPresent">
+    <div class="container">
+        <div class="col-xs-12 form-group">
+            <select2-org-unit data-id="selectedOrgId"
+                              data-label="Overfør til"
+                              data-placeholder="Vælg organisationsenhed"
+                              data-options="ctrl.orgUnits"
+                              data-ng-model="ctrl.selectedOrg"
+                              data-on-change="ctrl.setSelectedOrg()">
+            </select2-org-unit>
+        </div>
+    </div>
+
+    <org-unit-migration-table ng-if="ctrl.roles.root.children.length > 0" title="Roller" options="ctrl.roles" configuration="ctrl.rolesTableConfig" unit-id="ctrl.unitId" organization-id="ctrl.organizationId" close-modal="ctrl.closeModal()"></org-unit-migration-table>
+    <org-unit-migration-table ng-if="ctrl.internalPayments.root.children.length > 0" title="Interne betalinger" options="ctrl.internalPayments" configuration="ctrl.internalPaymentTableConfig" unit-id="ctrl.unitId" organization-id="ctrl.organizationId" close-modal="ctrl.closeModal()"></org-unit-migration-table>
+    <org-unit-migration-table ng-if="ctrl.externalPayments.root.children.length > 0" title="Eksterne betalinger" options="ctrl.externalPayments" configuration="ctrl.externalPaymentTableConfig" unit-id="ctrl.unitId" organization-id="ctrl.organizationId" close-modal="ctrl.closeModal()"></org-unit-migration-table>
+    <org-unit-migration-table ng-if="ctrl.contractRegistrations.root.children.length > 0" title="Kontrakter (ansvarlig organisationsenhed)" options="ctrl.contractRegistrations" configuration="ctrl.contractTableConfig" unit-id="ctrl.unitId" organization-id="ctrl.organizationId" close-modal="ctrl.closeModal()"></org-unit-migration-table>
+    <org-unit-migration-table ng-if="ctrl.relevantSystemRegistrations.root.children.length > 0" title="System (relevant organisationsenhed)" options="ctrl.relevantSystemRegistrations" configuration="ctrl.relevantSystemTableConfig" unit-id="ctrl.unitId" organization-id="ctrl.organizationId" close-modal="ctrl.closeModal()"></org-unit-migration-table>
+    <org-unit-migration-table ng-if="ctrl.responsibleSystemRegistrations.root.children.length > 0" title="System (ansvarlig organisationsenhed)" options="ctrl.responsibleSystemRegistrations" configuration="ctrl.responsibleSystemTableConfig" unit-id="ctrl.unitId" organization-id="ctrl.organizationId" close-modal="ctrl.closeModal()"></org-unit-migration-table>
+
+    <button class="btn btn-default" ng-click="ctrl.selectAll()" ng-if="!ctrl.allSelections">Vælg all</button>
+    <button class="btn btn-default" ng-click="ctrl.deselectAll()" ng-if="ctrl.allSelections">Fravælg all</button>
+    <div class="pull-right">
+        <button class="btn btn-danger" ng-click="ctrl.deleteSelected()" ng-disabled="!ctrl.anySelections">Slet valgte</button>
+        <button class="btn btn-warning" ng-click="ctrl.transfer()" ng-disabled="!ctrl.shouldTransferBtnBeEnabled">Overfør valgte</button>
     </div>
 </div>
 
-<org-unit-migration-table ng-if="ctrl.roles.root.children.length > 0" title="Roller" options="ctrl.roles" configuration="ctrl.rolesTableConfig" unit-id="ctrl.unitId"></org-unit-migration-table>
-<org-unit-migration-table ng-if="ctrl.internalPayments.root.children.length > 0" title="Interne betalinger" options="ctrl.internalPayments" configuration="ctrl.internalPaymentTableConfig" unit-id="ctrl.unitId"></org-unit-migration-table>
-<org-unit-migration-table ng-if="ctrl.externalPayments.root.children.length > 0" title="Eksterne betalinger" options="ctrl.externalPayments" configuration="ctrl.externalPaymentTableConfig" unit-id="ctrl.unitId"></org-unit-migration-table>
-<org-unit-migration-table ng-if="ctrl.contractRegistrations.root.children.length > 0" title="Kontrakter (ansvarlig organisationsenhed)" options="ctrl.contractRegistrations" configuration="ctrl.contractTableConfig" unit-id="ctrl.unitId"></org-unit-migration-table>
-<org-unit-migration-table ng-if="ctrl.relevantSystemRegistrations.root.children.length > 0" title="System (relevant organisationsenhed)" options="ctrl.relevantSystemRegistrations" configuration="ctrl.relevantSystemTableConfig" unit-id="ctrl.unitId"></org-unit-migration-table>
-<org-unit-migration-table ng-if="ctrl.responsibleSystemRegistrations.root.children.length > 0" title="System (ansvarlig organisationsenhed)" options="ctrl.responsibleSystemRegistrations" configuration="ctrl.responsibleSystemTableConfig" unit-id="ctrl.unitId"></org-unit-migration-table>
-
-<button class="btn btn-default" ng-click="ctrl.selectAll()" ng-if="!ctrl.allSelections">Vælg all</button>
-<button class="btn btn-default" ng-click="ctrl.deselectAll()" ng-if="ctrl.allSelections">Fravælg all</button>
-<div class="pull-right">
-    <button class="btn btn-danger" ng-click="ctrl.deleteSelected()" ng-disabled="!ctrl.anySelections">Slet valgte</button>
-    <button class="btn btn-warning" ng-click="ctrl.transfer()" ng-disabled="!ctrl.shouldTransferBtnBeEnabled">Overfør valgte</button>
-</div>
+<h5 ng-if="!ctrl.isAnyDataPresent">Der er ikke nogle registreringer der anvender '{{ctrl.unitName}}'</h5>

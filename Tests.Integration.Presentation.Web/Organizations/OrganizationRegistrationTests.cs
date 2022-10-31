@@ -23,7 +23,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var (right, contract, externalEconomyStream, internalEconomyStream, usage, unit) = await SetupRegistrations(organizationId);
 
-            var registrationsRoot = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            var registrationsRoot = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
 
             AssertRegistrationsAreValid(right, contract, externalEconomyStream, internalEconomyStream, usage, registrationsRoot);
         }
@@ -34,12 +34,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var (_, _, _, _, _, unit) = await SetupRegistrations(organizationId);
 
-            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
 
             var selectedRegistrations = ToChangeParametersList(registrations);
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Id, selectedRegistrations);
 
-            var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.OrganizationUnitRights);
             Assert.Empty(registrationsRootAfterDeletion.Payments);
             Assert.Empty(registrationsRootAfterDeletion.ItContractRegistrations);
@@ -53,50 +53,50 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var (_, _, _, _, _, unit) = await SetupRegistrations(organizationId);
 
-            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
 
             //----Check UnitRights deletion----
             var selectedRegistrations = CreateChangeParametersWithOnlyUnitRegistrations(registrations);
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Id, selectedRegistrations);
 
-            var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            var registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.OrganizationUnitRights);
 
             //----Check Internal Payment deletion----
             selectedRegistrations = CreateChangeParametersWithOnlyInternalPayment(registrations);
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Id, selectedRegistrations);
 
-            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
             Assert.Single(registrationsRootAfterDeletion.Payments);
             var payment = registrationsRootAfterDeletion.Payments.FirstOrDefault();
             Assert.Empty(payment.InternalPayments);
 
             //----Check External Payment deletion----
             selectedRegistrations = CreateChangeParametersWithOnlyExternalPayment(registrations);
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Id, selectedRegistrations);
 
-            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.Payments);
 
             //----Check Contract registrations deletion----
             selectedRegistrations = CreateChangeParametersWithOnlyContractRegistrations(registrations);
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Id, selectedRegistrations);
 
-            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.ItContractRegistrations);
             
             //----Check Responsible unit deletion----
             selectedRegistrations = CreateChangeParametersWithOnlyResponsibleSystems(registrations);
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Id, selectedRegistrations);
 
-            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.ResponsibleSystems);
 
             //----Check Relevant unit deletion----
             selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);
-            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(unit.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Id, selectedRegistrations);
 
-            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit.Id);
+            registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Id);
             Assert.Empty(registrationsRootAfterDeletion.RelevantSystems);
         }
 
@@ -106,12 +106,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var (_, _, _, _, _, unit) = await SetupRegistrations(organizationId);
 
-            await OrganizationRegistrationHelper.DeleteUnitWithRegistrationsAsync(unit.Id, organizationId);
+            await OrganizationRegistrationHelper.DeleteUnitWithRegistrationsAsync(organizationId, unit.Id);
 
             var rootOrganizationUnit = await OrganizationUnitHelper.GetOrganizationUnitsAsync(organizationId);
             Assert.DoesNotContain(unit.Id, rootOrganizationUnit.Children.Select(x => x.Id));
 
-            using var registrationsResponse = await OrganizationRegistrationHelper.SendGetRegistrationsAsync(unit.Id);
+            using var registrationsResponse = await OrganizationRegistrationHelper.SendGetRegistrationsAsync(organizationId, unit.Id);
             Assert.Equal(HttpStatusCode.BadRequest, registrationsResponse.StatusCode);
         }
 
@@ -122,74 +122,74 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var (right, contract, externalEconomyStream, internalEconomyStream, usage, unit1) = await SetupRegistrations(organizationId);
             var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
 
-            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
 
             //----Org unit rights----
             var selectedRegistrations = CreateChangeParametersWithOnlyUnitRegistrations(registrations);
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
 
-            var registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            var registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
             Assert.Empty(registrationsUnit1.OrganizationUnitRights);
 
-            var registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            var registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             AssertRegistrationIsValid(right, registrationsUnit2.OrganizationUnitRights);
 
             //----Internal payments----
             selectedRegistrations = CreateChangeParametersWithOnlyInternalPayment(registrations);
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
 
-            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
             Assert.Single(registrationsUnit1.Payments);
             var payment = registrationsUnit1.Payments.FirstOrDefault();
             Assert.Empty(payment.InternalPayments);
 
-            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             Assert.Single(registrationsUnit2.Payments);
             var targetPayment = registrationsUnit2.Payments.FirstOrDefault();
             AssertRegistrationIsValid(internalEconomyStream, targetPayment.InternalPayments);
 
             //----External payments----
             selectedRegistrations = CreateChangeParametersWithOnlyExternalPayment(registrations);
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
 
-            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
             Assert.Empty(registrationsUnit1.Payments);
 
-            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             Assert.Single(registrationsUnit2.Payments);
             targetPayment = registrationsUnit2.Payments.FirstOrDefault();
             AssertRegistrationIsValid(externalEconomyStream, targetPayment.ExternalPayments);
 
             //----Contract registrations----
             selectedRegistrations = CreateChangeParametersWithOnlyContractRegistrations(registrations);
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
 
-            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
             Assert.Empty(registrationsUnit1.ItContractRegistrations);
             Assert.Empty(registrationsUnit1.Payments);
 
-            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             AssertRegistrationIsValid(contract, registrationsUnit2.ItContractRegistrations);
 
 
             //----Relevant systems----
             selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
 
-            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
             Assert.Empty(registrationsUnit1.RelevantSystems);
 
-            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             AssertRegistrationIsValid(usage, registrationsUnit2.RelevantSystems);
 
             //----Responsible systems----
             selectedRegistrations = CreateChangeParametersWithOnlyResponsibleSystems(registrations);
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(unit1.Id, unit2.Id, selectedRegistrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
 
-            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit1.Id);
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
             Assert.Empty(registrationsUnit1.ItContractRegistrations);
 
-            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(unit2.Id);
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             AssertRegistrationIsValid(usage, registrationsUnit2.ResponsibleSystems);
         }
 
@@ -275,7 +275,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         private static ChangeOrganizationRegistrationRequestDTO CreateChangeParametersWithOnlyInternalPayment(
             OrganizationRegistrationDTO registrations)
         {
-            var dto = new OrganizationRegistrationDTO()
+            var dto = new OrganizationRegistrationDTO
             {
                 Payments = registrations.Payments
                     .Select(x =>

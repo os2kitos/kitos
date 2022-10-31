@@ -360,10 +360,6 @@
                 return null;
             }
 
-            $scope.$on('$routeChangeStart', function ($event, next, current) {
-                console.log("test");
-            });
-
             $scope.editUnit = function (unit) {
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
@@ -371,11 +367,7 @@
                     controller: [
                         "$scope", "$uibModalInstance", "autofocus", "organizationRegistrationsService", function ($modalScope, $modalInstance, autofocus, organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
                             autofocus();
-
-                            $modalScope.$on('$routeChangeStart', function ($event, next, current) {
-                                console.log("test");
-                            });
-
+                            
                             // edit or create-new mode
                             $modalScope.isNew = false;
 

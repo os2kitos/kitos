@@ -1019,9 +1019,10 @@ namespace Tests.Unit.Core.Model
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void Can_Remove_EconomyStream(bool isInternal)
+        public void Can_Reset_EconomyStream(bool isInternal)
         {
             var id = A<int>();
+            var unit = new OrganizationUnit {Id = A<int>()};
             var contract = new ItContract();
             if (isInternal)
             {
@@ -1030,6 +1031,7 @@ namespace Tests.Unit.Core.Model
                     new()
                     {
                         Id = id,
+                        OrganizationUnit = unit,
                     }
                 };
             }
@@ -1040,6 +1042,7 @@ namespace Tests.Unit.Core.Model
                     new()
                     {
                         Id = id,
+                        OrganizationUnit = unit,
                     }
                 };
             }
@@ -1047,8 +1050,18 @@ namespace Tests.Unit.Core.Model
             var result = contract.ResetEconomyStreamOrganizationUnit(id, isInternal);
 
             Assert.True(result.IsNone);
-            Assert.DoesNotContain(id, contract.ExternEconomyStreams.Select(x => x.Id));
-            Assert.DoesNotContain(id, contract.InternEconomyStreams.Select(x => x.Id));
+            if (isInternal)
+            {
+                var intern = contract.InternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(intern);
+                Assert.Null(intern.OrganizationUnit);
+            }
+            else
+            {
+                var external = contract.ExternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(external);
+                Assert.Null(external.OrganizationUnit);
+            }
         }
 
         [Fact]

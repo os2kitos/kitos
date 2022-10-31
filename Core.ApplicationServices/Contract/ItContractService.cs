@@ -148,9 +148,10 @@ namespace Core.ApplicationServices.Contract
             {
                 return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
                     .Select(targetUuid => TransferPayments(contract, targetUuid, isInternal, paymentIds))
+                    .GetValueOrDefault()
                     .Match
                     (
-                        error => error.Value,
+                        error => error,
                         () => Result<ItContract, OperationError>.Success(contract)
                     );
             }).Match(_ => Maybe<OperationError>.None,

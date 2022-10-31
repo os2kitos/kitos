@@ -891,6 +891,7 @@ namespace Core.DomainModel.ItContract
                 return new OperationError($"EconomyStream with id: {id} was not found", OperationFailure.NotFound);
 
             stream.OrganizationUnit = targetUnit;
+            stream.OrganizationUnitId = targetUnit.Id
             return Maybe<OperationError>.None;
         }
 

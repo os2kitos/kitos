@@ -5,7 +5,9 @@
         return{
             bindings: {
                 organizationId: "<",
-                unitId: "<"
+                unitId: "<",
+                unitName: "@",
+                closeModal: "&",
             },
             controller: OrganizationUnitMigrationController,
             controllerAs: "ctrl",
@@ -18,6 +20,8 @@
         selectedRegistrationChanged?: () => void;
         selectedRegistrationGroupChanged?: (root: IOrganizationUnitMigrationRoot) => void;
         refreshData: () => void;
+        checkIsBusy: () => boolean;
+        setIsBusy: (value: boolean) => void;
         type: Models.ViewModel.Organization.OrganizationRegistrationOption;
     }
 
@@ -28,15 +32,20 @@
     interface IOrganizationUnitMigrationController extends ng.IComponentController {
         organizationId: number;
         unitId: number;
+        unitName: string;
+        closeModal: () => void;
     }
 
     class OrganizationUnitMigrationController implements IOrganizationUnitMigrationController {
         organizationId: number | null = null;
         unitId: number | null = null;
+        unitName: string | null = null;
+        closeModal: () => void;
         anySelections = false;
         allSelections = false;
         targetUnitSelected = false;
         shouldTransferBtnBeEnabled = false;
+        isAnyDataPresent = false;
 
         roles: IOrganizationUnitMigrationOptions;
         internalPayments: IOrganizationUnitMigrationOptions;
@@ -56,9 +65,10 @@
 
         private isBusy = false;
 
-        static $inject: string[] = ["organizationRegistrationsService", "organizationApiService"];
+        static $inject: string[] = ["organizationRegistrationsService", "organizationApiService", "notify"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
-            private readonly organizationApiService: Services.IOrganizationApiService) {
+            private readonly organizationApiService: Services.IOrganizationApiService,
+            private readonly notify) {
         }
 
         $onInit() {
@@ -68,6 +78,9 @@
             if (this.unitId === null) {
                 console.error("missing attribute: 'unitId'");
             }
+            if (this.unitName === null) {
+                console.error("missing attribute: 'unitName'");
+            }
 
             this.createTableConfigurations();
             this.setupOptions();
@@ -76,7 +89,6 @@
             this.orgUnits = [];
             this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
                 this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
-                $(`#selectedOrgId>option[value='${this.unitId}']`).attr('disabled', 'disabled');
             });
         }
 
@@ -90,9 +102,14 @@
             this.isBusy = true;
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
-                .then(() => this.refreshData(),
-                    error => console.error(error));
+            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
+                .then(() => {
+                    this.refreshData(); 
+                },
+                error => {
+                    console.error(error);
+                    this.notify.addErrorMessage("Delete selected failed");
+                });
 
             this.isBusy = false;
         }
@@ -109,11 +126,14 @@
             this.isBusy = true;
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.transferSelectedRegistrations(this.unitId, this.selectedOrg.id, request)
+            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationId, this.unitId, this.selectedOrg.id, request)
                 .then(() => {
                     this.selectedOrg = null;
                     this.refreshData();
-                }, error => console.log(error));
+                }, error => {
+                    console.log(error);
+                    this.notify.addErrorMessage("Transfer failed");
+                });
 
             this.isBusy = false;
         }
@@ -121,8 +141,9 @@
         setSelectedOrg() {
             if (!this.selectedOrg?.id)
                 return;
-            if (this.selectedOrg.id === this.unitId) {
+            if (parseInt(this.selectedOrg.id) === this.unitId) {
                 this.selectedOrg = null;
+                this.notify.addErrorMessage("You cannot choose the current unit");
                 return;
             }
             const selectedRegistrations = this.collectSelectedRegistrations();
@@ -242,12 +263,12 @@
         }
 
         private createTableConfigurations() {
-            this.rolesTableConfig = this.createStandardTableConfig("Rolle");
+            this.rolesTableConfig = this.createUserFullNameTableConfig("Rolle");
             this.internalPaymentTableConfig = this.createPaymentTableConfig("Betaling (Anskaffelse,Drift,Andet)");
             this.externalPaymentTableConfig = this.createPaymentTableConfig("Betaling (Anskaffelse,Drift,Andet)");
             this.contractTableConfig = this.createStandardTableConfig("Kontraktnavn");
-            this.relevantSystemTableConfig = this.createSystemTableConfig("Systemnavn");
-            this.responsibleSystemTableConfig = this.createSystemTableConfig("Systemnavn");
+            this.relevantSystemTableConfig = this.createStandardTableConfig("Systemnavn");
+            this.responsibleSystemTableConfig = this.createStandardTableConfig("Systemnavn");
         }
 
         private setupOptions() {
@@ -269,26 +290,14 @@
                 this.responsibleSystemRegistrations.root.children);
         }
 
-        private createBaseOptions(type: Models.ViewModel.Organization.OrganizationRegistrationOption): IOrganizationUnitMigrationOptions {
-            return {
-                root: {
-                    selected: false,
-                    children: []
-                },
-                type: type,
-                selectedRegistrationChanged: () => this.updateAnySelections(),
-                selectedRegistrationGroupChanged: (root: IOrganizationUnitMigrationRoot) => this.changeRegistrationGroupStatus(root),
-                refreshData: () => this.refreshData()
-            } as IOrganizationUnitMigrationOptions;
-        }
-
         private getData(): ng.IPromise<void> {
-            return this.organizationRegistrationsService.getRegistrations(this.unitId).then(response => {
-                this.roles.root.children = this.mapOrganizationDtoToOptions(response.organizationUnitRights);
+            return this.organizationRegistrationsService.getRegistrations(this.organizationId, this.unitId).then(response => {
+                this.roles.root.children = this.mapDtoWithUserFullNameToOptions(response.organizationUnitRights);
                 this.getPaymentOptions(response.payments);
                 this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);
                 this.relevantSystemRegistrations.root.children = this.mapOrganizationDtoWithEnabledToOptions(response.relevantSystems);
                 this.responsibleSystemRegistrations.root.children = this.mapOrganizationDtoWithEnabledToOptions(response.responsibleSystems);
+                this.checkIsAnyDataPresent();
             }, error => {
                 console.error(error);
             });
@@ -299,16 +308,54 @@
                 .then(() => this.updateAnySelections());
         }
 
+        private checkIsAnyDataPresent(): void {
+            if (this.roles.root.children.length === 0 &&
+                this.externalPayments.root.children.length === 0 &&
+                this.internalPayments.root.children.length === 0 &&
+                this.contractRegistrations.root.children.length === 0 &&
+                this.relevantSystemRegistrations.root.children.length === 0 &&
+                this.responsibleSystemRegistrations.root.children.length === 0) {
+
+                this.isAnyDataPresent = false;
+                return;
+            }
+
+            this.isAnyDataPresent = true;
+        }
+
+        private checkIsBusy(): boolean {
+            return this.isBusy;
+        }
+
+        private setIsBusy(value: boolean): void{
+            this.isBusy = value;
+        }
+
+        private createBaseOptions(type: Models.ViewModel.Organization.OrganizationRegistrationOption): IOrganizationUnitMigrationOptions {
+            return {
+                root: {
+                    selected: false,
+                    children: []
+                },
+                type: type,
+                selectedRegistrationChanged: () => this.updateAnySelections(),
+                selectedRegistrationGroupChanged: (root: IOrganizationUnitMigrationRoot) => this.changeRegistrationGroupStatus(root),
+                refreshData: () => this.refreshData(),
+                checkIsBusy: () => this.checkIsBusy(),
+                setIsBusy: (value: boolean) => this.setIsBusy(value)
+            } as IOrganizationUnitMigrationOptions;
+        }
+
         private createStandardTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: title, property: "text" },
             ] as IMigrationTableColumn[];
         }
 
-        private createSystemTableConfig(title: string): IMigrationTableColumn[] {
+        private createUserFullNameTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: title, property: "text" },
-                { title: "Status", property: "objectText" },
+                { title: "Bruger", property: "objectText" }
             ] as IMigrationTableColumn[];
         }
 
@@ -329,12 +376,21 @@
             });
         }
 
-        private mapOrganizationDtoWithEnabledToOptions(registrations: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
+        private mapDtoWithUserFullNameToOptions(registrations: Models.Generic.NamedEntity.NamedEntityWithUserFullNameDTO[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
             return registrations.map(res => {
                 return {
                     id: res.id,
                     text: res.name,
-                    objectText: res.disabled ? "Ikke aktivt" : "Aktivt" 
+                    objectText: res.userFullName
+                } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
+            });
+        }
+
+        private mapOrganizationDtoWithEnabledToOptions(registrations: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
+            return registrations.map(res => {
+                return {
+                    id: res.id,
+                    text: Helpers.SystemNameFormat.apply(res.name, res.disabled)
             } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
             });
         }
@@ -357,11 +413,12 @@
                 return {
                     id: element.id,
                     text: element.name,
-                    objectText: Helpers.RenderFieldsHelper.renderInternalReference(
+                    objectText: `<a class="modal-close" data-element-type="payment-contract" data-ui-sref="it-contract.edit.main({id: ${contract.id}})">${contract.name}</a>`/*
+                    Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(
                         "payment-contract",
                         "it-contract.edit.main",
                         contract.id,
-                        contract.name),
+                        contract.name)*/,
                     index: index + 1,
                     optionalObjectContext: contract
                 } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
@@ -371,7 +428,6 @@
 
     angular.module("app")
         .component("orgUnitMigration", setupComponent());
-
 
     angular.module('app')
         .directive('compile', ['$compile', function ($compile) {

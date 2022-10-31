@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return new OrganizationRegistrationDTO
             {
-                OrganizationUnitRights = details.OrganizationUnitRights.Select(MapUnitRightToNamedEntityDto).ToList(),
+                OrganizationUnitRights = details.OrganizationUnitRights.Select(MapUnitRightToNamedEntityDtoWithUserFullNameDto).ToList(),
                 ItContractRegistrations = details.ItContractRegistrations.Select(x => x.MapToNamedEntityDTO()).ToList(),
                 Payments = details.PaymentRegistrationDetails.Select(ToPaymentRegistrationDto).ToList(),
                 RelevantSystems = details.RelevantSystems.Select(x => x.MapToNamedEntityWithEnabledStatusDTO()).ToList(),
@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         private static PaymentRegistrationDTO ToPaymentRegistrationDto(PaymentRegistrationDetails details)
         {
-            return new PaymentRegistrationDTO()
+            return new PaymentRegistrationDTO
             {
                 ItContract = details.ItContract.MapToNamedEntityDTO(),
                 InternalPayments = details.InternalPayments.Select(MapPaymentToNamedEntityDto).ToList(),
@@ -97,12 +97,13 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
 
-        private static NamedEntityDTO MapUnitRightToNamedEntityDto(OrganizationUnitRight right)
+        private static NamedEntityWithUserFullNameDTO MapUnitRightToNamedEntityDtoWithUserFullNameDto(OrganizationUnitRight right)
         {
-            return new NamedEntityDTO
+            return new NamedEntityWithUserFullNameDTO
             {
                 Id = right.Id,
-                Name = right.Role.Name
+                Name = right.Role.Name,
+                UserFullName = right.User.GetFullName()
             };
         }
 

@@ -54,7 +54,7 @@ namespace Tests.Unit.Core.Model.Organizations
             var unit = SetupOrganizationUnit(unitId, origin, isUsing, hasRights, hasEconomy, isResponsible);
             var org = new Organization { OrgUnits = new List<OrganizationUnit> { unit } };
             
-            const string expectedErrorMessage = "Unit has assigned registrations";
+            const string expectedErrorMessage = "Unit is being used";
 
             var result = org.RemoveOrganizationUnit(unitId);
 

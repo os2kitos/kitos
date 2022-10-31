@@ -7,7 +7,9 @@
                 title: "@",
                 options: "<",
                 configuration: "<",
-                unitId: "<"
+                unitId: "<",
+                organizationId: "<",
+                closeModal: "&"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -26,6 +28,8 @@
         options: IOrganizationUnitMigrationOptions;
         configuration: IMigrationTableColumn[];
         unitId: number;
+        organizationId: number;
+        closeModal: () => void;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
@@ -33,10 +37,14 @@
         options: IOrganizationUnitMigrationOptions | null;
         configuration: IMigrationTableColumn[] | null = null;
         unitId: number | null = null;
+        organizationId: number | null = null;
+        closeModal: () => void;
         root: IOrganizationUnitMigrationRoot;
 
-        static $inject: string[] = ["organizationRegistrationsService"];
-        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService) {
+        static $inject: string[] = ["organizationRegistrationsService", "notify", "$"];
+        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
+            private readonly notify,
+            private readonly $) {
         }
 
         $onInit() {
@@ -52,8 +60,16 @@
             if (this.unitId === null) {
                 console.error("missing migration table attribute: 'unitId'");
             }
+            if (this.organizationId === null) {
+                console.error("missing migration table attribute: 'organizationId'");
+            }
 
             this.root = this.options.root;
+
+           /* $(`id-${this.title}-objectText`).on("click",
+                e => {
+                    this.closeModal();
+                });*/
         }
 
         registrationSelected() {
@@ -71,16 +87,28 @@
         }
 
         delete(registration: Models.ViewModel.Organization.IOrganizationUnitRegistration) {
+            if (this.options.checkIsBusy()) {
+                    return;
+            }
             if (!confirm('Er du sikker på, at du vil slette registreringen?')) {
                 return;
             }
+            this.options.setIsBusy(true);
 
             registration.selected = true;
             const request = this.createChangeRequest(registration);
             registration.selected = false;
 
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.unitId, request)
-                .then(() => this.options.refreshData());
+            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
+                .then(() => {
+                        this.options.refreshData();
+                    },
+                    error => {
+                        console.log(error);
+                        this.notify.addErrorMessage("Failed to deleted the selected unit");
+                    });
+
+            this.options.setIsBusy(false);
         }
 
         createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {

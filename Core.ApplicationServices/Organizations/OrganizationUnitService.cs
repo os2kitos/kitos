@@ -66,9 +66,9 @@ namespace Core.ApplicationServices.Organizations
             using var transaction = _transactionManager.Begin();
 
             var canModifyOrganization = CanModifyOrganization(organizationId);
-            if (canModifyOrganization.Failed)
+            if (canModifyOrganization.HasValue)
             {
-                return canModifyOrganization.Error;
+                return canModifyOrganization.Value;
             }
 
             var unit = GetOrganziationUnit(unitId);
@@ -118,9 +118,9 @@ namespace Core.ApplicationServices.Organizations
             using var transaction = _transactionManager.Begin();
 
             var canModifyOrganization = CanModifyOrganization(organizationId);
-            if (canModifyOrganization.Failed)
+            if (canModifyOrganization.HasValue)
             {
-                return canModifyOrganization.Error;
+                return canModifyOrganization.Value;
             }
 
             var deleteRegistrationsResult = GetOrganizationRegistrations(organizationId, unitId)
@@ -141,9 +141,9 @@ namespace Core.ApplicationServices.Organizations
             using var transaction = _transactionManager.Begin();
 
             var canModifyOrganization = CanModifyOrganization(organizationId);
-            if (canModifyOrganization.Failed)
+            if (canModifyOrganization.HasValue)
             {
-                return canModifyOrganization.Error;
+                return canModifyOrganization.Value;
             }
 
             var unit = GetOrganziationUnit(unitId);
@@ -201,23 +201,25 @@ namespace Core.ApplicationServices.Organizations
         private Result<OrganizationUnit, OperationError> GetOrganziationUnit(int unitId)
         {
             return _identityResolver.ResolveUuid<OrganizationUnit>(unitId)
-                .Select(x => _organizationService.GetOrganizationUnit(x))
-                .GetValueOrDefault();
+                .Match(x => _organizationService.GetOrganizationUnit(x),
+                    () => new OperationError($"Organization unit with id: {unitId} not found", OperationFailure.NotFound));
         }
 
         private Result<Organization, OperationError> GetOrganization(int id, OrganizationDataReadAccessLevel? accessLevel = null)
         {
             return _identityResolver.ResolveUuid<Organization>(id)
-                .Select(x => _organizationService.GetOrganization(x, accessLevel))
-                .GetValueOrDefault();
+                .Match(x => _organizationService.GetOrganization(x, accessLevel),
+                    () => new OperationError($"Organization with id: {id} not found", OperationFailure.NotFound));
         }
 
-        private Result<bool, OperationError> CanModifyOrganization(int id, OrganizationDataReadAccessLevel? accessLevel = null)
+        private Maybe<OperationError> CanModifyOrganization(int id, OrganizationDataReadAccessLevel? accessLevel = null)
         {
             return GetOrganization(id, accessLevel)
                 .Match
                 (
-                    organization => Result<bool, OperationError>.Success(_authorizationContext.AllowModify(organization)),
+                    organization => _authorizationContext.AllowModify(organization) == false 
+                        ? new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden) 
+                        : Maybe<OperationError>.None,
                     error => error
                 );
         }

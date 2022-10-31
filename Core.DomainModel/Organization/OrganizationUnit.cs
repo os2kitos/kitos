@@ -159,11 +159,11 @@ namespace Core.DomainModel.Organization
         {
             return new OrganizationRegistrationDetails
             (
-                Rights,
-                ResponsibleForItContracts,
-                GetUnitPayments(),
-                Using.Where(x => x.OrganizationUnit.Id == Id).Select(x => x.ItSystemUsage),
-                Using.Select(x => x.ItSystemUsage)
+                Rights.ToList(),
+                ResponsibleForItContracts.ToList(),
+                GetUnitPayments().ToList(),
+                Using.Where(x => x.OrganizationUnit.Id == Id).Select(x => x.ItSystemUsage).ToList(),
+                Using.Select(x => x.ItSystemUsage).ToList()
             );
         }
 
@@ -171,7 +171,7 @@ namespace Core.DomainModel.Organization
         {
             var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();
             var externContracts = EconomyStreams.Where(x => x.ExternPaymentFor != null).Select(x => x.ExternPaymentFor).ToList();
-            var contracts = internContracts.Concat(externContracts).ToList();
+            var contracts = internContracts.Concat(externContracts).GroupBy(x => x.Id).Select(x => x.First()).ToList();
 
             return contracts.Select(itContract => new PaymentRegistrationDetails(Id, itContract));
         }

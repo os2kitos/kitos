@@ -21,7 +21,8 @@
                 <td><input data-disabled-on-busy type="checkbox" ng-model="registration.selected" ng-change="ctrl.registrationSelected()" /></td>
                 <td ng-repeat="header in ctrl.configuration">
                     <div class="{{header.cssClass}}">
-                        <p compile="registration[header.property]"></p>
+                        <!--<div ng-bind-html="registration[header.property]"></div>-->
+                        <p id="id-{{ctrl.title}}-{{header.property}}" compile="registration[header.property]"></p>
                     </div>
                 </td>
                 <td class="pull-right"><button class="glyphicon glyphicon-trash" data-disabled-on-busy ng-click="ctrl.delete(registration)"></button></td>

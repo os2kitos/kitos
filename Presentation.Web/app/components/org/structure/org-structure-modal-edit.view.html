@@ -61,7 +61,7 @@
                     </a>
                 </div>
                 <div ng-if="isRegistrationDetailsExpanded" class="panel-body">
-                    <org-unit-migration organization-id="orgUnit.orgId" unit-id="orgUnit.id" />
+                    <org-unit-migration organization-id="orgUnit.orgId" unit-id="orgUnit.id" unit-name="orgUnit.oldName" close-modal="cancel()"/>
                 </div>
             </div>
 </form>
