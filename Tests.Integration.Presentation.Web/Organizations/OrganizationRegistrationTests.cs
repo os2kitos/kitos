@@ -112,7 +112,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.DoesNotContain(unit.Id, rootOrganizationUnit.Children.Select(x => x.Id));
 
             using var registrationsResponse = await OrganizationRegistrationHelper.SendGetRegistrationsAsync(organizationId, unit.Id);
-            Assert.Equal(HttpStatusCode.BadRequest, registrationsResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, registrationsResponse.StatusCode);
         }
 
         [Fact]
@@ -171,6 +171,15 @@ namespace Tests.Integration.Presentation.Web.Organizations
             registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             AssertRegistrationIsValid(contract, registrationsUnit2.ItContractRegistrations);
 
+            //----Responsible systems----
+            selectedRegistrations = CreateChangeParametersWithOnlyResponsibleSystems(registrations);
+            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
+
+            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
+            Assert.Empty(registrationsUnit1.ItContractRegistrations);
+
+            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
+            AssertRegistrationIsValid(usage, registrationsUnit2.ResponsibleSystems);
 
             //----Relevant systems----
             selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);
@@ -181,16 +190,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
             AssertRegistrationIsValid(usage, registrationsUnit2.RelevantSystems);
-
-            //----Responsible systems----
-            selectedRegistrations = CreateChangeParametersWithOnlyResponsibleSystems(registrations);
-            await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Id, unit2.Id, selectedRegistrations);
-
-            registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Id);
-            Assert.Empty(registrationsUnit1.ItContractRegistrations);
-
-            registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Id);
-            AssertRegistrationIsValid(usage, registrationsUnit2.ResponsibleSystems);
         }
 
         private static void AssertRegistrationsAreValid(OrganizationUnitRight right, ItContract contract,
@@ -249,16 +248,16 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             return new ChangeOrganizationRegistrationRequestDTO()
             {
-                ItContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id),
-                OrganizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id),
+                ItContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id).ToList(),
+                OrganizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id).ToList(),
                 PaymentRegistrationDetails = registrations.Payments.Select(x => new ChangePaymentRegistraitonRequestDTO
                 {
                     ItContractId = x.ItContract.Id,
-                    InternalPayments = x.InternalPayments.Select(x => x.Id),
-                    ExternalPayments = x.ExternalPayments.Select(x => x.Id)
-                }),
-                RelevantSystems = registrations.RelevantSystems.Select(x => x.Id),
-                ResponsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id),
+                    InternalPayments = x.InternalPayments.Select(x => x.Id).ToList(),
+                    ExternalPayments = x.ExternalPayments.Select(x => x.Id).ToList()
+                }).ToList(),
+                RelevantSystems = registrations.RelevantSystems.Select(x => x.Id).ToList(),
+                ResponsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id).ToList(),
             };
         }
 

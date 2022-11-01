@@ -337,15 +337,16 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
-        public Maybe<OperationError> SetContractResponsibleUnit(int targetUnitId, int contractId)
+        public Maybe<OperationError> SetContractResponsibleUnit(int contractId, int targetUnitId)
         {
             return Modify(contractId, contract =>
             {
                 return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
                     .Select(contract.SetResponsibleOrganizationUnit)
+                    .GetValueOrDefault()
                     .Match
                     (
-                        error => error.Value,
+                        error => error,
                         () => Result<ItContract, OperationError>.Success(contract)
                     );
             }).Match(_ => Maybe<OperationError>.None, 

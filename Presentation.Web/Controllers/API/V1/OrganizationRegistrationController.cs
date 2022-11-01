@@ -2,11 +2,11 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
@@ -21,10 +21,13 @@ namespace Presentation.Web.Controllers.API.V1
     public class OrganizationRegistrationController: BaseApiController
     {
         private readonly IOrganizationUnitService _organizationUnitService;
+        private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationRegistrationController(IOrganizationUnitService organizationUnitService)
+        public OrganizationRegistrationController(IOrganizationUnitService organizationUnitService,
+            IOrgUnitService orgUnitService)
         {
             _organizationUnitService = organizationUnitService;
+            _orgUnitService = orgUnitService;
         }
 
         [HttpGet]
@@ -59,8 +62,8 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage DeleteUnitWithRegistrations(int organizationId, int unitId)
         {
-            return _organizationUnitService.DeleteAllUnitOrganizationRegistrations(organizationId, unitId)
-                .Match(FromOperationError, Ok);
+            _orgUnitService.Delete(organizationId, unitId);
+            return Ok();
         }
 
         [HttpPut]

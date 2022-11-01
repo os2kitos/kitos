@@ -129,8 +129,7 @@ namespace Core.ApplicationServices.Organizations
 
             if (deleteRegistrationsResult.HasValue)
                 return deleteRegistrationsResult.Value;
-
-            _orgUnitService.Delete(organizationId, unitId);
+            
             transaction.Commit();
 
             return Maybe<OperationError>.None;
@@ -171,12 +170,12 @@ namespace Core.ApplicationServices.Organizations
                 .Match
                 (
                     error => error,
-                    () => TransferPayments(unitId, parameters.PaymentRegistrationDetails)
+                    () => TransferPayments(targetUnitId, parameters.PaymentRegistrationDetails)
                 )
                 .Match
                 (
                     error => error,
-                    () => TransferContractRegistrations(unitId, parameters.ItContractRegistrations)
+                    () => TransferContractRegistrations(targetUnitId, parameters.ItContractRegistrations)
                 )
                 .Match
                 (
@@ -331,21 +330,21 @@ namespace Core.ApplicationServices.Organizations
         private static OrganizationRegistrationChangeParameters ToChangeParametersFromRegistrationDetails(
             OrganizationRegistrationDetails registrations)
         {
-            var itContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id);
-            var organizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id);
+            var itContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id).ToList();
+            var organizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id).ToList();
             var paymentRegistrationDetails = registrations.PaymentRegistrationDetails.Select
             (x =>
                 new PaymentChangeParameters
                 (
                     x.ItContract.Id,
-                    x.InternalPayments.Select(ip => ip.Id),
-                    x.ExternalPayments.Select(ep => ep.Id)
+                    x.InternalPayments.Select(ip => ip.Id).ToList(),
+                    x.ExternalPayments.Select(ep => ep.Id).ToList()
                 )
-            );
-            var relevantSystems = registrations.RelevantSystems.Select(x => x.Id);
-            var responsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id);
+            ).ToList();
+            var relevantSystems = registrations.RelevantSystems.Select(x => x.Id).ToList();
+            var responsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id).ToList();
 
-            return new OrganizationRegistrationChangeParameters(itContractRegistrations, organizationUnitRights, paymentRegistrationDetails, responsibleSystems,relevantSystems);
+            return new OrganizationRegistrationChangeParameters(organizationUnitRights, itContractRegistrations, paymentRegistrationDetails, responsibleSystems,relevantSystems);
         }
     }
 }
