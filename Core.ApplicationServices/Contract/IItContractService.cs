@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.Contract
         Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlans(int organizationId);
         Maybe<OperationError> SetContractResponsibleUnit(int contractId, int targetUnitId);
         Maybe<OperationError> RemoveContractResponsibleUnit(int contractId);
-        Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds);
+        Maybe<OperationError> RemovePaymentResponsibleUnits(int contractId, bool isInternal, IEnumerable<int> paymentIds);
         Maybe<OperationError> TransferPayments(int contractId, int targetUnitId, bool isInternal, IEnumerable<int> paymentIds);
     }
 }

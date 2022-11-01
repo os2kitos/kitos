@@ -125,7 +125,7 @@ namespace Core.ApplicationServices.Contract
             return Result<IQueryable<ItContract>, OperationError>.Success(contracts);
         }
 
-        public Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds)
+        public Maybe<OperationError> RemovePaymentResponsibleUnits(int contractId, bool isInternal, IEnumerable<int> paymentIds)
         {
             return Modify(contractId, contract =>
             {

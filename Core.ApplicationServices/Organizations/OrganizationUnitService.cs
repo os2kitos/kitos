@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.UI.WebControls;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
@@ -22,7 +20,6 @@ namespace Core.ApplicationServices.Organizations
         private readonly IItContractService _contractService;
         private readonly IItSystemUsageService _usageService;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IOrgUnitService _orgUnitService;
         private readonly ITransactionManager _transactionManager;
 
         public OrganizationUnitService(IEntityIdentityResolver identityResolver, 
@@ -31,7 +28,6 @@ namespace Core.ApplicationServices.Organizations
             IItContractService contractService,
             IItSystemUsageService usageService, 
             IAuthorizationContext authorizationContext, 
-            IOrgUnitService orgUnitService,
             ITransactionManager transactionManager)
         {
             _organizationService = organizationService;
@@ -39,7 +35,6 @@ namespace Core.ApplicationServices.Organizations
             _contractService = contractService;
             _usageService = usageService;
             _authorizationContext = authorizationContext;
-            _orgUnitService = orgUnitService;
             _transactionManager = transactionManager;
             _identityResolver = identityResolver;
         }
@@ -227,11 +222,11 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var payment in payments)
             {
-                var removeInternalPaymentsResult = _contractService.RemovePayments(payment.ItContractId, true, payment.InternalPayments);
+                var removeInternalPaymentsResult = _contractService.RemovePaymentResponsibleUnits(payment.ItContractId, true, payment.InternalPayments);
                 if (removeInternalPaymentsResult.HasValue)
                     return removeInternalPaymentsResult.Value;
 
-                var removeExternalPaymentsResult = _contractService.RemovePayments(payment.ItContractId, false, payment.ExternalPayments);
+                var removeExternalPaymentsResult = _contractService.RemovePaymentResponsibleUnits(payment.ItContractId, false, payment.ExternalPayments);
                 if (removeExternalPaymentsResult.HasValue)
                     return removeExternalPaymentsResult.Value;
             }

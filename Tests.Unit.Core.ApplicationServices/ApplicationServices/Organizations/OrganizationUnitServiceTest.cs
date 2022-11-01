@@ -9,7 +9,6 @@ using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
-using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
@@ -35,9 +34,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
             var contractServiceMock = new Mock<IItContractService>();
             var usageServiceMock = new Mock<IItSystemUsageService>();
-            var orgUnitServiceMock = new Mock<IOrgUnitService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
-            
+
             _sut = new OrganizationUnitService(
                 _identityResolverMock.Object,
                 _organizationServiceMock.Object,
@@ -45,7 +43,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 contractServiceMock.Object,
                 usageServiceMock.Object,
                 _authorizationContextMock.Object,
-                orgUnitServiceMock.Object,
                 _transactionManagerMock.Object);
         }
 

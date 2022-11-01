@@ -418,14 +418,7 @@
                     id: element.id,
                     text: element.name,
                     targetPageObjectId: contract.id,
-                    objectText: contract.name
-                        //`<a class="modal-close" data-element-type="payment-contract" data-ui-sref="it-contract.edit.main({id: ${contract.id}})">${contract.name}</a>`
-                    /*
-                    Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(
-                        "payment-contract",
-                        "it-contract.edit.main",
-                        contract.id,
-                        contract.name)*/,
+                    objectText: contract.name,
                     index: index + 1,
                     optionalObjectContext: contract
                 } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
@@ -435,27 +428,4 @@
 
     angular.module("app")
         .component("orgUnitMigration", setupComponent());
-
-    angular.module('app')
-        .directive('compile', ['$compile', function ($compile) {
-            return function (scope, element, attrs) {
-                scope.$watch(
-                    function (scope) {
-                        // watch the 'compile' expression for changes
-                        return scope.$eval(attrs.compile);
-                    },
-                    function (value) {
-                        // when the 'compile' expression changes
-                        // assign it into the current DOM
-                        element.html(value);
-
-                        // compile the new DOM and link it to the current
-                        // scope.
-                        // NOTE: we only compile .childNodes so that
-                        // we don't get into infinite loop compiling ourselves
-                        $compile(element.contents())(scope);
-                    }
-                );
-            };
-        }]);
 }
