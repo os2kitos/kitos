@@ -1019,9 +1019,10 @@ namespace Tests.Unit.Core.Model
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void Can_Remove_EconomyStream(bool isInternal)
+        public void Can_Reset_EconomyStream(bool isInternal)
         {
             var id = A<int>();
+            var unit = new OrganizationUnit {Id = A<int>()};
             var contract = new ItContract();
             if (isInternal)
             {
@@ -1030,6 +1031,7 @@ namespace Tests.Unit.Core.Model
                     new()
                     {
                         Id = id,
+                        OrganizationUnit = unit,
                     }
                 };
             }
@@ -1040,15 +1042,26 @@ namespace Tests.Unit.Core.Model
                     new()
                     {
                         Id = id,
+                        OrganizationUnit = unit,
                     }
                 };
             }
 
-            var result = contract.RemoveEconomyStream(id, isInternal);
+            var result = contract.ResetEconomyStreamOrganizationUnit(id, isInternal);
 
-            Assert.True(result.Ok);
-            Assert.DoesNotContain(id, contract.ExternEconomyStreams.Select(x => x.Id));
-            Assert.DoesNotContain(id, contract.InternEconomyStreams.Select(x => x.Id));
+            Assert.True(result.IsNone);
+            if (isInternal)
+            {
+                var intern = contract.InternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(intern);
+                Assert.Null(intern.OrganizationUnit);
+            }
+            else
+            {
+                var external = contract.ExternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(external);
+                Assert.Null(external.OrganizationUnit);
+            }
         }
 
         [Fact]
@@ -1058,11 +1071,11 @@ namespace Tests.Unit.Core.Model
             var contract = new ItContract();
             var expectedErrorMessage = $"EconomyStream with id: {id} was not found";
 
-            var result = contract.RemoveEconomyStream(id, A<bool>());
+            var result = contract.ResetEconomyStreamOrganizationUnit(id, A<bool>());
 
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-            Assert.Equal(expectedErrorMessage, result.Error.Message);
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+            Assert.Equal(expectedErrorMessage, result.Value.Message);
         }
     }
 }

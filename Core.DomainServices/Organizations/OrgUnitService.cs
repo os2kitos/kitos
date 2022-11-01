@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Commands;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.DataAccess;
@@ -15,18 +16,18 @@ namespace Core.DomainServices.Organizations
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<Organization> _organizationRepository;
-        private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _itSystemUsageOrgUnitUsageRepository;
         private readonly ITransactionManager _transactionManager;
+        private readonly ICommandBus _commandBus;
 
         public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository, 
             ITransactionManager transactionManager, 
-            IGenericRepository<Organization> organizationRepository)
+            IGenericRepository<Organization> organizationRepository, 
+            ICommandBus commandBus)
         {
             _orgUnitRepository = orgUnitRepository;
-            _itSystemUsageOrgUnitUsageRepository = itSystemUsageOrgUnitUsageRepository;
             _transactionManager = transactionManager;
             _organizationRepository = organizationRepository;
+            _commandBus = commandBus;
         }
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
@@ -48,56 +49,27 @@ namespace Core.DomainServices.Organizations
         {
             var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
 
-            return GetSubTree(orgUnit);
+            return orgUnit.FlattenHierarchy().ToList();
         }
 
-        public ICollection<OrganizationUnit> GetSubTree(OrganizationUnit unit)
+        public bool DescendsFrom(int descendantUnitId, int ancestorUnitId)
         {
-            var unreached = new Queue<OrganizationUnit>();
-            var reached = new List<OrganizationUnit>();
-
-            unreached.Enqueue(unit);
-            while (unreached.Count > 0)
+            var unit = _orgUnitRepository.GetByKey(descendantUnitId);
+            if (unit == null)
             {
-                var orgUnit = unreached.Dequeue();
-
-                reached.Add(orgUnit);
-
-                foreach (var child in orgUnit.Children)
-                {
-                    unreached.Enqueue(child);
-                }
+                throw new ArgumentException($"Invalid org unit id:{descendantUnitId}");
             }
 
-            return reached;
+            return unit.SearchAncestry(ancestor => ancestor.Id == ancestorUnitId).HasValue;
         }
 
-        public bool IsAncestorOf(OrganizationUnit unit, OrganizationUnit ancestor)
-        {
-            if (unit == null || ancestor == null) return false;
-
-            do
-            {
-                if (unit.Id == ancestor.Id) return true;
-
-                unit = unit.Parent;
-
-            } while (unit != null);
-
-            return false;
-        }
-
-        public bool IsAncestorOf(int unitId, int ancestorId)
-        {
-            var unit = _orgUnitRepository.GetByKey(unitId);
-            var ancestor = _orgUnitRepository.GetByKey(ancestorId);
-
-            return IsAncestorOf(unit, ancestor);
-        }
-
-        public void Delete(int id, int organizationId)
+        public void Delete(int organizationId, int id)
         {
             using var transaction = _transactionManager.Begin();
+
+            var deleteRegistrationsResult = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(new RemoveOrganizationUnitRegistrationsCommand(organizationId, id));
+            if (deleteRegistrationsResult.HasValue)
+                throw new ArgumentException(deleteRegistrationsResult.Value.Message.GetValueOrDefault());
 
             var organization = _organizationRepository.GetByKey(organizationId);
             var result = organization.RemoveOrganizationUnit(id);
@@ -105,20 +77,7 @@ namespace Core.DomainServices.Organizations
                 throw new ArgumentException(result.Error.Message.GetValueOrDefault());
 
             var orgUnit = result.Value;
-
-            // Remove OrgUnit from ItSystemUsages
-            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId == id);
-            foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)
-            {
-                if (itSystemUsage.ResponsibleItSystemUsage != null)
-                {
-                    throw new ArgumentException($"OrganizationUnit is ResponsibleOrgUnit for ItSystemUsage: {itSystemUsage.ItSystemUsageId}");
-                }
-
-                _itSystemUsageOrgUnitUsageRepository.Delete(itSystemUsage);
-
-            }
-
+            
             // attach children to parent of this instance to avoid orphans
             // parent id will never be null because users aren't allowed to delete the root node
             foreach (var child in orgUnit.Children)
@@ -127,7 +86,6 @@ namespace Core.DomainServices.Organizations
             }
 
             _orgUnitRepository.DeleteWithReferencePreload(orgUnit);
-            _itSystemUsageOrgUnitUsageRepository.Save();
             _orgUnitRepository.Save();
 
             transaction.Commit();

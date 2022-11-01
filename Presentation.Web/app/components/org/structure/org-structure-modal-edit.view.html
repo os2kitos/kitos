@@ -1,9 +1,9 @@
 ﻿<div data-ng-if="!createNew">
-    <div class="modal-header">
+    <div class="modal-header wide-modal">
         <h3>Rediger {{::orgUnit.oldName}}</h3>
         <span class="help-block small" ng-if="supplementaryText !== null">{{::supplementaryText}}</span>
     </div>
-    <div class="modal-body">
+    <div class="modal-body wide-modal">
         <form name="editForm" novalidate="novalidate" class="form-horizontal">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -56,12 +56,12 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <a id="expand_collapse_registrations" class="task-fold control-label" data-ng-click="isRegistrationDetailsExpanded = !isRegistrationDetailsExpanded">
-                        <span>Registrations</span>
+                        <span>Registreringer</span>
                         <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isRegistrationDetailsExpanded, 'fa-plus-square-o': !isRegistrationDetailsExpanded}"></i>
                     </a>
                 </div>
                 <div ng-if="isRegistrationDetailsExpanded" class="panel-body">
-                    <org-unit-migration organization-id="orgUnit.orgId" unit-id="orgUnit.id" />
+                    <org-unit-migration organization-id="orgUnit.orgId" unit-id="orgUnit.id" unit-name="orgUnit.oldName" close-modal="cancel()"/>
                 </div>
             </div>
 </form>

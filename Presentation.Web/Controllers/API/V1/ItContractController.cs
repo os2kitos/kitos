@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.Abstractions.Types;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Contract;
 using Core.DomainModel;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -264,13 +264,8 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     return Forbidden();
                 }
-                // this trick will put the first object in the result as well as the children
-                var children = new[] { itContract }.SelectNestedChildren(x => x.Children);
-                // gets parents only
-                var parents = itContract.SelectNestedParents(x => x.Parent);
-                // put it all in one result
-                var contracts = children.Union(parents);
-                return Ok(Map(contracts));
+
+                return Ok(Map(itContract.FlattenCompleteHierarchy().ToList()));
             }
             catch (Exception e)
             {

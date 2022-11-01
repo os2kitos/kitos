@@ -28,11 +28,9 @@ namespace Core.ApplicationServices.Contract
         IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions);
         Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId);
         Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlans(int organizationId);
-        Maybe<OperationError> TransferContractResponsibleUnit(Guid targetUnitUuid, int contractId);
+        Maybe<OperationError> SetContractResponsibleUnit(int contractId, int targetUnitId);
         Maybe<OperationError> RemoveContractResponsibleUnit(int contractId);
-        IEnumerable<ItContract> GetContractsByResponsibleUnitId(int unitId);
-        IEnumerable<ItContract> GetContractsWhereUnitIsResponsibleForPayment(int unitId);
-        Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds);
-        Maybe<OperationError> TransferPayments(int contractId, OrganizationUnit targetUnit, IEnumerable<int> paymentIds);
+        Maybe<OperationError> RemovePaymentResponsibleUnits(int contractId, bool isInternal, IEnumerable<int> paymentIds);
+        Maybe<OperationError> TransferPayments(int contractId, int targetUnitId, bool isInternal, IEnumerable<int> paymentIds);
     }
 }

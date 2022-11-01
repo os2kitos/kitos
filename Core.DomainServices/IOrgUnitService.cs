@@ -12,11 +12,9 @@ namespace Core.DomainServices
         OrganizationUnit GetRoot(OrganizationUnit unit);
 
         ICollection<OrganizationUnit> GetSubTree(int orgUnitId);
-        ICollection<OrganizationUnit> GetSubTree(OrganizationUnit unit);
 
-        bool IsAncestorOf(OrganizationUnit unitA, OrganizationUnit unitB);
-        bool IsAncestorOf(int unitIdA, int unitIdB);
-        void Delete(int id, int organizationId);
+        bool DescendsFrom(int descendantUnitId, int ancestorUnitId);
+        void Delete(int organizationId, int id);
         IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization);
         Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid);
     }

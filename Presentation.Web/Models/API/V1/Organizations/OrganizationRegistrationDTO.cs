@@ -6,14 +6,14 @@ namespace Presentation.Web.Models.API.V1.Organizations
     {
         public OrganizationRegistrationDTO()
         {
-            OrganizationUnitRights = new List<NamedEntityDTO>();
+            OrganizationUnitRights = new List<NamedEntityWithUserFullNameDTO>();
             ItContractRegistrations = new List<NamedEntityDTO>();
             Payments = new List<PaymentRegistrationDTO>();
             RelevantSystems = new List<NamedEntityWithEnabledStatusDTO>();
             ResponsibleSystems = new List<NamedEntityWithEnabledStatusDTO>();
         }
 
-        public IEnumerable<NamedEntityDTO> OrganizationUnitRights { get; set; }
+        public IEnumerable<NamedEntityWithUserFullNameDTO> OrganizationUnitRights { get; set; }
         public IEnumerable<NamedEntityDTO> ItContractRegistrations { get; set; }
         public IEnumerable<PaymentRegistrationDTO> Payments { get; set; }
         public IEnumerable<NamedEntityWithEnabledStatusDTO> ResponsibleSystems { get; set; }

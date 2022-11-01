@@ -1,11 +1,10 @@
-﻿using Core.DomainModel.ItContract;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
-    public class ChangePaymentRegistraitonRequest
+    public class ChangePaymentRegistraitonRequestDTO
     {
-        public ChangePaymentRegistraitonRequest()
+        public ChangePaymentRegistraitonRequestDTO()
         {
             InternalPayments = new List<int>();
             ExternalPayments = new List<int>();

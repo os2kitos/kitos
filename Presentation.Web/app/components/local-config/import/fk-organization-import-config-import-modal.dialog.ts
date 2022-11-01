@@ -14,7 +14,7 @@
 
         open(flow: FKOrganisationImportFlow, organizationUuid: string, synchronizationDepth: number | null): ng.ui.bootstrap.IModalInstanceService {
             return this.$uibModal.open({
-                windowClass: "modal fade in",
+                windowClass: "modal fade in wide-modal",
                 templateUrl: "app/components/local-config/import/fk-organization-import-config-import-modal.view.html",
                 controller: FKOrganisationImportController,
                 controllerAs: "vm",
@@ -23,22 +23,27 @@
                     "orgUuid": [() => organizationUuid],
                     "synchronizationDepth": [() => synchronizationDepth]
                 },
-                backdrop: "static" //Make sure accidental click outside the modal does not close it during the import process
+                backdrop: "static", //Make sure accidental click outside the modal does not close it during the import process
             });
         }
     }
 
     class FKOrganisationImportController {
-        static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance"];
+        static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance", "notify"];
+        isConsequencesCollapsed: boolean = false;
+        isHierarchyCollapsed: boolean = false;
         busy: boolean = false;
+        updating: boolean = false;
         loadingHierarchy: boolean | null;
+        consequencesAwaitingApproval: Array<Models.Api.Organization.ConnectionUpdateOrganizationUnitConsequenceDTO> | null = null;
         fkOrgHierarchy: Kitos.Shared.Components.Organization.IOrganizationTreeComponentOptions | null = null;
         constructor(
             readonly flow: FKOrganisationImportFlow,
             private readonly organizationUuid: string,
             initialImportDepth: number | null,
             private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService,
-            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
+            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+            private readonly notify) {
             this.fkOrgHierarchy = {
                 availableLevels: initialImportDepth,
                 root: null
@@ -47,11 +52,16 @@
 
         $onInit() {
             this.loadingHierarchy = true;
+            this.isConsequencesCollapsed = this.isHierarchyCollapsed = false;
+            this.consequencesAwaitingApproval = null;
             this.stsOrganizationSyncService
                 .getSnapshot(this.organizationUuid)
                 .then(root => {
                     this.fkOrgHierarchy.root = this.createNodeVm(root);
                     this.loadingHierarchy = false;
+                }, error => {
+                    console.error(error);
+                    this.notify.addErrorMessage("Fejl i indlæsning af hierarkiet fra FK Organisation. Genindlæs siden og prøv igen.");
                 });
         }
 
@@ -73,16 +83,67 @@
         performImport() {
             if (!this.busy) {
                 this.busy = true;
-                this.stsOrganizationSyncService
-                    .createConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
-                    .then(() => {
-                        this.busy = false;
-                        this.$uibModalInstance.close();
-                    }, error => {
-                        console.log("Error:", error);
-                        this.busy = false;
-                    });
+                if (this.flow === FKOrganisationImportFlow.Create) {
+                    this.createConnection();
+                } else if (this.flow === FKOrganisationImportFlow.Update) {
+                    this.updateConnection();
+                }
             }
+        }
+
+        acceptConsequences() {
+            this.performUpdate();
+        }
+
+        rejectConsequences() {
+            this.updating = false;
+            this.consequencesAwaitingApproval = null;
+            this.isHierarchyCollapsed = false;
+        }
+
+        private performUpdate() {
+            /*
+             TODO: https://os2web.atlassian.net/browse/KITOSUDV-3524
+                    Once completed do the stuff below in the success "then". If errror, display an error with notify and disable busy and updating
+             */
+            this.updating = true;
+            this.busy = true;
+            this.closeDialog();
+        }
+
+        private createConnection() {
+            this.stsOrganizationSyncService
+                .createConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+                .then(() => {
+                    this.closeDialog();
+                }, error => {
+                    console.error("Error:", error);
+                    this.busy = false;
+                    this.notify.addErrorMessage("Fejl ifm. oprettelse af forbindelsen. Prøv igen.");
+                });
+        }
+
+        private closeDialog() {
+            this.busy = false;
+            this.$uibModalInstance.close();
+        }
+
+        private updateConnection() {
+            this.isConsequencesCollapsed = false;
+            this.stsOrganizationSyncService
+                .getConnectionUpdateConsequences(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+                .then(consequences => {
+                    if (consequences.consequences.length > 0) {
+                        this.consequencesAwaitingApproval = consequences.consequences;
+                        this.busy = false;
+                    } else {
+                        this.performUpdate();
+                    }
+                }, error => {
+                    console.error(error);
+                    this.busy = false;
+                    this.notify.addErrorMessage("Fejl ifm. oprettelse af opdateringen. Prøv igen.");
+                });
         }
     }
 

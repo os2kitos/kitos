@@ -42,20 +42,19 @@ namespace Tests.Unit.Core.Model.Organizations
         }
 
         [Theory]
-        [InlineData(false, false, false, false, true)]
-        [InlineData(false, false, false, true, false)]
-        [InlineData(false, false, true, false, false)]
-        [InlineData(false, true, false, false, false)]
-        [InlineData(true, false, false, false, false)]
-        [InlineData(true, true, true, true, true)]
-        public void RemoveOrganizationUnit_Returns_BadState_When_Unit_Is_In_Use(bool isUsing, bool hasRights, bool hasEconomy, bool isResponsible, bool isDelegated)
+        [InlineData(false, false, false, true)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, true, false, false)]
+        [InlineData(true, false, false, false)]
+        [InlineData(true, true, true, true)]
+        public void RemoveOrganizationUnit_Returns_BadState_When_Unit_Is_In_Use(bool isUsing, bool hasRights, bool hasEconomy, bool isResponsible)
         {
             var unitId = A<int>();
             var origin = OrganizationUnitOrigin.Kitos;
-            var unit = SetupOrganizationUnit(unitId, origin, isUsing, hasRights, hasEconomy, isResponsible, isDelegated);
+            var unit = SetupOrganizationUnit(unitId, origin, isUsing, hasRights, hasEconomy, isResponsible);
             var org = new Organization { OrgUnits = new List<OrganizationUnit> { unit } };
             
-            const string expectedErrorMessage = "Unit has assigned registrations";
+            const string expectedErrorMessage = "Unit is being used";
 
             var result = org.RemoveOrganizationUnit(unitId);
 
@@ -105,7 +104,7 @@ namespace Tests.Unit.Core.Model.Organizations
         }
 
         private OrganizationUnit SetupOrganizationUnit(int id, OrganizationUnitOrigin origin, 
-            bool isUsing = false, bool hasRights = false, bool hasEconomy = false, bool isResponsible = false, bool isDelegated = false)
+            bool isUsing = false, bool hasRights = false, bool hasEconomy = false, bool isResponsible = false)
         {
             var unit = new OrganizationUnit
             {
@@ -115,7 +114,6 @@ namespace Tests.Unit.Core.Model.Organizations
                 Rights = hasRights ? new List<OrganizationUnitRight> { new() } : new List<OrganizationUnitRight>(),
                 EconomyStreams = hasEconomy ? new List<EconomyStream> { new() } : new List<EconomyStream>(),
                 ResponsibleForItContracts = isResponsible ? new List<ItContract> { new() } : new List<ItContract>(),
-                DelegatedSystemUsages = isDelegated ? new List<ItSystemUsage> { new() } : new List<ItSystemUsage>()
             };
             
             return unit;

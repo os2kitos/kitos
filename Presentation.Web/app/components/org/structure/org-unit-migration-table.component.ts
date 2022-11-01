@@ -7,7 +7,9 @@
                 title: "@",
                 options: "<",
                 configuration: "<",
-                unitId: "<"
+                unitId: "<",
+                organizationId: "<",
+                closeModal: "&"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -18,6 +20,7 @@
     export interface IMigrationTableColumn{
         title: string;
         property: string;
+        isLink?: boolean;
         cssClass?: string;
     }
 
@@ -26,6 +29,8 @@
         options: IOrganizationUnitMigrationOptions;
         configuration: IMigrationTableColumn[];
         unitId: number;
+        organizationId: number;
+        closeModal: () => void;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
@@ -33,10 +38,14 @@
         options: IOrganizationUnitMigrationOptions | null;
         configuration: IMigrationTableColumn[] | null = null;
         unitId: number | null = null;
+        organizationId: number | null = null;
+        closeModal: () => void;
         root: IOrganizationUnitMigrationRoot;
 
-        static $inject: string[] = ["organizationUnitService"];
-        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService) {
+        static $inject: string[] = ["organizationUnitService", "notify", "$state"];
+        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
+            private readonly notify,
+            private readonly $state) {
         }
 
         $onInit() {
@@ -51,6 +60,9 @@
             }
             if (this.unitId === null) {
                 console.error("missing migration table attribute: 'unitId'");
+            }
+            if (this.organizationId === null) {
+                console.error("missing migration table attribute: 'organizationId'");
             }
 
             this.root = this.options.root;
@@ -70,45 +82,54 @@
             }
         }
 
-        delete(registration: Models.Organization.IOrganizationUnitRegistration) {
+        delete(registration: Models.ViewModel.Organization.IOrganizationUnitRegistration) {
+            if (this.options.checkIsBusy()) {
+                    return;
+            }
             if (!confirm('Er du sikker på, at du vil slette registreringen?')) {
                 return;
             }
+            this.options.setIsBusy(true);
 
             registration.selected = true;
             const request = this.createChangeRequest(registration);
             registration.selected = false;
 
-            this.organizationUnitService.deleteSelectedRegistrations(this.unitId, request)
+            this.organizationUnitService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
                 .then(() => this.options.refreshData());
         }
 
-        createChangeRequest(request: Models.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequest {
+        navigateTo(id: number) {
+            this.$state.go(this.options.dataRelatedPage, { id: id })
+                .then(() => this.closeModal());
+        }
 
-            const roles = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const contractRegistration = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const internalPayments = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const externalPayments = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const responsibleSystems = new Array<Models.Organization.IOrganizationUnitRegistration>();
-            const relevantSystems = new Array<Models.Organization.IOrganizationUnitRegistration>();
+        private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
+
+            const roles = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const contractRegistration = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const internalPayments = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const externalPayments = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const responsibleSystems = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
+            const relevantSystems = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
 
             switch (this.options.type) {
-                case Models.Organization.OrganizationRegistrationOption.Roles:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.Roles:
                     roles.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.ContractRegistrations:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.ContractRegistrations:
                     contractRegistration.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.InternalPayments:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.InternalPayments:
                     internalPayments.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.ExternalPayments:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.ExternalPayments:
                     externalPayments.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.RelevantSystems:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.RelevantSystems:
                     relevantSystems.push(request);
                     break;
-                case Models.Organization.OrganizationRegistrationOption.ResponsibleSystems:
+                case Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems:
                     responsibleSystems.push(request);
                     break;
                 default:

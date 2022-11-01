@@ -363,10 +363,11 @@
             $scope.editUnit = function (unit) {
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
+                    windowClass: "modal fade in wide-modal",
                     controller: [
                         "$scope", "$uibModalInstance", "autofocus", "organizationUnitService", function ($modalScope, $modalInstance, autofocus, organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
                             autofocus();
-
+                            
                             // edit or create-new mode
                             $modalScope.isNew = false;
 
@@ -539,13 +540,12 @@
 
                                 $modalScope.submitting = true;
 
-                                organizationUnitService.deleteOrganizationUnit(unit.id, unit.organizationId)
+                                organizationUnitService.deleteOrganizationUnit(unit.organizationId, unit.id)
                                     .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();
                                         $modalInstance.close();
-                                    },
-                                        (error) => {
+                                    }, (error) => {
                                             $modalScope.submitting = false;
 
                                             notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />

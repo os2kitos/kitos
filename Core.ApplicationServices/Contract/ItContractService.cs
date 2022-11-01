@@ -14,6 +14,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
@@ -43,6 +44,7 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
         private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly IEntityIdentityResolver _identityResolver;
 
         public ItContractService(
             IItContractRepository repository,
@@ -62,7 +64,7 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
             IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
             IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService, 
-            IGenericRepository<EconomyStream> economyStreamRepository)
+            IGenericRepository<EconomyStream> economyStreamRepository, IEntityIdentityResolver identityResolver)
         {
             _repository = repository;
             _referenceService = referenceService;
@@ -82,6 +84,7 @@ namespace Core.ApplicationServices.Contract
             _optionExtendOptionsService = optionExtendOptionsService;
             _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
             _economyStreamRepository = economyStreamRepository;
+            _identityResolver = identityResolver;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -122,21 +125,16 @@ namespace Core.ApplicationServices.Contract
             return Result<IQueryable<ItContract>, OperationError>.Success(contracts);
         }
 
-        public Maybe<OperationError> RemovePayments(int contractId, bool isInternal, IEnumerable<int> paymentIds)
+        public Maybe<OperationError> RemovePaymentResponsibleUnits(int contractId, bool isInternal, IEnumerable<int> paymentIds)
         {
             return Modify(contractId, contract =>
             {
-                var economyStreamsToDelete = new List<EconomyStream>();
                 foreach (var paymentId in paymentIds)
                 {
-                    var result = contract.RemoveEconomyStream(paymentId, isInternal);
-                    if (result.Failed)
-                        return result.Error;
-
-                    economyStreamsToDelete.Add(result.Value);
+                    var result = contract.ResetEconomyStreamOrganizationUnit(paymentId, isInternal);
+                    if (result.HasValue)
+                        return result.Value;
                 }
-
-                _economyStreamRepository.RemoveRange(economyStreamsToDelete);
                 _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
 
                 return Result<ItContract, OperationError>.Success(contract);
@@ -144,23 +142,34 @@ namespace Core.ApplicationServices.Contract
                 err => err);
         }
 
-        public Maybe<OperationError> TransferPayments(int contractId, OrganizationUnit targetUnit, IEnumerable<int> paymentIds)
+        public Maybe<OperationError> TransferPayments(int contractId, int targetUnitId, bool isInternal, IEnumerable<int> paymentIds)
         {
             return Modify(contractId, contract =>
             {
-                foreach (var paymentId in paymentIds)
-                {
-                    var payment = contract.GetPaymentById(paymentId);
-                    if (payment.Failed)
-                        return payment.Error;
-
-                    payment.Value.TransferEconomyStream(targetUnit);
-                }
-
-                _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
-                return Result<ItContract, OperationError>.Success(contract);
+                return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
+                    .Select(targetUuid => TransferPayments(contract, targetUuid, isInternal, paymentIds))
+                    .GetValueOrDefault()
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItContract, OperationError>.Success(contract)
+                    );
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);
+        }
+
+        private Maybe<OperationError> TransferPayments(ItContract contract, Guid targetUnitUuid, bool isInternal,
+            IEnumerable<int> paymentIds)
+        {
+            foreach (var paymentId in paymentIds)
+            {
+                var result = contract.TransferEconomyStream(paymentId, targetUnitUuid, isInternal);
+                if (result.HasValue)
+                    return result.Value;
+            }
+
+            _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
+            return Maybe<OperationError>.None;
         }
 
         public Result<ItContract, OperationFailure> Delete(int id)
@@ -328,31 +337,18 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
-        public IEnumerable<ItContract> GetContractsByResponsibleUnitId(int unitId)
-        {
-            return _repository.AsQueryable().Where(x => x.ResponsibleOrganizationUnitId == unitId).ToList();
-        }
-
-        public IEnumerable<ItContract> GetContractsWhereUnitIsResponsibleForPayment(int unitId)
-        {
-            return _repository.AsQueryable().Where(x => 
-                x.InternEconomyStreams
-                    .Select(internEconomy => internEconomy.OrganizationUnitId)
-                    .Contains(unitId) 
-                || x.ExternEconomyStreams
-                    .Select(externEconomy => externEconomy.OrganizationUnitId)
-                    .Contains(unitId))
-                .ToList();
-        }
-
-        public Maybe<OperationError> TransferContractResponsibleUnit(Guid targetUnitUuid, int contractId)
+        public Maybe<OperationError> SetContractResponsibleUnit(int contractId, int targetUnitId)
         {
             return Modify(contractId, contract =>
             {
-                var result = contract.SetResponsibleOrganizationUnit(targetUnitUuid);
-                return result.HasValue
-                ? result.Value
-                    : Result<ItContract, OperationError>.Success(contract);
+                return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
+                    .Select(contract.SetResponsibleOrganizationUnit)
+                    .GetValueOrDefault()
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItContract, OperationError>.Success(contract)
+                    );
             }).Match(_ => Maybe<OperationError>.None, 
                 err => err);
         }
@@ -366,7 +362,7 @@ namespace Core.ApplicationServices.Contract
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);
         }
-
+        
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
         {
             var readAccessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);

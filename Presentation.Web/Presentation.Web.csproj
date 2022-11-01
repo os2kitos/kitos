@@ -357,6 +357,7 @@
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config-import-modal.dialog.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-consequences-log.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-unit-migration-table.component.ts" />
@@ -373,6 +374,9 @@
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-change-category.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-consequence-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\connection-update-consequences-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-origin.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-org-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-registration-dto.ts" />
@@ -387,7 +391,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
-    <TypeScriptCompile Include="app\models\organization\organization-unit-migration.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-unit-migration.ts" />
     <TypeScriptCompile Include="app\models\users\user-deletion-strategy-type.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\feature-toggle\feature-toggle-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-contract\it-contract-overview-view-model.ts" />
@@ -415,9 +419,13 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistraitonRequest.cs" />
+    <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitConsequenceDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ConnectionUpdateConsequencesResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitChangeCategory.cs" />
+    <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistraitonRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\ChangeOrganizationRegistrationRequest.cs" />
+    <Compile Include="Models\API\V1\Organizations\ChangeOrganizationRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
@@ -660,6 +668,7 @@
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-consequences-log.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config-import-modal.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
@@ -865,6 +874,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\Generic\option-type-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\edit-org-unit-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\OrganizationDeletionConflictsViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\connection-update-organization-unit-change-category-options.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />

@@ -1,9 +1,10 @@
-﻿module Kitos.Models.Organization {
+﻿module Kitos.Models.ViewModel.Organization {
     
-    export interface IOrganizationUnitRegistration extends Models.ViewModel.Organization.IHasSelection {
+    export interface IOrganizationUnitRegistration extends Organization.IHasSelection {
         id: number;
         text: string;
         index?: number;
+        targetPageObjectId?: number;
         objectText?: string;
 
         targetUnitId?: number;

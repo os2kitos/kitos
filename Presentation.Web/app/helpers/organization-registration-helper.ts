@@ -1,14 +1,14 @@
 ﻿module Kitos.Helpers {
     export class OrganizationRegistrationHelper {
         static createChangeRequest(
-            contractRegistrations: Models.Organization.IOrganizationUnitRegistration[],
-            externalPayments: Models.Organization.IOrganizationUnitRegistration[],
-            internalPayments: Models.Organization.IOrganizationUnitRegistration[],
-            roles: Models.Organization.IOrganizationUnitRegistration[],
-            relevantSystems: Models.Organization.IOrganizationUnitRegistration[],
-            responsibleSystems: Models.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.OrganizationRegistrationChangeRequest {
+            contractRegistrations: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            externalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            internalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            roles: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            relevantSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            responsibleSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
 
-            const changeRequest = new Models.Api.Organization.OrganizationRegistrationChangeRequest();
+            const changeRequest = new Models.Api.Organization.OrganizationRegistrationChangeRequestDto();
 
             changeRequest.itContractRegistrations = OrganizationRegistrationHelper.mapSelectedOptionsToIds(contractRegistrations);
             changeRequest.paymentRegistrationDetails = OrganizationRegistrationHelper.createPaymentChangeRequest(externalPayments, internalPayments);
@@ -19,14 +19,14 @@
             return changeRequest;
         }
 
-        static mapSelectedOptionsToIds(options: Array<Models.Organization.IOrganizationUnitRegistration>): Array<number> {
+        static mapSelectedOptionsToIds(options: Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>): Array<number> {
             return options.filter(x => x.selected)
                 .map(item => item.id);
         }
 
         private static createPaymentChangeRequest(
-            externalPayments: Models.Organization.IOrganizationUnitRegistration[],
-            internalPayments: Models.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.PaymentRegistrationChangeRequest[] {
+            externalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            internalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.PaymentRegistrationChangeRequestDto[] {
 
             const selectedExternPayments = externalPayments.filter(x => x.selected);
             const selectedInternPayments = internalPayments.filter(x => x.selected);
@@ -37,7 +37,7 @@
 
             var payments = [];
             contractIds.forEach(contractId => {
-                var payment = new Models.Api.Organization.PaymentRegistrationChangeRequest();
+                var payment = new Models.Api.Organization.PaymentRegistrationChangeRequestDto();
                 payment.itContractId = contractId;
                 payment.externalPayments = this.mapSelectedOptionsToIds(selectedExternPayments.filter(x => x.optionalObjectContext.id === contractId));
                 payment.internalPayments = this.mapSelectedOptionsToIds(selectedInternPayments.filter(x => x.optionalObjectContext.id === contractId));

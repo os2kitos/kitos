@@ -2,6 +2,7 @@
     export interface IStsOrganizationSyncService {
         getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>
         createConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void>
+        getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>
         getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>
         disconnect(organizationUuidid: string): ng.IPromise<boolean>
     }
@@ -14,6 +15,15 @@
             private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
             private readonly $q: ng.IQService,
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) {
+        }
+
+        getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO> {
+            let query = "";
+            if (synchronizationDepth) {
+                query = `?synchronizationDepth=${synchronizationDepth}`;
+            }
+            return this.genericApiWrapper
+                .getDataFromUrl<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>(`${this.getBasePath(organizationUuid)}/connection/update${query}`);
         }
 
         private getBasePath(organizationUuid: string) {

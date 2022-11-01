@@ -4,6 +4,7 @@ using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -27,7 +28,10 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _organizationUserContext = new Mock<IOrganizationalUserContext>();
             _organizationUnitRightRepository = new Mock<IGenericRepository<OrganizationUnitRight>>();
+            _transactionManager = new Mock<ITransactionManager>(); 
             _transactionManager = new Mock<ITransactionManager>();
+            var orgRepository = new Mock<IGenericRepository<Organization>>();
+            var identityResolver = new Mock<IEntityIdentityResolver>();
 
             _sut = new OrganizationRightsService(_authorizationContext.Object,
                 _organizationRightRepository.Object,
@@ -35,7 +39,9 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<IDomainEvents>(), 
                 Mock.Of<ILogger>(),
                 _organizationUnitRightRepository.Object,
-                _transactionManager.Object);
+                _transactionManager.Object,
+                orgRepository.Object,
+                identityResolver.Object);
         }
 
         [Fact]
