@@ -65,11 +65,8 @@ namespace Core.BackgroundJobs.Model
             Func<PendingReadModelUpdate, IQueryable<int>> getRootIdsQuery)
         {
             var updatesExecuted = 0;
-            foreach (var update in _updateRepository.GetMany(childChangeType, int.MaxValue).ToList())
+            foreach (var update in _updateRepository.GetMany(childChangeType, int.MaxValue).ToList().TakeWhile(_ => !token.IsCancellationRequested))
             {
-                if (token.IsCancellationRequested)
-                    break;
-
                 using var transaction = _transactionManager.Begin();
 
                 var ids = getRootIdsQuery(update).Distinct().ToList();
