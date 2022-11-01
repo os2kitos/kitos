@@ -1,7 +1,7 @@
 ﻿module Kitos.Services.Organization {
 
     export interface IOrganizationUnitService {
-        getUnitAccessRights(unitId: number)//: ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto>;
+        getUnitAccessRights(orgId: number, unitId: number): ng.IPromise<Models.Api.Organization.UnitAccessRightsDto>;
         getRegistrations(orgId: number, unitId: number): ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto>;
         deleteSelectedRegistrations(orgId: number, unitId: number, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<boolean>;
         deleteOrganizationUnit(organizationId: number, unitId: number): angular.IPromise<boolean>;
@@ -9,8 +9,17 @@
     }
 
     export class OrganizationUnitService implements IOrganizationUnitService {
-        getUnitAccessRights(unitId: number)/*: ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto>*/ {
-
+        getUnitAccessRights(orgId: number, unitId: number): ng.IPromise<Models.Api.Organization.UnitAccessRightsDto> {
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(`api/v1/organization-units/access-rights/${orgId}/${unitId}`)
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.Api.Organization.UnitAccessRightsDto }
+                        return response.response;
+                    },
+                    error => this.apiWrapper.handleServerError(error)
+                );
         }
 
         getRegistrations(orgId: number, unitId: number): ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto> {

@@ -18,12 +18,12 @@ namespace Presentation.Web.Controllers.API.V1
 {
     [PublicApi]
     [RoutePrefix("api/v1/organization-units")]
-    public class OrgUnitController: BaseApiController
+    public class OrganizationRegistrationsController: BaseApiController
     {
         private readonly IOrganizationUnitService _organizationUnitService;
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrgUnitController(IOrganizationUnitService organizationUnitService,
+        public OrganizationRegistrationsController(IOrganizationUnitService organizationUnitService,
             IOrgUnitService orgUnitService)
         {
             _organizationUnitService = organizationUnitService;
@@ -86,13 +86,8 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage GetUnitAccessRights(int unitId)
         {
             return _organizationUnitService.GetUnitAccessRightsByUnitId(unitId)
-                .Match(value => Ok(ToAccessRightsDto(value)),
-                    error => error.FailureType switch
-                {
-                    OperationFailure.NotFound => NotFound(),
-                    OperationFailure.BadInput => BadRequest(error.Message.GetValueOrDefault()),
-                    _ => BadRequest()
-                });
+                .Select(ToAccessRightsDto)
+                .Match(Ok, FromOperationError);
         }
 
         private static OrganizationRegistrationDTO ToRegistrationDto(OrganizationRegistrationDetails details)

@@ -96,7 +96,11 @@
             registration.selected = false;
 
             this.organizationUnitService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
-                .then(() => this.options.refreshData());
+                .then(() => this.options.refreshData()),
+                error => {
+                    console.log(error);
+                    this.notify.addErrorMessage("Failed to deleted the selected unit");
+                };
         }
 
         navigateTo(id: number) {

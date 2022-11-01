@@ -26,4 +26,10 @@
         externalPayments: number[];
         internalPayments: number[];
     }
+
+    export class UnitAccessRightsDto {
+        canBeRead: boolean;
+        canBeModified: boolean;
+        canBeDeleted: boolean;
+    }
 }
