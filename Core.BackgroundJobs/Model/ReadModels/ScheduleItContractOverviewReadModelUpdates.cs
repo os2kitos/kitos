@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItContract;
@@ -59,7 +60,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
         private int HandleItSystemChanges(CancellationToken token, HashSet<int> alreadyScheduledIds)
         {
-            return ScheduleRootEntityChanges(token, alreadyScheduledIds, PendingReadModelUpdateSourceCategory.ItContract_ItSystem, update => _readModelRepository.GetByItSystem(update.SourceId));
+            return ScheduleRootEntityChanges(token, alreadyScheduledIds, PendingReadModelUpdateSourceCategory.ItContract_ItSystem, update => _readModelRepository.GetSourceIdsByItSystem(update.SourceId));
         }
 
         private int HandleItSystemUsageChanges(CancellationToken token, HashSet<int> alreadyScheduledIds)
