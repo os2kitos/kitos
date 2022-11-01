@@ -22,7 +22,13 @@
                 <td ng-repeat="header in ctrl.configuration">
                     <div class="{{header.cssClass}}">
                         <!--<div ng-bind-html="registration[header.property]"></div>-->
-                        <p id="id-{{ctrl.title}}-{{header.property}}" compile="registration[header.property]"></p>
+                        <a ng-if="header.isLink" href="" ng-click="ctrl.navigateTo(registration.targetPageObjectId)">
+                            {{registration[header.property]}}
+                        </a>
+
+                        <div ng-if="!header.isLink">
+                            {{registration[header.property]}}
+                        </div>
                     </div>
                 </td>
                 <td class="pull-right"><button class="glyphicon glyphicon-trash" data-disabled-on-busy ng-click="ctrl.delete(registration)"></button></td>

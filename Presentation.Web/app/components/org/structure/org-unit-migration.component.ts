@@ -23,6 +23,7 @@
         checkIsBusy: () => boolean;
         setIsBusy: (value: boolean) => void;
         type: Models.ViewModel.Organization.OrganizationRegistrationOption;
+        dataRelatedPage: string;
     }
 
     export interface IOrganizationUnitMigrationRoot extends Models.ViewModel.Organization.IHasSelection {
@@ -273,11 +274,11 @@
 
         private setupOptions() {
             this.roles = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.Roles);
-            this.internalPayments = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.InternalPayments);
-            this.externalPayments = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ExternalPayments);
-            this.contractRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ContractRegistrations);
-            this.relevantSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.RelevantSystems);
-            this.responsibleSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems);
+            this.internalPayments = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.InternalPayments, "it-contract.edit.economy");
+            this.externalPayments = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ExternalPayments, "it-contract.edit.economy");
+            this.contractRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ContractRegistrations, "it-contract.edit.main");
+            this.relevantSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.RelevantSystems, "it-system.usage.org");
+            this.responsibleSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems, "it-system.usage.org");
         }
 
         private createChangeRequest(): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
@@ -331,13 +332,14 @@
             this.isBusy = value;
         }
 
-        private createBaseOptions(type: Models.ViewModel.Organization.OrganizationRegistrationOption): IOrganizationUnitMigrationOptions {
+        private createBaseOptions(type: Models.ViewModel.Organization.OrganizationRegistrationOption, dataRelatedPage?: string): IOrganizationUnitMigrationOptions {
             return {
                 root: {
                     selected: false,
                     children: []
                 },
                 type: type,
+                dataRelatedPage: dataRelatedPage,
                 selectedRegistrationChanged: () => this.updateAnySelections(),
                 selectedRegistrationGroupChanged: (root: IOrganizationUnitMigrationRoot) => this.changeRegistrationGroupStatus(root),
                 refreshData: () => this.refreshData(),
@@ -348,7 +350,7 @@
 
         private createStandardTableConfig(title: string): IMigrationTableColumn[] {
             return [
-                { title: title, property: "text" },
+                { title: title, property: "text", isLink: true },
             ] as IMigrationTableColumn[];
         }
 
@@ -362,7 +364,7 @@
         private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: "Index", property: "index" },
-                { title: "Kontraktnavn", property: "objectText" },
+                { title: "Kontraktnavn", property: "objectText", isLink: true },
                 { title: title, property: "text" }
             ] as IMigrationTableColumn[];
         }
@@ -372,6 +374,7 @@
                 return {
                     id: res.id,
                     text: res.name,
+                    targetPageObjectId: res.id,
                 } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
             });
         }
@@ -390,8 +393,9 @@
             return registrations.map(res => {
                 return {
                     id: res.id,
-                    text: Helpers.SystemNameFormat.apply(res.name, res.disabled)
-            } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
+                    text: Helpers.SystemNameFormat.apply(res.name, res.disabled),
+                    targetPageObjectId: res.id,
+                } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
             });
         }
 
@@ -413,7 +417,10 @@
                 return {
                     id: element.id,
                     text: element.name,
-                    objectText: `<a class="modal-close" data-element-type="payment-contract" data-ui-sref="it-contract.edit.main({id: ${contract.id}})">${contract.name}</a>`/*
+                    targetPageObjectId: contract.id,
+                    objectText: contract.name
+                        //`<a class="modal-close" data-element-type="payment-contract" data-ui-sref="it-contract.edit.main({id: ${contract.id}})">${contract.name}</a>`
+                    /*
                     Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(
                         "payment-contract",
                         "it-contract.edit.main",

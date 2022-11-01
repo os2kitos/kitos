@@ -20,6 +20,7 @@
     export interface IMigrationTableColumn{
         title: string;
         property: string;
+        isLink?: boolean;
         cssClass?: string;
     }
 
@@ -41,10 +42,10 @@
         closeModal: () => void;
         root: IOrganizationUnitMigrationRoot;
 
-        static $inject: string[] = ["organizationRegistrationsService", "notify", "$"];
+        static $inject: string[] = ["organizationRegistrationsService", "notify", "$state"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
             private readonly notify,
-            private readonly $) {
+            private readonly $state) {
         }
 
         $onInit() {
@@ -65,11 +66,6 @@
             }
 
             this.root = this.options.root;
-
-           /* $(`id-${this.title}-objectText`).on("click",
-                e => {
-                    this.closeModal();
-                });*/
         }
 
         registrationSelected() {
@@ -111,7 +107,12 @@
             this.options.setIsBusy(false);
         }
 
-        createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
+        navigateTo(id: number) {
+            this.$state.go(this.options.dataRelatedPage, { id: id })
+                .then(() => this.closeModal());
+        }
+
+        private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
 
             const roles = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
             const contractRegistration = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();

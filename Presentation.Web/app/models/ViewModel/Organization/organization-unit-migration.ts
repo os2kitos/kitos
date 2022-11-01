@@ -4,6 +4,7 @@
         id: number;
         text: string;
         index?: number;
+        targetPageObjectId?: number;
         objectText?: string;
 
         targetUnitId?: number;
