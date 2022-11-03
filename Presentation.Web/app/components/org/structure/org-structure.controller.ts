@@ -433,7 +433,10 @@
                             $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot && !$modalScope.orgUnit.isFkOrganizationUnit;
                             $modalScope.canChangeName = $modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
                             $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
-                            $modalScope.canDelete = $modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
+                            $modalScope.canDelete = false;//$modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
+
+                            organizationUnitService.getUnitAccessRights(unit.organizationId, unit.id)
+                                .then(res => $modalScope.canDelete = res.canBeDeleted);
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting
