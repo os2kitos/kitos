@@ -33,10 +33,10 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await response.ReadOdataListResponseBodyAsAsync<OrganizationUnitRole>();
         }
 
-        public static async Task<UnitAccessRightsDTO> GetUnitAccessRights(int unitId, Cookie optionalLogin = null)
+        public static async Task<UnitAccessRightsDTO> GetUnitAccessRights(int orgId, int unitId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organization-units/access-rights/{unitId}");
+            var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organization-units/access-rights/{orgId}/{unitId}");
 
             using var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

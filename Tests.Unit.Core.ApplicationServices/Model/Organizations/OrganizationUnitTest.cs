@@ -54,7 +54,7 @@ namespace Tests.Unit.Core.Model.Organizations
             var unit = SetupOrganizationUnit(unitId, origin, isUsing, hasRights, hasEconomy, isResponsible);
             var org = new Organization { OrgUnits = new List<OrganizationUnit> { unit } };
             
-            const string expectedErrorMessage = "Unit is being used";
+            const string expectedErrorMessage = "Unit cannot be deleted";
 
             var result = org.RemoveOrganizationUnit(unitId);
 
@@ -78,11 +78,37 @@ namespace Tests.Unit.Core.Model.Organizations
         }
 
         [Fact]
+        public void CanChangeName_Returns_True()
+        {
+            var unitId = A<int>();
+            var origin = OrganizationUnitOrigin.Kitos;
+            var unit = SetupOrganizationUnit(unitId, origin);
+
+            var result = unit.CanChangeName();
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CanBeRearranged_Returns_True()
+        {
+            var unitId = A<int>();
+            var origin = OrganizationUnitOrigin.Kitos;
+            var unit = SetupOrganizationUnit(unitId, origin);
+            unit.Parent = new OrganizationUnit();
+
+            var result = unit.CanChangeName();
+
+            Assert.True(result);
+        }
+
+        [Fact]
         public void CanBeDeleted_Returns_True()
         {
             var unitId = A<int>();
             var origin = OrganizationUnitOrigin.Kitos;
             var unit = SetupOrganizationUnit(unitId, origin);
+            unit.Parent = new OrganizationUnit();
 
             var result = unit.CanBeDeleted();
 
@@ -95,6 +121,7 @@ namespace Tests.Unit.Core.Model.Organizations
             var unitId = A<int>();
             var origin = OrganizationUnitOrigin.Kitos;
             var unit = SetupOrganizationUnit(unitId, origin);
+            unit.Parent = new OrganizationUnit();
             var org = new Organization { OrgUnits = new List<OrganizationUnit> { unit } };
 
             var result = org.RemoveOrganizationUnit(unitId);
@@ -103,7 +130,7 @@ namespace Tests.Unit.Core.Model.Organizations
             Assert.Equal(unitId, result.Value.Id);
         }
 
-        private OrganizationUnit SetupOrganizationUnit(int id, OrganizationUnitOrigin origin, 
+        private static OrganizationUnit SetupOrganizationUnit(int id, OrganizationUnitOrigin origin, 
             bool isUsing = false, bool hasRights = false, bool hasEconomy = false, bool isResponsible = false)
         {
             var unit = new OrganizationUnit

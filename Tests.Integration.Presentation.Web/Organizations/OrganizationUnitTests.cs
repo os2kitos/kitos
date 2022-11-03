@@ -25,10 +25,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organizationId);
             var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
 
-            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(unit.Id, cookie);
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organizationId, unit.Id, cookie);
 
             Assert.True(accessRights.CanBeRead);
             Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanBeRearranged);
             Assert.True(accessRights.CanBeDeleted);
         }
 
@@ -40,10 +42,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organizationId);
             var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
 
-            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(unit.Id, cookie);
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organizationId, unit.Id, cookie);
 
             Assert.True(accessRights.CanBeRead);
             Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanBeRearranged);
             Assert.True(accessRights.CanBeDeleted);
         }
 
@@ -55,10 +59,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organizationId);
             var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
 
-            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(unit.Id, cookie);
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organizationId, unit.Id, cookie);
 
             Assert.True(accessRights.CanBeRead);
             Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanNameBeModified);
+            Assert.False(accessRights.CanBeRearranged);
             Assert.False(accessRights.CanBeDeleted);
         }
 

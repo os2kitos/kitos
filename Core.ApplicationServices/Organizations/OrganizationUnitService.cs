@@ -39,9 +39,16 @@ namespace Core.ApplicationServices.Organizations
             _identityResolver = identityResolver;
         }
 
-        public Result<UnitAccessRights, OperationError> GetUnitAccessRightsByUnitId(int unitId)
+        public Result<UnitAccessRights, OperationError> GetUnitAccessRightsByUnitId(int organizationId, int unitId)
         {
-            return GetOrganziationUnit(unitId).Select(GetUnitAccessRights);
+            return GetOrganization(organizationId)
+                .Match
+                (
+                    _ => GetOrganziationUnit(unitId),
+                    error => error
+                )
+                .Match(unit => Result<UnitAccessRights, OperationError>.Success(GetUnitAccessRights(unit)),
+                    error => error);
         }
 
         public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int organizationId, int unitId)
@@ -226,8 +233,8 @@ namespace Core.ApplicationServices.Organizations
         private UnitAccessRights GetUnitAccessRights(OrganizationUnit unit)
         {
             var canBeModified = _authorizationContext.AllowModify(unit);
-            var canNameBeModified = true;//unit.;
-            var canBeRearranged = true;//unit.;
+            var canNameBeModified = canBeModified && unit.CanChangeName();
+            var canBeRearranged = canBeModified && unit.CanChangeParent();
             var canBeDeleted = _authorizationContext.AllowDelete(unit) && unit.CanBeDeleted();
             return new UnitAccessRights(canBeRead: true, canBeModified, canNameBeModified, canBeRearranged, canBeDeleted);
         }

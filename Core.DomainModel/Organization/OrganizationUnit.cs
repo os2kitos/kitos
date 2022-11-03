@@ -152,7 +152,27 @@ namespace Core.DomainModel.Organization
 
         public bool CanBeDeleted()
         {
-            return Parent != null && Origin == OrganizationUnitOrigin.Kitos;
+            return HasParent() && IsOfKitosOrigin();
+        }
+
+        public bool CanChangeName()
+        {
+            return IsOfKitosOrigin();
+        }
+
+        public bool CanChangeParent()
+        {
+            return HasParent() && IsOfKitosOrigin();
+        }
+
+        private bool HasParent()
+        {
+            return Parent != null;
+        }
+
+        private bool IsOfKitosOrigin()
+        {
+            return Origin == OrganizationUnitOrigin.Kitos;
         }
 
         public bool IsUsed()

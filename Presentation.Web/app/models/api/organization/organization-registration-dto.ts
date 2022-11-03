@@ -31,5 +31,7 @@
         canBeRead: boolean;
         canBeModified: boolean;
         canBeDeleted: boolean;
+        canNameBeModified: boolean;
+        canBeRearranged: boolean;
     }
 }

@@ -430,13 +430,17 @@
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
-                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot && !$modalScope.orgUnit.isFkOrganizationUnit;
-                            $modalScope.canChangeName = $modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
                             $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
-                            $modalScope.canDelete = false;//$modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
+                            $modalScope.canChangeParent = false;
+                            $modalScope.canChangeName = false;
+                            $modalScope.canDelete = false;
 
                             organizationUnitService.getUnitAccessRights(unit.organizationId, unit.id)
-                                .then(res => $modalScope.canDelete = res.canBeDeleted);
+                                .then(res => {
+                                    $modalScope.canDelete = res.canBeDeleted;
+                                    $modalScope.canChangeName = res.canNameBeModified;
+                                    $modalScope.canChangeParent = res.canBeRearranged;
+                                });
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting

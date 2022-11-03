@@ -6,7 +6,7 @@ namespace Core.ApplicationServices.Organizations
 {
     public interface IOrganizationUnitService
     {
-        Result<UnitAccessRights, OperationError> GetUnitAccessRightsByUnitId(int unitId);
+        Result<UnitAccessRights, OperationError> GetUnitAccessRightsByUnitId(int organizationId, int unitId);
         Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int organizationId, int unitId);
         Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int organizationId, int unitId, OrganizationRegistrationChangeParameters parameters);
         Maybe<OperationError> DeleteAllUnitOrganizationRegistrations(int organizationId, int unitId);

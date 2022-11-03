@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.ItContract;
@@ -79,13 +78,13 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("access-rights/{unitId}")]
+        [Route("access-rights/{organizationId}/{unitId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetUnitAccessRights(int unitId)
+        public HttpResponseMessage GetUnitAccessRights(int organizationId, int unitId)
         {
-            return _organizationUnitService.GetUnitAccessRightsByUnitId(unitId)
+            return _organizationUnitService.GetUnitAccessRightsByUnitId(organizationId, unitId)
                 .Select(ToAccessRightsDto)
                 .Match(Ok, FromOperationError);
         }
@@ -148,7 +147,7 @@ namespace Presentation.Web.Controllers.API.V1
         private static UnitAccessRightsDTO ToAccessRightsDto(
             UnitAccessRights accessRights)
         {
-            return new UnitAccessRightsDTO(accessRights.CanBeRead, accessRights.CanBeModified, accessRights.CanBeDeleted);
+            return new UnitAccessRightsDTO(accessRights.CanBeRead, accessRights.CanBeModified, accessRights.CanNameBeModified, accessRights.CanBeRearranged, accessRights.CanBeDeleted);
         }
     }
 }
