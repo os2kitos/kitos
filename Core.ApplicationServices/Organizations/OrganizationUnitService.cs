@@ -47,8 +47,11 @@ namespace Core.ApplicationServices.Organizations
                     _ => GetOrganziationUnit(unitId),
                     error => error
                 )
-                .Match(unit => Result<UnitAccessRights, OperationError>.Success(GetUnitAccessRights(unit)),
-                    error => error);
+                .Match
+                (
+                    unit => Result<UnitAccessRights, OperationError>.Success(GetUnitAccessRights(unit)),
+                    error => error
+                );
         }
 
         public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int organizationId, int unitId)

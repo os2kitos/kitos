@@ -17,12 +17,12 @@ namespace Presentation.Web.Controllers.API.V1
 {
     [PublicApi]
     [RoutePrefix("api/v1/organization-units")]
-    public class OrganizationRegistrationsController: BaseApiController
+    public class OrganizationRegistrationController: BaseApiController
     {
         private readonly IOrganizationUnitService _organizationUnitService;
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationRegistrationsController(IOrganizationUnitService organizationUnitService,
+        public OrganizationRegistrationController(IOrganizationUnitService organizationUnitService,
             IOrgUnitService orgUnitService)
         {
             _organizationUnitService = organizationUnitService;

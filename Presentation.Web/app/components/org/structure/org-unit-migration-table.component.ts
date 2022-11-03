@@ -99,7 +99,7 @@
                 .then(() => this.options.refreshData()),
                 error => {
                     console.log(error);
-                    this.notify.addErrorMessage("Failed to deleted the selected unit");
+                    this.notify.addErrorMessage("Failed to delete the selected unit");
                 };
         }
 
