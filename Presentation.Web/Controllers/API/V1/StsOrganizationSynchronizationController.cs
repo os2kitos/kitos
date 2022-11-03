@@ -97,7 +97,14 @@ namespace Presentation.Web.Controllers.API.V1
         [Route("connection")]
         public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
-            throw new NotImplementedException("yet");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return _stsOrganizationSynchronizationService
+                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .Match(FromOperationError, Ok);
         }
 
         #region DTO Mapping

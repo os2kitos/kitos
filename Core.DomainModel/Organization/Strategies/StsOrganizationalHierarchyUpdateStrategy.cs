@@ -135,7 +135,45 @@ namespace Core.DomainModel.Organization.Strategies
       
         public OrganizationTreeUpdateConsequences PerformUpdate(ExternalOrganizationUnit root)
         {
-            throw new System.NotImplementedException();
+            var consequences = ComputeUpdate(root);
+            var organizationUnits = _organization.GetRoot().FlattenHierarchy().ToList();
+
+            foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
+            {
+                var unitToConvert = organizationUnits.FirstOrDefault(x => x.Uuid == unitToNativeUnit.Uuid);
+                unitToConvert?.ConvertToKitosUnit();
+            }
+
+            foreach (var externalUnitToDelete in consequences.DeletedExternalUnitsBeingDeleted)
+            {
+                var unitToDelete = organizationUnits.FirstOrDefault(x => x.Uuid == externalUnitToDelete.Uuid);
+                if (unitToDelete != null)
+                    organizationUnits.Remove(unitToDelete);
+            }
+
+            foreach (var (unitToAdd, parent) in consequences.AddedExternalOrganizationUnits)
+            {
+                var parentUnit = organizationUnits.FirstOrDefault(x => x.ExternalOriginUuid == parent.Uuid);
+                parentUnit?.Children.Add(unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization));
+            }
+
+            foreach (var (movedUnit, oldParent, newParent) in consequences.OrganizationUnitsBeingMoved)
+            {
+                oldParent.Children.Remove(movedUnit);
+                var newUnitParent = organizationUnits.FirstOrDefault(x => x.Uuid == newParent.Uuid);
+                newUnitParent?.Children.Add(movedUnit);
+            }
+
+            foreach (var (affectedUnit, _, newName) in consequences.OrganizationUnitsBeingRenamed)
+            {
+                var unit = organizationUnits.FirstOrDefault(x => x.Uuid == affectedUnit.Uuid);
+                if (unit != null)
+                {
+                    affectedUnit.Name = newName;
+                }
+            }
+
+            return consequences;
         }
     }
 }

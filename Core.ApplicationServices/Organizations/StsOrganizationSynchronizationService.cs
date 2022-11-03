@@ -133,6 +133,29 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
+        public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude)
+        {
+            return Modify(organizationId, organization =>
+            {
+                return LoadOrganizationUnits(organization)
+                    .Match
+                    (
+                        importRoot =>
+                        {
+                            var error = organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
+                            if (error.Ok) 
+                                return Maybe<OperationError>.None;
+
+                            _logger.Error("Failed to update connect to for org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Error.FailureType, error.Error.Message.GetValueOrFallback(""));
+                            return new OperationError("Failed to update sub tree", OperationFailure.UnknownError);
+
+                        },
+                        error => error
+                    );
+            });
+        }
+
+
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {
             return _stsOrganizationUnitService.ResolveOrganizationTree(organization).Match<Result<ExternalOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
