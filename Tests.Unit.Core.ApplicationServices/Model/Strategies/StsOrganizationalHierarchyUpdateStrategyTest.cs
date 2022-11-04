@@ -167,144 +167,48 @@ namespace Tests.Unit.Core.Model.Strategies
         public void ComputeUpdate_Detects_Removed_Units_Which_Are_Converted_Since_They_Contain_Retained_SubTree_Content()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var nodeExpectedToBeConverted = root
-                .FlattenHierarchy()
-                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
-                    x != root &&
-                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
-                    x.Children.Any(c => c.Origin == OrganizationUnitOrigin.Kitos))
-                .RandomItem();
-
-            var subtreeOfRemovedExternalItem = nodeExpectedToBeConverted
-                .FlattenHierarchy()
-                .Where(node => node != nodeExpectedToBeConverted);
-            var expectedRemovedUnits = subtreeOfRemovedExternalItem.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
-
-            var externalTree = ConvertToExternalTree(root, (_, currentChildren) =>
-            {
-                //Make sure the removed subtree is filtered out
-                return currentChildren.Where(child => child != nodeExpectedToBeConverted);
-            });
+            var (_, externalTree, nodeExpectedToBeConverted, expectedRemovedUnits) = CreateTreeWithUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContent();
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
-            Assert.Same(nodeExpectedToBeConverted, organizationUnit);
-
-            var expectedRemovedItems = expectedRemovedUnits.OrderBy(unit => unit.Id);
-            var actualRemovedItems = consequences.DeletedExternalUnitsBeingDeleted.OrderBy(unit => unit.Id);
-            Assert.Equal(expectedRemovedItems, actualRemovedItems);
-
-            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
-            Assert.Empty(consequences.AddedExternalOrganizationUnits);
-            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+            AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(consequences, nodeExpectedToBeConverted, expectedRemovedUnits);
         }
 
         [Fact]
         public void ComputeUpdate_Detects_Removed_Units_Which_Are_Converted_Since_They_Are_Still_In_Use()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var removedNodeInUse = root
-                .FlattenHierarchy()
-                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
-                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
-                    x.IsLeaf())
-                .RandomItem();
-            removedNodeInUse.Using.Add(new ItSystemUsageOrgUnitUsage());
-
-            var externalTree = ConvertToExternalTree(root, (_, currentChildren) =>
-            {
-                //Make sure the removed subtree is filtered out
-                return currentChildren.Where(child => child != removedNodeInUse);
-            });
+            var (_, externalTree, removedNodeInUse) = CreateTreeWithUnitsWhichAreConvertedSinceTheyAreStillInUse();
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
-            Assert.Same(removedNodeInUse, organizationUnit);
-
-            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
-            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
-            Assert.Empty(consequences.AddedExternalOrganizationUnits);
-            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+            AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(consequences, removedNodeInUse);
         }
 
         [Fact]
         public void ComputeUpdate_Detects_Removed_Units_Which_Are_Deleted()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var expectedRemovedUnit = root
-                .FlattenHierarchy()
-                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
-                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
-                    x.IsLeaf())
-                .RandomItem();
+            var (_, externalTree, expectedRemovedUnit) = CreateTreeWithUnitsWhichAreDeleted();
 
-            var externalTree = ConvertToExternalTree(root, (_, currentChildren) =>
-            {
-                //Make sure the removed subtree is filtered out
-                return currentChildren.Where(child => child != expectedRemovedUnit);
-            });
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted);
-            Assert.Same(expectedRemovedUnit, removedUnit);
-
-            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
-            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
-            Assert.Empty(consequences.AddedExternalOrganizationUnits);
-            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+            AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(consequences, expectedRemovedUnit);
         }
 
         [Fact]
         public void ComputeUpdate_Detects_Removed_Nodes_Where_Leafs_Are_Moved_To_Removed_UnitsParent()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var expectedRemovedUnit = root
-                .FlattenHierarchy()
-                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
-                    x != root &&
-                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
-                    !x.IsLeaf() &&
-                    x.FlattenHierarchy().All(c => c.Origin == OrganizationUnitOrigin.STS_Organisation))
-                .RandomItem();
-
-            var expectedParentChanges = expectedRemovedUnit.Children;
-
-            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
-            {
-                if (current == expectedRemovedUnit.Parent)
-                {
-                    return currentChildren
-                        .Where(child => child != expectedRemovedUnit)
-                        //Move the children of the removed item to the removed item's parent
-                        .Concat(expectedParentChanges.Select(x => new OrganizationUnit
-                        {
-                            Id = x.Id,
-                            Organization = _organization,
-                            ExternalOriginUuid = x.ExternalOriginUuid,
-                            Origin = x.Origin,
-                            Children = x.Children,
-                            Name = x.Name
-                        })).ToList();
-                }
-                return currentChildren;
-            });
+            var (_, externalTree, expectedParentChangesIEnumerable, expectedRemovedUnit) = CreateTreeWithUnitsWhichLeafsAreMovedToRemovedUnitsParent();
+            var expectedParentChanges = expectedParentChangesIEnumerable.ToList();
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
@@ -396,6 +300,85 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Contains(movedUnit.Uuid, rootParent.Children.Select(x => x.Uuid));
         }
 
+        [Fact]
+        public void PerformUpdate_Updates_Removed_Units_Which_Are_Converted_Since_They_Contain_Retained_SubTree_Content()
+        {
+            //Arrange
+            var (root, externalTree, nodeExpectedToBeConverted, expectedRemovedUnits) = CreateTreeWithUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContent();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            var organizationUnit = AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(consequences, nodeExpectedToBeConverted, expectedRemovedUnits);
+
+            var unit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == organizationUnit.Uuid);
+            Assert.NotNull(unit);
+            Assert.Equal(OrganizationUnitOrigin.Kitos, unit.Origin);
+        }
+
+
+        [Fact]
+        public void PerformUpdate_Updates_Removed_Units_Which_Are_Converted_Since_They_Are_Still_In_Use()
+        {
+            //Arrange
+            var (root, externalTree, removedNodeInUse) = CreateTreeWithUnitsWhichAreConvertedSinceTheyAreStillInUse();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            var organizationUnit = AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(consequences, removedNodeInUse);
+
+            var unit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == organizationUnit.Uuid);
+            Assert.NotNull(unit);
+            Assert.Equal(OrganizationUnitOrigin.Kitos, unit.Origin);
+        }
+
+        [Fact]
+        public void PerformUpdate_Removes_Removed_Units_Which_Are_Deleted()
+        {
+            //Arrange
+            var (root, externalTree, expectedRemovedUnit) = CreateTreeWithUnitsWhichAreDeleted();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            var removedUnit = AssertUnitsWhichAreDeletedWereDetected(consequences, expectedRemovedUnit);
+
+            Assert.Null(root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == removedUnit.Uuid));
+        }
+
+        [Fact]
+        public void PerformUpdate_Removes_Removed_Nodes_Where_Leafs_Are_Moved_To_Removed_UnitsParent()
+        {
+            //Arrange
+            var (root, externalTree, expectedParentChanges, expectedRemovedUnit) = CreateTreeWithUnitsWhichLeafsAreMovedToRemovedUnitsParent();
+            var expectedParentChangesCount = expectedParentChanges.Count();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Same(expectedRemovedUnit, removedUnit);
+            var movedUnits = consequences.OrganizationUnitsBeingMoved.ToList();
+            Assert.Equal(expectedParentChangesCount, movedUnits.Count);
+            foreach (var (_, oldParent, newParent) in movedUnits)
+            {
+                Assert.Equal(removedUnit, oldParent);
+                Assert.Equal(removedUnit.Parent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
+            }
+
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+
+            var hierarchy = root.FlattenHierarchy();
+            Assert.Null(hierarchy.FirstOrDefault(x => x.Uuid == removedUnit.Uuid));
+        }
+
         private static (ExternalOrganizationUnit addedRootUnit, ExternalOrganizationUnit addedChildUnit) AssertNewUnitsWereDetected(OrganizationTreeUpdateConsequences consequences, IEnumerable<OrganizationUnit> expectedNewUnits, OrganizationUnit expectedSubTree, OrganizationUnit randomParentOfNewSubTree, OrganizationUnit expectedChild)
         {
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
@@ -441,7 +424,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit>(movedUnit, newParent);
         }
-
+        
         private static (OrganizationUnit movedUnit, ExternalOrganizationUnit newParent) AssertUnitsToMoveToNewlyAddedParentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit root, OrganizationUnit newItem, OrganizationUnit randomLeafWhichMustBeMovedToRoot)
         {
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
@@ -456,7 +439,49 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(movedUnit.Parent, oldParent);
             Assert.Equal(unitToAdd.Uuid, newParent.Uuid);
 
-            return new (movedUnit, newParent);
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit>(movedUnit, newParent);
+        }
+
+        private static OrganizationUnit AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit nodeExpectedToBeConverted, IEnumerable<OrganizationUnit> expectedRemovedUnits)
+        {
+            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Same(nodeExpectedToBeConverted, organizationUnit);
+
+            var expectedRemovedItems = expectedRemovedUnits.OrderBy(unit => unit.Id);
+            var actualRemovedItems = consequences.DeletedExternalUnitsBeingDeleted.OrderBy(unit => unit.Id);
+            Assert.Equal(expectedRemovedItems, actualRemovedItems);
+
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+
+            return organizationUnit;
+        }
+
+        private static OrganizationUnit AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit removedNodeInUse)
+        {
+            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Same(removedNodeInUse, organizationUnit);
+
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+
+            return organizationUnit;
+        }
+
+        private static OrganizationUnit AssertUnitsWhichAreDeletedWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit expectedRemovedUnit)
+        {
+            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Same(expectedRemovedUnit, removedUnit);
+
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+
+            return removedUnit;
         }
 
         private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>> customChildren = null)
@@ -559,6 +584,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit>(root, externalTree, randomLeafWhichMustBeMovedToRoot);
         }
+
         private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafMovedToNewlyImportedItem, OrganizationUnit newItem) CreateTreeWithUnitsMovedToNewlyAddedUnit()
         {
             PrepareConnectedOrganization();
@@ -604,6 +630,111 @@ namespace Tests.Unit.Core.Model.Strategies
             });
 
             return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, OrganizationUnit>(root, externalTree, randomLeafMovedToNewlyImportedItem, newItem);
+        }
+
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit nodeExpectedToBeConverted, IEnumerable<OrganizationUnit> expectedRemovedUnits) CreateTreeWithUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContent()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var nodeExpectedToBeConverted = root
+                .FlattenHierarchy()
+                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
+                    x != root &&
+                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
+                    x.Children.Any(c => c.Origin == OrganizationUnitOrigin.Kitos))
+                .RandomItem();
+
+            var subtreeOfRemovedExternalItem = nodeExpectedToBeConverted
+                .FlattenHierarchy()
+                .Where(node => node != nodeExpectedToBeConverted);
+            var expectedRemovedUnits = subtreeOfRemovedExternalItem.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
+
+            var externalTree = ConvertToExternalTree(root, (_, currentChildren) =>
+            {
+                //Make sure the removed subtree is filtered out
+                return currentChildren.Where(child => child != nodeExpectedToBeConverted);
+            });
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, IEnumerable<OrganizationUnit>>(root, externalTree, nodeExpectedToBeConverted, expectedRemovedUnits);
+        }
+
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit nodeExpectedToBeConverted) CreateTreeWithUnitsWhichAreConvertedSinceTheyAreStillInUse()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var removedNodeInUse = root
+                .FlattenHierarchy()
+                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
+                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
+                    x.IsLeaf())
+                .RandomItem();
+            removedNodeInUse.Using.Add(new ItSystemUsageOrgUnitUsage());
+
+            var externalTree = ConvertToExternalTree(root, (_, currentChildren) =>
+            {
+                //Make sure the removed subtree is filtered out
+                return currentChildren.Where(child => child != removedNodeInUse);
+            });
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit>(root, externalTree, removedNodeInUse);
+        }
+
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit expectedRemovedUnit) CreateTreeWithUnitsWhichAreDeleted()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var expectedRemovedUnit = root
+                .FlattenHierarchy()
+                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
+                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
+                    x.IsLeaf())
+                .RandomItem();
+
+            var externalTree = ConvertToExternalTree(root, (_, currentChildren) =>
+            {
+                //Make sure the removed subtree is filtered out
+                return currentChildren.Where(child => child != expectedRemovedUnit);
+            });
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit>(root, externalTree, expectedRemovedUnit);
+        }
+
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, IEnumerable<OrganizationUnit> expectedParentChanges, OrganizationUnit expectedRemovedUnit) CreateTreeWithUnitsWhichLeafsAreMovedToRemovedUnitsParent()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var expectedRemovedUnit = root
+                .FlattenHierarchy()
+                .Where(x => //Find a synced node that contains native children which are not deleted by external deletions. We expect the native child to be deleted (if any)
+                    x != root &&
+                    x.Origin == OrganizationUnitOrigin.STS_Organisation &&
+                    !x.IsLeaf() &&
+                    x.FlattenHierarchy().All(c => c.Origin == OrganizationUnitOrigin.STS_Organisation))
+                .RandomItem();
+
+            var expectedParentChanges = expectedRemovedUnit.Children;
+
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                if (current == expectedRemovedUnit.Parent)
+                {
+                    return currentChildren
+                        .Where(child => child != expectedRemovedUnit)
+                        //Move the children of the removed item to the removed item's parent
+                        .Concat(expectedParentChanges.Select(x => new OrganizationUnit
+                        {
+                            Id = x.Id,
+                            Organization = _organization,
+                            ExternalOriginUuid = x.ExternalOriginUuid,
+                            Origin = x.Origin,
+                            Children = x.Children,
+                            Name = x.Name
+                        })).ToList();
+                }
+                return currentChildren;
+            });
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, IEnumerable<OrganizationUnit>, OrganizationUnit>(root, externalTree, expectedParentChanges, expectedRemovedUnit);
         }
     }
 }
