@@ -115,193 +115,52 @@ namespace Tests.Unit.Core.Model.Strategies
         public void ComputeUpdate_Detects_New_OrganizationUnits()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var randomParentOfNewSubTree = root
-                .FlattenHierarchy()
-                .Skip(1) // Skip the root
-                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
-                .RandomItem();
-
-            var expectedSubTree = CreateOrganizationUnit(
-                OrganizationUnitOrigin.STS_Organisation,
-                new[]
-                {
-                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
-                }
-            );
-            var expectedNewUnits = expectedSubTree.FlattenHierarchy().ToList();
-            var expectedChild = expectedNewUnits.Skip(1).Single();
-
-            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
-            {
-                //Add the new sub tree if this is the parent of the new sub tree we expect
-                if (current == randomParentOfNewSubTree)
-                {
-                    return expectedSubTree
-                        .WrapAsEnumerable()
-                        .Concat(currentChildren);
-                }
-
-                return currentChildren;
-            });
-
+            var (_, externalTree, randomParentOfNewSubTree, expectedSubTree, expectedChild, expectedNewUnits) = CreateTreeWithNewOrganizationUnits();
+            
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
-            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
-            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
-            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
-
-            var addedUnits = consequences.AddedExternalOrganizationUnits.ToList();
-            Assert.Equal(2, addedUnits.Count);
-            Assert.Contains(addedUnits, unit => expectedNewUnits.Any(x => x.ExternalOriginUuid.GetValueOrDefault() == unit.unitToAdd.Uuid));
-
-            var addedRoot = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedSubTree.ExternalOriginUuid.GetValueOrDefault()));
-            Assert.Equal(randomParentOfNewSubTree.ExternalOriginUuid.GetValueOrDefault(), addedRoot.parent.Uuid);
-            var addedChild = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedChild.ExternalOriginUuid.GetValueOrDefault()));
-            Assert.Equal(addedRoot.unitToAdd, addedChild.parent);
-
+            AssertNewUnitsWereDetected(consequences, expectedNewUnits, expectedSubTree, randomParentOfNewSubTree, expectedChild);
         }
 
         [Fact]
         public void ComputeUpdate_Detects_Renamed_OrganizationUnits()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var randomItemToRename = root
-                .FlattenHierarchy()
-                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
-                .RandomItem();
-
-            var externalTree = ConvertToExternalTree(root);
-
-            var expectedNewName = randomItemToRename.Name; //as converted
-            var expectedOldNAme = A<string>();
-            randomItemToRename.Name = expectedOldNAme; //Rename the local item to enforce name change detection
+            var (_, externalTree, randomItemToRename, expectedOldName, expectedNewName) = CreateTreeWithRenamedOrganizationUnits();
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
-            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
-            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
-            Assert.Empty(consequences.AddedExternalOrganizationUnits);
-            var (affectedUnit, oldName, newName) = Assert.Single(consequences.OrganizationUnitsBeingRenamed);
-            Assert.Same(randomItemToRename, affectedUnit);
-            Assert.Equal(expectedOldNAme, oldName);
-            Assert.Equal(expectedNewName, newName);
+            AssertUnitsToRenameWereDetected(consequences, randomItemToRename, expectedOldName, expectedNewName);
         }
 
         [Fact, Description("Verifies if we detect if an existing unit has been moved to another existing unit")]
         public void ComputeUpdate_Detects_Units_Moved_To_Existing_Parent()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var randomLeafWhichMustBeMovedToRoot = root
-                .FlattenHierarchy()
-                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
-                .Where(x => x.IsLeaf())
-                .RandomItem();
-
-            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
-            {
-                if (current == randomLeafWhichMustBeMovedToRoot.Parent)
-                {
-                    //Remove from the current parent
-                    return currentChildren.Where(child => child != randomLeafWhichMustBeMovedToRoot).ToList();
-                }
-
-                if (current.IsRoot())
-                {
-                    //Move to the root
-                    return currentChildren.Append(randomLeafWhichMustBeMovedToRoot).ToList();
-                }
-
-                return currentChildren;
-            });
+            var (_, externalTree, randomLeafWhichMustBeMovedToRoot) = CreateTreeWithUnitsMovedToExistingParent();
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
-            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
-            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
-            Assert.Empty(consequences.AddedExternalOrganizationUnits);
-
-            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
-            Assert.Equal(randomLeafWhichMustBeMovedToRoot, movedUnit);
-            Assert.Equal(movedUnit.Parent, oldParent);
-            Assert.Equal(externalTree, newParent);
+            AssertUnitsToMoveToExistingParentsWereDetected(consequences, externalTree, randomLeafWhichMustBeMovedToRoot);
         }
 
         [Fact, Description("Verifies if we detect if an existing unit has been moved one of the new units")]
         public void ComputeUpdate_Detects_Units_Moved_To_Newly_Added_Parent()
         {
             //Arrange
-            PrepareConnectedOrganization();
-            var root = _organization.GetRoot();
-            var randomLeafMovedToNewlyImportedItem = root
-                .FlattenHierarchy()
-                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
-                .Where(x => x.IsLeaf())
-                .RandomItem();
-
-            var newItem = CreateOrganizationUnit(
-                OrganizationUnitOrigin.STS_Organisation,
-                new[]
-                {
-                    //NOTE: Make a copy to not modify the existing object (children in the list will get the parent in scope and this affects detection)
-                    new OrganizationUnit
-                    {
-                        Id = randomLeafMovedToNewlyImportedItem.Id,
-                        Organization = _organization,
-                        Origin = randomLeafMovedToNewlyImportedItem.Origin,
-                        ExternalOriginUuid = randomLeafMovedToNewlyImportedItem.ExternalOriginUuid,
-                        Name = randomLeafMovedToNewlyImportedItem.Name
-                    }
-                }
-            );
-            newItem.Parent = root;
-
-            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
-            {
-                if (current == randomLeafMovedToNewlyImportedItem.Parent)
-                {
-                    //Remove from the current parent
-                    return currentChildren.Where(child => child != randomLeafMovedToNewlyImportedItem).ToList();
-                }
-
-                if (current.IsRoot())
-                {
-                    //Add the new item to the root and the new item contains the moved item
-                    return currentChildren.Append(newItem).ToList();
-                }
-
-                return currentChildren;
-            });
+            var (root, externalTree, randomLeafMovedToNewlyImportedItem, newItem) = CreateTreeWithUnitsMovedToNewlyAddedUnit();
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
-            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
-            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
-            var (unitToAdd, parent) = Assert.Single(consequences.AddedExternalOrganizationUnits);
-            Assert.Equal(newItem.ExternalOriginUuid.GetValueOrDefault(), unitToAdd.Uuid);
-            Assert.Equal(root.ExternalOriginUuid.GetValueOrDefault(), parent.Uuid);
-
-            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
-            Assert.Equal(randomLeafMovedToNewlyImportedItem, movedUnit);
-            Assert.Equal(movedUnit.Parent, oldParent);
-            Assert.Equal(unitToAdd.Uuid, newParent.Uuid);
+            AssertUnitsToMoveToNewlyAddedParentWereDetected(consequences, root, newItem, randomLeafMovedToNewlyImportedItem);
         }
 
         [Fact]
@@ -467,6 +326,139 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.AddedExternalOrganizationUnits);
         }
 
+        [Fact]
+        public void PerformUpdate_Updates_New_OrganizationUnits()
+        {
+            //Arrange
+            var (root, externalTree, randomParentOfNewSubTree, expectedSubTree, expectedChild, expectedNewUnits) = CreateTreeWithNewOrganizationUnits();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            var (addedRoot, addedChild) = AssertNewUnitsWereDetected(consequences, expectedNewUnits, expectedSubTree, randomParentOfNewSubTree, expectedChild);
+
+            var rootUnits = root.FlattenHierarchy().ToList();
+            Assert.Contains(addedRoot.Uuid, rootUnits.Select(x => x.ExternalOriginUuid).ToList());
+            Assert.Contains(addedChild.Uuid, rootUnits.Select(x => x.ExternalOriginUuid).ToList());
+        }
+
+        [Fact]
+        public void PerformUpdate_Updates_Renamed_OrganizationUnits()
+        {
+            //Arrange
+            var (root, externalTree, randomItemToRename, expectedOldName, expectedNewName) = CreateTreeWithRenamedOrganizationUnits();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            AssertUnitsToRenameWereDetected(consequences, randomItemToRename, expectedOldName, expectedNewName);
+
+            var rootUnit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == randomItemToRename.Uuid);
+            Assert.NotNull(rootUnit);
+            Assert.Equal(expectedNewName, rootUnit.Name);
+        }
+
+        [Fact]
+        public void PerformUpdate_Updates_Units_Moved_To_Existing_Parent()
+        {
+            //Arrange
+            var (root, externalTree, randomLeafWhichMustBeMovedToRoot) = CreateTreeWithUnitsMovedToExistingParent();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            var (movedUnit, newParent) = AssertUnitsToMoveToExistingParentsWereDetected(consequences, externalTree, randomLeafWhichMustBeMovedToRoot);
+
+            var rootParent= root.FlattenHierarchy().FirstOrDefault(x => x.ExternalOriginUuid == newParent.Uuid);
+            Assert.NotNull(rootParent);
+            Assert.Contains(movedUnit.Uuid, rootParent.Children.Select(x => x.Uuid));
+        }
+
+        [Fact]
+        public void PerformUpdate_Updates_Units_Moved_To_Newly_Added_Parent()
+        {
+            //Arrange
+            var (root, externalTree, randomLeafMovedToNewlyImportedItem, newItem) = CreateTreeWithUnitsMovedToNewlyAddedUnit();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            var (movedUnit, newParent) = AssertUnitsToMoveToNewlyAddedParentWereDetected(consequences, root, newItem, randomLeafMovedToNewlyImportedItem);
+
+            var rootParent = root.FlattenHierarchy().FirstOrDefault(x => x.ExternalOriginUuid == newParent.Uuid);
+            var rootMovedUnit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == movedUnit.Uuid);
+            Assert.NotNull(rootParent);
+            Assert.NotNull(rootMovedUnit);
+            Assert.Contains(movedUnit.Uuid, rootParent.Children.Select(x => x.Uuid));
+        }
+
+        private static (ExternalOrganizationUnit addedRootUnit, ExternalOrganizationUnit addedChildUnit) AssertNewUnitsWereDetected(OrganizationTreeUpdateConsequences consequences, IEnumerable<OrganizationUnit> expectedNewUnits, OrganizationUnit expectedSubTree, OrganizationUnit randomParentOfNewSubTree, OrganizationUnit expectedChild)
+        {
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+
+            var addedUnits = consequences.AddedExternalOrganizationUnits.ToList();
+            Assert.Equal(2, addedUnits.Count);
+            Assert.Contains(addedUnits, unit => expectedNewUnits.Any(x => x.ExternalOriginUuid.GetValueOrDefault() == unit.unitToAdd.Uuid));
+
+            var addedRoot = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedSubTree.ExternalOriginUuid.GetValueOrDefault()));
+            Assert.Equal(randomParentOfNewSubTree.ExternalOriginUuid.GetValueOrDefault(), addedRoot.parent.Uuid);
+            var addedChild = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedChild.ExternalOriginUuid.GetValueOrDefault()));
+            Assert.Equal(addedRoot.unitToAdd, addedChild.parent);
+
+            return (addedRoot.unitToAdd, addedChild.unitToAdd);
+        }
+
+        private static void AssertUnitsToRenameWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit randomItemToRename, string expectedOldName, string expectedNewName)
+        {
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingMoved);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+            var (affectedUnit, oldName, newName) = Assert.Single(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Same(randomItemToRename, affectedUnit);
+            Assert.Equal(expectedOldName, oldName);
+            Assert.Equal(expectedNewName, newName);
+        }
+
+        private static (OrganizationUnit movedUnit, ExternalOrganizationUnit newParent) AssertUnitsToMoveToExistingParentsWereDetected(OrganizationTreeUpdateConsequences consequences, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafWhichMustBeMovedToRoot)
+        {
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+
+            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
+            Assert.Equal(randomLeafWhichMustBeMovedToRoot, movedUnit);
+            Assert.Equal(movedUnit.Parent, oldParent);
+            Assert.Equal(externalTree, newParent);
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit>(movedUnit, newParent);
+        }
+
+        private static (OrganizationUnit movedUnit, ExternalOrganizationUnit newParent) AssertUnitsToMoveToNewlyAddedParentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit root, OrganizationUnit newItem, OrganizationUnit randomLeafWhichMustBeMovedToRoot)
+        {
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
+            var (unitToAdd, parent) = Assert.Single(consequences.AddedExternalOrganizationUnits);
+            Assert.Equal(newItem.ExternalOriginUuid.GetValueOrDefault(), unitToAdd.Uuid);
+            Assert.Equal(root.ExternalOriginUuid.GetValueOrDefault(), parent.Uuid);
+
+            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
+            Assert.Equal(randomLeafWhichMustBeMovedToRoot, movedUnit);
+            Assert.Equal(movedUnit.Parent, oldParent);
+            Assert.Equal(unitToAdd.Uuid, newParent.Uuid);
+
+            return new (movedUnit, newParent);
+        }
+
         private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>> customChildren = null)
         {
             customChildren ??= ((unit, existingChildren) => existingChildren);
@@ -482,6 +474,136 @@ namespace Tests.Unit.Core.Model.Strategies
                     .Select(child => ConvertToExternalTree(child, customChildren))
                     .ToList()
                 );
+        }
+
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomParentOfNewSubTree, OrganizationUnit
+            expectedSubTree, OrganizationUnit expectedChild, IEnumerable<OrganizationUnit> expectedNewUnits)
+            CreateTreeWithNewOrganizationUnits()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+
+            var randomParentOfNewSubTree = root
+                .FlattenHierarchy()
+                .Skip(1) // Skip the root
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .RandomItem();
+
+            var expectedSubTree = CreateOrganizationUnit(
+                OrganizationUnitOrigin.STS_Organisation,
+                new[]
+                {
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                }
+            );
+            var expectedNewUnits = expectedSubTree.FlattenHierarchy().ToList();
+            var expectedChild = expectedNewUnits.Skip(1).Single();
+
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                //Add the new sub tree if this is the parent of the new sub tree we expect
+                if (current == randomParentOfNewSubTree)
+                {
+                    return expectedSubTree
+                        .WrapAsEnumerable()
+                        .Concat(currentChildren);
+                }
+
+                return currentChildren;
+            });
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, OrganizationUnit, OrganizationUnit, IEnumerable<OrganizationUnit>>(root, externalTree, randomParentOfNewSubTree, expectedSubTree, expectedChild, expectedNewUnits);
+        }
+
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomItemToRename, string expectedOldName, string expectedNewName) CreateTreeWithRenamedOrganizationUnits()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+
+            var randomItemToRename = root
+                .FlattenHierarchy()
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .RandomItem();
+
+            var externalTree = ConvertToExternalTree(root);
+
+            var expectedNewName = randomItemToRename.Name; //as converted
+            var expectedOldName = A<string>();
+            randomItemToRename.Name = expectedOldName; //Rename the local item to enforce name change detection
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, string, string>(root, externalTree, randomItemToRename, expectedOldName, expectedNewName);
+        }
+
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafWhichMustBeMovedToRoot) CreateTreeWithUnitsMovedToExistingParent()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var randomLeafWhichMustBeMovedToRoot = root
+                .FlattenHierarchy()
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .Where(x => x.IsLeaf())
+                .RandomItem();
+
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                if (current == randomLeafWhichMustBeMovedToRoot.Parent)
+                {
+                    //Remove from the current parent
+                    return currentChildren.Where(child => child != randomLeafWhichMustBeMovedToRoot).ToList();
+                }
+
+                return current.IsRoot()
+                    ? currentChildren.Append(randomLeafWhichMustBeMovedToRoot).ToList()
+                    : currentChildren;
+            });
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit>(root, externalTree, randomLeafWhichMustBeMovedToRoot);
+        }
+        private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafMovedToNewlyImportedItem, OrganizationUnit newItem) CreateTreeWithUnitsMovedToNewlyAddedUnit()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var randomLeafMovedToNewlyImportedItem = root
+                .FlattenHierarchy()
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .Where(x => x.IsLeaf())
+                .RandomItem();
+
+            var newItem = CreateOrganizationUnit(
+                OrganizationUnitOrigin.STS_Organisation,
+                new[]
+                {
+                    //NOTE: Make a copy to not modify the existing object (children in the list will get the parent in scope and this affects detection)
+                    new OrganizationUnit
+                    {
+                        Id = randomLeafMovedToNewlyImportedItem.Id,
+                        Organization = _organization,
+                        Origin = randomLeafMovedToNewlyImportedItem.Origin,
+                        ExternalOriginUuid = randomLeafMovedToNewlyImportedItem.ExternalOriginUuid,
+                        Name = randomLeafMovedToNewlyImportedItem.Name
+                    }
+                }
+            );
+            newItem.Parent = root;
+
+            var externalTree = ConvertToExternalTree(root, (current, currentChildren) =>
+            {
+                if (current == randomLeafMovedToNewlyImportedItem.Parent)
+                {
+                    //Remove from the current parent
+                    return currentChildren.Where(child => child != randomLeafMovedToNewlyImportedItem).ToList();
+                }
+
+                if (current.IsRoot())
+                {
+                    //Add the new item to the root and the new item contains the moved item
+                    return currentChildren.Append(newItem).ToList();
+                }
+
+                return currentChildren;
+            });
+
+            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, OrganizationUnit>(root, externalTree, randomLeafMovedToNewlyImportedItem, newItem);
         }
     }
 }

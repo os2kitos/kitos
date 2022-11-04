@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Core.DomainModel.Extensions;
 
@@ -144,23 +145,21 @@ namespace Core.DomainModel.Organization.Strategies
                 unitToConvert?.ConvertToKitosUnit();
             }
 
-            foreach (var externalUnitToDelete in consequences.DeletedExternalUnitsBeingDeleted)
-            {
-                var unitToDelete = organizationUnits.FirstOrDefault(x => x.Uuid == externalUnitToDelete.Uuid);
-                if (unitToDelete != null)
-                    organizationUnits.Remove(unitToDelete);
-            }
-
             foreach (var (unitToAdd, parent) in consequences.AddedExternalOrganizationUnits)
             {
                 var parentUnit = organizationUnits.FirstOrDefault(x => x.ExternalOriginUuid == parent.Uuid);
-                parentUnit?.Children.Add(unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization));
+                var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization);
+                parentUnit?.Children.Add(newUnit);
+                if (organizationUnits.Any(x => x.Uuid == newUnit.Uuid))
+                    continue;
+
+                organizationUnits.Add(newUnit);
             }
 
             foreach (var (movedUnit, oldParent, newParent) in consequences.OrganizationUnitsBeingMoved)
             {
                 oldParent.Children.Remove(movedUnit);
-                var newUnitParent = organizationUnits.FirstOrDefault(x => x.Uuid == newParent.Uuid);
+                var newUnitParent = organizationUnits.FirstOrDefault(x => x.ExternalOriginUuid == newParent.Uuid);
                 newUnitParent?.Children.Add(movedUnit);
             }
 
@@ -171,6 +170,16 @@ namespace Core.DomainModel.Organization.Strategies
                 {
                     affectedUnit.Name = newName;
                 }
+            }
+
+            foreach (var externalUnitToDelete in consequences.DeletedExternalUnitsBeingDeleted)
+            {
+                var unitToDelete = organizationUnits.FirstOrDefault(x => x.Uuid == externalUnitToDelete.Uuid);
+                if (unitToDelete == null)
+                    continue;
+
+                var parent = organizationUnits.FirstOrDefault(x => x.Uuid == unitToDelete.Parent.Uuid);
+                parent?.Children.Remove(unitToDelete);
             }
 
             return consequences;
