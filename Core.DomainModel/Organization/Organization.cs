@@ -212,7 +212,7 @@ namespace Core.DomainModel.Organization
                     throw new ArgumentOutOfRangeException();
             }
 
-            var childLevelsToInclude = levelsIncluded.Select(levels=>levels-1); //subtract the root level before copying
+            var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
             var filteredTree = root.Copy(childLevelsToInclude);
 
             return strategy.ComputeUpdate(filteredTree);
@@ -308,6 +308,107 @@ namespace Core.DomainModel.Organization
             StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
 
             return strategy.PerformUpdate(filteredTree);
+        }
+
+        public Maybe<OperationError> AddOrganizationUnit(OrganizationUnit newUnit, OrganizationUnit parentUnit)
+        {
+            if (newUnit == null) throw new ArgumentNullException(nameof(newUnit));
+            if (parentUnit == null) throw new ArgumentNullException(nameof(parentUnit));
+
+            if (newUnit == parentUnit)
+            {
+                return new OperationError("new unit is the same as the parent", OperationFailure.BadInput);
+            }
+
+            if (parentUnit.Organization != this)
+            {
+                return new OperationError("Parent unit is from a different organization", OperationFailure.BadInput);
+            }
+
+            var duplicateUnit = GetOrganizationUnit(newUnit.Uuid);
+            if (duplicateUnit.HasValue)
+            {
+                return new OperationError("Unit already added", OperationFailure.BadInput);
+            }
+
+            if (GetOrganizationUnit(parentUnit.Uuid).IsNone)
+            {
+                return new OperationError("Parent unit has not been added to the organization", OperationFailure.BadInput);
+            }
+
+
+            newUnit.Organization = this;
+
+            return parentUnit.AddChild(newUnit);
+        }
+
+        public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit)
+        {
+            if (movedUnit == null) throw new ArgumentNullException(nameof(movedUnit));
+            if (oldParentUnit == null) throw new ArgumentNullException(nameof(oldParentUnit));
+            if (newParentUnit == null) throw new ArgumentNullException(nameof(newParentUnit));
+            if (GetOrganizationUnit(movedUnit.Uuid).IsNone)
+            {
+                return new OperationError($"Moved unit with uuid + {movedUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (GetOrganizationUnit(oldParentUnit.Uuid).IsNone)
+            {
+                return new OperationError($"old parent unit with uuid + {oldParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (GetOrganizationUnit(newParentUnit.Uuid).IsNone)
+            {
+                return new OperationError($"new parent unit with uuid + {newParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (movedUnit == oldParentUnit)
+            {
+                return new OperationError($"moved unit equals old parent unit with uuid + {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (movedUnit == newParentUnit)
+            {
+                return new OperationError($"moved unit equals new parent unit with uuid + {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            var removeChildError = oldParentUnit.RemoveChild(movedUnit);
+
+            if (removeChildError.HasValue)
+            {
+                return removeChildError.Value;
+            }
+
+            return oldParentUnit.AddChild(movedUnit);
+        }
+
+        public Maybe<OperationError> DeleteOrganizationUnit(OrganizationUnit unitToDelete)
+        {
+            if (unitToDelete == null) throw new ArgumentNullException(nameof(unitToDelete));
+            var organizationUnit = GetOrganizationUnit(unitToDelete.Uuid);
+            if (organizationUnit.IsNone)
+            {
+                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} Does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (unitToDelete.IsUsed())
+            {
+                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} from organization with uuid {Uuid} cannot be deleted as it is still in use!", OperationFailure.BadInput);
+            }
+
+            //Migrate any children to the parent!
+            foreach (var child in unitToDelete.Children.ToList())
+            {
+                var relocateOrganizationUnitError = RelocateOrganizationUnit(child, unitToDelete, unitToDelete.Parent);
+                if (relocateOrganizationUnitError.HasValue)
+                {
+                    return relocateOrganizationUnitError;
+                }
+            }
+            OrgUnits.Remove(unitToDelete);
+            unitToDelete.ResetParent();
+
+            return Maybe<OperationError>.None;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
 
 namespace Core.DomainModel.Organization.Strategies
@@ -87,7 +87,7 @@ namespace Core.DomainModel.Organization.Strategies
                 var organizationUnit = candidateForRemoval.Value;
                 var removedSubtreeIds = organizationUnit
                     .FlattenHierarchy()
-                    .Select(x=>x.Id)
+                    .Select(x => x.Id)
                     .ToHashSet();
 
                 var partsOfSubtreeWhichAreMoved = parentChanges
@@ -133,56 +133,107 @@ namespace Core.DomainModel.Organization.Strategies
                 renamedUnits.Select(x => (x.current, x.current.Name, x.imported.Name)).ToList(),
                 parentChanges);
         }
-      
-        public OrganizationTreeUpdateConsequences PerformUpdate(ExternalOrganizationUnit root)
+
+        public Result<OrganizationTreeUpdateConsequences, OperationError> PerformUpdate(ExternalOrganizationUnit root)
         {
             var consequences = ComputeUpdate(root);
-            var organizationUnits = _organization.GetRoot().FlattenHierarchy().ToList();
+            var currentTreeByUuid = _organization
+                .OrgUnits
+                .Where(unit => unit.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
 
-            foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
-            {
-                var unitToConvert = organizationUnits.FirstOrDefault(x => x.Uuid == unitToNativeUnit.Uuid);
-                unitToConvert?.ConvertToKitosUnit();
-            }
-
-            foreach (var (unitToAdd, parent) in consequences.AddedExternalOrganizationUnits)
-            {
-                var parentUnit = organizationUnits.FirstOrDefault(x => x.ExternalOriginUuid == parent.Uuid);
-                var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization);
-                parentUnit?.Children.Add(newUnit);
-                if (organizationUnits.Any(x => x.Uuid == newUnit.Uuid))
-                    continue;
-
-                organizationUnits.Add(newUnit);
-            }
-
-            foreach (var (movedUnit, oldParent, newParent) in consequences.OrganizationUnitsBeingMoved)
-            {
-                oldParent.Children.Remove(movedUnit);
-                var newUnitParent = organizationUnits.FirstOrDefault(x => x.ExternalOriginUuid == newParent.Uuid);
-                newUnitParent?.Children.Add(movedUnit);
-            }
-
+            //Renaming
             foreach (var (affectedUnit, _, newName) in consequences.OrganizationUnitsBeingRenamed)
             {
-                var unit = organizationUnits.FirstOrDefault(x => x.Uuid == affectedUnit.Uuid);
-                if (unit != null)
+                var nameToUse = newName ?? "";
+                if (nameToUse.Length > OrganizationUnit.MaxNameLength)
                 {
-                    affectedUnit.Name = newName;
+                    nameToUse = nameToUse.Substring(0, OrganizationUnit.MaxNameLength);
+                }
+                var updateNameError = affectedUnit.UpdateName(nameToUse);
+                if (updateNameError.HasValue)
+                {
+                    return updateNameError.Value;
                 }
             }
 
+            //Conversion to native units
+            foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
+            {
+                unitToNativeUnit.ConvertToKitosUnit();
+            }
+
+            //Addition of new units
+            foreach (var (unitToAdd, parent) in OrderByParentToLeaf(root, consequences.AddedExternalOrganizationUnits))
+            {
+                if (currentTreeByUuid.TryGetValue(parent.Uuid, out var parentUnit))
+                {
+                    var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization);
+
+                    var addOrgUnitError = _organization.AddOrganizationUnit(newUnit, parentUnit);
+                    if (addOrgUnitError.HasValue)
+                    {
+                        return addOrgUnitError.Value;
+                    }
+
+                    currentTreeByUuid.Add(unitToAdd.Uuid, newUnit);
+                }
+                else
+                {
+                    return new OperationError($"Parent unit with external uuid {parent.Uuid} could not be found", OperationFailure.BadInput);
+                }
+            }
+
+            //Relocation of existing units
+            foreach (var (movedUnit, oldParent, newParent) in consequences.OrganizationUnitsBeingMoved)
+            {
+                if (!currentTreeByUuid.TryGetValue(oldParent.ExternalOriginUuid.GetValueOrDefault(), out var oldParentUnit))
+                {
+                    return new OperationError($"Old parent unit with uuid {oldParent.Uuid} could not be found", OperationFailure.BadInput);
+                }
+
+                if (!currentTreeByUuid.TryGetValue(newParent.Uuid, out var newParentUnit))
+                {
+                    return new OperationError($"New parent unit with external uuid {newParent.Uuid} could not be found", OperationFailure.BadInput);
+
+                }
+
+                var relocationError = _organization.RelocateOrganizationUnit(movedUnit, oldParentUnit, newParentUnit);
+                if (relocationError.HasValue)
+                {
+                    return relocationError.Value;
+                }
+            }
+
+            //Deletion of units
             foreach (var externalUnitToDelete in consequences.DeletedExternalUnitsBeingDeleted)
             {
-                var unitToDelete = organizationUnits.FirstOrDefault(x => x.Uuid == externalUnitToDelete.Uuid);
-                if (unitToDelete == null)
-                    continue;
-
-                var parent = organizationUnits.FirstOrDefault(x => x.Uuid == unitToDelete.Parent.Uuid);
-                parent?.Children.Remove(unitToDelete);
+                var deleteOrganizationUnitError = _organization.DeleteOrganizationUnit(externalUnitToDelete);
+                if (deleteOrganizationUnitError.HasValue)
+                {
+                    return deleteOrganizationUnitError.Value;
+                }
             }
 
             return consequences;
+        }
+
+        private IEnumerable<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)> OrderByParentToLeaf(ExternalOrganizationUnit externalRoot, IEnumerable<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)> addedUnits)
+        {
+            var unitsToAdd = addedUnits.ToList();
+            var relevantIds = unitsToAdd.SelectMany(x => new[] { x.parent.Uuid, x.unitToAdd.Uuid }).ToHashSet();
+            var ordering = externalRoot
+                //Flatten the hierarchy from parent to leaf
+                .Flatten()
+                //Select only the parts that we care about
+                .Where(unit => relevantIds.Contains(unit.Uuid))
+                //Find the ordering key of those units
+                .Select((unit, index) => new { unit, index })
+                //Create the lookup
+                .ToDictionary(x => x.unit.Uuid, x => x.index);
+
+            //Make sure parents are added before children
+            return unitsToAdd.OrderBy(unitToAdd => ordering[unitToAdd.unitToAdd.Uuid]).ToList();
         }
     }
 }

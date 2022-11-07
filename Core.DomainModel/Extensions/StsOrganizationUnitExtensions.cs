@@ -9,7 +9,7 @@ namespace Core.DomainModel.Extensions
         {
             return new OrganizationUnit
             {
-                Name = stsOrganizationUnit.Name,
+                Name = stsOrganizationUnit.Name.Length > OrganizationUnit.MaxNameLength ? stsOrganizationUnit.Name.Substring(0, OrganizationUnit.MaxNameLength) : stsOrganizationUnit.Name,
                 Origin = origin,
                 ExternalOriginUuid = stsOrganizationUnit.Uuid,
                 Organization = parentOrganization,

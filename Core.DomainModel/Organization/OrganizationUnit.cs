@@ -62,7 +62,7 @@ namespace Core.DomainModel.Organization
         /// Local tasks that was created in this unit
         /// </summary>
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
-        
+
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.
         /// </summary>
@@ -153,6 +153,60 @@ namespace Core.DomainModel.Organization
         public bool IsUsed()
         {
             return Using.Any() || EconomyStreams.Any() || ResponsibleForItContracts.Any() || Rights.Any();
+        }
+
+        public Maybe<OperationError> AddChild(OrganizationUnit child)
+        {
+            if (child == null) throw new ArgumentNullException(nameof(child));
+
+            if (child.Organization != Organization)
+            {
+                return new OperationError($"child with uuid {child.Uuid} is from a different organization", OperationFailure.BadInput);
+            }
+
+            if (Children.Any(c => c.Uuid == child.Uuid))
+            {
+                return new OperationError($"child with uuid {child.Uuid} already added", OperationFailure.BadInput);
+            }
+
+            Children.Add(child);
+            child.Parent = this;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateName(string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                return new OperationError($"newName must be defined in this unit with id {Id}", OperationFailure.BadInput);
+            }
+
+            if (newName.Length > MaxNameLength)
+            {
+                return new OperationError($"newName exceeds the max length of {MaxNameLength}", OperationFailure.BadInput);
+            }
+
+            Name = newName;
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemoveChild(OrganizationUnit child)
+        {
+            if (child == null) throw new ArgumentNullException(nameof(child));
+            if (!Children.Remove(child))
+            {
+                return new OperationError($"Child with id:{child.Id} could not be removed from this unit with id {Id} as it is not a child of this unit", OperationFailure.BadInput);
+            }
+
+            child.ResetParent();
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetParent()
+        {
+            Parent = null;
+            ParentId = null;
         }
     }
 }

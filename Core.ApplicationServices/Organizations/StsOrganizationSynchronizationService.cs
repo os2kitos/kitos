@@ -136,23 +136,18 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude)
         {
             return Modify(organizationId, organization =>
-            {
-                return LoadOrganizationUnits(organization)
-                    .Match
-                    (
-                        importRoot =>
+                LoadOrganizationUnits(organization)
+                    .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude))
+                    .Select(consequences =>
+                    {
+                        foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
                         {
-                            var error = organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
-                            if (error.Ok) 
-                                return Maybe<OperationError>.None;
-
-                            _logger.Error("Failed to update connect to for org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Error.FailureType, error.Error.Message.GetValueOrFallback(""));
-                            return new OperationError("Failed to update sub tree", OperationFailure.UnknownError);
-
-                        },
-                        error => error
-                    );
-            });
+                            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(affectedUnit));
+                        }
+                        return consequences;
+                    })
+                    .Match(_ => Maybe<OperationError>.None, error => error)
+            );
         }
 
 
