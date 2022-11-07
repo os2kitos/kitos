@@ -3,7 +3,7 @@
     /// <summary>
     /// Marker interface
     /// </summary>
-    public abstract class IDomainEvent
+    public interface IDomainEvent
     {
     }
 }

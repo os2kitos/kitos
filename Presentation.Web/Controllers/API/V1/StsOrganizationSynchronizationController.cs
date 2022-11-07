@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Organizations;
-using Core.DomainServices.Model.StsOrganization;
+using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
 
@@ -23,7 +24,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("snapshot")]
-        public HttpResponseMessage GetSnapshotFromStsOrganization(Guid organizationId, uint? levels = null)
+        public HttpResponseMessage GetSnapshotFromStsOrganization(Guid organizationId, int? levels = null)
         {
             return _stsOrganizationSynchronizationService
                 .GetStsOrganizationalHierarchy(organizationId, levels.FromNullableValueType())
@@ -33,34 +34,175 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("connection-status")]
-        public HttpResponseMessage GetConnectionStatus(Guid organizationId)
+        public HttpResponseMessage GetSynchronizationStatus(Guid organizationId)
         {
             return _stsOrganizationSynchronizationService
-                .ValidateConnection(organizationId)
-                .Match
-                (
-                    error => Ok(new CheckStsOrganizationConnectionResponseDTO
+                .GetSynchronizationDetails(organizationId)
+                .Select(details => new StsOrganizationSynchronizationDetailsResponseDTO
+                {
+                    Connected = details.Connected,
+                    SynchronizationDepth = details.SynchronizationDepth,
+                    CanCreateConnection = details.CanCreateConnection,
+                    CanDeleteConnection = details.CanDeleteConnection,
+                    CanUpdateConnection = details.CanUpdateConnection,
+                    AccessStatus = new StsOrganizationAccessStatusResponseDTO
                     {
-                        Error = error.Detail,
-                        Connected = false
-                    }),
-                    () => Ok(new CheckStsOrganizationConnectionResponseDTO()
-                    {
-                        Connected = true
-                    })
-                );
+                        AccessGranted = details.CheckConnectionError == null,
+                        Error = details.CheckConnectionError
+                    }
+                })
+                .Match(Ok, FromOperationError);
 
         }
 
-        private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(StsOrganizationUnit organizationUnit)
+        [HttpPost]
+        [Route("connection")]
+        public HttpResponseMessage CreateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
-            return new StsOrganizationOrgUnitDTO()
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return _stsOrganizationSynchronizationService
+                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .Match(FromOperationError, Ok);
+        }
+
+        [HttpDelete]
+        [Route("connection")]
+        public HttpResponseMessage Disconnect(Guid organizationId)
+        {
+            return _stsOrganizationSynchronizationService
+                .Disconnect(organizationId)
+                .Match(FromOperationError, Ok);
+        }
+
+        [HttpGet]
+        [Route("connection/update")]
+        public HttpResponseMessage GetUpdateConsequences(Guid organizationId, int? synchronizationDepth = null)
+        {
+            if (synchronizationDepth is < 1)
+            {
+                return BadRequest($"{nameof(synchronizationDepth)} must greater than 0");
+            }
+
+            return _stsOrganizationSynchronizationService
+                .GetConnectionExternalHierarchyUpdateConsequences(organizationId, synchronizationDepth.FromNullableValueType())
+                .Select(MapUpdateConsequencesResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPut]
+        [Route("connection")]
+        public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
+        {
+            throw new NotImplementedException("yet");
+        }
+
+        #region DTO Mapping
+        private static ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
+        {
+            var dtos = new List<ConnectionUpdateOrganizationUnitConsequenceDTO>();
+            dtos.AddRange(MapAddedOrganizationUnits(consequences));
+            dtos.AddRange(MapRenamedOrganizationUnits(consequences));
+            dtos.AddRange(MapMovedOrganizationUnits(consequences));
+            dtos.AddRange(MapRemovedOrganizationUnits(consequences));
+            dtos.AddRange(MapConvertedOrganizationUnits(consequences));
+            return new ConnectionUpdateConsequencesResponseDTO
+            {
+                Consequences = dtos
+            };
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .DeletedExternalUnitsBeingConvertedToNativeUnits
+                .Select(converted => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                {
+                    Name = converted.Name,
+                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Converted,
+                    Uuid = converted.ExternalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{converted.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .DeletedExternalUnitsBeingDeleted
+                .Select(deleted => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                {
+                    Name = deleted.Name,
+                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Deleted,
+                    Uuid = deleted.ExternalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{deleted.Name}' slettes."
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .OrganizationUnitsBeingMoved
+                .Select(moved =>
+                {
+                    var (movedUnit, oldParent, newParent) = moved;
+                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
+                    {
+                        Name = movedUnit.Name,
+                        Category = ConnectionUpdateOrganizationUnitChangeCategory.Moved,
+                        Uuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        Description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
+                    };
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .OrganizationUnitsBeingRenamed
+                .Select(renamed =>
+                {
+                    var (affectedUnit, oldName, newName) = renamed;
+                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
+                    {
+                        Name = oldName,
+                        Category = ConnectionUpdateOrganizationUnitChangeCategory.Renamed,
+                        Uuid = affectedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        Description = $"'{oldName}' omdøbes til '{newName}'"
+                    };
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .AddedExternalOrganizationUnits
+                .Select(added => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                {
+                    Name = added.unitToAdd.Name,
+                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Added,
+                    Uuid = added.unitToAdd.Uuid,
+                    Description = $"'{added.unitToAdd.Name}' tilføjes som underenhed til '{added.parent.Name}'"
+                }
+                )
+                .ToList();
+        }
+
+        private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
+        {
+            return new StsOrganizationOrgUnitDTO
             {
                 Uuid = organizationUnit.Uuid,
                 Name = organizationUnit.Name,
-                UserFacingKey = organizationUnit.UserFacingKey,
                 Children = organizationUnit.Children.Select(MapOrganizationUnitDTO).ToList()
             };
         }
+        #endregion DTO Mapping
     }
 }

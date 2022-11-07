@@ -4,5 +4,7 @@
        ui-select2="model.select2Config"
        ng-model="model.selectedElement"
        ng-change="model.elementSelected(model.selectedElement)"
-       ng-disabled="disabled" 
-       placeholder="{{::placeholder || ' '}}"/>
+       ng-disabled="disabled"
+       placeholder="{{::placeholder || ' '}}" />
+
+<span ng-if="optionDescription" class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> {{ optionDescription }}</span>

@@ -242,12 +242,9 @@
             if (!confirm('Er du sikker på, at du vil slette brugeren?')) {
                 return;
             }
+            
             this.userRoleAdministrationService.removeUser(this.loggedInUser.currentOrganizationId, this.userToModify.Id)
-                .then(success => {
-                    if (success) {
-                        this.$uibModalInstance.close();
-                    }
-                });
+                .then(success => this.closeModalOnSuccess(success));
         }
 
         deleteSelectedRoles() {
@@ -394,6 +391,12 @@
             const selectedAdminRoles = this.vmAdminRoot.rights.filter(r => r.selected);
 
             return selectedAdminRoles;
+        }
+
+        private closeModalOnSuccess(isSuccessful) {
+            if (isSuccessful) {
+                this.$uibModalInstance.close();
+            }
         }
     }
 

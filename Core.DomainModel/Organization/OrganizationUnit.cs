@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 // ReSharper disable VirtualMemberCallInConstructor
@@ -17,8 +20,22 @@ namespace Core.DomainModel.Organization
             OwnedTasks = new List<TaskRef>();
             DefaultUsers = new List<OrganizationRight>();
             Using = new List<ItSystemUsageOrgUnitUsage>();
-            Uuid = Guid.NewGuid();
+            var uuid = Guid.NewGuid();
+            Uuid = uuid;
+            Origin = OrganizationUnitOrigin.Kitos;
+            Children = new List<OrganizationUnit>();
+            ResponsibleForItContracts = new List<ItContract.ItContract>();
+            EconomyStreams = new List<EconomyStream>();
         }
+
+        /// <summary>
+        /// Determines the origin of the organization unit
+        /// </summary>
+        public OrganizationUnitOrigin Origin { get; set; }
+        /// <summary>
+        /// Determines the optional external origin-specific uuid
+        /// </summary>
+        public Guid? ExternalOriginUuid { get; set; }
 
         public string LocalId { get; set; }
 
@@ -45,14 +62,7 @@ namespace Core.DomainModel.Organization
         /// Local tasks that was created in this unit
         /// </summary>
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
-        /// <summary>
-        /// Gets or sets the delegated system usages.
-        /// </summary>
-        /// <value>
-        /// The delegated system usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
-
+        
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.
         /// </summary>
@@ -104,5 +114,45 @@ namespace Core.DomainModel.Organization
         }
 
         public Guid Uuid { get; set; }
+
+        public Maybe<OperationError> ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin origin, ExternalOrganizationUnit importRoot)
+        {
+            if (importRoot == null)
+            {
+                throw new ArgumentNullException(nameof(importRoot));
+            }
+            if (Origin == origin)
+            {
+                return new OperationError("Org unit already connected. Please do an update in stead", OperationFailure.BadState);
+            }
+
+            //Switch the origin of the root
+            Origin = origin;
+            ExternalOriginUuid = importRoot.Uuid;
+            Name = importRoot.Name;
+
+            foreach (var organizationUnit in importRoot.Children.Select(child => child.ToOrganizationUnit(origin, Organization)).ToList())
+            {
+                Children.Add(organizationUnit);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ConvertToKitosUnit()
+        {
+            if (Origin == OrganizationUnitOrigin.Kitos)
+            {
+                throw new InvalidOperationException("Already a KITOS unit");
+            }
+
+            Origin = OrganizationUnitOrigin.Kitos;
+            ExternalOriginUuid = null;
+        }
+
+        public bool IsUsed()
+        {
+            return Using.Any() || EconomyStreams.Any() || ResponsibleForItContracts.Any() || Rights.Any();
+        }
     }
 }

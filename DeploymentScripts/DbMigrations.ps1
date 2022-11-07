@@ -8,14 +8,15 @@ Function Run-DB-Migrations([bool]$newDb = $false, [string]$migrationsFolder, [st
         Write-Host "Disabling seed for new database"
         $Env:SeedNewDb="no"
     }
-    
+
     & "$migrationsFolder\ef6.exe"  `
         database update  `
         --assembly "$migrationsFolder\Infrastructure.DataAccess.dll"  `
         --connection-string "$connectionString"  `
         --connection-provider "System.Data.SqlClient"  `
-        --verbose  `
         --project-dir "$migrationsFolder"
+
+    # NOTE: add the --verbose flag to get full statement output (for debugging)
     
     if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO MIGRATE DB" }
 }

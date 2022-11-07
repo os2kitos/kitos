@@ -92,7 +92,6 @@
     <Compile Include="Mapping\ReadModelMappingHelpers.cs" />
     <Compile Include="Model\StsOrganization\CheckConnectionError.cs" />
     <Compile Include="Model\StsOrganization\ResolveOrganizationTreeError.cs" />
-    <Compile Include="Model\StsOrganization\StsOrganizationUnit.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
     <Compile Include="Notifications\UserNotificationService.cs" />
     <Compile Include="Organizations\IStsOrganizationCompanyLookupService.cs" />
@@ -263,7 +262,7 @@
       <Name>Core.Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">

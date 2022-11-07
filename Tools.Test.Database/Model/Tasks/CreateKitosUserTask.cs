@@ -82,7 +82,7 @@ namespace Tools.Test.Database.Model.Tasks
             var newRight = new OrganizationRight
             {
                 UserId = newUser.Id,
-                Role = _role,
+                Role = _role == OrganizationRole.GlobalAdmin ? OrganizationRole.User : _role,
                 OrganizationId = org.Id,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id

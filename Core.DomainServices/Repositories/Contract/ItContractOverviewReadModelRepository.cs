@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -92,32 +93,30 @@ namespace Core.DomainServices.Repositories.Contract
             return BeginQuery().Where(x => x.OptionExtendId == optionExtendTypeId);
         }
 
-        public IQueryable<ItContractOverviewReadModel> GetByItSystem(int itSystemId)
+        public IQueryable<int> GetSourceIdsByItSystem(int itSystemId)
         {
             var itSystem = _itSystemRepository.GetSystem(itSystemId);
-            var emptyQuery = Enumerable.Empty<ItContractOverviewReadModel>().AsQueryable();
+            var sourceIds = new List<int>();
             if (itSystem == null)
             {
-                return emptyQuery;
+                return sourceIds.AsQueryable();
             }
 
             var usageIds = itSystem.Usages.Select(x => x.Id).ToList();
 
             if (!usageIds.Any())
             {
-                return emptyQuery;
+                return sourceIds.AsQueryable();
             }
 
-            IQueryable<ItContractOverviewReadModel> query = null;
 
             foreach (var usageId in usageIds)
             {
-                var byUsageQuery = GetByItSystemUsage(usageId);
+                sourceIds.AddRange(GetByItSystemUsage(usageId).Select(x => x.SourceEntityId).ToList());
 
-                query = query == null ? byUsageQuery : query.Union(byUsageQuery);
             }
 
-            return query;
+            return sourceIds.AsQueryable();
 
         }
 

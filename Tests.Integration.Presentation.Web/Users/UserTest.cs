@@ -135,47 +135,13 @@ namespace Tests.Integration.Presentation.Web.Users
             var (_, userId, organization, originalEmail) = await CreatePrerequisitesAsync(userRole);
             var name = A<string>();
 
-            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
-            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
-            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
-            await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
-
-            SsoIdentityHelper.AddSsoIdentityToUser(userId);
+            await AssignRolesToUser(userId, organization.Id, name);
+            AssignSsoIdentityToUser(userId);
             
-            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
+            using var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
 
-            DatabaseAccess.MapFromEntitySet<User, User>(repository =>
-            {
-                var user = repository.AsQueryable().ById(userId);
-                if (user == null)
-                {
-                    throw new ArgumentException("Failed to find user with id", nameof(userId));
-                }
-
-                user.Transform(ProxyLoader.LoadReferencedEntities);
-
-                Assert.True(user.Deleted);
-                Assert.False(user.IsGlobalAdmin);
-                Assert.False(user.HasApiAccess);
-                Assert.False(user.HasStakeHolderAccess);
-
-                Assert.Contains("_deleted_user@kitos.dk", user.Email);
-                Assert.Empty(user.LastName);
-                Assert.Equal("Slettet bruger", user.Name);
-                Assert.NotNull(user.LockedOutDate);
-                Assert.NotNull(user.DeletedDate);
-                Assert.Null(user.PhoneNumber);
-
-                Assert.Empty(user.DataProcessingRegistrationRights);
-                Assert.Empty(user.OrganizationRights);
-                Assert.Empty(user.ItContractRights);
-                Assert.Empty(user.ItSystemRights);
-                Assert.Empty(user.OrganizationUnitRights);
-                Assert.Empty(user.SsoIdentities);
-
-                return user;
-            });
+            AssertUserIsDeleted(userId);
         }
 
         [Fact]
@@ -185,7 +151,7 @@ namespace Tests.Integration.Presentation.Web.Users
 
             var (cookie, userId, _, _) = await CreatePrerequisitesAsync(userRole);
 
-            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId, cookie);
+            using var deleteResponse = await UserHelper.SendDeleteUserAsync(userId, cookie);
             Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
         }
 
@@ -229,7 +195,7 @@ namespace Tests.Integration.Presentation.Web.Users
             var userRole = OrganizationRole.User;
             var (_, userId, org, _) = await CreatePrerequisitesAsync(userRole);
 
-            var response = await OrganizationHelper.SendGetUserOrganizationsRequestAsync(userId);
+            using var response = await OrganizationHelper.SendGetUserOrganizationsRequestAsync(userId);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var organizations = await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<OrganizationSimpleDTO>>();
@@ -238,6 +204,148 @@ namespace Tests.Integration.Presentation.Web.Users
             var organizationSimpleDtos = organizations.ToList();
             Assert.Contains(org.Id, organizationSimpleDtos.Select(x => x.Id));
             Assert.Single(organizationSimpleDtos);
+        }
+
+        [Fact]
+        public async Task Delete_User_From_Organization_As_GlobalAdmin()
+        {
+            var (testCookie, _, organization1, _) = await CreatePrerequisitesAsync(OrganizationRole.GlobalAdmin);
+
+            var userRole = OrganizationRole.User;
+            var (userId, _, _) = await HttpApi.CreateUserAndLogin(CreateEmail(), userRole, organization1.Id);
+
+            var organization2 = await CreateOrganizationAsync();
+            using var assignRoleResponse2 = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.User, organization2.Id);
+            Assert.Equal(HttpStatusCode.Created, assignRoleResponse2.StatusCode);
+
+            var name = A<string>();
+            await AssignRolesToUser(userId, organization1.Id, name);
+            await AssignRolesToUser(userId, organization2.Id, name);
+
+            AssignSsoIdentityToUser(userId);
+
+            using var deleteResponse1 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization2.Id);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse1.StatusCode);
+
+            AssertUserIsRemovedOnlyFromDesignatedOrganization(userId, organization2.Id, organization1.Id);
+
+            using var deleteResponse2 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization1.Id);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse2.StatusCode);
+
+            AssertUserIsDeleted(userId);
+        }
+
+        [Fact]
+        public async Task Delete_User_From_Organization_As_LocalAdmin()
+        {
+            var (testCookie, localAdminId, organization1, _) = await CreatePrerequisitesAsync(OrganizationRole.LocalAdmin);
+
+            var organization2 = await CreateOrganizationAsync();
+            using var assignLocalAdminRoleResponse1 = await HttpApi.SendAssignRoleToUserAsync(localAdminId, OrganizationRole.LocalAdmin, organization2.Id);
+            Assert.Equal(HttpStatusCode.Created, assignLocalAdminRoleResponse1.StatusCode);
+
+            var userRole = OrganizationRole.User;
+            var (userId, _, _) = await HttpApi.CreateUserAndLogin(CreateEmail(), userRole, organization1.Id);
+
+            using var assignRoleResponse2 = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.User, organization2.Id);
+            Assert.Equal(HttpStatusCode.Created, assignRoleResponse2.StatusCode);
+
+            var name = A<string>();
+            await AssignRolesToUser(userId, organization1.Id, name);
+            await AssignRolesToUser(userId, organization2.Id, name);
+
+            AssignSsoIdentityToUser(userId);
+
+            using var deleteResponse1 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization2.Id);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse1.StatusCode);
+
+            AssertUserIsRemovedOnlyFromDesignatedOrganization(userId, organization2.Id, organization1.Id);
+
+            using var deleteResponse2 = await UserHelper.SendDeleteUserAsync(userId, testCookie, organization1.Id);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse2.StatusCode);
+
+            AssertUserIsDeleted(userId);
+        }
+
+        private async Task AssignRolesToUser(int userId, int orgId, string name)
+        {
+            await RightsHelper.AddUserRole(userId, orgId, RightsType.ItContractRights, name);
+            await RightsHelper.AddUserRole(userId, orgId, RightsType.OrganizationUnitRights, name);
+            await RightsHelper.AddUserRole(userId, orgId, RightsType.ItSystemRights, name);
+            await RightsHelper.AddDprRoleToUser(userId, orgId, name);
+        }
+
+        private void AssignSsoIdentityToUser(int userId)
+        {
+            SsoIdentityHelper.AddSsoIdentityToUser(userId);
+        }
+
+        private void AssertUserIsDeleted(int userId)
+        {
+            DatabaseAccess.MapFromEntitySet<User, User>(repository =>
+            {
+                var user = repository.AsQueryable().ById(userId);
+                if (user == null)
+                {
+                    throw new ArgumentException("Failed to find user with id", nameof(userId));
+                }
+
+                user.Transform(ProxyLoader.LoadReferencedEntities);
+
+                Assert.True(user.Deleted);
+                Assert.False(user.IsGlobalAdmin);
+                Assert.False(user.HasApiAccess);
+                Assert.False(user.HasStakeHolderAccess);
+
+                Assert.Contains("_deleted_user@kitos.dk", user.Email);
+                Assert.Empty(user.LastName);
+                Assert.Equal("Slettet bruger", user.Name);
+                Assert.NotNull(user.LockedOutDate);
+                Assert.NotNull(user.DeletedDate);
+                Assert.Null(user.PhoneNumber);
+
+                Assert.Empty(user.DataProcessingRegistrationRights);
+                Assert.Empty(user.OrganizationRights);
+                Assert.Empty(user.ItContractRights);
+                Assert.Empty(user.ItSystemRights);
+                Assert.Empty(user.OrganizationUnitRights);
+                Assert.Empty(user.SsoIdentities);
+
+                return user;
+            });
+        }
+
+        private void AssertUserIsRemovedOnlyFromDesignatedOrganization(int userId, int deletedFromOrganizationId, int remainingOrganizationId)
+        {
+            DatabaseAccess.MapFromEntitySet<User, User>(repository =>
+            {
+                var user = repository.AsQueryable().ById(userId);
+                if (user == null)
+                {
+                    throw new ArgumentException("Failed to find user with id", nameof(userId));
+                }
+
+                user.Transform(ProxyLoader.LoadReferencedEntities);
+
+                var orgIds = user.GetOrganizationIds().ToList();
+                Assert.DoesNotContain(deletedFromOrganizationId, orgIds);
+                Assert.Contains(remainingOrganizationId, orgIds);
+                Assert.False(user.Deleted);
+
+                Assert.Empty(user.DataProcessingRegistrationRights.Where(x => x.Object.OrganizationId == deletedFromOrganizationId));
+                Assert.Empty(user.OrganizationRights.Where(x => x.OrganizationId == deletedFromOrganizationId));
+                Assert.Empty(user.ItContractRights.Where(x => x.Object.OrganizationId == deletedFromOrganizationId));
+                Assert.Empty(user.ItSystemRights.Where(x => x.Object.OrganizationId == deletedFromOrganizationId));
+                Assert.Empty(user.OrganizationUnitRights.Where(x => x.Object.OrganizationId == deletedFromOrganizationId));
+
+                Assert.NotEmpty(user.DataProcessingRegistrationRights.Where(x => x.Object.OrganizationId == remainingOrganizationId));
+                Assert.NotEmpty(user.OrganizationRights.Where(x => x.OrganizationId == remainingOrganizationId));
+                Assert.NotEmpty(user.ItContractRights.Where(x => x.Object.OrganizationId == remainingOrganizationId));
+                Assert.NotEmpty(user.ItSystemRights.Where(x => x.Object.OrganizationId == remainingOrganizationId));
+                Assert.NotEmpty(user.OrganizationUnitRights.Where(x => x.Object.OrganizationId == remainingOrganizationId));
+
+                return user;
+            });
         }
 
         private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization, string email)> CreatePrerequisitesAsync(OrganizationRole role, string email = "", string name = "", string lastName = "", bool hasApiAccess = false)

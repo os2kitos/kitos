@@ -16,12 +16,13 @@
             </div>
             <div class="panel-body">
                 <script type="text/ng-template" id="nodes_renderer.html">
-                    <div ui-tree-handle data-ng-click="chooseOrgUnit(node, $event)" class="tree-node tree-node-content"
+                    <div ui-tree-handle ng-click="chooseOrgUnit(node, $event); toggle(this);" class="tree-node tree-node-content"
                          ng-class="{
                                       'selected': node == chosenOrgUnit,
-                                      'hasWriteAccess': node.hasWriteAccess
+                                      'hasWriteAccess': node.hasWriteAccess,
+                                      'org-unit-origin-fk-org': showDifferenceBetweenOrgUnitOrigin === true && node.origin === 1
                                     }">
-                        <a class="small" ng-if="node.children && node.children.length > 0" data-nodrag ng-click="toggle(this)">
+                        <a class="small" ng-if="node.children && node.children.length > 0" data-nodrag>
                             <span class="glyphicon"
                                   ng-class="{
                                       'glyphicon-chevron-right': collapsed,
@@ -29,7 +30,7 @@
                                     }">
                             </span>
                         </a>
-                        {{ node.name }}
+                        {{node.name}}
                     </div>
                     <ol ui-tree-nodes="" data-ng-model="node.children" ng-class="{hidden: collapsed}">
                         <li collapsed="true" data-ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
@@ -45,6 +46,14 @@
                     <ol ui-tree-nodes="" data-ng-model="nodes" id="tree-root">
                         <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
                     </ol>
+                </div>
+                <div class="org-structure-legend" ng-if="showDifferenceBetweenOrgUnitOrigin">
+                    <div>
+                        <span class="org-structure-legend-color org-structure-legend-color-native-unit"></span> Enheder oprettet i KITOS
+                    </div>
+                    <div>
+                        <span class="org-structure-legend-color org-structure-legend-color-fk-org-unit"></span> Enheder synkroniseret fra FK Organisation
+                    </div>
                 </div>
             </div>
         </div>

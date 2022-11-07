@@ -504,6 +504,7 @@ module Kitos.Utility.KendoGrid {
         launch(): void;
         withUser(user: Services.IUser): IKendoGridLauncher<TDataSource>;
         withGridBinding(gridBinding: IGridViewAccess<TDataSource>): IKendoGridLauncher<TDataSource>;
+        withArrayDataSource(arrayDataSource: Array<TDataSource>): IKendoGridLauncher<TDataSource>;
         withStandardSorting(sourceField: string): IKendoGridLauncher<TDataSource>;
         withEntityTypeName(name: string): IKendoGridLauncher<TDataSource>;
         withExcelOutputName(name: string): IKendoGridLauncher<TDataSource>;
@@ -517,6 +518,12 @@ module Kitos.Utility.KendoGrid {
         withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource>;
         withOverviewType(overviewType: Models.Generic.OverviewType): IKendoGridLauncher<TDataSource>;
+        withFlexibleWidth(): IKendoGridLauncher<TDataSource>;
+        resetAnySavedSettings(): IKendoGridLauncher<TDataSource>;
+        withoutColumnToggling(): IKendoGridLauncher<TDataSource>;
+        withoutPersonalFilterOptions(): IKendoGridLauncher<TDataSource>;
+        withoutGridResetControls(): IKendoGridLauncher<TDataSource>;
+        withDefaultPageSize(pageSize: number): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
@@ -535,6 +542,13 @@ module Kitos.Utility.KendoGrid {
         private parameterMapper: ParameterMapper = (data, type) => null;
         private overviewType: Models.Generic.OverviewType = null;
         private postCreationActions: Array<(gridBinding: IGridViewAccess<TDataSource>) => void> = [];
+        private arrayDataSource: Array<TDataSource> | null = null;
+        private flexibleWidth: boolean = false;
+        private preLaunchActions: Array<Function> = [];
+        private withColumnToggling: boolean = true;
+        private withPersonalFilterOptions: boolean = true;
+        private withGridResetControls: boolean = true;
+        private defaultPageSize: number = 100;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -547,6 +561,41 @@ module Kitos.Utility.KendoGrid {
             private readonly $window: ng.IWindowService
         ) {
 
+        }
+
+        withDefaultPageSize(pageSize: number): IKendoGridLauncher<TDataSource> {
+            this.defaultPageSize = pageSize;
+            return this;
+        }
+
+        withoutPersonalFilterOptions(): IKendoGridLauncher<TDataSource> {
+            this.withPersonalFilterOptions = false;
+            return this;
+        }
+
+        withoutGridResetControls(): IKendoGridLauncher<TDataSource> {
+            this.withGridResetControls = false;
+            return this;
+        }
+
+        withoutColumnToggling(): IKendoGridLauncher<TDataSource> {
+            this.withColumnToggling = false;
+            return this;
+        }
+        resetAnySavedSettings(): IKendoGridLauncher<TDataSource> {
+            this.preLaunchActions.push(() => this.gridState.reset());
+            return this;
+        }
+
+        withFlexibleWidth(): IKendoGridLauncher<TDataSource> {
+            this.flexibleWidth = true;
+            return this;
+        }
+
+        withArrayDataSource(arrayDataSource: TDataSource[]): IKendoGridLauncher<TDataSource> {
+            if (!arrayDataSource) throw "arrayDataSource must be defined";
+            this.arrayDataSource = arrayDataSource;
+            return this;
         }
 
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource> {
@@ -765,8 +814,10 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("$scope", this.$scope);
             this.checkRequiredField("storageKey", this.storageKey);
             this.checkRequiredField("entityTypeName", this.entityTypeName);
-            this.checkRequiredField("urlFactory", this.urlFactory);
-            this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
+            if (!this.arrayDataSource) {
+                this.checkRequiredField("urlFactory", this.urlFactory);
+                this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
+            }
             this.checkRequiredField("gridBinding", this.gridBinding);
 
             this.$scope.kendoVm = {
@@ -783,17 +834,22 @@ module Kitos.Utility.KendoGrid {
                 this.customToolbarEntries.unshift(localAdminDropdown);
             }
 
-            const filterDropdown = this.setupFilterDropdown();
-            this.customToolbarEntries.unshift(filterDropdown);
+            if (this.withPersonalFilterOptions) {
+                const filterDropdown = this.setupFilterDropdown();
+                this.customToolbarEntries.unshift(filterDropdown);
+            }
 
             var toolbar = [
-                {
+                
+            ];
+            if (this.withGridResetControls) {
+                toolbar.push({
                     name: "clearFilter",
                     text: "Gendan kolonneopsætning",
                     template:
                         "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
-                }
-            ];
+                });
+            }
 
             //Add the excel export button with multiple options
             const excelExportDropdownEntry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid);
@@ -914,37 +970,44 @@ module Kitos.Utility.KendoGrid {
                 });
 
             //Build the grid
-            const defaultPageSize = 100;
+            const defaultPageSize = this.defaultPageSize;
             const validPageSizes = [10, 25, 50, 100, 200, "all"];
+            const dataSource: any | kendo.data.DataSource = {
+
+            };
+            if (this.arrayDataSource) {
+                dataSource.data = this.arrayDataSource;
+            } else {
+                dataSource.type = "odata-v4";
+                dataSource.transport = {
+                    read: {
+                        url: options => this.urlFactory(options),
+                        dataType: "json"
+                    },
+                    parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data, type)
+                };
+                dataSource.sort = {
+                    field: this.standardSortingSourceField,
+                    dir: "asc"
+                };
+                dataSource.pageSize = defaultPageSize;
+                dataSource.serverPaging = true;
+                dataSource.serverSorting = true;
+                dataSource.serverFiltering = true;
+                dataSource.schema = {
+                    model: {
+                        fields: schemaFields,
+                    },
+                    parse: response => {
+                        response.value = this.responseParser(response.value);
+                        return response;
+                    }
+                };
+            }
+
             const mainGridOptions: IKendoGridOptions<TDataSource> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
-                dataSource: {
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: options => this.urlFactory(options),
-                            dataType: "json"
-                        },
-                        parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data, type)
-                    },
-                    sort: {
-                        field: this.standardSortingSourceField,
-                        dir: "asc"
-                    },
-                    pageSize: defaultPageSize,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true,
-                    schema: {
-                        model: {
-                            fields: schemaFields,
-                        },
-                        parse: response => {
-                            response.value = this.responseParser(response.value);
-                            return response;
-                        }
-                    }
-                },
+                dataSource: dataSource,
                 toolbar: toolbar,
                 excel: {
                     fileName: this.excelOutputName
@@ -971,8 +1034,7 @@ module Kitos.Utility.KendoGrid {
                     }
                 },
                 groupable: false,
-                columnMenu: true,
-                height: this.$window.innerHeight - 200,
+                columnMenu: this.withColumnToggling,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -983,32 +1045,39 @@ module Kitos.Utility.KendoGrid {
                 columns: columns,
             };
 
+            if (!this.flexibleWidth) {
+                mainGridOptions.height = this.$window.innerHeight - 200;
+            }
+
             this.gridState
                 .applySavedGridOptions(mainGridOptions)
                 .then((settingsToBeLoadedAfterRendering) => {
                     //Saved indexes must be applied after rendering since the map only contains values for visible columns. sorting beforehand will move all currently invisible columns out of the original order, and that will affect the filter menu.
                     this.postCreationActions.push(access => {
                         const createdColumns = access.mainGrid.columns;
-                        settingsToBeLoadedAfterRendering.columnOrder.forEach(savedColumnOrder => {
-                            var columnIndex = this._.findIndex(createdColumns, column => {
-                                if (!column.hasOwnProperty("persistId")) {
-                                    console.error(`Unable to find persistId property in grid column with field=${column.field}`);
-                                    return false;
-                                }
+                        settingsToBeLoadedAfterRendering
+                            .columnOrder
+                            .sort((a, b) => a.columnIndex - b.columnIndex) //ascending order - otherwise reordering will nor work as expected
+                            .forEach(savedColumnOrder => {
+                                var columnIndex = this._.findIndex(createdColumns, column => {
+                                    if (!column.hasOwnProperty("persistId")) {
+                                        console.error(`Unable to find persistId property in grid column with field=${column.field}`);
+                                        return false;
+                                    }
 
-                                return column.persistId === savedColumnOrder.persistId;
-                            });
-                            if (columnIndex !== -1) {
-                                var columnObj = createdColumns[columnIndex];
-                                // reorder column
-                                if (savedColumnOrder.columnIndex !== columnIndex) {
-                                    // check if index is out of bounds
-                                    if (savedColumnOrder.columnIndex < createdColumns.length) {
-                                        access.mainGrid.reorderColumn(savedColumnOrder.columnIndex, columnObj);
+                                    return column.persistId === savedColumnOrder.persistId;
+                                });
+                                if (columnIndex !== -1) {
+                                    var columnObj = createdColumns[columnIndex];
+                                    // reorder column
+                                    if (savedColumnOrder.columnIndex !== columnIndex) {
+                                        // check if index is out of bounds
+                                        if (savedColumnOrder.columnIndex < createdColumns.length) {
+                                            access.mainGrid.reorderColumn(savedColumnOrder.columnIndex, columnObj);
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
                     });
 
                     this.postCreationActions.push(_ => {
@@ -1044,6 +1113,7 @@ module Kitos.Utility.KendoGrid {
                     });
                 }
             });
+            this.preLaunchActions.forEach(action => action());
             this.build();
         }
 

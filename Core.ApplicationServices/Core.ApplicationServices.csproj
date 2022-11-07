@@ -146,6 +146,7 @@
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
+    <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
@@ -268,10 +269,11 @@
     <Compile Include="References\ReferenceService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
-    <Compile Include="UIConfiguration\Handlers\HandleUserBeingDeleted.cs" />
+    <Compile Include="Users\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="UIConfiguration\IUIModuleCustomizationService.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
     <Compile Include="UserService.cs" />
+    <Compile Include="Users\Handlers\RemoveUserFromOrganizationCommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
@@ -279,7 +281,7 @@
       <Name>Core.Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
