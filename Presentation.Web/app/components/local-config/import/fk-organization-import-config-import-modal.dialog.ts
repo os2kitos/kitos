@@ -106,7 +106,7 @@
             this.updating = true;
             this.busy = true;
 
-            this.stsOrganizationSyncService.updateConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+            return this.stsOrganizationSyncService.updateConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
                 .then(() => {
                     this.closeDialog();
                 }, error => {
@@ -142,7 +142,7 @@
                         this.consequencesAwaitingApproval = consequences.consequences;
                         this.busy = false;
                     } else {
-                        this.performUpdate();
+                        return this.performUpdate();
                     }
                 }, error => {
                     console.error(error);

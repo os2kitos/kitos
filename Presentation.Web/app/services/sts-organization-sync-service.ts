@@ -94,7 +94,7 @@
         }
 
         updateConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void> {
-            return this.apiUseCaseFactory.createCreation("Forbindelse til FK Organisation", () => {
+            return this.apiUseCaseFactory.createUpdate("Forbindelse til FK Organisation", () => {
                 return this.genericApiWrapper.put(`${this.getBasePath(organizationUuidid)}/connection`, {
                     synchronizationDepth: synchronizationDepth
                 });
