@@ -43,8 +43,5 @@ namespace Core.ApplicationServices.SystemUsage
         Maybe<OperationError> TransferRelevantUsage(int unitId, OrganizationUnit targetUnit, int id);
         Maybe<OperationError> RemoveResponsibleUsage(int id);
         Maybe<OperationError> RemoveRelevantUnit(int id, int unitId);
-
-        IEnumerable<ItSystemUsage> GetSystemsByResponsibleUnitId(int unitId);
-        IEnumerable<ItSystemUsage> GetSystemsByRelevantUnitId(int unitId);
     }
 }

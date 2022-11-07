@@ -1,34 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Organizations
 {
     public class OrganizationUnitService : IOrganizationUnitService
     {
-        private readonly IEntityIdentityResolver _identityResolver;
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IItContractService _contractService;
         private readonly IItSystemUsageService _usageService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
+        private readonly IDomainEvents _domainEvents;
+        private readonly IDatabaseControl _databaseControl;
 
-        public OrganizationUnitService(IEntityIdentityResolver identityResolver, 
-            IOrganizationService organizationService,
+        public OrganizationUnitService(IOrganizationService organizationService,
             IOrganizationRightsService organizationRightsService, 
             IItContractService contractService,
             IItSystemUsageService usageService, 
             IAuthorizationContext authorizationContext, 
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager, 
+            IDomainEvents domainEvents,
+            IDatabaseControl databaseControl)
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;
@@ -36,40 +39,31 @@ namespace Core.ApplicationServices.Organizations
             _usageService = usageService;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
-            _identityResolver = identityResolver;
+            _domainEvents = domainEvents;
+            _databaseControl = databaseControl;
         }
 
-        public Result<OrganizationRegistrationDetails, OperationError> GetOrganizationRegistrations(int organizationId, int unitId)
+        public Result<OrganizationRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
         {
-            return GetOrganization(organizationId, OrganizationDataReadAccessLevel.All)
-                .Match
-                (
-                    _ => GetOrganziationUnit(unitId),
-                    error => error
-                )
-                .Match
-                (
-                    unit => _authorizationContext.AllowReads(unit) == false
-                        ? new OperationError("User is not allowed to read the unit", OperationFailure.Forbidden)
-                        : Result<OrganizationRegistrationDetails, OperationError>.Success(unit.GetUnitRegistrations()),
-                    error => error
-                );
+            return _organizationService.GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(_ => _organizationService.GetOrganizationUnit(unitUuid))
+                .Bind(unit => Result<OrganizationRegistrationDetails, OperationError>.Success(unit.GetUnitRegistrations()));
         }
 
-        public Maybe<OperationError> DeleteSelectedOrganizationRegistrations(int organizationId, int unitId, OrganizationRegistrationChangeParameters parameters)
+        public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationRegistrationChangeParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
 
-            var canModifyOrganization = CanModifyOrganization(organizationId);
-            if (canModifyOrganization.HasValue)
+            var authorizeResult = GetOrganizationAndAuthorizeModification(organizationUuid);
+            if (authorizeResult.Failed)
             {
-                return canModifyOrganization.Value;
+                return authorizeResult.Error;
             }
 
-            var unit = GetOrganziationUnit(unitId);
-            if (unit.Failed)
+            var unit = authorizeResult.Value.GetOrganizationUnit(unitUuid);
+            if (unit.IsNone)
             {
-                return unit.Error;
+                return new OperationError($"Unit with id: {unit.Value.Id} was not found", OperationFailure.NotFound);
             }
 
             if (!_authorizationContext.AllowDelete(unit.Value))
@@ -77,11 +71,11 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
             
-            var result =  _organizationRightsService.RemoveUnitRightsByIds(organizationId, parameters.OrganizationUnitRights)
+            var result =  _organizationRightsService.RemoveUnitRightsByIds(organizationUuid, unitUuid, parameters.OrganizationUnitRights)
                 .Match
                 (
                     error => error,
-                () => RemovePayments(parameters.PaymentRegistrationDetails)
+                () => RemovePaymentResponsibleUnits(parameters.PaymentRegistrationDetails)
                 )
                 .Match
                 (
@@ -96,7 +90,7 @@ namespace Core.ApplicationServices.Organizations
                 .Match
                 (
                     error => error,
-                    () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unitId)
+                    () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unit.Value.Id)
                 );
 
             if (result.HasValue)
@@ -104,52 +98,50 @@ namespace Core.ApplicationServices.Organizations
                 return result.Value;
             }
 
+            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unit.Value));
+            _databaseControl.SaveChanges();
             transaction.Commit();
+
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> DeleteAllUnitOrganizationRegistrations(int organizationId, int unitId)
+        public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid)
         {
             using var transaction = _transactionManager.Begin();
 
-            var canModifyOrganization = CanModifyOrganization(organizationId);
-            if (canModifyOrganization.HasValue)
-            {
-                return canModifyOrganization.Value;
-            }
-
-            var deleteRegistrationsResult = GetOrganizationRegistrations(organizationId, unitId)
-                .Match(val => DeleteSelectedOrganizationRegistrations(organizationId, unitId, ToChangeParametersFromRegistrationDetails(val)),
+            var deleteRegistrationsError = GetRegistrations(organizationUuid, unitUuid)
+                .Match(val => DeleteRegistrations(organizationUuid, unitUuid, ToChangeParametersFromRegistrationDetails(val)),
                     error => error);
 
-            if (deleteRegistrationsResult.HasValue)
-                return deleteRegistrationsResult.Value;
-            
+            if (deleteRegistrationsError.HasValue)
+                return deleteRegistrationsError.Value;
+
+            _databaseControl.SaveChanges();
             transaction.Commit();
 
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> TransferSelectedOrganizationRegistrations(int organizationId, int unitId, int targetUnitId, OrganizationRegistrationChangeParameters parameters)
+        public Maybe<OperationError> TransferRegistrations(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, OrganizationRegistrationChangeParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
 
-            var canModifyOrganization = CanModifyOrganization(organizationId);
-            if (canModifyOrganization.HasValue)
+            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
+            if (organizationResult.Failed)
             {
-                return canModifyOrganization.Value;
+                return organizationResult.Error;
             }
 
-            var unit = GetOrganziationUnit(unitId);
-            if (unit.Failed)
+            var unit = organizationResult.Value.GetOrganizationUnit(targetUnitUuid);
+            if (unit.IsNone)
             {
-                return unit.Error;
+                return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
             }
 
-            var targetUnit = GetOrganziationUnit(targetUnitId);
-            if (targetUnit.Failed)
+            var targetUnit = organizationResult.Value.GetOrganizationUnit(targetUnitUuid);
+            if (targetUnit.IsNone)
             {
-                return targetUnit.Error;
+                return new OperationError($"Unit with uuid: {targetUnitUuid} was not found", OperationFailure.NotFound);
             }
 
             if (!_authorizationContext.AllowModify(unit.Value))
@@ -161,16 +153,16 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            var result = _organizationRightsService.TransferUnitRightsByIds(organizationId, targetUnitId, parameters.OrganizationUnitRights)
+            var result = _organizationRightsService.TransferUnitRightsByIds(organizationUuid, unitUuid, targetUnitUuid, parameters.OrganizationUnitRights)
                 .Match
                 (
                     error => error,
-                    () => TransferPayments(targetUnitId, parameters.PaymentRegistrationDetails)
+                    () => TransferPayments(targetUnitUuid, parameters.PaymentRegistrationDetails)
                 )
                 .Match
                 (
                     error => error,
-                    () => TransferContractRegistrations(targetUnitId, parameters.ItContractRegistrations)
+                    () => TransferContractRegistrations(targetUnitUuid, parameters.ItContractRegistrations)
                 )
                 .Match
                 (
@@ -180,7 +172,7 @@ namespace Core.ApplicationServices.Organizations
                 .Match
                 (
                     error => error,
-                    () => TransferSystemRelevantRegistrations(unitId, targetUnit.Value, parameters.RelevantSystems)
+                    () => TransferSystemRelevantRegistrations(unit.Value.Id, targetUnit.Value, parameters.RelevantSystems)
                 );
 
             if (result.HasValue)
@@ -188,47 +180,37 @@ namespace Core.ApplicationServices.Organizations
                 return result.Value;
             }
 
+            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unit.Value));
+            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(targetUnit.Value));
+            _databaseControl.SaveChanges();
             transaction.Commit();
             return Maybe<OperationError>.None;
         }
 
-        private Result<OrganizationUnit, OperationError> GetOrganziationUnit(int unitId)
+        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid, OrganizationDataReadAccessLevel? accessLevel = null)
         {
-            return _identityResolver.ResolveUuid<OrganizationUnit>(unitId)
-                .Match(x => _organizationService.GetOrganizationUnit(x),
-                    () => new OperationError($"Organization unit with id: {unitId} not found", OperationFailure.NotFound));
-        }
-
-        private Result<Organization, OperationError> GetOrganization(int id, OrganizationDataReadAccessLevel? accessLevel = null)
-        {
-            return _identityResolver.ResolveUuid<Organization>(id)
-                .Match(x => _organizationService.GetOrganization(x, accessLevel),
-                    () => new OperationError($"Organization with id: {id} not found", OperationFailure.NotFound));
-        }
-
-        private Maybe<OperationError> CanModifyOrganization(int id, OrganizationDataReadAccessLevel? accessLevel = null)
-        {
-            return GetOrganization(id, accessLevel)
+            return _organizationService.GetOrganization(uuid, accessLevel)
                 .Match
                 (
-                    organization => _authorizationContext.AllowModify(organization) == false 
-                        ? new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden) 
-                        : Maybe<OperationError>.None,
+                    organization => 
+                        _authorizationContext.AllowModify(organization) == false 
+                            ? new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden) 
+                            : Result<Organization, OperationError>.Success(organization),
                     error => error
                 );
         }
 
-        private Maybe<OperationError> RemovePayments(IEnumerable<PaymentChangeParameters> payments)
+        private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)
         {
             foreach (var payment in payments)
             {
-                var removeInternalPaymentsResult = _contractService.RemovePaymentResponsibleUnits(payment.ItContractId, true, payment.InternalPayments);
-                if (removeInternalPaymentsResult.HasValue)
-                    return removeInternalPaymentsResult.Value;
+                var removeInternalPaymentsError = _contractService.RemovePaymentResponsibleUnits(payment.ItContractId, true, payment.InternalPayments);
+                if (removeInternalPaymentsError.HasValue)
+                    return removeInternalPaymentsError.Value;
 
-                var removeExternalPaymentsResult = _contractService.RemovePaymentResponsibleUnits(payment.ItContractId, false, payment.ExternalPayments);
-                if (removeExternalPaymentsResult.HasValue)
-                    return removeExternalPaymentsResult.Value;
+                var removeExternalPaymentsError = _contractService.RemovePaymentResponsibleUnits(payment.ItContractId, false, payment.ExternalPayments);
+                if (removeExternalPaymentsError.HasValue)
+                    return removeExternalPaymentsError.Value;
             }
 
             return Maybe<OperationError>.None;
@@ -238,9 +220,9 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var contractId in contractIds)
             {
-                var deleteResult = _contractService.RemoveContractResponsibleUnit(contractId);
-                if (deleteResult.HasValue)
-                    return deleteResult.Value;
+                var deleteError = _contractService.RemoveContractResponsibleUnit(contractId);
+                if (deleteError.HasValue)
+                    return deleteError.Value;
             }
 
             return Maybe<OperationError>.None;
@@ -250,9 +232,9 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var systemId in systemIds)
             {
-                var deleteResult = _usageService.RemoveRelevantUnit(systemId, unitId);
-                if (deleteResult.HasValue)
-                    return deleteResult.Value;
+                var deleteError = _usageService.RemoveRelevantUnit(systemId, unitId);
+                if (deleteError.HasValue)
+                    return deleteError.Value;
             }
 
             return Maybe<OperationError>.None;
@@ -262,25 +244,25 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var systemId in systemIds)
             {
-                var deleteResult = _usageService.RemoveResponsibleUsage(systemId);
-                if (deleteResult.HasValue)
-                    return deleteResult.Value;
+                var deleteError = _usageService.RemoveResponsibleUsage(systemId);
+                if (deleteError.HasValue)
+                    return deleteError.Value;
             }
 
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> TransferPayments(int targetUnitId, IEnumerable<PaymentChangeParameters> payments)
+        private Maybe<OperationError> TransferPayments(Guid targetUnitUuid, IEnumerable<PaymentChangeParameters> payments)
         {
             foreach (var payment in payments)
             {
-                var transferInternalPaymentsResult = _contractService.TransferPayments(payment.ItContractId, targetUnitId, true, payment.InternalPayments);
-                if (transferInternalPaymentsResult.HasValue)
-                    return transferInternalPaymentsResult.Value;
+                var transferInternalPaymentsError = _contractService.TransferPayments(payment.ItContractId, targetUnitUuid, true, payment.InternalPayments);
+                if (transferInternalPaymentsError.HasValue)
+                    return transferInternalPaymentsError.Value;
 
-                var transferExternalPaymentsResult = _contractService.TransferPayments(payment.ItContractId, targetUnitId, false, payment.ExternalPayments);
-                if (transferExternalPaymentsResult.HasValue)
-                    return transferExternalPaymentsResult.Value;
+                var transferExternalPaymentsError = _contractService.TransferPayments(payment.ItContractId, targetUnitUuid, false, payment.ExternalPayments);
+                if (transferExternalPaymentsError.HasValue)
+                    return transferExternalPaymentsError.Value;
             }
 
             return Maybe<OperationError>.None;
@@ -290,21 +272,21 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var systemId in systemIds)
             {
-                var transferResult = _usageService.TransferResponsibleUsage(targetUnit, systemId);
-                if (transferResult.HasValue)
-                    return transferResult.Value;
+                var transferError = _usageService.TransferResponsibleUsage(targetUnit, systemId);
+                if (transferError.HasValue)
+                    return transferError.Value;
             }
 
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> TransferContractRegistrations(int targetUnitId, IEnumerable<int> contractIds)
+        private Maybe<OperationError> TransferContractRegistrations(Guid targetUnitUuid, IEnumerable<int> contractIds)
         {
             foreach (var contractId in contractIds)
             {
-                var transferResult = _contractService.SetContractResponsibleUnit(contractId, targetUnitId);
-                if (transferResult.HasValue)
-                    return transferResult.Value;
+                var transferError = _contractService.SetContractResponsibleUnit(contractId, targetUnitUuid);
+                if (transferError.HasValue)
+                    return transferError.Value;
             }
 
             return Maybe<OperationError>.None;
@@ -314,9 +296,9 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var systemId in systemIds)
             {
-                var transferResult = _usageService.TransferRelevantUsage(unitId, targetUnit, systemId);
-                if (transferResult.HasValue)
-                    return transferResult.Value;
+                var transferError = _usageService.TransferRelevantUsage(unitId, targetUnit, systemId);
+                if (transferError.HasValue)
+                    return transferError.Value;
             }
 
             return Maybe<OperationError>.None;

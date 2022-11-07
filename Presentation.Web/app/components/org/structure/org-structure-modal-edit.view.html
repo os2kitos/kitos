@@ -22,7 +22,7 @@
                                 Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underenhed til {{::orgUnit.oldName}}.
                             </p>
                             <p class="help-block" ng-if="!canChangeParent">
-                                Du kan ikke ændre {{ ::orgUnit.oldName + 's' }} overordnet organisationsenhed.
+                                Du kan ikke ændre overordnet organisationsenhed for "{{ ::orgUnit.oldName}}"
                                 <span data-ng-show="!isAdmin">Kontakt en lokal administrator.</span>
                             </p>
                         </div>
@@ -61,7 +61,7 @@
                     </a>
                 </div>
                 <div ng-if="isRegistrationDetailsExpanded" class="panel-body">
-                    <org-unit-migration organization-id="orgUnit.orgId" unit-id="orgUnit.id" unit-name="{{::orgUnit.oldName}}" close-modal="cancel()"/>
+                    <org-unit-migration organization-id="orgUnit.orgId" organization-uuid="{{::orgUnit.orgUuid}}" unit-uuid="{{::orgUnit.uuid}}" unit-name="{{::orgUnit.oldName}}" close-modal="cancel()"/>
                 </div>
             </div>
 </form>

@@ -5,7 +5,8 @@
         return{
             bindings: {
                 organizationId: "<",
-                unitId: "<",
+                organizationUuid: "@",
+                unitUuid: "@",
                 unitName: "@",
                 closeModal: "&",
             },
@@ -32,14 +33,16 @@
 
     interface IOrganizationUnitMigrationController extends ng.IComponentController {
         organizationId: number;
-        unitId: number;
+        organizationUuid: string;
+        unitUuid: string;
         unitName: string;
         closeModal: () => void;
     }
 
     class OrganizationUnitMigrationController implements IOrganizationUnitMigrationController {
         organizationId: number | null = null;
-        unitId: number | null = null;
+        organizationUuid: string;
+        unitUuid: string | null = null;
         unitName: string | null = null;
         closeModal: () => void;
         anySelections = false;
@@ -76,8 +79,8 @@
             if (this.organizationId === null) {
                 console.error("missing attribute: 'organizationId'");
             }
-            if (this.unitId === null) {
-                console.error("missing attribute: 'unitId'");
+            if (this.unitUuid === null) {
+                console.error("missing attribute: 'unitUuid'");
             }
             if (this.unitName === null) {
                 console.error("missing attribute: 'unitName'");
@@ -103,16 +106,16 @@
             this.isBusy = true;
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
+            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.refreshData(); 
+                    this.isBusy = false;
                 },
                 error => {
                     console.error(error);
                     this.notify.addErrorMessage("Delete selected failed");
+                    this.isBusy = false;
                 });
-
-            this.isBusy = false;
         }
 
         transfer() {
@@ -127,24 +130,24 @@
             this.isBusy = true;
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationId, this.unitId, this.selectedOrg.id, request)
+            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, this.selectedOrg.id, request)
                 .then(() => {
                     this.selectedOrg = null;
                     this.refreshData();
+                    this.isBusy = false;
                 }, error => {
                     console.log(error);
                     this.notify.addErrorMessage("Transfer failed");
+                    this.isBusy = false;
                 });
-
-            this.isBusy = false;
         }
 
         setSelectedOrg() {
             if (!this.selectedOrg?.id)
                 return;
-            if (parseInt(this.selectedOrg.id) === this.unitId) {
+            if (this.selectedOrg.id === this.unitUuid) {
                 this.selectedOrg = null;
-                this.notify.addErrorMessage("You cannot choose the current unit");
+                this.notify.addErrorMessage("Du kan ikke overføre til denne enhed");
                 return;
             }
             const selectedRegistrations = this.collectSelectedRegistrations();
@@ -292,7 +295,7 @@
         }
 
         private getData(): ng.IPromise<void> {
-            return this.organizationRegistrationsService.getRegistrations(this.organizationId, this.unitId).then(response => {
+            return this.organizationRegistrationsService.getRegistrations(this.organizationUuid, this.unitUuid).then(response => {
                 this.roles.root.children = this.mapDtoWithUserFullNameToOptions(response.organizationUnitRights);
                 this.getPaymentOptions(response.payments);
                 this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);

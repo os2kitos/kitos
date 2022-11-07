@@ -63,32 +63,32 @@ namespace Core.DomainServices.Organizations
             return unit.SearchAncestry(ancestor => ancestor.Id == ancestorUnitId).HasValue;
         }
 
-        public void Delete(int organizationId, int id)
+        public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
         {
             using var transaction = _transactionManager.Begin();
 
-            var deleteRegistrationsResult = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(new RemoveOrganizationUnitRegistrationsCommand(organizationId, id));
-            if (deleteRegistrationsResult.HasValue)
-                throw new ArgumentException(deleteRegistrationsResult.Value.Message.GetValueOrDefault());
+            var organization = _organizationRepository.GetByKey(organizationUuid);
+            if(organization == null)
+                return new OperationError($"Organization with uuid: {organizationUuid} not found", OperationFailure.NotFound);
+            var unit = organization.GetOrganizationUnit(unitUuid);
+            if(unit.IsNone)
+                return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
 
-            var organization = _organizationRepository.GetByKey(organizationId);
-            var result = organization.RemoveOrganizationUnit(id);
-            if (result.Failed)
-                throw new ArgumentException(result.Error.Message.GetValueOrDefault());
+            var deleteRegistrationsError = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(new RemoveOrganizationUnitRegistrationsCommand(organization.Uuid, unitUuid));
+            if (deleteRegistrationsError.HasValue)
+                return deleteRegistrationsError.Value;
 
-            var orgUnit = result.Value;
             
-            // attach children to parent of this instance to avoid orphans
-            // parent id will never be null because users aren't allowed to delete the root node
-            foreach (var child in orgUnit.Children)
-            {
-                child.ParentId = orgUnit.ParentId;
-            }
-
-            _orgUnitRepository.DeleteWithReferencePreload(orgUnit);
+            var result = organization.RemoveOrganizationUnit(unit.Value.Id);
+            if (result.Failed)
+                return result.Error;
+            
+            _orgUnitRepository.DeleteWithReferencePreload(result.Value);
             _orgUnitRepository.Save();
 
             transaction.Commit();
+
+            return Maybe<OperationError>.None;
         }
 
         public IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization)

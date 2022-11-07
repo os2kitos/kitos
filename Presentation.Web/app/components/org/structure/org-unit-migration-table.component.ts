@@ -28,8 +28,8 @@
         title: string;
         options: IOrganizationUnitMigrationOptions;
         configuration: IMigrationTableColumn[];
-        unitId: number;
-        organizationId: number;
+        unitUuid: string;
+        organizationUuid: string;
         closeModal: () => void;
     }
 
@@ -37,15 +37,16 @@
         title: string | null = null;
         options: IOrganizationUnitMigrationOptions | null;
         configuration: IMigrationTableColumn[] | null = null;
-        unitId: number | null = null;
-        organizationId: number | null = null;
+        unitUuid: string | null = null;
+        organizationUuid: string | null = null;
         closeModal: () => void;
         root: IOrganizationUnitMigrationRoot;
 
-        static $inject: string[] = ["organizationRegistrationsService", "notify", "$state"];
+        static $inject: string[] = ["organizationRegistrationsService", "notify", "$state", "$window"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
             private readonly notify,
-            private readonly $state) {
+            private readonly $state,
+            private readonly $window) {
         }
 
         $onInit() {
@@ -58,10 +59,10 @@
             if (this.configuration === null) {
                 console.error("missing migration table attribute: 'configuration'");
             }
-            if (this.unitId === null) {
-                console.error("missing migration table attribute: 'unitId'");
+            if (this.unitUuid === null) {
+                console.error("missing migration table attribute: 'unitUuid'");
             }
-            if (this.organizationId === null) {
+            if (this.organizationUuid === null) {
                 console.error("missing migration table attribute: 'organizationId'");
             }
 
@@ -95,21 +96,25 @@
             const request = this.createChangeRequest(registration);
             registration.selected = false;
 
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
+            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
-                        this.options.refreshData();
-                    },
-                    error => {
-                        console.log(error);
-                        this.notify.addErrorMessage("Failed to deleted the selected unit");
-                    });
+                    this.options.refreshData();
+                    this.options.setIsBusy(false);
+                },
+                error => {
+                    console.log(error);
+                    this.notify.addErrorMessage("Failed to deleted the selected unit");
+                    this.options.setIsBusy(false);
+                });
 
             this.options.setIsBusy(false);
         }
 
         navigateTo(id: number) {
-            this.$state.go(this.options.dataRelatedPage, { id: id })
-                .then(() => this.closeModal());
+            const url = this.$state.href(this.options.dataRelatedPage, { id: id });
+            this.$window.open(url, "_blank");
+            /*this.$state.go()
+                .then(() => this.closeModal());*/
         }
 
         private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {

@@ -287,16 +287,6 @@ namespace Core.ApplicationServices.SystemUsage
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
         }
 
-        public IEnumerable<ItSystemUsage> GetSystemsByResponsibleUnitId(int unitId)
-        {
-            return _usageRepository.AsQueryable().Where(x => x.ResponsibleUsage.OrganizationUnitId == unitId).ToList();
-        }
-
-        public IEnumerable<ItSystemUsage> GetSystemsByRelevantUnitId(int unitId)
-        {
-            return _usageRepository.AsQueryable().Where(x => x.UsedBy.Select(usedBy => usedBy.OrganizationUnitId).Contains(unitId)).ToList();
-        }
-
         public Maybe<OperationError> TransferResponsibleUsage(OrganizationUnit targetUnit, int id)
         {
             return Modify(id, system =>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -7,7 +8,6 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -23,7 +23,6 @@ namespace Core.ApplicationServices.Organizations
         private readonly ILogger _logger;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<Organization> _organizationRepository;
-        private readonly IEntityIdentityResolver _identityResolver;
 
         public OrganizationRightsService(IAuthorizationContext authorizationContext,
             IGenericRepository<OrganizationRight> organizationRightRepository,
@@ -31,8 +30,7 @@ namespace Core.ApplicationServices.Organizations
             IDomainEvents domainEvents, ILogger logger,
             IGenericRepository<OrganizationUnitRight> unitRightRepository,
             ITransactionManager transactionManager,
-            IGenericRepository<Organization> organizationRepository, 
-            IEntityIdentityResolver identityResolver)
+            IGenericRepository<Organization> organizationRepository)
         {
             _authorizationContext = authorizationContext;
             _organizationRightRepository = organizationRightRepository;
@@ -42,7 +40,6 @@ namespace Core.ApplicationServices.Organizations
             _unitRightRepository = unitRightRepository;
             _transactionManager = transactionManager;
             _organizationRepository = organizationRepository;
-            _identityResolver = identityResolver;
         }
 
         public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
@@ -90,26 +87,24 @@ namespace Core.ApplicationServices.Organizations
             return RemoveRight(right);
         }
 
-        public Maybe<OperationError> RemoveUnitRightsByIds(int organizationId, IEnumerable<int> rightIds)
+        public Maybe<OperationError> RemoveUnitRightsByIds(Guid organizationUuid, Guid unitUuid, IEnumerable<int> rightIds)
         {
             using var transaction = _transactionManager.Begin();
 
-            var result = CanModifyOrganization(organizationId);
-            if (result.HasValue)
+            var unitResult = GetOrganizationUnit(organizationUuid, unitUuid);
+            if (unitResult.Failed)
             {
-                return result;
+                return unitResult.Error;
             }
-
+            
             var rightsToDelete = new List<OrganizationUnitRight>();
             foreach (var rightId in rightIds)
             {
-                var unitRight = _unitRightRepository.GetByKey(rightId);
-                if (unitRight == null)
-                    return new OperationError($"Unit right with id: {rightId} not found", OperationFailure.NotFound);
-                if (!_authorizationContext.AllowModify(unitRight.Object))
-                    return new OperationError("User is not allowed to perform this operation", OperationFailure.Forbidden);
+                var unitRightResult = unitResult.Value.GetRight(rightId);
+                if (unitRightResult.Failed)
+                    return unitRightResult.Error;
                 
-                rightsToDelete.Add(unitRight);
+                rightsToDelete.Add(unitRightResult.Value);
             }
             var userIds = rightsToDelete.Select(x => x.UserId).ToList();
 
@@ -124,31 +119,39 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> TransferUnitRightsByIds(int organizationId, int targetUnitId, IEnumerable<int> rightIds)
+        public Maybe<OperationError> TransferUnitRightsByIds(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, IEnumerable<int> rightIds)
         {
             using var transaction = _transactionManager.Begin();
 
-            var result = CanModifyOrganization(organizationId);
-            if (result.HasValue)
+            var unitResult = GetOrganizationUnit(organizationUuid, unitUuid);
+            if (unitResult.Failed)
             {
-                return result;
+                return unitResult.Error;
             }
+            var targetUnitResult = GetOrganizationUnit(organizationUuid, targetUnitUuid);
+            if (targetUnitResult.Failed)
+            {
+                return targetUnitResult.Error;
+            }
+
+            var currentUnit = unitResult.Value;
+            var targetUnit = targetUnitResult.Value;
 
             foreach (var rightId in rightIds)
             {
-                var unitRight = _unitRightRepository.GetByKey(rightId);
-                if (unitRight == null)
+                var unitRightResult = targetUnit.GetRight(rightId);
+                if (unitRightResult == null)
                 {
                     return new OperationError(OperationFailure.NotFound);
                 }
+                var unitRight = unitRightResult.Value;
 
-                if (!_authorizationContext.AllowModify(unitRight.Object))
+                if (unitRight.ObjectId != currentUnit.Id)
                 {
-                    return new OperationError(OperationFailure.Forbidden);
+                    return new OperationError($"Right with id: {unitRight.ObjectId} is not part of the Organization unit with id: {currentUnit.Id}", OperationFailure.BadState);
                 }
-                
 
-                unitRight.ObjectId = targetUnitId;
+                unitRight.ObjectId = targetUnit.Id;
 
                 _unitRightRepository.Update(unitRight);
                 _domainEvents.Raise(new AdministrativeAccessRightsChanged(unitRight.UserId));
@@ -158,22 +161,35 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> CanModifyOrganization(int id)
+        private Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUuid, Guid unitUuid)
         {
-            return _identityResolver.ResolveUuid<Organization>(id)
-                .Select(x => _organizationRepository.GetByKey(id))
-                .Match
-                (
-                    organization =>
-                    {
-                        if (_authorizationContext.AllowModify(organization) == false)
-                            return new OperationError("User is not allowed to edit the organization",
-                                OperationFailure.Forbidden);
+            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
+            if (organizationResult.Failed)
+            {
+                return organizationResult.Error;
+            }
 
-                        return Maybe<OperationError>.None;
-                    },
-                    () => new OperationError($"Organization with id: {id} was not found", OperationFailure.BadInput)
-                );
+            var unit = organizationResult.Value.GetOrganizationUnit(unitUuid);
+            if (unit.IsNone)
+            {
+                return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+            }
+            if (!_authorizationContext.AllowModify(unit.Value))
+            {
+                return new OperationError("User is not allowed to perform this operation", OperationFailure.Forbidden);
+            }
+
+            return unit.Value;
+        }
+
+        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
+        {
+            var organization = _organizationRepository.GetByKey(uuid);
+            if(organization == null)
+                return new OperationError($"Organization with uuid: {uuid} was not found", OperationFailure.NotFound);
+            return _authorizationContext.AllowModify(organization) == false 
+                ? new OperationError("User is not allowed to edit the organization", OperationFailure.Forbidden) 
+                : organization;
         }
 
         private Result<OrganizationRight, OperationFailure> RemoveRight(OrganizationRight right)

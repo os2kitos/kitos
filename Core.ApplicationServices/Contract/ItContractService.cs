@@ -131,24 +131,21 @@ namespace Core.ApplicationServices.Contract
             {
                 foreach (var paymentId in paymentIds)
                 {
-                    var result = contract.ResetEconomyStreamOrganizationUnit(paymentId, isInternal);
-                    if (result.HasValue)
-                        return result.Value;
+                    var error = contract.ResetEconomyStreamOrganizationUnit(paymentId, isInternal);
+                    if (error.HasValue)
+                        return error.Value;
                 }
-                _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
 
                 return Result<ItContract, OperationError>.Success(contract);
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);
         }
 
-        public Maybe<OperationError> TransferPayments(int contractId, int targetUnitId, bool isInternal, IEnumerable<int> paymentIds)
+        public Maybe<OperationError> TransferPayments(int contractId, Guid targetUnitUuid, bool isInternal, IEnumerable<int> paymentIds)
         {
             return Modify(contractId, contract =>
             {
-                return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
-                    .Select(targetUuid => TransferPayments(contract, targetUuid, isInternal, paymentIds))
-                    .GetValueOrDefault()
+                return TransferPayments(contract, targetUnitUuid, isInternal, paymentIds)
                     .Match
                     (
                         error => error,
@@ -158,7 +155,7 @@ namespace Core.ApplicationServices.Contract
                 err => err);
         }
 
-        private Maybe<OperationError> TransferPayments(ItContract contract, Guid targetUnitUuid, bool isInternal,
+        private static Maybe<OperationError> TransferPayments(ItContract contract, Guid targetUnitUuid, bool isInternal,
             IEnumerable<int> paymentIds)
         {
             foreach (var paymentId in paymentIds)
@@ -167,8 +164,7 @@ namespace Core.ApplicationServices.Contract
                 if (result.HasValue)
                     return result.Value;
             }
-
-            _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
+            
             return Maybe<OperationError>.None;
         }
 
@@ -337,13 +333,11 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
-        public Maybe<OperationError> SetContractResponsibleUnit(int contractId, int targetUnitId)
+        public Maybe<OperationError> SetContractResponsibleUnit(int contractId, Guid targetUnitUuid)
         {
             return Modify(contractId, contract =>
             {
-                return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
-                    .Select(contract.SetResponsibleOrganizationUnit)
-                    .GetValueOrDefault()
+                return contract.SetResponsibleOrganizationUnit(targetUnitUuid)
                     .Match
                     (
                         error => error,

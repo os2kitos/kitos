@@ -167,6 +167,15 @@ namespace Core.DomainModel.Organization
             );
         }
 
+        public Result<OrganizationUnitRight, OperationError> GetRight(int rightId)
+        {
+            var right = Rights.FirstOrDefault(x => x.Id == rightId);
+            if(right == null)
+                return new OperationError($"Organization unit right with id: {rightId} was not found", OperationFailure.NotFound);
+
+            return right;
+        }
+
         private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
         {
             var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();

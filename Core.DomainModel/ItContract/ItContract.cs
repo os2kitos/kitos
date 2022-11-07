@@ -876,15 +876,16 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> TransferEconomyStream(int id, Guid targetUnitUuid, bool isInternal)
         {
             return Organization.GetOrganizationUnit(targetUnitUuid)
-                .Select
+                .Match
                 (
                     targetUnit => isInternal
-                            ? TransferSelectedEconomyStream(id, targetUnit, InternEconomyStreams)
-                            : TransferSelectedEconomyStream(id, targetUnit, ExternEconomyStreams)
-                ).GetValueOrDefault();
+                            ? TransferEconomyStream(id, targetUnit, InternEconomyStreams)
+                            : TransferEconomyStream(id, targetUnit, ExternEconomyStreams),
+                    () => new OperationError($"Organization unit with uuid: {targetUnitUuid} was not found", OperationFailure.NotFound)
+                );
         }
 
-        private static Maybe<OperationError> TransferSelectedEconomyStream(int id, OrganizationUnit targetUnit, IEnumerable<EconomyStream> economyStreams)
+        private static Maybe<OperationError> TransferEconomyStream(int id, OrganizationUnit targetUnit, IEnumerable<EconomyStream> economyStreams)
         {
             var stream = economyStreams.FirstOrDefault(x => x.Id == id);
             if (stream == null)

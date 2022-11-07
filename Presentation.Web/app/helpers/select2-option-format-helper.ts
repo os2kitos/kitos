@@ -30,6 +30,7 @@
         private static visitUnit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number, options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number> []) {
             const option = {
                 id: String(orgUnit.id),
+                uuid: orgUnit.uuid,
                 text: orgUnit.name,
                 indentationLevel: indentationLevel
             };

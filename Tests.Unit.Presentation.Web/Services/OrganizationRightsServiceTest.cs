@@ -31,7 +31,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>(); 
             _transactionManager = new Mock<ITransactionManager>();
             var orgRepository = new Mock<IGenericRepository<Organization>>();
-            var identityResolver = new Mock<IEntityIdentityResolver>();
 
             _sut = new OrganizationRightsService(_authorizationContext.Object,
                 _organizationRightRepository.Object,
@@ -40,8 +39,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _organizationUnitRightRepository.Object,
                 _transactionManager.Object,
-                orgRepository.Object,
-                identityResolver.Object);
+                orgRepository.Object);
         }
 
         [Fact]

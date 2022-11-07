@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -142,9 +141,7 @@ namespace Presentation.Web.Controllers.API.V1
         [NonAction]
         public override HttpResponseMessage Put(int id, int organizationId, JObject jObject) => throw new NotSupportedException();
 
-        protected override void DeleteQuery(OrganizationUnit entity)
-        {
-            _orgUnitService.Delete(entity.OrganizationId, entity.Id);
-        }
+        [NonAction]
+        public override HttpResponseMessage Delete(int id, int organizationId) => throw new NotSupportedException();
     }
 }

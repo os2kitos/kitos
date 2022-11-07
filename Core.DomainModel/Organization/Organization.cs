@@ -290,6 +290,13 @@ namespace Core.DomainModel.Organization
             if (unit.IsUsed())
                 return new OperationError("Unit is being used", OperationFailure.BadState);
 
+            // attach children to parent of this instance to avoid orphans
+            // parent id will never be null because users aren't allowed to delete the root node
+            foreach (var child in unit.Children)
+            {
+                child.ParentId = unit.ParentId;
+            }
+
             OrgUnits.Remove(unit);
 
             return unit;
