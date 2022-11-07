@@ -123,47 +123,31 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var unitUuid = A<Guid>();
             var operationError = new OperationError(OperationFailure.NotFound);
 
-            ExpectGetOrganizationReturnsTrue(orgUuid, OrganizationDataReadAccessLevel.All);
+            ExpectGetOrganizationReturns(orgUuid, new Organization(), OrganizationDataReadAccessLevel.All);
             
-            ExpectGetOrganizationUnitReturns(unitUuid, operationError);
-
             var result = _sut.GetRegistrations(orgUuid, unitUuid);
             Assert.True(result.Failed);
             Assert.Equal(operationError.FailureType, result.Error.FailureType);
         }
 
         [Fact]
-        public void GetOrganizationRegistrations_Returns_Forbidden()
-        {
-            var orgUuid = A<Guid>();
-            var unitUuid = A<Guid>();
-            var unit = new OrganizationUnit() { Uuid = unitUuid};
-
-            ExpectGetOrganizationReturnsTrue(orgUuid, OrganizationDataReadAccessLevel.All);
-            
-            ExpectGetOrganizationUnitReturns(unitUuid, unit);
-            ExpectAllowReadsReturns(unit, false);
-
-            var result = _sut.GetRegistrations(orgUuid, unitUuid);
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
-        [Fact]
         public void DeleteSelectedOrganizationRegistrations_Returns_NotFound_When_Unit_NotFound()
         {
-            var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
+            var unitUuid = A<Guid>();
+            var org = new Organization()
+            {
+                Uuid = orgUuid
+            };
 
-            ExpectGetOrganizationReturnsTrue(orgUuid); 
-            ExpectGetOrganizationUnitReturns(unitUuid, new OperationError(OperationFailure.NotFound));
+            ExpectGetOrganizationReturns(orgUuid, org); 
+            ExpectAllowModifyReturns(org, true);
 
             var operationError = new OperationError(OperationFailure.NotFound);
             var result = _sut.DeleteRegistrations(orgUuid, unitUuid, CreateEmptyChangeParameters());
 
             Assert.True(result.HasValue);
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
-            Assert.Equal(operationError.Message, result.Value.Message);
         }
 
         [Fact]
@@ -171,10 +155,17 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         {
             var orgUuid = A<Guid>();
             var unitUuid = A<Guid>();
-            var unit = new OrganizationUnit() { Uuid = unitUuid};
+            var unit = new OrganizationUnit { Uuid = unitUuid};
+            var org = new Organization()
+            {
+                Uuid = orgUuid,
+                OrgUnits = new List<OrganizationUnit>()
+                {
+                    unit
+                }
+            };
 
-            ExpectGetOrganizationReturnsTrue(orgUuid);
-            ExpectGetOrganizationUnitReturns(unitUuid, unit);
+            ExpectGetOrganizationReturns(orgUuid, org);
             ExpectAllowDeleteReturns(unit, false);
 
             var result = _sut.DeleteRegistrations(orgUuid, unitUuid, CreateEmptyChangeParameters());
@@ -183,36 +174,31 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void TransferSelectedOrganizationRegistrations_Returns_NotFound(bool isUnitValid, bool isTargetUnitValid)
+        [InlineData(false)]
+        [InlineData(true)]
+        public void TransferSelectedOrganizationRegistrations_Returns_NotFound(bool isUnitValid)
         {
             var orgUuid = A<Guid>();
             var targetUnitUuid = A<Guid>();
             var unitUuid = A<Guid>();
-            var expectedMessage = "Organization not found";
-            var operationError = new OperationError(expectedMessage, OperationFailure.NotFound);
+            var operationError = new OperationError(OperationFailure.NotFound);
 
-            ExpectGetOrganizationReturnsTrue(orgUuid);
+            var org = new Organization
+            {
+                Uuid = orgUuid
+            };
+
+            ExpectGetOrganizationReturns(orgUuid, org);
+            ExpectAllowModifyReturns(org, true);
+
             if (isUnitValid)
             {
-                ExpectGetOrganizationUnitReturns(unitUuid, new OrganizationUnit());
-                ExpectGetOrganizationUnitReturns(targetUnitUuid, operationError);
+                org.OrgUnits = new List<OrganizationUnit>() {new () {Uuid = unitUuid}};
             }
-            else if(isTargetUnitValid)
-            {
-                ExpectGetOrganizationUnitReturns(unitUuid, operationError);
-                ExpectGetOrganizationUnitReturns(targetUnitUuid, new OrganizationUnit());
-            }
-            else
-            {
-                throw new Exception("Invalid data");
-            }
-            
+
             var result = _sut.TransferRegistrations(orgUuid, unitUuid, targetUnitUuid, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
-            Assert.Equal(operationError.Message, result.Value.Message);
         }
 
         [Theory]
@@ -225,26 +211,23 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var targetUnitUuid = A<Guid>();
             var unit = new OrganizationUnit { Uuid = unitUuid };
             var targetUnit = new OrganizationUnit { Uuid = targetUnitUuid };
+            var org = new Organization()
+            {
+                Uuid = orgUuid,
+                OrgUnits = new List<OrganizationUnit>
+                {
+                    unit, targetUnit
+                }
+            };
 
-            ExpectGetOrganizationReturnsTrue(orgUuid);
-
-            ExpectGetOrganizationUnitReturns(unitUuid, unit);
-            ExpectGetOrganizationUnitReturns(targetUnitUuid, targetUnit);
-
+            ExpectGetOrganizationReturns(orgUuid, org);
+            
             ExpectAllowModifyReturns(unit, isUnitValid);
             ExpectAllowModifyReturns(targetUnit, isTargetUnitValid);
 
             var result = _sut.TransferRegistrations(orgUuid, unitUuid, targetUnitUuid, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
-        }
-
-        private void ExpectGetOrganizationReturnsTrue(Guid orgUuid, OrganizationDataReadAccessLevel? readAccessLevel = null)
-        {
-            var org = new Organization { Uuid = orgUuid };
-            
-            ExpectGetOrganizationReturns(orgUuid, org, readAccessLevel);
-            ExpectAllowModifyReturns(org, true);
         }
 
         private void ExpectGetOrganizationUnitReturns(Guid uuid, OrganizationUnit result)

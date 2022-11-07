@@ -46,8 +46,23 @@ namespace Core.ApplicationServices.Organizations
         public Result<OrganizationRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
         {
             return _organizationService.GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Bind(_ => _organizationService.GetOrganizationUnit(unitUuid))
-                .Bind(unit => Result<OrganizationRegistrationDetails, OperationError>.Success(unit.GetUnitRegistrations()));
+                .Match<Result<OrganizationUnit, OperationError>>
+                (
+                    organization =>
+                    {
+                        var unit = organization.GetOrganizationUnit(unitUuid);
+                        if(unit.IsNone)
+                            return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+
+                        return unit.Value;
+                    },
+                    error => error
+                )
+                .Match
+                (
+                    unit => Result<OrganizationRegistrationDetails, OperationError>.Success(unit.GetUnitRegistrations()),
+                    error => error
+                );
         }
 
         public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationRegistrationChangeParameters parameters)
@@ -63,7 +78,7 @@ namespace Core.ApplicationServices.Organizations
             var unit = authorizeResult.Value.GetOrganizationUnit(unitUuid);
             if (unit.IsNone)
             {
-                return new OperationError($"Unit with id: {unit.Value.Id} was not found", OperationFailure.NotFound);
+                return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
             }
 
             if (!_authorizationContext.AllowDelete(unit.Value))
