@@ -46,11 +46,26 @@ BEGIN
     HasStakeHolderAccess = 0
     FROM [User]
     WHERE Deleted = 0
-    AND Id NOT IN 
-    (
-        SELECT *
-            FROM #idsToPreserve
-    );
+    AND Id NOT IN (SELECT * FROM #idsToPreserve);
+
+	DELETE FROM DataProcessingRegistrationRights
+	WHERE UserId NOT IN (SELECT * FROM #idsToPreserve);
+
+	DELETE FROM ItContractRights
+	WHERE UserId NOT IN (SELECT * FROM #idsToPreserve);
+
+	DELETE FROM ItSystemRights
+	WHERE UserId NOT IN (SELECT * FROM #idsToPreserve);
+
+	DELETE FROM OrganizationUnitRights
+	WHERE UserId NOT IN (SELECT * FROM #idsToPreserve);
+
+	DELETE FROM OrganizationRights
+	WHERE UserId NOT IN (SELECT * FROM #idsToPreserve);
+
+	DELETE FROM SsoUserIdentities
+	WHERE User_Id NOT IN (SELECT * FROM #idsToPreserve);
+
 
     -- Make sure the temp table doesn't exist
     If(OBJECT_ID('tempdb..#idsToPreserve') Is Not Null)
