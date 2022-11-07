@@ -102,7 +102,9 @@ namespace Core.ApplicationServices.Organizations
             {
                 var unitRightResult = unitResult.Value.GetRight(rightId);
                 if (unitRightResult.Failed)
+                {
                     return unitRightResult.Error;
+                }
                 
                 rightsToDelete.Add(unitRightResult.Value);
             }
@@ -139,11 +141,12 @@ namespace Core.ApplicationServices.Organizations
 
             foreach (var rightId in rightIds)
             {
-                var unitRightResult = targetUnit.GetRight(rightId);
-                if (unitRightResult == null)
+                var unitRightResult = currentUnit.GetRight(rightId);
+                if (unitRightResult.Failed)
                 {
-                    return new OperationError(OperationFailure.NotFound);
+                    return unitRightResult.Error;
                 }
+
                 var unitRight = unitRightResult.Value;
 
                 if (unitRight.ObjectId != currentUnit.Id)
@@ -184,7 +187,7 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
         {
-            var organization = _organizationRepository.GetByKey(uuid);
+            var organization = _organizationRepository.AsQueryable().FirstOrDefault(x => x.Uuid == uuid);
             if(organization == null)
                 return new OperationError($"Organization with uuid: {uuid} was not found", OperationFailure.NotFound);
             return _authorizationContext.AllowModify(organization) == false 
