@@ -113,6 +113,7 @@
                     console.error("Error: ", error);
                     this.updating = false;
                     this.busy = false;
+                    this.notify.addErrorMessage("Fejl ifm. oprettelse af opdateringen. Prøv igen.");
                 });
         }
 
