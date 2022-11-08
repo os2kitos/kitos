@@ -8,6 +8,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
@@ -39,7 +40,17 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _dbControlMock = new Mock<IDatabaseControl>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _domainEventsMock = new Mock<IDomainEvents>();
-            _sut = new StsOrganizationSynchronizationService(_authorizationContextMock.Object, _stsOrganizationUnitService.Object, _organizationServiceMock.Object, Mock.Of<ILogger>(), Mock.Of<IStsOrganizationService>(), _dbControlMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object);
+            _sut = new StsOrganizationSynchronizationService(
+                _authorizationContextMock.Object,
+                _stsOrganizationUnitService.Object,
+                _organizationServiceMock.Object,
+                Mock.Of<ILogger>(),
+                Mock.Of<IStsOrganizationService>(),
+                _dbControlMock.Object,
+                _transactionManagerMock.Object,
+                _domainEventsMock.Object,
+                new Mock<IGenericRepository<OrganizationUnit>>().Object
+            );
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

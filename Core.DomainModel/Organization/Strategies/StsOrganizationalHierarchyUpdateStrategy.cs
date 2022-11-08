@@ -168,7 +168,7 @@ namespace Core.DomainModel.Organization.Strategies
             {
                 if (currentTreeByUuid.TryGetValue(parent.Uuid, out var parentUnit))
                 {
-                    var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization);
+                    var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
 
                     var addOrgUnitError = _organization.AddOrganizationUnit(newUnit, parentUnit);
                     if (addOrgUnitError.HasValue)
@@ -206,7 +206,7 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Deletion of units
-            foreach (var externalUnitToDelete in consequences.DeletedExternalUnitsBeingDeleted)
+            foreach (var externalUnitToDelete in OrderUnitsToDeleteByLeafToParent(_organization.GetRoot(), consequences.DeletedExternalUnitsBeingDeleted))
             {
                 var deleteOrganizationUnitError = _organization.DeleteOrganizationUnit(externalUnitToDelete);
                 if (deleteOrganizationUnitError.HasValue)
@@ -218,22 +218,37 @@ namespace Core.DomainModel.Organization.Strategies
             return consequences;
         }
 
-        private IEnumerable<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)> OrderByParentToLeaf(ExternalOrganizationUnit externalRoot, IEnumerable<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)> addedUnits)
+        private static IEnumerable<OrganizationUnit> OrderUnitsToDeleteByLeafToParent(OrganizationUnit root, IEnumerable<OrganizationUnit> deletedUnits)
+        {
+            var unitsToDelete = deletedUnits.ToList();
+            var relevantIds = unitsToDelete.Select(x => x.Uuid).ToHashSet();
+
+            var ordering = CreateUuidToIndexMap(root.FlattenHierarchy().Select(x => x.Uuid).ToList(), relevantIds);
+
+            //Make sure leafs are added before children
+            return unitsToDelete.OrderByDescending(unitToDelete => ordering[unitToDelete.Uuid]).ToList();
+        }
+
+        private static IEnumerable<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)> OrderByParentToLeaf(ExternalOrganizationUnit externalRoot, IEnumerable<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)> addedUnits)
         {
             var unitsToAdd = addedUnits.ToList();
             var relevantIds = unitsToAdd.SelectMany(x => new[] { x.parent.Uuid, x.unitToAdd.Uuid }).ToHashSet();
-            var ordering = externalRoot
-                //Flatten the hierarchy from parent to leaf
-                .Flatten()
-                //Select only the parts that we care about
-                .Where(unit => relevantIds.Contains(unit.Uuid))
-                //Find the ordering key of those units
-                .Select((unit, index) => new { unit, index })
-                //Create the lookup
-                .ToDictionary(x => x.unit.Uuid, x => x.index);
+            var ordering = CreateUuidToIndexMap(externalRoot.Flatten().Select(x => x.Uuid).ToList(), relevantIds);
 
             //Make sure parents are added before children
             return unitsToAdd.OrderBy(unitToAdd => ordering[unitToAdd.unitToAdd.Uuid]).ToList();
+        }
+
+        private static Dictionary<Guid, int> CreateUuidToIndexMap(IEnumerable<Guid> flattenedHierarchy, HashSet<Guid> relevantIds)
+        {
+            var ordering = flattenedHierarchy
+                //Select only the parts that we care about
+                .Where(relevantIds.Contains)
+                //Find the ordering key of those units
+                .Select((uuid, index) => new { uuid, index })
+                //Create the lookup
+                .ToDictionary(x => x.uuid, x => x.index);
+            return ordering;
         }
     }
 }

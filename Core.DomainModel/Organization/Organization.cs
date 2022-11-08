@@ -190,10 +190,7 @@ namespace Core.DomainModel.Organization
 
         public Result<OrganizationTreeUpdateConsequences, OperationError> ComputeExternalOrganizationHierarchyUpdateConsequences(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
         {
-            if (root == null)
-            {
-                throw new ArgumentNullException(nameof(root));
-            }
+            if (root == null) throw new ArgumentNullException(nameof(root));
 
             IExternalOrganizationalHierarchyUpdateStrategy strategy;
             //Pre-validate
@@ -281,10 +278,7 @@ namespace Core.DomainModel.Organization
 
         public Result<OrganizationTreeUpdateConsequences, OperationError> UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
         {
-            if (root == null)
-            {
-                throw new ArgumentNullException(nameof(root));
-            }
+            if (root == null) throw new ArgumentNullException(nameof(root));
 
             IExternalOrganizationalHierarchyUpdateStrategy strategy;
             //Pre-validate
@@ -310,17 +304,24 @@ namespace Core.DomainModel.Organization
             return strategy.PerformUpdate(filteredTree);
         }
 
-        public Maybe<OperationError> AddOrganizationUnit(OrganizationUnit newUnit, OrganizationUnit parentUnit)
+        /// <summary>
+        /// Adds a organization unit
+        /// </summary>
+        /// <param name="newUnit"></param>
+        /// <param name="parentUnit">If set to None, the new unit will be added to the organization root</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Maybe<OperationError> AddOrganizationUnit(OrganizationUnit newUnit, Maybe<OrganizationUnit> parentUnit)
         {
             if (newUnit == null) throw new ArgumentNullException(nameof(newUnit));
             if (parentUnit == null) throw new ArgumentNullException(nameof(parentUnit));
-
-            if (newUnit == parentUnit)
+            var actualParent = parentUnit.GetValueOrFallback(GetRoot());
+            if (newUnit == actualParent)
             {
                 return new OperationError("new unit is the same as the parent", OperationFailure.BadInput);
             }
 
-            if (parentUnit.Organization != this)
+            if (actualParent.Organization != this)
             {
                 return new OperationError("Parent unit is from a different organization", OperationFailure.BadInput);
             }
@@ -331,15 +332,19 @@ namespace Core.DomainModel.Organization
                 return new OperationError("Unit already added", OperationFailure.BadInput);
             }
 
-            if (GetOrganizationUnit(parentUnit.Uuid).IsNone)
+            if (GetOrganizationUnit(actualParent.Uuid).IsNone)
             {
                 return new OperationError("Parent unit has not been added to the organization", OperationFailure.BadInput);
             }
 
+            var addedError = actualParent.AddChild(newUnit);
+            if (addedError.IsNone)
+            {
+                newUnit.Organization = this;
+                OrgUnits.Add(newUnit);
+            }
 
-            newUnit.Organization = this;
-
-            return parentUnit.AddChild(newUnit);
+            return addedError;
         }
 
         public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit)
@@ -372,6 +377,11 @@ namespace Core.DomainModel.Organization
                 return new OperationError($"moved unit equals new parent unit with uuid + {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
             }
 
+            if (movedUnit == GetRoot())
+            {
+                return new OperationError($"Cannot move the organization root", OperationFailure.BadInput);
+            }
+
             var removeChildError = oldParentUnit.RemoveChild(movedUnit);
 
             if (removeChildError.HasValue)
@@ -379,7 +389,7 @@ namespace Core.DomainModel.Organization
                 return removeChildError.Value;
             }
 
-            return oldParentUnit.AddChild(movedUnit);
+            return newParentUnit.AddChild(movedUnit);
         }
 
         public Maybe<OperationError> DeleteOrganizationUnit(OrganizationUnit unitToDelete)
@@ -396,6 +406,11 @@ namespace Core.DomainModel.Organization
                 return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} from organization with uuid {Uuid} cannot be deleted as it is still in use!", OperationFailure.BadInput);
             }
 
+            if (unitToDelete == GetRoot())
+            {
+                return new OperationError("Cannot delete the organization root", OperationFailure.BadInput);
+            }
+
             //Migrate any children to the parent!
             foreach (var child in unitToDelete.Children.ToList())
             {
@@ -405,8 +420,15 @@ namespace Core.DomainModel.Organization
                     return relocateOrganizationUnitError;
                 }
             }
+
+            var removeChildError = unitToDelete.Parent.RemoveChild(unitToDelete);
+
+            if (removeChildError.HasValue)
+            {
+                return removeChildError;
+            }
+
             OrgUnits.Remove(unitToDelete);
-            unitToDelete.ResetParent();
 
             return Maybe<OperationError>.None;
         }

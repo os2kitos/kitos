@@ -5,6 +5,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
@@ -22,6 +23,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IDatabaseControl _databaseControl;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
+        private readonly IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private readonly IAuthorizationContext _authorizationContext;
 
         public StsOrganizationSynchronizationService(
@@ -32,7 +34,8 @@ namespace Core.ApplicationServices.Organizations
             IStsOrganizationService stsOrganizationService,
             IDatabaseControl databaseControl,
             ITransactionManager transactionManager,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IGenericRepository<OrganizationUnit> organizationUnitRepository)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -41,6 +44,7 @@ namespace Core.ApplicationServices.Organizations
             _databaseControl = databaseControl;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
+            _organizationUnitRepository = organizationUnitRepository;
             _authorizationContext = authorizationContext;
         }
 
@@ -140,6 +144,7 @@ namespace Core.ApplicationServices.Organizations
                     .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude))
                     .Select(consequences =>
                     {
+                        _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted);
                         foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
                         {
                             _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(affectedUnit));

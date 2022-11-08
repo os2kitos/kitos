@@ -7,6 +7,7 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.Strategies;
+using Core.DomainServices.Organizations;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;

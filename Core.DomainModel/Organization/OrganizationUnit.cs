@@ -206,7 +206,6 @@ namespace Core.DomainModel.Organization
         public void ResetParent()
         {
             Parent = null;
-            ParentId = null;
         }
     }
 }
