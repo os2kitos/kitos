@@ -157,8 +157,6 @@ namespace Core.DomainModel.Organization
 
         public OrganizationRegistrationDetails GetUnitRegistrations()
         {
-            var usings = Using.ToList();
-
             return new OrganizationRegistrationDetails
             (
                 Rights.ToList(),
