@@ -330,7 +330,7 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
-        public Maybe<OperationError> SetContractResponsibleUnit(int contractId, Guid targetUnitUuid)
+        public Maybe<OperationError> SetResponsibleUnit(int contractId, Guid targetUnitUuid)
         {
             return Modify(contractId, contract =>
             {
@@ -344,7 +344,7 @@ namespace Core.ApplicationServices.Contract
                 err => err);
         }
 
-        public Maybe<OperationError> RemoveContractResponsibleUnit(int contractId)
+        public Maybe<OperationError> RemoveResponsibleUnit(int contractId)
         {
             return Modify(contractId, contract =>
             {

@@ -1047,9 +1047,9 @@ namespace Tests.Unit.Core.Model
                 };
             }
 
-            var result = contract.ResetEconomyStreamOrganizationUnit(id, isInternal);
+            var error = contract.ResetEconomyStreamOrganizationUnit(id, isInternal);
 
-            Assert.True(result.IsNone);
+            Assert.True(error.IsNone);
             if (isInternal)
             {
                 var intern = contract.InternEconomyStreams.FirstOrDefault();
@@ -1071,11 +1071,76 @@ namespace Tests.Unit.Core.Model
             var contract = new ItContract();
             var expectedErrorMessage = $"EconomyStream with id: {id} was not found";
 
-            var result = contract.ResetEconomyStreamOrganizationUnit(id, A<bool>());
+            var error = contract.ResetEconomyStreamOrganizationUnit(id, A<bool>());
 
-            Assert.True(result.HasValue);
-            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
-            Assert.Equal(expectedErrorMessage, result.Value.Message);
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+            Assert.Equal(expectedErrorMessage, error.Value.Message);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Transfer_EconomyStream(bool isInternal)
+        {
+            var id = A<int>();
+            var unit = new OrganizationUnit {Id = A<int>()};
+            var targetUnit = new OrganizationUnit {Uuid = A<Guid>()};
+            var contract = new ItContract()
+            {
+                Organization = new Organization()
+                {
+                    OrgUnits = new List<OrganizationUnit>()
+                    {
+                        targetUnit
+                    }
+                }
+            };
+            var economyStream = new EconomyStream
+            {
+                Id = id,
+                OrganizationUnit = unit,
+            };
+
+            if (isInternal)
+            {
+                contract.InternEconomyStreams = new List<EconomyStream> { economyStream };
+            }
+            else
+            {
+                contract.ExternEconomyStreams = new List<EconomyStream> { economyStream };
+            }
+
+            var error = contract.TransferEconomyStream(id, targetUnit.Uuid, isInternal);
+
+            Assert.True(error.IsNone);
+            if (isInternal)
+            {
+                var intern = contract.InternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(intern);
+                Assert.Equal(intern.OrganizationUnit.Uuid, targetUnit.Uuid);
+            }
+            else
+            {
+                var external = contract.ExternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(external);
+                Assert.Equal(external.OrganizationUnit.Uuid, targetUnit.Uuid);
+            }
+        }
+
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Transfer_EconomyStream_Returns_NotFound(bool isInternal)
+        {
+            var id = A<int>();
+            var contract = new ItContract(){Organization = new Organization()};
+
+            var error = contract.TransferEconomyStream(id, A<Guid>(), isInternal);
+
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
         }
     }
 }

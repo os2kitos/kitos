@@ -34,12 +34,9 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
         private void RemoveItSystemUsageOrgUnitUsages(Guid unitUuid)
         {
-            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.AsQueryable().Where(x => x.OrganizationUnit.Uuid == unitUuid);
-            foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)
-            {
-                _itSystemUsageOrgUnitUsageRepository.Delete(itSystemUsage);
-            }
+            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.AsQueryable().Where(x => x.OrganizationUnit.Uuid == unitUuid).ToList();
 
+            _itSystemUsageOrgUnitUsageRepository.RemoveRange(itSystemUsageOrgUnitUsages);
             _itSystemUsageOrgUnitUsageRepository.Save();
         }
     }

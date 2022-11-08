@@ -235,7 +235,7 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var contractId in contractIds)
             {
-                var deleteError = _contractService.RemoveContractResponsibleUnit(contractId);
+                var deleteError = _contractService.RemoveResponsibleUnit(contractId);
                 if (deleteError.HasValue)
                     return deleteError.Value;
             }
@@ -299,7 +299,7 @@ namespace Core.ApplicationServices.Organizations
         {
             foreach (var contractId in contractIds)
             {
-                var transferError = _contractService.SetContractResponsibleUnit(contractId, targetUnitUuid);
+                var transferError = _contractService.SetResponsibleUnit(contractId, targetUnitUuid);
                 if (transferError.HasValue)
                     return transferError.Value;
             }

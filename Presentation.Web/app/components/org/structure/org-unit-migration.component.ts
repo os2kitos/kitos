@@ -8,7 +8,7 @@
                 organizationUuid: "@",
                 unitUuid: "@",
                 unitName: "@",
-                closeModal: "&",
+                stateParameters: "<"
             },
             controller: OrganizationUnitMigrationController,
             controllerAs: "ctrl",
@@ -36,7 +36,7 @@
         organizationUuid: string;
         unitUuid: string;
         unitName: string;
-        closeModal: () => void;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
     }
 
     class OrganizationUnitMigrationController implements IOrganizationUnitMigrationController {
@@ -44,7 +44,8 @@
         organizationUuid: string;
         unitUuid: string | null = null;
         unitName: string | null = null;
-        closeModal: () => void;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
+
         anySelections = false;
         allSelections = false;
         targetUnitSelected = false;
@@ -66,9 +67,7 @@
         contractTableConfig: IMigrationTableColumn[];
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
-
-        private isBusy = false;
-
+        
         static $inject: string[] = ["organizationRegistrationsService", "organizationApiService", "notify"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
             private readonly organizationApiService: Services.IOrganizationApiService,
@@ -97,29 +96,29 @@
         }
 
         deleteSelected() {
-            if (this.isBusy) {
+            if (this.checkIsBusy()) {
                 return;
             }
             if (!confirm('Er du sikker på, at du vil slette de valgte registreringer?')) {
                 return;
             }
-            this.isBusy = true;
+            this.setIsBusy(true);
 
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
-                    this.refreshData(); 
-                    this.isBusy = false;
+                    this.refreshData();
+                    this.setIsBusy(false);
                 },
                 error => {
                     console.error(error);
                     this.notify.addErrorMessage("Delete selected failed");
-                    this.isBusy = false;
+                    this.setIsBusy(false);
                 });
         }
 
         transfer() {
-            if (this.isBusy) {
+            if (this.checkIsBusy()) {
                 return;
             }
             if (!this.selectedOrg?.id)
@@ -127,18 +126,19 @@
             if (!confirm(`Er du sikker på, at du vil overføre de valgte registreringer til "${this.selectedOrg.text}"?`)) {
                 return;
             }
-            this.isBusy = true;
+            this.setIsBusy(true);
+
 
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, this.selectedOrg.uuid, request)
                 .then(() => {
                     this.selectedOrg = null;
                     this.refreshData();
-                    this.isBusy = false;
+                    this.setIsBusy(false);
                 }, error => {
                     console.log(error);
                     this.notify.addErrorMessage("Transfer failed");
-                    this.isBusy = false;
+                    this.setIsBusy(false);
                 });
         }
 
@@ -324,11 +324,11 @@
         }
 
         private checkIsBusy(): boolean {
-            return this.isBusy;
+            return this.stateParameters.checkIsRootBusy();
         }
 
         private setIsBusy(value: boolean): void{
-            this.isBusy = value;
+            this.stateParameters.setRootIsBusy(value);
         }
 
         private createBaseOptions(type: Models.ViewModel.Organization.OrganizationRegistrationOption, dataRelatedPage?: string): IOrganizationUnitMigrationOptions {

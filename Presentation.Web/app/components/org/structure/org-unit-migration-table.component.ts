@@ -8,8 +8,7 @@
                 options: "<",
                 configuration: "<",
                 unitUuid: "@",
-                organizationUuid: "@",
-                closeModal: "&"
+                organizationUuid: "@"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -35,7 +34,6 @@
         configuration: IMigrationTableColumn[];
         unitUuid: string;
         organizationUuid: string;
-        closeModal: () => void;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
@@ -44,7 +42,6 @@
         configuration: IMigrationTableColumn[] | null = null;
         unitUuid: string | null = null;
         organizationUuid: string | null = null;
-        closeModal: () => void;
         root: IOrganizationUnitMigrationRoot;
         columnTypes = MigrationTableColumnType;
 
@@ -119,8 +116,6 @@
         navigateTo(id: number) {
             const url = this.$state.href(this.options.dataRelatedPage, { id: id });
             this.$window.open(url, "_blank");
-            /*this.$state.go()
-                .then(() => this.closeModal());*/
         }
 
         private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {

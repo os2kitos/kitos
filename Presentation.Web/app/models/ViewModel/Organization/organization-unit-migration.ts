@@ -10,6 +10,11 @@
         optionalObjectContext?: any;
     }
 
+    export interface IRegistrationMigrationStateParameters {
+        checkIsRootBusy: () => boolean;
+        setRootIsBusy: (value: boolean) => void;
+    }
+
     export enum OrganizationRegistrationOption {
         Roles = 0,
         InternalPayments = 1,

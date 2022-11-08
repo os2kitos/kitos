@@ -536,6 +536,19 @@
                                 };
                             };
 
+                            $modalScope.setIsBusy = (value: boolean): void => {
+                                $modalScope.submitting = value;
+                            }
+
+                            $modalScope.checkIsBusy = (): boolean => {
+                                return $modalScope.submitting;
+                            }
+
+                            $modalScope.stateParameters = {
+                                setRootIsBusy: (value: boolean) => $modalScope.setIsBusy(value),
+                                checkIsRootBusy: () => $modalScope.checkIsBusy()
+                            } as Kitos.Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
+
                             $modalScope.delete = function () {
                                 //don't allow duplicate submitting
                                 if ($modalScope.submitting) return;

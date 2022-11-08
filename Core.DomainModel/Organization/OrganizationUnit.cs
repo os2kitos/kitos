@@ -176,6 +176,20 @@ namespace Core.DomainModel.Organization
             return right;
         }
 
+        public Result<OrganizationUnitRight, OperationError> RemoveRight(int rightId)
+        {
+            return GetRight(rightId)
+                .Match<Result<OrganizationUnitRight, OperationError>>
+                (
+                    right =>
+                    {
+                        Rights.Remove(right);
+                        return right;
+                    },
+                    error => error
+                );
+        }
+
         private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
         {
             var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();

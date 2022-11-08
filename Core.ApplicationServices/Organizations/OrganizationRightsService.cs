@@ -91,22 +91,23 @@ namespace Core.ApplicationServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var unitResult = GetOrganizationUnitByUuid(organizationUuid, unitUuid);
+            var unitResult = GetOrganizationUnitByUuidAndAuthorizeModification(organizationUuid, unitUuid);
             if (unitResult.Failed)
             {
                 return unitResult.Error;
             }
-            
+            var unit = unitResult.Value;
+
             var rightsToDelete = new List<OrganizationUnitRight>();
             foreach (var rightId in rightIds)
             {
-                var unitRightResult = unitResult.Value.GetRight(rightId);
-                if (unitRightResult.Failed)
+                var removeResult = unit.RemoveRight(rightId);
+                if (removeResult.Failed)
                 {
-                    return unitRightResult.Error;
+                    return removeResult.Error;
                 }
                 
-                rightsToDelete.Add(unitRightResult.Value);
+                rightsToDelete.Add(removeResult.Value);
             }
             var userIds = rightsToDelete.Select(x => x.UserId).ToList();
 
@@ -130,13 +131,14 @@ namespace Core.ApplicationServices.Organizations
             {
                 return organizationResult.Error;
             }
+            var organization = organizationResult.Value;
 
-            var unitResult = GetOrganizationUnit(organizationResult.Value, unitUuid);
+            var unitResult = GetOrganizationUnitAndAuthorizeModification(organization, unitUuid);
             if (unitResult.Failed)
             {
                 return unitResult.Error;
             }
-            var targetUnitResult = GetOrganizationUnit(organizationResult.Value, targetUnitUuid);
+            var targetUnitResult = GetOrganizationUnitAndAuthorizeModification(organization, targetUnitUuid);
             if (targetUnitResult.Failed)
             {
                 return targetUnitResult.Error;
@@ -152,7 +154,6 @@ namespace Core.ApplicationServices.Organizations
                 {
                     return unitRightResult.Error;
                 }
-
                 var unitRight = unitRightResult.Value;
 
                 if (unitRight.ObjectId != currentUnit.Id)
@@ -170,15 +171,13 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Result<OrganizationUnit, OperationError> GetOrganizationUnitByUuid(Guid organizationUuid, Guid unitUuid)
+        private Result<OrganizationUnit, OperationError> GetOrganizationUnitByUuidAndAuthorizeModification(Guid organizationUuid, Guid unitUuid)
         {
-            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
-            return organizationResult.Failed 
-                ? organizationResult.Error 
-                : GetOrganizationUnit(organizationResult.Value, unitUuid);
+            return GetOrganizationAndAuthorizeModification(organizationUuid)
+                .Bind(organization => GetOrganizationUnitAndAuthorizeModification(organization, unitUuid));
         }
 
-        private Result<OrganizationUnit, OperationError> GetOrganizationUnit(Organization organization, Guid unitUuid)
+        private Result<OrganizationUnit, OperationError> GetOrganizationUnitAndAuthorizeModification(Organization organization, Guid unitUuid)
         {
             var unit = organization.GetOrganizationUnit(unitUuid);
             if (unit.IsNone)
