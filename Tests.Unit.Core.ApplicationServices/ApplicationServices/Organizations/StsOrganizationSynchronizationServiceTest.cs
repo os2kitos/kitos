@@ -389,6 +389,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == unaffectedUnit)), Times.Never());
         }
 
+        //TODO: Extend with tests of the update scenarios
+
         private void VerifyChangesSaved(Mock<IDatabaseTransaction> transaction, Organization organization)
         {
             _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());

@@ -7,7 +7,6 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.Strategies;
-using Core.DomainServices.Organizations;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -142,13 +141,13 @@ namespace Tests.Unit.Core.Model.Strategies
         public void ComputeUpdate_Detects_Units_Moved_To_Existing_Parent()
         {
             //Arrange
-            var (_, externalTree, randomLeafWhichMustBeMovedToRoot) = CreateTreeWithUnitsMovedToExistingParent();
+            var (newRoot, externalTree, randomLeafWhichMustBeMovedToRoot) = CreateTreeWithUnitsMovedToExistingParent();
 
             //Act
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            AssertUnitsToMoveToExistingParentsWereDetected(consequences, externalTree, randomLeafWhichMustBeMovedToRoot);
+            AssertUnitsToMoveToExistingParentsWereDetected(consequences, randomLeafWhichMustBeMovedToRoot, newRoot);
         }
 
         [Fact, Description("Verifies if we detect if an existing unit has been moved one of the new units")]
@@ -201,7 +200,7 @@ namespace Tests.Unit.Core.Model.Strategies
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(consequences, expectedRemovedUnit);
+            AssertUnitsWhichAreDeletedWereDetected(consequences, expectedRemovedUnit);
         }
 
         [Fact]
@@ -235,18 +234,14 @@ namespace Tests.Unit.Core.Model.Strategies
         public void PerformUpdate_Updates_New_OrganizationUnits()
         {
             //Arrange
-            var (root, externalTree, randomParentOfNewSubTree, expectedSubTree, expectedChild, expectedNewUnits) = CreateTreeWithNewOrganizationUnits();
+            var (root, externalTree, _, _, _, expectedNewUnits) = CreateTreeWithNewOrganizationUnits();
 
             //Act
             var consequences = _sut.PerformUpdate(externalTree);
 
             //Assert
             Assert.True(consequences.Ok);
-            var (addedRoot, addedChild) = AssertNewUnitsWereDetected(consequences.Value, expectedNewUnits, expectedSubTree, randomParentOfNewSubTree, expectedChild);
-
-            var rootUnits = root.FlattenHierarchy().ToList();
-            Assert.Contains(addedRoot.Uuid, rootUnits.Select(x => x.ExternalOriginUuid).ToList());
-            Assert.Contains(addedChild.Uuid, rootUnits.Select(x => x.ExternalOriginUuid).ToList());
+            Assert.ProperSubset(root.FlattenHierarchy().Where(x=>x.Origin == OrganizationUnitOrigin.STS_Organisation).Select(x=>x.ExternalOriginUuid.GetValueOrDefault()).ToHashSet(),expectedNewUnits.Select(x=>x.ExternalOriginUuid.GetValueOrDefault()).ToHashSet());
         }
 
         [Fact]
@@ -260,11 +255,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            AssertUnitsToRenameWereDetected(consequences.Value, randomItemToRename, expectedOldName, expectedNewName);
-
-            var rootUnit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == randomItemToRename.Uuid);
-            Assert.NotNull(rootUnit);
-            Assert.Equal(expectedNewName, rootUnit.Name);
+            Assert.Equal(expectedNewName,randomItemToRename.Name);
         }
 
         [Fact]
@@ -278,11 +269,8 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            var (movedUnit, newParent) = AssertUnitsToMoveToExistingParentsWereDetected(consequences.Value, externalTree, randomLeafWhichMustBeMovedToRoot);
+            Assert.Contains(randomLeafWhichMustBeMovedToRoot, root.Children);
 
-            var rootParent = root.FlattenHierarchy().FirstOrDefault(x => x.ExternalOriginUuid == newParent.Uuid);
-            Assert.NotNull(rootParent);
-            Assert.Contains(movedUnit.Uuid, rootParent.Children.Select(x => x.Uuid));
         }
 
         [Fact]
@@ -296,13 +284,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            var (movedUnit, newParent) = AssertUnitsToMoveToNewlyAddedParentWereDetected(consequences.Value, root, newItem, randomLeafMovedToNewlyImportedItem);
-
-            var rootParent = root.FlattenHierarchy().FirstOrDefault(x => x.ExternalOriginUuid == newParent.Uuid);
-            var rootMovedUnit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == movedUnit.Uuid);
-            Assert.NotNull(rootParent);
-            Assert.NotNull(rootMovedUnit);
-            Assert.Contains(movedUnit.Uuid, rootParent.Children.Select(x => x.Uuid));
+            Assert.Equal(newItem.ExternalOriginUuid.GetValueOrDefault(),randomLeafMovedToNewlyImportedItem.Parent.ExternalOriginUuid.GetValueOrDefault());
         }
 
         [Fact]
@@ -316,13 +298,11 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            var organizationUnit = AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(consequences.Value, nodeExpectedToBeConverted, expectedRemovedUnits);
-
-            var unit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == organizationUnit.Uuid);
-            Assert.NotNull(unit);
-            Assert.Equal(OrganizationUnitOrigin.Kitos, unit.Origin);
+            Assert.DoesNotContain(root.FlattenHierarchy(),child=>expectedRemovedUnits.Contains(child));
+            var actualConverted = Assert.Single(root.FlattenHierarchy().Where(x => x == nodeExpectedToBeConverted));
+            Assert.Equal(OrganizationUnitOrigin.Kitos,actualConverted.Origin);
+            Assert.Null(actualConverted.ExternalOriginUuid);
         }
-
 
         [Fact]
         public void PerformUpdate_Updates_Removed_Units_Which_Are_Converted_Since_They_Are_Still_In_Use()
@@ -335,11 +315,10 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            var organizationUnit = AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(consequences.Value, removedNodeInUse);
 
-            var unit = root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == organizationUnit.Uuid);
-            Assert.NotNull(unit);
-            Assert.Equal(OrganizationUnitOrigin.Kitos, unit.Origin);
+            var expectedConversion = Assert.Single(root.FlattenHierarchy().Where(x => x == removedNodeInUse));
+            Assert.Equal(OrganizationUnitOrigin.Kitos, expectedConversion.Origin);
+            Assert.Null(expectedConversion.ExternalOriginUuid);
         }
 
         [Fact]
@@ -353,9 +332,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            var removedUnit = AssertUnitsWhichAreDeletedWereDetected(consequences.Value, expectedRemovedUnit);
-
-            Assert.Null(root.FlattenHierarchy().FirstOrDefault(x => x.Uuid == removedUnit.Uuid));
+            Assert.DoesNotContain(expectedRemovedUnit, root.FlattenHierarchy());
         }
 
         [Fact]
@@ -374,10 +351,10 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Same(expectedRemovedUnit, removedUnit);
             var movedUnits = consequences.Value.OrganizationUnitsBeingMoved.ToList();
             Assert.Equal(expectedParentChangesCount, movedUnits.Count);
-            foreach (var (_, oldParent, newParent) in movedUnits)
+            foreach (var (affectedUnit, oldParent, newParent) in movedUnits)
             {
                 Assert.Equal(removedUnit, oldParent);
-                Assert.Equal(removedUnit.Parent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
+                Assert.Equal(affectedUnit.Parent?.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
             }
 
             Assert.Empty(consequences.Value.DeletedExternalUnitsBeingConvertedToNativeUnits);
@@ -388,7 +365,7 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Null(hierarchy.FirstOrDefault(x => x.Uuid == removedUnit.Uuid));
         }
 
-        private static (ExternalOrganizationUnit addedRootUnit, ExternalOrganizationUnit addedChildUnit) AssertNewUnitsWereDetected(OrganizationTreeUpdateConsequences consequences, IEnumerable<OrganizationUnit> expectedNewUnits, OrganizationUnit expectedSubTree, OrganizationUnit randomParentOfNewSubTree, OrganizationUnit expectedChild)
+        private static void AssertNewUnitsWereDetected(OrganizationTreeUpdateConsequences consequences, IEnumerable<OrganizationUnit> expectedNewUnits, OrganizationUnit expectedSubTree, OrganizationUnit randomParentOfNewSubTree, OrganizationUnit expectedChild)
         {
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
             Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
@@ -403,8 +380,6 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(randomParentOfNewSubTree.ExternalOriginUuid.GetValueOrDefault(), addedRoot.parent.Uuid);
             var addedChild = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedChild.ExternalOriginUuid.GetValueOrDefault()));
             Assert.Equal(addedRoot.unitToAdd, addedChild.parent);
-
-            return (addedRoot.unitToAdd, addedChild.unitToAdd);
         }
 
         private static void AssertUnitsToRenameWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit randomItemToRename, string expectedOldName, string expectedNewName)
@@ -419,36 +394,32 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(expectedNewName, newName);
         }
 
-        private static (OrganizationUnit movedUnit, ExternalOrganizationUnit newParent) AssertUnitsToMoveToExistingParentsWereDetected(OrganizationTreeUpdateConsequences consequences, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafWhichMustBeMovedToRoot)
+        private static (OrganizationUnit movedUnit, ExternalOrganizationUnit newParent) AssertUnitsToMoveToExistingParentsWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit randomLeafWhichMustBeMovedToRoot, OrganizationUnit expectedNewParent)
         {
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
             Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
             Assert.Empty(consequences.AddedExternalOrganizationUnits);
 
-            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
+            var (movedUnit, _, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
             Assert.Equal(randomLeafWhichMustBeMovedToRoot, movedUnit);
-            Assert.Equal(movedUnit.Parent, oldParent);
-            Assert.Equal(externalTree, newParent);
+            Assert.Equal(expectedNewParent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
 
             return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit>(movedUnit, newParent);
         }
 
-        private static (OrganizationUnit movedUnit, ExternalOrganizationUnit newParent) AssertUnitsToMoveToNewlyAddedParentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit root, OrganizationUnit newItem, OrganizationUnit randomLeafWhichMustBeMovedToRoot)
+        private static void AssertUnitsToMoveToNewlyAddedParentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit root, OrganizationUnit exptectedNewItem, OrganizationUnit expectedMovedUnit)
         {
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
             Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
             var (unitToAdd, parent) = Assert.Single(consequences.AddedExternalOrganizationUnits);
-            Assert.Equal(newItem.ExternalOriginUuid.GetValueOrDefault(), unitToAdd.Uuid);
+            Assert.Equal(exptectedNewItem.ExternalOriginUuid.GetValueOrDefault(), unitToAdd.Uuid);
             Assert.Equal(root.ExternalOriginUuid.GetValueOrDefault(), parent.Uuid);
 
-            var (movedUnit, oldParent, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
-            Assert.Equal(randomLeafWhichMustBeMovedToRoot, movedUnit);
-            Assert.Equal(movedUnit.Parent, oldParent);
+            var (movedUnit, _, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
+            Assert.Equal(expectedMovedUnit, movedUnit);
             Assert.Equal(unitToAdd.Uuid, newParent.Uuid);
-
-            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit>(movedUnit, newParent);
         }
 
         private static OrganizationUnit AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit nodeExpectedToBeConverted, IEnumerable<OrganizationUnit> expectedRemovedUnits)
@@ -546,7 +517,7 @@ namespace Tests.Unit.Core.Model.Strategies
                 return currentChildren;
             });
 
-            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, OrganizationUnit, OrganizationUnit, IEnumerable<OrganizationUnit>>(root, externalTree, randomParentOfNewSubTree, expectedSubTree, expectedChild, expectedNewUnits);
+            return (root, externalTree, randomParentOfNewSubTree, expectedSubTree, expectedChild, expectedNewUnits);
         }
 
         private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomItemToRename, string expectedOldName, string expectedNewName) CreateTreeWithRenamedOrganizationUnits()
@@ -565,7 +536,7 @@ namespace Tests.Unit.Core.Model.Strategies
             var expectedOldName = A<string>();
             randomItemToRename.Name = expectedOldName; //Rename the local item to enforce name change detection
 
-            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, string, string>(root, externalTree, randomItemToRename, expectedOldName, expectedNewName);
+            return (root, externalTree, randomItemToRename, expectedOldName, expectedNewName);
         }
 
         private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafWhichMustBeMovedToRoot) CreateTreeWithUnitsMovedToExistingParent()
@@ -591,7 +562,7 @@ namespace Tests.Unit.Core.Model.Strategies
                     : currentChildren;
             });
 
-            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit>(root, externalTree, randomLeafWhichMustBeMovedToRoot);
+            return (root, externalTree, randomLeafWhichMustBeMovedToRoot);
         }
 
         private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafMovedToNewlyImportedItem, OrganizationUnit newItem) CreateTreeWithUnitsMovedToNewlyAddedUnit()
@@ -638,7 +609,7 @@ namespace Tests.Unit.Core.Model.Strategies
                 return currentChildren;
             });
 
-            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit, OrganizationUnit, OrganizationUnit>(root, externalTree, randomLeafMovedToNewlyImportedItem, newItem);
+            return (root, externalTree, randomLeafMovedToNewlyImportedItem, newItem);
         }
 
         private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit nodeExpectedToBeConverted, IEnumerable<OrganizationUnit> expectedRemovedUnits) CreateTreeWithUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContent()

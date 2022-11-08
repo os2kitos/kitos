@@ -117,6 +117,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             }
         }
 
+        //TODO: Extend with more specific tests of new methods
+
         private ExternalOrganizationUnit CreateOrgUnit(params ExternalOrganizationUnit[] children)
         {
             return new ExternalOrganizationUnit(A<Guid>(), A<string>(), new Dictionary<string, string>(), children ?? Array.Empty<ExternalOrganizationUnit>());
