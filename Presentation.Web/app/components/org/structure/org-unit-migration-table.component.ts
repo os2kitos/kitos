@@ -7,8 +7,8 @@
                 title: "@",
                 options: "<",
                 configuration: "<",
-                unitId: "<",
-                organizationId: "<",
+                unitUuid: "@",
+                organizationUuid: "@",
                 closeModal: "&"
             },
             controller: OrganizationUnitMigrationTableController,
@@ -17,10 +17,15 @@
         }
     }
 
+    export enum MigrationTableColumnType {
+        Text = 0,
+        Link = 1
+    }
+
     export interface IMigrationTableColumn{
         title: string;
         property: string;
-        isLink?: boolean;
+        type: MigrationTableColumnType;
         cssClass?: string;
     }
 
@@ -41,6 +46,7 @@
         organizationUuid: string | null = null;
         closeModal: () => void;
         root: IOrganizationUnitMigrationRoot;
+        columnTypes = MigrationTableColumnType;
 
         static $inject: string[] = ["organizationRegistrationsService", "notify", "$state", "$window"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,

@@ -542,7 +542,7 @@
 
                                 $modalScope.submitting = true;
 
-                                organizationRegistrationsService.deleteOrganizationUnit(unit.organizationId, unit.id)
+                                organizationRegistrationsService.deleteOrganizationUnit(unit.organization.uuid, unit.uuid)
                                     .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();

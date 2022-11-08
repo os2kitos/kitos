@@ -130,7 +130,7 @@
             this.isBusy = true;
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, this.selectedOrg.id, request)
+            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, this.selectedOrg.uuid, request)
                 .then(() => {
                     this.selectedOrg = null;
                     this.refreshData();
@@ -145,15 +145,11 @@
         setSelectedOrg() {
             if (!this.selectedOrg?.id)
                 return;
-            if (this.selectedOrg.id === this.unitUuid) {
+            if (this.selectedOrg.uuid === this.unitUuid) {
                 this.selectedOrg = null;
                 this.notify.addErrorMessage("Du kan ikke overføre til denne enhed");
                 return;
             }
-            const selectedRegistrations = this.collectSelectedRegistrations();
-            selectedRegistrations.forEach(registration => {
-                registration.targetUnitId = this.selectedOrg.id;
-            });
 
             this.checkShouldTransferBtnBeEnabled();
         }
@@ -353,22 +349,22 @@
 
         private createStandardTableConfig(title: string): IMigrationTableColumn[] {
             return [
-                { title: title, property: "text", isLink: true },
+                { title: title, property: "text", type: MigrationTableColumnType.Link },
             ] as IMigrationTableColumn[];
         }
 
         private createUserFullNameTableConfig(title: string): IMigrationTableColumn[] {
             return [
-                { title: title, property: "text" },
-                { title: "Bruger", property: "objectText" }
+                { title: title, property: "text", type: MigrationTableColumnType.Text },
+                { title: "Bruger", property: "objectText", type: MigrationTableColumnType.Text }
             ] as IMigrationTableColumn[];
         }
 
         private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
             return [
-                { title: "Index", property: "index" },
-                { title: "Kontraktnavn", property: "objectText", isLink: true },
-                { title: title, property: "text" }
+                { title: "Index", property: "index", type: MigrationTableColumnType.Text },
+                { title: "Kontraktnavn", property: "objectText", type: MigrationTableColumnType.Link },
+                { title: title, property: "text", type: MigrationTableColumnType.Text }
             ] as IMigrationTableColumn[];
         }
 

@@ -67,7 +67,7 @@ namespace Core.DomainServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var organization = _organizationRepository.GetByKey(organizationUuid);
+            var organization = _organizationRepository.AsQueryable().FirstOrDefault(x => x.Uuid == organizationUuid);
             if(organization == null)
                 return new OperationError($"Organization with uuid: {organizationUuid} not found", OperationFailure.NotFound);
             var unit = organization.GetOrganizationUnit(unitUuid);

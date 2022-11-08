@@ -157,12 +157,14 @@ namespace Core.DomainModel.Organization
 
         public OrganizationRegistrationDetails GetUnitRegistrations()
         {
+            var usings = Using.ToList();
+
             return new OrganizationRegistrationDetails
             (
                 Rights.ToList(),
                 ResponsibleForItContracts.ToList(),
                 GetUnitPayments().ToList(),
-                Using.Where(x => x.OrganizationUnit.Id == Id).Select(x => x.ItSystemUsage).ToList(),
+                Using.Where(x => x.ResponsibleItSystemUsage != null).Select(x => x.ResponsibleItSystemUsage).ToList(),
                 Using.Select(x => x.ItSystemUsage).ToList()
             );
         }

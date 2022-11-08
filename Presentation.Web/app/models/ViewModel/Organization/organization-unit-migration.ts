@@ -7,7 +7,6 @@
         targetPageObjectId?: number;
         objectText?: string;
 
-        targetUnitId?: number;
         optionalObjectContext?: any;
     }
 

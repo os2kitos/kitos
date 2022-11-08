@@ -56,6 +56,7 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpDelete]
+        [Route("")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -128,8 +129,8 @@ namespace Presentation.Web.Controllers.API.V1
                 requestDto.ItContractRegistrations,
                 requestDto.PaymentRegistrationDetails.Select(x =>
                     new PaymentChangeParameters(x.ItContractId, x.InternalPayments, x.ExternalPayments)),
-                requestDto.RelevantSystems,
-                requestDto.ResponsibleSystems
+                requestDto.ResponsibleSystems,
+                requestDto.RelevantSystems
             );
         }
     }

@@ -147,7 +147,7 @@ namespace Core.ApplicationServices.Organizations
                 return organizationResult.Error;
             }
 
-            var unit = organizationResult.Value.GetOrganizationUnit(targetUnitUuid);
+            var unit = organizationResult.Value.GetOrganizationUnit(unitUuid);
             if (unit.IsNone)
             {
                 return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);

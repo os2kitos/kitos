@@ -21,10 +21,10 @@
                 <td><input data-disabled-on-busy type="checkbox" ng-model="registration.selected" ng-change="ctrl.registrationSelected()" /></td>
                 <td ng-repeat="header in ctrl.configuration">
                     <div class="{{header.cssClass}}">
-                        <a ng-if="header.isLink" href="" ng-click="ctrl.navigateTo(registration.targetPageObjectId)">
+                        <a ng-if="header.type === ctrl.columnTypes.Link" href="" ng-click="ctrl.navigateTo(registration.targetPageObjectId)">
                             {{::registration[header.property]}}
                         </a>
-                        <div ng-if="!header.isLink">
+                        <div ng-if="header.type === ctrl.columnTypes.Text">
                             {{::registration[header.property]}}
                         </div>
                     </div>

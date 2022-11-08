@@ -181,12 +181,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Uuid, unit2.Uuid, selectedRegistrations);
 
             registrationsUnit1 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Uuid);
-            Assert.Empty(registrationsUnit1.ItContractRegistrations);
+            Assert.Empty(registrationsUnit1.ResponsibleSystems);
 
             registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Uuid);
+            AssertRegistrationIsValid(usage, registrationsUnit2.RelevantSystems);
             AssertRegistrationIsValid(usage, registrationsUnit2.ResponsibleSystems);
 
+
             //----Relevant systems----
+            selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);
+            await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit2.Uuid, selectedRegistrations);
+
             selectedRegistrations = CreateChangeParametersWithOnlyRelevantSystems(registrations);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Uuid, unit2.Uuid, selectedRegistrations);
 
