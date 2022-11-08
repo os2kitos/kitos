@@ -236,31 +236,13 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Contains(expectedObject.Id, registrationList.Select(x => x.Id));
         }
 
-
-        private static EconomyStream CreateEconomyStream(int unitId)
-        {
-            var economy = new EconomyStream
-            {
-                OrganizationUnitId = unitId
-            };
-            AssignOwnership(economy);
-
-            return economy;
-        }
-
-        private static void AssignOwnership(IEntity entity)
-        {
-            entity.ObjectOwnerId = TestEnvironment.DefaultUserId;
-            entity.LastChangedByUserId = TestEnvironment.DefaultUserId;
-        }
-
         private static ChangeOrganizationRegistrationRequestDTO ToChangeParametersList(OrganizationRegistrationDTO registrations)
         {
             return new ChangeOrganizationRegistrationRequestDTO()
             {
                 ItContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id).ToList(),
                 OrganizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id).ToList(),
-                PaymentRegistrationDetails = registrations.Payments.Select(x => new ChangePaymentRegistraitonRequestDTO
+                PaymentRegistrationDetails = registrations.Payments.Select(x => new ChangePaymentRegistrationRequestDTO
                 {
                     ItContractId = x.ItContract.Id,
                     InternalPayments = x.InternalPayments.Select(x => x.Id).ToList(),
@@ -407,7 +389,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             {
                 var unitEntity = context.OrganizationUnits.FirstOrDefault(u => u.Id == unit.Id);
                 if (unitEntity == null)
-                    throw new Exception($"Unit with ID: {unit.Uuid} not found!");
+                    throw new Exception($"Unit with ID: {unit.Id} was not found!");
 
                 context.OrganizationUnitRoles.Add(newRole);
                 right.RoleId = newRole.Id;
@@ -425,6 +407,23 @@ namespace Tests.Integration.Presentation.Web.Organizations
             });
 
             return (right, contract, externalEconomyStream, internalEconomyStream, usage, unit);
+        }
+
+        private static EconomyStream CreateEconomyStream(int unitId)
+        {
+            var economy = new EconomyStream
+            {
+                OrganizationUnitId = unitId
+            };
+            AssignOwnership(economy);
+
+            return economy;
+        }
+
+        private static void AssignOwnership(IEntity entity)
+        {
+            entity.ObjectOwnerId = TestEnvironment.DefaultUserId;
+            entity.LastChangedByUserId = TestEnvironment.DefaultUserId;
         }
     }
 }

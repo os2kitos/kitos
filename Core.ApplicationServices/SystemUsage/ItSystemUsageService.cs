@@ -291,9 +291,9 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var result = system.TransferResponsibleOrganizationalUnit(targetUnit);
-                return result.HasValue 
-                    ? result.Value 
+                var error = system.TransferResponsibleOrganizationalUnit(targetUnit);
+                return error.HasValue 
+                    ? error.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);
@@ -303,9 +303,9 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var result = system.TransferUsedByUnit(unitId, targetUnit);
-                return result.HasValue
-                    ? result.Value
+                var error = system.TransferUsedByUnit(unitId, targetUnit);
+                return error.HasValue
+                    ? error.Value
                     : Result<ItSystemUsage, OperationError>.Success(system);
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);
@@ -315,9 +315,9 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var result = system.RemoveResponsibleOrganizationUnit();
-                return result.HasValue 
-                    ? result.Value 
+                var error = system.RemoveResponsibleOrganizationUnit();
+                return error.HasValue 
+                    ? error.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);
@@ -327,9 +327,9 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var result = system.RemoveUsedByUnit(unitId);
-                return result.HasValue
-                    ? result.Value
+                var error = system.RemoveUsedByUnit(unitId);
+                return error.HasValue
+                    ? error.Value
                     : Result<ItSystemUsage, OperationError>.Success(system);
             }).Match(_ => Maybe<OperationError>.None,
                 err => err);

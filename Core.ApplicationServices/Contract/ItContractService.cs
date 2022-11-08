@@ -9,7 +9,6 @@ using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
@@ -44,7 +43,6 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
         private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
-        private readonly IEntityIdentityResolver _identityResolver;
 
         public ItContractService(
             IItContractRepository repository,
@@ -64,7 +62,7 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
             IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
             IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService, 
-            IGenericRepository<EconomyStream> economyStreamRepository, IEntityIdentityResolver identityResolver)
+            IGenericRepository<EconomyStream> economyStreamRepository)
         {
             _repository = repository;
             _referenceService = referenceService;
@@ -84,7 +82,6 @@ namespace Core.ApplicationServices.Contract
             _optionExtendOptionsService = optionExtendOptionsService;
             _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
             _economyStreamRepository = economyStreamRepository;
-            _identityResolver = identityResolver;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)

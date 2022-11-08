@@ -423,7 +423,7 @@
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitConsequenceDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateConsequencesResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitChangeCategory.cs" />
-    <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistraitonRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangeOrganizationRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationDTO.cs" />

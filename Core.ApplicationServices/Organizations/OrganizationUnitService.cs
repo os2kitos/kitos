@@ -69,13 +69,13 @@ namespace Core.ApplicationServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var authorizeResult = GetOrganizationAndAuthorizeModification(organizationUuid);
-            if (authorizeResult.Failed)
+            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
+            if (organizationResult.Failed)
             {
-                return authorizeResult.Error;
+                return organizationResult.Error;
             }
 
-            var unit = authorizeResult.Value.GetOrganizationUnit(unitUuid);
+            var unit = organizationResult.Value.GetOrganizationUnit(unitUuid);
             if (unit.IsNone)
             {
                 return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);

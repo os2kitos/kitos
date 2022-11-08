@@ -91,7 +91,7 @@ namespace Core.ApplicationServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var unitResult = GetOrganizationUnit(organizationUuid, unitUuid);
+            var unitResult = GetOrganizationUnitByUuid(organizationUuid, unitUuid);
             if (unitResult.Failed)
             {
                 return unitResult.Error;
@@ -125,12 +125,18 @@ namespace Core.ApplicationServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var unitResult = GetOrganizationUnit(organizationUuid, unitUuid);
+            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
+            if (organizationResult.Failed)
+            {
+                return organizationResult.Error;
+            }
+
+            var unitResult = GetOrganizationUnit(organizationResult.Value, unitUuid);
             if (unitResult.Failed)
             {
                 return unitResult.Error;
             }
-            var targetUnitResult = GetOrganizationUnit(organizationUuid, targetUnitUuid);
+            var targetUnitResult = GetOrganizationUnit(organizationResult.Value, targetUnitUuid);
             if (targetUnitResult.Failed)
             {
                 return targetUnitResult.Error;
@@ -164,15 +170,17 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUuid, Guid unitUuid)
+        private Result<OrganizationUnit, OperationError> GetOrganizationUnitByUuid(Guid organizationUuid, Guid unitUuid)
         {
             var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
-            if (organizationResult.Failed)
-            {
-                return organizationResult.Error;
-            }
+            return organizationResult.Failed 
+                ? organizationResult.Error 
+                : GetOrganizationUnit(organizationResult.Value, unitUuid);
+        }
 
-            var unit = organizationResult.Value.GetOrganizationUnit(unitUuid);
+        private Result<OrganizationUnit, OperationError> GetOrganizationUnit(Organization organization, Guid unitUuid)
+        {
+            var unit = organization.GetOrganizationUnit(unitUuid);
             if (unit.IsNone)
             {
                 return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
