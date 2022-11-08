@@ -15,7 +15,7 @@ namespace Core.DomainServices.Repositories.Contract
         IQueryable<ItContractOverviewReadModel> GetByParentContract(int parentContractId);
         IQueryable<ItContractOverviewReadModel> GetByTerminationDeadlineType(int terminationDeadlineId);
         IQueryable<ItContractOverviewReadModel> GetByOptionExtendType(int optionExtendTypeId);
-        IQueryable<ItContractOverviewReadModel> GetByItSystem(int itSystemId);
+        IQueryable<int> GetSourceIdsByItSystem(int itSystemId);
         IQueryable<ItContractOverviewReadModel> GetByItSystemUsage(int systemUsageId);
         IQueryable<ItContractOverviewReadModel> GetByDataProcessingRegistration(int dprId);
         IQueryable<ItContractOverviewReadModel> GetByUser(int userId);
