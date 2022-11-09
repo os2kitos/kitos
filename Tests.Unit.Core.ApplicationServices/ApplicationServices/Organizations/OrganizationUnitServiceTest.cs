@@ -15,6 +15,7 @@ using Tests.Toolkit.Patterns;
 using Moq;
 using Xunit;
 using Core.DomainModel.Events;
+using Core.DomainServices;
 
 namespace Tests.Unit.Core.ApplicationServices.Organizations
 {
@@ -27,6 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IDatabaseControl> _databaseControl;
+        private readonly Mock<IGenericRepository<OrganizationUnit>> _repositoryMock;
 
         public OrganizationUnitServiceTest()
         {
@@ -38,6 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _transactionManagerMock = new Mock<ITransactionManager>();
             _domainEvents = new Mock<IDomainEvents>();
             _databaseControl = new Mock<IDatabaseControl>();
+            _repositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
 
             _sut = new OrganizationUnitService(
                 _organizationServiceMock.Object,
@@ -47,7 +50,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _authorizationContextMock.Object,
                 _transactionManagerMock.Object,
                 _domainEvents.Object,
-                _databaseControl.Object);
+                _databaseControl.Object,
+                _repositoryMock.Object);
         }
 
         [Fact]
@@ -265,9 +269,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _authorizationContextMock.Setup(x => x.AllowModify(unit)).Returns(result);
         }
 
-        private static OrganizationRegistrationChangeParameters CreateEmptyChangeParameters()
+        private static OrganizationUnitRegistrationChangeParameters CreateEmptyChangeParameters()
         {
-            return new OrganizationRegistrationChangeParameters(
+            return new OrganizationUnitRegistrationChangeParameters(
                 new List<int>(), 
                 new List<int>(),
                 new List<PaymentChangeParameters>(), 

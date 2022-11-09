@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItContract
@@ -160,6 +161,18 @@ namespace Core.DomainModel.ItContract
 
             if (InternPaymentFor != null)
                 yield return InternPaymentFor.OrganizationId;
+        }
+
+        public void SetOrganizationUnit(OrganizationUnit unit)
+        {
+            OrganizationUnit = unit;
+            //OrganizationUnitId = unit.Id;
+        }
+
+        public void ResetOrganizationUnit()
+        {
+            OrganizationUnit = null;
+            //OrganizationUnitId = null;
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
-    public class OrganizationRegistrationDTO
+    public class OrganizationRegistrationUnitDTO
     {
-        public OrganizationRegistrationDTO()
+        public OrganizationRegistrationUnitDTO()
         {
             OrganizationUnitRights = new List<NamedEntityWithUserFullNameDTO>();
             ItContractRegistrations = new List<NamedEntityDTO>();

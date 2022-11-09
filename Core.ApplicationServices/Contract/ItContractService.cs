@@ -134,8 +134,7 @@ namespace Core.ApplicationServices.Contract
                 }
 
                 return Result<ItContract, OperationError>.Success(contract);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
         public Maybe<OperationError> TransferPayments(int contractId, Guid targetUnitUuid, bool isInternal, IEnumerable<int> paymentIds)
@@ -148,8 +147,7 @@ namespace Core.ApplicationServices.Contract
                         error => error,
                         () => Result<ItContract, OperationError>.Success(contract)
                     );
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
         private static Maybe<OperationError> TransferPayments(ItContract contract, Guid targetUnitUuid, bool isInternal,
@@ -340,8 +338,7 @@ namespace Core.ApplicationServices.Contract
                         error => error,
                         () => Result<ItContract, OperationError>.Success(contract)
                     );
-            }).Match(_ => Maybe<OperationError>.None, 
-                err => err);
+            }).MatchFailure();
         }
 
         public Maybe<OperationError> RemoveResponsibleUnit(int contractId)
@@ -350,8 +347,7 @@ namespace Core.ApplicationServices.Contract
             {
                 contract.ResetResponsibleOrganizationUnit();
                 return Result<ItContract, OperationError>.Success(contract);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
         
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)

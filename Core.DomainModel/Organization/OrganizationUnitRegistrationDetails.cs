@@ -2,9 +2,9 @@
 
 namespace Core.DomainModel.Organization
 {
-    public class OrganizationRegistrationDetails
+    public class OrganizationUnitRegistrationDetails
     {
-        public OrganizationRegistrationDetails(
+        public OrganizationUnitRegistrationDetails(
             IEnumerable<OrganizationUnitRight> organizationUnitRights, 
             IEnumerable<ItContract.ItContract> itContractRegistrations, 
             IEnumerable<PaymentRegistrationDetails> paymentRegistrationDetails,

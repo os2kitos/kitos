@@ -130,7 +130,7 @@
 
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, this.selectedOrg.uuid, request)
+            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.selectedOrg = null;
                     this.refreshData();
@@ -280,8 +280,9 @@
             this.responsibleSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems, "it-system.usage.org");
         }
 
-        private createChangeRequest(): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
-            return Helpers.OrganizationRegistrationHelper.createChangeRequest(
+        private createChangeRequest(): Models.Api.Organization.TransferOrganizationRegistrationRequestDto {
+            return Helpers.OrganizationRegistrationHelper.createTransferRequest(
+                this.selectedOrg.uuid,
                 this.contractRegistrations.root.children,
                 this.externalPayments.root.children,
                 this.internalPayments.root.children,

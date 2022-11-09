@@ -2,9 +2,9 @@
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
-    public class ChangeOrganizationRegistrationRequestDTO
+    public class ChangeOrganizationUnitRegistrationRequestDTO
     {
-        public ChangeOrganizationRegistrationRequestDTO()
+        public ChangeOrganizationUnitRegistrationRequestDTO()
         {
             OrganizationUnitRights = new List<int>();
             ItContractRegistrations = new List<int>();

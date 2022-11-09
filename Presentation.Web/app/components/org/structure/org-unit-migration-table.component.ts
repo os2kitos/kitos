@@ -55,18 +55,23 @@
         $onInit() {
             if (this.title === null) {
                 console.error("missing migration table attribute: 'title'");
+                return;
             }
             if (this.options === null) {
                 console.error("missing migration table attribute: 'options'");
+                return;
             }
             if (this.configuration === null) {
                 console.error("missing migration table attribute: 'configuration'");
+                return;
             }
             if (this.unitUuid === null) {
                 console.error("missing migration table attribute: 'unitUuid'");
+                return;
             }
             if (this.organizationUuid === null) {
                 console.error("missing migration table attribute: 'organizationId'");
+                return;
             }
 
             this.root = this.options.root;

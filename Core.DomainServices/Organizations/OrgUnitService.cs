@@ -70,16 +70,17 @@ namespace Core.DomainServices.Organizations
             var organization = _organizationRepository.AsQueryable().FirstOrDefault(x => x.Uuid == organizationUuid);
             if(organization == null)
                 return new OperationError($"Organization with uuid: {organizationUuid} not found", OperationFailure.NotFound);
-            var unit = organization.GetOrganizationUnit(unitUuid);
-            if(unit.IsNone)
+            var unitResult = organization.GetOrganizationUnit(unitUuid);
+            if(unitResult.IsNone)
                 return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+            var unit = unitResult.Value;
 
-            var deleteRegistrationsError = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(new RemoveOrganizationUnitRegistrationsCommand(organization.Uuid, unitUuid));
+            var deleteRegistrationsError = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(new RemoveOrganizationUnitRegistrationsCommand(organization, unit));
             if (deleteRegistrationsError.HasValue)
                 return deleteRegistrationsError.Value;
 
             
-            var result = organization.RemoveOrganizationUnit(unit.Value.Id);
+            var result = organization.RemoveOrganizationUnit(unit.Id);
             if (result.Failed)
                 return result.Error;
             

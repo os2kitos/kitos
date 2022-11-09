@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
@@ -101,13 +103,20 @@ namespace Core.ApplicationServices.Organizations
             var rightsToDelete = new List<OrganizationUnitRight>();
             foreach (var rightId in rightIds)
             {
-                var removeResult = unit.RemoveRight(rightId);
-                if (removeResult.Failed)
+                var organizationUnitRightResult = unit.GetRight(rightId);
+                if (organizationUnitRightResult.IsNone)
                 {
-                    return removeResult.Error;
+                    return new OperationError($"Organization unit right with id: {rightId} was not found", OperationFailure.NotFound);
                 }
+                var rightToRemove = organizationUnitRightResult.Value;
                 
-                rightsToDelete.Add(removeResult.Value);
+                var result = unit.RemoveRole(rightToRemove.Role, rightToRemove.User);
+                if (result.Failed)
+                {
+                    return result.Error;
+                }
+
+                rightsToDelete.Add(rightToRemove);
             }
             var userIds = rightsToDelete.Select(x => x.UserId).ToList();
 
@@ -138,6 +147,7 @@ namespace Core.ApplicationServices.Organizations
             {
                 return unitResult.Error;
             }
+
             var targetUnitResult = GetOrganizationUnitAndAuthorizeModification(organization, targetUnitUuid);
             if (targetUnitResult.Failed)
             {
@@ -149,23 +159,26 @@ namespace Core.ApplicationServices.Organizations
 
             foreach (var rightId in rightIds)
             {
-                var unitRightResult = currentUnit.GetRight(rightId);
-                if (unitRightResult.Failed)
+                var organizationUnitRightResult = currentUnit.GetRight(rightId);
+
+                if (organizationUnitRightResult.IsNone)
                 {
-                    return unitRightResult.Error;
+                    return new OperationError($"Organization unit right with id: {rightId} was not found", OperationFailure.NotFound);
                 }
-                var unitRight = unitRightResult.Value;
+                var right = organizationUnitRightResult.Value;
 
-                if (unitRight.ObjectId != currentUnit.Id)
+                var error = currentUnit.RemoveRole(right.Role, right.User)
+                    .Bind(x => targetUnit.AssignRole(x.Role, x.User))
+                    .MatchFailure();
+                if (error.HasValue)
                 {
-                    return new OperationError($"Right with id: {unitRight.ObjectId} is not part of the Organization unit with id: {currentUnit.Id}", OperationFailure.BadState);
+                    return error.Value;
                 }
 
-                unitRight.ObjectId = targetUnit.Id;
-
-                _unitRightRepository.Update(unitRight);
-                _domainEvents.Raise(new AdministrativeAccessRightsChanged(unitRight.UserId));
+                _unitRightRepository.Update(right);
+                _domainEvents.Raise(new AdministrativeAccessRightsChanged(right.UserId));
             }
+
             _unitRightRepository.Save();
             transaction.Commit();
             return Maybe<OperationError>.None;
@@ -179,27 +192,20 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<OrganizationUnit, OperationError> GetOrganizationUnitAndAuthorizeModification(Organization organization, Guid unitUuid)
         {
-            var unit = organization.GetOrganizationUnit(unitUuid);
-            if (unit.IsNone)
-            {
-                return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
-            }
-            if (!_authorizationContext.AllowModify(unit.Value))
-            {
-                return new OperationError("User is not allowed to perform this operation", OperationFailure.Forbidden);
-            }
-
-            return unit.Value;
+            return organization.GetOrganizationUnit(unitUuid)
+                .Match
+                (
+                    WithModificationAccess, 
+                    () => new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound)
+                );
         }
 
         private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
         {
             var organization = _organizationRepository.AsQueryable().FirstOrDefault(x => x.Uuid == uuid);
-            if(organization == null)
-                return new OperationError($"Organization with uuid: {uuid} was not found", OperationFailure.NotFound);
-            return _authorizationContext.AllowModify(organization) == false 
-                ? new OperationError("User is not allowed to edit the organization", OperationFailure.Forbidden) 
-                : organization;
+            return organization == null 
+                ? new OperationError($"Organization with uuid: {uuid} was not found", OperationFailure.NotFound) 
+                : WithModificationAccess(organization);
         }
 
         private Result<OrganizationRight, OperationFailure> RemoveRight(OrganizationRight right)
@@ -225,6 +231,11 @@ namespace Core.ApplicationServices.Organizations
             _domainEvents.Raise(new AdministrativeAccessRightsChanged(right.UserId));
 
             return right;
+        }
+
+        private Result<T, OperationError> WithModificationAccess<T>(T entity) where T : IEntity
+        {
+            return _authorizationContext.AllowModify(entity) ? Result<T, OperationError>.Success(entity) : new OperationError(OperationFailure.Forbidden);
         }
     }
 }

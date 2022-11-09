@@ -322,13 +322,18 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Can_Remove_UsedByUnit()
         {
-            var unitId = A<int>();
+            var unitUuid = A<Guid>();
+            var unit = new OrganizationUnit {Uuid = unitUuid};
             var usage = new ItSystemUsage
             {
-                UsedBy = new List<ItSystemUsageOrgUnitUsage>{ new() { OrganizationUnitId = unitId, OrganizationUnit = new OrganizationUnit { Id = unitId } } }
+                UsedBy = new List<ItSystemUsageOrgUnitUsage>{ new() { OrganizationUnit = unit } },
+                Organization = new Organization
+                {
+                    OrgUnits = new List<OrganizationUnit>{ unit }
+                }
             };
 
-            var result = usage.RemoveUsedByUnit(unitId);
+            var result = usage.RemoveUsedByUnit(unitUuid);
 
             Assert.False(result.HasValue);
             Assert.Empty(usage.UsedBy);
@@ -337,16 +342,19 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Can_Transfer_OrganizationalUsage()
         {
-            var unitId = A<int>();
-            var responsibleUsage = new ItSystemUsageOrgUnitUsage { OrganizationUnitId = unitId, OrganizationUnit = new OrganizationUnit { Id = unitId } };
-            var targetUnit = new OrganizationUnit {Id = A<int>()};
+            var unitUuid = A<Guid>();
+            var targetUnitUuid = A<Guid>();
+            var unit = new OrganizationUnit {Uuid = unitUuid};
+            var targetUnit = new OrganizationUnit {Uuid = targetUnitUuid};
+            var responsibleUsage = new ItSystemUsageOrgUnitUsage { OrganizationUnit = unit };
             var usage = new ItSystemUsage
             {
                 UsedBy = new List<ItSystemUsageOrgUnitUsage> { responsibleUsage },
                 ResponsibleUsage = responsibleUsage,
+                Organization = new Organization {OrgUnits = new List<OrganizationUnit> { unit, targetUnit }}
             };
 
-            var result = usage.TransferResponsibleOrganizationalUnit(targetUnit);
+            var result = usage.TransferResponsibleOrganizationalUnit(targetUnitUuid);
 
             Assert.False(result.HasValue);
             Assert.Equal(targetUnit.Id, usage.ResponsibleUsage.OrganizationUnit.Id);
@@ -355,18 +363,24 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Can_Transfer_UsedByUnit()
         {
-            var unitId = A<int>();
-            var targetUnit = new OrganizationUnit { Id = A<int>() };
+            var unitUuid = A<Guid>();
+            var targetUnitUuid = A<Guid>();
+            var unit = new OrganizationUnit { Uuid = unitUuid};
+            var targetUnit = new OrganizationUnit { Uuid = targetUnitUuid};
             var usage = new ItSystemUsage
             {
-                UsedBy = new List<ItSystemUsageOrgUnitUsage> { new() { OrganizationUnitId = unitId, OrganizationUnit = new OrganizationUnit { Id = unitId } } }
+                Organization = new Organization()
+                {
+                    OrgUnits = new List<OrganizationUnit>{unit, targetUnit} 
+                },
+                UsedBy = new List<ItSystemUsageOrgUnitUsage> { new() { OrganizationUnit = unit } }
             };
 
-            var result = usage.TransferUsedByUnit(unitId, targetUnit);
+            var result = usage.TransferUsedByUnit(unitUuid, targetUnitUuid);
 
             Assert.False(result.HasValue);
-            Assert.DoesNotContain(unitId, usage.UsedBy.Select(x => x.OrganizationUnit.Id));
-            Assert.Contains(targetUnit.Id, usage.UsedBy.Select(x => x.OrganizationUnit.Id));
+            Assert.DoesNotContain(unitUuid, usage.UsedBy.Select(x => x.OrganizationUnit.Uuid));
+            Assert.Contains(targetUnitUuid, usage.UsedBy.Select(x => x.OrganizationUnit.Uuid));
         }
 
         [Theory]

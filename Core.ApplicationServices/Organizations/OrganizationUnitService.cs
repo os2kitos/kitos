@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
 
@@ -23,6 +27,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IDatabaseControl _databaseControl;
+        private readonly IGenericRepository<OrganizationUnit> _repository;
 
         public OrganizationUnitService(IOrganizationService organizationService,
             IOrganizationRightsService organizationRightsService, 
@@ -31,7 +36,8 @@ namespace Core.ApplicationServices.Organizations
             IAuthorizationContext authorizationContext, 
             ITransactionManager transactionManager, 
             IDomainEvents domainEvents,
-            IDatabaseControl databaseControl)
+            IDatabaseControl databaseControl, 
+            IGenericRepository<OrganizationUnit> repository)
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;
@@ -41,165 +47,168 @@ namespace Core.ApplicationServices.Organizations
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
             _databaseControl = databaseControl;
+            _repository = repository;
         }
 
-        public Result<OrganizationRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
+        public Result<OrganizationUnitRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
         {
-            return _organizationService.GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Match<Result<OrganizationUnit, OperationError>>
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind<OrganizationUnit>
                 (
                     organization =>
                     {
                         var unit = organization.GetOrganizationUnit(unitUuid);
-                        if(unit.IsNone)
+                        if (unit.IsNone)
                             return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
 
                         return unit.Value;
-                    },
-                    error => error
+                    }
                 )
-                .Match
-                (
-                    unit => Result<OrganizationRegistrationDetails, OperationError>.Success(unit.GetUnitRegistrations()),
-                    error => error
-                );
+                .Select(unit => unit.GetUnitRegistrations());
         }
 
-        public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationRegistrationChangeParameters parameters)
+        public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationUnitRegistrationChangeParameters parameters)
         {
-            using var transaction = _transactionManager.Begin();
-
-            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
-            if (organizationResult.Failed)
+            return Modify(organizationUuid, unitUuid, (_, unit) =>
             {
-                return organizationResult.Error;
-            }
-
-            var unit = organizationResult.Value.GetOrganizationUnit(unitUuid);
-            if (unit.IsNone)
-            {
-                return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
-            }
-
-            if (!_authorizationContext.AllowDelete(unit.Value))
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
-            
-            var result =  _organizationRightsService.RemoveUnitRightsByIds(organizationUuid, unitUuid, parameters.OrganizationUnitRights)
-                .Match
-                (
-                    error => error,
-                () => RemovePaymentResponsibleUnits(parameters.PaymentRegistrationDetails)
-                )
-                .Match
-                (
-                    error => error,
-                    () => RemoveContractRegistrations(parameters.ItContractRegistrations)
-                )
-                .Match
-                (
-                    error => error,
-                    () => RemoveSystemResponsibleRegistrations(parameters.ResponsibleSystems)
-                )
-                .Match
-                (
-                    error => error,
-                    () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unit.Value.Id)
-                );
-
-            if (result.HasValue)
-            {
-                return result.Value;
-            }
-
-            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unit.Value));
-            _databaseControl.SaveChanges();
-            transaction.Commit();
-
-            return Maybe<OperationError>.None;
+                return _organizationRightsService.RemoveUnitRightsByIds(organizationUuid, unitUuid, parameters.OrganizationUnitRights)
+                    .Match
+                    (
+                        error => error,
+                        () => RemovePaymentResponsibleUnits(parameters.PaymentRegistrationDetails)
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => RemoveContractRegistrations(parameters.ItContractRegistrations)
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => RemoveSystemResponsibleRegistrations(parameters.ResponsibleSystems)
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => RemoveSystemRelevantUnits(parameters.RelevantSystems, unitUuid)
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => Result<OrganizationUnit, OperationError>.Success(unit)
+                    );
+            }).MatchFailure();
         }
 
         public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid)
         {
-            using var transaction = _transactionManager.Begin();
-
-            var deleteRegistrationsError = GetRegistrations(organizationUuid, unitUuid)
-                .Match(val => DeleteRegistrations(organizationUuid, unitUuid, ToChangeParametersFromRegistrationDetails(val)),
-                    error => error);
-
-            if (deleteRegistrationsError.HasValue)
-                return deleteRegistrationsError.Value;
-
-            _databaseControl.SaveChanges();
-            transaction.Commit();
-
-            return Maybe<OperationError>.None;
+            return Modify(organizationUuid, unitUuid, (_, unit) =>
+            {
+                return GetRegistrations(organizationUuid, unitUuid)
+                    .Match
+                    (
+                        val => DeleteRegistrations(organizationUuid, unitUuid,
+                            ToChangeParametersFromRegistrationDetails(val)),
+                        error => error
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => Result<OrganizationUnit, OperationError>.Success(unit)
+                    );
+            }).MatchFailure();
         }
 
-        public Maybe<OperationError> TransferRegistrations(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, OrganizationRegistrationChangeParameters parameters)
+        public Maybe<OperationError> TransferRegistrations(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, OrganizationUnitRegistrationChangeParameters parameters)
+        {
+            return Modify(organizationUuid, unitUuid, (organization, unit) =>
+            {
+                var targetUnitResult = organization.GetOrganizationUnit(targetUnitUuid);
+                if (targetUnitResult.IsNone)
+                {
+                    return new OperationError($"Unit with uuid: {targetUnitUuid} was not found",
+                        OperationFailure.NotFound);
+                }
+
+                var targetUnit = targetUnitResult.Value;
+
+                if (!_authorizationContext.AllowModify(targetUnit))
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+
+                var error = _organizationRightsService.TransferUnitRightsByIds(organizationUuid, unitUuid,
+                        targetUnitUuid, parameters.OrganizationUnitRights)
+                    .Match
+                    (
+                        error => error,
+                        () => TransferPayments(targetUnitUuid, parameters.PaymentRegistrationDetails)
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => TransferContractRegistrations(targetUnitUuid, parameters.ItContractRegistrations)
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => TransferSystemResponsibleRegistrations(targetUnitUuid, parameters.ResponsibleSystems)
+                    )
+                    .Match
+                    (
+                        error => error,
+                        () => TransferSystemRelevantRegistrations(unitUuid, targetUnitUuid, parameters.RelevantSystems)
+                    );
+
+                if (error.HasValue)
+                {
+                    return error.Value;
+                }
+
+                _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(targetUnitResult.Value));
+                
+                return Result<OrganizationUnit, OperationError>.Success(unit);
+            }).MatchFailure();
+        }
+        
+        private Result<TSuccess, OperationError> Modify<TSuccess>(Guid organizationId, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin();
 
-            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
+            var organizationResult = GetOrganizationAndAuthorizeModification(organizationId);
+
             if (organizationResult.Failed)
             {
                 return organizationResult.Error;
             }
+            var organization = organizationResult.Value;
 
-            var unit = organizationResult.Value.GetOrganizationUnit(unitUuid);
-            if (unit.IsNone)
+            var unitResult = organization.GetOrganizationUnit(unitUuid);
+            if (unitResult.IsNone)
             {
                 return new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
             }
+            var unit = unitResult.Value;
 
-            var targetUnit = organizationResult.Value.GetOrganizationUnit(targetUnitUuid);
-            if (targetUnit.IsNone)
-            {
-                return new OperationError($"Unit with uuid: {targetUnitUuid} was not found", OperationFailure.NotFound);
-            }
-
-            if (!_authorizationContext.AllowModify(unit.Value))
-            {
+            if (!_authorizationContext.AllowModify(unit))
                 return new OperationError(OperationFailure.Forbidden);
-            }
-            if (!_authorizationContext.AllowModify(targetUnit.Value))
+
+            var mutationResult = mutation(organization, unit);
+
+            if (!mutationResult.Ok)
             {
-                return new OperationError(OperationFailure.Forbidden);
+                transaction.Rollback();
+                return mutationResult;
             }
 
-            var result = _organizationRightsService.TransferUnitRightsByIds(organizationUuid, unitUuid, targetUnitUuid, parameters.OrganizationUnitRights)
-                .Match
-                (
-                    error => error,
-                    () => TransferPayments(targetUnitUuid, parameters.PaymentRegistrationDetails)
-                )
-                .Match
-                (
-                    error => error,
-                    () => TransferContractRegistrations(targetUnitUuid, parameters.ItContractRegistrations)
-                )
-                .Match
-                (
-                    error => error,
-                    () => TransferSystemResponsibleRegistrations(targetUnit.Value, parameters.ResponsibleSystems)
-                )
-                .Match
-                (
-                    error => error,
-                    () => TransferSystemRelevantRegistrations(unit.Value.Id, targetUnit.Value, parameters.RelevantSystems)
-                );
+            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unitResult.Value));
 
-            if (result.HasValue)
-            {
-                return result.Value;
-            }
-
-            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unit.Value));
-            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(targetUnit.Value));
+            _repository.Update(unit);
             _databaseControl.SaveChanges();
             transaction.Commit();
-            return Maybe<OperationError>.None;
+
+            return mutationResult;
         }
 
         private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid, OrganizationDataReadAccessLevel? accessLevel = null)
@@ -243,11 +252,11 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> RemoveSystemRelevantUnits(IEnumerable<int> systemIds, int unitId)
+        private Maybe<OperationError> RemoveSystemRelevantUnits(IEnumerable<int> systemIds, Guid unitUuid)
         {
             foreach (var systemId in systemIds)
             {
-                var deleteError = _usageService.RemoveRelevantUnit(systemId, unitId);
+                var deleteError = _usageService.RemoveRelevantUnit(systemId, unitUuid);
                 if (deleteError.HasValue)
                     return deleteError.Value;
             }
@@ -283,11 +292,11 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> TransferSystemResponsibleRegistrations(OrganizationUnit targetUnit, IEnumerable<int> systemIds)
+        private Maybe<OperationError> TransferSystemResponsibleRegistrations(Guid targetUnitUuid, IEnumerable<int> systemIds)
         {
             foreach (var systemId in systemIds)
             {
-                var transferError = _usageService.TransferResponsibleUsage(targetUnit, systemId);
+                var transferError = _usageService.TransferResponsibleUsage(systemId, targetUnitUuid);
                 if (transferError.HasValue)
                     return transferError.Value;
             }
@@ -307,11 +316,11 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> TransferSystemRelevantRegistrations(int unitId, OrganizationUnit targetUnit, IEnumerable<int> systemIds)
+        private Maybe<OperationError> TransferSystemRelevantRegistrations(Guid unitUuid, Guid targetUnitUuid, IEnumerable<int> systemIds)
         {
             foreach (var systemId in systemIds)
             {
-                var transferError = _usageService.TransferRelevantUsage(unitId, targetUnit, systemId);
+                var transferError = _usageService.TransferRelevantUsage(systemId, unitUuid, targetUnitUuid);
                 if (transferError.HasValue)
                     return transferError.Value;
             }
@@ -319,12 +328,12 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private static OrganizationRegistrationChangeParameters ToChangeParametersFromRegistrationDetails(
-            OrganizationRegistrationDetails registrations)
+        private static OrganizationUnitRegistrationChangeParameters ToChangeParametersFromRegistrationDetails(
+            OrganizationUnitRegistrationDetails unitRegistrations)
         {
-            var itContractRegistrations = registrations.ItContractRegistrations.Select(x => x.Id).ToList();
-            var organizationUnitRights = registrations.OrganizationUnitRights.Select(x => x.Id).ToList();
-            var paymentRegistrationDetails = registrations.PaymentRegistrationDetails.Select
+            var itContractRegistrations = unitRegistrations.ItContractRegistrations.Select(x => x.Id).ToList();
+            var organizationUnitRights = unitRegistrations.OrganizationUnitRights.Select(x => x.Id).ToList();
+            var paymentRegistrationDetails = unitRegistrations.PaymentRegistrationDetails.Select
             (x =>
                 new PaymentChangeParameters
                 (
@@ -333,10 +342,10 @@ namespace Core.ApplicationServices.Organizations
                     x.ExternalPayments.Select(ep => ep.Id).ToList()
                 )
             ).ToList();
-            var relevantSystems = registrations.RelevantSystems.Select(x => x.Id).ToList();
-            var responsibleSystems = registrations.ResponsibleSystems.Select(x => x.Id).ToList();
+            var relevantSystems = unitRegistrations.RelevantSystems.Select(x => x.Id).ToList();
+            var responsibleSystems = unitRegistrations.ResponsibleSystems.Select(x => x.Id).ToList();
 
-            return new OrganizationRegistrationChangeParameters(organizationUnitRights, itContractRegistrations, paymentRegistrationDetails, responsibleSystems,relevantSystems);
+            return new OrganizationUnitRegistrationChangeParameters(organizationUnitRights, itContractRegistrations, paymentRegistrationDetails, responsibleSystems,relevantSystems);
         }
     }
 }

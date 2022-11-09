@@ -19,6 +19,26 @@
             return changeRequest;
         }
 
+        static createTransferRequest(
+            targetUnitUuid: string,
+            contractRegistrations: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            externalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            internalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            roles: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            relevantSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            responsibleSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.TransferOrganizationRegistrationRequestDto {
+
+            const request = OrganizationRegistrationHelper.createChangeRequest(contractRegistrations,
+                externalPayments,
+                internalPayments,
+                roles,
+                relevantSystems,
+                responsibleSystems) as Models.Api.Organization.TransferOrganizationRegistrationRequestDto;
+            request.targetUnitUuid = targetUnitUuid;
+
+            return request;
+        }
+
         static mapSelectedOptionsToIds(options: Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>): Array<number> {
             return options.filter(x => x.selected)
                 .map(item => item.id);

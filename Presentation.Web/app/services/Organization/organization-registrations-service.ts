@@ -4,7 +4,7 @@
         getRegistrations(orgId: string, unitId: string): ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto>;
         deleteSelectedRegistrations(orgId: string, unitId: string, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<boolean>;
         deleteOrganizationUnit(organizationId: string, unitId: string): angular.IPromise<boolean>;
-        transferSelectedRegistrations(orgId: string, unitId: string, targetUnitId: string, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<void>;
+        transferSelectedRegistrations(orgId: string, unitId: string, body: Models.Api.Organization.TransferOrganizationRegistrationRequestDto): angular.IPromise<void>;
     }
 
     export class OrganizationRegistrationsService implements IOrganizationRegistrationsService {
@@ -36,10 +36,10 @@
                 .executeAsync();
         }
 
-        transferSelectedRegistrations(orgUuid: string, unitUuid: string, targetUnitUuid: string, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<void> {
+        transferSelectedRegistrations(orgUuid: string, unitUuid: string, body: Models.Api.Organization.TransferOrganizationRegistrationRequestDto): angular.IPromise<void> {
             return this.apiUseCaseFactory
                 .createUpdate("Registreringer",
-                    () => this.apiWrapper.put(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/registrations/${targetUnitUuid}`, body))
+                    () => this.apiWrapper.put(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/registrations`, body))
                 .executeAsync();
         }
 

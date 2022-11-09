@@ -19,12 +19,12 @@ namespace Presentation.Web.Controllers.API.V1
     [PublicApi]
     [RoutePrefix("api/v1/organizations/{organizationUuid}/organization-units/{unitUuid}")]
 
-    public class OrganizationRegistrationController: BaseApiController
+    public class OrganizationUnitRegistrationController: BaseApiController
     {
         private readonly IOrganizationUnitService _organizationUnitService;
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationRegistrationController(IOrganizationUnitService organizationUnitService,
+        public OrganizationUnitRegistrationController(IOrganizationUnitService organizationUnitService,
             IOrgUnitService orgUnitService)
         {
             _organizationUnitService = organizationUnitService;
@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] ChangeOrganizationRegistrationRequestDTO requestDto)
+        public HttpResponseMessage RemoveRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] ChangeOrganizationUnitRegistrationRequestDTO requestDto)
         {
             var changeParameters = ToChangeParameters(requestDto);
             return _organizationUnitService.DeleteRegistrations(organizationUuid, unitUuid, changeParameters)
@@ -68,20 +68,20 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpPut]
-        [Route("registrations/{targetUnitUuid}")]
+        [Route("registrations")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage TransferRegistrations(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, [FromBody] ChangeOrganizationRegistrationRequestDTO requestDto)
+        public HttpResponseMessage TransferRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] TransferOrganizationUnitRegistrationRequestDTO requestDto)
         {
             var changeParameters = ToChangeParameters(requestDto);
-            return _organizationUnitService.TransferRegistrations(organizationUuid, unitUuid, targetUnitUuid, changeParameters)
+            return _organizationUnitService.TransferRegistrations(organizationUuid, unitUuid, requestDto.TargetUnitUuid, changeParameters)
                 .Match(FromOperationError, Ok);
         }
 
-        private static OrganizationRegistrationDTO ToRegistrationDto(OrganizationRegistrationDetails details)
+        private static OrganizationRegistrationUnitDTO ToRegistrationDto(OrganizationUnitRegistrationDetails details)
         {
-            return new OrganizationRegistrationDTO
+            return new OrganizationRegistrationUnitDTO
             {
                 OrganizationUnitRights = details.OrganizationUnitRights.Select(MapUnitRightToNamedEntityDtoWithUserFullNameDto).ToList(),
                 ItContractRegistrations = details.ItContractRegistrations.Select(x => x.MapToNamedEntityDTO()).ToList(),
@@ -120,10 +120,10 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
 
-        private static OrganizationRegistrationChangeParameters ToChangeParameters(
-            ChangeOrganizationRegistrationRequestDTO requestDto)
+        private static OrganizationUnitRegistrationChangeParameters ToChangeParameters(
+            ChangeOrganizationUnitRegistrationRequestDTO requestDto)
         {
-            return new OrganizationRegistrationChangeParameters
+            return new OrganizationUnitRegistrationChangeParameters
             (
                 requestDto.OrganizationUnitRights,
                 requestDto.ItContractRegistrations,

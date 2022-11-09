@@ -155,9 +155,9 @@ namespace Core.DomainModel.Organization
             return Using.Any() || EconomyStreams.Any() || ResponsibleForItContracts.Any() || Rights.Any();
         }
 
-        public OrganizationRegistrationDetails GetUnitRegistrations()
+        public OrganizationUnitRegistrationDetails GetUnitRegistrations()
         {
-            return new OrganizationRegistrationDetails
+            return new OrganizationUnitRegistrationDetails
             (
                 Rights.ToList(),
                 ResponsibleForItContracts.ToList(),
@@ -167,36 +167,24 @@ namespace Core.DomainModel.Organization
             );
         }
 
-        public Result<OrganizationUnitRight, OperationError> GetRight(int rightId)
+        public Maybe<OrganizationUnitRight> GetRight(int rightId)
         {
-            var right = Rights.FirstOrDefault(x => x.Id == rightId);
-            if(right == null)
-                return new OperationError($"Organization unit right with id: {rightId} was not found", OperationFailure.NotFound);
-
-            return right;
+            return Rights.FirstOrDefault(x => x.Id == rightId);
         }
-
-        public Result<OrganizationUnitRight, OperationError> RemoveRight(int rightId)
-        {
-            return GetRight(rightId)
-                .Match<Result<OrganizationUnitRight, OperationError>>
-                (
-                    right =>
-                    {
-                        Rights.Remove(right);
-                        return right;
-                    },
-                    error => error
-                );
-        }
-
+        
         private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
         {
             var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();
             var externContracts = EconomyStreams.Where(x => x.ExternPaymentFor != null).Select(x => x.ExternPaymentFor).ToList();
             var contracts = internContracts.Concat(externContracts).GroupBy(x => x.Id).Select(x => x.First()).ToList();
 
-            return contracts.Select(itContract => new PaymentRegistrationDetails(Id, itContract));
+            return contracts
+                .Select(itContract => 
+                    new PaymentRegistrationDetails(
+                        itContract, 
+                        itContract.GetInternalPaymentsForUnit(Id), 
+                        itContract.GetExternalPaymentsForUnit(Id)))
+                .ToList();
         }
     }
 }

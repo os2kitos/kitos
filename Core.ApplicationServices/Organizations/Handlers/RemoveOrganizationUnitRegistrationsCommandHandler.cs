@@ -21,13 +21,13 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
         public Maybe<OperationError> Execute(RemoveOrganizationUnitRegistrationsCommand command)
         {
-            return _organizationUnitService.DeleteRegistrations(command.OrganizationUuid, command.UnitUuid)
+            return _organizationUnitService.DeleteRegistrations(command.Organization.Uuid, command.OrganizationUnit.Uuid)
                 .Match
                 (
                     error => error,
                     () =>
                     {
-                        RemoveItSystemUsageOrgUnitUsages(command.UnitUuid);
+                        RemoveItSystemUsageOrgUnitUsages(command.OrganizationUnit.Uuid);
                         return Maybe<OperationError>.None;
                     });
         }

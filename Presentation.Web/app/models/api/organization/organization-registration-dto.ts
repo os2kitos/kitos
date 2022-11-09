@@ -21,6 +21,10 @@
         responsibleSystems: number[];
     }
 
+    export class TransferOrganizationRegistrationRequestDto extends OrganizationRegistrationChangeRequestDto {
+        targetUnitUuid: string;
+    }
+
     export class PaymentRegistrationChangeRequestDto {
         itContractId: number;
         externalPayments: number[];

@@ -287,28 +287,26 @@ namespace Core.ApplicationServices.SystemUsage
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
         }
 
-        public Maybe<OperationError> TransferResponsibleUsage(OrganizationUnit targetUnit, int id)
+        public Maybe<OperationError> TransferResponsibleUsage(int systemId, Guid targetUnitUuid)
         {
-            return Modify(id, system =>
+            return Modify(systemId, system =>
             {
-                var error = system.TransferResponsibleOrganizationalUnit(targetUnit);
+                var error = system.TransferResponsibleOrganizationalUnit(targetUnitUuid);
                 return error.HasValue 
                     ? error.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
-        public Maybe<OperationError> TransferRelevantUsage(int unitId, OrganizationUnit targetUnit, int id)
+        public Maybe<OperationError> TransferRelevantUsage(int systemId, Guid unitUuid, Guid targetUnitUuid)
         {
-            return Modify(id, system =>
+            return Modify(systemId, system =>
             {
-                var error = system.TransferUsedByUnit(unitId, targetUnit);
+                var error = system.TransferUsedByUnit(unitUuid, targetUnitUuid);
                 return error.HasValue
                     ? error.Value
                     : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
         public Maybe<OperationError> RemoveResponsibleUsage(int id)
@@ -319,20 +317,18 @@ namespace Core.ApplicationServices.SystemUsage
                 return error.HasValue 
                     ? error.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
         
-        public Maybe<OperationError> RemoveRelevantUnit(int id, int unitId)
+        public Maybe<OperationError> RemoveRelevantUnit(int id, Guid unitUuid)
         {
             return Modify(id, system =>
             {
-                var error = system.RemoveUsedByUnit(unitId);
+                var error = system.RemoveUsedByUnit(unitUuid);
                 return error.HasValue
                     ? error.Value
                     : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)

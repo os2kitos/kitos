@@ -93,7 +93,7 @@
     <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
     <Compile Include="Organization\OrganizationTreeUpdateConsequences.cs" />
-    <Compile Include="Organization\OrganizationRegistrationDetails.cs" />
+    <Compile Include="Organization\OrganizationUnitRegistrationDetails.cs" />
     <Compile Include="Organization\OrganizationUnitOrigin.cs" />
     <Compile Include="Organization\Strategies\IExternalOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\Strategies\StsOrganizationalHierarchyUpdateStrategy.cs" />
