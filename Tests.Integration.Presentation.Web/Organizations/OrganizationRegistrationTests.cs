@@ -138,8 +138,20 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Empty(registrationsUnit1.OrganizationUnitRights);
 
             var registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Uuid);
-            AssertRegistrationIsValid(right, registrationsUnit2.OrganizationUnitRights);
+            Assert.NotEmpty(registrationsUnit2.OrganizationUnitRights);
+            
+            var rights = DatabaseAccess.MapFromEntitySet<OrganizationUnitRight, List<OrganizationUnitRight>>(x => 
+                x.AsQueryable()
+                .Where(xc =>
+                    xc.RoleId == right.RoleId 
+                    && xc.ObjectId == unit2.Id 
+                    && xc.UserId == right.UserId)
+                .ToList());
 
+            Assert.Single(rights);
+            var newRight = rights.FirstOrDefault();
+            Assert.NotEqual(right.Id, newRight.Id);
+            
             //----Internal payments----
             selectedRegistrations = CreateChangeParametersWithOnlyInternalPayment(registrations, unit2.Uuid);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Uuid, unit2.Uuid, selectedRegistrations);

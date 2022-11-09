@@ -280,26 +280,90 @@ namespace Core.DomainModel.Organization
             }
         }
 
-        public Result<OrganizationUnit, OperationError> RemoveOrganizationUnit(int unitId)
+        public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit)
         {
-            var unit = OrgUnits.FirstOrDefault(x => x.Id == unitId);
-            if (unit == null)
-                return new OperationError("Unit doesn't exist in the organization", OperationFailure.NotFound);
-            if (unit.Origin != OrganizationUnitOrigin.Kitos)
-                return new OperationError("Only a KITOS unit can be deleted", OperationFailure.BadState);
-            if (unit.IsUsed())
-                return new OperationError("Unit is being used", OperationFailure.BadState);
-
-            // attach children to parent of this instance to avoid orphans
-            // parent id will never be null because users aren't allowed to delete the root node
-            foreach (var child in unit.Children)
+            if (movedUnit == null) throw new ArgumentNullException(nameof(movedUnit));
+            if (oldParentUnit == null) throw new ArgumentNullException(nameof(oldParentUnit));
+            if (newParentUnit == null) throw new ArgumentNullException(nameof(newParentUnit));
+            if (GetOrganizationUnit(movedUnit.Uuid).IsNone)
             {
-                child.ParentId = unit.ParentId;
+                return new OperationError($"Moved unit with uuid + {movedUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
             }
 
-            OrgUnits.Remove(unit);
+            if (GetOrganizationUnit(oldParentUnit.Uuid).IsNone)
+            {
+                return new OperationError($"old parent unit with uuid + {oldParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
 
-            return unit;
+            if (GetOrganizationUnit(newParentUnit.Uuid).IsNone)
+            {
+                return new OperationError($"new parent unit with uuid + {newParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (movedUnit == oldParentUnit)
+            {
+                return new OperationError($"moved unit equals old parent unit with uuid + {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (movedUnit == newParentUnit)
+            {
+                return new OperationError($"moved unit equals new parent unit with uuid + {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (movedUnit == GetRoot())
+            {
+                return new OperationError($"Cannot move the organization root", OperationFailure.BadInput);
+            }
+
+            var removeChildError = oldParentUnit.RemoveChild(movedUnit);
+
+            if (removeChildError.HasValue)
+            {
+                return removeChildError.Value;
+            }
+
+            return newParentUnit.AddChild(movedUnit);
+        }
+
+        public Maybe<OperationError> DeleteOrganizationUnit(OrganizationUnit unitToDelete)
+        {
+            if (unitToDelete == null) throw new ArgumentNullException(nameof(unitToDelete));
+            var organizationUnit = GetOrganizationUnit(unitToDelete.Uuid);
+            if (organizationUnit.IsNone)
+            {
+                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} Does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (unitToDelete.IsUsed())
+            {
+                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} from organization with uuid {Uuid} cannot be deleted as it is still in use!", OperationFailure.BadInput);
+            }
+
+            if (unitToDelete == GetRoot())
+            {
+                return new OperationError("Cannot delete the organization root", OperationFailure.BadInput);
+            }
+
+            //Migrate any children to the parent!
+            foreach (var child in unitToDelete.Children.ToList())
+            {
+                var relocateOrganizationUnitError = RelocateOrganizationUnit(child, unitToDelete, unitToDelete.Parent);
+                if (relocateOrganizationUnitError.HasValue)
+                {
+                    return relocateOrganizationUnitError;
+                }
+            }
+
+            var removeChildError = unitToDelete.Parent.RemoveChild(unitToDelete);
+
+            if (removeChildError.HasValue)
+            {
+                return removeChildError;
+            }
+
+            OrgUnits.Remove(unitToDelete);
+
+            return Maybe<OperationError>.None;
         }
     }
 }

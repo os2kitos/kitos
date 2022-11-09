@@ -38,18 +38,16 @@
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
         title: string | null = null;
-        options: IOrganizationUnitMigrationOptions | null;
+        options: IOrganizationUnitMigrationOptions | null = null;
         configuration: IMigrationTableColumn[] | null = null;
         unitUuid: string | null = null;
         organizationUuid: string | null = null;
         root: IOrganizationUnitMigrationRoot;
         columnTypes = MigrationTableColumnType;
-
-        static $inject: string[] = ["organizationRegistrationsService", "notify", "$state", "$window"];
+        
+        static $inject: string[] = ["organizationRegistrationsService", "notify"];
         constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
-            private readonly notify,
-            private readonly $state,
-            private readonly $window) {
+            private readonly notify) {
         }
 
         $onInit() {
@@ -58,23 +56,27 @@
                 return;
             }
             if (this.options === null) {
-                console.error("missing migration table attribute: 'options'");
+                console.error(`missing migration table attribute: 'options' for table with title: ${this.title}`);
                 return;
             }
             if (this.configuration === null) {
-                console.error("missing migration table attribute: 'configuration'");
+                console.error(`missing migration table attribute: 'configuration' for table with title: ${this.title}`);
                 return;
             }
             if (this.unitUuid === null) {
-                console.error("missing migration table attribute: 'unitUuid'");
+                console.error(`missing migration table attribute: 'unitUuid' for table with title: ${this.title}`);
                 return;
             }
             if (this.organizationUuid === null) {
-                console.error("missing migration table attribute: 'organizationId'");
+                console.error(`missing migration table attribute: 'organizationId' for table with title: ${this.title}`);
                 return;
             }
 
             this.root = this.options.root;
+        }
+
+        getPageRoute(id: number) {
+            return `${this.options.dataRelatedPage}({ id: ${id} })`;
         }
 
         registrationSelected() {
@@ -116,11 +118,6 @@
                 });
 
             this.options.setIsBusy(false);
-        }
-
-        navigateTo(id: number) {
-            const url = this.$state.href(this.options.dataRelatedPage, { id: id });
-            this.$window.open(url, "_blank");
         }
 
         private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {

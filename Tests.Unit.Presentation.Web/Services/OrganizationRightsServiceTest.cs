@@ -1,6 +1,10 @@
-﻿using Core.Abstractions.Types;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -21,6 +25,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<OrganizationUnitRight>> _organizationUnitRightRepository;
         private readonly Mock<IOrganizationalUserContext> _organizationUserContext;
         private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IGenericRepository<Organization>> _orgRepository;
 
         public OrganizationRightsServiceTest()
         {
@@ -29,8 +34,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationUserContext = new Mock<IOrganizationalUserContext>();
             _organizationUnitRightRepository = new Mock<IGenericRepository<OrganizationUnitRight>>();
             _transactionManager = new Mock<ITransactionManager>(); 
-            _transactionManager = new Mock<ITransactionManager>();
-            var orgRepository = new Mock<IGenericRepository<Organization>>();
+            _orgRepository = new Mock<IGenericRepository<Organization>>();
 
             _sut = new OrganizationRightsService(_authorizationContext.Object,
                 _organizationRightRepository.Object,
@@ -39,7 +43,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _organizationUnitRightRepository.Object,
                 _transactionManager.Object,
-                orgRepository.Object);
+                _orgRepository.Object);
         }
 
         [Fact]
@@ -157,6 +161,66 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(organizationRole, resultValue.Role);
             _organizationRightRepository.Verify(x => x.Insert(It.IsAny<OrganizationRight>()), Times.Once);
             _organizationRightRepository.Verify(x => x.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void RemoveUnitRightsByIds_Returns_Ok()
+        {
+            //TODO: Create OrganizationRightsService tests
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var unitId = A<int>();
+            var unitUuid = A<Guid>();
+            var rightId = A<int>();
+            var userId = A<int>();
+            var unit = new OrganizationUnit
+            {
+                Uuid = unitUuid,
+                Rights = new List<OrganizationUnitRight>()
+                {
+                    new OrganizationUnitRight()
+                    {
+                        UserId = userId,
+                        ObjectId = unitId
+                    }
+                }
+            };
+            var organization = new Organization()
+            {
+                OrgUnits = new List<OrganizationUnit> { unit }
+            };
+
+            ExpectGetOrganizationReturns(organization);
+            ExpectAllowModifyReturns(organization, result: true);
+            ExpectAllowModifyReturns(unit, result: true);
+
+            _sut.RemoveUnitRightsByIds(organizationUuid, unitUuid, new List<int>{rightId})
+
+
+            //_authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationId, It.IsAny<OrganizationRight>())).Returns(true);
+            //_organizationRightRepository.Setup(x => x.Insert(It.IsAny<OrganizationRight>())).Returns<OrganizationRight>(right => right);
+
+            //Act
+            //var result = _sut.AssignRole(organizationId, userId, organizationRole);
+
+            //Assert
+            //Assert.True(result.Ok);
+            //var resultValue = result.Value;
+            //Assert.Equal(organizationId, resultValue.OrganizationId);
+            //Assert.Equal(userId, resultValue.UserId);
+            //Assert.Equal(organizationRole, resultValue.Role);
+            //_organizationRightRepository.Verify(x => x.Insert(It.IsAny<OrganizationRight>()), Times.Once);
+            //_organizationRightRepository.Verify(x => x.Save(), Times.Once);
+        }
+
+        private void ExpectGetOrganizationReturns(Organization organization)
+        {
+            _orgRepository.Setup(x => x.AsQueryable()).Returns(new List<Organization>{ organization }.AsQueryable());
+        }
+
+        private void ExpectAllowModifyReturns<T>(T entity, bool result) where T : IEntity
+        {
+            _authorizationContext.Setup(x => x.AllowModify(entity)).Returns(result);
         }
     }
 }

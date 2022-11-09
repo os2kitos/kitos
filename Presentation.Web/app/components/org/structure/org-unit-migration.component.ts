@@ -41,7 +41,7 @@
 
     class OrganizationUnitMigrationController implements IOrganizationUnitMigrationController {
         organizationId: number | null = null;
-        organizationUuid: string;
+        organizationUuid: string | null = null;
         unitUuid: string | null = null;
         unitName: string | null = null;
         stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
@@ -58,8 +58,8 @@
         contractRegistrations: IOrganizationUnitMigrationOptions;
         relevantSystemRegistrations: IOrganizationUnitMigrationOptions;
         responsibleSystemRegistrations: IOrganizationUnitMigrationOptions;
-        orgUnits: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[];
-        selectedOrg: any;
+        orgUnits: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[];
+        selectedOrg: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>;
 
         rolesTableConfig: IMigrationTableColumn[];
         internalPaymentTableConfig: IMigrationTableColumn[];
@@ -77,12 +77,19 @@
         $onInit() {
             if (this.organizationId === null) {
                 console.error("missing attribute: 'organizationId'");
+                return;
+            }
+            if (this.organizationUuid === null) {
+                console.error("missing attribute: 'organizationUuid'");
+                return;
             }
             if (this.unitUuid === null) {
                 console.error("missing attribute: 'unitUuid'");
+                return;
             }
             if (this.unitName === null) {
                 console.error("missing attribute: 'unitName'");
+                return;
             }
 
             this.createTableConfigurations();
@@ -145,7 +152,7 @@
         setSelectedOrg() {
             if (!this.selectedOrg?.id)
                 return;
-            if (this.selectedOrg.uuid === this.unitUuid) {
+            if (this.selectedOrg.optionalExtraObject.uuid === this.unitUuid) {
                 this.selectedOrg = null;
                 this.notify.addErrorMessage("Du kan ikke overføre til denne enhed");
                 return;
@@ -282,7 +289,7 @@
 
         private createChangeRequest(): Models.Api.Organization.TransferOrganizationRegistrationRequestDto {
             return Helpers.OrganizationRegistrationHelper.createTransferRequest(
-                this.selectedOrg.uuid,
+                this.selectedOrg.optionalExtraObject.uuid,
                 this.contractRegistrations.root.children,
                 this.externalPayments.root.children,
                 this.internalPayments.root.children,

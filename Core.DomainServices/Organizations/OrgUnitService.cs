@@ -80,11 +80,11 @@ namespace Core.DomainServices.Organizations
                 return deleteRegistrationsError.Value;
 
             
-            var result = organization.RemoveOrganizationUnit(unit.Id);
-            if (result.Failed)
-                return result.Error;
+            var error = organization.DeleteOrganizationUnit(unit);
+            if (error.HasValue)
+                return error.Value;
             
-            _orgUnitRepository.DeleteWithReferencePreload(result.Value);
+            _orgUnitRepository.DeleteWithReferencePreload(unit);
             _orgUnitRepository.Save();
 
             transaction.Commit();

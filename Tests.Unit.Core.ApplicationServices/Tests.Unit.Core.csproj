@@ -259,7 +259,6 @@
     <Compile Include="Model\ItContractTest.cs" />
     <Compile Include="Model\ItInterfaceTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
-    <Compile Include="Model\Organizations\OrganizationUnitTest.cs" />
     <Compile Include="Model\References\AddReferenceCommandTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />
@@ -349,7 +348,9 @@
     <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
     <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.fixes.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Model\Organizations\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

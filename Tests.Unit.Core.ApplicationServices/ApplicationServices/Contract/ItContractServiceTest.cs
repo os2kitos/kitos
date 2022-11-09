@@ -609,16 +609,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var id = A<int>();
             var targetUnitUuid = A<Guid>();
-            var contract = new ItContract()
-            {
-                Organization = new Organization()
-                {  
-                    OrgUnits = new List<OrganizationUnit>()
-                    {
-                        new (){Uuid = targetUnitUuid}
-                    }
-                }
-            };
+            var contract = SetupContractWithOrganizationAndUnit(id, targetUnitUuid);
+
             var economyStreamId = A<int>();
             var economyStreamIdList = new List<int> {economyStreamId};
             var economyStream = new EconomyStream {Id = economyStreamId};
@@ -668,16 +660,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var id = A<int>();
             var targetUnitUuid = A<Guid>();
-            var contract = new ItContract()
-            {
-                Organization = new Organization()
-                {  
-                    OrgUnits = new List<OrganizationUnit>()
-                    {
-                        new (){Uuid = targetUnitUuid}
-                    }
-                }
-            };
+            var contract = SetupContractWithOrganizationAndUnit(id, targetUnitUuid);
 
             ExpectGetContractReturns(id, contract);
             ExpectAllowModifyReturns(contract, true);
@@ -711,17 +694,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var id = A<int>();
             var targetUnitUuid = A<Guid>();
-            var contract = new ItContract()
-            {
-                Id = id,
-                Organization = new Organization()
-                {  
-                    OrgUnits = new List<OrganizationUnit>()
-                    {
-                        new (){Uuid = targetUnitUuid}
-                    }
-                }
-            };
+            var contract = SetupContractWithOrganizationAndUnit(id, targetUnitUuid);
 
             ExpectGetContractReturns(id, contract);
             ExpectAllowModifyReturns(contract, true);
@@ -754,14 +727,47 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(crossOrganizationReadAccessLevel);
         }
 
-        private List<ItContract> CreateListOfContracts(int numberOfItems)
+        private IEnumerable<ItContract> CreateListOfContracts(int numberOfItems)
         {
             var contracts = new List<ItContract>();
-            for (int i = 0; i < numberOfItems; i++)
+            for (var i = 0; i < numberOfItems; i++)
             {
                 contracts.Add(new ItContract() { Id = A<int>() });
             }
             return contracts;
+        }
+
+        private ItContract SetupContractWithOrganizationAndUnit(int id, Guid unitUuid)
+        {
+            var contract = CreateContract(id);
+            contract.Organization = CreateOrganization();
+            contract.Organization.OrgUnits.Add(CreateOrganizationUnit(unitUuid));
+
+            return contract;
+        }
+
+        private ItContract CreateContract(int id)
+        {
+            return new ItContract()
+            {
+                Id = id
+            };
+        }
+
+        private Organization CreateOrganization()
+        {
+            return new Organization()
+            {
+                OrgUnits = new List<OrganizationUnit>()
+            };
+        }
+
+        private OrganizationUnit CreateOrganizationUnit(Guid uuid)
+        {
+            return new OrganizationUnit
+            {
+                Uuid = uuid
+            };
         }
 
         private EconomyStream CreateEconomyStream()

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
@@ -157,6 +156,7 @@ namespace Core.ApplicationServices.Organizations
             var currentUnit = unitResult.Value;
             var targetUnit = targetUnitResult.Value;
 
+            var rightsToDelete = new List<OrganizationUnitRight>();
             foreach (var rightId in rightIds)
             {
                 var organizationUnitRightResult = currentUnit.GetRight(rightId);
@@ -167,18 +167,24 @@ namespace Core.ApplicationServices.Organizations
                 }
                 var right = organizationUnitRightResult.Value;
 
-                var error = currentUnit.RemoveRole(right.Role, right.User)
-                    .Bind(x => targetUnit.AssignRole(x.Role, x.User))
-                    .MatchFailure();
-                if (error.HasValue)
+                var removeRightResult = currentUnit.RemoveRole(right.Role, right.User);
+                if (removeRightResult.Failed)
                 {
-                    return error.Value;
+                    return removeRightResult.Error;
                 }
+                var removedRight = removeRightResult.Value;
+                rightsToDelete.Add(removedRight);
 
-                _unitRightRepository.Update(right);
-                _domainEvents.Raise(new AdministrativeAccessRightsChanged(right.UserId));
+                var assignRightResult = targetUnit.AssignRole(removedRight.Role, removedRight.User);
+                if (assignRightResult.Failed)
+                {
+                    return assignRightResult.Error;
+                }
+                
+                _domainEvents.Raise(new AdministrativeAccessRightsChanged(removedRight.UserId));
             }
 
+            _unitRightRepository.RemoveRange(rightsToDelete);
             _unitRightRepository.Save();
             transaction.Commit();
             return Maybe<OperationError>.None;

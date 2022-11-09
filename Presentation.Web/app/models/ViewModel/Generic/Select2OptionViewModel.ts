@@ -20,7 +20,6 @@
     }
 
     export interface Select2OptionViewModelWithIndentation<T> extends ISelect2Model {
-        uuid?: string;
         indentationLevel: number;
         optionalExtraObject?: T;
     }

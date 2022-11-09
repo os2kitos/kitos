@@ -186,5 +186,42 @@ namespace Core.DomainModel.Organization
                         itContract.GetExternalPaymentsForUnit(Id)))
                 .ToList();
         }
+
+        public Maybe<OperationError> AddChild(OrganizationUnit child)
+        {
+            if (child == null) throw new ArgumentNullException(nameof(child));
+
+            if (child.Organization != Organization)
+            {
+                return new OperationError($"child with uuid {child.Uuid} is from a different organization", OperationFailure.BadInput);
+            }
+
+            if (Children.Any(c => c.Uuid == child.Uuid))
+            {
+                return new OperationError($"child with uuid {child.Uuid} already added", OperationFailure.BadInput);
+            }
+
+            Children.Add(child);
+            child.Parent = this;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemoveChild(OrganizationUnit child)
+        {
+            if (child == null) throw new ArgumentNullException(nameof(child));
+            if (!Children.Remove(child))
+            {
+                return new OperationError($"Child with id:{child.Id} could not be removed from this unit with id {Id} as it is not a child of this unit", OperationFailure.BadInput);
+            }
+
+            child.ResetParent();
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetParent()
+        {
+            Parent = null;
+        }
     }
 }
