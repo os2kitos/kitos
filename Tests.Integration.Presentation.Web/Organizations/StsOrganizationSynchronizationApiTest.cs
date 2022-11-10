@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
