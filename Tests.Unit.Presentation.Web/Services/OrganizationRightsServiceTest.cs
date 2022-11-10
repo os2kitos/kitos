@@ -265,7 +265,6 @@ namespace Tests.Unit.Presentation.Web.Services
 
             organization.OrgUnits = new List<OrganizationUnit> {unit};
             
-
             ExpectGetOrganizationReturns(organization);
             ExpectAllowModifyReturns(organization, result: true);
             ExpectAllowModifyReturns(unit, result: false);

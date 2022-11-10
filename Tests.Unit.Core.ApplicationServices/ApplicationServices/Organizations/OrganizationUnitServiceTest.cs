@@ -8,7 +8,6 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Generic;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;

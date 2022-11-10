@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Mapping;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations
 {
-    public class OrganizationRegistrationTests: WithAutoFixture
+    public class OrganizationUnitRegistrationTests: WithAutoFixture
     {
         [Fact]
         public async Task Can_Get_Registrations()
