@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Transactions;
+using System.Runtime.Remoting.Messaging;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -9,7 +9,6 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -106,16 +105,18 @@ namespace Core.ApplicationServices.Organizations
             return Modify(organizationUuid, unitUuid, (_, unit) =>
             {
                 return GetRegistrations(organizationUuid, unitUuid)
-                    .Match
+                    .Bind<OrganizationUnit>
                     (
-                        val => DeleteRegistrations(organizationUuid, unitUuid,
-                            ToChangeParametersFromRegistrationDetails(val)),
-                        error => error
-                    )
-                    .Match
-                    (
-                        error => error,
-                        () => Result<OrganizationUnit, OperationError>.Success(unit)
+                        details =>
+                        {
+                            var error = DeleteRegistrations(organizationUuid, unitUuid, ToChangeParametersFromRegistrationDetails(details));
+                            if (error.HasValue)
+                            {
+                                return error.Value;
+                            }
+
+                            return unit;
+                        }
                     );
             }).MatchFailure();
         }

@@ -155,9 +155,9 @@ namespace Core.ApplicationServices.Contract
         {
             foreach (var paymentId in paymentIds)
             {
-                var result = contract.TransferEconomyStream(paymentId, targetUnitUuid, isInternal);
-                if (result.HasValue)
-                    return result.Value;
+                var error = contract.TransferEconomyStream(paymentId, targetUnitUuid, isInternal);
+                if (error.HasValue)
+                    return error.Value;
             }
             
             return Maybe<OperationError>.None;
