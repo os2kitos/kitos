@@ -187,6 +187,7 @@ namespace Core.ApplicationServices.Organizations
             _unitRightRepository.RemoveRange(rightsToDelete);
             _unitRightRepository.Save();
             transaction.Commit();
+
             return Maybe<OperationError>.None;
         }
 
