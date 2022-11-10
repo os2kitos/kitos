@@ -284,7 +284,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [ODataRoute("DeactivateAdvice")]
         public IHttpActionResult DeactivateAdvice([FromODataUri] int key)
         {
-            var transaction = _transactionManager.Begin();
+            using var transaction = _transactionManager.Begin();
             var entity = Repository.AsQueryable().ById(key);
             if (entity == null) return NotFound();
 
