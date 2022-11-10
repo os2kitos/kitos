@@ -306,9 +306,47 @@ namespace Tests.Unit.Presentation.Web.Services
 
             Assert.False(error.HasValue);
 
-            transaction.Verify(x => x.Commit(), Times.Once());
-            _organizationUnitRightRepository.Verify(x => x.Save(), Times.Once());
             _domainEvents.Verify(x => x.Raise(It.IsAny<AdministrativeAccessRightsChanged>()), Times.Once());
+            _organizationUnitRightRepository.Verify(x => x.Save(), Times.Once());
+            transaction.Verify(x => x.Commit(), Times.Once());
+        }
+
+        [Fact]
+        public void TransferUnitRightsByIds_Returns_Ok_When_TargetUnit_Has_Same_Role_With_Same_User()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var unitId = A<int>();
+            var targetId = A<int>();
+            var unitUuid = A<Guid>();
+            var targetUuid = A<Guid>();
+            var rightId = A<int>();
+            var roleId = A<int>();
+            var userId = A<int>();
+
+            var unit = CreateOrganizationUnit(unitId, unitUuid);
+            var targetUnit = CreateOrganizationUnit(targetId, targetUuid);
+            unit.Rights = new List<OrganizationUnitRight> { CreateUnitRight(unitId, rightId, userId, roleId) };
+            targetUnit.Rights = new List<OrganizationUnitRight> { CreateUnitRight(unitId, rightId, userId, roleId) };
+
+            var organization = CreateOrganization(organizationUuid);
+            organization.OrgUnits = new List<OrganizationUnit> { unit, targetUnit };
+
+            ExpectGetOrganizationReturns(organization);
+            ExpectAllowModifyReturns(organization, result: true);
+            ExpectAllowModifyReturns(unit, result: true);
+            ExpectAllowModifyReturns(targetUnit, result: true);
+
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            var error = _sut.TransferUnitRightsByIds(organizationUuid, unitUuid, targetUuid, new List<int> { rightId });
+
+            Assert.False(error.HasValue);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<AdministrativeAccessRightsChanged>()), Times.Once());
+            _organizationUnitRightRepository.Verify(x => x.Save(), Times.Once());
+            transaction.Verify(x => x.Commit(), Times.Once());
         }
 
         [Fact]
@@ -430,7 +468,6 @@ namespace Tests.Unit.Presentation.Web.Services
 
             var unit = CreateOrganizationUnit(unitId, unitUuid);
             var targetUnit = CreateOrganizationUnit(targetId, targetUuid);
-            //unit.Rights = new List<OrganizationUnitRight> { CreateUnitRight(unitId, rightId) };
 
             var organization = CreateOrganization(organizationUuid);
             organization.OrgUnits = new List<OrganizationUnit> { unit, targetUnit };
@@ -440,16 +477,10 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(unit, result: true);
             ExpectAllowModifyReturns(targetUnit, result: false);
 
-            //var transaction = new Mock<IDatabaseTransaction>();
-            //_transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-
             var error = _sut.TransferUnitRightsByIds(organizationUuid, unitUuid, targetUuid, new List<int> { rightId });
 
             Assert.True(error.HasValue);
             Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
-            //transaction.Verify(x => x.Commit(), Times.Once());
-            //_organizationUnitRightRepository.Verify(x => x.Save(), Times.Once());
-            //_domainEvents.Verify(x => x.Raise(It.IsAny<AdministrativeAccessRightsChanged>()), Times.Once());
         }
 
         [Fact]
@@ -485,19 +516,19 @@ namespace Tests.Unit.Presentation.Web.Services
             return new OrganizationUnit { Id = id, Uuid = uuid };
         }
 
-        private OrganizationUnitRight CreateUnitRight(int unitId, int rightId)
+        private OrganizationUnitRight CreateUnitRight(int unitId, int rightId, int? userId = null, int? roleId = null)
         {
-            var userId = A<int>();
-            var roleId = A<int>();
+            var localUserId = userId ?? A<int>();
+            var localRoleId = roleId ?? A<int>();
 
             return new OrganizationUnitRight
             {
                 Id = rightId,
-                UserId = userId,
-                User = new User() {Id = userId},
+                UserId = localUserId,
+                User = new User { Id = localUserId },
                 ObjectId = unitId,
-                Role = new OrganizationUnitRole {Id = roleId},
-                RoleId = roleId
+                Role = new OrganizationUnitRole { Id = localRoleId },
+                RoleId = localRoleId
             };
         }
 

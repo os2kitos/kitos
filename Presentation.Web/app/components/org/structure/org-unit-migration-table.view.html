@@ -21,7 +21,7 @@
                 <td><input data-disabled-on-busy type="checkbox" ng-model="registration.selected" ng-change="ctrl.registrationSelected()" /></td>
                 <td ng-repeat="header in ctrl.configuration">
                     <div class="{{header.cssClass}}">
-                        <a ng-if="header.type === ctrl.columnTypes.Link" ui-sref="{{ctrl.getPageRoute(registration.id)}}" target="_blank" ng-click="$dismiss()">
+                        <a ng-if="header.type === ctrl.columnTypes.Link" ui-sref="{{ctrl.getPageRoute(registration.targetPageObjectId)}}" target="_blank" ng-click="$dismiss()">
                             {{::registration[header.property]}}
                         </a>
                         <div ng-if="header.type === ctrl.columnTypes.Text">

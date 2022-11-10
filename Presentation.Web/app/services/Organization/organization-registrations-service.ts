@@ -1,28 +1,28 @@
 ﻿module Kitos.Services.Organization {
 
     export interface IOrganizationRegistrationsService {
-        getRegistrations(orgId: string, unitId: string): ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto>;
-        deleteSelectedRegistrations(orgId: string, unitId: string, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<boolean>;
+        getRegistrations(orgId: string, unitId: string): ng.IPromise<Models.Api.Organization.OrganizationUnitRegistrationDetailsDto>;
+        deleteSelectedRegistrations(orgId: string, unitId: string, body: Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto): angular.IPromise<boolean>;
         deleteOrganizationUnit(organizationId: string, unitId: string): angular.IPromise<boolean>;
-        transferSelectedRegistrations(orgId: string, unitId: string, body: Models.Api.Organization.TransferOrganizationRegistrationRequestDto): angular.IPromise<void>;
+        transferSelectedRegistrations(orgId: string, unitId: string, body: Models.Api.Organization.TransferOrganizationUnitRegistrationRequestDto): angular.IPromise<void>;
     }
 
     export class OrganizationRegistrationsService implements IOrganizationRegistrationsService {
 
-        getRegistrations(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.OrganizationRegistrationDetailsDto> {
+        getRegistrations(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.OrganizationUnitRegistrationDetailsDto> {
             return this
                 .$http
                 .get<API.Models.IApiWrapper<any>>(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/registrations`)
                 .then(
                     result => {
-                        var response = result.data as { response: Models.Api.Organization.OrganizationRegistrationDetailsDto }
+                        var response = result.data as { response: Models.Api.Organization.OrganizationUnitRegistrationDetailsDto }
                         return response.response;
                     },
                     error => this.apiWrapper.handleServerError(error)
                 );
         }
 
-        deleteSelectedRegistrations(orgUuid: string, unitUuid: string, body: Models.Api.Organization.OrganizationRegistrationChangeRequestDto): angular.IPromise<boolean> {
+        deleteSelectedRegistrations(orgUuid: string, unitUuid: string, body: Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto): angular.IPromise<boolean> {
             return this.apiUseCaseFactory
                 .createDeletion("Registreringer",
                     () => this.apiWrapper.delete(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/registrations`, body))
@@ -36,7 +36,7 @@
                 .executeAsync();
         }
 
-        transferSelectedRegistrations(orgUuid: string, unitUuid: string, body: Models.Api.Organization.TransferOrganizationRegistrationRequestDto): angular.IPromise<void> {
+        transferSelectedRegistrations(orgUuid: string, unitUuid: string, body: Models.Api.Organization.TransferOrganizationUnitRegistrationRequestDto): angular.IPromise<void> {
             return this.apiUseCaseFactory
                 .createUpdate("Registreringer",
                     () => this.apiWrapper.put(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/registrations`, body))

@@ -120,7 +120,7 @@
             this.options.setIsBusy(false);
         }
 
-        private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
+        private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {
 
             const roles = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
             const contractRegistration = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();

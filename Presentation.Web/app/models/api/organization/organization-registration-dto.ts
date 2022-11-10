@@ -1,5 +1,5 @@
 ﻿module Kitos.Models.Api.Organization {
-    export class OrganizationRegistrationDetailsDto {
+    export class OrganizationUnitRegistrationDetailsDto {
         itContractRegistrations: Generic.NamedEntity.NamedEntityDTO[];
         organizationUnitRights: Generic.NamedEntity.NamedEntityWithUserFullNameDTO[];
         payments: PaymentRegistrationDetailsDto[];
@@ -13,7 +13,7 @@
         internalPayments: Generic.NamedEntity.NamedEntityDTO[];
     }
 
-    export class OrganizationRegistrationChangeRequestDto {
+    export class OrganizationUnitRegistrationChangeRequestDto {
         itContractRegistrations: number[];
         organizationUnitRights: number[];
         paymentRegistrationDetails: PaymentRegistrationChangeRequestDto[];
@@ -21,7 +21,7 @@
         responsibleSystems: number[];
     }
 
-    export class TransferOrganizationRegistrationRequestDto extends OrganizationRegistrationChangeRequestDto {
+    export class TransferOrganizationUnitRegistrationRequestDto extends OrganizationUnitRegistrationChangeRequestDto {
         targetUnitUuid: string;
     }
 

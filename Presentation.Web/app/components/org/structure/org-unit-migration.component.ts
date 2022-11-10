@@ -136,7 +136,7 @@
             this.setIsBusy(true);
 
 
-            const request = this.createChangeRequest();
+            const request = this.createTransferRequest();
             this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.selectedOrg = null;
@@ -287,9 +287,19 @@
             this.responsibleSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems, "it-system.usage.org");
         }
 
-        private createChangeRequest(): Models.Api.Organization.TransferOrganizationRegistrationRequestDto {
+        private createChangeRequest(): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {
+            return Helpers.OrganizationRegistrationHelper.createChangeRequest(
+                this.contractRegistrations.root.children,
+                this.externalPayments.root.children,
+                this.internalPayments.root.children,
+                this.roles.root.children,
+                this.relevantSystemRegistrations.root.children,
+                this.responsibleSystemRegistrations.root.children);
+        }
+
+        private createTransferRequest(): Models.Api.Organization.TransferOrganizationUnitRegistrationRequestDto {
             return Helpers.OrganizationRegistrationHelper.createTransferRequest(
-                this.selectedOrg.optionalExtraObject.uuid,
+                this.selectedOrg?.optionalExtraObject?.uuid,
                 this.contractRegistrations.root.children,
                 this.externalPayments.root.children,
                 this.internalPayments.root.children,
