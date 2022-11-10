@@ -177,16 +177,13 @@ namespace Core.ApplicationServices.Organizations
 
                 //Check if a right with the same role and user is already assigned to the target
                 var rightsWithSameRole = targetUnit.GetRights(removedRight.RoleId);
-                if (rightsWithSameRole.Any(x => x.UserId == removedRight.UserId))
+                if (!rightsWithSameRole.Any(x => x.UserId == removedRight.UserId))
                 {
-                    _domainEvents.Raise(new AdministrativeAccessRightsChanged(removedRight.UserId));
-                    continue;
-                }
-
-                var assignRightResult = targetUnit.AssignRole(removedRight.Role, removedRight.User);
-                if (assignRightResult.Failed)
-                {
-                    return assignRightResult.Error;
+                    var assignRightResult = targetUnit.AssignRole(removedRight.Role, removedRight.User);
+                    if (assignRightResult.Failed)
+                    {
+                        return assignRightResult.Error;
+                    }
                 }
                 
                 _domainEvents.Raise(new AdministrativeAccessRightsChanged(removedRight.UserId));
