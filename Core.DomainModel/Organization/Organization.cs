@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.Read;
@@ -347,39 +348,57 @@ namespace Core.DomainModel.Organization
             return addedError;
         }
 
-        public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit)
+        public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit, bool includeSubtree)
         {
             if (movedUnit == null) throw new ArgumentNullException(nameof(movedUnit));
             if (oldParentUnit == null) throw new ArgumentNullException(nameof(oldParentUnit));
             if (newParentUnit == null) throw new ArgumentNullException(nameof(newParentUnit));
             if (GetOrganizationUnit(movedUnit.Uuid).IsNone)
             {
-                return new OperationError($"Moved unit with uuid + {movedUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+                return new OperationError($"Moved unit with uuid {movedUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
             }
 
             if (GetOrganizationUnit(oldParentUnit.Uuid).IsNone)
             {
-                return new OperationError($"old parent unit with uuid + {oldParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+                return new OperationError($"old parent unit with uuid {oldParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
             }
 
             if (GetOrganizationUnit(newParentUnit.Uuid).IsNone)
             {
-                return new OperationError($"new parent unit with uuid + {newParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+                return new OperationError($"new parent unit with uuid {newParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
             }
 
             if (movedUnit == oldParentUnit)
             {
-                return new OperationError($"moved unit equals old parent unit with uuid + {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+                return new OperationError($"moved unit equals old parent unit with uuid {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
             }
 
             if (movedUnit == newParentUnit)
             {
-                return new OperationError($"moved unit equals new parent unit with uuid + {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+                return new OperationError($"moved unit equals new parent unit with uuid {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
             }
 
             if (movedUnit == GetRoot())
             {
                 return new OperationError($"Cannot move the organization root", OperationFailure.BadInput);
+            }
+
+            if (!includeSubtree)
+            {
+                //If sub tree is not part of the move, move the children to the moved unit's parent
+                var movedUnitParent = movedUnit.Parent;
+                foreach (var child in movedUnit.Children.ToList())
+                {
+                    RelocateOrganizationUnit(child, movedUnit, movedUnitParent, true);
+                }
+            }
+            else
+            {
+                //If subtree is to be moved along with it, then the target unit cannot be a descendant of the moved unit
+                if (movedUnit.FlattenHierarchy().Contains(newParentUnit))
+                {
+                    return new OperationError($"newParentUnit with uuid {newParentUnit.Uuid} is a descendant of org unit with uuid {movedUnit.Uuid}", OperationFailure.BadInput);
+                }
             }
 
             var removeChildError = oldParentUnit.RemoveChild(movedUnit);
@@ -398,7 +417,7 @@ namespace Core.DomainModel.Organization
             var organizationUnit = GetOrganizationUnit(unitToDelete.Uuid);
             if (organizationUnit.IsNone)
             {
-                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} Does not belong to this organization with uuid {Uuid}", OperationFailure.BadInput);
+                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} Does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
             }
 
             if (unitToDelete.IsUsed())
@@ -414,7 +433,7 @@ namespace Core.DomainModel.Organization
             //Migrate any children to the parent!
             foreach (var child in unitToDelete.Children.ToList())
             {
-                var relocateOrganizationUnitError = RelocateOrganizationUnit(child, unitToDelete, unitToDelete.Parent);
+                var relocateOrganizationUnitError = RelocateOrganizationUnit(child, unitToDelete, unitToDelete.Parent, true);
                 if (relocateOrganizationUnitError.HasValue)
                 {
                     return relocateOrganizationUnitError;

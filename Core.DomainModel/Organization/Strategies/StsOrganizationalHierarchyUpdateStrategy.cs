@@ -198,7 +198,7 @@ namespace Core.DomainModel.Organization.Strategies
 
                 }
 
-                var relocationError = _organization.RelocateOrganizationUnit(movedUnit, oldParentUnit, newParentUnit);
+                var relocationError = _organization.RelocateOrganizationUnit(movedUnit, oldParentUnit, newParentUnit, false);
                 if (relocationError.HasValue)
                 {
                     return relocationError.Value;
@@ -208,6 +208,7 @@ namespace Core.DomainModel.Organization.Strategies
             //Deletion of units
             foreach (var externalUnitToDelete in OrderUnitsToDeleteByLeafToParent(_organization.GetRoot(), consequences.DeletedExternalUnitsBeingDeleted))
             {
+                externalUnitToDelete.ConvertToKitosUnit(); //Convert to KITOS unit before deleting it (external units cannot be deleted)
                 var deleteOrganizationUnitError = _organization.DeleteOrganizationUnit(externalUnitToDelete);
                 if (deleteOrganizationUnitError.HasValue)
                 {
