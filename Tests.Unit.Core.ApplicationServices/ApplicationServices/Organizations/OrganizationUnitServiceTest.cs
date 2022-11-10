@@ -185,7 +185,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var orgUuid = A<Guid>();
             var targetUnitUuid = A<Guid>();
             var unitUuid = A<Guid>();
-            var operationError = new OperationError(OperationFailure.NotFound);
 
             var org = new Organization
             {
@@ -195,14 +194,19 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectAllowModifyReturns(org, true);
 
+            //If unit is valid check if target unit returns NotFound
             if (isUnitValid)
             {
-                org.OrgUnits = new List<OrganizationUnit>() {new () {Uuid = unitUuid}};
+                var unit = new OrganizationUnit {Uuid = unitUuid};
+                org.OrgUnits = new List<OrganizationUnit> { unit };
+                ExpectAllowModifyReturns(unit, true);
+                var transaction = new Mock<IDatabaseTransaction>();
+                _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
             }
 
             var result = _sut.TransferRegistrations(orgUuid, unitUuid, targetUnitUuid, CreateEmptyChangeParameters());
             Assert.True(result.HasValue);
-            Assert.Equal(operationError.FailureType, result.Value.FailureType);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
 
         [Theory]
