@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -144,7 +145,10 @@ namespace Core.ApplicationServices.Organizations
                     .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude))
                     .Select(consequences =>
                     {
-                        _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted);
+                        if (consequences.DeletedExternalUnitsBeingDeleted.Any())
+                        {
+                            _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted);
+                        }
                         foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
                         {
                             _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(affectedUnit));

@@ -287,7 +287,7 @@ namespace Core.DomainModel.Organization
                 case OrganizationUnitOrigin.STS_Organisation:
                     if (StsOrganizationConnection?.Connected != true)
                     {
-                        return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.Conflict);
+                        return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.BadState);
                     }
                     strategy = StsOrganizationConnection.GetUpdateStrategy();
                     break;
