@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetUnitAccessRights(Guid organizationUuid, Guid unitUuid)
         {
-            return _organizationUnitService.GetUnitAccessRightsByUnitId(organizationUuid, unitUuid)
+            return _organizationUnitService.GetAccessRights(organizationUuid, unitUuid)
                 .Select(ToAccessRightsDto)
                 .Match(Ok, FromOperationError);
         }

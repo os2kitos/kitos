@@ -48,7 +48,7 @@ namespace Core.ApplicationServices.Organizations
             _repository = repository;
         }
 
-        public Result<UnitAccessRights, OperationError> GetUnitAccessRightsByUnitId(Guid organizationUuid, Guid unitUuid)
+        public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid)
         {
             return _organizationService
                 .GetOrganization(organizationUuid)
