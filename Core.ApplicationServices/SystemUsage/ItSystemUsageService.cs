@@ -10,7 +10,6 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -287,62 +286,54 @@ namespace Core.ApplicationServices.SystemUsage
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
         }
 
-        public IEnumerable<ItSystemUsage> GetSystemsByResponsibleUnitId(int unitId)
+        public Maybe<OperationError> TransferResponsibleUsage(int systemId, Guid targetUnitUuid)
         {
-            return _usageRepository.AsQueryable().Where(x => x.ResponsibleUsage.OrganizationUnitId == unitId).ToList();
-        }
-
-        public IEnumerable<ItSystemUsage> GetSystemsByRelevantUnitId(int unitId)
-        {
-            return _usageRepository.AsQueryable().Where(x => x.UsedBy.Select(usedBy => usedBy.OrganizationUnitId).Contains(unitId)).ToList();
-        }
-
-        public Maybe<OperationError> TransferResponsibleUsage(OrganizationUnit targetUnit, int id)
-        {
-            return Modify(id, system =>
+            return Modify(systemId, system =>
             {
-                var result = system.TransferResponsibleOrganizationalUnit(targetUnit);
-                return result.HasValue 
-                    ? result.Value 
+                var error = system.TransferResponsibleOrganizationalUnit(targetUnitUuid);
+                return error.HasValue 
+                    ? error.Value 
                     : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
-        public Maybe<OperationError> TransferRelevantUsage(int unitId, OrganizationUnit targetUnit, int id)
+        public Maybe<OperationError> TransferRelevantUsage(int systemId, Guid unitUuid, Guid targetUnitUuid)
         {
-            return Modify(id, system =>
+            return Modify(systemId, system =>
             {
-                var result = system.TransferUsedByUnit(unitId, targetUnit);
-                return result.HasValue
-                    ? result.Value
-                    : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+                return system.TransferUsedByUnit(unitUuid, targetUnitUuid)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
+            }).MatchFailure();
         }
 
         public Maybe<OperationError> RemoveResponsibleUsage(int id)
         {
             return Modify(id, system =>
             {
-                var result = system.RemoveResponsibleOrganizationUnit();
-                return result.HasValue 
-                    ? result.Value 
-                    : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+                return system.RemoveResponsibleOrganizationUnit()
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
+            }).MatchFailure();
         }
         
-        public Maybe<OperationError> RemoveRelevantUnit(int id, int unitId)
+        public Maybe<OperationError> RemoveRelevantUnit(int id, Guid unitUuid)
         {
             return Modify(id, system =>
             {
-                var result = system.RemoveUsedByUnit(unitId);
-                return result.HasValue
-                    ? result.Value
-                    : Result<ItSystemUsage, OperationError>.Success(system);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+                return system.RemoveUsedByUnit(unitUuid)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
+            }).MatchFailure();
         }
 
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)

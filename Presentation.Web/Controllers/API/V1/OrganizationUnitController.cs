@@ -141,9 +141,7 @@ namespace Presentation.Web.Controllers.API.V1
         [NonAction]
         public override HttpResponseMessage Put(int id, int organizationId, JObject jObject) => throw new NotSupportedException();
 
-        protected override void DeleteQuery(OrganizationUnit entity)
-        {
-            _orgUnitService.Delete(entity.OrganizationId, entity.Id);
-        }
+        [NonAction]
+        public override HttpResponseMessage Delete(int id, int organizationId) => throw new NotSupportedException();
     }
 }

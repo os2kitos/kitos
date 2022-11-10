@@ -39,12 +39,9 @@ namespace Core.ApplicationServices.SystemUsage
         Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId);
         Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved);
         Result<ItSystemUsage, OperationError> GetItSystemUsageById(int usageId);
-        Maybe<OperationError> TransferResponsibleUsage(OrganizationUnit targetUnit, int id);
-        Maybe<OperationError> TransferRelevantUsage(int unitId, OrganizationUnit targetUnit, int id);
+        Maybe<OperationError> TransferResponsibleUsage(int systemId, Guid targetUnitUuid);
+        Maybe<OperationError> TransferRelevantUsage(int systemId, Guid unitUuid, Guid targetUnitUuid);
         Maybe<OperationError> RemoveResponsibleUsage(int id);
-        Maybe<OperationError> RemoveRelevantUnit(int id, int unitId);
-
-        IEnumerable<ItSystemUsage> GetSystemsByResponsibleUnitId(int unitId);
-        IEnumerable<ItSystemUsage> GetSystemsByRelevantUnitId(int unitId);
+        Maybe<OperationError> RemoveRelevantUnit(int id, Guid unitUuid);
     }
 }

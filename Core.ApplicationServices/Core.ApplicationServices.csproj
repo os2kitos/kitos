@@ -145,7 +145,7 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
-    <Compile Include="Model\Organizations\OrganizationRegistrationChangeParameters.cs" />
+    <Compile Include="Model\Organizations\OrganizationUnitRegistrationChangeParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\PaymentChangeParameters.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />

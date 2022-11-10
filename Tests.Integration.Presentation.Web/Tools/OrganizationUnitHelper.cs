@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Organizations;
@@ -25,7 +25,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<List<OrganizationUnitRole>> GetOrganizationUnitRolesAsync(Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var orgUnitUrl = TestEnvironment.CreateUrl($"odata/OrganizationUnitRoles");
+            var orgUnitUrl = TestEnvironment.CreateUrl("odata/OrganizationUnitRoles");
 
             using var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -33,10 +33,10 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await response.ReadOdataListResponseBodyAsAsync<OrganizationUnitRole>();
         }
 
-        public static async Task<UnitAccessRightsDTO> GetUnitAccessRights(int orgId, int unitId, Cookie optionalLogin = null)
+        public static async Task<UnitAccessRightsDTO> GetUnitAccessRights(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organization-units/access-rights/{orgId}/{unitId}");
+            var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid}/organization-units/{unitUuid}/access-rights");
 
             using var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

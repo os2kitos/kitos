@@ -6,9 +6,9 @@
             internalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
             roles: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
             relevantSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
-            responsibleSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
+            responsibleSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {
 
-            const changeRequest = new Models.Api.Organization.OrganizationRegistrationChangeRequestDto();
+            const changeRequest = new Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto();
 
             changeRequest.itContractRegistrations = OrganizationRegistrationHelper.mapSelectedOptionsToIds(contractRegistrations);
             changeRequest.paymentRegistrationDetails = OrganizationRegistrationHelper.createPaymentChangeRequest(externalPayments, internalPayments);
@@ -17,6 +17,26 @@
             changeRequest.responsibleSystems = OrganizationRegistrationHelper.mapSelectedOptionsToIds(responsibleSystems);
 
             return changeRequest;
+        }
+
+        static createTransferRequest(
+            targetUnitUuid: string,
+            contractRegistrations: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            externalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            internalPayments: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            roles: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            relevantSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[],
+            responsibleSystems: Models.ViewModel.Organization.IOrganizationUnitRegistration[]): Models.Api.Organization.TransferOrganizationUnitRegistrationRequestDto {
+
+            const request = OrganizationRegistrationHelper.createChangeRequest(contractRegistrations,
+                externalPayments,
+                internalPayments,
+                roles,
+                relevantSystems,
+                responsibleSystems) as Models.Api.Organization.TransferOrganizationUnitRegistrationRequestDto;
+            request.targetUnitUuid = targetUnitUuid;
+
+            return request;
         }
 
         static mapSelectedOptionsToIds(options: Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>): Array<number> {

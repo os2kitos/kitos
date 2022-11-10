@@ -15,21 +15,17 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations
 {
-<<<<<<<< HEAD:Tests.Integration.Presentation.Web/Organizations/OrganizationUnitTests.cs
     public class OrganizationUnitTests: WithAutoFixture
-========
-    public class OrganizationUnitRegistrationTests: WithAutoFixture
->>>>>>>> cefd0b575d6d762a7e916851d445219a067d2a03:Tests.Integration.Presentation.Web/Organizations/OrganizationUnitRegistrationTests.cs
     {
         [Fact]
         public async Task GlobalAdmin_Has_All_AccessRights()
         {
-            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
-            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organizationId);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
 
-            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organizationId, unit.Id, cookie);
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
 
             Assert.True(accessRights.CanBeRead);
             Assert.True(accessRights.CanBeModified);
@@ -41,12 +37,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
         [Fact]
         public async Task LocalAdmin_From_Organization_Has_All_AccessRights()
         {
-            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
-            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organizationId);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
 
-            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organizationId, unit.Id, cookie);
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
 
             Assert.True(accessRights.CanBeRead);
             Assert.True(accessRights.CanBeModified);
@@ -58,12 +54,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
         [Fact]
         public async Task User_From_Organization_Has_Only_Read_Access()
         {
-            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
-            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organizationId);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, A<string>());
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
 
-            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organizationId, unit.Id, cookie);
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
 
             Assert.True(accessRights.CanBeRead);
             Assert.False(accessRights.CanBeModified);

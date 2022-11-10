@@ -409,7 +409,7 @@
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
-    <Compile Include="Controllers\API\V1\OrganizationRegistrationController.cs" />
+    <Compile Include="Controllers\API\V1\OrganizationUnitRegistrationController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
     <Compile Include="Controllers\API\V1\UserDeletionController.cs" />
@@ -423,13 +423,14 @@
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitConsequenceDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateConsequencesResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitChangeCategory.cs" />
-    <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistraitonRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\ChangeOrganizationRegistrationRequestDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ChangeOrganizationUnitRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationUnitDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\TransferOrganizationUnitRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\UnitAccessRightsDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />

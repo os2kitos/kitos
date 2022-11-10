@@ -9,7 +9,6 @@ using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
@@ -44,7 +43,6 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
         private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
-        private readonly IEntityIdentityResolver _identityResolver;
 
         public ItContractService(
             IItContractRepository repository,
@@ -64,7 +62,7 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
             IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
             IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService, 
-            IGenericRepository<EconomyStream> economyStreamRepository, IEntityIdentityResolver identityResolver)
+            IGenericRepository<EconomyStream> economyStreamRepository)
         {
             _repository = repository;
             _referenceService = referenceService;
@@ -84,7 +82,6 @@ namespace Core.ApplicationServices.Contract
             _optionExtendOptionsService = optionExtendOptionsService;
             _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
             _economyStreamRepository = economyStreamRepository;
-            _identityResolver = identityResolver;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -131,44 +128,38 @@ namespace Core.ApplicationServices.Contract
             {
                 foreach (var paymentId in paymentIds)
                 {
-                    var result = contract.ResetEconomyStreamOrganizationUnit(paymentId, isInternal);
-                    if (result.HasValue)
-                        return result.Value;
+                    var error = contract.ResetEconomyStreamOrganizationUnit(paymentId, isInternal);
+                    if (error.HasValue)
+                        return error.Value;
                 }
-                _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
 
                 return Result<ItContract, OperationError>.Success(contract);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
-        public Maybe<OperationError> TransferPayments(int contractId, int targetUnitId, bool isInternal, IEnumerable<int> paymentIds)
+        public Maybe<OperationError> TransferPayments(int contractId, Guid targetUnitUuid, bool isInternal, IEnumerable<int> paymentIds)
         {
             return Modify(contractId, contract =>
             {
-                return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
-                    .Select(targetUuid => TransferPayments(contract, targetUuid, isInternal, paymentIds))
-                    .GetValueOrDefault()
+                return TransferPayments(contract, targetUnitUuid, isInternal, paymentIds)
                     .Match
                     (
                         error => error,
                         () => Result<ItContract, OperationError>.Success(contract)
                     );
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
 
-        private Maybe<OperationError> TransferPayments(ItContract contract, Guid targetUnitUuid, bool isInternal,
+        private static Maybe<OperationError> TransferPayments(ItContract contract, Guid targetUnitUuid, bool isInternal,
             IEnumerable<int> paymentIds)
         {
             foreach (var paymentId in paymentIds)
             {
-                var result = contract.TransferEconomyStream(paymentId, targetUnitUuid, isInternal);
-                if (result.HasValue)
-                    return result.Value;
+                var error = contract.TransferEconomyStream(paymentId, targetUnitUuid, isInternal);
+                if (error.HasValue)
+                    return error.Value;
             }
-
-            _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
+            
             return Maybe<OperationError>.None;
         }
 
@@ -337,30 +328,26 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
-        public Maybe<OperationError> SetContractResponsibleUnit(int contractId, int targetUnitId)
+        public Maybe<OperationError> SetResponsibleUnit(int contractId, Guid targetUnitUuid)
         {
             return Modify(contractId, contract =>
             {
-                return _identityResolver.ResolveUuid<OrganizationUnit>(targetUnitId)
-                    .Select(contract.SetResponsibleOrganizationUnit)
-                    .GetValueOrDefault()
+                return contract.SetResponsibleOrganizationUnit(targetUnitUuid)
                     .Match
                     (
                         error => error,
                         () => Result<ItContract, OperationError>.Success(contract)
                     );
-            }).Match(_ => Maybe<OperationError>.None, 
-                err => err);
+            }).MatchFailure();
         }
 
-        public Maybe<OperationError> RemoveContractResponsibleUnit(int contractId)
+        public Maybe<OperationError> RemoveResponsibleUnit(int contractId)
         {
             return Modify(contractId, contract =>
             {
                 contract.ResetResponsibleOrganizationUnit();
                 return Result<ItContract, OperationError>.Success(contract);
-            }).Match(_ => Maybe<OperationError>.None,
-                err => err);
+            }).MatchFailure();
         }
         
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)

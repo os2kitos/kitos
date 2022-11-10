@@ -1,15 +1,18 @@
-﻿namespace Core.DomainModel.Commands
+﻿using System;
+using Core.DomainModel.Organization;
+
+namespace Core.DomainModel.Commands
 {
     public class RemoveOrganizationUnitRegistrationsCommand : ICommand
     {
-        public RemoveOrganizationUnitRegistrationsCommand(int organizationId, int unitId)
+        public RemoveOrganizationUnitRegistrationsCommand(Organization.Organization organization, OrganizationUnit organizationUnit)
         {
-            OrganizationId = organizationId;
-            UnitId = unitId;
+            Organization = organization;
+            OrganizationUnit = organizationUnit;
         }
 
-        public int OrganizationId { get; }
-        public int UnitId { get; set; }
+        public Organization.Organization Organization { get; }
+        public OrganizationUnit OrganizationUnit{ get; }
 
     }
 }

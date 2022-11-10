@@ -5,9 +5,10 @@
         return{
             bindings: {
                 organizationId: "<",
-                unitId: "<",
+                organizationUuid: "@",
+                unitUuid: "@",
                 unitName: "@",
-                closeModal: "&",
+                stateParameters: "<"
             },
             controller: OrganizationUnitMigrationController,
             controllerAs: "ctrl",
@@ -32,16 +33,19 @@
 
     interface IOrganizationUnitMigrationController extends ng.IComponentController {
         organizationId: number;
-        unitId: number;
+        organizationUuid: string;
+        unitUuid: string;
         unitName: string;
-        closeModal: () => void;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
     }
 
     class OrganizationUnitMigrationController implements IOrganizationUnitMigrationController {
         organizationId: number | null = null;
-        unitId: number | null = null;
+        organizationUuid: string | null = null;
+        unitUuid: string | null = null;
         unitName: string | null = null;
-        closeModal: () => void;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
+
         anySelections = false;
         allSelections = false;
         targetUnitSelected = false;
@@ -54,8 +58,8 @@
         contractRegistrations: IOrganizationUnitMigrationOptions;
         relevantSystemRegistrations: IOrganizationUnitMigrationOptions;
         responsibleSystemRegistrations: IOrganizationUnitMigrationOptions;
-        orgUnits: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[];
-        selectedOrg: any;
+        orgUnits: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[];
+        selectedOrg: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>;
 
         rolesTableConfig: IMigrationTableColumn[];
         internalPaymentTableConfig: IMigrationTableColumn[];
@@ -63,9 +67,7 @@
         contractTableConfig: IMigrationTableColumn[];
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
-
-        private isBusy = false;
-
+        
         static $inject: string[] = ["organizationUnitService", "organizationApiService", "notify"];
         constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
             private readonly organizationApiService: Services.IOrganizationApiService,
@@ -75,12 +77,19 @@
         $onInit() {
             if (this.organizationId === null) {
                 console.error("missing attribute: 'organizationId'");
+                return;
             }
-            if (this.unitId === null) {
-                console.error("missing attribute: 'unitId'");
+            if (this.organizationUuid === null) {
+                console.error("missing attribute: 'organizationUuid'");
+                return;
+            }
+            if (this.unitUuid === null) {
+                console.error("missing attribute: 'unitUuid'");
+                return;
             }
             if (this.unitName === null) {
                 console.error("missing attribute: 'unitName'");
+                return;
             }
 
             this.createTableConfigurations();
@@ -94,29 +103,29 @@
         }
 
         deleteSelected() {
-            if (this.isBusy) {
+            if (this.checkIsBusy()) {
                 return;
             }
             if (!confirm('Er du sikker på, at du vil slette de valgte registreringer?')) {
                 return;
             }
-            this.isBusy = true;
+            this.setIsBusy(true);
 
             const request = this.createChangeRequest();
-            this.organizationUnitService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
+            this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
-                    this.refreshData(); 
+                    this.refreshData();
+                    this.setIsBusy(false);
                 },
                 error => {
                     console.error(error);
                     this.notify.addErrorMessage("Delete selected failed");
+                    this.setIsBusy(false);
                 });
-
-            this.isBusy = false;
         }
 
         transfer() {
-            if (this.isBusy) {
+            if (this.checkIsBusy()) {
                 return;
             }
             if (!this.selectedOrg?.id)
@@ -124,33 +133,30 @@
             if (!confirm(`Er du sikker på, at du vil overføre de valgte registreringer til "${this.selectedOrg.text}"?`)) {
                 return;
             }
-            this.isBusy = true;
+            this.setIsBusy(true);
 
-            const request = this.createChangeRequest();
-            this.organizationUnitService.transferSelectedRegistrations(this.organizationId, this.unitId, this.selectedOrg.id, request)
+
+            const request = this.createTransferRequest();
+            this.organizationUnitService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.selectedOrg = null;
                     this.refreshData();
+                    this.setIsBusy(false);
                 }, error => {
                     console.log(error);
                     this.notify.addErrorMessage("Transfer failed");
+                    this.setIsBusy(false);
                 });
-
-            this.isBusy = false;
         }
 
         setSelectedOrg() {
             if (!this.selectedOrg?.id)
                 return;
-            if (parseInt(this.selectedOrg.id) === this.unitId) {
+            if (this.selectedOrg.optionalExtraObject.uuid === this.unitUuid) {
                 this.selectedOrg = null;
-                this.notify.addErrorMessage("You cannot choose the current unit");
+                this.notify.addErrorMessage("Du kan ikke overføre til denne enhed");
                 return;
             }
-            const selectedRegistrations = this.collectSelectedRegistrations();
-            selectedRegistrations.forEach(registration => {
-                registration.targetUnitId = this.selectedOrg.id;
-            });
 
             this.checkShouldTransferBtnBeEnabled();
         }
@@ -281,7 +287,7 @@
             this.responsibleSystemRegistrations = this.createBaseOptions(Models.ViewModel.Organization.OrganizationRegistrationOption.ResponsibleSystems, "it-system.usage.org");
         }
 
-        private createChangeRequest(): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
+        private createChangeRequest(): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {
             return Helpers.OrganizationRegistrationHelper.createChangeRequest(
                 this.contractRegistrations.root.children,
                 this.externalPayments.root.children,
@@ -291,8 +297,19 @@
                 this.responsibleSystemRegistrations.root.children);
         }
 
+        private createTransferRequest(): Models.Api.Organization.TransferOrganizationUnitRegistrationRequestDto {
+            return Helpers.OrganizationRegistrationHelper.createTransferRequest(
+                this.selectedOrg?.optionalExtraObject?.uuid,
+                this.contractRegistrations.root.children,
+                this.externalPayments.root.children,
+                this.internalPayments.root.children,
+                this.roles.root.children,
+                this.relevantSystemRegistrations.root.children,
+                this.responsibleSystemRegistrations.root.children);
+        }
+
         private getData(): ng.IPromise<void> {
-            return this.organizationUnitService.getRegistrations(this.organizationId, this.unitId).then(response => {
+            return this.organizationUnitService.getRegistrations(this.organizationUuid, this.unitUuid).then(response => {
                 this.roles.root.children = this.mapDtoWithUserFullNameToOptions(response.organizationUnitRights);
                 this.getPaymentOptions(response.payments);
                 this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);
@@ -325,11 +342,11 @@
         }
 
         private checkIsBusy(): boolean {
-            return this.isBusy;
+            return this.stateParameters.checkIsRootBusy();
         }
 
         private setIsBusy(value: boolean): void{
-            this.isBusy = value;
+            this.stateParameters.setRootIsBusy(value);
         }
 
         private createBaseOptions(type: Models.ViewModel.Organization.OrganizationRegistrationOption, dataRelatedPage?: string): IOrganizationUnitMigrationOptions {
@@ -350,22 +367,22 @@
 
         private createStandardTableConfig(title: string): IMigrationTableColumn[] {
             return [
-                { title: title, property: "text", isLink: true },
+                { title: title, property: "text", type: MigrationTableColumnType.Link },
             ] as IMigrationTableColumn[];
         }
 
         private createUserFullNameTableConfig(title: string): IMigrationTableColumn[] {
             return [
-                { title: title, property: "text" },
-                { title: "Bruger", property: "objectText" }
+                { title: title, property: "text", type: MigrationTableColumnType.Text },
+                { title: "Bruger", property: "objectText", type: MigrationTableColumnType.Text }
             ] as IMigrationTableColumn[];
         }
 
         private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
             return [
-                { title: "Index", property: "index" },
-                { title: "Kontraktnavn", property: "objectText", isLink: true },
-                { title: title, property: "text" }
+                { title: "Index", property: "index", type: MigrationTableColumnType.Text },
+                { title: "Kontraktnavn", property: "objectText", type: MigrationTableColumnType.Link },
+                { title: title, property: "text", type: MigrationTableColumnType.Text }
             ] as IMigrationTableColumn[];
         }
 

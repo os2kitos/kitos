@@ -409,6 +409,8 @@
                                 newParent: unit.parentId,
                                 orgId: unit.organizationId,
                                 isRoot: unit.parentId == undefined,
+                                uuid: unit.uuid,
+                                orgUuid: unit.organization.uuid,
                                 isFkOrganizationUnit: unit.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                             } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
 
@@ -435,7 +437,7 @@
                             $modalScope.canChangeName = false;
                             $modalScope.canDelete = false;
 
-                            organizationUnitService.getUnitAccessRights(unit.organizationId, unit.id)
+                            organizationUnitService.getUnitAccessRights(unit.organization.uuid, unit.uuid)
                                 .then(res => {
                                     $modalScope.canDelete = res.canBeDeleted;
                                     $modalScope.canChangeName = res.canNameBeModified;
@@ -541,13 +543,26 @@
                                 };
                             };
 
+                            $modalScope.setIsBusy = (value: boolean): void => {
+                                $modalScope.submitting = value;
+                            }
+
+                            $modalScope.checkIsBusy = (): boolean => {
+                                return $modalScope.submitting;
+                            }
+
+                            $modalScope.stateParameters = {
+                                setRootIsBusy: (value: boolean) => $modalScope.setIsBusy(value),
+                                checkIsRootBusy: () => $modalScope.checkIsBusy()
+                            } as Kitos.Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
+
                             $modalScope.delete = function () {
                                 //don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
                                 $modalScope.submitting = true;
 
-                                organizationUnitService.deleteOrganizationUnit(unit.organizationId, unit.id)
+                                organizationUnitService.deleteOrganizationUnit(unit.organization.uuid, unit.uuid)
                                     .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();

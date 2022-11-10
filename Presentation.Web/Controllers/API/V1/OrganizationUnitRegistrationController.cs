@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -16,13 +17,14 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API.V1
 {
     [PublicApi]
-    [RoutePrefix("api/v1/organization-units")]
-    public class OrganizationRegistrationController: BaseApiController
+    [RoutePrefix("api/v1/organizations/{organizationUuid}/organization-units/{unitUuid}")]
+
+    public class OrganizationUnitRegistrationController: BaseApiController
     {
         private readonly IOrganizationUnitService _organizationUnitService;
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationRegistrationController(IOrganizationUnitService organizationUnitService,
+        public OrganizationUnitRegistrationController(IOrganizationUnitService organizationUnitService,
             IOrgUnitService orgUnitService)
         {
             _organizationUnitService = organizationUnitService;
@@ -30,68 +32,68 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("{organizationId}/{unitId}")]
+        [Route("registrations")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetUnitRegistrations(int organizationId, int unitId)
+        public HttpResponseMessage GetRegistrations(Guid organizationUuid, Guid  unitUuid)
         {
-            return _organizationUnitService.GetOrganizationRegistrations(organizationId, unitId)
+            return _organizationUnitService.GetRegistrations(organizationUuid, unitUuid)
                 .Select(ToRegistrationDto)
                 .Match(Ok, FromOperationError);
         }
 
         [HttpDelete]
-        [Route("{organizationId}/{unitId}")]
+        [Route("registrations")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveSelectedUnitRegistrations(int organizationId, int unitId, [FromBody] ChangeOrganizationRegistrationRequestDTO requestDto)
+        public HttpResponseMessage RemoveRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] ChangeOrganizationUnitRegistrationRequestDTO requestDto)
         {
             var changeParameters = ToChangeParameters(requestDto);
-            return _organizationUnitService.DeleteSelectedOrganizationRegistrations(organizationId, unitId, changeParameters)
+            return _organizationUnitService.DeleteRegistrations(organizationUuid, unitUuid, changeParameters)
                 .Match(FromOperationError, Ok);
         }
 
         [HttpDelete]
-        [Route("unit/{organizationId}/{unitId}")]
+        [Route("")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage DeleteUnitWithRegistrations(int organizationId, int unitId)
+        public HttpResponseMessage Delete(Guid organizationUuid, Guid unitUuid)
         {
-            _orgUnitService.Delete(organizationId, unitId);
-            return Ok();
+            return _orgUnitService.Delete(organizationUuid, unitUuid)
+                .Match(FromOperationError, Ok);
         }
 
         [HttpPut]
-        [Route("{organizationId}/{unitId}/{targetUnitId}")]
+        [Route("registrations")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage TransferSelectedUnitRegistrations(int organizationId, int unitId, int targetUnitId, [FromBody] ChangeOrganizationRegistrationRequestDTO requestDto)
+        public HttpResponseMessage TransferRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] TransferOrganizationUnitRegistrationRequestDTO requestDto)
         {
             var changeParameters = ToChangeParameters(requestDto);
-            return _organizationUnitService.TransferSelectedOrganizationRegistrations(organizationId, unitId, targetUnitId, changeParameters)
+            return _organizationUnitService.TransferRegistrations(organizationUuid, unitUuid, requestDto.TargetUnitUuid, changeParameters)
                 .Match(FromOperationError, Ok);
         }
 
         [HttpGet]
-        [Route("access-rights/{organizationId}/{unitId}")]
+        [Route("access-rights")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetUnitAccessRights(int organizationId, int unitId)
+        public HttpResponseMessage GetUnitAccessRights(Guid organizationUuid, Guid unitUuid)
         {
-            return _organizationUnitService.GetUnitAccessRightsByUnitId(organizationId, unitId)
+            return _organizationUnitService.GetUnitAccessRightsByUnitId(organizationUuid, unitUuid)
                 .Select(ToAccessRightsDto)
                 .Match(Ok, FromOperationError);
         }
 
-        private static OrganizationRegistrationDTO ToRegistrationDto(OrganizationRegistrationDetails details)
+        private static OrganizationRegistrationUnitDTO ToRegistrationDto(OrganizationUnitRegistrationDetails details)
         {
-            return new OrganizationRegistrationDTO
+            return new OrganizationRegistrationUnitDTO
             {
                 OrganizationUnitRights = details.OrganizationUnitRights.Select(MapUnitRightToNamedEntityDtoWithUserFullNameDto).ToList(),
                 ItContractRegistrations = details.ItContractRegistrations.Select(x => x.MapToNamedEntityDTO()).ToList(),
@@ -130,17 +132,17 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
 
-        private static OrganizationRegistrationChangeParameters ToChangeParameters(
-            ChangeOrganizationRegistrationRequestDTO requestDto)
+        private static OrganizationUnitRegistrationChangeParameters ToChangeParameters(
+            ChangeOrganizationUnitRegistrationRequestDTO requestDto)
         {
-            return new OrganizationRegistrationChangeParameters
+            return new OrganizationUnitRegistrationChangeParameters
             (
                 requestDto.OrganizationUnitRights,
                 requestDto.ItContractRegistrations,
                 requestDto.PaymentRegistrationDetails.Select(x =>
                     new PaymentChangeParameters(x.ItContractId, x.InternalPayments, x.ExternalPayments)),
-                requestDto.RelevantSystems,
-                requestDto.ResponsibleSystems
+                requestDto.ResponsibleSystems,
+                requestDto.RelevantSystems
             );
         }
 

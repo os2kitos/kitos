@@ -846,15 +846,6 @@ namespace Core.DomainModel.ItContract
             return ExternEconomyStreams.Where(x => x.OrganizationUnitId == unitId).ToList();
         }
 
-        public Result<EconomyStream, OperationError> GetPaymentById(int id)
-        {
-            var economy = ExternEconomyStreams.FirstOrDefault(x => x.Id == id) ?? InternEconomyStreams.FirstOrDefault(x => x.Id == id);
-
-            return economy != null
-                ? economy
-                : new OperationError($"Payment with id: {id} not found", OperationFailure.NotFound);
-        }
-
         public Maybe<OperationError> ResetEconomyStreamOrganizationUnit(int id, bool isInternal)
         {
             return isInternal 
@@ -868,7 +859,7 @@ namespace Core.DomainModel.ItContract
             if (stream == null)
                 return new OperationError($"EconomyStream with id: {id} was not found", OperationFailure.NotFound);
 
-            stream.OrganizationUnit = null;
+            stream.ResetOrganizationUnit();
 
             return Maybe<OperationError>.None;
         }
@@ -876,22 +867,22 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> TransferEconomyStream(int id, Guid targetUnitUuid, bool isInternal)
         {
             return Organization.GetOrganizationUnit(targetUnitUuid)
-                .Select
+                .Match
                 (
                     targetUnit => isInternal
-                            ? TransferSelectedEconomyStream(id, targetUnit, InternEconomyStreams)
-                            : TransferSelectedEconomyStream(id, targetUnit, ExternEconomyStreams)
-                ).GetValueOrDefault();
+                            ? TransferEconomyStream(id, targetUnit, InternEconomyStreams)
+                            : TransferEconomyStream(id, targetUnit, ExternEconomyStreams),
+                    () => new OperationError($"Organization unit with uuid: {targetUnitUuid} was not found", OperationFailure.NotFound)
+                );
         }
 
-        private static Maybe<OperationError> TransferSelectedEconomyStream(int id, OrganizationUnit targetUnit, IEnumerable<EconomyStream> economyStreams)
+        private static Maybe<OperationError> TransferEconomyStream(int id, OrganizationUnit targetUnit, IEnumerable<EconomyStream> economyStreams)
         {
             var stream = economyStreams.FirstOrDefault(x => x.Id == id);
             if (stream == null)
                 return new OperationError($"EconomyStream with id: {id} was not found", OperationFailure.NotFound);
 
-            stream.OrganizationUnit = targetUnit;
-            stream.OrganizationUnitId = targetUnit.Id;
+            stream.SetOrganizationUnit(targetUnit);
             return Maybe<OperationError>.None;
         }
 

@@ -2,9 +2,9 @@
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
-    public class ChangePaymentRegistraitonRequestDTO
+    public class ChangePaymentRegistrationRequestDTO
     {
-        public ChangePaymentRegistraitonRequestDTO()
+        public ChangePaymentRegistrationRequestDTO()
         {
             InternalPayments = new List<int>();
             ExternalPayments = new List<int>();

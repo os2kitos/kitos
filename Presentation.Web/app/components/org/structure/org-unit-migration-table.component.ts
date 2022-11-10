@@ -7,9 +7,8 @@
                 title: "@",
                 options: "<",
                 configuration: "<",
-                unitId: "<",
-                organizationId: "<",
-                closeModal: "&"
+                unitUuid: "@",
+                organizationUuid: "@"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -17,10 +16,15 @@
         }
     }
 
+    export enum MigrationTableColumnType {
+        Text = 0,
+        Link = 1
+    }
+
     export interface IMigrationTableColumn{
         title: string;
         property: string;
-        isLink?: boolean;
+        type: MigrationTableColumnType;
         cssClass?: string;
     }
 
@@ -28,44 +32,51 @@
         title: string;
         options: IOrganizationUnitMigrationOptions;
         configuration: IMigrationTableColumn[];
-        unitId: number;
-        organizationId: number;
-        closeModal: () => void;
+        unitUuid: string;
+        organizationUuid: string;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
         title: string | null = null;
-        options: IOrganizationUnitMigrationOptions | null;
+        options: IOrganizationUnitMigrationOptions | null = null;
         configuration: IMigrationTableColumn[] | null = null;
-        unitId: number | null = null;
-        organizationId: number | null = null;
-        closeModal: () => void;
+        unitUuid: string | null = null;
+        organizationUuid: string | null = null;
         root: IOrganizationUnitMigrationRoot;
-
-        static $inject: string[] = ["organizationUnitService", "notify", "$state"];
+        columnTypes = MigrationTableColumnType;
+        
+        static $inject: string[] = ["organizationUnitService", "notify"];
         constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
-            private readonly notify,
-            private readonly $state) {
+            private readonly notify) {
         }
 
         $onInit() {
             if (this.title === null) {
                 console.error("missing migration table attribute: 'title'");
+                return;
             }
             if (this.options === null) {
-                console.error("missing migration table attribute: 'options'");
+                console.error(`missing migration table attribute: 'options' for table with title: ${this.title}`);
+                return;
             }
             if (this.configuration === null) {
-                console.error("missing migration table attribute: 'configuration'");
+                console.error(`missing migration table attribute: 'configuration' for table with title: ${this.title}`);
+                return;
             }
-            if (this.unitId === null) {
-                console.error("missing migration table attribute: 'unitId'");
+            if (this.unitUuid === null) {
+                console.error(`missing migration table attribute: 'unitUuid' for table with title: ${this.title}`);
+                return;
             }
-            if (this.organizationId === null) {
-                console.error("missing migration table attribute: 'organizationId'");
+            if (this.organizationUuid === null) {
+                console.error(`missing migration table attribute: 'organizationId' for table with title: ${this.title}`);
+                return;
             }
 
             this.root = this.options.root;
+        }
+
+        getPageRoute(id: number) {
+            return `${this.options.dataRelatedPage}({ id: ${id} })`;
         }
 
         registrationSelected() {
@@ -95,20 +106,21 @@
             const request = this.createChangeRequest(registration);
             registration.selected = false;
 
-            this.organizationUnitService.deleteSelectedRegistrations(this.organizationId, this.unitId, request)
-                .then(() => this.options.refreshData()),
+            this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
+                .then(() => {
+                    this.options.refreshData();
+                    this.options.setIsBusy(false);
+                },
                 error => {
                     console.log(error);
-                    this.notify.addErrorMessage("Failed to delete the selected unit");
-                };
+                    this.notify.addErrorMessage("Failed to deleted the selected unit");
+                    this.options.setIsBusy(false);
+                });
+
+            this.options.setIsBusy(false);
         }
 
-        navigateTo(id: number) {
-            this.$state.go(this.options.dataRelatedPage, { id: id })
-                .then(() => this.closeModal());
-        }
-
-        private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationRegistrationChangeRequestDto {
+        private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {
 
             const roles = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();
             const contractRegistration = new Array<Models.ViewModel.Organization.IOrganizationUnitRegistration>();

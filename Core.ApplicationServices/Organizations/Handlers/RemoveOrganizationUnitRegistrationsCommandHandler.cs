@@ -3,6 +3,7 @@ using Core.DomainModel.Commands;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using System;
+using System.Linq;
 
 namespace Core.ApplicationServices.Organizations.Handlers
 {
@@ -20,25 +21,22 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
         public Maybe<OperationError> Execute(RemoveOrganizationUnitRegistrationsCommand command)
         {
-            return _organizationUnitService.DeleteAllUnitOrganizationRegistrations(command.OrganizationId, command.UnitId)
+            return _organizationUnitService.DeleteRegistrations(command.Organization.Uuid, command.OrganizationUnit.Uuid)
                 .Match
                 (
                     error => error,
                     () =>
                     {
-                        RemoveItSystemUsageOrgUnitUsages(command.UnitId);
+                        RemoveItSystemUsageOrgUnitUsages(command.OrganizationUnit.Uuid);
                         return Maybe<OperationError>.None;
                     });
         }
 
-        private void RemoveItSystemUsageOrgUnitUsages(int unitId)
+        private void RemoveItSystemUsageOrgUnitUsages(Guid unitUuid)
         {
-            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId == unitId);
-            foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)
-            {
-                _itSystemUsageOrgUnitUsageRepository.Delete(itSystemUsage);
-            }
+            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.AsQueryable().Where(x => x.OrganizationUnit.Uuid == unitUuid).ToList();
 
+            _itSystemUsageOrgUnitUsageRepository.RemoveRange(itSystemUsageOrgUnitUsages);
             _itSystemUsageOrgUnitUsageRepository.Save();
         }
     }

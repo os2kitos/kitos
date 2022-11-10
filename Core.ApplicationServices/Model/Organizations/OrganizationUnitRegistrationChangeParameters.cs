@@ -1,13 +1,10 @@
-﻿using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Organization;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Core.ApplicationServices.Model.Organizations
 {
-    public class OrganizationRegistrationChangeParameters
+    public class OrganizationUnitRegistrationChangeParameters
     {
-        public OrganizationRegistrationChangeParameters(
+        public OrganizationUnitRegistrationChangeParameters(
             IEnumerable<int> organizationUnitRights, 
             IEnumerable<int> itContractRegistrations, 
             IEnumerable<PaymentChangeParameters> paymentRegistrationDetails, 
