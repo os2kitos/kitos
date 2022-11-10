@@ -10,7 +10,6 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -302,10 +301,12 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(systemId, system =>
             {
-                var error = system.TransferUsedByUnit(unitUuid, targetUnitUuid);
-                return error.HasValue
-                    ? error.Value
-                    : Result<ItSystemUsage, OperationError>.Success(system);
+                return system.TransferUsedByUnit(unitUuid, targetUnitUuid)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
             }).MatchFailure();
         }
 
@@ -313,10 +314,12 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var error = system.RemoveResponsibleOrganizationUnit();
-                return error.HasValue 
-                    ? error.Value 
-                    : Result<ItSystemUsage, OperationError>.Success(system);
+                return system.RemoveResponsibleOrganizationUnit()
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
             }).MatchFailure();
         }
         
@@ -324,10 +327,12 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return Modify(id, system =>
             {
-                var error = system.RemoveUsedByUnit(unitUuid);
-                return error.HasValue
-                    ? error.Value
-                    : Result<ItSystemUsage, OperationError>.Success(system);
+                return system.RemoveUsedByUnit(unitUuid)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
             }).MatchFailure();
         }
 
