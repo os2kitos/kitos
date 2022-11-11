@@ -56,7 +56,7 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
         {
             using var transaction = _transactionManager.Begin();
-            var deleteResult = GetOrganizationAndAuthorizeModification(organizationUuid, OrganizationDataReadAccessLevel.All)
+            var deleteResult = GetOrganizationAndAuthorizeModification(organizationUuid)
                 .Bind(organization => CombineWithOrganizationUnit(unitUuid, organization))
                 .Bind(WithDeletionPermission)
                 .Bind(DeleteOrganizationUnit);
@@ -220,9 +220,9 @@ namespace Core.ApplicationServices.Organizations
             return mutationResult;
         }
 
-        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid, OrganizationDataReadAccessLevel? accessLevel = null)
+        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
         {
-            return _organizationService.GetOrganization(uuid, accessLevel)
+            return _organizationService.GetOrganization(uuid, OrganizationDataReadAccessLevel.All)
                 .Match
                 (
                     organization =>
