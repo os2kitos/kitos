@@ -203,6 +203,38 @@ namespace Core.DomainModel.Organization
             return Maybe<OperationError>.None;
         }
 
+        public OrganizationUnitRegistrationDetails GetUnitRegistrations()
+        {
+            return new OrganizationUnitRegistrationDetails
+            (
+                Rights.ToList(),
+                ResponsibleForItContracts.ToList(),
+                GetUnitPayments().ToList(),
+                Using.Where(x => x.ResponsibleItSystemUsage != null).Select(x => x.ResponsibleItSystemUsage).ToList(),
+                Using.Select(x => x.ItSystemUsage).ToList()
+            );
+        }
+
+        public Maybe<OrganizationUnitRight> GetRight(int rightId)
+        {
+            return Rights.FirstOrDefault(x => x.Id == rightId);
+        }
+
+        private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
+        {
+            var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();
+            var externContracts = EconomyStreams.Where(x => x.ExternPaymentFor != null).Select(x => x.ExternPaymentFor).ToList();
+            var contracts = internContracts.Concat(externContracts).GroupBy(x => x.Id).Select(x => x.First()).ToList();
+
+            return contracts
+                .Select(itContract =>
+                    new PaymentRegistrationDetails(
+                        itContract,
+                        itContract.GetInternalPaymentsForUnit(Id),
+                        itContract.GetExternalPaymentsForUnit(Id)))
+                .ToList();
+        }
+
         public void ResetParent()
         {
             Parent = null;
