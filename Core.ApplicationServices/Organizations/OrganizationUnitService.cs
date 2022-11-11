@@ -13,7 +13,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
-using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -53,11 +52,11 @@ namespace Core.ApplicationServices.Organizations
             _commandBus = commandBus;
         }
 
-        public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid, bool enforceAccess = false)
+        public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid)
         {
             return _organizationService
-                .GetOrganization(organizationUuid)
-                .Bind<OrganizationUnit>
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind<(Organization organization,OrganizationUnit organizationUnit)>
                 (
                     organization =>
                     {
@@ -66,31 +65,13 @@ namespace Core.ApplicationServices.Organizations
                         {
                             return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
                         }
-                        return unit.Value;
+                        return (organization,unit.Value);
                     }
                 )
-                .Select(unit => GetAccessRights(unit, enforceAccess));
+                .Select(orgAndUnit => GetAccessRights(orgAndUnit.organization,orgAndUnit.organizationUnit));
         }
 
-        public Result<OrganizationUnitRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
-        {
-            return _organizationService
-            .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-        .Bind<OrganizationUnit>
-        (
-        organization =>
-        {
-            var unit = organization.GetOrganizationUnit(unitUuid);
-            if (unit.IsNone)
-                return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
-
-            return unit.Value;
-        }
-        )
-        .Select(unit => unit.GetUnitRegistrations());
-        }
-
-public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
+        public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
         {
             using var transaction = _transactionManager.Begin();
             var deleteResult = GetOrganizationAndAuthorizeModification(organizationUuid, OrganizationDataReadAccessLevel.All)
@@ -269,34 +250,37 @@ public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
                 );
         }
 
-        private UnitAccessRights GetAccessRights(OrganizationUnit unit, bool enforceAccess = false)
+        private UnitAccessRights GetAccessRights(Organization organization, OrganizationUnit unit)
         {
-            //if user is not allowed to modify return just the "read" right
-            if (_authorizationContext.AllowModify(unit))
+            var canBeModified = false;
+            var canBeRenamed = false;
+            var canFieldsBeModified = false;
+            var canBeRearranged = false;
+            var canBeDeleted = false;
+
+            if (!_authorizationContext.AllowModify(unit))
+                return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canFieldsBeModified, canBeRearranged, canBeDeleted);
+
+            canBeModified = true;
+            if (unit.IsOfKitosOrigin())
             {
-                return new UnitAccessRights(true, false, false, false, false);
+                canBeRenamed = true;
+                canFieldsBeModified = true;
+
+                if (organization.GetRoot() != unit)
+                {
+                    canBeRearranged = true;
+                    canBeDeleted = true;
+                }
+            }
+            if (!_authorizationContext.AllowDelete(unit))
+            {
+                canBeDeleted = false;
             }
 
-            if (enforceAccess)
-            {
-                //if unit is not of Kitos origin it is impossible to modify fields or delete the unit
-                if (!unit.IsOfKitosOrigin())
-                {
-                    return new UnitAccessRights(true, true, false, false, false);
-                }
-                //if unit is not root it cannot be rearranged
-                if (!unit.Organization.IsUnitRoot(unit.Id))
-                {
-                    return new UnitAccessRights(true, true, true, false, false);
-                }
-            }
-
-            //if user is not allowed to delete the unit return false, else true
-            return !_authorizationContext.AllowDelete(unit) 
-                ? new UnitAccessRights(true, true, true, true, false) 
-                : new UnitAccessRights(true, true, true, true, true);
+            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canFieldsBeModified, canBeRearranged, canBeDeleted);
         }
-        
+
         private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)
         {
             foreach (var payment in payments)

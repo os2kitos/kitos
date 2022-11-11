@@ -259,7 +259,6 @@
     <Compile Include="Model\ItContractTest.cs" />
     <Compile Include="Model\ItInterfaceTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
-    <Compile Include="Model\Organizations\OrganizationUnitTest.cs" />
     <Compile Include="Model\References\AddReferenceCommandTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />

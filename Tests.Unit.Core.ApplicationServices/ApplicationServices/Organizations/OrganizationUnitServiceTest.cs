@@ -247,7 +247,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
-            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
+            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound), OrganizationDataReadAccessLevel.All);
 
             var result = _sut.GetAccessRights(orgUuid, unitUuid);
 
@@ -263,7 +263,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             var organization = new Organization() {Uuid = orgUuid};
 
-            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectGetOrganizationReturns(orgUuid, organization, OrganizationDataReadAccessLevel.All);
 
             var result = _sut.GetAccessRights(orgUuid, unitUuid);
 
@@ -284,8 +284,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Origin = OrganizationUnitOrigin.Kitos
             };
             var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            unit.Organization = organization;
 
-            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectGetOrganizationReturns(orgUuid, organization, OrganizationDataReadAccessLevel.All);
             ExpectAllowModifyReturns(unit, true);
             ExpectAllowDeleteReturns(unit, true);
 
@@ -295,9 +296,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var accessRights = result.Value;
 
             Assert.True(accessRights.CanBeDeleted);
-            Assert.True(accessRights.CanNameBeModified);
-            Assert.True(accessRights.CanEanBeModified);
-            Assert.True(accessRights.CanDeviceIdBeModified);
+            Assert.True(accessRights.CanBeRenamed);
+            Assert.True(accessRights.CanEanBeRenamed);
+            Assert.True(accessRights.CanDeviceIdBeRenamed);
             Assert.True(accessRights.CanBeModified);
             Assert.True(accessRights.CanBeRearranged);
             Assert.True(accessRights.CanBeRead);

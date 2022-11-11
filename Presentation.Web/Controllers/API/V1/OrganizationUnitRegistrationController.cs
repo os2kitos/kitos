@@ -136,9 +136,9 @@ namespace Presentation.Web.Controllers.API.V1
             return new UnitAccessRightsDTO(
                 accessRights.CanBeRead, 
                 accessRights.CanBeModified, 
-                accessRights.CanNameBeModified, 
-                accessRights.CanEanBeModified, 
-                accessRights.CanDeviceIdBeModified, 
+                accessRights.CanBeRenamed, 
+                accessRights.CanEanBeRenamed, 
+                accessRights.CanDeviceIdBeRenamed, 
                 accessRights.CanBeRearranged, 
                 accessRights.CanBeDeleted);
         }
