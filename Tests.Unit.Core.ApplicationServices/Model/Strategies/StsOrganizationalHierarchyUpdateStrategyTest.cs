@@ -270,7 +270,23 @@ namespace Tests.Unit.Core.Model.Strategies
             //Assert
             Assert.True(consequences.Ok);
             Assert.Contains(randomLeafWhichMustBeMovedToRoot, root.Children);
+        }
 
+        [Fact]
+        public void PerformUpdate_Updates_Units_Moved_To_Existing_Parent_And_Includes_Native_Children_Created_Moved_Item()
+        {
+            //Arrange
+            var (root, externalTree, randomLeafWhichMustBeMovedToRoot) = CreateTreeWithUnitsMovedToExistingParent();
+            var childExpectedToBeMoved = CreateOrganizationUnit(OrganizationUnitOrigin.Kitos);
+            _organization.AddOrganizationUnit(childExpectedToBeMoved, randomLeafWhichMustBeMovedToRoot);
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            Assert.True(consequences.Ok);
+            Assert.Contains(randomLeafWhichMustBeMovedToRoot, root.Children);
+            Assert.Contains(childExpectedToBeMoved, randomLeafWhichMustBeMovedToRoot.Children);
         }
 
         [Fact]

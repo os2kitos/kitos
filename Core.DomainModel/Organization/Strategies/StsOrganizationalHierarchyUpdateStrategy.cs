@@ -198,10 +198,23 @@ namespace Core.DomainModel.Organization.Strategies
 
                 }
 
+                var nativeUnitsCreatedUnderMovedExternalUnit = movedUnit.Children.Where(child=>child.Origin == OrganizationUnitOrigin.Kitos).ToList();
+                
+                //Move the moved unit without affecting the subtree (let the consequences decide that)
                 var relocationError = _organization.RelocateOrganizationUnit(movedUnit, oldParentUnit, newParentUnit, false);
                 if (relocationError.HasValue)
                 {
                     return relocationError.Value;
+                }
+                //Make sure that "native" children created on the moved unit "tags along" as opposed to connected units which should only be moved if moved in fk org
+                foreach (var child in nativeUnitsCreatedUnderMovedExternalUnit)
+                {
+                    //Only native nodes can exist as children to native units, so reloacte the sub tree
+                    var childRelocationError = _organization.RelocateOrganizationUnit(child, child.Parent, movedUnit, true);
+                    if (childRelocationError.HasValue)
+                    {
+                        return childRelocationError.Value;
+                    }
                 }
             }
 
