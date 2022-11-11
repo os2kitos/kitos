@@ -610,7 +610,8 @@ namespace Core.DomainModel.ItSystemUsage
             if (organizationUnits.Select(x => x.Uuid).Distinct().Count() != organizationUnits.Count)
                 return new OperationError("No duplicates allowed in using org units", OperationFailure.BadInput);
 
-            if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
+            var responsibleOrgUnitIsValid = responsibleOrgUnit.Select(responsible=>organizationUnits.Any(unit=>responsible == unit)).GetValueOrFallback(true);
+            if (!responsibleOrgUnitIsValid)
                 return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
 
             var newOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage

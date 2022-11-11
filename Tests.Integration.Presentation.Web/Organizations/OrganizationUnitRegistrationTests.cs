@@ -17,6 +17,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
 {
     public class OrganizationUnitTests: WithAutoFixture
     {
+        private string CreateEmail() => $"{A<Guid>():N}@kitos.dk";
+
         [Fact]
         public async Task GlobalAdmin_Has_All_AccessRights()
         {
@@ -401,6 +403,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
         private async Task<(OrganizationUnitRight right, ItContract contract, EconomyStream externalEconomyStream, EconomyStream internalEconomyStream, ItSystemUsage usage, OrgUnitDTO unitDto)> SetupRegistrations(int organizationId)
         {
+            var (userId, _, _) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, organizationId);
             var organizationName = A<string>();
 
             var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, organizationName);
@@ -409,17 +412,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
             {
                 Name = A<string>()
             };
-            AssignOwnership(newRole);
+            AssignOwnership(newRole, userId);
 
             var right = new OrganizationUnitRight
             {
                 ObjectId = unit.Id,
-                UserId = TestEnvironment.DefaultUserId
+                UserId = userId
             };
-            AssignOwnership(right);
+            AssignOwnership(right, userId);
 
-            var internalEconomyStream = CreateEconomyStream(unit.Id);
-            var externalEconomyStream = CreateEconomyStream(unit.Id);
+            var internalEconomyStream = CreateEconomyStream(unit.Id, userId);
+            var externalEconomyStream = CreateEconomyStream(unit.Id, userId);
 
             var contract = new ItContract
             {
@@ -428,7 +431,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 InternEconomyStreams = new List<EconomyStream>() { internalEconomyStream },
                 ExternEconomyStreams = new List<EconomyStream>() { externalEconomyStream }
             };
-            AssignOwnership(contract);
+            AssignOwnership(contract, userId);
 
             var itSystemUsageOrgUnitUsage = new ItSystemUsageOrgUnitUsage
             {
@@ -442,7 +445,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 OrganizationId = organizationId,
                 AccessModifier = AccessModifier.Local
             };
-            AssignOwnership(system);
+            AssignOwnership(system, userId);
 
             var usage = new ItSystemUsage
             {
@@ -450,7 +453,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 ResponsibleUsage = itSystemUsageOrgUnitUsage,
                 UsedBy = new List<ItSystemUsageOrgUnitUsage> { itSystemUsageOrgUnitUsage }
             };
-            AssignOwnership(usage);
+            AssignOwnership(usage, userId);
 
             DatabaseAccess.MutateDatabase(context =>
             {
@@ -476,21 +479,21 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return (right, contract, externalEconomyStream, internalEconomyStream, usage, unit);
         }
 
-        private static EconomyStream CreateEconomyStream(int unitId)
+        private static EconomyStream CreateEconomyStream(int unitId, int userId)
         {
             var economy = new EconomyStream
             {
                 OrganizationUnitId = unitId
             };
-            AssignOwnership(economy);
+            AssignOwnership(economy, userId);
 
             return economy;
         }
 
-        private static void AssignOwnership(IEntity entity)
+        private static void AssignOwnership(IEntity entity, int userId)
         {
-            entity.ObjectOwnerId = TestEnvironment.DefaultUserId;
-            entity.LastChangedByUserId = TestEnvironment.DefaultUserId;
+            entity.ObjectOwnerId = userId;
+            entity.LastChangedByUserId = userId;
         }
     }
 }

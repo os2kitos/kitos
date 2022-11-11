@@ -43,7 +43,7 @@ namespace Core.ApplicationServices.SystemUsage
             IDomainEvents domainEvents,
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
-            IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository, 
+            IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             IGenericRepository<ArchivePeriod> archivePeriodRepository)
         {
             _usageRepository = usageRepository;
@@ -144,34 +144,32 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<ItSystemUsage, OperationError> Delete(int id)
         {
-            using (var transaction = _transactionManager.Begin())
+            using var transaction = _transactionManager.Begin();
+            var itSystemUsage = GetById(id);
+            if (itSystemUsage == null)
             {
-                var itSystemUsage = GetById(id);
-                if (itSystemUsage == null)
-                {
-                    return new OperationError($"Could not find it system usage with Id: {id}", OperationFailure.NotFound);
-                }
-                if (!_authorizationContext.AllowDelete(itSystemUsage))
-                {
-                    return new OperationError($"Not allowed to delete it system usage with Id: {id}", OperationFailure.Forbidden);
-                }
-
-                // delete it system usage
-                var deleteBySystemUsageId = _referenceService.DeleteBySystemUsageId(id);
-                if (deleteBySystemUsageId.Failed)
-                {
-                    transaction.Rollback();
-                    return new OperationError($"Failed to delete it system usage with Id: {id}. Failed to delete references", deleteBySystemUsageId.Error);
-                }
-
-                _itSystemUsageAttachedOptionRepository.DeleteAllBySystemUsageId(id);
-
-                _domainEvents.Raise(new EntityBeingDeletedEvent<ItSystemUsage>(itSystemUsage));
-                _usageRepository.DeleteByKeyWithReferencePreload(id);
-                _usageRepository.Save();
-                transaction.Commit();
-                return itSystemUsage;
+                return new OperationError($"Could not find it system usage with Id: {id}", OperationFailure.NotFound);
             }
+            if (!_authorizationContext.AllowDelete(itSystemUsage))
+            {
+                return new OperationError($"Not allowed to delete it system usage with Id: {id}", OperationFailure.Forbidden);
+            }
+
+            // delete it system usage
+            var deleteBySystemUsageId = _referenceService.DeleteBySystemUsageId(id);
+            if (deleteBySystemUsageId.Failed)
+            {
+                transaction.Rollback();
+                return new OperationError($"Failed to delete it system usage with Id: {id}. Failed to delete references", deleteBySystemUsageId.Error);
+            }
+
+            _itSystemUsageAttachedOptionRepository.DeleteAllBySystemUsageId(id);
+
+            _domainEvents.Raise(new EntityBeingDeletedEvent<ItSystemUsage>(itSystemUsage));
+            _usageRepository.DeleteByKeyWithReferencePreload(id);
+            _usageRepository.Save();
+            transaction.Commit();
+            return itSystemUsage;
         }
 
         public ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId)
@@ -291,8 +289,8 @@ namespace Core.ApplicationServices.SystemUsage
             return Modify(systemId, system =>
             {
                 var error = system.TransferResponsibleOrganizationalUnit(targetUnitUuid);
-                return error.HasValue 
-                    ? error.Value 
+                return error.HasValue
+                    ? error.Value
                     : Result<ItSystemUsage, OperationError>.Success(system);
             }).MatchFailure();
         }
@@ -322,7 +320,7 @@ namespace Core.ApplicationServices.SystemUsage
                     );
             }).MatchFailure();
         }
-        
+
         public Maybe<OperationError> RemoveRelevantUnit(int id, Guid unitUuid)
         {
             return Modify(id, system =>
@@ -355,11 +353,15 @@ namespace Core.ApplicationServices.SystemUsage
 
             var mutationResult = mutation(usage);
 
-            if (mutationResult.Ok)
+            if (mutationResult.Failed)
+            {
+                transaction.Rollback();
+            }
+            else
             {
                 _usageRepository.Update(usage);
-                _usageRepository.Save();
                 _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
+                _usageRepository.Save();
                 transaction.Commit();
             }
 

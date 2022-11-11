@@ -215,17 +215,17 @@ namespace Core.ApplicationServices.Organizations
 
             var mutationResult = mutation(organization, unit);
 
-            if (!mutationResult.Ok)
+            if (mutationResult.Failed)
             {
                 transaction.Rollback();
-                return mutationResult;
             }
-
-            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unitResult.Value));
-
-            _repository.Update(unit);
-            _databaseControl.SaveChanges();
-            transaction.Commit();
+            else
+            {
+                _repository.Update(unit);
+                _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unitResult.Value));
+                _databaseControl.SaveChanges();
+                transaction.Commit();
+            }
 
             return mutationResult;
         }

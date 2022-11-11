@@ -87,7 +87,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var contractRoles = await ItContractHelper.GetRolesAsync(cookie);
                     Assert.NotEmpty(contractRoles);
 
-                    var singleContractRole = contractRoles.RandomItem();
+                    var singleContractRole = contractRoles.Where(x=>x.IsEnabled && x.IsObligatory).RandomItem();
                     Assert.NotNull(singleContractRole);
 
                     return singleContractRole.Id;
@@ -95,7 +95,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var systemRoles = await ItSystemHelper.GetRolesAsync(cookie);
                     Assert.NotEmpty(systemRoles);
 
-                    var singleSystemRole = systemRoles.RandomItem();
+                    var singleSystemRole = systemRoles.Where(x => x.IsEnabled && x.IsObligatory).RandomItem();
                     Assert.NotNull(singleSystemRole);
 
                     return singleSystemRole.Id;
@@ -103,7 +103,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var organizationUnitRoles = await OrganizationUnitHelper.GetOrganizationUnitRolesAsync(cookie);
                     Assert.NotEmpty(organizationUnitRoles);
 
-                    var singleOrganizationUnit = organizationUnitRoles.RandomItem();
+                    var singleOrganizationUnit = organizationUnitRoles.Where(x=>x.IsEnabled && x.IsObligatory).RandomItem();
                     Assert.NotNull(singleOrganizationUnit);
 
                     return singleOrganizationUnit.Id;

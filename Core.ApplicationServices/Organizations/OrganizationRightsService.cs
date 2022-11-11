@@ -108,10 +108,11 @@ namespace Core.ApplicationServices.Organizations
                     return new OperationError($"Organization unit right with id: {rightId} was not found", OperationFailure.NotFound);
                 }
                 var rightToRemove = organizationUnitRightResult.Value;
-                
+
                 var result = unit.RemoveRole(rightToRemove.Role, rightToRemove.User);
                 if (result.Failed)
                 {
+                    transaction.Rollback();
                     return result.Error;
                 }
 
@@ -170,6 +171,7 @@ namespace Core.ApplicationServices.Organizations
                 var removeRightResult = currentUnit.RemoveRole(right.Role, right.User);
                 if (removeRightResult.Failed)
                 {
+                    transaction.Rollback();
                     return removeRightResult.Error;
                 }
                 var removedRight = removeRightResult.Value;
@@ -177,18 +179,16 @@ namespace Core.ApplicationServices.Organizations
 
                 //Check if a right with the same role and user is already assigned to the target
                 var rightsWithSameRole = targetUnit.GetRights(removedRight.RoleId);
-                if (rightsWithSameRole.Any(x => x.UserId == removedRight.UserId))
+                if (!rightsWithSameRole.Any(x => x.UserId == removedRight.UserId))
                 {
-                    _domainEvents.Raise(new AdministrativeAccessRightsChanged(removedRight.UserId));
-                    continue;
+                    var assignRightResult = targetUnit.AssignRole(removedRight.Role, removedRight.User);
+                    if (assignRightResult.Failed)
+                    {
+                        transaction.Rollback();
+                        return assignRightResult.Error;
+                    }
                 }
 
-                var assignRightResult = targetUnit.AssignRole(removedRight.Role, removedRight.User);
-                if (assignRightResult.Failed)
-                {
-                    return assignRightResult.Error;
-                }
-                
                 _domainEvents.Raise(new AdministrativeAccessRightsChanged(removedRight.UserId));
             }
 
@@ -210,7 +210,7 @@ namespace Core.ApplicationServices.Organizations
             return organization.GetOrganizationUnit(unitUuid)
                 .Match
                 (
-                    WithModificationAccess, 
+                    WithModificationAccess,
                     () => new OperationError($"Unit with uuid: {unitUuid} was not found", OperationFailure.NotFound)
                 );
         }
@@ -218,8 +218,8 @@ namespace Core.ApplicationServices.Organizations
         private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
         {
             var organization = _organizationRepository.AsQueryable().FirstOrDefault(x => x.Uuid == uuid);
-            return organization == null 
-                ? new OperationError($"Organization with uuid: {uuid} was not found", OperationFailure.NotFound) 
+            return organization == null
+                ? new OperationError($"Organization with uuid: {uuid} was not found", OperationFailure.NotFound)
                 : WithModificationAccess(organization);
         }
 
