@@ -30,21 +30,6 @@ namespace Core.DomainServices.Organizations
             _commandBus = commandBus;
         }
 
-        public OrganizationUnit GetRoot(OrganizationUnit unit)
-        {
-            var whereWeStarted = unit;
-
-            while (unit.Parent != null)
-            {
-                unit = unit.Parent;
-
-                //did we get a loop?
-                if (unit.Id == whereWeStarted.Id) throw new Exception("Loop in Organization Units");
-            }
-
-            return unit;
-        }
-
         public ICollection<OrganizationUnit> GetSubTree(int orgUnitId)
         {
             var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);

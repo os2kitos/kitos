@@ -40,5 +40,12 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="levelsToInclude"></param>
         /// <returns></returns>
         Result<OrganizationTreeUpdateConsequences, OperationError> GetConnectionExternalHierarchyUpdateConsequences(Guid organizationId, Maybe<int> levelsToInclude);
+        /// <summary>
+        /// Updates the connection to the STS Organization
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="levelsToInclude"></param>
+        /// <returns></returns>
+        Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude);
     }
 }

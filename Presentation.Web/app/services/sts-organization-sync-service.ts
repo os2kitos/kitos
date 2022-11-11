@@ -1,10 +1,11 @@
 ﻿module Kitos.Services.Organization {
     export interface IStsOrganizationSyncService {
-        getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>
-        createConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void>
-        getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>
-        getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>
-        disconnect(organizationUuidid: string): ng.IPromise<boolean>
+        getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>;
+        createConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void>;
+        getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>;
+        getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>;
+        disconnect(organizationUuidid: string): ng.IPromise<boolean>;
+        updateConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void>;
     }
 
     export class StsOrganizationSyncService implements IStsOrganizationSyncService {
@@ -89,6 +90,17 @@
                 //Clear cache after
                 this.purgeCache(organizationUuidid);
                 return result;
+            });
+        }
+
+        updateConnection(organizationUuidid: string, synchronizationDepth: number | null): ng.IPromise<void> {
+            return this.apiUseCaseFactory.createUpdate("Forbindelse til FK Organisation", () => {
+                return this.genericApiWrapper.put(`${this.getBasePath(organizationUuidid)}/connection`, {
+                    synchronizationDepth: synchronizationDepth
+                });
+            }).executeAsync(() => {
+                //Clear cache after
+                this.purgeCache(organizationUuidid);
             });
         }
     }

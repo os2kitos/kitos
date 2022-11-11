@@ -50,7 +50,7 @@
         allSelections = false;
         targetUnitSelected = false;
         shouldTransferBtnBeEnabled = false;
-        isAnyDataPresent = false;
+        isAnyDataPresent: boolean | null = null;
 
         roles: IOrganizationUnitMigrationOptions;
         internalPayments: IOrganizationUnitMigrationOptions;

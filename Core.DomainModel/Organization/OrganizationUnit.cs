@@ -62,7 +62,7 @@ namespace Core.DomainModel.Organization
         /// Local tasks that was created in this unit
         /// </summary>
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
-        
+
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.
         /// </summary>
@@ -175,38 +175,6 @@ namespace Core.DomainModel.Organization
             return Using.Any() || EconomyStreams.Any() || ResponsibleForItContracts.Any() || Rights.Any();
         }
 
-        public OrganizationUnitRegistrationDetails GetUnitRegistrations()
-        {
-            return new OrganizationUnitRegistrationDetails
-            (
-                Rights.ToList(),
-                ResponsibleForItContracts.ToList(),
-                GetUnitPayments().ToList(),
-                Using.Where(x => x.ResponsibleItSystemUsage != null).Select(x => x.ResponsibleItSystemUsage).ToList(),
-                Using.Select(x => x.ItSystemUsage).ToList()
-            );
-        }
-
-        public Maybe<OrganizationUnitRight> GetRight(int rightId)
-        {
-            return Rights.FirstOrDefault(x => x.Id == rightId);
-        }
-        
-        private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
-        {
-            var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();
-            var externContracts = EconomyStreams.Where(x => x.ExternPaymentFor != null).Select(x => x.ExternPaymentFor).ToList();
-            var contracts = internContracts.Concat(externContracts).GroupBy(x => x.Id).Select(x => x.First()).ToList();
-
-            return contracts
-                .Select(itContract => 
-                    new PaymentRegistrationDetails(
-                        itContract, 
-                        itContract.GetInternalPaymentsForUnit(Id), 
-                        itContract.GetExternalPaymentsForUnit(Id)))
-                .ToList();
-        }
-
         public Maybe<OperationError> AddChild(OrganizationUnit child)
         {
             if (child == null) throw new ArgumentNullException(nameof(child));
@@ -227,6 +195,22 @@ namespace Core.DomainModel.Organization
             return Maybe<OperationError>.None;
         }
 
+        public Maybe<OperationError> UpdateName(string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                return new OperationError($"newName must be defined in this unit with id {Id}", OperationFailure.BadInput);
+            }
+
+            if (newName.Length > MaxNameLength)
+            {
+                return new OperationError($"newName exceeds the max length of {MaxNameLength}", OperationFailure.BadInput);
+            }
+
+            Name = newName;
+            return Maybe<OperationError>.None;
+        }
+
         public Maybe<OperationError> RemoveChild(OrganizationUnit child)
         {
             if (child == null) throw new ArgumentNullException(nameof(child));
@@ -237,6 +221,38 @@ namespace Core.DomainModel.Organization
 
             child.ResetParent();
             return Maybe<OperationError>.None;
+        }
+
+        public OrganizationUnitRegistrationDetails GetUnitRegistrations()
+        {
+            return new OrganizationUnitRegistrationDetails
+            (
+                Rights.ToList(),
+                ResponsibleForItContracts.ToList(),
+                GetUnitPayments().ToList(),
+                Using.Where(x => x.ResponsibleItSystemUsage != null).Select(x => x.ResponsibleItSystemUsage).ToList(),
+                Using.Select(x => x.ItSystemUsage).ToList()
+            );
+        }
+
+        public Maybe<OrganizationUnitRight> GetRight(int rightId)
+        {
+            return Rights.FirstOrDefault(x => x.Id == rightId);
+        }
+
+        private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
+        {
+            var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();
+            var externContracts = EconomyStreams.Where(x => x.ExternPaymentFor != null).Select(x => x.ExternPaymentFor).ToList();
+            var contracts = internContracts.Concat(externContracts).GroupBy(x => x.Id).Select(x => x.First()).ToList();
+
+            return contracts
+                .Select(itContract =>
+                    new PaymentRegistrationDetails(
+                        itContract,
+                        itContract.GetInternalPaymentsForUnit(Id),
+                        itContract.GetExternalPaymentsForUnit(Id)))
+                .ToList();
         }
 
         public void ResetParent()

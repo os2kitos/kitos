@@ -6,8 +6,6 @@ using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
-using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -34,29 +32,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
         public override IHttpActionResult Get()
         {
             return base.Get();
-        }
-
-        /// <summary>
-        /// Henter alle organisationens IT Kontrakter
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        [EnableQuery(MaxExpansionDepth = 3)]
-        [ODataRoute("Organizations({key})/ItContracts")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetItContracts(int key)
-        {
-            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(key);
-            if (organizationDataReadAccessLevel != OrganizationDataReadAccessLevel.All)
-            {
-                return Forbidden();
-            }
-
-            var result = Repository.AsQueryable().ByOrganizationId(key);
-
-            return Ok(result);
         }
 
         [NonAction]
