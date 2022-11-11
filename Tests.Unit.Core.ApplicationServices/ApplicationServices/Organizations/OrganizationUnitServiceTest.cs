@@ -237,14 +237,64 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
 
-        private void ExpectGetOrganizationUnitReturns(Guid uuid, OrganizationUnit result)
+        [Fact]
+        public void GetAccessRights_Returns_NotFound_When_Organization_Was_NotFound()
         {
-            _organizationServiceMock.Setup(x => x.GetOrganizationUnit(uuid)).Returns(result);
+            var unitUuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
+
+            var result = _sut.GetAccessRights(orgUuid, unitUuid);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
-        private void ExpectGetOrganizationUnitReturns(Guid uuid, OperationError result)
+        [Fact]
+        public void GetAccessRights_Returns_NotFound_When_OrganizationUnit_Was_NotFound()
         {
-            _organizationServiceMock.Setup(x => x.GetOrganizationUnit(uuid)).Returns(result);
+            var unitUuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            var organization = new Organization() {Uuid = orgUuid};
+
+            ExpectGetOrganizationReturns(orgUuid, organization);
+
+            var result = _sut.GetAccessRights(orgUuid, unitUuid);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetAccessRights_Returns_AccessRights()
+        {
+            var unitUuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            var unit = new OrganizationUnit
+            {
+                Uuid = unitUuid,
+                Parent = new OrganizationUnit(),
+                Origin = OrganizationUnitOrigin.Kitos
+            };
+            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(unit, true);
+            ExpectAllowDeleteReturns(unit, true);
+
+            var result = _sut.GetAccessRights(orgUuid, unitUuid);
+
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+
+            Assert.True(accessRights.CanBeDeleted);
+            Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanBeRearranged);
+            Assert.True(accessRights.CanBeRead);
         }
 
         private void ExpectGetOrganizationReturns(Guid uuid, Organization result, OrganizationDataReadAccessLevel? readAccessLevel = null)
@@ -255,11 +305,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void ExpectGetOrganizationReturns(Guid uuid, OperationError result, OrganizationDataReadAccessLevel? readAccessLevel = null)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(uuid, readAccessLevel)).Returns(result);
-        }
-
-        private void ExpectAllowReadsReturns(IEntity unit, bool result)
-        {
-            _authorizationContextMock.Setup(x => x.AllowReads(unit)).Returns(result);
         }
 
         private void ExpectAllowDeleteReturns(IEntity unit, bool result)

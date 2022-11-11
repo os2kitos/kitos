@@ -150,19 +150,14 @@ namespace Core.DomainModel.Organization
             ExternalOriginUuid = null;
         }
 
-        public bool CanBeDeleted()
+        private bool CanBeModified()
         {
             return HasParent() && IsOfKitosOrigin();
         }
 
-        public bool CanChangeName()
+        private bool CanChangeName()
         {
             return IsOfKitosOrigin();
-        }
-
-        public bool CanChangeParent()
-        {
-            return HasParent() && IsOfKitosOrigin();
         }
 
         private bool HasParent()
@@ -252,8 +247,8 @@ namespace Core.DomainModel.Organization
         public UnitAccessRights GetAccessRights(bool isUserAllowedToRead, bool isUserAllowedToModify, bool isUserAllowedToDelete)
         {
             var canNameBeModified = isUserAllowedToModify && CanChangeName();
-            var canBeRearranged = isUserAllowedToModify && CanChangeParent();
-            var canBeDeleted = isUserAllowedToDelete && CanBeDeleted();
+            var canBeRearranged = isUserAllowedToModify && CanBeModified();
+            var canBeDeleted = isUserAllowedToDelete && CanBeModified();
 
             return new UnitAccessRights(isUserAllowedToRead, isUserAllowedToModify, canNameBeModified, canBeRearranged, canBeDeleted);
         }
