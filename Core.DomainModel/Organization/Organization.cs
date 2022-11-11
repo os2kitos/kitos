@@ -451,5 +451,10 @@ namespace Core.DomainModel.Organization
 
             return Maybe<OperationError>.None;
         }
+
+        public bool IsUnitRoot(int id)
+        {
+            return GetRoot().Id == id;
+        }
     }
 }

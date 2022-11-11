@@ -436,12 +436,16 @@
 
                             $modalScope.canChangeParent = false;
                             $modalScope.canChangeName = false;
+                            $modalScope.canEanBeModified = false;
+                            $modalScope.canDeviceIdBeModified = false;
                             $modalScope.canDelete = false;
 
                             organizationUnitService.getUnitAccessRights(unit.organization.uuid, unit.uuid)
                                 .then(res => {
                                     $modalScope.canDelete = res.canBeDeleted;
                                     $modalScope.canChangeName = res.canNameBeModified;
+                                    $modalScope.canEanBeModified = res.canEanBeModified;
+                                    $modalScope.canDeviceIdBeModified = res.canDeviceIdBeModified;
                                     $modalScope.canChangeParent = res.canBeRearranged;
                                 });
 

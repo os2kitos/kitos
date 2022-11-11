@@ -36,6 +36,8 @@
         canBeModified: boolean;
         canBeDeleted: boolean;
         canNameBeModified: boolean;
+        canEanBeModified: boolean;
+        canDeviceIdBeModified: boolean;
         canBeRearranged: boolean;
     }
 }

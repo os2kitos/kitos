@@ -292,6 +292,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             Assert.True(accessRights.CanBeDeleted);
             Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanEanBeModified);
+            Assert.True(accessRights.CanDeviceIdBeModified);
             Assert.True(accessRights.CanBeModified);
             Assert.True(accessRights.CanBeRearranged);
             Assert.True(accessRights.CanBeRead);

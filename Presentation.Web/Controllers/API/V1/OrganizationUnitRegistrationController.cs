@@ -149,7 +149,14 @@ namespace Presentation.Web.Controllers.API.V1
         private static UnitAccessRightsDTO ToAccessRightsDto(
             UnitAccessRights accessRights)
         {
-            return new UnitAccessRightsDTO(accessRights.CanBeRead, accessRights.CanBeModified, accessRights.CanNameBeModified, accessRights.CanBeRearranged, accessRights.CanBeDeleted);
+            return new UnitAccessRightsDTO(
+                accessRights.CanBeRead, 
+                accessRights.CanBeModified, 
+                accessRights.CanNameBeModified, 
+                accessRights.CanEanBeModified, 
+                accessRights.CanDeviceIdBeModified, 
+                accessRights.CanBeRearranged, 
+                accessRights.CanBeDeleted);
         }
     }
 }

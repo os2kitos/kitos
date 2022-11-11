@@ -6,7 +6,7 @@ namespace Tests.Unit.Core.Model.Organizations
 {
     public class OrganizationUnitTest : WithAutoFixture
     {
-        [Theory]
+        /*[Theory]
         [InlineData(false, false)]
         [InlineData(true, true)]
         public void GetAccessRights_CanBeRead(
@@ -131,6 +131,6 @@ namespace Tests.Unit.Core.Model.Organizations
                 Parent = hasParent ? new OrganizationUnit() : null,
                 Origin = isKitosUnit ? OrganizationUnitOrigin.Kitos : OrganizationUnitOrigin.STS_Organisation
             };
-        }
+        }*/
     }
 }

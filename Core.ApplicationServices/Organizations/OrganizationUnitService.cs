@@ -48,7 +48,7 @@ namespace Core.ApplicationServices.Organizations
             _repository = repository;
         }
 
-        public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid)
+        public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid, bool enforceAccess = false)
         {
             return _organizationService
                 .GetOrganization(organizationUuid)
@@ -64,7 +64,7 @@ namespace Core.ApplicationServices.Organizations
                         return unit.Value;
                     }
                 )
-                .Select(GetAccessRights);
+                .Select(unit => GetAccessRights(unit, enforceAccess));
         }
 
         public Result<OrganizationUnitRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
@@ -243,14 +243,34 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
-        private UnitAccessRights GetAccessRights(OrganizationUnit unit)
+        private UnitAccessRights GetAccessRights(OrganizationUnit unit, bool enforceAccess = false)
         {
-            var canBeModified = _authorizationContext.AllowModify(unit);
-            var canBeDeleted = _authorizationContext.AllowDelete(unit);
+            //if user is not allowed to modify return just the "read" right
+            if (_authorizationContext.AllowModify(unit))
+            {
+                return new UnitAccessRights(true, false, false, false, false);
+            }
 
-            return unit.GetAccessRights(isUserAllowedToRead: true, canBeModified, canBeDeleted);
+            if (enforceAccess)
+            {
+                //if unit is not of Kitos origin it is impossible to modify fields or delete the unit
+                if (!unit.IsOfKitosOrigin())
+                {
+                    return new UnitAccessRights(true, true, false, false, false);
+                }
+                //if unit is not root it cannot be rearranged
+                if (!unit.Organization.IsUnitRoot(unit.Id))
+                {
+                    return new UnitAccessRights(true, true, true, false, false);
+                }
+            }
+
+            //if user is not allowed to delete the unit return false, else true
+            return !_authorizationContext.AllowDelete(unit) 
+                ? new UnitAccessRights(true, true, true, true, false) 
+                : new UnitAccessRights(true, true, true, true, true);
         }
-
+        
         private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)
         {
             foreach (var payment in payments)
