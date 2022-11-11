@@ -202,9 +202,8 @@ namespace Core.ApplicationServices.Organizations
             }
             else
             {
-                _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unitResult.Value));
-
                 _repository.Update(unit);
+                _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(unitResult.Value));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }

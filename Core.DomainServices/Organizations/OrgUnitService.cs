@@ -19,9 +19,9 @@ namespace Core.DomainServices.Organizations
         private readonly ITransactionManager _transactionManager;
         private readonly ICommandBus _commandBus;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            ITransactionManager transactionManager, 
-            IGenericRepository<Organization> organizationRepository, 
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository,
+            ITransactionManager transactionManager,
+            IGenericRepository<Organization> organizationRepository,
             ICommandBus commandBus)
         {
             _orgUnitRepository = orgUnitRepository;
@@ -68,22 +68,27 @@ namespace Core.DomainServices.Organizations
             using var transaction = _transactionManager.Begin();
 
             var organization = _organizationRepository.AsQueryable().FirstOrDefault(x => x.Uuid == organizationUuid);
-            if(organization == null)
+            if (organization == null)
                 return new OperationError($"Organization with uuid: {organizationUuid} not found", OperationFailure.NotFound);
             var unitResult = organization.GetOrganizationUnit(unitUuid);
-            if(unitResult.IsNone)
+            if (unitResult.IsNone)
                 return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
             var unit = unitResult.Value;
 
             var deleteRegistrationsError = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(new RemoveOrganizationUnitRegistrationsCommand(organization, unit));
             if (deleteRegistrationsError.HasValue)
+            {
+                transaction.Rollback();
                 return deleteRegistrationsError.Value;
+            }
 
-            
             var error = organization.DeleteOrganizationUnit(unit);
             if (error.HasValue)
+            {
+                transaction.Rollback();
                 return error.Value;
-            
+            }
+
             _orgUnitRepository.DeleteWithReferencePreload(unit);
             _orgUnitRepository.Save();
 

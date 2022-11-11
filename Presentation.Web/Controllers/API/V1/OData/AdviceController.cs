@@ -299,6 +299,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
             catch (Exception e)
             {
+                transaction.Rollback();
                 Logger.ErrorException("Failed to delete advice", e);
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
