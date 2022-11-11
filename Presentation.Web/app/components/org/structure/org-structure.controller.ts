@@ -363,10 +363,11 @@
             $scope.editUnit = function (unit) {
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
+                    windowClass: "modal fade in wide-modal",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
+                        "$scope", "$uibModalInstance", "autofocus", "organizationRegistrationsService", function ($modalScope, $modalInstance, autofocus, organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
                             autofocus();
-
+                            
                             // edit or create-new mode
                             $modalScope.isNew = false;
 
@@ -408,6 +409,8 @@
                                 newParent: unit.parentId,
                                 orgId: unit.organizationId,
                                 isRoot: unit.parentId == undefined,
+                                uuid: unit.uuid,
+                                orgUuid: unit.organization.uuid,
                                 isFkOrganizationUnit: unit.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                             } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
 
@@ -533,21 +536,31 @@
                                 };
                             };
 
+                            $modalScope.setIsBusy = (value: boolean): void => {
+                                $modalScope.submitting = value;
+                            }
+
+                            $modalScope.checkIsBusy = (): boolean => {
+                                return $modalScope.submitting;
+                            }
+
+                            $modalScope.stateParameters = {
+                                setRootIsBusy: (value: boolean) => $modalScope.setIsBusy(value),
+                                checkIsRootBusy: () => $modalScope.checkIsBusy()
+                            } as Kitos.Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
+
                             $modalScope.delete = function () {
                                 //don't allow duplicate submitting
                                 if ($modalScope.submitting) return;
 
                                 $modalScope.submitting = true;
 
-                                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" +
-                                    unit.id +
-                                    "?organizationId=" +
-                                    user.currentOrganizationId).then((result) => {
+                                organizationRegistrationsService.deleteOrganizationUnit(unit.organization.uuid, unit.uuid)
+                                    .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();
                                         $modalInstance.close();
-                                    },
-                                        (error) => {
+                                    }, (error) => {
                                             $modalScope.submitting = false;
 
                                             notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
@@ -558,7 +571,7 @@
                             };
 
                             $modalScope.cancel = function () {
-                                $modalInstance.dismiss("cancel");
+                                $modalInstance.close("cancel");
                             };
 
                             function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {

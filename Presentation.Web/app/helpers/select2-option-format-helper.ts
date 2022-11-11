@@ -12,12 +12,35 @@
             return Select2OptionsFormatHelper.formatText(org.text, org.optionalObjectContext?.cvrNumber);
         }
 
+        public static addIndentationToUnitChildren(orgUnit: Models.Api.Organization.OrganizationUnit, indentationLevel: number): Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[] {
+            const options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[] = [];
+            Select2OptionsFormatHelper.visitUnit(orgUnit, indentationLevel, options);
+
+            return options;
+        }
+
         private static formatText(text: string, subText?: string): string {
             let result = `<div>${text}</div>`;
             if (subText) {
                 result += `<div class="small">${subText}</div>`;
             }
             return result;
+        }
+        
+        private static visitUnit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number, options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[]) {
+            const option = {
+                id: String(orgUnit.id),
+                text: orgUnit.name,
+                indentationLevel: indentationLevel,
+                optionalExtraObject: orgUnit
+            };
+
+            options.push(option);
+
+            orgUnit.children.forEach(child => {
+                return Select2OptionsFormatHelper.visitUnit(child, indentationLevel + 1, options);
+            });
+
         }
     }
 }

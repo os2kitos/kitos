@@ -134,6 +134,7 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
+    <Compile Include="Organizations\OrganizationUnitRegistrationTests.cs" />
     <Compile Include="Organizations\OrganizationSequentialTests.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
@@ -210,6 +211,7 @@
     <Compile Include="Tools\Model\RightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
     <Compile Include="Tools\OrganizationHelper.cs" />
+    <Compile Include="Tools\OrganizationRegistrationHelper.cs" />
     <Compile Include="Tools\OrganizationUnitHelper.cs" />
     <Compile Include="Tools\ReadModelTestTools.cs" />
     <Compile Include="Tools\ReferencesHelper.cs" />

@@ -252,6 +252,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IEntityResolver>().To<NinjectEntityResolver>().InCommandScope(Mode);
             kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationService>().To<UIModuleCustomizationService>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
@@ -386,6 +387,7 @@ namespace Presentation.Web.Ninject
 
             RegisterCommands<RemoveUserFromOrganizationCommandHandler>(kernel);
             RegisterCommands<RemoveUserFromKitosCommandHandler>(kernel);
+            RegisterCommands<RemoveOrganizationUnitRegistrationsCommandHandler>(kernel);
         }
 
         private void RegisterCommands<THandler>(IKernel kernel)

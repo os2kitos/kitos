@@ -199,7 +199,7 @@ namespace Core.ApplicationServices.Rights
           int organizationId,
           Func<(Organization organization, User user, IEnumerable<DataProcessingRegistrationRight> dprRights, IEnumerable<ItContractRight> contractRights, IEnumerable<ItSystemRight> systemRights, IEnumerable<OrganizationUnitRight> organizationUnitRights, IEnumerable<OrganizationRole> rolesInOrganization), Maybe<OperationError>> mutation)
         {
-            var transaction = _transactionManager.Begin();
+            using var transaction = _transactionManager.Begin();
             var uuidResult = _identityResolver.ResolveUuid<Organization>(organizationId);
 
             if (uuidResult.IsNone)

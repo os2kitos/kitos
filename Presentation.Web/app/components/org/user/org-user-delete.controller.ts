@@ -289,7 +289,7 @@
         selectOrDeselectGroup(rights: Models.ViewModel.Organization.IHasSelection[]) {
             const areAllSelected = rights.filter(vm => !vm.selected).length < 1;
             const targetSelectValue = !areAllSelected;
-            this.setSelectGroupToValue(rights, targetSelectValue);
+            Helpers.CheckboxSelectionHelper.setSelectGroupToValue(rights, targetSelectValue);
             this.updateAnySelections();
         }
 
@@ -303,9 +303,6 @@
             this.updateAnySelections();
         }
 
-        selectOrDeselectAll() {
-        }
-
         private getAllRoles(): Array<Models.ViewModel.Organization.IHasSelection> {
             return []
                 .concat(this.vmAdminRoot.rights)
@@ -313,12 +310,6 @@
                 .concat(this.vmOrgRoot.rights)
                 .concat(this.vmSystemRoot.rights)
                 .concat(this.vmContractRoot.rights);
-        }
-
-        private setSelectGroupToValue(rights: Models.ViewModel.Organization.IHasSelection[], targetValue: boolean) {
-            rights.forEach(vm => {
-                vm.selected = targetValue;
-            });
         }
 
         private changeAllSelections(targetValue: boolean) {
@@ -330,7 +321,7 @@
         }
 
         private changeGroupSelectionStatus(groupRoot: IRootAssignedRightsWithGroupSelectionViewModel | IRootAssignedAdminRolesWithGroupSelectionViewModel, targetValue: boolean) {
-            this.setSelectGroupToValue(groupRoot.rights, targetValue);
+            Helpers.CheckboxSelectionHelper.setSelectGroupToValue(groupRoot.rights, targetValue);
             groupRoot.selected = targetValue;
         }
 

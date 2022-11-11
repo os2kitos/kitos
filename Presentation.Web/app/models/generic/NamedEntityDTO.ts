@@ -13,6 +13,9 @@
         expired: boolean;
         description: string;
     }
+    export interface NamedEntityWithUserFullNameDTO extends NamedEntityDTO {
+        userFullName: string;
+    }
 
     export interface EntityWithOrganizationRelationshipDTO extends NamedEntityDTO {
         organization : Organization.ShallowOrganizationDTO

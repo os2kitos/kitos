@@ -599,6 +599,35 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
+        [InlineData(true, false, true, true)]
+        [InlineData(false, true, true, true)]
+        [InlineData(false, false, true, false)]
+        [InlineData(true, false, false, true)]
+        [InlineData(false, true, false, false)]
+        [InlineData(false, false, false, false)]
+        public void AllowDelete_For_OrganizationUnit_Object_Returns(
+           bool isGlobalAdmin,
+           bool isLocalAdmin,
+           bool isInSameOrganization,
+           bool expectedResult)
+        {
+            //Arrange
+            var orgId = A<int>();
+            var inputEntity = new OrganizationUnit() {OrganizationId = orgId};
+
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectHasRoleReturns(orgId, OrganizationRole.LocalAdmin, isLocalAdmin);
+            ExpectHasModuleLevelAccessReturns(inputEntity, isLocalAdmin);
+            ExpectHasRoleInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
+
+            //Act
+            var allowUpdates = _sut.AllowDelete(inputEntity);
+
+            //Assert
+            Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        [Theory]
         [InlineData(true, true)]
         [InlineData(false, false)]
         public void AllowSystemUsageMigration_Returns(bool globalAdmin, bool expectedResult)

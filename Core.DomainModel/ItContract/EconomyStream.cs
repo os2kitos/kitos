@@ -161,5 +161,15 @@ namespace Core.DomainModel.ItContract
             if (InternPaymentFor != null)
                 yield return InternPaymentFor.OrganizationId;
         }
+
+        public void SetOrganizationUnit(OrganizationUnit unit)
+        {
+            OrganizationUnit = unit;
+        }
+
+        public void ResetOrganizationUnit()
+        {
+            OrganizationUnit = null;
+        }
     }
 }
