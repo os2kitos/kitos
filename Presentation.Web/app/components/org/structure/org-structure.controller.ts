@@ -433,6 +433,7 @@
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
                             $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
+
                             $modalScope.canChangeParent = false;
                             $modalScope.canChangeName = false;
                             $modalScope.canDelete = false;
