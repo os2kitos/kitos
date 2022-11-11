@@ -9,8 +9,6 @@ namespace Core.DomainServices
 {
     public interface IOrgUnitService
     {
-        OrganizationUnit GetRoot(OrganizationUnit unit);
-
         ICollection<OrganizationUnit> GetSubTree(int orgUnitId);
 
         bool DescendsFrom(int descendantUnitId, int ancestorUnitId);

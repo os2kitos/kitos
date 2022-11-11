@@ -8,7 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Properties
             this.Property(x => x.OrganizationId).HasUniqueIndexAnnotation("UX_LocalId", 0);
-            this.Property(x => x.LocalId).HasMaxLength(100).HasUniqueIndexAnnotation("UX_LocalId", 1);
+            this.Property(x => x.LocalId).HasMaxLength(OrganizationUnit.MaxNameLength).HasUniqueIndexAnnotation("UX_LocalId", 1);
 
             // Table & Column Mappings
             this.ToTable("OrganizationUnit");

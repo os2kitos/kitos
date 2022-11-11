@@ -102,13 +102,19 @@
         }
 
         private performUpdate() {
-            /*
-             TODO: https://os2web.atlassian.net/browse/KITOSUDV-3524
-                    Once completed do the stuff below in the success "then". If errror, display an error with notify and disable busy and updating
-             */
+            
             this.updating = true;
             this.busy = true;
-            this.closeDialog();
+
+            return this.stsOrganizationSyncService.updateConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+                .then(() => {
+                    this.closeDialog();
+                }, error => {
+                    console.error("Error: ", error);
+                    this.updating = false;
+                    this.busy = false;
+                    this.notify.addErrorMessage("Fejl ifm. oprettelse af opdateringen. Prøv igen.");
+                });
         }
 
         private createConnection() {
@@ -137,7 +143,7 @@
                         this.consequencesAwaitingApproval = consequences.consequences;
                         this.busy = false;
                     } else {
-                        this.performUpdate();
+                        return this.performUpdate();
                     }
                 }, error => {
                     console.error(error);
