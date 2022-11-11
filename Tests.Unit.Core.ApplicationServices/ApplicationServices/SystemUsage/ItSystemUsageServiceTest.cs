@@ -9,13 +9,16 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -714,6 +717,158 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(OperationFailure.BadInput, addResult.Error.FailureType);
         }
 
+        [Fact]
+        public void Can_TransferResponsibleUsage()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            var targetUnit = CreateOrganizationUnit(itSystemUsage.OrganizationId);
+            itSystemUsage.Organization.OrgUnits.Add(targetUnit);
+            itSystemUsage.ResponsibleUsage = CreateItSystemUsageOrgUnitUsage(itSystemUsage, CreateOrganizationUnit(itSystemUsage.OrganizationId));
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.TransferResponsibleUsage(itSystemUsage.Id, targetUnit.Uuid);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _usageRepository.Verify(x => x.Update(itSystemUsage));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void TransferResponsibleUsage_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.TransferResponsibleUsage(id, A<Guid>()));
+        }
+
+        [Fact]
+        public void TransferResponsibleUsage_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.TransferResponsibleUsage(id, A<Guid>()));
+        }
+
+        [Fact]
+        public void Can_TransferRelevantUsage()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            var targetUnit = CreateOrganizationUnit(itSystemUsage.OrganizationId);
+            var unit = CreateOrganizationUnit(itSystemUsage.OrganizationId);
+
+            itSystemUsage.Organization.OrgUnits.Add(unit);
+            itSystemUsage.Organization.OrgUnits.Add(targetUnit);
+
+            itSystemUsage.UsedBy = new List<ItSystemUsageOrgUnitUsage>{ CreateItSystemUsageOrgUnitUsage(itSystemUsage, unit) };
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.TransferRelevantUsage(itSystemUsage.Id, unit.Uuid, targetUnit.Uuid);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _usageRepository.Verify(x => x.Update(itSystemUsage));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void TransferRelevantUsage_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.TransferRelevantUsage(id, A<Guid>(), A<Guid>()));
+        }
+
+        [Fact]
+        public void TransferRelevantUsage_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.TransferRelevantUsage(id, A<Guid>(), A<Guid>()));
+        }
+
+        [Fact]
+        public void Can_RemoveResponsibleUsage()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            itSystemUsage.ResponsibleUsage = CreateItSystemUsageOrgUnitUsage(itSystemUsage, CreateOrganizationUnit(itSystemUsage.OrganizationId));
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.RemoveResponsibleUsage(itSystemUsage.Id);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _usageRepository.Verify(x => x.Update(itSystemUsage));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void RemoveResponsibleUsage_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.RemoveResponsibleUsage(id));
+        }
+
+        [Fact]
+        public void RemoveResponsibleUsage_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.RemoveResponsibleUsage(id));
+        }
+
+        [Fact]
+        public void Can_RemoveRelevantUnit()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            var unit = CreateOrganizationUnit(itSystemUsage.OrganizationId);
+
+            itSystemUsage.Organization.OrgUnits.Add(unit);
+
+            itSystemUsage.UsedBy = new List<ItSystemUsageOrgUnitUsage> { CreateItSystemUsageOrgUnitUsage(itSystemUsage, unit) };
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.RemoveRelevantUnit(itSystemUsage.Id, unit.Uuid);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _usageRepository.Verify(x => x.Update(itSystemUsage));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void RemoveRelevantUnit_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.RemoveRelevantUnit(id, A<Guid>()));
+        }
+
+        [Fact]
+        public void RemoveRelevantUnit_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.RemoveRelevantUnit(id, A<Guid>()));
+        }
+
         private static void AssertArchivePeriod(ArchivePeriod expected, ArchivePeriod actual)
         {
             Assert.Equal(expected.StartDate, actual.StartDate);
@@ -753,6 +908,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             return new ItSystemUsage
             {
                 OrganizationId = organizationId,
+                Organization = new Organization
+                {
+                    Id = organizationId
+                },
                 Id = A<int>(),
                 ItSystemId = itSystem.Id,
                 ItSystem = itSystem
@@ -765,6 +924,28 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             {
                 Name = A<string>(),
                 Id = A<int>()
+            };
+        }
+
+        private OrganizationUnit CreateOrganizationUnit(int orgId)
+        {
+            return new OrganizationUnit()
+            {
+                Name = A<string>(),
+                Id = A<int>(),
+                Uuid = A<Guid>(),
+                OrganizationId = orgId
+            };
+        }
+
+        private ItSystemUsageOrgUnitUsage CreateItSystemUsageOrgUnitUsage(ItSystemUsage usage, OrganizationUnit organizationUnit)
+        {
+            return new ItSystemUsageOrgUnitUsage()
+            {
+                ItSystemUsage = usage,
+                ItSystemUsageId = usage.Id,
+                OrganizationUnit = organizationUnit,
+                OrganizationUnitId = organizationUnit.Id
             };
         }
 
@@ -803,6 +984,45 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private void ExpectUsageRepositoryAsQueryable(params ItSystemUsage[] itSystemUsages)
         {
             _usageRepository.Setup(x => x.AsQueryable()).Returns(itSystemUsages.AsQueryable());
+        }
+
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Usage not found" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Usage_NotFound(Func<int, Maybe<OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetUsageByKeyReturns(id, null);
+
+            //Act
+            var error = command(id);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+        }
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Missing Write access" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(Func<int, Maybe<OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            var itSystemUsage = CreateSystemUsage(A<int>(), CreateItSystem());
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, false);
+
+            //Act
+            var result = command(id);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
     }
 }

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Extensions;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DataAccess;
 
 
 namespace Core.DomainServices.Organizations
@@ -14,12 +15,19 @@ namespace Core.DomainServices.Organizations
     public class OrgUnitService : IOrgUnitService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
-        private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _itSystemUsageOrgUnitUsageRepository;
+        private readonly IGenericRepository<Organization> _organizationRepository;
+        private readonly ITransactionManager _transactionManager;
+        private readonly ICommandBus _commandBus;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository,
+            ITransactionManager transactionManager,
+            IGenericRepository<Organization> organizationRepository,
+            ICommandBus commandBus)
         {
             _orgUnitRepository = orgUnitRepository;
-            _itSystemUsageOrgUnitUsageRepository = itSystemUsageOrgUnitUsageRepository;
+            _transactionManager = transactionManager;
+            _organizationRepository = organizationRepository;
+            _commandBus = commandBus;
         }
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
@@ -55,33 +63,38 @@ namespace Core.DomainServices.Organizations
             return unit.SearchAncestry(ancestor => ancestor.Id == ancestorUnitId).HasValue;
         }
 
-        public void Delete(int id)
+        public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
         {
-            // Remove OrgUnit from ItSystemUsages
-            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId == id);
-            foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)
+            using var transaction = _transactionManager.Begin();
+
+            var organization = _organizationRepository.AsQueryable().FirstOrDefault(x => x.Uuid == organizationUuid);
+            if (organization == null)
+                return new OperationError($"Organization with uuid: {organizationUuid} not found", OperationFailure.NotFound);
+            var unitResult = organization.GetOrganizationUnit(unitUuid);
+            if (unitResult.IsNone)
+                return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+            var unit = unitResult.Value;
+
+            var deleteRegistrationsError = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(new RemoveOrganizationUnitRegistrationsCommand(organization, unit));
+            if (deleteRegistrationsError.HasValue)
             {
-                if (itSystemUsage.ResponsibleItSystemUsage != null)
-                {
-                    throw new ArgumentException($"OrganizationUnit is ResponsibleOrgUnit for ItSystemUsage: {itSystemUsage.ItSystemUsageId}");
-                }
-
-                _itSystemUsageOrgUnitUsageRepository.Delete(itSystemUsage);
-
-            }
-            _itSystemUsageOrgUnitUsageRepository.Save();
-
-            var orgUnit = _orgUnitRepository.GetByKey(id);
-
-            // attach children to parent of this instance to avoid orphans
-            // parent id will never be null because users aren't allowed to delete the root node
-            foreach (var child in orgUnit.Children)
-            {
-                child.ParentId = orgUnit.ParentId;
+                transaction.Rollback();
+                return deleteRegistrationsError.Value;
             }
 
-            _orgUnitRepository.DeleteWithReferencePreload(orgUnit);
+            var error = organization.DeleteOrganizationUnit(unit);
+            if (error.HasValue)
+            {
+                transaction.Rollback();
+                return error.Value;
+            }
+
+            _orgUnitRepository.DeleteWithReferencePreload(unit);
             _orgUnitRepository.Save();
+
+            transaction.Commit();
+
+            return Maybe<OperationError>.None;
         }
 
         public IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization)

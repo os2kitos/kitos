@@ -258,6 +258,8 @@ namespace Core.ApplicationServices.Authorization
                     OrganizationRight right =>
                         // Only global admin can set other users as global admins
                         AllowAdministerOrganizationRight(right),
+                    OrganizationUnit unit =>
+                        IsGlobalAdmin() || IsLocalAdmin(unit.OrganizationId),
                     _ => true
                 };
             }

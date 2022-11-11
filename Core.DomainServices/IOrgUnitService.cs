@@ -14,7 +14,7 @@ namespace Core.DomainServices
         ICollection<OrganizationUnit> GetSubTree(int orgUnitId);
 
         bool DescendsFrom(int descendantUnitId, int ancestorUnitId);
-        void Delete(int id);
+        Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid);
         IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization);
         Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid);
     }

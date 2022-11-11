@@ -68,7 +68,7 @@ namespace Core.DomainModel
                         Rights.Remove(right);
                         return right;
                     },
-                    () => new OperationError($"Role with id {role.Id} is not assigned to user with id ${user.Id}",
+                    () => new OperationError($"Role with id {role.Id} is not assigned to user with id {user.Id}",
                         OperationFailure.BadInput)
                 );
 
