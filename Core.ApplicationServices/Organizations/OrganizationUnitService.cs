@@ -7,11 +7,13 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
+using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -26,16 +28,18 @@ namespace Core.ApplicationServices.Organizations
         private readonly IDomainEvents _domainEvents;
         private readonly IDatabaseControl _databaseControl;
         private readonly IGenericRepository<OrganizationUnit> _repository;
+        private readonly ICommandBus _commandBus;
 
         public OrganizationUnitService(IOrganizationService organizationService,
-            IOrganizationRightsService organizationRightsService, 
+            IOrganizationRightsService organizationRightsService,
             IItContractService contractService,
-            IItSystemUsageService usageService, 
-            IAuthorizationContext authorizationContext, 
-            ITransactionManager transactionManager, 
+            IItSystemUsageService usageService,
+            IAuthorizationContext authorizationContext,
+            ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IDatabaseControl databaseControl, 
-            IGenericRepository<OrganizationUnit> repository)
+            IDatabaseControl databaseControl,
+            IGenericRepository<OrganizationUnit> repository,
+            ICommandBus commandBus)
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;
@@ -46,6 +50,7 @@ namespace Core.ApplicationServices.Organizations
             _domainEvents = domainEvents;
             _databaseControl = databaseControl;
             _repository = repository;
+            _commandBus = commandBus;
         }
 
         public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid, bool enforceAccess = false)
@@ -70,19 +75,40 @@ namespace Core.ApplicationServices.Organizations
         public Result<OrganizationUnitRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
         {
             return _organizationService
-                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Bind<OrganizationUnit>
-                (
-                    organization =>
-                    {
-                        var unit = organization.GetOrganizationUnit(unitUuid);
-                        if (unit.IsNone)
-                            return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+            .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+        .Bind<OrganizationUnit>
+        (
+        organization =>
+        {
+            var unit = organization.GetOrganizationUnit(unitUuid);
+            if (unit.IsNone)
+                return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
 
-                        return unit.Value;
-                    }
-                )
-                .Select(unit => unit.GetUnitRegistrations());
+            return unit.Value;
+        }
+        )
+        .Select(unit => unit.GetUnitRegistrations());
+        }
+
+public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
+        {
+            using var transaction = _transactionManager.Begin();
+            var deleteResult = GetOrganizationAndAuthorizeModification(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(organization => CombineWithOrganizationUnit(unitUuid, organization))
+                .Bind(WithDeletionPermission)
+                .Bind(DeleteOrganizationUnit);
+
+            if (deleteResult.Failed)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(deleteResult.Value));
+                _databaseControl.SaveChanges();
+                transaction.Commit();
+            }
+            return deleteResult.MatchFailure();
         }
 
         public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationUnitRegistrationChangeParameters parameters)
@@ -186,11 +212,11 @@ namespace Core.ApplicationServices.Organizations
                 }
 
                 _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(targetUnitResult.Value));
-                
+
                 return Result<OrganizationUnit, OperationError>.Success(unit);
             }).MatchFailure();
         }
-        
+
         private Result<TSuccess, OperationError> Modify<TSuccess>(Guid organizationId, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin();
@@ -235,9 +261,9 @@ namespace Core.ApplicationServices.Organizations
             return _organizationService.GetOrganization(uuid, accessLevel)
                 .Match
                 (
-                    organization => 
-                        _authorizationContext.AllowModify(organization) == false 
-                            ? new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden) 
+                    organization =>
+                        _authorizationContext.AllowModify(organization) == false
+                            ? new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden)
                             : Result<Organization, OperationError>.Success(organization),
                     error => error
                 );
@@ -392,7 +418,58 @@ namespace Core.ApplicationServices.Organizations
             var relevantSystems = unitRegistrations.RelevantSystems.Select(x => x.Id).ToList();
             var responsibleSystems = unitRegistrations.ResponsibleSystems.Select(x => x.Id).ToList();
 
-            return new OrganizationUnitRegistrationChangeParameters(organizationUnitRights, itContractRegistrations, paymentRegistrationDetails, responsibleSystems,relevantSystems);
+            return new OrganizationUnitRegistrationChangeParameters(organizationUnitRights, itContractRegistrations, paymentRegistrationDetails, responsibleSystems, relevantSystems);
+        }
+
+        private Result<OrganizationUnit, OperationError> DeleteOrganizationUnit((Organization organization, OrganizationUnit organizationUnit) orgAndUnit)
+        {
+            var (organization, organizationUnit) = orgAndUnit;
+            var deleteCommand = new RemoveOrganizationUnitRegistrationsCommand(organization, organizationUnit);
+            var deleteRegistrationsError = _commandBus.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(deleteCommand);
+            if (deleteRegistrationsError.HasValue)
+            {
+                return deleteRegistrationsError.Value;
+            }
+
+            var error = organization.DeleteOrganizationUnit(organizationUnit);
+            if (error.HasValue)
+            {
+                return error.Value;
+            }
+
+            _repository.DeleteWithReferencePreload(organizationUnit);
+            return organizationUnit;
+        }
+
+        private Result<(Organization organization, OrganizationUnit organizationUnit), OperationError> WithDeletionPermission((Organization organization, OrganizationUnit organizationUnit) orgAndUnit)
+        {
+            return _authorizationContext.AllowDelete(orgAndUnit.organizationUnit) ? (orgAndUnit) : new OperationError("Not authorized to delete org unit", OperationFailure.Forbidden);
+        }
+
+        private static Result<(Organization organization, OrganizationUnit organizationUnit), OperationError> CombineWithOrganizationUnit(Guid unitUuid, Organization organization)
+        {
+            var organizationUnit = organization.GetOrganizationUnit(unitUuid);
+            if (organizationUnit.IsNone)
+                return new OperationError(OperationFailure.NotFound);
+            return (organization, organizationUnit.Value);
+        }
+
+        public Result<OrganizationUnitRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind<OrganizationUnit>
+                (
+                    organization =>
+                    {
+                        var unit = organization.GetOrganizationUnit(unitUuid);
+                        if (unit.IsNone)
+                            return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+
+                        return unit.Value;
+                    }
+                )
+                .Select(unit => unit.GetUnitRegistrations());
         }
     }
 }

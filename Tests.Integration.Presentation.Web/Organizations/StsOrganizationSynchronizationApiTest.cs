@@ -440,12 +440,13 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
-        public async Task Can_PUT_UPDATE_Consequences_With_Moval_Consequences()
+        public async Task Can_PUT_UPDATE_Consequences_With_Relocation_Consequences()
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
             const int levels = 2;
+            var uuidOfExpectedMoval = Guid.NewGuid();
             using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels);
             (Guid expectedMoval, Guid expectedParent) expectedMoval = (Guid.Empty, Guid.Empty);
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
@@ -464,6 +465,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
                 //Make first leaf parent of second leaf
                 secondLeaf.ParentId = firstLeaf.Id;
+
+                //Add a native units so we can check that it is moved along with the moved unit
+                var organization = secondLeaf.Organization;
+                organization.AddOrganizationUnit(new OrganizationUnit { Organization = organization, Name = "Native test unit", Uuid = uuidOfExpectedMoval, ObjectOwner = secondLeaf.ObjectOwner, LastChangedByUser = secondLeaf.LastChangedByUser }, secondLeaf);
             });
 
             //Act
@@ -473,6 +478,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
             var actualParentUuid = DatabaseAccess.MapFromEntitySet<OrganizationUnit, Guid>(x => x.AsQueryable().ByUuid(expectedMoval.expectedMoval).Parent.Uuid);
             Assert.Equal(expectedMoval.expectedParent, actualParentUuid);
+            var movedItemChildrenUuids = DatabaseAccess.MapFromEntitySet<OrganizationUnit, IEnumerable<Guid>>(x => x.AsQueryable().ByUuid(expectedMoval.expectedMoval).Children.Select(x => x.Uuid).ToList());
+            Assert.Contains(uuidOfExpectedMoval, movedItemChildrenUuids);
         }
 
         [Fact]

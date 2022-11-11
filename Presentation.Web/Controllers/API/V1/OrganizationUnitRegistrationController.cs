@@ -7,7 +7,6 @@ using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
-using Core.DomainServices;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
@@ -22,13 +21,10 @@ namespace Presentation.Web.Controllers.API.V1
     public class OrganizationUnitRegistrationController: BaseApiController
     {
         private readonly IOrganizationUnitService _organizationUnitService;
-        private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationUnitRegistrationController(IOrganizationUnitService organizationUnitService,
-            IOrgUnitService orgUnitService)
+        public OrganizationUnitRegistrationController(IOrganizationUnitService organizationUnitService)
         {
             _organizationUnitService = organizationUnitService;
-            _orgUnitService = orgUnitService;
         }
 
         [HttpGet]
@@ -52,18 +48,6 @@ namespace Presentation.Web.Controllers.API.V1
         {
             var changeParameters = ToChangeParameters(requestDto);
             return _organizationUnitService.DeleteRegistrations(organizationUuid, unitUuid, changeParameters)
-                .Match(FromOperationError, Ok);
-        }
-
-        [HttpDelete]
-        [Route("")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage Delete(Guid organizationUuid, Guid unitUuid)
-        {
-            return _orgUnitService.Delete(organizationUuid, unitUuid)
                 .Match(FromOperationError, Ok);
         }
 
