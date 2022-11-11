@@ -7,6 +7,7 @@ using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
@@ -28,6 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IDatabaseControl> _databaseControl;
         private readonly Mock<IGenericRepository<OrganizationUnit>> _repositoryMock;
+        private readonly Mock<ICommandBus> _commandBusMock;
 
         public OrganizationUnitServiceTest()
         {
@@ -41,6 +43,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _databaseControl = new Mock<IDatabaseControl>();
             _repositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
 
+            _commandBusMock = new Mock<ICommandBus>();
             _sut = new OrganizationUnitService(
                 _organizationServiceMock.Object,
                 organizationRightsServiceMock.Object,
@@ -50,7 +53,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _transactionManagerMock.Object,
                 _domainEvents.Object,
                 _databaseControl.Object,
-                _repositoryMock.Object);
+                _repositoryMock.Object,
+                _commandBusMock.Object);
         }
 
         [Fact]
@@ -58,7 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         {
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
-            
+
             ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound), OrganizationDataReadAccessLevel.All);
 
             var result = _sut.GetRegistrations(orgUuid, unitUuid);
@@ -83,7 +87,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             {
                 maybeResult = _sut.DeleteRegistrations(orgUuid, unitUuid, CreateEmptyChangeParameters());
             }
-            else if(isTransferSelected)
+            else if (isTransferSelected)
             {
                 maybeResult = _sut.TransferRegistrations(orgUuid, unitUuid, A<Guid>(), CreateEmptyChangeParameters());
             }
@@ -100,7 +104,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
             var org = new Organization { Uuid = orgUuid };
-            
+
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectAllowModifyReturns(org, false);
 
@@ -109,7 +113,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             {
                 maybeResult = _sut.DeleteRegistrations(orgUuid, unitUuid, CreateEmptyChangeParameters());
             }
-            else if(isTransferSelected)
+            else if (isTransferSelected)
             {
                 maybeResult = _sut.TransferRegistrations(orgUuid, unitUuid, A<Guid>(), CreateEmptyChangeParameters());
             }
@@ -127,7 +131,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var operationError = new OperationError(OperationFailure.NotFound);
 
             ExpectGetOrganizationReturns(orgUuid, new Organization(), OrganizationDataReadAccessLevel.All);
-            
+
             var result = _sut.GetRegistrations(orgUuid, unitUuid);
             Assert.True(result.Failed);
             Assert.Equal(operationError.FailureType, result.Error.FailureType);
@@ -143,7 +147,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Uuid = orgUuid
             };
 
-            ExpectGetOrganizationReturns(orgUuid, org); 
+            ExpectGetOrganizationReturns(orgUuid, org);
             ExpectAllowModifyReturns(org, true);
 
             var operationError = new OperationError(OperationFailure.NotFound);
@@ -158,7 +162,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         {
             var orgUuid = A<Guid>();
             var unitUuid = A<Guid>();
-            var unit = new OrganizationUnit { Uuid = unitUuid};
+            var unit = new OrganizationUnit { Uuid = unitUuid };
             var org = new Organization()
             {
                 Uuid = orgUuid,
@@ -196,7 +200,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //If unit is valid check if target unit returns NotFound
             if (isUnitValid)
             {
-                var unit = new OrganizationUnit {Uuid = unitUuid};
+                var unit = new OrganizationUnit { Uuid = unitUuid };
                 org.OrgUnits = new List<OrganizationUnit> { unit };
                 ExpectAllowModifyReturns(unit, true);
                 var transaction = new Mock<IDatabaseTransaction>();
@@ -228,7 +232,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             ExpectGetOrganizationReturns(orgUuid, org);
-            
+
             ExpectAllowModifyReturns(unit, isUnitValid);
             ExpectAllowModifyReturns(targetUnit, isTargetUnitValid);
 
@@ -275,10 +279,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private static OrganizationUnitRegistrationChangeParameters CreateEmptyChangeParameters()
         {
             return new OrganizationUnitRegistrationChangeParameters(
-                new List<int>(), 
                 new List<int>(),
-                new List<PaymentChangeParameters>(), 
-                new List<int>(), 
+                new List<int>(),
+                new List<PaymentChangeParameters>(),
+                new List<int>(),
                 new List<int>());
         }
     }

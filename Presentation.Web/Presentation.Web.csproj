@@ -409,6 +409,7 @@
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
+    <Compile Include="Controllers\API\V1\OrganizationUnitLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitRegistrationController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
