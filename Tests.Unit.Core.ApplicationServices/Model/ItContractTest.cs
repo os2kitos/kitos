@@ -658,7 +658,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_Start_Date_Has_Not_Passed(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract()
             {
                 Concluded = now.AddDays(1),
@@ -681,7 +681,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_End_Date_Has_Passed(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract()
             {
                 ExpirationDate = now.AddDays(-1),
@@ -704,7 +704,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_Termination_Deadline_Has_Passed_With_No_TerminationPeriod(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract()
             {
                 Terminated = now.AddDays(-1),
@@ -727,7 +727,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_Termination_Deadline_Has_Passed_With_And_TerminationPeriod_Passed(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var terminationDeadline = new Random(A<int>()).Next(1, 12);
             var sut = new ItContract()
             {
@@ -756,7 +756,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Termination_Deadline_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract
             {
                 Terminated = now.AddDays(dayOffset),
@@ -779,7 +779,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Termination_Deadline_Passed_But_TerminationPeriod_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var terminationDeadline = new Random(A<int>()).Next(1, 12);
             var sut = new ItContract
             {
@@ -807,7 +807,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Start_Date_Has_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract
             {
                 Concluded = now.AddDays(dayOffset),
@@ -831,7 +831,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_End_Date_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract
             {
                 ExpirationDate = now.AddDays(dayOffset),
@@ -1061,6 +1061,11 @@ namespace Tests.Unit.Core.Model
 
             Assert.True(error.HasValue);
             Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+        }
+
+        private DateTime CreateValidDate()
+        {
+            return DateTime.Now.AddMonths(new Random(A<int>()).Next(-30, 30));
         }
     }
 }

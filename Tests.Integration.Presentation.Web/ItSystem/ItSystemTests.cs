@@ -15,7 +15,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemTests : WithAutoFixture
     {
-
         [Theory]
         [InlineData(OrganizationRole.User)]
         [InlineData(OrganizationRole.GlobalAdmin)]
