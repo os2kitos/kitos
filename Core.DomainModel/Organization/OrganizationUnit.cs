@@ -248,5 +248,14 @@ namespace Core.DomainModel.Organization
         {
             Parent = null;
         }
+
+        public UnitAccessRights GetAccessRights(bool isUserAllowedToRead, bool isUserAllowedToModify, bool isUserAllowedToDelete)
+        {
+            var canNameBeModified = isUserAllowedToModify && CanChangeName();
+            var canBeRearranged = isUserAllowedToModify && CanChangeParent();
+            var canBeDeleted = isUserAllowedToDelete && CanBeDeleted();
+
+            return new UnitAccessRights(isUserAllowedToRead, isUserAllowedToModify, canNameBeModified, canBeRearranged, canBeDeleted);
+        }
     }
 }

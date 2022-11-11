@@ -1,4 +1,4 @@
-﻿namespace Core.ApplicationServices.Model.Organizations
+﻿namespace Core.DomainModel.Organization
 {
     public class UnitAccessRights
     {

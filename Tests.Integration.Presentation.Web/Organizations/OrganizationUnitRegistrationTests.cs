@@ -17,8 +17,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
 {
     public class OrganizationUnitTests: WithAutoFixture
     {
-        private string CreateEmail() => $"{A<Guid>():N}@kitos.dk";
-
         [Fact]
         public async Task GlobalAdmin_Has_All_AccessRights()
         {

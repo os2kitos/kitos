@@ -64,7 +64,7 @@ namespace Core.ApplicationServices.Organizations
                         return unit.Value;
                     }
                 )
-                .Select(GetUnitAccessRights);
+                .Select(GetAccessRights);
         }
 
         public Result<OrganizationUnitRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid)
@@ -243,13 +243,12 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
-        private UnitAccessRights GetUnitAccessRights(OrganizationUnit unit)
+        private UnitAccessRights GetAccessRights(OrganizationUnit unit)
         {
             var canBeModified = _authorizationContext.AllowModify(unit);
-            var canNameBeModified = canBeModified && unit.CanChangeName();
-            var canBeRearranged = canBeModified && unit.CanChangeParent();
-            var canBeDeleted = _authorizationContext.AllowDelete(unit) && unit.CanBeDeleted();
-            return new UnitAccessRights(canBeRead: true, canBeModified, canNameBeModified, canBeRearranged, canBeDeleted);
+            var canBeDeleted = _authorizationContext.AllowDelete(unit);
+
+            return unit.GetAccessRights(isUserAllowedToRead: true, canBeModified, canBeDeleted);
         }
 
         private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)
