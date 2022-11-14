@@ -18,7 +18,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
 using Core.DomainModel.Notification;
@@ -134,29 +133,37 @@ namespace Core.ApplicationServices
                 var advice = _adviceRepository.AsQueryable().ById(id);
                 if (advice != null)
                 {
-                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
+                    if (IsDeactivated(advice))
                     {
-                        if (DispatchEmails(advice))
-                        {
-                            _adviceRepository.Update(advice);
-
-                            _adviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = _operationClock.Now });
-                        }
-                    }
-
-                    if (advice.AdviceType == AdviceType.Immediate)
-                    {
-                        advice.IsActive = false;
-                    }
-                    else if (IsAdviceExpired(advice))
-                    {
-                        advice.IsActive = false;
+                        _logger.Warning("SendAdvice has been invoked for deactivated Advice with id: {adviceId}. The hangfire jobs should have been deleted during deactivation. Check the logs.", id);
                         DeleteJobFromHangfire(advice);
                     }
+                    else
+                    {
+                        if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
+                        {
+                            if (DispatchEmails(advice))
+                            {
+                                _adviceRepository.Update(advice);
 
-                    _adviceRepository.Save();
-                    _adviceSentRepository.Save();
-                    transaction.Commit();
+                                _adviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = _operationClock.Now });
+                            }
+                        }
+
+                        if (advice.AdviceType == AdviceType.Immediate)
+                        {
+                            advice.IsActive = false;
+                        }
+                        else if (IsAdviceExpired(advice))
+                        {
+                            advice.IsActive = false;
+                            DeleteJobFromHangfire(advice);
+                        }
+
+                        _adviceRepository.Save();
+                        _adviceSentRepository.Save();
+                        transaction.Commit();
+                    }
                 }
                 else
                 {
@@ -171,6 +178,11 @@ namespace Core.ApplicationServices
                 transaction.Rollback();
                 throw;
             }
+        }
+
+        private static bool IsDeactivated(Advice advice)
+        {
+            return !advice.IsActive;
         }
 
         private bool IsAdviceExpired(Advice advice)
