@@ -68,7 +68,7 @@ namespace Core.ApplicationServices.Organizations
                         return (organization,unit.Value);
                     }
                 )
-                .Select(orgAndUnit => GetAccessRights(orgAndUnit.organization,orgAndUnit.organizationUnit));
+                .Select(orgAndUnit => GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit));
         }
 
         public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
@@ -427,7 +427,11 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<(Organization organization, OrganizationUnit organizationUnit), OperationError> WithDeletionPermission((Organization organization, OrganizationUnit organizationUnit) orgAndUnit)
         {
-            return _authorizationContext.AllowDelete(orgAndUnit.organizationUnit) ? (orgAndUnit) : new OperationError("Not authorized to delete org unit", OperationFailure.Forbidden);
+            var accessRights = GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit);
+            if(accessRights.CanBeDeleted == false)
+                return new OperationError("Not authorized to delete org unit", OperationFailure.Forbidden);
+
+            return orgAndUnit;
         }
 
         private static Result<(Organization organization, OrganizationUnit organizationUnit), OperationError> CombineWithOrganizationUnit(Guid unitUuid, Organization organization)
