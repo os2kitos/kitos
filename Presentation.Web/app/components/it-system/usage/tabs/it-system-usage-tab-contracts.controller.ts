@@ -39,15 +39,28 @@
             };
 
             function bindContracts(usage) {
-                $scope.usage = usage;
-                $scope.contracts = entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts);
+                $scope.contracts = usage.contracts.map(contract => {
+                    return {
+                        id: contract.id,
+                        name: contract.name,
+                        contractTypeName: contract.contractTypeName,
+                        supplierName: contract.supplierName,
+                        hasOperationElement: contract.hasOperationElement,
+                        concluded: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.concluded),
+                        expirationDate: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.expirationDate),
+                        terminated: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.terminated)
+                    }
+                });
+                $scope.contractsToSelect = entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts);
+
                 $scope.mainContractId = usage.mainContractId;
                 currentMainContract = usage.mainContractId;
-                let match
+                let match;
                 if (usage.mainContractId !== null) {
                     match = usage.contracts && usage.contracts.find(x => { return x.id === usage.mainContractId });
                 }
                 itSystemUsage.mainContractIsActive = match?.isActive;
+                $scope.mainContractIsActive = match?.isActive;
 
             }
 
