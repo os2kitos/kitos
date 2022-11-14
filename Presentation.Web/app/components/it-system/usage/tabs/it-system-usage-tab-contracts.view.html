@@ -29,42 +29,42 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="contract in usage.contracts">
+                <tr data-ng-repeat="contract in contracts">
                     <!-- name -->
                     <td>
                         <a data-ui-sref="it-contract.edit.main({id: contract.id})">
-                            {{ contract.name ? contract.name : 'Unavngiven' }}
+                            {{:: contract.name ? contract.name : 'Unavngiven' }}
                         </a>
                     </td>
 
                     <!-- type -->
                     <td ng-if="showContractType">
-                        {{ contract.contractTypeName }}
+                        {{::contract.contractTypeName }}
                     </td>
 
                     <!-- supplier -->
                     <td>
-                        {{ contract.supplierName }}
+                        {{::contract.supplierName }}
                     </td>
 
                     <!-- has operation -->
                     <td>
-                        <span data-ng-if="contract.hasOperationElement" class="text-success">
+                        <span ng-if="contract.hasOperationElement" class="text-success">
                             <i class="glyphicon glyphicon-ok"></i>
                         </span>
                     </td>
 
                     <!-- concluded ("indgået") -->
                     <td ng-if="showContractAgreementPeriod">
-                        <span data-ng-model="contract.concluded" data-datereader=""></span>
+                        {{::contract.concluded}}
                     </td>
                     <!-- expiration -->
                     <td ng-if="showContractAgreementPeriod">
-                        <span data-ng-model="contract.expirationDate" data-datereader=""></span>
+                        {{::contract.expirationDate}}
                     </td>
                     <!-- terminated -->
                     <td ng-if="showContractAgreementTermination">
-                        <span data-ng-model="contract.terminated" data-datereader=""></span>
+                        {{::contract.terminated}}
                     </td>
                 </tr>
             </tbody>
@@ -81,7 +81,7 @@
                     <div class="col-xs-3">
                         <select-simple data-id="contract-selector"
                                        data-placeholder="Ingen kontrakt"
-                                       data-options="contracts"
+                                       data-options="contractsToSelect"
                                        data-ng-model="mainContractId"
                                        data-function="saveMainContract"
                                        data-ng-disabled="!hasWriteAccess">
@@ -89,10 +89,10 @@
                     </div>
                     <div class="col-xs-4" data-ng-show="mainContractId !== null">
                         IT systemet har nu status som:
-                        <strong class="text-success" data-ng-show="usage.mainContractIsActive">
+                        <strong class="text-success" ng-show="mainContractIsActive">
                             Aktivt
                         </strong>
-                        <strong class="text-danger" data-ng-hide="usage.mainContractIsActive">
+                        <strong class="text-danger" ng-hide="mainContractIsActive">
                             Inaktivt
                         </strong>
                     </div>
