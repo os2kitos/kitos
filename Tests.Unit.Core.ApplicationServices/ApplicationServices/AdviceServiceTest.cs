@@ -80,7 +80,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 AdviceType = AdviceType.Immediate,
                 ObjectOwnerId = A<int>(),
                 Type = A<RelatedEntityType>(),
-                RelationId = A<int>()
+                RelationId = A<int>(),
+                IsActive = true
             };
             SetupAdviceRepository(immediateAdvice);
             SetupTransactionManager();
@@ -105,7 +106,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Id = A<int>(),
                 Subject = A<string>(),
                 AdviceType = AdviceType.Immediate,
-                Reciepients = CreateDefaultReceivers()
+                Reciepients = CreateDefaultReceivers(),
+                IsActive = true
             };
             SetupAdviceRepository(immediateAdvice);
             SetupTransactionManager();
@@ -119,6 +121,31 @@ namespace Tests.Unit.Core.ApplicationServices
             _hangfireApiMock.Verify(x => x.RemoveRecurringJobIfExists(It.IsAny<string>()), Times.Never);
         }
 
+        [Fact]
+        public void SendAdvice_GivenImmediateAdvice_Which_Is_Inactive_No_Email_Sent()
+        {
+            //Arrange
+            var immediateAdvice = new Advice
+            {
+                Id = A<int>(),
+                Subject = A<string>(),
+                AdviceType = AdviceType.Immediate,
+                Reciepients = CreateDefaultReceivers(),
+                IsActive = false
+            };
+            SetupAdviceRepository(immediateAdvice);
+            SetupTransactionManager();
+            _hangfireApiMock.Setup(x => x.GetScheduledJobs(0, int.MaxValue)).Returns(new JobList<ScheduledJobDto>(Array.Empty<KeyValuePair<string, ScheduledJobDto>>()));
+            _hangfireApiMock.Setup(x => x.GetRecurringJobs()).Returns(new List<RecurringJobDto>());
+
+            //Act
+            var result = _sut.SendAdvice(immediateAdvice.Id);
+
+            //Assert
+            Assert.True(result);
+            
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never());
+        }
 
         [Fact]
         public void SendAdvice_GivenRecurringActiveAdvice_AdviceIsSentAndJobIsNotCancelled()
@@ -132,7 +159,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(-1),
                 StopDate = DateTime.Now.AddDays(1),
-                Reciepients = CreateDefaultReceivers()
+                Reciepients = CreateDefaultReceivers(),
+                IsActive = true
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
@@ -143,6 +171,34 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result);
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+        }
+
+        [Fact]
+        public void SendAdvice_GivenRecurringAdvice_Which_Is_Inactive_Email_Not_Sent()
+        {
+            //Arrange
+            var recurringAdvice = new Advice
+            {
+                Id = A<int>(),
+                Subject = A<string>(),
+                AdviceType = AdviceType.Repeat,
+                Scheduling = Scheduling.Quarter,
+                AlarmDate = DateTime.Now.AddDays(-1),
+                StopDate = DateTime.Now.AddDays(1),
+                Reciepients = CreateDefaultReceivers(),
+                IsActive = false
+            };
+            SetupAdviceRepository(recurringAdvice);
+            SetupTransactionManager();
+            _hangfireApiMock.Setup(x => x.GetScheduledJobs(0, int.MaxValue)).Returns(new JobList<ScheduledJobDto>(Array.Empty<KeyValuePair<string, ScheduledJobDto>>()));
+            _hangfireApiMock.Setup(x => x.GetRecurringJobs()).Returns(new List<RecurringJobDto>());
+
+            //Act
+            var result = _sut.SendAdvice(recurringAdvice.Id);
+
+            //Assert
+            Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never());
         }
 
         [Fact]
@@ -157,7 +213,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(-1),
                 StopDate = null,
-                Reciepients = CreateDefaultReceivers()
+                Reciepients = CreateDefaultReceivers(),
+                IsActive = true
             };
             _operationClockMock.Setup(x => x.Now).Returns(DateTime.MaxValue);
             SetupAdviceRepository(recurringAdvice);
@@ -183,7 +240,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddYears(4),
                 StopDate = DateTime.Now.AddYears(5),
-                Reciepients = CreateDefaultReceivers()
+                Reciepients = CreateDefaultReceivers(),
+                IsActive = true
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
@@ -214,7 +272,7 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
-            _hangfireApiMock.Setup(x => x.GetScheduledJobs(0, int.MaxValue)).Returns(new JobList<ScheduledJobDto>(new KeyValuePair<string, ScheduledJobDto>[0]));
+            _hangfireApiMock.Setup(x => x.GetScheduledJobs(0, int.MaxValue)).Returns(new JobList<ScheduledJobDto>(Array.Empty<KeyValuePair<string, ScheduledJobDto>>()));
             _hangfireApiMock.Setup(x => x.GetRecurringJobs()).Returns(new List<RecurringJobDto>());
 
             //Act
@@ -236,7 +294,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(1),
                 StopDate = DateTime.Now.AddDays(2),
-                Reciepients = CreateDefaultReceivers()
+                Reciepients = CreateDefaultReceivers(),
+                IsActive = true
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();

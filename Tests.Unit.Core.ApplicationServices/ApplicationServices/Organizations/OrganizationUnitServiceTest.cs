@@ -63,7 +63,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
-            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound), OrganizationDataReadAccessLevel.All);
+            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
 
             var result = _sut.GetRegistrations(orgUuid, unitUuid);
 
@@ -130,7 +130,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var unitUuid = A<Guid>();
             var operationError = new OperationError(OperationFailure.NotFound);
 
-            ExpectGetOrganizationReturns(orgUuid, new Organization(), OrganizationDataReadAccessLevel.All);
+            ExpectGetOrganizationReturns(orgUuid, new Organization());
 
             var result = _sut.GetRegistrations(orgUuid, unitUuid);
             Assert.True(result.Failed);
@@ -247,7 +247,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
-            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound), OrganizationDataReadAccessLevel.All);
+            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
 
             var result = _sut.GetAccessRights(orgUuid, unitUuid);
 
@@ -263,7 +263,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             var organization = new Organization() {Uuid = orgUuid};
 
-            ExpectGetOrganizationReturns(orgUuid, organization, OrganizationDataReadAccessLevel.All);
+            ExpectGetOrganizationReturns(orgUuid, organization);
 
             var result = _sut.GetAccessRights(orgUuid, unitUuid);
 
@@ -286,7 +286,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
             unit.Organization = organization;
 
-            ExpectGetOrganizationReturns(orgUuid, organization, OrganizationDataReadAccessLevel.All);
+            ExpectGetOrganizationReturns(orgUuid, organization);
             ExpectAllowModifyReturns(unit, true);
             ExpectAllowDeleteReturns(unit, true);
 
@@ -304,14 +304,118 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(accessRights.CanBeRead);
         }
 
-        private void ExpectGetOrganizationReturns(Guid uuid, Organization result, OrganizationDataReadAccessLevel? readAccessLevel = null)
+        [Fact]
+        public void Can_Delete_Organization_Unit()
         {
-            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, readAccessLevel)).Returns(result);
+            //Arrange
+            var orgId = A<Guid>();
+            var unitUuid = A<Guid>();
+            var root = new OrganizationUnit { Uuid = A<Guid>() };
+            var toRemove = new OrganizationUnit { Uuid = unitUuid };
+            toRemove.Parent = root;
+            root.Children.Add(toRemove);
+            var org = new Organization
+            {
+                Uuid = orgId,
+                OrgUnits = new List<OrganizationUnit>
+                {
+                    root,toRemove
+                }
+            };
+
+            var transaction = ExpectBeginTransaction();
+            ExpectGetOrganizationReturns(orgId, org);
+            ExpectAllowModifyReturns(org, true);
+            ExpectAllowModifyReturns(toRemove, true);
+            ExpectAllowDeleteReturns(toRemove, true);
+            ExpectDeleteUnitCommandReturns(toRemove, Maybe<OperationError>.None);
+
+            //Act
+            var deleteError = _sut.Delete(orgId, unitUuid);
+
+            //Assert
+            Assert.True(deleteError.IsNone);
+            _databaseControl.Verify(x => x.SaveChanges(), Times.Once());
+            transaction.Verify(x => x.Commit(), Times.Once());
         }
 
-        private void ExpectGetOrganizationReturns(Guid uuid, OperationError result, OrganizationDataReadAccessLevel? readAccessLevel = null)
+        [Fact]
+        public void Cannot_Delete_Organization_Unit_If_Delete_Command_Fails()
         {
-            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, readAccessLevel)).Returns(result);
+            //Arrange
+            var orgId = A<Guid>();
+            var unitUuid = A<Guid>();
+            var root = new OrganizationUnit { Uuid = A<Guid>() };
+            var toRemove = new OrganizationUnit { Uuid = unitUuid };
+            toRemove.Parent = root;
+            root.Children.Add(toRemove);
+            var org = new Organization
+            {
+                Uuid = orgId,
+                OrgUnits = new List<OrganizationUnit>
+                {
+                    root,toRemove
+                }
+            };
+
+            var transaction = ExpectBeginTransaction();
+            ExpectGetOrganizationReturns(orgId, org);
+            ExpectAllowModifyReturns(org, true);
+            ExpectAllowDeleteReturns(toRemove, true);
+            ExpectDeleteUnitCommandReturns(toRemove, A<OperationError>());
+
+            //Act
+            var deleteError = _sut.Delete(orgId, unitUuid);
+
+            //Assert
+            Assert.False(deleteError.IsNone);
+            _databaseControl.Verify(x => x.SaveChanges(), Times.Never());
+            transaction.Verify(x => x.Commit(), Times.Never());
+            transaction.Verify(x => x.Rollback(), Times.Once());
+        }
+
+        [Fact]
+        public void Cannot_Delete_Organization_Unit_If_Delete_Unit_Is_UnAuthorized()
+        {
+            //Arrange
+            var orgId = A<Guid>();
+            var unitUuid = A<Guid>();
+            var root = new OrganizationUnit { Uuid = A<Guid>() };
+            var toRemove = new OrganizationUnit { Uuid = unitUuid };
+            toRemove.Parent = root;
+            root.Children.Add(toRemove);
+            var org = new Organization
+            {
+                Uuid = orgId,
+                OrgUnits = new List<OrganizationUnit>
+                {
+                    root,toRemove
+                }
+            };
+
+            var transaction = ExpectBeginTransaction();
+            ExpectGetOrganizationReturns(orgId, org);
+            ExpectAllowModifyReturns(org, true);
+            ExpectAllowDeleteReturns(toRemove, false);
+
+            //Act
+            var deleteError = _sut.Delete(orgId, unitUuid);
+
+            //Assert
+            Assert.False(deleteError.IsNone);
+            _databaseControl.Verify(x => x.SaveChanges(), Times.Never());
+            transaction.Verify(x => x.Commit(), Times.Never());
+            transaction.Verify(x => x.Rollback(), Times.Once());
+        }
+
+        private void ExpectGetOrganizationReturns(Guid uuid, Organization result)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, OrganizationDataReadAccessLevel.All)).Returns(result);
+        }
+
+        private void ExpectGetOrganizationReturns(Guid uuid, OperationError result)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, OrganizationDataReadAccessLevel.All)).Returns(result);
         }
 
         private void ExpectAllowDeleteReturns(IEntity unit, bool result)
@@ -332,6 +436,21 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 new List<PaymentChangeParameters>(),
                 new List<int>(),
                 new List<int>());
+        }
+
+        private void ExpectDeleteUnitCommandReturns(OrganizationUnit toRemove, Maybe<OperationError> result)
+        {
+            _commandBusMock.Setup(x =>
+                    x.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(
+                        It.Is<RemoveOrganizationUnitRegistrationsCommand>(unit => unit.OrganizationUnit == toRemove)))
+                .Returns(result);
+        }
+
+        private Mock<IDatabaseTransaction> ExpectBeginTransaction()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
+            return transaction;
         }
     }
 }
