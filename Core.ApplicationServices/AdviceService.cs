@@ -18,7 +18,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
 using Core.DomainModel.Notification;
@@ -134,29 +133,37 @@ namespace Core.ApplicationServices
                 var advice = _adviceRepository.AsQueryable().ById(id);
                 if (advice != null)
                 {
-                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
+                    if (IsDeactivated(advice))
                     {
-                        if (DispatchEmails(advice))
-                        {
-                            _adviceRepository.Update(advice);
-
-                            _adviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = _operationClock.Now });
-                        }
-                    }
-
-                    if (advice.AdviceType == AdviceType.Immediate)
-                    {
-                        advice.IsActive = false;
-                    }
-                    else if (IsAdviceExpired(advice))
-                    {
-                        advice.IsActive = false;
+                        _logger.Warning("SendAdvice has been invoked for deactivated Advice with id: {adviceId}. The hangfire jobs should have been deleted during deactivation. Check the logs.", id);
                         DeleteJobFromHangfire(advice);
                     }
+                    else
+                    {
+                        if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
+                        {
+                            if (DispatchEmails(advice))
+                            {
+                                _adviceRepository.Update(advice);
 
-                    _adviceRepository.Save();
-                    _adviceSentRepository.Save();
-                    transaction.Commit();
+                                _adviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = _operationClock.Now });
+                            }
+                        }
+
+                        if (advice.AdviceType == AdviceType.Immediate)
+                        {
+                            advice.IsActive = false;
+                        }
+                        else if (IsAdviceExpired(advice))
+                        {
+                            advice.IsActive = false;
+                            DeleteJobFromHangfire(advice);
+                        }
+
+                        _adviceRepository.Save();
+                        _adviceSentRepository.Save();
+                        transaction.Commit();
+                    }
                 }
                 else
                 {
@@ -171,6 +178,11 @@ namespace Core.ApplicationServices
                 transaction.Rollback();
                 throw;
             }
+        }
+
+        private static bool IsDeactivated(Advice advice)
+        {
+            return !advice.IsActive;
         }
 
         private bool IsAdviceExpired(Advice advice)
@@ -397,49 +409,56 @@ namespace Core.ApplicationServices
                 throw new ArgumentException(nameof(adviceId) + " does not point to a valid id or points to an advice without alarm date or scheduling");
             }
 
-            var adviceAlarmDate = advice.AlarmDate.Value;
-            var adviceScheduling = advice.Scheduling.Value;
-
-            var adviceTriggers = AdviceTriggerFactory.CreateFrom(adviceAlarmDate, adviceScheduling);
-
-            foreach (var adviceTrigger in adviceTriggers)
+            if (IsDeactivated(advice))
             {
-                var jobId = adviceTrigger.PartitionId.Match(partitionId => Advice.CreatePartitionJobId(adviceId, partitionId), () => advice.JobId);
-                _hangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
+                _logger.Warning("Advice with id: {adviceId} will not be scheduled since it has been deactivated.", adviceId);
             }
-
-            if (advice.StopDate.HasValue)
+            else
             {
-                //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
-                var deactivateAt = advice.StopDate.Value.Date == DateTime.MaxValue.Date ? DateTime.MaxValue.Date : advice.StopDate.Value.Date.AddDays(1);
-                _hangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(deactivateAt));
-            }
+                var adviceAlarmDate = advice.AlarmDate.Value;
+                var adviceScheduling = advice.Scheduling.Value;
 
-            //If time has passed the trigger time, Hangfire will not fire until the next trigger date so we must force it.
-            if (adviceAlarmDate.Date.Equals(_operationClock.Now.Date))
-            {
-                switch (adviceScheduling)
+                var adviceTriggers = AdviceTriggerFactory.CreateFrom(adviceAlarmDate, adviceScheduling);
+
+                foreach (var adviceTrigger in adviceTriggers)
                 {
-                    case Scheduling.Day:
-                    case Scheduling.Week:
-                    case Scheduling.Month:
-                    case Scheduling.Year:
-                    case Scheduling.Quarter:
-                    case Scheduling.Semiannual:
-                        var mustScheduleAdviceToday =
-                            advice.AdviceSent.Where(x => x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false &&
-                            WillTriggerInvokeToday() == false;
-                        if (mustScheduleAdviceToday)
-                        {
-                            //Send the first advice now
-                            _hangfireApi.Schedule(() => SendAdvice(adviceId));
-                        }
-                        break;
-                    //Intentional fallthrough - no corrections here
-                    case Scheduling.Hour:
-                    case Scheduling.Immediate:
-                    default:
-                        break;
+                    var jobId = adviceTrigger.PartitionId.Match(partitionId => Advice.CreatePartitionJobId(adviceId, partitionId), () => advice.JobId);
+                    _hangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
+                }
+
+                if (advice.StopDate.HasValue)
+                {
+                    //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
+                    var deactivateAt = advice.StopDate.Value.Date == DateTime.MaxValue.Date ? DateTime.MaxValue.Date : advice.StopDate.Value.Date.AddDays(1);
+                    _hangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(deactivateAt));
+                }
+
+                //If time has passed the trigger time, Hangfire will not fire until the next trigger date so we must force it.
+                if (adviceAlarmDate.Date.Equals(_operationClock.Now.Date))
+                {
+                    switch (adviceScheduling)
+                    {
+                        case Scheduling.Day:
+                        case Scheduling.Week:
+                        case Scheduling.Month:
+                        case Scheduling.Year:
+                        case Scheduling.Quarter:
+                        case Scheduling.Semiannual:
+                            var mustScheduleAdviceToday =
+                                advice.AdviceSent.Where(x => x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false &&
+                                WillTriggerInvokeToday() == false;
+                            if (mustScheduleAdviceToday)
+                            {
+                                //Send the first advice now
+                                _hangfireApi.Schedule(() => SendAdvice(adviceId));
+                            }
+                            break;
+                        //Intentional fallthrough - no corrections here
+                        case Scheduling.Hour:
+                        case Scheduling.Immediate:
+                        default:
+                            break;
+                    }
                 }
             }
         }
