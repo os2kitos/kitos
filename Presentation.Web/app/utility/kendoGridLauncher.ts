@@ -1046,7 +1046,7 @@ module Kitos.Utility.KendoGrid {
             };
 
             if (!this.flexibleWidth) {
-                mainGridOptions.height = this.$window.innerHeight - 200;
+                mainGridOptions.height = this.$window.innerHeight - 150;
             }
 
             this.gridState
