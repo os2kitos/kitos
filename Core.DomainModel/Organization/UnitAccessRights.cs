@@ -6,7 +6,7 @@
         {
             CanBeRead = canBeRead;
             CanBeModified = canBeModified;
-            CanBeRenamed = canFieldsBeRenamed; //TODO: This one is a specific permission... only native units can be renamed by the user
+            CanBeRenamed = canBeRenamed;
             CanEanBeRenamed = canFieldsBeRenamed;
             CanDeviceIdBeRenamed= canFieldsBeRenamed;
             CanBeRearranged = canBeRearranged;

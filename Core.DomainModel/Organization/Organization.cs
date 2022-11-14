@@ -452,7 +452,7 @@ namespace Core.DomainModel.Organization
             return Maybe<OperationError>.None;
         }
 
-        public bool IsUnitRoot(OrganizationUnit unit)
+        private bool IsUnitRoot(OrganizationUnit unit)
         {
             return unit.Parent == null;
         }

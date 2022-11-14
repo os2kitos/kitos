@@ -13,12 +13,12 @@
             CanBeDeleted = canBeDeleted;
         }
 
-        public bool CanBeRead { get; set; }
-        public bool CanBeModified { get; set; }
-        public bool CanNameBeModified { get; set; }
+        public bool CanBeRead { get; }
+        public bool CanBeModified { get; }
+        public bool CanNameBeModified { get; }
         public bool CanEanBeModified { get; }
         public bool CanDeviceIdBeModified { get; }
-        public bool CanBeRearranged { get; set; }
-        public bool CanBeDeleted { get; set; }
+        public bool CanBeRearranged { get; }
+        public bool CanBeDeleted { get; }
     }
 }
