@@ -16,14 +16,14 @@
         ($scope, $http, itSystemUsage, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory, contractUiState: Kitos.Models.UICustomization.ICustomizedModuleUI, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
             var usageId = itSystemUsage.id;
             bindContracts(itSystemUsage);
-            var currentMainContract = null;
+            var currentMainContract: number;
 
             const reloadContractState = () => {
                 return itSystemUsageService.getItSystemUsage(usageId)
                     .then((usage) => bindContracts(usage));
             }
 
-            $scope.saveMainContract = id => {
+            $scope.saveMainContract = (id: any) => {
                 if (currentMainContract === id || _.isUndefined(id)) {
                     return;
                 }
@@ -38,7 +38,7 @@
                 }
             };
 
-            function bindContracts(usage) {
+            function bindContracts(usage: any) {
                 $scope.contracts = usage.contracts.map(contract => {
                     return {
                         id: contract.id,
@@ -61,7 +61,6 @@
                 }
                 itSystemUsage.mainContractIsActive = match?.isActive;
                 $scope.mainContractIsActive = match?.isActive;
-
             }
 
             //UI Customization
