@@ -7,6 +7,7 @@ namespace Core.ApplicationServices.Organizations
 {
     public interface IOrganizationUnitService
     {
+        Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid);
         Result<OrganizationUnitRegistrationDetails, OperationError> GetRegistrations(Guid organizationUuid, Guid unitUuid);
         Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationUnitRegistrationChangeParameters parameters);
         Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid);
