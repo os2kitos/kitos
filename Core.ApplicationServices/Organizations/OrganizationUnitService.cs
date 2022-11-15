@@ -71,6 +71,31 @@ namespace Core.ApplicationServices.Organizations
                 .Select(orgAndUnit => GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit));
         }
 
+        public Result<IEnumerable<UnitWithAccessRights>, OperationError> GetAccessRightsByOrganization(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind<(Organization organization,IEnumerable<OrganizationUnit> organizationUnits)>
+                (
+                    organization =>
+                    {
+                        var units = organization.GetAllOrganizationUnits();
+                        return (organization, units);
+                    }
+                )
+                .Select<IEnumerable<UnitWithAccessRights>>(orgAndUnits =>
+                {
+                    var result = new List<UnitWithAccessRights>();
+                    foreach (var unit in orgAndUnits.organizationUnits)
+                    {
+                        var accessRight = GetAccessRights(orgAndUnits.organization, unit);
+                        result.Add(new UnitWithAccessRights(unit, accessRight));
+                    }
+
+                    return result;
+                } );
+        }
+
         public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
         {
             using var transaction = _transactionManager.Begin();
