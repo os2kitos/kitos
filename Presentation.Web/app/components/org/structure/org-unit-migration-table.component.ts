@@ -48,8 +48,8 @@
         root: IOrganizationUnitMigrationRoot;
         columnTypes = MigrationTableColumnType;
         
-        static $inject: string[] = ["organizationRegistrationsService", "notify"];
-        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
+        static $inject: string[] = ["organizationUnitService", "notify"];
+        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
             private readonly notify) {
         }
 
@@ -113,7 +113,7 @@
             const request = this.createChangeRequest(registration);
             registration.selected = false;
 
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
+            this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.stateParameters.hasRegistrationsChanges = true;
 

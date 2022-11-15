@@ -365,7 +365,7 @@
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
                     windowClass: "modal fade in wide-modal",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", "organizationRegistrationsService", function ($modalScope, $modalInstance, autofocus, organizationRegistrationsService: Kitos.Services.Organization.IOrganizationRegistrationsService) {
+                        "$scope", "$uibModalInstance", "autofocus", "organizationUnitService", function ($modalScope, $modalInstance, autofocus, organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
                             autofocus();
                             
                             // edit or create-new mode
@@ -435,10 +435,22 @@
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
-                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot && !$modalScope.orgUnit.isFkOrganizationUnit;
-                            $modalScope.canChangeName = $modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
                             $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
-                            $modalScope.canDelete = $modalScope.isAdmin && !$modalScope.orgUnit.isFkOrganizationUnit;
+
+                            $modalScope.canChangeParent = false;
+                            $modalScope.canChangeName = false;
+                            $modalScope.canEanBeModified = false;
+                            $modalScope.canDeviceIdBeModified = false;
+                            $modalScope.canDelete = false;
+
+                            organizationUnitService.getUnitAccessRights(unit.organization.uuid, unit.uuid)
+                                .then(res => {
+                                    $modalScope.canDelete = res.canBeDeleted;
+                                    $modalScope.canChangeName = res.canNameBeModified;
+                                    $modalScope.canEanBeModified = res.canEanBeModified;
+                                    $modalScope.canDeviceIdBeModified = res.canDeviceIdBeModified;
+                                    $modalScope.canChangeParent = res.canBeRearranged;
+                                });
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting
@@ -582,7 +594,7 @@
 
                                 $modalScope.submitting = true;
 
-                                organizationRegistrationsService.deleteOrganizationUnit(unit.organization.uuid, unit.uuid)
+                                organizationUnitService.deleteOrganizationUnit(unit.organization.uuid, unit.uuid)
                                     .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();

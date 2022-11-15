@@ -21,7 +21,7 @@ namespace Core.DomainModel.Organization
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
-            organizationUnits.ForEach(unit => unit.ConvertToKitosUnit());
+            organizationUnits.ForEach(unit => unit.ConvertToNativeKitosUnit());
 
             Connected = false;
             SynchronizationDepth = null;
