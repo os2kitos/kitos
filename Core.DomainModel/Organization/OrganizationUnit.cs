@@ -139,7 +139,7 @@ namespace Core.DomainModel.Organization
             return Maybe<OperationError>.None;
         }
 
-        public void ConvertToKitosUnit()
+        public void ConvertToNativeKitosUnit()
         {
             if (Origin == OrganizationUnitOrigin.Kitos)
             {
@@ -150,7 +150,7 @@ namespace Core.DomainModel.Organization
             ExternalOriginUuid = null;
         }
 
-        public bool IsOfKitosOrigin()
+        public bool IsNativeKitosUnit()
         {
             return Origin == OrganizationUnitOrigin.Kitos;
         }

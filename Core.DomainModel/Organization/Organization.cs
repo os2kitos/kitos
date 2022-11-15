@@ -144,7 +144,7 @@ namespace Core.DomainModel.Organization
         /// <returns></returns>
         public OrganizationUnit GetRoot()
         {
-            return OrgUnits.FirstOrDefault(IsUnitRoot);
+            return OrgUnits.FirstOrDefault(MatchRoot);
         }
 
         public IEnumerable<int> GetOrganizationIds() => new[] { Id };
@@ -452,7 +452,7 @@ namespace Core.DomainModel.Organization
             return Maybe<OperationError>.None;
         }
 
-        private bool IsUnitRoot(OrganizationUnit unit)
+        private static bool MatchRoot(OrganizationUnit unit)
         {
             return unit.Parent == null;
         }

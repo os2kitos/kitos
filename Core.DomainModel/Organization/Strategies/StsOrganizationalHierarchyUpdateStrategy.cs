@@ -160,7 +160,7 @@ namespace Core.DomainModel.Organization.Strategies
             //Conversion to native units
             foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
             {
-                unitToNativeUnit.ConvertToKitosUnit();
+                unitToNativeUnit.ConvertToNativeKitosUnit();
             }
 
             //Addition of new units
@@ -221,7 +221,7 @@ namespace Core.DomainModel.Organization.Strategies
             //Deletion of units
             foreach (var externalUnitToDelete in OrderUnitsToDeleteByLeafToParent(_organization.GetRoot(), consequences.DeletedExternalUnitsBeingDeleted))
             {
-                externalUnitToDelete.ConvertToKitosUnit(); //Convert to KITOS unit before deleting it (external units cannot be deleted)
+                externalUnitToDelete.ConvertToNativeKitosUnit(); //Convert to KITOS unit before deleting it (external units cannot be deleted)
                 var deleteOrganizationUnitError = _organization.DeleteOrganizationUnit(externalUnitToDelete);
                 if (deleteOrganizationUnitError.HasValue)
                 {
