@@ -370,8 +370,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             Assert.True(accessRights.CanBeRead);
             Assert.False(accessRights.CanBeRenamed);
-            Assert.False(accessRights.CanEanBeRenamed);
-            Assert.False(accessRights.CanDeviceIdBeRenamed);
+            Assert.False(accessRights.CanEanBeModified);
+            Assert.False(accessRights.CanDeviceIdBeModified);
             Assert.False(accessRights.CanBeModified);
             Assert.False(accessRights.CanBeRearranged);
             Assert.False(accessRights.CanBeDeleted);
@@ -405,8 +405,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(accessRights.CanBeRead);
             Assert.True(accessRights.CanBeModified);
             Assert.False(accessRights.CanBeRenamed);
-            Assert.True(accessRights.CanEanBeRenamed);
-            Assert.True(accessRights.CanDeviceIdBeRenamed);
+            Assert.True(accessRights.CanEanBeModified);
+            Assert.True(accessRights.CanDeviceIdBeModified);
             Assert.False(accessRights.CanBeRearranged);
             Assert.False(accessRights.CanBeDeleted);
         }
@@ -439,8 +439,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(accessRights.CanBeRead);
             Assert.True(accessRights.CanBeModified);
             Assert.True(accessRights.CanBeRenamed);
-            Assert.True(accessRights.CanEanBeRenamed);
-            Assert.True(accessRights.CanDeviceIdBeRenamed);
+            Assert.True(accessRights.CanEanBeModified);
+            Assert.True(accessRights.CanDeviceIdBeModified);
             Assert.False(accessRights.CanBeRearranged);
             Assert.False(accessRights.CanBeDeleted);
         }
@@ -474,8 +474,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(accessRights.CanBeRead);
             Assert.True(accessRights.CanBeModified);
             Assert.True(accessRights.CanBeRenamed);
-            Assert.True(accessRights.CanEanBeRenamed);
-            Assert.True(accessRights.CanDeviceIdBeRenamed);
+            Assert.True(accessRights.CanEanBeModified);
+            Assert.True(accessRights.CanDeviceIdBeModified);
             Assert.True(accessRights.CanBeRearranged);
             Assert.False(accessRights.CanBeDeleted);
         }
