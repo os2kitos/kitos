@@ -43,7 +43,7 @@
         static $inject: string[] = ["$http", "apiUseCaseFactory"];
 
         private readonly apiWrapper: Services.Generic.ApiWrapper;
-        constructor(private readonly $http: ng.IHttpService,
+        constructor(readonly $http: ng.IHttpService,
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) {
             this.apiWrapper = new Services.Generic.ApiWrapper($http);
         }
