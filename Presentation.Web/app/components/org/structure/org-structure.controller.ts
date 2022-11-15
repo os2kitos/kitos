@@ -14,7 +14,8 @@
                     localOrgUnitRoles: ['localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OrganizationUnitRoles).getAll()
                     ],
-                    orgUnitRoles: ['organizationUnitOdataService', (organizationUnitOdataService: Kitos.Services.Organization.IOrganizationUnitOdataService) => organizationUnitOdataService.getOrganizationUnitRoles() ],
+                    orgUnitRoles: ['$http', $http => $http.get("odata/OrganizationUnitRoles")
+                        .then(result => result.data.value)],
                     user: [
                         "userService", userService => userService.getUser()
                     ],
@@ -32,7 +33,7 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitOdataService",
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
         function ($scope,
             $http: ng.IHttpService,
             $modal,
@@ -45,8 +46,7 @@
             hasWriteAccess,
             authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
             select2LoadingService: Kitos.Services.ISelect2LoadingService,
-            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
-            organizationUnitOdataService: Kitos.Services.Organization.IOrganizationUnitOdataService) {
+            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
