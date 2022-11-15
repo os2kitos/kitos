@@ -137,8 +137,8 @@ namespace Presentation.Web.Controllers.API.V1
                 accessRights.CanBeRead, 
                 accessRights.CanBeModified, 
                 accessRights.CanBeRenamed, 
-                accessRights.CanEanBeRenamed, 
-                accessRights.CanDeviceIdBeRenamed, 
+                accessRights.CanEanBeModified, 
+                accessRights.CanDeviceIdBeModified, 
                 accessRights.CanBeRearranged, 
                 accessRights.CanBeDeleted);
         }

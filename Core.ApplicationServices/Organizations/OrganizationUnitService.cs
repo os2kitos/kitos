@@ -252,20 +252,18 @@ namespace Core.ApplicationServices.Organizations
 
         private UnitAccessRights GetAccessRights(Organization organization, OrganizationUnit unit)
         {
-            var canBeModified = false;
+            if (!_authorizationContext.AllowModify(unit))
+                return UnitAccessRights.ReadOnly();
+
+            const bool canBeModified = true;
             var canBeRenamed = false;
-            var canFieldsBeModified = false;
+            const bool canInfoAdditionalfieldsBeModified = true;
             var canBeRearranged = false;
             var canBeDeleted = false;
 
-            if (!_authorizationContext.AllowModify(unit))
-                return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canFieldsBeModified, canBeRearranged, canBeDeleted);
-
-            canBeModified = true;
             if (unit.IsNativeKitosUnit())
             {
                 canBeRenamed = true;
-                canFieldsBeModified = true;
 
                 if (organization.GetRoot() != unit)
                 {
@@ -278,7 +276,7 @@ namespace Core.ApplicationServices.Organizations
                 canBeDeleted = false;
             }
 
-            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canFieldsBeModified, canBeRearranged, canBeDeleted);
+            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canInfoAdditionalfieldsBeModified, canBeRearranged, canBeDeleted);
         }
 
         private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)
