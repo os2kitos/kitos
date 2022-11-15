@@ -114,6 +114,8 @@
             const request = this.createChangeRequest();
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
+                    this.stateParameters.hasRegistrationsChanges = true;
+
                     this.refreshData();
                     this.setIsBusy(false);
                 },
@@ -140,6 +142,8 @@
             this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.selectedOrg = null;
+                    this.stateParameters.hasRegistrationsChanges = true;
+
                     this.refreshData();
                     this.setIsBusy(false);
                 }, error => {

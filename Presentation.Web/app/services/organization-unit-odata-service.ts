@@ -3,6 +3,7 @@
 
     export interface IOrganizationUnitOdataService {
         getOrganizationUnits(): angular.IPromise<Models.IOrganizationUnit[]>;
+        getOrganizationUnitRoles(): ng.IPromise<any>;
     }
 
     export class OrganizationUnitOdataService implements IOrganizationUnitOdataService {
@@ -31,6 +32,11 @@
                     this.inMemoryCacheService.setEntry(cacheKey, value, Kitos.Shared.Time.Offset.compute(Kitos.Shared.Time.TimeUnit.Minutes, 10));
                     return value;
                 });
+        }
+
+        getOrganizationUnitRoles(): ng.IPromise<any> {
+            return this.$http.get<any>("odata/OrganizationUnitRoles")
+                .then(result => result.data.value);
         }
     }
 

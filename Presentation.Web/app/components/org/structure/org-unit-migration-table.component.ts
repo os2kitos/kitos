@@ -8,7 +8,8 @@
                 options: "<",
                 configuration: "<",
                 unitUuid: "@",
-                organizationUuid: "@"
+                organizationUuid: "@",
+                stateParameters: "<"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -34,6 +35,7 @@
         configuration: IMigrationTableColumn[];
         unitUuid: string;
         organizationUuid: string;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
@@ -42,6 +44,7 @@
         configuration: IMigrationTableColumn[] | null = null;
         unitUuid: string | null = null;
         organizationUuid: string | null = null;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters | null = null;
         root: IOrganizationUnitMigrationRoot;
         columnTypes = MigrationTableColumnType;
         
@@ -69,6 +72,10 @@
             }
             if (this.organizationUuid === null) {
                 console.error(`missing migration table attribute: 'organizationId' for table with title: ${this.title}`);
+                return;
+            }
+            if (this.stateParameters === null) {
+                console.error(`missing migration table attribute: 'stateParameters' for table with title: ${this.title}`);
                 return;
             }
 
@@ -108,6 +115,8 @@
 
             this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
+                    this.stateParameters.hasRegistrationsChanges = true;
+
                     this.options.refreshData();
                     this.options.setIsBusy(false);
                 },

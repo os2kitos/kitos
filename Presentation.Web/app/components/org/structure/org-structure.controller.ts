@@ -14,8 +14,7 @@
                     localOrgUnitRoles: ['localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OrganizationUnitRoles).getAll()
                     ],
-                    orgUnitRoles: ['$http', $http => $http.get("odata/OrganizationUnitRoles")
-                        .then(result => result.data.value)],
+                    orgUnitRoles: ['organizationUnitOdataService', (organizationUnitOdataService: Kitos.Services.Organization.IOrganizationUnitOdataService) => organizationUnitOdataService.getOrganizationUnitRoles() ],
                     user: [
                         "userService", userService => userService.getUser()
                     ],
@@ -33,7 +32,7 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitOdataService",
         function ($scope,
             $http: ng.IHttpService,
             $modal,
@@ -46,7 +45,8 @@
             hasWriteAccess,
             authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
             select2LoadingService: Kitos.Services.ISelect2LoadingService,
-            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
+            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            organizationUnitOdataService: Kitos.Services.Organization.IOrganizationUnitOdataService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -126,8 +126,8 @@
                 }
             }
 
-            function loadUnits() {
-                var rootNode = rootNodeOfOrganization;
+            function loadUnits(unit = null) {
+                var rootNode = unit ?? rootNodeOfOrganization;
                 $scope.nodes = [rootNode];
 
                 flattenAndSave(rootNode, false, null);
@@ -406,6 +406,7 @@
                                 newName: unit.name,
                                 newEan: unit.ean,
                                 localId: unit.localId,
+                                currentParent: unit.parentId,
                                 newParent: unit.parentId,
                                 orgId: unit.organizationId,
                                 isRoot: unit.parentId == undefined,
@@ -468,7 +469,15 @@
                                 }).then((result) => {
                                     notify.addSuccessMessage(name + " er ændret.");
 
-                                    $modalInstance.close(result.data.response);
+                                    if (parent !== $modalScope.orgUnit.currentParent) {
+                                        var parentUnit = orgUnits.filter(x => x.id === parent);
+                                        $modalInstance.close(createResult(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitRelocated, parentUnit[0]));
+                                    } else if ($modalScope.stateParameters.hasRegistrationsChanges) {
+                                        $modalInstance.close(createResult(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged, result.data.response));
+                                    }
+                                    else {
+                                        $modalInstance.close(createResult(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.None));
+                                    }
                                     inMemoryCacheService.clear();
                                 },
                                     (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
@@ -511,7 +520,7 @@
                                 }).then((result) => {
                                     notify.addSuccessMessage(name + " er gemt.");
 
-                                    $modalInstance.close(result.data.response);
+                                    $modalInstance.close(createResult(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.SubUnitCreated, result.data.response));
                                     inMemoryCacheService.clear();
                                 },
                                     (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
@@ -546,7 +555,8 @@
 
                             $modalScope.stateParameters = {
                                 setRootIsBusy: (value: boolean) => $modalScope.setIsBusy(value),
-                                checkIsRootBusy: () => $modalScope.checkIsBusy()
+                                checkIsRootBusy: () => $modalScope.checkIsBusy(),
+                                hasRegistrationsChanges: false,
                             } as Kitos.Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
 
                             $modalScope.delete = function () {
@@ -559,7 +569,7 @@
                                     .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();
-                                        $modalInstance.close();
+                                        $modalInstance.close(createResult(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitDeleted));
                                     }, (error) => {
                                             $modalScope.submitting = false;
 
@@ -571,7 +581,11 @@
                             };
 
                             $modalScope.cancel = function () {
-                                $modalInstance.close("cancel");
+                                if ($modalScope.stateParameters.hasRegistrationsChanges) {
+                                    $modalInstance.close(createResult(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged, unit));
+                                    return;
+                                }
+                                $modalInstance.close(createResult(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.None));
                             };
 
                             function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {
@@ -606,13 +620,45 @@
                                     }
                                 };
                             }
+
+                            function createResult(type: Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType, unit = null): Kitos.Models.ViewModel.Organization.IOrganizationUnitEditResult {
+                                return {
+                                    type: type,
+                                    scopeToUnit: unit
+                                };
+                            }
                         }
                     ]
                 });
 
-                modal.result.then(function (returnedUnit) {
-                    $state.go($state.current, {}, { reload: true });
-                    loadUnits();
+                modal.result.then((result: Kitos.Models.ViewModel.Organization.IOrganizationUnitEditResult) => {
+                    switch (result.type) {
+                        case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.SubUnitCreated:
+                        case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitRelocated:
+                            const node1 = $scope.orgUnits[result.scopeToUnit.id];
+                            if (node1 === null) {
+                                return;
+                            }
+                            $state.go($state.current, {}, { reload: true });
+                            loadUnits();
+                            $scope.chooseOrgUnit(node1);
+                            break;
+                        case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitDeleted:
+                            $state.go($state.current, {}, { reload: true });
+                            loadUnits();
+                            break;
+                        case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged:
+                            const node = $scope.orgUnits[result.scopeToUnit.id];
+                            if (node === null) {
+                                return;
+                            }
+
+                            loadRights(node);
+                            break;
+                        case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.None:
+                        default:
+                            break;
+                    }
                 });
             };
 
