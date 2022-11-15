@@ -100,6 +100,7 @@
     <Compile Include="Organization\PaymentRegistrationDetails.cs" />
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />
+    <Compile Include="Organization\UnitAccessRights.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />

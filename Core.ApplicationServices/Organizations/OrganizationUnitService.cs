@@ -13,7 +13,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
-using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -53,6 +52,25 @@ namespace Core.ApplicationServices.Organizations
             _commandBus = commandBus;
         }
 
+        public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind<(Organization organization,OrganizationUnit organizationUnit)>
+                (
+                    organization =>
+                    {
+                        var unit = organization.GetOrganizationUnit(unitUuid);
+                        if (unit.IsNone)
+                        {
+                            return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+                        }
+                        return (organization,unit.Value);
+                    }
+                )
+                .Select(orgAndUnit => GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit));
+        }
+
         public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
         {
             using var transaction = _transactionManager.Begin();
@@ -71,7 +89,6 @@ namespace Core.ApplicationServices.Organizations
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }
-
             return deleteResult.MatchFailure();
         }
 
@@ -233,6 +250,35 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
+        private UnitAccessRights GetAccessRights(Organization organization, OrganizationUnit unit)
+        {
+            if (!_authorizationContext.AllowModify(unit))
+                return UnitAccessRights.ReadOnly();
+
+            const bool canBeModified = true;
+            var canBeRenamed = false;
+            const bool canInfoAdditionalfieldsBeModified = true;
+            var canBeRearranged = false;
+            var canBeDeleted = false;
+
+            if (unit.IsNativeKitosUnit())
+            {
+                canBeRenamed = true;
+
+                if (organization.GetRoot() != unit)
+                {
+                    canBeRearranged = true;
+                    canBeDeleted = true;
+                }
+            }
+            if (!_authorizationContext.AllowDelete(unit))
+            {
+                canBeDeleted = false;
+            }
+
+            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canInfoAdditionalfieldsBeModified, canBeRearranged, canBeDeleted);
+        }
+
         private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)
         {
             foreach (var payment in payments)
@@ -379,7 +425,11 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<(Organization organization, OrganizationUnit organizationUnit), OperationError> WithDeletionPermission((Organization organization, OrganizationUnit organizationUnit) orgAndUnit)
         {
-            return _authorizationContext.AllowDelete(orgAndUnit.organizationUnit) ? (orgAndUnit) : new OperationError("Not authorized to delete org unit", OperationFailure.Forbidden);
+            var accessRights = GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit);
+            if(accessRights.CanBeDeleted == false)
+                return new OperationError("Not authorized to delete org unit", OperationFailure.Forbidden);
+
+            return orgAndUnit;
         }
 
         private static Result<(Organization organization, OrganizationUnit organizationUnit), OperationError> CombineWithOrganizationUnit(Guid unitUuid, Organization organization)

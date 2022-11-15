@@ -15,9 +15,58 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations
 {
-    public class OrganizationUnitRegistrationTests: WithAutoFixture
+    public class OrganizationUnitTests: WithAutoFixture
     {
-        private string CreateEmail() => $"{A<Guid>():N}@kitos.dk";
+        [Fact]
+        public async Task GlobalAdmin_Has_All_AccessRights()
+        {
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanBeRearranged);
+            Assert.True(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public async Task LocalAdmin_From_Organization_Has_All_AccessRights()
+        {
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanBeRearranged);
+            Assert.True(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public async Task User_From_Organization_Has_Only_Read_Access()
+        {
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+
+            var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanNameBeModified);
+            Assert.False(accessRights.CanBeRearranged);
+            Assert.False(accessRights.CanBeDeleted);
+        }
 
         [Fact]
         public async Task Can_Get_Registrations()
@@ -343,6 +392,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationName = A<string>();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             return organization;
+        }
+
+        private string CreateEmail()
+        {
+            return $"{nameof(OrganizationUnitTests)}{A<string>()}@test.dk";
         }
 
         private async Task<(OrganizationUnitRight right, ItContract contract, EconomyStream externalEconomyStream, EconomyStream internalEconomyStream, ItSystemUsage usage, OrgUnitDTO unitDto)> SetupRegistrations(int organizationId)

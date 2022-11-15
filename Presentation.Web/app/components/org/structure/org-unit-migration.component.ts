@@ -68,8 +68,8 @@
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
         
-        static $inject: string[] = ["organizationRegistrationsService", "organizationApiService", "notify"];
-        constructor(private readonly organizationRegistrationsService: Services.Organization.IOrganizationRegistrationsService,
+        static $inject: string[] = ["organizationUnitService", "organizationApiService", "notify"];
+        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
             private readonly organizationApiService: Services.IOrganizationApiService,
             private readonly notify) {
         }
@@ -112,7 +112,7 @@
             this.setIsBusy(true);
 
             const request = this.createChangeRequest();
-            this.organizationRegistrationsService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
+            this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.refreshData();
                     this.setIsBusy(false);
@@ -137,7 +137,7 @@
 
 
             const request = this.createTransferRequest();
-            this.organizationRegistrationsService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
+            this.organizationUnitService.transferSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.selectedOrg = null;
                     this.refreshData();
@@ -309,7 +309,7 @@
         }
 
         private getData(): ng.IPromise<void> {
-            return this.organizationRegistrationsService.getRegistrations(this.organizationUuid, this.unitUuid).then(response => {
+            return this.organizationUnitService.getRegistrations(this.organizationUuid, this.unitUuid).then(response => {
                 this.roles.root.children = this.mapDtoWithUserFullNameToOptions(response.organizationUnitRights);
                 this.getPaymentOptions(response.payments);
                 this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);

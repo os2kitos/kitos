@@ -144,7 +144,7 @@ namespace Core.DomainModel.Organization
         /// <returns></returns>
         public OrganizationUnit GetRoot()
         {
-            return OrgUnits.FirstOrDefault(u => u.Parent == null);
+            return OrgUnits.FirstOrDefault(MatchRoot);
         }
 
         public IEnumerable<int> GetOrganizationIds() => new[] { Id };
@@ -450,6 +450,11 @@ namespace Core.DomainModel.Organization
             OrgUnits.Remove(unitToDelete);
 
             return Maybe<OperationError>.None;
+        }
+
+        private static bool MatchRoot(OrganizationUnit unit)
+        {
+            return unit.Parent == null;
         }
     }
 }
