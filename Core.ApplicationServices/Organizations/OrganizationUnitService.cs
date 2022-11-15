@@ -262,7 +262,7 @@ namespace Core.ApplicationServices.Organizations
                 return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canFieldsBeModified, canBeRearranged, canBeDeleted);
 
             canBeModified = true;
-            if (unit.IsOfKitosOrigin())
+            if (unit.IsNativeKitosUnit())
             {
                 canBeRenamed = true;
                 canFieldsBeModified = true;
