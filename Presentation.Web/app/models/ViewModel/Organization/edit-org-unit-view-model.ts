@@ -5,8 +5,9 @@
         oldName: string,
         newName: string,
         newEan: string,
-        currentParent: number,
+        oldParent: number,
         newParent: number,
+        oldLocalId: number,
         localId: number,
         orgId: number,
         isRoot: boolean,
@@ -16,13 +17,14 @@
     export enum OrganizationUnitEditResultType {
         None = 0,
         RightsChanged = 1,
-        UnitRelocated = 2,
-        UnitDeleted = 3,
-        SubUnitCreated = 4
+        FieldsChanged = 2,
+        UnitRelocated = 3,
+        UnitDeleted = 4,
+        SubUnitCreated = 5
     }
 
     export interface IOrganizationUnitEditResult{
-        type: OrganizationUnitEditResultType,
+        types: OrganizationUnitEditResultType[],
         scopeToUnit: any,
     }
 }
