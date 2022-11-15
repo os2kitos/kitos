@@ -10,29 +10,13 @@
 
     export class OrganizationUnitService implements IOrganizationUnitService {
         getUnitAccessRights(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.UnitAccessRightsDto> {
-            return this
-                .$http
-                .get<API.Models.IApiWrapper<any>>(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/access-rights`)
-                .then(
-                    result => {
-                        var response = result.data as { response: Models.Api.Organization.UnitAccessRightsDto }
-                        return response.response;
-                    },
-                    error => this.apiWrapper.handleServerError(error)
-                );
+            return this.apiWrapper
+                .getDataFromUrl<Models.Api.Organization.UnitAccessRightsDto>(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/access-rights`);
         }
 
         getRegistrations(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.OrganizationUnitRegistrationDetailsDto> {
-            return this
-                .$http
-                .get<API.Models.IApiWrapper<any>>(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/registrations`)
-                .then(
-                    result => {
-                        var response = result.data as { response: Models.Api.Organization.OrganizationUnitRegistrationDetailsDto }
-                        return response.response;
-                    },
-                    error => this.apiWrapper.handleServerError(error)
-                );
+            return this.apiWrapper
+                .getDataFromUrl<Models.Api.Organization.OrganizationUnitRegistrationDetailsDto>(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/registrations`);
         }
 
         deleteSelectedRegistrations(orgUuid: string, unitUuid: string, body: Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto): angular.IPromise<boolean> {

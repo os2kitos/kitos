@@ -60,13 +60,16 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void GetOrganizationRegistrations_Returns_NotFound_When_Organization_Was_NotFound()
         {
+            //Arrange
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
             ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
 
+            //Act
             var result = _sut.GetRegistrations(orgUuid, unitUuid);
 
+            //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
@@ -76,12 +79,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [InlineData(false, true)]
         public void OrganizationUnitService_Methods_Return_NotFound_When_Organization_Was_NotFound(bool isDeleteSelected, bool isTransferSelected)
         {
+            //Arrange
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
             ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
             _transactionManagerMock.Setup(x => x.Begin());
 
+            //Act
             var maybeResult = Maybe<OperationError>.None;
             if (isDeleteSelected)
             {
@@ -92,6 +97,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 maybeResult = _sut.TransferRegistrations(orgUuid, unitUuid, A<Guid>(), CreateEmptyChangeParameters());
             }
 
+            //Assert
             Assert.True(maybeResult.HasValue);
             Assert.Equal(OperationFailure.NotFound, maybeResult.Value.FailureType);
         }
@@ -101,6 +107,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [InlineData(false, true)]
         public void OrganizationUnitService_Methods_Return_Forbidden_When_User_Is_Not_Allowed_To_Modify_Organization(bool isDeleteSelected, bool isTransferSelected)
         {
+            //Arrange
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
             var org = new Organization { Uuid = orgUuid };
@@ -108,6 +115,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectAllowModifyReturns(org, false);
 
+            //Act
             var maybeResult = Maybe<OperationError>.None;
             if (isDeleteSelected)
             {
@@ -119,6 +127,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             }
 
             Assert.True(maybeResult.HasValue);
+
+            //Assert
             Assert.Equal(OperationFailure.Forbidden, maybeResult.Value.FailureType);
             Assert.Equal("User is not allowed to modify the organization", maybeResult.Value.Message);
         }
@@ -126,13 +136,17 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void GetOrganizationRegistrations_Returns_NotFound()
         {
+            //Arrange
             var orgUuid = A<Guid>();
             var unitUuid = A<Guid>();
             var operationError = new OperationError(OperationFailure.NotFound);
 
             ExpectGetOrganizationReturns(orgUuid, new Organization());
 
+            //Act
             var result = _sut.GetRegistrations(orgUuid, unitUuid);
+
+            //Assert
             Assert.True(result.Failed);
             Assert.Equal(operationError.FailureType, result.Error.FailureType);
         }
@@ -140,6 +154,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void DeleteSelectedOrganizationRegistrations_Returns_NotFound_When_Unit_NotFound()
         {
+            //Arrange
             var orgUuid = A<Guid>();
             var unitUuid = A<Guid>();
             var org = new Organization()
@@ -151,8 +166,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectAllowModifyReturns(org, true);
 
             var operationError = new OperationError(OperationFailure.NotFound);
+
+            //Act
             var result = _sut.DeleteRegistrations(orgUuid, unitUuid, CreateEmptyChangeParameters());
 
+            //Assert
             Assert.True(result.HasValue);
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
         }
@@ -160,6 +178,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void DeleteSelectedOrganizationRegistrations_Returns_Forbidden()
         {
+            //Arrange
             var orgUuid = A<Guid>();
             var unitUuid = A<Guid>();
             var unit = new OrganizationUnit { Uuid = unitUuid };
@@ -175,7 +194,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectAllowDeleteReturns(unit, false);
 
+            //Act
             var result = _sut.DeleteRegistrations(orgUuid, unitUuid, CreateEmptyChangeParameters());
+
+            //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
@@ -185,6 +207,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [InlineData(true)]
         public void TransferSelectedOrganizationRegistrations_Returns_NotFound(bool isUnitValid)
         {
+            //Arrange
             var orgUuid = A<Guid>();
             var targetUnitUuid = A<Guid>();
             var unitUuid = A<Guid>();
@@ -207,7 +230,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
             }
 
+            //Act
             var result = _sut.TransferRegistrations(orgUuid, unitUuid, targetUnitUuid, CreateEmptyChangeParameters());
+
+            //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
@@ -217,6 +243,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [InlineData(true, false)]
         public void TransferSelectedOrganizationRegistrations_Returns_Forbidden(bool isUnitValid, bool isTargetUnitValid)
         {
+            //Arrange
             var orgUuid = A<Guid>();
             var unitUuid = A<Guid>();
             var targetUnitUuid = A<Guid>();
@@ -236,7 +263,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectAllowModifyReturns(unit, isUnitValid);
             ExpectAllowModifyReturns(targetUnit, isTargetUnitValid);
 
+            //Act
             var result = _sut.TransferRegistrations(orgUuid, unitUuid, targetUnitUuid, CreateEmptyChangeParameters());
+
+            //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
@@ -244,13 +274,16 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void GetAccessRights_Returns_NotFound_When_Organization_Was_NotFound()
         {
+            //Arrange
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
             ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
 
+            //Act
             var result = _sut.GetAccessRights(orgUuid, unitUuid);
 
+            //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
@@ -258,6 +291,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void GetAccessRights_Returns_NotFound_When_OrganizationUnit_Was_NotFound()
         {
+            //Arrange
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
@@ -265,8 +299,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             ExpectGetOrganizationReturns(orgUuid, organization);
 
+            //Act
             var result = _sut.GetAccessRights(orgUuid, unitUuid);
 
+            //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
@@ -274,6 +310,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void GetAccessRights_Returns_AccessRights()
         {
+            //Arrange
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
@@ -290,8 +327,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectAllowModifyReturns(unit, true);
             ExpectAllowDeleteReturns(unit, true);
 
+            //Act
             var result = _sut.GetAccessRights(orgUuid, unitUuid);
 
+            //Assert
             Assert.True(result.Ok);
             var accessRights = result.Value;
 
@@ -302,6 +341,143 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(accessRights.CanBeModified);
             Assert.True(accessRights.CanBeRearranged);
             Assert.True(accessRights.CanBeRead);
+        }
+
+        [Fact]
+        public void GetAccessRights_Returns_Only_ReadAllowed_When_Not_Allowed_To_Modify()
+        {
+            //Arrange
+            var unitUuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            var unit = new OrganizationUnit
+            {
+                Uuid = unitUuid,
+                Origin = OrganizationUnitOrigin.Kitos
+            };
+            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            unit.Organization = organization;
+
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(unit, false);
+
+            //Act
+            var result = _sut.GetAccessRights(orgUuid, unitUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.False(accessRights.CanBeRenamed);
+            Assert.False(accessRights.CanEanBeRenamed);
+            Assert.False(accessRights.CanDeviceIdBeRenamed);
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeRearranged);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public void GetAccessRights_Returns_CorrectRights_When_Unit_Is_Not_Of_Kitos_Origin()
+        {
+            //Arrange
+            var unitUuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            var unit = new OrganizationUnit
+            {
+                Uuid = unitUuid,
+                Origin = OrganizationUnitOrigin.STS_Organisation
+            };
+            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            unit.Organization = organization;
+
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(unit, true);
+
+            //Act
+            var result = _sut.GetAccessRights(orgUuid, unitUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeRenamed);
+            Assert.True(accessRights.CanEanBeRenamed);
+            Assert.True(accessRights.CanDeviceIdBeRenamed);
+            Assert.False(accessRights.CanBeRearranged);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public void GetAccessRights_Returns_CorrectRights_When_Unit_Is_Root()
+        {
+            //Arrange
+            var unitUuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            var unit = new OrganizationUnit
+            {
+                Uuid = unitUuid,
+                Origin = OrganizationUnitOrigin.Kitos
+            };
+            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            unit.Organization = organization;
+
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(unit, true);
+
+            //Act
+            var result = _sut.GetAccessRights(orgUuid, unitUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanBeRenamed);
+            Assert.True(accessRights.CanEanBeRenamed);
+            Assert.True(accessRights.CanDeviceIdBeRenamed);
+            Assert.False(accessRights.CanBeRearranged);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public void GetAccessRights_Returns_CorrectRights_When_Unit_Is_Not_Root()
+        {
+            //Arrange
+            var unitUuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            var unit = new OrganizationUnit
+            {
+                Uuid = unitUuid,
+                Parent = new OrganizationUnit(),
+                Origin = OrganizationUnitOrigin.Kitos
+            };
+            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            unit.Organization = organization;
+
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(unit, true);
+
+            //Act
+            var result = _sut.GetAccessRights(orgUuid, unitUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanBeRenamed);
+            Assert.True(accessRights.CanEanBeRenamed);
+            Assert.True(accessRights.CanDeviceIdBeRenamed);
+            Assert.True(accessRights.CanBeRearranged);
+            Assert.False(accessRights.CanBeDeleted);
         }
 
         [Fact]
