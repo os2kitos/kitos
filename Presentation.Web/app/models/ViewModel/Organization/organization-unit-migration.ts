@@ -13,7 +13,7 @@
     export interface IRegistrationMigrationStateParameters {
         checkIsRootBusy: () => boolean;
         setRootIsBusy: (value: boolean) => void;
-        hasRegistrationsChanges: boolean;
+        registrationsChanged: () => void;
     }
 
     export enum OrganizationRegistrationOption {

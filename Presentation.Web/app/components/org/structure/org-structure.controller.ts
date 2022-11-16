@@ -126,8 +126,8 @@
                 }
             }
 
-            function loadUnits(unit = null) {
-                var rootNode = unit ?? rootNodeOfOrganization;
+            function loadUnits() {
+                var rootNode = rootNodeOfOrganization;
                 $scope.nodes = [rootNode];
 
                 flattenAndSave(rootNode, false, null);
@@ -498,7 +498,7 @@
                                         resultTypes.push(Kitos.Models.ViewModel.Organization
                                             .OrganizationUnitEditResultType.UnitRelocated);
                                     } else {
-                                        if ($modalScope.stateParameters.hasRegistrationsChanges) {
+                                        if (hasRegistrationChanges) {
                                             resultTypes.push(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged);
                                         }
                                         if (hasChange) {
@@ -574,6 +574,8 @@
                                 };
                             };
 
+                            var hasRegistrationChanges = false;
+
                             $modalScope.setIsBusy = (value: boolean): void => {
                                 $modalScope.submitting = value;
                             }
@@ -582,10 +584,14 @@
                                 return $modalScope.submitting;
                             }
 
+                            $modalScope.registrationsChanged = () => {
+                                hasRegistrationChanges = true;
+                            }
+
                             $modalScope.stateParameters = {
                                 setRootIsBusy: (value: boolean) => $modalScope.setIsBusy(value),
                                 checkIsRootBusy: () => $modalScope.checkIsBusy(),
-                                hasRegistrationsChanges: false,
+                                registrationsChanged: () => $modalScope.registrationsChanged(),
                             } as Kitos.Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
 
                             $modalScope.delete = function () {
@@ -610,7 +616,7 @@
                             };
 
                             $modalScope.cancel = function () {
-                                if ($modalScope.stateParameters.hasRegistrationsChanges) {
+                                if (hasRegistrationChanges) {
                                     $modalInstance.close(createResult([Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged], unit));
                                     return;
                                 }
@@ -652,8 +658,8 @@
 
                             function createResult(types: Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType[] = null, unit = null): Kitos.Models.ViewModel.Organization.IOrganizationUnitEditResult {
                                 let resultTypes = types;
-                                if (resultTypes === null || resultTypes.length === 0) {
-                                    resultTypes = [Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.None];
+                                if (!resultTypes) {
+                                    resultTypes = [];
                                 }
                                 return {
                                     types: resultTypes,
@@ -671,7 +677,6 @@
                             case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitRelocated:
                             case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitDeleted:
                                 $state.go($state.current, {}, { reload: true });
-                                loadUnits();
                                 break;
                             case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.FieldsChanged:
                                 const currentNode = $scope.orgUnits[result.scopeToUnit.id];
@@ -691,7 +696,6 @@
 
                                 loadRights(node);
                                 break;
-                            case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.None:
                             default:
                                 break;
                         }

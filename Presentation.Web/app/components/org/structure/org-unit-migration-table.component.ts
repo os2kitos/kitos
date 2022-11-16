@@ -115,7 +115,7 @@
 
             this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
-                    this.stateParameters.hasRegistrationsChanges = true;
+                    this.stateParameters.registrationsChanged();
 
                     this.options.refreshData();
                     this.options.setIsBusy(false);

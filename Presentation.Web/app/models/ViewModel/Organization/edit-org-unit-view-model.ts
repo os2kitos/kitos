@@ -15,7 +15,6 @@
     }
 
     export enum OrganizationUnitEditResultType {
-        None = 0,
         RightsChanged = 1,
         FieldsChanged = 2,
         UnitRelocated = 3,
