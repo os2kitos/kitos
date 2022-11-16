@@ -664,29 +664,12 @@
 
                 unit.children.forEach(child => applyAccessRights(child, accessRights));
             }
-
-            $scope.getNotDraggableClass = (node) => {
-                return isNotDraggable(node) ? "cursorPointer" : "";
-            }
-
-            $scope.isNotDraggable = (node) => isNotDraggable(node);
-
-            function isNotDraggable(node){
-                return node.draggable === false;
-            }
-
-
+            
             $scope.treeOptions = {
                 accept: function(sourceNodeScope, destNodesScope, destIndex) {
                     return !angular.isUndefined(destNodesScope.$parentNodesScope);
 
                 },
-                /*beforeDrag: (sourceNodeScope) => {
-                    if (sourceNodeScope.$modelValue?.draggable === undefined)
-                        return true;
-
-                    return sourceNodeScope.$modelValue?.draggable;
-                },*/
                 dropped: function (e) {
                     var parent = e.dest.nodesScope.$nodeScope;
 

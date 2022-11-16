@@ -272,6 +272,22 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Fact]
+        public void GetAccessRightsByOrganization_Returns_NotFound_When_Organization_Was_NotFound()
+        {
+            //Arrange
+            var orgUuid = A<Guid>();
+
+            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
+
+            //Act
+            var result = _sut.GetAccessRightsByOrganization(orgUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
         public void GetAccessRights_Returns_NotFound_When_Organization_Was_NotFound()
         {
             //Arrange
