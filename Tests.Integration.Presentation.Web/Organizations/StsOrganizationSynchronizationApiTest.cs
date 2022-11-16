@@ -535,8 +535,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             }
             else
             {
-                var childrenToImport = treeToImport.Children.ToList();
-                var importedUnits = importedTree.Children.ToList();
+                var childrenToImport = treeToImport.Children.OrderBy(x=>x.Uuid.ToString()).ToList();
+                var importedUnits = importedTree.Children.OrderBy(x=>x.ExternalOriginUuid.GetValueOrDefault().ToString()).ToList();
                 Assert.Equal(childrenToImport.Count, importedUnits.Count);
                 for (var i = 0; i < childrenToImport.Count; i++)
                 {
