@@ -71,7 +71,7 @@ namespace Core.ApplicationServices.Organizations
                 .Select(orgAndUnit => GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit));
         }
 
-        public Result<IEnumerable<UnitWithAccessRights>, OperationError> GetAccessRightsByOrganization(Guid organizationUuid)
+        public Result<IEnumerable<UnitAccessRightsWithUnitData>, OperationError> GetAccessRightsByOrganization(Guid organizationUuid)
         {
             return _organizationService
                 .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
@@ -83,13 +83,13 @@ namespace Core.ApplicationServices.Organizations
                         return (organization, units);
                     }
                 )
-                .Select<IEnumerable<UnitWithAccessRights>>(orgAndUnits =>
+                .Select<IEnumerable<UnitAccessRightsWithUnitData>>(orgAndUnits =>
                 {
-                    var result = new List<UnitWithAccessRights>();
+                    var result = new List<UnitAccessRightsWithUnitData>();
                     foreach (var unit in orgAndUnits.organizationUnits)
                     {
                         var accessRight = GetAccessRights(orgAndUnits.organization, unit);
-                        result.Add(new UnitWithAccessRights(unit, accessRight));
+                        result.Add(new UnitAccessRightsWithUnitData(unit, accessRight));
                     }
 
                     return result;

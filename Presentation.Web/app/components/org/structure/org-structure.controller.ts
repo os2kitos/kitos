@@ -33,7 +33,7 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitService",
         function ($scope,
             $http: ng.IHttpService,
             $modal,
@@ -46,7 +46,8 @@
             hasWriteAccess,
             authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
             select2LoadingService: Kitos.Services.ISelect2LoadingService,
-            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
+            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -129,6 +130,7 @@
             function loadUnits() {
                 var rootNode = rootNodeOfOrganization;
                 $scope.nodes = [rootNode];
+
 
                 flattenAndSave(rootNode, false, null);
             }
@@ -632,17 +634,59 @@
                 loadRights($scope.chosenOrgUnit);
             });
 
-            $scope.dragEnabled = false;
+            $scope.isReordering = false;
+            $scope.loadingAccessRights = false;
 
             $scope.toggleDrag = function () {
-                $scope.dragEnabled = !$scope.dragEnabled;
+                $scope.isReordering = !$scope.isReordering;
+
+                if ($scope.isReordering) {
+                    $scope.loadingAccessRights = true;
+                    organizationUnitService.getUnitAccessRightsForOrganization(rootNodeOfOrganization.organization.uuid)
+                        .then(response => {
+                            applyAccessRights(rootNodeOfOrganization, response);
+                            $scope.loadingAccessRights = false;
+                        }, error => {
+                            notify.addErrorMessage("Failed to load unit access rights");
+                            console.log(error);
+                            $scope.loadingAccessRights = false;
+                            $scope.isReordering = false;
+                        });
+                }
             };
 
+            function applyAccessRights(unit: Kitos.Models.Api.Organization.IOrganizationUnitDto,
+                accessRights: Kitos.Models.Api.Organization.UnitAccessRightsWithUnitIdDto[]) {
+                var unitAccessRights = accessRights.filter(x => x.unitId === unit.id);
+                if (unitAccessRights.length === 1) {
+                    unit.draggable = unitAccessRights[0].canBeRearranged;
+                }
+
+                unit.children.forEach(child => applyAccessRights(child, accessRights));
+            }
+
+            $scope.getNotDraggableClass = (node) => {
+                return isNotDraggable(node) ? "cursorPointer" : "";
+            }
+
+            $scope.isNotDraggable = (node) => isNotDraggable(node);
+
+            function isNotDraggable(node){
+                return node.draggable === false;
+            }
+
+
             $scope.treeOptions = {
-                accept: function (sourceNodeScope, destNodesScope, destIndex) {
+                accept: function(sourceNodeScope, destNodesScope, destIndex) {
                     return !angular.isUndefined(destNodesScope.$parentNodesScope);
 
                 },
+                /*beforeDrag: (sourceNodeScope) => {
+                    if (sourceNodeScope.$modelValue?.draggable === undefined)
+                        return true;
+
+                    return sourceNodeScope.$modelValue?.draggable;
+                },*/
                 dropped: function (e) {
                     var parent = e.dest.nodesScope.$nodeScope;
 

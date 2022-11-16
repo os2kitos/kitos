@@ -434,7 +434,7 @@
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\TransferOrganizationUnitRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\UnitAccessRightsDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\UnitWithAccessRightsDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\UnitAccessRightsWithUnitIdDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
     <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />

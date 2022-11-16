@@ -2,6 +2,7 @@
 
     export interface IOrganizationUnitService {
         getUnitAccessRights(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.UnitAccessRightsDto>;
+        getUnitAccessRightsForOrganization(orgUuid: string): ng.IPromise<Models.Api.Organization.UnitAccessRightsWithUnitIdDto[]>;
         getRegistrations(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.OrganizationUnitRegistrationDetailsDto>;
         deleteSelectedRegistrations(orgUuid: string, unitUuid: string, body: Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto): angular.IPromise<boolean>;
         deleteOrganizationUnit(organizationId: string, unitUuid: string): angular.IPromise<boolean>;
@@ -12,6 +13,11 @@
         getUnitAccessRights(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.UnitAccessRightsDto> {
             return this.apiWrapper
                 .getDataFromUrl<Models.Api.Organization.UnitAccessRightsDto>(`api/v1/organizations/${orgUuid}/organization-units/${unitUuid}/access-rights`);
+        }
+
+        getUnitAccessRightsForOrganization(orgUuid: string): ng.IPromise<Models.Api.Organization.UnitAccessRightsWithUnitIdDto[]> {
+            return this.apiWrapper
+                .getDataFromUrl<Models.Api.Organization.UnitAccessRightsWithUnitIdDto[]>(`api/v1/organizations/${orgUuid}/organization-units/all/access-rights`);
         }
 
         getRegistrations(orgUuid: string, unitUuid: string): ng.IPromise<Models.Api.Organization.OrganizationUnitRegistrationDetailsDto> {

@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace Core.DomainModel.Organization
+﻿namespace Core.DomainModel.Organization
 {
-    public class UnitWithAccessRights
+    public class UnitAccessRightsWithUnitData
     {
-        public UnitWithAccessRights(OrganizationUnit organizationUnit, UnitAccessRights unitAccessRights)
+        public UnitAccessRightsWithUnitData(OrganizationUnit organizationUnit, UnitAccessRights unitAccessRights)
         {
             OrganizationUnit = organizationUnit;
             UnitAccessRights = unitAccessRights;

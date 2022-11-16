@@ -13,6 +13,7 @@
             CanBeDeleted = canBeDeleted;
         }
 
+        public int UnitId { get; set; }
         public bool CanBeRead { get; }
         public bool CanBeModified { get; }
         public bool CanNameBeModified { get; }

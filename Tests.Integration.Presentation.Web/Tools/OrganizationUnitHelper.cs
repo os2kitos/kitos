@@ -44,7 +44,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await response.ReadResponseBodyAsKitosApiResponseAsync<UnitAccessRightsDTO>();
         }
 
-        public static async Task<List<UnitWithAccessRightsDTO>> GetUnitAccessRightsForOrganization(Guid organizationUuid, Cookie optionalLogin = null)
+        public static async Task<List<UnitAccessRightsWithUnitIdDTO>> GetUnitAccessRightsForOrganization(Guid organizationUuid, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid}/organization-units/all/access-rights");
@@ -53,7 +53,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var res = await response.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsKitosApiResponseAsync<List<UnitWithAccessRightsDTO>>();
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<List<UnitAccessRightsWithUnitIdDTO>>();
         }
     }
 }

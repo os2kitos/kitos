@@ -6,8 +6,8 @@
                 <span class="glyphicon glyphicon-list"></span>
                 <h7 class="panel-title">Organisation</h7>
                 <span class="pull-right">
-                    <a ng-if="hasWriteAccess && !dragEnabled" data-ng-click="toggleDrag()">Omstrukturer</a>
-                    <a ng-if="dragEnabled" data-ng-click="toggleDrag()">Færdig</a>
+                    <a ng-if="hasWriteAccess && !isReordering" data-ng-click="toggleDrag()">Omstrukturer</a>
+                    <a ng-if="isReordering" data-ng-click="toggleDrag()">Færdig</a>
                     <span class="pull-right" data-ng-hide="true || hasWriteAccess">Låst</span>
                     <span data-ng-show="hasWriteAccess">
                         <a data-ng-click="editUnit(chosenOrgUnit)">Rediger</a>
@@ -16,9 +16,10 @@
             </div>
             <div class="panel-body">
                 <script type="text/ng-template" id="nodes_renderer.html">
-                    <div ui-tree-handle ng-click="chooseOrgUnit(node, $event); toggle(this);" class="tree-node tree-node-content"
+                    <div ui-tree-handle ng-click="chooseOrgUnit(node, $event); toggle(this);" data-nodrag="{{node.draggable === false && isReordering}}" class="tree-node tree-node-content"
                          ng-class="{
                                       'selected': node == chosenOrgUnit,
+                                      'nonDragable': !isReordering || (node.draggable === false && isReordering),
                                       'hasWriteAccess': node.hasWriteAccess,
                                       'org-unit-origin-fk-org': showDifferenceBetweenOrgUnitOrigin === true && node.origin === 1
                                     }">
@@ -36,25 +37,30 @@
                         <li collapsed="true" data-ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
                         </li>
                     </ol>
+                
                 </script>
-                <div ui-tree="treeOptions" data-drag-enabled="false" ng-if="!dragEnabled">
-                    <ol ui-tree-nodes="" data-ng-model="nodes" id="tree-root" class="nonDragable">
-                        <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-                    </ol>
-                </div>
-                <div ui-tree="treeOptions" ng-if="dragEnabled">
-                    <ol ui-tree-nodes="" data-ng-model="nodes" id="tree-root">
-                        <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-                    </ol>
-                </div>
-                <div class="org-structure-legend" ng-if="showDifferenceBetweenOrgUnitOrigin">
-                    <div>
-                        <span class="org-structure-legend-color org-structure-legend-color-native-unit"></span> Enheder oprettet i KITOS
+                <div ng-if="!loadingAccessRights">
+                    <div ui-tree="treeOptions" data-drag-enabled="false" ng-if="!isReordering">
+                        <ol ui-tree-nodes="" data-ng-model="nodes" id="tree-root">
+                            <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+                        </ol>
                     </div>
-                    <div>
-                        <span class="org-structure-legend-color org-structure-legend-color-fk-org-unit"></span> Enheder synkroniseret fra FK Organisation
+                    <div ui-tree="treeOptions" ng-if="isReordering">
+                        <ol ui-tree-nodes="" data-ng-model="nodes" id="tree-root">
+                            <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+                        </ol>
+                    </div>
+                    <div class="org-structure-legend" ng-if="showDifferenceBetweenOrgUnitOrigin">
+                        <div>
+                            <span class="org-structure-legend-color org-structure-legend-color-native-unit"></span> Enheder oprettet i KITOS
+                        </div>
+                        <div>
+                            <span class="org-structure-legend-color org-structure-legend-color-fk-org-unit"></span> Enheder synkroniseret fra FK Organisation
+                        </div>
                     </div>
                 </div>
+
+                <span ng-if="loadingAccessRights" class="pull-left"><progress-spinner data-show-text="true" data-custom-text="Loading unit access rights, it might take a while..." /></span>
             </div>
         </div>
     </div>

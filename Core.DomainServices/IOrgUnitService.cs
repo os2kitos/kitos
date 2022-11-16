@@ -12,6 +12,7 @@ namespace Core.DomainServices
         ICollection<OrganizationUnit> GetSubTree(int orgUnitId);
 
         bool DescendsFrom(int descendantUnitId, int ancestorUnitId);
+        bool IsNativeKitosUnit(int unitId);
         IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization);
         Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid);
     }

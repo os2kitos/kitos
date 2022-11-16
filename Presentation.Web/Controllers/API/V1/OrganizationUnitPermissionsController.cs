@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage GetUnitAccessRightsForOrganization(Guid organizationUuid)
         {
             return _organizationUnitService.GetAccessRightsByOrganization(organizationUuid)
-                .Select(ToUnitWithAccessRightsDtoAccessRightsDto)
+                .Select(x => ToUnitAccessRightsDtoWithUnitIdDtos(x).ToList())
                 .Match(Ok, FromOperationError);
         }
 
@@ -60,11 +60,11 @@ namespace Presentation.Web.Controllers.API.V1
                 accessRights.CanBeDeleted);
         }
 
-        private static IEnumerable<UnitWithAccessRightsDTO> ToUnitWithAccessRightsDtoAccessRightsDto(
-            IEnumerable<UnitWithAccessRights> accessRights)
+        private static IEnumerable<UnitAccessRightsWithUnitIdDTO> ToUnitAccessRightsDtoWithUnitIdDtos(
+            IEnumerable<UnitAccessRightsWithUnitData> accessRights)
         {
             return accessRights.Select(x =>
-                new UnitWithAccessRightsDTO(
+                new UnitAccessRightsWithUnitIdDTO(
                     x.OrganizationUnit.Id,
                     x.UnitAccessRights.CanBeRead,
                     x.UnitAccessRights.CanBeModified,
