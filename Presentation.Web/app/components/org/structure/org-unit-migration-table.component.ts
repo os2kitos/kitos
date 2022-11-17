@@ -117,16 +117,16 @@
                 .then(() => {
                     this.stateParameters.registrationsChanged();
 
-                    this.options.refreshData();
-                    this.options.setIsBusy(false);
-                },
-                error => {
-                    console.log(error);
-                    this.notify.addErrorMessage("Failed to deleted the selected unit");
-                    this.options.setIsBusy(false);
-                });
-
-            this.options.setIsBusy(false);
+                    return this.options.refreshData();
+                })
+                .then(
+                    () => this.options.setIsBusy(false),
+                    error => {
+                        console.error(error);
+                        this.notify.addErrorMessage("Failed to deleted the selected unit");
+                        this.options.setIsBusy(false);
+                    }
+                );
         }
 
         private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {

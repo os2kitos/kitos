@@ -20,7 +20,7 @@
         root: IOrganizationUnitMigrationRoot;
         selectedRegistrationChanged?: () => void;
         selectedRegistrationGroupChanged?: (root: IOrganizationUnitMigrationRoot) => void;
-        refreshData: () => void;
+        refreshData: () => ng.IPromise<void>;
         checkIsBusy: () => boolean;
         setIsBusy: (value: boolean) => void;
         type: Models.ViewModel.Organization.OrganizationRegistrationOption;
@@ -115,15 +115,16 @@
             this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.stateParameters.registrationsChanged();
-
-                    this.refreshData();
-                    this.setIsBusy(false);
-                },
-                error => {
-                    console.error(error);
-                    this.notify.addErrorMessage("Delete selected failed");
-                    this.setIsBusy(false);
-                });
+                    return this.refreshData();
+                })
+                .then(
+                    () => this.setIsBusy(false),
+                    error => {
+                        console.error(error);
+                        this.notify.addErrorMessage("Delete selected failed");
+                        this.setIsBusy(false);
+                    }
+                );
         }
 
         transfer() {
@@ -144,13 +145,16 @@
                     this.selectedOrg = null;
                     this.stateParameters.registrationsChanged();
 
-                    this.refreshData();
-                    this.setIsBusy(false);
-                }, error => {
-                    console.log(error);
-                    this.notify.addErrorMessage("Transfer failed");
-                    this.setIsBusy(false);
-                });
+                    return this.refreshData();
+                })
+                .then(
+                    () => this.setIsBusy(false),
+                    error => {
+                        console.error(error);
+                        this.notify.addErrorMessage("Transfer failed");
+                        this.setIsBusy(false);
+                    }
+                );
         }
 
         setSelectedOrg() {
@@ -325,8 +329,8 @@
             });
         }
 
-        private refreshData() {
-            this.getData()
+        private refreshData(): ng.IPromise<void> {
+            return this.getData()
                 .then(() => this.updateAnySelections());
         }
 
