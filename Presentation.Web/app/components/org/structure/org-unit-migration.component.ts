@@ -121,7 +121,6 @@
                     () => this.setIsBusy(false),
                     error => {
                         console.error(error);
-                        this.notify.addErrorMessage("Delete selected failed");
                         this.setIsBusy(false);
                     }
                 );
@@ -144,14 +143,12 @@
                 .then(() => {
                     this.selectedOrg = null;
                     this.stateParameters.registrationsChanged();
-
                     return this.refreshData();
                 })
                 .then(
                     () => this.setIsBusy(false),
                     error => {
                         console.error(error);
-                        this.notify.addErrorMessage("Transfer failed");
                         this.setIsBusy(false);
                     }
                 );

@@ -49,8 +49,7 @@
         columnTypes = MigrationTableColumnType;
         
         static $inject: string[] = ["organizationUnitService", "notify"];
-        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
-            private readonly notify) {
+        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService) {
         }
 
         $onInit() {
@@ -116,14 +115,12 @@
             this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
                     this.stateParameters.registrationsChanged();
-
                     return this.options.refreshData();
                 })
                 .then(
                     () => this.options.setIsBusy(false),
                     error => {
                         console.error(error);
-                        this.notify.addErrorMessage("Failed to deleted the selected unit");
                         this.options.setIsBusy(false);
                     }
                 );
