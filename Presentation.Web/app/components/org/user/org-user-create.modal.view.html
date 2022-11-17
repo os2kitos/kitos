@@ -127,7 +127,7 @@
 </div>
 <div class="modal-footer">
     <button class="btn btn-success" data-ng-show="emailExists" data-ng-disabled="userExists && emailExists" data-ng-click="ctrl.attachUser()">Tilknyt bruger</button>
-    <button class="btn btn-primary" data-ng-hide="emailExists" data-ng-click="ctrl.create(false)" data-ng-disabled="ctrl.createUser.form.$invalid || ctrl.createUser.form.$pristine || ctrl.busy" data-disabled-on-busy="">Opret bruger</button>
-    <button class="btn btn-success" data-ng-hide="emailExists" data-ng-click="ctrl.create(true)" data-ng-disabled="ctrl.createUser.form.$invalid || ctrl.createUser.form.$pristine || ctrl.busy" data-disabled-on-busy="">Opret bruger og send advis</button>
+    <button class="btn btn-primary" data-ng-hide="emailExists" data-ng-click="ctrl.create(false)" data-ng-disabled="createUser.form.$invalid || createUser.form.$pristine || ctrl.busy" data-disabled-on-busy="">Opret bruger</button>
+    <button class="btn btn-success" data-ng-hide="emailExists" data-ng-click="ctrl.create(true)" data-ng-disabled="createUser.form.$invalid || createUser.form.$pristine || ctrl.busy" data-disabled-on-busy="">Opret bruger og send advis</button>
     <button class="btn btn-warning" data-ng-click="ctrl.cancel()" data-ng-disabled="ctrl.busy" data-disabled-on-busy="">Annuller</button>
 </div>
