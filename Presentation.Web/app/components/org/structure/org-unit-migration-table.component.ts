@@ -116,8 +116,6 @@
                     this.notify.addErrorMessage("Failed to deleted the selected unit");
                     this.options.setIsBusy(false);
                 });
-
-            this.options.setIsBusy(false);
         }
 
         private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {

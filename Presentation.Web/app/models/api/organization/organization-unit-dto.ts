@@ -10,6 +10,5 @@
         externalOriginUuid: string | null;
         organization?: IOrganizationDto;
         children?: IOrganizationUnitDto[];
-        draggable?: boolean;
     }
 }

@@ -39,7 +39,7 @@
             $modal,
             $state,
             notify,
-            rootNodeOfOrganization: Kitos.Models.Api.Organization.IOrganizationUnitDto,
+            rootNodeOfOrganization: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
             localOrgUnitRoles,
             orgUnitRoles,
             user,
@@ -130,7 +130,6 @@
             function loadUnits() {
                 var rootNode = rootNodeOfOrganization;
                 $scope.nodes = [rootNode];
-
 
                 flattenAndSave(rootNode, false, null);
             }
@@ -647,7 +646,7 @@
                             applyAccessRights(rootNodeOfOrganization, response);
                             $scope.loadingAccessRights = false;
                         }, error => {
-                            notify.addErrorMessage("Failed to load unit access rights");
+                            notify.addErrorMessage("Kunne ikke indlæse rettighederne for organisationsenheden");
                             console.log(error);
                             $scope.loadingAccessRights = false;
                             $scope.isReordering = false;
@@ -655,9 +654,9 @@
                 }
             };
 
-            function applyAccessRights(unit: Kitos.Models.Api.Organization.IOrganizationUnitDto,
+            function applyAccessRights(unit: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
                 accessRights: Kitos.Models.Api.Organization.UnitAccessRightsWithUnitIdDto[]) {
-                var unitAccessRights = accessRights.filter(x => x.unitId === unit.id);
+                const unitAccessRights = accessRights.filter(x => x.unitId === unit.id);
                 if (unitAccessRights.length === 1) {
                     unit.draggable = unitAccessRights[0].canBeRearranged;
                 }

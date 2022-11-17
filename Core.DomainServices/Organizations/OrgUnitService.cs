@@ -37,17 +37,6 @@ namespace Core.DomainServices.Organizations
             return unit.SearchAncestry(ancestor => ancestor.Id == ancestorUnitId).HasValue;
         }
 
-        public bool IsNativeKitosUnit(int unitId)
-        {
-            var unit = _orgUnitRepository.GetByKey(unitId);
-            if (unit == null)
-            {
-                throw new ArgumentException($"Invalid org unit id:{unitId}");
-            }
-
-            return unit.IsNativeKitosUnit();
-        }
-
         public IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization)
         {
             return _orgUnitRepository.AsQueryable().ByOrganizationId(organization.Id);
