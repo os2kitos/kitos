@@ -190,6 +190,7 @@ namespace Presentation.Web
             CreateMap<Organization, OrganizationSimpleDTO>();
 
             CreateMap<OrganizationUnit, OrgUnitDTO>()
+                  .ForMember(dest => dest.Children, opt => opt.MapFrom(unit => unit.Children.OrderBy(child => child.Name).ToList()))
                   .ReverseMap()
                   .ForMember(dest => dest.Children, opt => opt.Ignore())
                   .IgnoreDestinationEntityFields();
@@ -274,7 +275,7 @@ namespace Presentation.Web
             //Output only - this mapping should not be reversed
             CreateMap<ItContract, ItContractSystemDTO>()
                 .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)));
-            
+
             CreateMap<EconomyStream, EconomyStreamDTO>()
                 .ReverseMap()
                 .IgnoreDestinationEntityFields();

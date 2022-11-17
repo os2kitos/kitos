@@ -119,6 +119,9 @@ namespace Presentation.Web.Controllers.API.V1
             return new ConnectionUpdateConsequencesResponseDTO
             {
                 Consequences = dtos
+                    .OrderBy(x => x.Name)
+                    .ThenBy(x => x.Category)
+                    .ToList()
             };
         }
 
@@ -207,7 +210,11 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 Uuid = organizationUnit.Uuid,
                 Name = organizationUnit.Name,
-                Children = organizationUnit.Children.Select(MapOrganizationUnitDTO).ToList()
+                Children = organizationUnit
+                    .Children
+                    .OrderBy(x => x.Name)
+                    .Select(MapOrganizationUnitDTO)
+                    .ToList()
             };
         }
         #endregion DTO Mapping
