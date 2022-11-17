@@ -8,7 +8,8 @@
                 options: "<",
                 configuration: "<",
                 unitUuid: "@",
-                organizationUuid: "@"
+                organizationUuid: "@",
+                stateParameters: "<"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -34,6 +35,7 @@
         configuration: IMigrationTableColumn[];
         unitUuid: string;
         organizationUuid: string;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
@@ -42,12 +44,12 @@
         configuration: IMigrationTableColumn[] | null = null;
         unitUuid: string | null = null;
         organizationUuid: string | null = null;
+        stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters | null = null;
         root: IOrganizationUnitMigrationRoot;
         columnTypes = MigrationTableColumnType;
         
         static $inject: string[] = ["organizationUnitService", "notify"];
-        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
-            private readonly notify) {
+        constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService) {
         }
 
         $onInit() {
@@ -69,6 +71,10 @@
             }
             if (this.organizationUuid === null) {
                 console.error(`missing migration table attribute: 'organizationId' for table with title: ${this.title}`);
+                return;
+            }
+            if (this.stateParameters === null) {
+                console.error(`missing migration table attribute: 'stateParameters' for table with title: ${this.title}`);
                 return;
             }
 
@@ -108,16 +114,16 @@
 
             this.organizationUnitService.deleteSelectedRegistrations(this.organizationUuid, this.unitUuid, request)
                 .then(() => {
-                    this.options.refreshData();
-                    this.options.setIsBusy(false);
-                },
-                error => {
-                    console.log(error);
-                    this.notify.addErrorMessage("Failed to deleted the selected unit");
-                    this.options.setIsBusy(false);
-                });
-
-            this.options.setIsBusy(false);
+                    this.stateParameters.registrationsChanged();
+                    return this.options.refreshData();
+                })
+                .then(
+                    () => this.options.setIsBusy(false),
+                    error => {
+                        console.error(error);
+                        this.options.setIsBusy(false);
+                    }
+                );
         }
 
         private createChangeRequest(request: Models.ViewModel.Organization.IOrganizationUnitRegistration): Models.Api.Organization.OrganizationUnitRegistrationChangeRequestDto {
