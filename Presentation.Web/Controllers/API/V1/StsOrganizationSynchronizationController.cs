@@ -107,6 +107,13 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(FromOperationError, Ok);
         }
 
+        [HttpGet]
+        [Route("changelog")]
+        public HttpResponseMessage GetChangelog(Guid organizationId)
+        {
+            return Ok(new List<StsOrganizationChangelogDTO>());
+        }
+
         #region DTO Mapping
         private static ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
         {

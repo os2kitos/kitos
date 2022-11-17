@@ -91,6 +91,7 @@
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
+    <Compile Include="Organization\ConnectionUpdateOrganizationUnitChangeType.cs" />
     <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
     <Compile Include="Organization\OrganizationTreeUpdateConsequences.cs" />
     <Compile Include="Organization\OrganizationUnitRegistrationDetails.cs" />
@@ -98,8 +99,10 @@
     <Compile Include="Organization\Strategies\IExternalOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\Strategies\StsOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\PaymentRegistrationDetails.cs" />
+    <Compile Include="Organization\StsOrganizationChangelog.cs" />
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />
+    <Compile Include="Organization\StsOrganizationConsequenceLog.cs" />
     <Compile Include="Organization\UnitAccessRights.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />

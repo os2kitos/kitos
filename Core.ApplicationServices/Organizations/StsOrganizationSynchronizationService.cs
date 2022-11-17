@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -155,11 +156,15 @@ namespace Core.ApplicationServices.Organizations
                         }
                         return consequences;
                     })
+                    .Select(consequences =>
+                    {
+                        LogChanges(organization.StsOrganizationConnection, consequences);
+                        return consequences;
+                    })
                     .Match(_ => Maybe<OperationError>.None, error => error)
             );
         }
-
-
+        
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {
             return _stsOrganizationUnitService.ResolveOrganizationTree(organization).Match<Result<ExternalOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
@@ -220,6 +225,102 @@ namespace Core.ApplicationServices.Organizations
             transaction.Commit();
 
             return Maybe<OperationError>.None;
+        }
+
+        private static void LogChanges(StsOrganizationConnection connection, OrganizationTreeUpdateConsequences consequences)
+        {
+            var logs = new List<StsOrganizationConsequenceLog>();
+            logs.AddRange(MapAddedOrganizationUnits(consequences));
+            logs.AddRange(MapRenamedOrganizationUnits(consequences));
+            logs.AddRange(MapMovedOrganizationUnits(consequences));
+            logs.AddRange(MapRemovedOrganizationUnits(consequences));
+            logs.AddRange(MapConvertedOrganizationUnits(consequences));
+
+            var changelog = new StsOrganizationChangelog
+            {
+                Consequences = logs
+            };
+
+            connection.StsOrganizationChangelogs.Add(changelog);
+        }
+
+        private static IEnumerable<StsOrganizationConsequenceLog> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .DeletedExternalUnitsBeingConvertedToNativeUnits
+                .Select(converted => new StsOrganizationConsequenceLog
+                {
+                    Name = converted.Name,
+                    Type = ConnectionUpdateOrganizationUnitChangeType.Converted,
+                    Uuid = converted.ExternalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{converted.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<StsOrganizationConsequenceLog> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .DeletedExternalUnitsBeingDeleted
+                .Select(deleted => new StsOrganizationConsequenceLog
+                {
+                    Name = deleted.Name,
+                    Type = ConnectionUpdateOrganizationUnitChangeType.Deleted,
+                    Uuid = deleted.ExternalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{deleted.Name}' slettes."
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<StsOrganizationConsequenceLog> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .OrganizationUnitsBeingMoved
+                .Select(moved =>
+                {
+                    var (movedUnit, oldParent, newParent) = moved;
+                    return new StsOrganizationConsequenceLog
+                    {
+                        Name = movedUnit.Name,
+                        Type = ConnectionUpdateOrganizationUnitChangeType.Moved,
+                        Uuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        Description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
+                    };
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<StsOrganizationConsequenceLog> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .OrganizationUnitsBeingRenamed
+                .Select(renamed =>
+                {
+                    var (affectedUnit, oldName, newName) = renamed;
+                    return new StsOrganizationConsequenceLog
+                    {
+                        Name = oldName,
+                        Type = ConnectionUpdateOrganizationUnitChangeType.Renamed,
+                        Uuid = affectedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        Description = $"'{oldName}' omdøbes til '{newName}'"
+                    };
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<StsOrganizationConsequenceLog> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        {
+            return consequences
+                .AddedExternalOrganizationUnits
+                .Select(added => new StsOrganizationConsequenceLog
+                {
+                    Name = added.unitToAdd.Name,
+                    Type = ConnectionUpdateOrganizationUnitChangeType.Added,
+                    Uuid = added.unitToAdd.Uuid,
+                    Description = $"'{added.unitToAdd.Name}' tilføjes som underenhed til '{added.parent.Name}'"
+                }
+                )
+                .ToList();
         }
     }
 }

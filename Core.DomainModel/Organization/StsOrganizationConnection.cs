@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.Organization.Strategies;
 
 namespace Core.DomainModel.Organization
@@ -9,6 +10,11 @@ namespace Core.DomainModel.Organization
     /// </summary>
     public class StsOrganizationConnection : Entity, IOwnedByOrganization
     {
+        public StsOrganizationConnection()
+        {
+            StsOrganizationChangelogs = new List<StsOrganizationChangelog>();
+        }
+
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
         public bool Connected { get; set; }
@@ -16,7 +22,8 @@ namespace Core.DomainModel.Organization
         /// Determines the optional synchronization depth used during synchronization from STS Organisation
         /// </summary>
         public int? SynchronizationDepth { get; set; }
-        //TODO https://os2web.atlassian.net/browse/KITOSUDV-3317 adds the change logs here
+        public ICollection<StsOrganizationChangelog> StsOrganizationChangelogs { get; set; }
+
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3312 adds automatic subscription here
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
