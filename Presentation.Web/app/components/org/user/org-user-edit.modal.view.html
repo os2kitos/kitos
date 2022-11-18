@@ -15,7 +15,6 @@
                 <div ng-messages="editUser.form.email.$error" ng-if="editUser.form.email.$invalid" class="color-maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Email is required.</div>
                     <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
-                    <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
                 </div>
             </div>
         </div>
@@ -27,7 +26,6 @@
                 <input type="text" name="name" id="name" data-ng-model="ctrl.vm.name" class="form-control" data-ng-required="true" data-disabled-on-busy maxlength="100">
                 <div ng-messages="editUser.form.name.$error" ng-if="editUser.form.name.$invalid" class="color-maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Name is required.</div>
-                    <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
                 </div>
             </div>
         </div>
@@ -39,7 +37,6 @@
                 <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.vm.lastName" class="form-control" data-ng-required="true" data-disabled-on-busy maxlength="100">
                 <div ng-messages="editUser.form.lastName.$error" ng-if="editUser.form.lastName.$invalid" class="color-maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Last name is required.</div>
-                    <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
                 </div>
             </div>
         </div>
