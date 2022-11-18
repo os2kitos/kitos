@@ -10,6 +10,7 @@ using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Context;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
@@ -31,7 +32,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IDatabaseControl> _dbControlMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
-        private Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
+        private readonly Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
+        private readonly Mock<Maybe<ActiveUserIdContext>> _activeUserIdContextMock;
+        private readonly Mock<IUserRepository> _userRepositoryMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -43,6 +46,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _transactionManagerMock = new Mock<ITransactionManager>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
+            _activeUserIdContextMock = new Mock<Maybe<ActiveUserIdContext>>();
+            _userRepositoryMock = new Mock<IUserRepository>();
+
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
                 _stsOrganizationUnitService.Object,
@@ -52,8 +58,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _dbControlMock.Object,
                 _transactionManagerMock.Object,
                 _domainEventsMock.Object,
-                _organizationUnitRepositoryMock.Object
-            );
+                _organizationUnitRepositoryMock.Object,
+                _activeUserIdContextMock.Object,
+                _userRepositoryMock.Object
+                );
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

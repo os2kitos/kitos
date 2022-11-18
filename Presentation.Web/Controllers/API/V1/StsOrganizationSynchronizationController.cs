@@ -6,6 +6,7 @@ using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
 
@@ -95,8 +96,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPut]
         [Route("connection")]
-        //TODO: Update frontend to pass the UserUuid
-        public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] UpdateConnectionToStsOrganizationRequestDTO request)
+        public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
             if (!ModelState.IsValid)
             {
@@ -104,21 +104,23 @@ namespace Presentation.Web.Controllers.API.V1
             }
 
             return _stsOrganizationSynchronizationService
-                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request?.UserUuid)
+                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType().Value)
                 .Match(FromOperationError, Ok);
         }
 
         [HttpGet]
-        [Route("changelog")]
-        public HttpResponseMessage GetChangelog(Guid organizationId)
+        [Route("changelog/{numberOfLastChangeLogs}")]
+        public HttpResponseMessage GetLastNumberOfChangeLogsForOrganization(Guid organizationId, int numberOfLastChangeLogs)
         {
-            return Ok(new List<StsOrganizationChangelogDTO>());
+            return _stsOrganizationSynchronizationService.GetChangeLogForOrganization(organizationId, numberOfLastChangeLogs)
+                .Select(MapChangeLogResponseDtoIEnumerable)
+                .Match(Ok, FromOperationError);
         }
 
         #region DTO Mapping
         private static ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
         {
-            var dtos = new List<ConnectionUpdateOrganizationUnitConsequenceDTO>();
+            var dtos = new List<ConnectionUpdateOrganizationUnitConsequenceResponseDTO>();
             dtos.AddRange(MapAddedOrganizationUnits(consequences));
             dtos.AddRange(MapRenamedOrganizationUnits(consequences));
             dtos.AddRange(MapMovedOrganizationUnits(consequences));
@@ -133,11 +135,11 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
 
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .DeletedExternalUnitsBeingConvertedToNativeUnits
-                .Select(converted => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                .Select(converted => new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
                 {
                     Name = converted.Name,
                     Category = ConnectionUpdateOrganizationUnitChangeCategory.Converted,
@@ -147,11 +149,11 @@ namespace Presentation.Web.Controllers.API.V1
                 .ToList();
         }
 
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .DeletedExternalUnitsBeingDeleted
-                .Select(deleted => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                .Select(deleted => new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
                 {
                     Name = deleted.Name,
                     Category = ConnectionUpdateOrganizationUnitChangeCategory.Deleted,
@@ -161,14 +163,14 @@ namespace Presentation.Web.Controllers.API.V1
                 .ToList();
         }
 
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .OrganizationUnitsBeingMoved
                 .Select(moved =>
                 {
                     var (movedUnit, oldParent, newParent) = moved;
-                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
+                    return new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
                     {
                         Name = movedUnit.Name,
                         Category = ConnectionUpdateOrganizationUnitChangeCategory.Moved,
@@ -179,14 +181,14 @@ namespace Presentation.Web.Controllers.API.V1
                 .ToList();
         }
 
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .OrganizationUnitsBeingRenamed
                 .Select(renamed =>
                 {
                     var (affectedUnit, oldName, newName) = renamed;
-                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
+                    return new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
                     {
                         Name = oldName,
                         Category = ConnectionUpdateOrganizationUnitChangeCategory.Renamed,
@@ -197,11 +199,11 @@ namespace Presentation.Web.Controllers.API.V1
                 .ToList();
         }
 
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .AddedExternalOrganizationUnits
-                .Select(added => new ConnectionUpdateOrganizationUnitConsequenceDTO
+                .Select(added => new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
                 {
                     Name = added.unitToAdd.Name,
                     Category = ConnectionUpdateOrganizationUnitChangeCategory.Added,
@@ -224,6 +226,14 @@ namespace Presentation.Web.Controllers.API.V1
                     .Select(MapOrganizationUnitDTO)
                     .ToList()
             };
+        }
+        private static IEnumerable<StsOrganizationChangeLogResponseDTO> MapChangeLogResponseDtoIEnumerable(IEnumerable<StsOrganizationChangeLog> logs)
+        {
+            return logs.Select(MapChangeLogResponseDto).ToList();
+        }
+        private static StsOrganizationChangeLogResponseDTO MapChangeLogResponseDto(StsOrganizationChangeLog log)
+        {
+            return new StsOrganizationChangeLogResponseDTO(log.Origin.ToStsOrganizationChangeLogOriginOption(), log.Name, log.LogTime, log.ConsequenceLogs);
         }
         #endregion DTO Mapping
     }

@@ -39,5 +39,13 @@ namespace Core.DomainModel.Organization
         {
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
+
+        public IEnumerable<StsOrganizationChangeLog> GetLastNumberOfChangeLogs(int number)
+        {
+            return StsOrganizationChangeLogs
+                .OrderByDescending(x => x.LogTime)
+                .Take(number)
+                .ToList();
+        }
     }
 }

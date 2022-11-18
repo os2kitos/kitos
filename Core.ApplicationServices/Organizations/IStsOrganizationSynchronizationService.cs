@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
@@ -46,6 +47,13 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="organizationId"></param>
         /// <param name="levelsToInclude"></param>
         /// <returns></returns>
-        Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, Guid? userUuid = null);
+        Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude);
+        /// <summary>
+        /// Gets the last x change logs for the organization
+        /// </summary>
+        /// <param name="organizationUuid"></param>
+        /// <param name="numberOfLastChangeLogs"></param>
+        /// <returns></returns>
+        Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogForOrganization(Guid organizationUuid, int numberOfLastChangeLogs);
     }
 }

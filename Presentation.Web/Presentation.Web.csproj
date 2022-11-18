@@ -405,6 +405,7 @@
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
@@ -421,7 +422,7 @@
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitConsequenceDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitConsequenceResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateConsequencesResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitChangeCategory.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistrationRequestDTO.cs" />
@@ -430,11 +431,11 @@
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationUnitDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangelogDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogOriginOption.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\TransferOrganizationUnitRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\UnitAccessRightsDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\UpdateConnectionToStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Users\AssignedRightDTO.cs" />
     <Compile Include="Models\API\V1\Users\OrganizationUserRoleAssignmentsDTO.cs" />
     <Compile Include="Models\API\V1\Users\RemoveUserRightsRequest.cs" />
