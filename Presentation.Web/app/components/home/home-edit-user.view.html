@@ -50,6 +50,7 @@
                     <input type="text" id="usermail" name="email" data-ng-model="user.email" data-ng-required="true" class="form-control" data-ng-blur="patch(emailFieldName, user.email)" />
                     <div ng-messages="profileForm.email.$error" ng-if="profileForm.email.$invalid" class="color-maroon" role="alert">
                         <div ng-message="required" style="margin:5px 0">Email is required.</div>
+                        <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
                     </div>
                 </div>
                 <div>

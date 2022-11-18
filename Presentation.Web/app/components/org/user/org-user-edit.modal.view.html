@@ -14,6 +14,7 @@
                 <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" data-ng-required="true" data-disabled-on-busy maxlength="100">
                 <div ng-messages="editUser.form.email.$error" ng-if="editUser.form.email.$invalid" class="color-maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Email is required.</div>
+                    <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
                     <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
                 </div>
             </div>

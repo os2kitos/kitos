@@ -14,6 +14,7 @@
                 <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" ng-required="true" data-unique-org-user data-unique-email autofocus data-ng-disabled="ctrl.busy" maxlength="100">
                 <div ng-messages="createUser.form.email.$error" ng-if="createUser.form.email.$invalid" class="color-maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Email is required.</div>
+                    <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
                     <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
                 </div>
             </div>
@@ -24,8 +25,11 @@
             </label>
             <div class="col-xs-8">
                 <input type="email" name="repeatEmail" id="repeatEmail" data-ng-model="ctrl.repeatEmail" class="form-control" data-match="ctrl.vm.email" data-ng-required="true" data-ng-disabled="ctrl.busy" maxlength="100">
+                <div>{{createUser.form.repeatEmail.$error}}</div>
                 <div ng-messages="createUser.form.repeatEmail.$error" ng-if="createUser.form.repeatEmail.$invalid" class="color-maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Repeat email is required.</div>
+                    <div ng-message="unique" style="margin:5px 0">Emails differ.</div>
+                    <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
                     <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
                 </div>
             </div>
