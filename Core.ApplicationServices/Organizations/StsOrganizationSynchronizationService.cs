@@ -83,7 +83,7 @@ namespace Core.ApplicationServices.Organizations
                     .Bind(root => FilterByRequestedLevels(root, levelsToInclude));
         }
 
-        public Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude)
+        public Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return Modify(organizationId, organization =>
             {
@@ -92,7 +92,7 @@ namespace Core.ApplicationServices.Organizations
                     (
                         importRoot =>
                         {
-                            var error = organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
+                            var error = organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude, subscribeToUpdates);
                             if (error.HasValue)
                             {
                                 _logger.Error("Failed to import org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Value.FailureType, error.Value.Message.GetValueOrFallback(""));
@@ -138,11 +138,11 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
-        public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude)
+        public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return Modify(organizationId, organization =>
                 LoadOrganizationUnits(organization)
-                    .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude))
+                    .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude, subscribeToUpdates))
                     .Select(consequences =>
                     {
                         if (consequences.DeletedExternalUnitsBeingDeleted.Any())

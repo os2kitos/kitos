@@ -31,7 +31,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _sut.StsOrganizationConnection = new StsOrganizationConnection() { Connected = true };
 
             //Act
-            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, CreateExternalOrganizationUnit(), Maybe<int>.None);
+            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, CreateExternalOrganizationUnit(), Maybe<int>.None,false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -54,7 +54,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             );
 
             //Act
-            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, Maybe<int>.None);
+            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, Maybe<int>.None, false);
 
             //Assert
             Assert.False(error.HasValue);
@@ -82,7 +82,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             );
 
             //Act
-            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, importedLevels);
+            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, importedLevels, false);
 
             //Assert
             Assert.False(error.HasValue);

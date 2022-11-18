@@ -216,7 +216,11 @@ namespace Core.DomainModel.Organization
             return strategy.ComputeUpdate(filteredTree);
         }
 
-        public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(
+            OrganizationUnitOrigin origin,
+            ExternalOrganizationUnit root,
+            Maybe<int> levelsIncluded,
+            bool subscribeToUpdates)
         {
             if (root == null)
             {
@@ -253,6 +257,7 @@ namespace Core.DomainModel.Organization
                     {
                         StsOrganizationConnection ??= new StsOrganizationConnection();
                         StsOrganizationConnection.Connected = true;
+                        StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
                         StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
                         return Maybe<OperationError>.None;
                     }
@@ -277,7 +282,11 @@ namespace Core.DomainModel.Organization
             }
         }
 
-        public Result<OrganizationTreeUpdateConsequences, OperationError> UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        public Result<OrganizationTreeUpdateConsequences, OperationError> UpdateConnectionToExternalOrganizationHierarchy(
+            OrganizationUnitOrigin origin,
+            ExternalOrganizationUnit root,
+            Maybe<int> levelsIncluded,
+            bool subscribeToUpdates)
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
@@ -301,6 +310,7 @@ namespace Core.DomainModel.Organization
             var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
             var filteredTree = root.Copy(childLevelsToInclude);
             StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
+            StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
 
             return strategy.PerformUpdate(filteredTree);
         }

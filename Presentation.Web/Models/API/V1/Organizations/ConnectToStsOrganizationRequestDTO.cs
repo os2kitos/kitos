@@ -6,5 +6,6 @@ namespace Presentation.Web.Models.API.V1.Organizations
     {
         [Range(1, int.MaxValue)]
         public int? SynchronizationDepth { get; set; }
+        public bool? SubscribeToUpdates { get; set; }
     }
 }

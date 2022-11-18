@@ -64,8 +64,13 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest(ModelState);
             }
 
+            if (request == null)
+            {
+                return BadRequest("Invalid request body");
+            }
+
             return _stsOrganizationSynchronizationService
-                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
                 .Match(FromOperationError, Ok);
         }
 
@@ -102,8 +107,13 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest(ModelState);
             }
 
+            if (request == null)
+            {
+                return BadRequest("Invalid request body");
+            }
+
             return _stsOrganizationSynchronizationService
-                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
                 .Match(FromOperationError, Ok);
         }
 

@@ -199,7 +199,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, onlyRoot ? 1 : Maybe<int>.None);
+            var error = _sut.Connect(organizationId, onlyRoot ? 1 : Maybe<int>.None, false);
 
             //Assert
             Assert.False(error.HasValue);
@@ -232,7 +232,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -253,7 +253,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -274,7 +274,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -319,7 +319,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, newDepth);
+            var error = _sut.UpdateConnection(organizationId, newDepth, false);
 
             //Assert
             Assert.False(error.HasValue);
@@ -354,7 +354,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -382,7 +382,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -408,7 +408,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -434,7 +434,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
