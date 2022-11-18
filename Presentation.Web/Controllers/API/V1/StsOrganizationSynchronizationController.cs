@@ -41,6 +41,7 @@ namespace Presentation.Web.Controllers.API.V1
                 .Select(details => new StsOrganizationSynchronizationDetailsResponseDTO
                 {
                     Connected = details.Connected,
+                    SubscribesToUpdates = details.SubscribesToUpdates,
                     SynchronizationDepth = details.SynchronizationDepth,
                     CanCreateConnection = details.CanCreateConnection,
                     CanDeleteConnection = details.CanDeleteConnection,

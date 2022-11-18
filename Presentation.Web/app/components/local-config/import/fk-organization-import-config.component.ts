@@ -28,6 +28,7 @@
 
     interface IFkOrganizationSynchronizationStatus {
         connected: boolean
+        subscribesToUpdates : boolean
         synchronizationDepth: number | null
     }
 
@@ -147,7 +148,8 @@
         private bindSynchronizationStatus(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
             this.synchronizationStatus = {
                 connected: result.connected,
-                synchronizationDepth: result.synchronizationDepth
+                synchronizationDepth: result.synchronizationDepth,
+                subscribesToUpdates: result.subscribesToUpdates
             };
         }
 

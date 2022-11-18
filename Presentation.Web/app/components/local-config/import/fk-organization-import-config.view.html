@@ -17,10 +17,14 @@
     <div id="sync-status">
         <span ng-if="ctrl.synchronizationStatus.connected">
             Organisationen er forbundet til FK Organisation
-        </span>
-        <span class="help-block small" ng-if="ctrl.synchronizationStatus.synchronizationDepth !== null">
-            <i class="fa fa-info-circle" aria-hidden="true"></i>
-            KITOS er forbundet i <strong>"{{::ctrl.synchronizationStatus.synchronizationDepth}}"</strong> niveauer fra FK Organisation.
+            <ul>
+                <li>
+                    Niveauer der synkroniseres: <strong>{{::ctrl.synchronizationStatus.synchronizationDepth === null ? 'Alle' : ctrl.synchronizationStatus.synchronizationDepth}}</strong>
+                </li>
+                <li>
+                    Importerer automatisk (dagligt) ændringer fra FK Organisation: <strong>{{::ctrl.synchronizationStatus.subscribesToUpdates ? 'Ja' : 'Nej'}}</strong>
+                </li>
+            </ul>
         </span>
         <span ng-if="!ctrl.synchronizationStatus.connected">Organisationen er <strong>ikke</strong> forbundet til FK Organisation</span>
     </div>
