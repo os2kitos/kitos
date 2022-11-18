@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI.WebControls;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -56,7 +57,7 @@ namespace Core.ApplicationServices.Organizations
         {
             return _organizationService
                 .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Bind<(Organization organization,OrganizationUnit organizationUnit)>
+                .Bind<(Organization organization, OrganizationUnit organizationUnit)>
                 (
                     organization =>
                     {
@@ -65,10 +66,31 @@ namespace Core.ApplicationServices.Organizations
                         {
                             return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
                         }
-                        return (organization,unit.Value);
+                        return (organization, unit.Value);
                     }
                 )
                 .Select(orgAndUnit => GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit));
+        }
+
+        public Result<IEnumerable<UnitAccessRightsWithUnitData>, OperationError> GetAccessRightsByOrganization(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select
+                (
+                    organization =>
+                    {
+                        var units = organization.GetAllOrganizationUnits();
+                        return (organization, units);
+                    }
+                )
+                .Select(orgAndUnits =>
+                    orgAndUnits
+                        .units
+                        .Select(unit => new UnitAccessRightsWithUnitData(unit, GetAccessRights(orgAndUnits.organization, unit)))
+                        .ToList()
+                        .AsEnumerable()
+                );
         }
 
         public Maybe<OperationError> Delete(Guid organizationUuid, Guid unitUuid)
@@ -426,7 +448,7 @@ namespace Core.ApplicationServices.Organizations
         private Result<(Organization organization, OrganizationUnit organizationUnit), OperationError> WithDeletionPermission((Organization organization, OrganizationUnit organizationUnit) orgAndUnit)
         {
             var accessRights = GetAccessRights(orgAndUnit.organization, orgAndUnit.organizationUnit);
-            if(accessRights.CanBeDeleted == false)
+            if (accessRights.CanBeDeleted == false)
                 return new OperationError("Not authorized to delete org unit", OperationFailure.Forbidden);
 
             return orgAndUnit;
