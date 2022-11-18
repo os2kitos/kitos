@@ -229,26 +229,21 @@ namespace Core.ApplicationServices.Organizations
 
         private static void LogChanges(StsOrganizationConnection connection, OrganizationTreeUpdateConsequences consequences)
         {
-            var logs = new List<StsOrganizationConsequenceLog>();
+            var logs = new List<StsOrganizationChangeLog>();
             logs.AddRange(MapAddedOrganizationUnits(consequences));
             logs.AddRange(MapRenamedOrganizationUnits(consequences));
             logs.AddRange(MapMovedOrganizationUnits(consequences));
             logs.AddRange(MapRemovedOrganizationUnits(consequences));
             logs.AddRange(MapConvertedOrganizationUnits(consequences));
-
-            var changelog = new StsOrganizationChangelog
-            {
-                Consequences = logs
-            };
-
-            connection.StsOrganizationChangelogs.Add(changelog);
+            
+            logs.ForEach(x => connection.StsOrganizationChangeLogs.Add(x));
         }
 
-        private static IEnumerable<StsOrganizationConsequenceLog> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<StsOrganizationChangeLog> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .DeletedExternalUnitsBeingConvertedToNativeUnits
-                .Select(converted => new StsOrganizationConsequenceLog
+                .Select(converted => new StsOrganizationChangeLog
                 {
                     Name = converted.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Converted,
@@ -258,11 +253,11 @@ namespace Core.ApplicationServices.Organizations
                 .ToList();
         }
 
-        private static IEnumerable<StsOrganizationConsequenceLog> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<StsOrganizationChangeLog> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .DeletedExternalUnitsBeingDeleted
-                .Select(deleted => new StsOrganizationConsequenceLog
+                .Select(deleted => new StsOrganizationChangeLog
                 {
                     Name = deleted.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Deleted,
@@ -272,14 +267,14 @@ namespace Core.ApplicationServices.Organizations
                 .ToList();
         }
 
-        private static IEnumerable<StsOrganizationConsequenceLog> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<StsOrganizationChangeLog> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .OrganizationUnitsBeingMoved
                 .Select(moved =>
                 {
                     var (movedUnit, oldParent, newParent) = moved;
-                    return new StsOrganizationConsequenceLog
+                    return new StsOrganizationChangeLog
                     {
                         Name = movedUnit.Name,
                         Type = ConnectionUpdateOrganizationUnitChangeType.Moved,
@@ -290,14 +285,14 @@ namespace Core.ApplicationServices.Organizations
                 .ToList();
         }
 
-        private static IEnumerable<StsOrganizationConsequenceLog> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<StsOrganizationChangeLog> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .OrganizationUnitsBeingRenamed
                 .Select(renamed =>
                 {
                     var (affectedUnit, oldName, newName) = renamed;
-                    return new StsOrganizationConsequenceLog
+                    return new StsOrganizationChangeLog
                     {
                         Name = oldName,
                         Type = ConnectionUpdateOrganizationUnitChangeType.Renamed,
@@ -308,11 +303,11 @@ namespace Core.ApplicationServices.Organizations
                 .ToList();
         }
 
-        private static IEnumerable<StsOrganizationConsequenceLog> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static IEnumerable<StsOrganizationChangeLog> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
         {
             return consequences
                 .AddedExternalOrganizationUnits
-                .Select(added => new StsOrganizationConsequenceLog
+                .Select(added => new StsOrganizationChangeLog
                 {
                     Name = added.unitToAdd.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Added,

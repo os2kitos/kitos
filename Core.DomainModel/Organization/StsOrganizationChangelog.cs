@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.DomainModel.Organization
 {
-    public class StsOrganizationChangelog : Entity
+    public class StsOrganizationChangeLog
     {
         public string ResponsibleEntityName { get; set; }
-        public IEnumerable<StsOrganizationConsequenceLog> Consequences { get; set; }
+        public Guid Uuid { get; set; }
+        public string Name { get; set; }
+        public ConnectionUpdateOrganizationUnitChangeType Type { get; set; }
+        public string Description { get; set; }
     }
 }

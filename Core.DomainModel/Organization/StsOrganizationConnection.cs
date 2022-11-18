@@ -12,7 +12,7 @@ namespace Core.DomainModel.Organization
     {
         public StsOrganizationConnection()
         {
-            StsOrganizationChangelogs = new List<StsOrganizationChangelog>();
+            StsOrganizationChangeLogs = new List<StsOrganizationChangeLog>();
         }
 
         public int OrganizationId { get; set; }
@@ -22,7 +22,7 @@ namespace Core.DomainModel.Organization
         /// Determines the optional synchronization depth used during synchronization from STS Organisation
         /// </summary>
         public int? SynchronizationDepth { get; set; }
-        public ICollection<StsOrganizationChangelog> StsOrganizationChangelogs { get; set; }
+        public ICollection<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
 
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3312 adds automatic subscription here
         public DisconnectOrganizationFromOriginResult Disconnect()
