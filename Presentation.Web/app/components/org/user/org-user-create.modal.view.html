@@ -12,9 +12,9 @@
             </label>
             <div class="col-xs-8">
                 <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" ng-required="true" data-unique-org-user data-unique-email autofocus data-ng-disabled="ctrl.busy" maxlength="100">
-                <div ng-messages="createUser.form.email.$error" ng-if="createUser.form.email.$invalid" class="color-maroon" role="alert">
-                    <div ng-message="required" style="margin:5px 0">Email is required.</div>
-                    <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
+                <div ng-messages="createUser.form.email.$error" ng-if="createUser.form.email.$invalid" class="input-validation-error" role="alert">
+                    <div ng-message="required" style="margin:5px 0">Email er påkrævet.</div>
+                    <div ng-message="email" style="margin:5px 0">Den indtastede email er ugyldig.</div>
                 </div>
             </div>
         </div>
@@ -24,10 +24,10 @@
             </label>
             <div class="col-xs-8">
                 <input type="email" name="repeatEmail" id="repeatEmail" data-ng-model="ctrl.repeatEmail" class="form-control" data-match="ctrl.vm.email" data-ng-required="true" data-ng-disabled="ctrl.busy" maxlength="100">
-                <div ng-messages="createUser.form.repeatEmail.$error" ng-if="createUser.form.repeatEmail.$invalid" class="color-maroon" role="alert">
-                    <div ng-message="required" style="margin:5px 0">Repeat email is required.</div>
-                    <div ng-message="unique" style="margin:5px 0">Emails differ.</div>
-                    <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
+                <div ng-messages="createUser.form.repeatEmail.$error" ng-if="createUser.form.repeatEmail.$invalid" class="input-validation-error" role="alert">
+                    <div ng-message="required" style="margin:5px 0">Gentag den indtastede email.</div>
+                    <div ng-message="unique" style="margin:5px 0">De to emails er forskellige.</div>
+                    <div ng-message="email" style="margin:5px 0">Den indtastede email er ugyldig.</div>
                 </div>
             </div>
         </div>
@@ -37,8 +37,8 @@
             </label>
             <div class="col-xs-8">
                 <input type="text" name="name" id="name" data-ng-model="ctrl.vm.name" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy" maxlength="100">
-                <div ng-messages="createUser.form.name.$error" ng-if="createUser.form.name.$invalid" class="color-maroon" role="alert">
-                    <div ng-message="required" style="margin:5px 0">Name is required.</div>
+                <div ng-messages="createUser.form.name.$error" ng-if="createUser.form.name.$invalid" class="input-validation-error" role="alert">
+                    <div ng-message="required" style="margin:5px 0">Indtast fornavn.</div>
                 </div>
             </div>
         </div>
@@ -48,8 +48,8 @@
             </label>
             <div class="col-xs-8">
                 <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.vm.lastName" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy" maxlength="100">
-                <div ng-messages="createUser.form.lastName.$error" ng-if="createUser.form.lastName.$invalid" class="color-maroon" role="alert">
-                    <div ng-message="required" style="margin:5px 0">Last name is required.</div>
+                <div ng-messages="createUser.form.lastName.$error" ng-if="createUser.form.lastName.$invalid" class="input-validation-error" role="alert">
+                    <div ng-message="required" style="margin:5px 0">Indtast efternavn.</div>
                 </div>
             </div>
         </div>

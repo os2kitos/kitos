@@ -77,9 +77,6 @@
                         return;
                     }
                 }
-                if (field === 'name' && value === undefined) {
-                    return;
-                }
 
                 var payload = {};
                 payload[field] = value;

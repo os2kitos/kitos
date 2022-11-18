@@ -21,8 +21,8 @@
                         Fornavn
                     </label>
                     <input type="text" id="username" name="name" data-ng-model="user.name" data-ng-required="true" class="form-control" data-ng-blur="patch(nameFieldName, user.name)" />
-                    <div ng-messages="profileForm.name.$error" ng-if="profileForm.name.$invalid" class="color-maroon" role="alert">
-                        <div ng-message="required" style="margin:5px 0">Name is required.</div>
+                    <div ng-messages="profileForm.name.$error" ng-if="profileForm.name.$invalid" class="input-validation-error" role="alert">
+                        <div ng-message="required" style="margin:5px 0">Indtast fornavn.</div>
                     </div>
                 </div>
                 <!-- User lastname -->
@@ -31,8 +31,8 @@
                         Efternavn
                     </label>
                     <input type="text" id="lastname" name="lastName" data-ng-model="user.lastName" data-ng-required="true" class="form-control" data-ng-blur="patch(lastNameFieldName, user.lastName)" />
-                    <div ng-messages="profileForm.lastName.$error" ng-if="profileForm.lastName.$invalid" class="color-maroon" role="alert">
-                        <div ng-message="required" style="margin:5px 0">Last name is required.</div>
+                    <div ng-messages="profileForm.lastName.$error" ng-if="profileForm.lastName.$invalid" class="input-validation-error" role="alert">
+                        <div ng-message="required" style="margin:5px 0">Indtast efternavn.</div>
                     </div>
                 </div>
                 <!-- User phonenumber -->
@@ -48,9 +48,9 @@
                         Email
                     </label>
                     <input type="text" id="usermail" name="email" data-ng-model="user.email" data-ng-required="true" class="form-control" data-ng-blur="patch(emailFieldName, user.email)" />
-                    <div ng-messages="profileForm.email.$error" ng-if="profileForm.email.$invalid" class="color-maroon" role="alert">
-                        <div ng-message="required" style="margin:5px 0">Email is required.</div>
-                        <div ng-message="email" style="margin:5px 0">Email is incorrect.</div>
+                    <div ng-messages="profileForm.email.$error" ng-if="profileForm.email.$invalid" class="input-validation-error" role="alert">
+                        <div ng-message="required" style="margin:5px 0">Email er påkrævet.</div>
+                        <div ng-message="email" style="margin:5px 0">Den indtastede email er ugyldig.</div>
                     </div>
                 </div>
                 <div>
