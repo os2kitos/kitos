@@ -73,7 +73,7 @@
             });
             $scope.showDifferenceBetweenOrgUnitOrigin =
                 // User is an admin with edit rights to the hierarchy
-                (user.isGlobalAdmin || user.isLocalAdmin) && 
+                (user.isGlobalAdmin || user.isLocalAdmin) &&
                 // Hierarchy root has been synced from a different source than KITOS
                 rootNodeOfOrganization.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos;
 
@@ -368,7 +368,7 @@
                     controller: [
                         "$scope", "$uibModalInstance", "autofocus", "organizationUnitService", function ($modalScope, $modalInstance, autofocus, organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
                             autofocus();
-                            
+
                             // edit or create-new mode
                             $modalScope.isNew = false;
 
@@ -494,7 +494,7 @@
 
 
                                     var resultTypes = [];
-                                    
+
                                     if (parent !== $modalScope.orgUnit.oldParent) {
                                         resultTypes.push(Kitos.Models.ViewModel.Organization
                                             .OrganizationUnitEditResultType.UnitRelocated);
@@ -506,7 +506,7 @@
                                             resultTypes.push(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.FieldsChanged);
                                         }
                                     }
-                                    
+
                                     $modalInstance.close(createResult(resultTypes, result.data.response));
                                     inMemoryCacheService.clear();
                                 },
@@ -607,12 +607,12 @@
                                         inMemoryCacheService.clear();
                                         $modalInstance.close(createResult([Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitDeleted]));
                                     }, (error) => {
-                                            $modalScope.submitting = false;
+                                        $modalScope.submitting = false;
 
-                                            notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
+                                        notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
                                                             Organisationsenheden bliver brugt som reference i en eller flere IT Systemer og/eller IT Kontrakter.<br /><br />
                                                             Fjern referencen for at kunne slette denne enhed.`);
-                                        });
+                                    });
 
                             };
 
@@ -718,7 +718,11 @@
                     $scope.loadingAccessRights = true;
                     organizationUnitService.getUnitAccessRightsForOrganization(rootNodeOfOrganization.organization.uuid)
                         .then(response => {
-                            applyAccessRights(rootNodeOfOrganization, response);
+                            const rightsMap = response.reduce((rights, next) => {
+                                rights[next.unitId] = next;
+                                return rights;
+                            }, {})
+                            applyAccessRights(rootNodeOfOrganization, rightsMap);
                             $scope.loadingAccessRights = false;
                         }, error => {
                             notify.addErrorMessage("Kunne ikke indlæse rettighederne for organisationsenheden");
@@ -730,17 +734,13 @@
             };
 
             function applyAccessRights(unit: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
-                accessRights: Kitos.Models.Api.Organization.UnitAccessRightsWithUnitIdDto[]) {
-                const unitAccessRights = accessRights.filter(x => x.unitId === unit.id);
-                if (unitAccessRights.length === 1) {
-                    unit.draggable = unitAccessRights[0].canBeRearranged;
-                }
-
+                accessRights: { [key: number]: Kitos.Models.Api.Organization.UnitAccessRightsWithUnitIdDto }) {
+                unit.draggable = accessRights[unit.id]?.canBeRearranged === true;
                 unit.children.forEach(child => applyAccessRights(child, accessRights));
             }
-            
+
             $scope.treeOptions = {
-                accept: function(sourceNodeScope, destNodesScope, destIndex) {
+                accept: function (sourceNodeScope, destNodesScope, destIndex) {
                     return !angular.isUndefined(destNodesScope.$parentNodesScope);
 
                 },
