@@ -16,14 +16,16 @@ namespace Core.DomainModel.Organization
         /// Determines the optional synchronization depth used during synchronization from STS Organisation
         /// </summary>
         public int? SynchronizationDepth { get; set; }
+
+        public bool SubscribeToUpdates { get; set; }
         //TODO https://os2web.atlassian.net/browse/KITOSUDV-3317 adds the change logs here
-        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3312 adds automatic subscription here
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
             organizationUnits.ForEach(unit => unit.ConvertToNativeKitosUnit());
 
             Connected = false;
+            SubscribeToUpdates = false;
             SynchronizationDepth = null;
             return new DisconnectOrganizationFromOriginResult(organizationUnits);
         }
