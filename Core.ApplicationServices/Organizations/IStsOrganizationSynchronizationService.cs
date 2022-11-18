@@ -46,6 +46,6 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="organizationId"></param>
         /// <param name="levelsToInclude"></param>
         /// <returns></returns>
-        Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude);
+        Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, Guid? userUuid = null);
     }
 }

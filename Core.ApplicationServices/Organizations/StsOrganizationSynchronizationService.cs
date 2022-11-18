@@ -12,7 +12,6 @@ using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
 using Serilog;
-using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -27,6 +26,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IUserService _userService;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
@@ -37,7 +37,8 @@ namespace Core.ApplicationServices.Organizations
             IDatabaseControl databaseControl,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IGenericRepository<OrganizationUnit> organizationUnitRepository)
+            IGenericRepository<OrganizationUnit> organizationUnitRepository,
+            IUserService userService)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -47,6 +48,7 @@ namespace Core.ApplicationServices.Organizations
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
             _organizationUnitRepository = organizationUnitRepository;
+            _userService = userService;
             _authorizationContext = authorizationContext;
         }
 
@@ -139,7 +141,7 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
-        public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude)
+        public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, Guid? userUuid = null)
         {
             return Modify(organizationId, organization =>
                 LoadOrganizationUnits(organization)
@@ -156,10 +158,12 @@ namespace Core.ApplicationServices.Organizations
                         }
                         return consequences;
                     })
-                    .Select(consequences =>
+                    .Bind(consequences =>
                     {
-                        LogChanges(organization.StsOrganizationConnection, consequences);
-                        return consequences;
+                        var error = LogChanges(organization.StsOrganizationConnection, consequences, userUuid);
+                        return error.HasValue 
+                            ? error.Value 
+                            : Result<Result<OrganizationTreeUpdateConsequences, OperationError>, OperationError>.Success(consequences);
                     })
                     .Match(_ => Maybe<OperationError>.None, error => error)
             );
@@ -227,7 +231,7 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private static void LogChanges(StsOrganizationConnection connection, OrganizationTreeUpdateConsequences consequences)
+        private Maybe<OperationError> LogChanges(StsOrganizationConnection connection, OrganizationTreeUpdateConsequences consequences, Guid? userUuid = null)
         {
             var logs = new List<StsOrganizationChangeLog>();
             logs.AddRange(MapAddedOrganizationUnits(consequences));
@@ -235,8 +239,25 @@ namespace Core.ApplicationServices.Organizations
             logs.AddRange(MapMovedOrganizationUnits(consequences));
             logs.AddRange(MapRemovedOrganizationUnits(consequences));
             logs.AddRange(MapConvertedOrganizationUnits(consequences));
-            
-            logs.ForEach(x => connection.StsOrganizationChangeLogs.Add(x));
+
+            var entityResponsibleForUpdate = "FK Organisation";
+            if (userUuid != null)
+            {
+                var userResult = _userService.GetUserInOrganization(connection.Organization.Uuid, userUuid.GetValueOrDefault());
+                if (userResult.Failed)
+                    return userResult.Error;
+                var user = userResult.Value;
+
+                entityResponsibleForUpdate = $"{user.GetFullName()} {user.Email}";
+            }
+
+            foreach (var log in logs)
+            {
+                log.ResponsibleEntityName = entityResponsibleForUpdate;
+
+                connection.StsOrganizationChangeLogs.Add(log);
+            }
+            return Maybe<OperationError>.None;
         }
 
         private static IEnumerable<StsOrganizationChangeLog> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)

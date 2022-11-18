@@ -95,7 +95,8 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPut]
         [Route("connection")]
-        public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
+        //TODO: Update frontend to pass the UserUuid
+        public HttpResponseMessage UpdateConnection(Guid organizationId, [FromBody] UpdateConnectionToStsOrganizationRequestDTO request)
         {
             if (!ModelState.IsValid)
             {
@@ -103,7 +104,7 @@ namespace Presentation.Web.Controllers.API.V1
             }
 
             return _stsOrganizationSynchronizationService
-                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request?.UserUuid)
                 .Match(FromOperationError, Ok);
         }
 
