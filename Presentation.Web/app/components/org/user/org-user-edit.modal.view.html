@@ -6,28 +6,40 @@
 </div>
 <div class="modal-body">
     <form name="editUser.form" novalidate="novalidate" class="form-horizontal">
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': editUser.form.email.$invalid }">
             <label for="email" class="col-xs-3 control-label">
                 Email-adresse
             </label>
             <div class="col-xs-8">
                 <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" data-ng-required="true" data-disabled-on-busy maxlength="100">
+                <div ng-messages="editUser.form.email.$error" ng-if="editUser.form.email.$invalid" class="color-maroon" role="alert">
+                    <div ng-message="required" style="margin:5px 0">Email is required.</div>
+                    <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
+                </div>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': editUser.form.name.$invalid }">
             <label for="name" class="col-xs-3 control-label">
                 Navn
             </label>
             <div class="col-xs-8">
                 <input type="text" name="name" id="name" data-ng-model="ctrl.vm.name" class="form-control" data-ng-required="true" data-disabled-on-busy maxlength="100">
+                <div ng-messages="editUser.form.name.$error" ng-if="editUser.form.name.$invalid" class="color-maroon" role="alert">
+                    <div ng-message="required" style="margin:5px 0">Name is required.</div>
+                    <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
+                </div>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': editUser.form.lastName.$invalid }">
             <label for="lastName" class="col-xs-3 control-label">
                 Efternavn
             </label>
             <div class="col-xs-8">
                 <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.vm.lastName" class="form-control" data-ng-required="true" data-disabled-on-busy maxlength="100">
+                <div ng-messages="editUser.form.lastName.$error" ng-if="editUser.form.lastName.$invalid" class="color-maroon" role="alert">
+                    <div ng-message="required" style="margin:5px 0">Last name is required.</div>
+                    <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
+                </div>
             </div>
         </div>
         <div class="form-group">

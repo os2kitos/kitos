@@ -16,18 +16,24 @@
                     </select2-org-unit>
                 </div>
                 <!-- User name -->
-                <div class="form-group">
+                <div class="form-group" ng-class="{ 'has-error': profileForm.name.$invalid }">
                     <label for="username" class="control-label">
                         Fornavn
                     </label>
-                    <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)" />
+                    <input type="text" id="username" name="name" data-ng-model="user.name" data-ng-required="true" class="form-control" data-ng-blur="patch(nameFieldName, user.name)" />
+                    <div ng-messages="profileForm.name.$error" ng-if="profileForm.name.$invalid" class="color-maroon" role="alert">
+                        <div ng-message="required" style="margin:5px 0">Name is required.</div>
+                    </div>
                 </div>
                 <!-- User lastname -->
-                <div class="form-group">
+                <div class="form-group" ng-class="{ 'has-error': profileForm.lastName.$invalid }">
                     <label for="lastname" class="control-label">
                         Efternavn
                     </label>
-                    <input type="text" id="lastname" data-ng-model="user.lastName" class="form-control" data-ng-blur="patch('lastName', user.lastName)" />
+                    <input type="text" id="lastname" name="lastName" data-ng-model="user.lastName" data-ng-required="true" class="form-control" data-ng-blur="patch(lastNameFieldName, user.lastName)" />
+                    <div ng-messages="profileForm.lastName.$error" ng-if="profileForm.lastName.$invalid" class="color-maroon" role="alert">
+                        <div ng-message="required" style="margin:5px 0">Last name is required.</div>
+                    </div>
                 </div>
                 <!-- User phonenumber -->
                 <div class="form-group">
@@ -37,11 +43,14 @@
                     <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)" />
                 </div>
                 <!-- User email -->
-                <div class="form-group">
+                <div class="form-group" ng-class="{ 'has-error': profileForm.email.$invalid }">
                     <label for="usermail" class="control-label">
                         Email
                     </label>
-                    <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)" />
+                    <input type="text" id="usermail" name="email" data-ng-model="user.email" data-ng-required="true" class="form-control" data-ng-blur="patch(emailFieldName, user.email)" />
+                    <div ng-messages="profileForm.email.$error" ng-if="profileForm.email.$invalid" class="color-maroon" role="alert">
+                        <div ng-message="required" style="margin:5px 0">Email is required.</div>
+                    </div>
                 </div>
                 <div>
                     <!-- User startpage preferences -->

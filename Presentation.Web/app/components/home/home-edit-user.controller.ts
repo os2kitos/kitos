@@ -48,6 +48,10 @@
             $scope.allowClear = false;
             $scope.primaryStartUnits = Kitos.Models.ViewModel.User.options;
 
+            $scope.nameFieldName = "name";
+            $scope.lastNameFieldName = "lastName";
+            $scope.emailFieldName = "email";
+
             var selectedOrgUnit = () => _.find(orgUnits, (orgUnit) => orgUnit.id === String(user.defaultOrganizationUnitId));
 
             function init(user, orgUnit) {
@@ -65,6 +69,18 @@
 
             //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {
+
+                if (value === undefined) {
+                    if (field === $scope.nameFieldName ||
+                        field === $scope.lastNameFieldName ||
+                        field === $scope.emailFieldName) {
+                        return;
+                    }
+                }
+                if (field === 'name' && value === undefined) {
+                    return;
+                }
+
                 var payload = {};
                 payload[field] = value;
 
