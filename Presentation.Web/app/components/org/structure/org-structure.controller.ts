@@ -731,11 +731,7 @@
 
             function applyAccessRights(unit: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
                 accessRights: Kitos.Models.Api.Organization.UnitAccessRightsWithUnitIdDto[]) {
-                const unitAccessRights = accessRights.filter(x => x.unitId === unit.id);
-                if (unitAccessRights.length === 1) {
-                    unit.draggable = unitAccessRights[0].canBeRearranged;
-                }
-
+                unit.draggable = accessRights.some(dto => dto.unitId === unit.id && dto.canBeRearranged);
                 unit.children.forEach(child => applyAccessRights(child, accessRights));
             }
             

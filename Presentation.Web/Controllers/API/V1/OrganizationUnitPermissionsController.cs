@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage GetUnitAccessRightsForOrganization(Guid organizationUuid)
         {
             return _organizationUnitService.GetAccessRightsByOrganization(organizationUuid)
-                .Select(x => ToUnitAccessRightsDtoWithUnitIdDtos(x).ToList())
+                .Select(ToUnitAccessRightsDtoWithUnitIdDtos)
                 .Match(Ok, FromOperationError);
         }
 
@@ -63,17 +63,12 @@ namespace Presentation.Web.Controllers.API.V1
         private static IEnumerable<UnitAccessRightsWithUnitIdDTO> ToUnitAccessRightsDtoWithUnitIdDtos(
             IEnumerable<UnitAccessRightsWithUnitData> accessRights)
         {
-            return accessRights.Select(x =>
-                new UnitAccessRightsWithUnitIdDTO(
-                    x.OrganizationUnit.Id,
-                    x.UnitAccessRights.CanBeRead,
-                    x.UnitAccessRights.CanBeModified,
-                    x.UnitAccessRights.CanBeRenamed,
-                    x.UnitAccessRights.CanEanBeModified,
-                    x.UnitAccessRights.CanDeviceIdBeModified,
-                    x.UnitAccessRights.CanBeRearranged,
-                    x.UnitAccessRights.CanBeDeleted)
-            );
+            return accessRights.Select(ToUnitAccessRightsWithUnitIdDto).ToList();
+        }
+
+        private static UnitAccessRightsWithUnitIdDTO ToUnitAccessRightsWithUnitIdDto(UnitAccessRightsWithUnitData x)
+        {
+            return new UnitAccessRightsWithUnitIdDTO(x.OrganizationUnit.Id, ToAccessRightsDto(x.UnitAccessRights));
         }
     }
 }

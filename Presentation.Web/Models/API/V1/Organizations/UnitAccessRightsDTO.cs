@@ -13,6 +13,12 @@
             CanBeDeleted = canBeDeleted;
         }
 
+        public UnitAccessRightsDTO(UnitAccessRightsDTO other)
+        : this(other.CanBeRead, other.CanBeModified, other.CanNameBeModified, other.CanEanBeModified, other.CanDeviceIdBeModified, other.CanBeRearranged, other.CanBeDeleted)
+        {
+
+        }
+
         public bool CanBeRead { get; }
         public bool CanBeModified { get; }
         public bool CanNameBeModified { get; }
