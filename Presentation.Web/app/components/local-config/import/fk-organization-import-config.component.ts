@@ -28,7 +28,7 @@
 
     interface IFkOrganizationSynchronizationStatus {
         connected: boolean
-        subscribesToUpdates : boolean
+        subscribesToUpdates: boolean
         synchronizationDepth: number | null
     }
 
@@ -96,7 +96,7 @@
                     enabled: result.canUpdateConnection,
                     onClick: () => {
                         this.fkOrganisationImportDialogFactory
-                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Update, this.currentOrganizationUuid, this.synchronizationStatus.synchronizationDepth)
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Update, this.currentOrganizationUuid, this.synchronizationStatus.synchronizationDepth, this.synchronizationStatus.subscribesToUpdates)
                             .closed.then(() => {
                                 //Reload state from backend if the dialog was closed 
                                 this.loadState();
@@ -133,7 +133,7 @@
                     enabled: result.canCreateConnection,
                     onClick: () => {
                         this.fkOrganisationImportDialogFactory
-                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null)
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null, false)
                             .closed.then(() => {
                                 //Reload state from backend if the dialog was closed 
                                 this.loadState();
