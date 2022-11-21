@@ -102,7 +102,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
             const int levels = 2;
-            using var getResponse = await SendGetSnapshotAsync(levels, targetOrgUuid, cookie);
+            using var getResponse = await SendGetSnapshotAsync(levels, targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
             var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
 
             //Act
