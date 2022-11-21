@@ -10,6 +10,7 @@ using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
+using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Organization.ServiceReference;
 using Serilog;
 
@@ -77,7 +78,7 @@ namespace Infrastructure.STS.Organization.DomainServices
 
             var searchRequest = CreateSearchForOrganizationRequest(organization, companyUuid.Value);
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
-            var response = channel.soeg(searchRequest);
+            var response = GetSearchResponse(channel, searchRequest);
             var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
             if (stsError.HasValue)
@@ -103,6 +104,11 @@ namespace Infrastructure.STS.Organization.DomainServices
             }
 
             return uuid;
+        }
+
+        private static soegResponse GetSearchResponse(OrganisationPortType channel, soegRequest searchRequest)
+        {
+            return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(searchRequest)).Execute();
         }
 
         private Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveExternalUuid(Core.DomainModel.Organization.Organization organization)
