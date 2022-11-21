@@ -959,6 +959,10 @@
     <Compile Include="Migrations\202211210847408_StsSyncState_With_Subscription.designer.cs">
       <DependentUpon>202211210847408_StsSyncState_With_Subscription.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202211210950434_Add_Latest_Subscription_Check.cs" />
+    <Compile Include="Migrations\202211210950434_Add_Latest_Subscription_Check.designer.cs">
+      <DependentUpon>202211210950434_Add_Latest_Subscription_Check.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1601,6 +1605,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202211210847408_StsSyncState_With_Subscription.resx">
       <DependentUpon>202211210847408_StsSyncState_With_Subscription.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202211210950434_Add_Latest_Subscription_Check.resx">
+      <DependentUpon>202211210950434_Add_Latest_Subscription_Check.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
