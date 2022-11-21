@@ -626,6 +626,9 @@ namespace Presentation.Web.Ninject
 
             //Maintenance
             kernel.Bind<PurgeOrphanedHangfireJobs>().ToSelf().InCommandScope(Mode);
+
+            //FK Org sync
+            kernel.Bind<ScheduleFkOrgUpdatesBackgroundJob>().ToSelf().InCommandScope(Mode);
         }
     }
 }

@@ -81,6 +81,7 @@
     <Compile Include="Model\ReadModels\RebuildItSystemUsageOverviewReadModelsBatchJob.cs" />
     <Compile Include="Model\ReadModels\RebuildReadModelsJob.cs" />
     <Compile Include="Model\ReadModels\ScheduleDataProcessingRegistrationReadModelUpdates.cs" />
+    <Compile Include="Model\ReadModels\ScheduleFkOrgUpdatesBackgroundJob.cs" />
     <Compile Include="Model\ReadModels\ScheduleItContractOverviewReadModelUpdates.cs" />
     <Compile Include="Model\ReadModels\ScheduleItSystemUsageOverviewReadModelUpdates.cs" />
     <Compile Include="Model\ReadModels\ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState.cs" />
