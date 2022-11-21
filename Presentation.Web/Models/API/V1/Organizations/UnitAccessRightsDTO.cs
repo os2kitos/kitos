@@ -2,6 +2,10 @@
 {
     public class UnitAccessRightsDTO
     {
+        public UnitAccessRightsDTO()
+        {
+        }
+
         public UnitAccessRightsDTO(bool canBeRead, bool canBeModified, bool canNameBeModified, bool canEanBeModified, bool canDeviceIdBeModified, bool canBeRearranged, bool canBeDeleted)
         {
             CanBeRead = canBeRead;
@@ -13,18 +17,18 @@
             CanBeDeleted = canBeDeleted;
         }
 
-        public UnitAccessRightsDTO(UnitAccessRightsDTO other)
+        protected UnitAccessRightsDTO(UnitAccessRightsDTO other)
         : this(other.CanBeRead, other.CanBeModified, other.CanNameBeModified, other.CanEanBeModified, other.CanDeviceIdBeModified, other.CanBeRearranged, other.CanBeDeleted)
         {
 
         }
 
-        public bool CanBeRead { get; }
-        public bool CanBeModified { get; }
-        public bool CanNameBeModified { get; }
-        public bool CanEanBeModified { get; }
-        public bool CanDeviceIdBeModified { get; }
-        public bool CanBeRearranged { get; }
-        public bool CanBeDeleted { get; }
+        public bool CanBeRead { get; set; }
+        public bool CanBeModified { get; set; }
+        public bool CanNameBeModified { get; set; }
+        public bool CanEanBeModified { get; set; }
+        public bool CanDeviceIdBeModified { get; set; }
+        public bool CanBeRearranged { get; set; }
+        public bool CanBeDeleted { get; set; }
     }
 }

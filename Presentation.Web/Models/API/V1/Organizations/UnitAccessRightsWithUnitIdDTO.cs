@@ -4,6 +4,10 @@
     {
         public int UnitId { get; set; }
 
+        public UnitAccessRightsWithUnitIdDTO()
+        {
+        }
+
         public UnitAccessRightsWithUnitIdDTO(int unitId, UnitAccessRightsDTO rights) 
             : base(rights)
         {

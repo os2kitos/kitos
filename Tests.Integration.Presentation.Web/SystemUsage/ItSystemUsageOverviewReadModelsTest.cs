@@ -97,20 +97,20 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(HttpStatusCode.Created, assignRoleResponse.StatusCode);
 
             // System changes
-            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled).DisposeAsync();
-            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organizationId, organizationId).DisposeAsync(); // Using default organization as BelongsTo
+            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organizationId, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync(); // Using default organization as BelongsTo
 
             var availableBusinessTypeOptions = (await ItSystemHelper.GetBusinessTypeOptionsAsync(organizationId)).ToList();
             var businessType = availableBusinessTypeOptions[Math.Abs(A<int>()) % availableBusinessTypeOptions.Count];
-            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId).DisposeAsync();
+            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             var taskRefs = (await ItSystemHelper.GetAvailableTaskRefsRequestAsync(system.Id)).ToList();
             var taskRef = taskRefs[Math.Abs(A<int>()) % taskRefs.Count];
-            await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId).DisposeAsync();
+            await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             // Parent system 
-            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled).DisposeAsync();
+            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             // System Usage changes
             var body = new
@@ -436,7 +436,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await OrganizationHelper.SendChangeOrganizationNameRequestAsync(organization1.Id, organizationName2, defaultOrganizationId).DisposeAsync();
+            await OrganizationHelper.SendChangeOrganizationNameRequestAsync(organization1.Id, organizationName2, defaultOrganizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
