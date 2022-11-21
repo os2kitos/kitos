@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
@@ -269,6 +270,102 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void GetAccessRightsByOrganization_Returns_NotFound_When_Organization_Was_NotFound()
+        {
+            //Arrange
+            var orgUuid = A<Guid>();
+
+            ExpectGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
+
+            //Act
+            var result = _sut.GetAccessRightsByOrganization(orgUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetAccessRightsByOrganization_Returns_AccessRights()
+        {
+            //Arrange
+            var unit1Uuid = A<Guid>();
+            var unit2Uuid = A<Guid>();
+            var unit3Uuid = A<Guid>();
+            var orgUuid = A<Guid>();
+
+            var unit1 = new OrganizationUnit
+            {
+                Uuid = unit1Uuid,
+                Parent = new OrganizationUnit(),
+                Origin = OrganizationUnitOrigin.Kitos
+            };
+            var unit2 = new OrganizationUnit
+            {
+                Uuid = unit2Uuid,
+                Parent = null,
+                Origin = OrganizationUnitOrigin.Kitos
+            };
+            var unit3 = new OrganizationUnit
+            {
+                Uuid = unit3Uuid,
+                Parent = new OrganizationUnit(),
+                Origin = OrganizationUnitOrigin.STS_Organisation
+            };
+
+            var organization = new Organization() { Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> { unit1, unit2, unit3 } };
+            unit1.Organization = organization;
+
+            ExpectGetOrganizationReturns(orgUuid, organization);
+            ExpectAllowModifyReturns(unit1, true);
+            ExpectAllowDeleteReturns(unit1, true);
+            ExpectAllowModifyReturns(unit2, true);
+            ExpectAllowDeleteReturns(unit2, true);
+            ExpectAllowModifyReturns(unit3, true);
+            ExpectAllowDeleteReturns(unit3, true);
+            
+            //Act
+            var result = _sut.GetAccessRightsByOrganization(orgUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value.ToList();
+
+            //unit 1 - all should be true
+            var unit1AccessRights = accessRights.FirstOrDefault(x => x.OrganizationUnit.Uuid == unit1Uuid);
+            Assert.NotNull(unit1AccessRights);
+            Assert.True(unit1AccessRights.UnitAccessRights.CanBeRead);
+            Assert.True(unit1AccessRights.UnitAccessRights.CanBeModified);
+            Assert.True(unit1AccessRights.UnitAccessRights.CanBeRearranged);
+            Assert.True(unit1AccessRights.UnitAccessRights.CanBeRenamed);
+            Assert.True(unit1AccessRights.UnitAccessRights.CanDeviceIdBeModified);
+            Assert.True(unit1AccessRights.UnitAccessRights.CanEanBeModified);
+            Assert.True(unit1AccessRights.UnitAccessRights.CanBeDeleted);
+
+            //unit 2 - Parent - shouldn't be allowed to delete and rearrange
+            var unit2AccessRights = accessRights.FirstOrDefault(x => x.OrganizationUnit.Uuid == unit2Uuid);
+            Assert.NotNull(unit2AccessRights);
+            Assert.True(unit2AccessRights.UnitAccessRights.CanBeRead);
+            Assert.True(unit2AccessRights.UnitAccessRights.CanBeModified);
+            Assert.False(unit2AccessRights.UnitAccessRights.CanBeRearranged);
+            Assert.True(unit2AccessRights.UnitAccessRights.CanBeRenamed);
+            Assert.True(unit2AccessRights.UnitAccessRights.CanDeviceIdBeModified);
+            Assert.True(unit2AccessRights.UnitAccessRights.CanEanBeModified);
+            Assert.False(unit2AccessRights.UnitAccessRights.CanBeDeleted);
+
+            //unit 3 - STS Org - shouldn't be allowed to delete, rearrange and rename
+            var unit3AccessRights = accessRights.FirstOrDefault(x => x.OrganizationUnit.Uuid == unit3Uuid);
+            Assert.NotNull(unit3AccessRights);
+            Assert.True(unit3AccessRights.UnitAccessRights.CanBeRead);
+            Assert.True(unit3AccessRights.UnitAccessRights.CanBeModified);
+            Assert.False(unit3AccessRights.UnitAccessRights.CanBeRearranged);
+            Assert.False(unit3AccessRights.UnitAccessRights.CanBeRenamed);
+            Assert.True(unit3AccessRights.UnitAccessRights.CanDeviceIdBeModified);
+            Assert.True(unit3AccessRights.UnitAccessRights.CanEanBeModified);
+            Assert.False(unit3AccessRights.UnitAccessRights.CanBeDeleted);
         }
 
         [Fact]

@@ -154,6 +154,11 @@ namespace Core.DomainModel.Organization
             return OrgUnits.FirstOrDefault(unit => unit.Uuid == organizationUnitId);
         }
 
+        public IEnumerable<OrganizationUnit> GetAllOrganizationUnits()
+        {
+            return OrgUnits.ToList();
+        }
+
         public Maybe<UIModuleCustomization> GetUiModuleCustomization(string module)
         {
             if (module == null)
