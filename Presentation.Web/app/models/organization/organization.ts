@@ -24,4 +24,8 @@
         ContactPersonId: number;
         ContactPerson: IUser;
     }
+
+    export interface IOrganizationDto {
+        uuid: string;
+    }
 }

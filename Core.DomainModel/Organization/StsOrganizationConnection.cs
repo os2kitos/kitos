@@ -25,13 +25,15 @@ namespace Core.DomainModel.Organization
         public int? SynchronizationDepth { get; set; }
         public virtual ICollection<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
 
-        //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3312 adds automatic subscription here
+
+        public bool SubscribeToUpdates { get; set; }
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
             organizationUnits.ForEach(unit => unit.ConvertToNativeKitosUnit());
 
             Connected = false;
+            SubscribeToUpdates = false;
             SynchronizationDepth = null;
             return new DisconnectOrganizationFromOriginResult(organizationUnits);
         }

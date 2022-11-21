@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -18,13 +19,16 @@ namespace Presentation.Web.Controllers.API.V1
     public class OrganizationUnitController : GenericHierarchyApiController<OrganizationUnit, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
+        private readonly IOrganizationUnitService _organizationUnitService;
 
         public OrganizationUnitController(
             IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService)
+            IOrgUnitService orgUnitService,
+            IOrganizationUnitService organizationUnitService)
             : base(repository)
         {
             _orgUnitService = orgUnitService;
+            _organizationUnitService = organizationUnitService;
         }
 
         public HttpResponseMessage Post(OrgUnitDTO dto) => base.Post(dto.OrganizationId, dto);
@@ -119,9 +123,30 @@ namespace Presentation.Web.Controllers.API.V1
                 JToken jtoken;
                 if (obj.TryGetValue("parentId", out jtoken))
                 {
-                    //TODO: You have to be local or global admin to change parent
-
                     var parentId = jtoken.Value<int>();
+
+                    var unit = Repository
+                        .AsQueryable()
+                        .ById(id);
+                    if (unit == null)
+                    {
+                        return BadRequest($"Unit with id: {id} was not found");
+                    }
+                    if (parentId == unit.ParentId.GetValueOrDefault())
+                    {
+                        return Ok();
+                    }
+                    var accessRightsResult = _organizationUnitService.GetAccessRights(unit.Organization.Uuid, unit.Uuid);
+                    if (accessRightsResult.Failed)
+                    {
+                        return FromOperationError(accessRightsResult.Error);
+                    }
+
+                    var accessRights = accessRightsResult.Value;
+                    if (!accessRights.CanBeRearranged)
+                    {
+                        return BadRequest("Unit cannot change its parent");
+                    }
 
                     //if the new parent is actually a descendant of the item, don't update - this would create a loop!
                     if (_orgUnitService.DescendsFrom(parentId, id))

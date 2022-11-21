@@ -42,6 +42,7 @@ namespace Presentation.Web.Controllers.API.V1
                 .Select(details => new StsOrganizationSynchronizationDetailsResponseDTO
                 {
                     Connected = details.Connected,
+                    SubscribesToUpdates = details.SubscribesToUpdates,
                     SynchronizationDepth = details.SynchronizationDepth,
                     CanCreateConnection = details.CanCreateConnection,
                     CanDeleteConnection = details.CanDeleteConnection,
@@ -65,8 +66,13 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest(ModelState);
             }
 
+            if (request == null)
+            {
+                return BadRequest("Invalid request body");
+            }
+
             return _stsOrganizationSynchronizationService
-                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType())
+                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
                 .Match(FromOperationError, Ok);
         }
 
@@ -103,8 +109,13 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest(ModelState);
             }
 
+            if (request == null)
+            {
+                return BadRequest("Invalid request body");
+            }
+
             return _stsOrganizationSynchronizationService
-                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType().Value)
+                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
                 .Match(FromOperationError, Ok);
         }
 

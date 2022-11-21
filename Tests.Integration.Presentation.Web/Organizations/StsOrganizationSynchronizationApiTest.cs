@@ -93,18 +93,20 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(expectedError, root.AccessStatus.Error);
         }
 
-        [Fact]
-        public async Task Can_POST_Create_Connection()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_POST_Create_Connection(bool subscribe)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
             const int levels = 2;
-            using var getResponse = await SendGetSnapshotAsync(levels, targetOrgUuid, cookie);
+            using var getResponse = await SendGetSnapshotAsync(levels, targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
             var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
 
             //Act
-            using var response = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels);
+            using var response = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels, subscribe);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -115,6 +117,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 Assert.NotNull(organization.StsOrganizationConnection);
                 Assert.True(organization.StsOrganizationConnection.Connected);
                 Assert.Equal(levels, organization.StsOrganizationConnection.SynchronizationDepth);
+                Assert.Equal(subscribe, organization.StsOrganizationConnection.SubscribeToUpdates);
                 AssertImportedTree(expectedImport, dbRoot, OrganizationUnitOrigin.STS_Organisation);
                 return true;
             });
@@ -482,6 +485,28 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Contains(uuidOfExpectedMoval, movedItemChildrenUuids);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_PUT_UPDATE_Consequences_With_SubscriptionChanges(bool initiallySubscribe)
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int levels = 1;
+            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels, initiallySubscribe);
+
+            //Act
+            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie, !initiallySubscribe);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            using var getResponse = await SendGetConnectionStatusAsync(targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
+            var dto = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
+            Assert.Equal(!initiallySubscribe, dto.SubscribesToUpdates);
+
+        }
+
         [Fact]
         public async Task Can_PUT_UPDATE_Consequences_With_Conversion_Consequences()
         {
@@ -784,8 +809,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             }
             else
             {
-                var childrenToImport = treeToImport.Children.OrderBy(x=>x.Name).ThenBy(x=>x.Uuid.ToString()).ToList();
-                var importedUnits = importedTree.Children.OrderBy(x=>x.Name).ThenBy(x=>x.ExternalOriginUuid.GetValueOrDefault().ToString()).ToList();
+                var childrenToImport = treeToImport.Children.OrderBy(x => x.Name).ThenBy(x => x.Uuid.ToString()).ToList();
+                var importedUnits = importedTree.Children.OrderBy(x => x.Name).ThenBy(x => x.ExternalOriginUuid.GetValueOrDefault().ToString()).ToList();
                 Assert.Equal(childrenToImport.Count, importedUnits.Count);
                 for (var i = 0; i < childrenToImport.Count; i++)
                 {
@@ -860,14 +885,15 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
-        private static async Task<HttpResponseMessage> SendPostCreateConnectionAsync(Guid targetOrgUuid, Cookie cookie, int levels)
+        private static async Task<HttpResponseMessage> SendPostCreateConnectionAsync(Guid targetOrgUuid, Cookie cookie, int levels, bool subscribe = false)
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
                     $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
             return await HttpApi.PostWithCookieAsync(postUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
-                SynchronizationDepth = levels
+                SynchronizationDepth = levels,
+                SubscribeToUpdates = subscribe
             });
         }
 
@@ -879,14 +905,15 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return await HttpApi.GetWithCookieAsync(getUrl, cookie);
         }
 
-        private static async Task<HttpResponseMessage> SendPutUpdateConsequencesAsync(Guid targetOrgUuid, int levels, Cookie cookie)
+        private static async Task<HttpResponseMessage> SendPutUpdateConsequencesAsync(Guid targetOrgUuid, int levels, Cookie cookie, bool subscribe = false)
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
                     $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
             return await HttpApi.PutWithCookieAsync(postUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
-                SynchronizationDepth = levels
+                SynchronizationDepth = levels,
+                SubscribeToUpdates = subscribe
             });
         }
 

@@ -105,6 +105,7 @@
     <Compile Include="Organization\StsOrganizationChangeLog.cs" />
     <Compile Include="Organization\StsOrganizationConsequenceLog.cs" />
     <Compile Include="Organization\UnitAccessRights.cs" />
+    <Compile Include="Organization\UnitAccessRightsWithUnitData.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />

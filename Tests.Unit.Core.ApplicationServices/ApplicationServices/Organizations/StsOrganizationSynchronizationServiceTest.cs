@@ -191,9 +191,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Connect__Hierarchy_Returns_Success_And_Imports_External_Units_Into_Kitos(bool onlyRoot)
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void Connect_Hierarchy_Returns_Success_And_Imports_External_Units_Into_Kitos(bool onlyRoot, bool subscribe)
         {
             //Arrange
             var organizationId = A<Guid>();
@@ -208,12 +208,13 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, onlyRoot ? 1 : Maybe<int>.None);
+            var error = _sut.Connect(organizationId, onlyRoot ? 1 : Maybe<int>.None, subscribe);
 
             //Assert
             Assert.False(error.HasValue);
             Assert.NotNull(organization.StsOrganizationConnection);
             Assert.True(organization.StsOrganizationConnection.Connected);
+            Assert.Equal(subscribe, organization.StsOrganizationConnection.SubscribeToUpdates);
             Assert.Equal(onlyRoot ? 1 : (int?)null, organization.StsOrganizationConnection.SynchronizationDepth);
             VerifyChangesSaved(transaction, organization);
 
@@ -241,7 +242,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -262,7 +263,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -283,7 +284,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -329,7 +330,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, newDepth);
+            var error = _sut.UpdateConnection(organizationId, newDepth, false);
 
             //Assert
             Assert.False(error.HasValue);
@@ -367,7 +368,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -395,7 +396,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -421,7 +422,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -447,7 +448,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -507,8 +508,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             transaction.Verify(x => x.Rollback(), Times.Once());
         }
 
-        [Fact]
-        public void Disconnect_Succeeds_And_Converts_All_Imported_Org_Units_To_Kitos_Units()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Disconnect_Succeeds_And_Converts_All_Imported_Org_Units_To_Kitos_Units(bool subscribeBeforeDisconnect)
         {
             //Arrange
             var organizationId = A<Guid>();
@@ -529,6 +532,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             {
                 Connected = true,
                 SynchronizationDepth = A<int>(),
+                SubscribeToUpdates = subscribeBeforeDisconnect
             };
             var organization = new Organization
             {
@@ -555,6 +559,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());
             Assert.False(organization.StsOrganizationConnection.Connected);
             Assert.Null(organization.StsOrganizationConnection.SynchronizationDepth);
+            Assert.False(organization.StsOrganizationConnection.SubscribeToUpdates);
             foreach (var organizationUnit in organization.OrgUnits)
             {
                 Assert.Equal(OrganizationUnitOrigin.Kitos, organizationUnit.Origin);

@@ -33,20 +33,21 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitService",
         function ($scope,
             $http: ng.IHttpService,
             $modal,
             $state,
             notify,
-            rootNodeOfOrganization: Kitos.Models.Api.Organization.IOrganizationUnitDto,
+            rootNodeOfOrganization: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
             localOrgUnitRoles,
             orgUnitRoles,
             user,
             hasWriteAccess,
             authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
             select2LoadingService: Kitos.Services.ISelect2LoadingService,
-            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
+            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -72,7 +73,7 @@
             });
             $scope.showDifferenceBetweenOrgUnitOrigin =
                 // User is an admin with edit rights to the hierarchy
-                (user.isGlobalAdmin || user.isLocalAdmin) && 
+                (user.isGlobalAdmin || user.isLocalAdmin) &&
                 // Hierarchy root has been synced from a different source than KITOS
                 rootNodeOfOrganization.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos;
 
@@ -367,7 +368,7 @@
                     controller: [
                         "$scope", "$uibModalInstance", "autofocus", "organizationUnitService", function ($modalScope, $modalInstance, autofocus, organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
                             autofocus();
-                            
+
                             // edit or create-new mode
                             $modalScope.isNew = false;
 
@@ -493,7 +494,7 @@
 
 
                                     var resultTypes = [];
-                                    
+
                                     if (parent !== $modalScope.orgUnit.oldParent) {
                                         resultTypes.push(Kitos.Models.ViewModel.Organization
                                             .OrganizationUnitEditResultType.UnitRelocated);
@@ -505,7 +506,7 @@
                                             resultTypes.push(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.FieldsChanged);
                                         }
                                     }
-                                    
+
                                     $modalInstance.close(createResult(resultTypes, result.data.response));
                                     inMemoryCacheService.clear();
                                 },
@@ -606,12 +607,12 @@
                                         inMemoryCacheService.clear();
                                         $modalInstance.close(createResult([Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitDeleted]));
                                     }, (error) => {
-                                            $modalScope.submitting = false;
+                                        $modalScope.submitting = false;
 
-                                            notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
+                                        notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
                                                             Organisationsenheden bliver brugt som reference i en eller flere IT Systemer og/eller IT Kontrakter.<br /><br />
                                                             Fjern referencen for at kunne slette denne enhed.`);
-                                        });
+                                    });
 
                             };
 
@@ -707,11 +708,36 @@
                 loadRights($scope.chosenOrgUnit);
             });
 
-            $scope.dragEnabled = false;
+            $scope.isReordering = false;
+            $scope.loadingAccessRights = false;
 
             $scope.toggleDrag = function () {
-                $scope.dragEnabled = !$scope.dragEnabled;
+                $scope.isReordering = !$scope.isReordering;
+
+                if ($scope.isReordering) {
+                    $scope.loadingAccessRights = true;
+                    organizationUnitService.getUnitAccessRightsForOrganization(rootNodeOfOrganization.organization.uuid)
+                        .then(response => {
+                            const rightsMap = response.reduce((rights, next) => {
+                                rights[next.unitId] = next;
+                                return rights;
+                            }, {})
+                            applyAccessRights(rootNodeOfOrganization, rightsMap);
+                            $scope.loadingAccessRights = false;
+                        }, error => {
+                            notify.addErrorMessage("Kunne ikke indlæse rettighederne for organisationsenheden");
+                            console.log(error);
+                            $scope.loadingAccessRights = false;
+                            $scope.isReordering = false;
+                        });
+                }
             };
+
+            function applyAccessRights(unit: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
+                accessRights: { [key: number]: Kitos.Models.Api.Organization.UnitAccessRightsWithUnitIdDto }) {
+                unit.draggable = accessRights[unit.id]?.canBeRearranged === true;
+                unit.children.forEach(child => applyAccessRights(child, accessRights));
+            }
 
             $scope.treeOptions = {
                 accept: function (sourceNodeScope, destNodesScope, destIndex) {

@@ -63,18 +63,6 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(FromOperationError, Ok);
         }
 
-        [HttpGet]
-        [Route("access-rights")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetUnitAccessRights(Guid organizationUuid, Guid unitUuid)
-        {
-            return _organizationUnitService.GetAccessRights(organizationUuid, unitUuid)
-                .Select(ToAccessRightsDto)
-                .Match(Ok, FromOperationError);
-        }
-
         private static OrganizationRegistrationUnitDTO ToRegistrationDto(OrganizationUnitRegistrationDetails details)
         {
             return new OrganizationRegistrationUnitDTO
@@ -128,19 +116,6 @@ namespace Presentation.Web.Controllers.API.V1
                 requestDto.ResponsibleSystems,
                 requestDto.RelevantSystems
             );
-        }
-
-        private static UnitAccessRightsDTO ToAccessRightsDto(
-            UnitAccessRights accessRights)
-        {
-            return new UnitAccessRightsDTO(
-                accessRights.CanBeRead, 
-                accessRights.CanBeModified, 
-                accessRights.CanBeRenamed, 
-                accessRights.CanEanBeModified, 
-                accessRights.CanDeviceIdBeModified, 
-                accessRights.CanBeRearranged, 
-                accessRights.CanBeDeleted);
         }
     }
 }

@@ -454,7 +454,8 @@ namespace Tests.Unit.Core.Model.Strategies
             return organizationUnit;
         }
 
-        private static OrganizationUnit AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit removedNodeInUse)
+        private static void AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(
+            OrganizationTreeUpdateConsequences consequences, OrganizationUnit removedNodeInUse)
         {
             var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits).organizationUnit;
             Assert.Same(removedNodeInUse, organizationUnit);
@@ -463,11 +464,10 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
             Assert.Empty(consequences.AddedExternalOrganizationUnits);
             Assert.Empty(consequences.OrganizationUnitsBeingMoved);
-
-            return organizationUnit;
         }
 
-        private static OrganizationUnit AssertUnitsWhichAreDeletedWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit expectedRemovedUnit)
+        private static void AssertUnitsWhichAreDeletedWereDetected(OrganizationTreeUpdateConsequences consequences,
+            OrganizationUnit expectedRemovedUnit)
         {
             var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted).organizationUnit;
             Assert.Same(expectedRemovedUnit, removedUnit);
@@ -476,8 +476,6 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
             Assert.Empty(consequences.AddedExternalOrganizationUnits);
             Assert.Empty(consequences.OrganizationUnitsBeingMoved);
-
-            return removedUnit;
         }
 
         private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>> customChildren = null)

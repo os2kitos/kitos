@@ -17,14 +17,14 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         public static async Task<OrganizationDTO> GetOrganizationAsync(int organizationId, Cookie optionalCookie = null)
         {
-            using var response = await SendGetOrganizationRequestAsync(organizationId,optionalCookie);
+            using var response = await SendGetOrganizationRequestAsync(organizationId, optionalCookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<OrganizationDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendGetOrganizationRequestAsync(int organizationId, Cookie optionalCookie = null)
         {
-            var cookie = optionalCookie  ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = optionalCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/organization/{organizationId}");
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
@@ -33,7 +33,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/contactPerson/{organizationId}"); //NOTE: This looks odd but it is how it works. On GET it uses the orgId and on patch it uses the contactPersonId
-            
+
             using var response = await HttpApi.GetWithCookieAsync(url, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<ContactPersonDTO>();
@@ -118,7 +118,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             using var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, body);
-
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
             return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<OrgUnitDTO>();
         }
 

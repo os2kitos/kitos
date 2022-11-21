@@ -21,13 +21,12 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="levelsToInclude"></param>
         /// <returns></returns>
         Result<ExternalOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<int> levelsToInclude);
+
         /// <summary>
         /// Connect the organization to "STS Organisation"
         /// </summary>
-        /// <param name="organizationId"></param>
-        /// <param name="levelsToInclude"></param>
         /// <returns></returns>
-        Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude);
+        Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates);
         /// <summary>
         /// Disconnect the KITOS organization from STS Organisation
         /// </summary>
@@ -44,10 +43,8 @@ namespace Core.ApplicationServices.Organizations
         /// <summary>
         /// Updates the connection to the STS Organization
         /// </summary>
-        /// <param name="organizationId"></param>
-        /// <param name="levelsToInclude"></param>
         /// <returns></returns>
-        Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude);
+        Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates);
         /// <summary>
         /// Gets the last x change logs for the organization
         /// </summary>

@@ -69,6 +69,78 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
+        public async Task GetOrganizationUnitAccessRights_GlobalAdmin_Has_All_AccessRights()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+
+            //Act
+            var accessRightsList = await OrganizationUnitHelper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
+
+            //Assert
+            var accessRights = accessRightsList.FirstOrDefault(x => x.UnitId == unit.Id);
+            Assert.NotNull(accessRights);
+
+            Assert.Equal(unit.Id, accessRights.UnitId);
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanBeRearranged);
+            Assert.True(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public async Task GetOrganizationUnitAccessRights_LocalAdmin_From_Organization_Has_All_AccessRights()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+
+            //Act
+            var accessRightsList = await OrganizationUnitHelper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
+
+            //Assert
+            var accessRights = accessRightsList.FirstOrDefault(x => x.UnitId == unit.Id);
+            Assert.NotNull(accessRights);
+
+            Assert.Equal(unit.Id, accessRights.UnitId);
+            Assert.True(accessRights.CanBeRead);
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanNameBeModified);
+            Assert.True(accessRights.CanBeRearranged);
+            Assert.True(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
+        public async Task GetOrganizationUnitAccessRights_User_From_Organization_Has_Only_Read_Access()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+
+            //Act
+            var accessRightsList = await OrganizationUnitHelper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
+
+            //Assert
+            var accessRights = accessRightsList.FirstOrDefault(x => x.UnitId == unit.Id);
+            Assert.NotNull(accessRights);
+
+            Assert.Equal(unit.Id, accessRights.UnitId);
+            Assert.True(accessRights.CanBeRead);
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanNameBeModified);
+            Assert.False(accessRights.CanBeRearranged);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Fact]
         public async Task Can_Get_Registrations()
         {
             var organization = await CreateOrganizationAsync();

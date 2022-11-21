@@ -28,6 +28,7 @@
 
     interface IFkOrganizationSynchronizationStatus {
         connected: boolean
+        subscribesToUpdates: boolean
         synchronizationDepth: number | null
     }
 
@@ -95,7 +96,7 @@
                     enabled: result.canUpdateConnection,
                     onClick: () => {
                         this.fkOrganisationImportDialogFactory
-                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Update, this.currentOrganizationUuid, this.synchronizationStatus.synchronizationDepth)
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Update, this.currentOrganizationUuid, this.synchronizationStatus.synchronizationDepth, this.synchronizationStatus.subscribesToUpdates)
                             .closed.then(() => {
                                 //Reload state from backend if the dialog was closed 
                                 this.loadState();
@@ -132,7 +133,7 @@
                     enabled: result.canCreateConnection,
                     onClick: () => {
                         this.fkOrganisationImportDialogFactory
-                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null)
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null, false)
                             .closed.then(() => {
                                 //Reload state from backend if the dialog was closed 
                                 this.loadState();
@@ -147,7 +148,8 @@
         private bindSynchronizationStatus(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
             this.synchronizationStatus = {
                 connected: result.connected,
-                synchronizationDepth: result.synchronizationDepth
+                synchronizationDepth: result.synchronizationDepth,
+                subscribesToUpdates: result.subscribesToUpdates
             };
         }
 

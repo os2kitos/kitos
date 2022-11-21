@@ -40,4 +40,8 @@
         canDeviceIdBeModified: boolean;
         canBeRearranged: boolean;
     }
+
+    export class UnitAccessRightsWithUnitIdDto extends UnitAccessRightsDto {
+        unitId: number;
+    }
 }
