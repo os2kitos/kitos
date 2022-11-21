@@ -14,20 +14,27 @@
 </div>
 <div class="form-group" ng-if="ctrl.synchronizationStatus !== null">
     <label for="sync-status" class="control-label small">Synkronisering <field-help-text data-key="local-config-fk-org-sync-status.label" /></label>
-    <div id="sync-status">
-        <span ng-if="ctrl.synchronizationStatus.connected">
-            Organisationen er forbundet til FK Organisation
-            <ul>
-                <li>
-                    Niveauer der synkroniseres: <strong>{{::ctrl.synchronizationStatus.synchronizationDepth === null ? 'Alle' : ctrl.synchronizationStatus.synchronizationDepth}}</strong>
-                </li>
-                <li>
-                    Importerer automatisk (dagligt) ændringer fra FK Organisation: <strong>{{::ctrl.synchronizationStatus.subscribesToUpdates ? 'Ja' : 'Nej'}}</strong>
-                </li>
-            </ul>
-        </span>
-        <span ng-if="!ctrl.synchronizationStatus.connected">Organisationen er <strong>ikke</strong> forbundet til FK Organisation</span>
+    <div id="sync-status" ng-if="ctrl.synchronizationStatus.connected">
+        <div class="well well-sm">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th width="33%">Niveauer der synkroniseres</th>
+                    <th width="33%">Importerer automatisk (dagligt) ændringer</th>
+                    <th width="33%">Dato for seneste automatiske tjek</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{::ctrl.synchronizationStatus.synchronizationDepth === null ? 'Alle' : ctrl.synchronizationStatus.synchronizationDepth}}</td>
+                    <td>{{::ctrl.synchronizationStatus.subscribesToUpdates ? 'Ja' : 'Nej'}}</td>
+                    <td>{{::ctrl.dateOfLatestSubscriptionCheck}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+    <div ng-if="!ctrl.synchronizationStatus.connected">Organisationen er <strong>ikke</strong> forbundet til FK Organisation</div>
 
 </div>
 <div class="form-group" ng-if="ctrl.commands && ctrl.commands.length > 0">

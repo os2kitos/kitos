@@ -46,6 +46,7 @@
         accessGranted: boolean | null = null;
         accessError: string | null = null;
         synchronizationStatus: IFkOrganizationSynchronizationStatus | null = null;
+        dateOfLatestSubscriptionCheck: string | null;
         commands: Array<IFkOrganizationCommand> | null = null;
         busy: boolean = false;
 
@@ -79,6 +80,11 @@
                     this.bindAccessProperties(result);
                     this.bindSynchronizationStatus(result);
                     this.bindCommands(result);
+                    if (result.dateOfLatestCheckBySubscription !== null) {
+                        this.dateOfLatestSubscriptionCheck = Helpers.RenderFieldsHelper.renderDate(result.dateOfLatestCheckBySubscription);
+                    } else {
+                        this.dateOfLatestSubscriptionCheck = result.subscribesToUpdates ? "Ikke tilgængeligt" : "Ikke relevant";
+                    }
                 }, error => {
                     console.error(error);
                     this.accessGranted = false;
