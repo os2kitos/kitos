@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_sts_subscription_flag : IMigrationMetadata
+    public sealed partial class StsSyncState_With_Subscription : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_sts_subscription_flag));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(StsSyncState_With_Subscription));
         
         string IMigrationMetadata.Id
         {
-            get { return "202211181038597_Added_sts_subscription_flag"; }
+            get { return "202211210847408_StsSyncState_With_Subscription"; }
         }
         
         string IMigrationMetadata.Source

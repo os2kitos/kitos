@@ -955,9 +955,9 @@
     <Compile Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.designer.cs">
       <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202211181038597_Added_sts_subscription_flag.cs" />
-    <Compile Include="Migrations\202211181038597_Added_sts_subscription_flag.designer.cs">
-      <DependentUpon>202211181038597_Added_sts_subscription_flag.cs</DependentUpon>
+    <Compile Include="Migrations\202211210847408_StsSyncState_With_Subscription.cs" />
+    <Compile Include="Migrations\202211210847408_StsSyncState_With_Subscription.designer.cs">
+      <DependentUpon>202211210847408_StsSyncState_With_Subscription.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1599,8 +1599,8 @@
     <EmbeddedResource Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.resx">
       <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202211181038597_Added_sts_subscription_flag.resx">
-      <DependentUpon>202211181038597_Added_sts_subscription_flag.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202211210847408_StsSyncState_With_Subscription.resx">
+      <DependentUpon>202211210847408_StsSyncState_With_Subscription.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

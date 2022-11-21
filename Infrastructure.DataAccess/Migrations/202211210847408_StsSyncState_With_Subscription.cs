@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Added_sts_subscription_flag : DbMigration
+    public partial class StsSyncState_With_Subscription : DbMigration
     {
         public override void Up()
         {
