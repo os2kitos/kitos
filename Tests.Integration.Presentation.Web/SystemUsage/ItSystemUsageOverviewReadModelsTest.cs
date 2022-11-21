@@ -97,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(HttpStatusCode.Created, assignRoleResponse.StatusCode);
 
             // System changes
-            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
             await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organizationId, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync(); // Using default organization as BelongsTo
 
@@ -110,7 +110,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             // Parent system 
-            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
 
             // System Usage changes
             var body = new
