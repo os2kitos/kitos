@@ -5,14 +5,14 @@
     }
 
     export interface IFKOrganisationImportDialogFactory {
-        open(flow: FKOrganisationImportFlow, organizationUuid: string, synchronizationDepth: number | null): ng.ui.bootstrap.IModalInstanceService
+        open(flow: FKOrganisationImportFlow, organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.ui.bootstrap.IModalInstanceService
     }
 
     export class FKOrganisationImportDialogFactory implements IFKOrganisationImportDialogFactory {
         static $inject = ["$uibModal"];
         constructor(private readonly $uibModal: ng.ui.bootstrap.IModalService) { }
 
-        open(flow: FKOrganisationImportFlow, organizationUuid: string, synchronizationDepth: number | null): ng.ui.bootstrap.IModalInstanceService {
+        open(flow: FKOrganisationImportFlow, organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.ui.bootstrap.IModalInstanceService {
             return this.$uibModal.open({
                 windowClass: "modal fade in wide-modal",
                 templateUrl: "app/components/local-config/import/fk-organization-import-config-import-modal.view.html",
@@ -21,7 +21,8 @@
                 resolve: {
                     "flow": [() => flow],
                     "orgUuid": [() => organizationUuid],
-                    "synchronizationDepth": [() => synchronizationDepth]
+                    "synchronizationDepth": [() => synchronizationDepth],
+                    "subscribesToUpdates": [() => subscribesToUpdates]
                 },
                 backdrop: "static", //Make sure accidental click outside the modal does not close it during the import process
             });
@@ -29,21 +30,24 @@
     }
 
     class FKOrganisationImportController {
-        static $inject = ["flow", "orgUuid", "synchronizationDepth", "stsOrganizationSyncService", "$uibModalInstance", "notify"];
+        static $inject = ["flow", "orgUuid", "synchronizationDepth", "subscribesToUpdates", "stsOrganizationSyncService", "$uibModalInstance", "notify"];
         isConsequencesCollapsed: boolean = false;
         isHierarchyCollapsed: boolean = false;
         busy: boolean = false;
         updating: boolean = false;
         loadingHierarchy: boolean | null;
+        subscribesToUpdates: boolean = false;
         consequencesAwaitingApproval: Array<Models.Api.Organization.ConnectionUpdateOrganizationUnitConsequenceDTO> | null = null;
         fkOrgHierarchy: Kitos.Shared.Components.Organization.IOrganizationTreeComponentOptions | null = null;
         constructor(
             readonly flow: FKOrganisationImportFlow,
             private readonly organizationUuid: string,
             initialImportDepth: number | null,
+            subscribesToUpdates: boolean,
             private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private readonly notify) {
+            this.subscribesToUpdates = subscribesToUpdates;
             this.fkOrgHierarchy = {
                 availableLevels: initialImportDepth,
                 root: null
@@ -102,11 +106,11 @@
         }
 
         private performUpdate() {
-            
+
             this.updating = true;
             this.busy = true;
 
-            return this.stsOrganizationSyncService.updateConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+            return this.stsOrganizationSyncService.updateConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels, this.subscribesToUpdates)
                 .then(() => {
                     this.closeDialog();
                 }, error => {
@@ -119,7 +123,7 @@
 
         private createConnection() {
             this.stsOrganizationSyncService
-                .createConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels)
+                .createConnection(this.organizationUuid, this.fkOrgHierarchy.availableLevels, this.subscribesToUpdates)
                 .then(() => {
                     this.closeDialog();
                 }, error => {

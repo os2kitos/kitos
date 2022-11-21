@@ -31,7 +31,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _sut.StsOrganizationConnection = new StsOrganizationConnection() { Connected = true };
 
             //Act
-            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, CreateExternalOrganizationUnit(), Maybe<int>.None);
+            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, CreateExternalOrganizationUnit(), Maybe<int>.None,false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -54,7 +54,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             );
 
             //Act
-            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, Maybe<int>.None);
+            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, Maybe<int>.None, false);
 
             //Assert
             Assert.False(error.HasValue);
@@ -66,9 +66,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        public void ImportNewExternalOrganizationOrgTree_Imports_Restricted_Subtree_If_No_Constraint_And_Registers_Sts_Org_Connection(int importedLevels)
+        [InlineData(1,true)]
+        [InlineData(2,false)]
+        public void ImportNewExternalOrganizationOrgTree_Imports_Restricted_Subtree_If_No_Constraint_And_Registers_Sts_Org_Connection(int importedLevels, bool subscribesToUpdates)
         {
             //Arrange
             var rootFromOrg = _sut.GetRoot();
@@ -82,12 +82,13 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             );
 
             //Act
-            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, importedLevels);
+            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, fullImportTree, importedLevels, subscribesToUpdates);
 
             //Assert
             Assert.False(error.HasValue);
             Assert.NotNull(_sut.StsOrganizationConnection);
             Assert.Equal(importedLevels, _sut.StsOrganizationConnection.SynchronizationDepth);
+            Assert.Equal(subscribesToUpdates, _sut.StsOrganizationConnection.SubscribeToUpdates);
             Assert.True(_sut.StsOrganizationConnection.Connected);
             AssertImportedTree(fullImportTree, rootFromOrg, importedLevels);
         }

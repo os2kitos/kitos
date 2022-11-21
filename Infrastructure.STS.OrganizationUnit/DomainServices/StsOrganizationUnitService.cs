@@ -10,8 +10,8 @@ using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
+using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.OrganizationUnit.ServiceReference;
-using Polly;
 using Serilog;
 
 namespace Infrastructure.STS.OrganizationUnit.DomainServices
@@ -142,20 +142,12 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
 
         private static soegResponse SearchOrganizationUnits(OrganisationEnhedPortType channel, soegRequest searchRequest)
         {
-            //This call is unstable, so we add some retries
-            return Policy
-                .Handle<Exception>()
-                .WaitAndRetry(new double[] { 1, 3, 5, 10 }.Select(TimeSpan.FromSeconds))
-                .Execute(() => channel.soeg(searchRequest));
+            return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(searchRequest)).Execute();
         }
 
         private static listResponse LoadOrganizationUnits(OrganisationEnhedPortType channel, listRequest listRequest)
         {
-            //This call is unstable, so we add some retries
-            return Policy
-                .Handle<Exception>()
-                .WaitAndRetry(new double[] { 1, 3, 5, 10 }.Select(TimeSpan.FromSeconds))
-                .Execute(() => channel.list(listRequest));
+            return new RetriedIntegrationRequest<listResponse>(() => channel.list(listRequest)).Execute();
         }
 
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType1) root, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)

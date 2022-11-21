@@ -8,6 +8,7 @@ using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
+using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Company.ServiceReference;
 using Serilog;
 
@@ -40,7 +41,7 @@ namespace Infrastructure.STS.Company.DomainServices
 
             try
             {
-                var response = channel.soeg(request);
+                var response = GetSearchResponse(channel, request);
 
                 var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
                 var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
@@ -74,6 +75,11 @@ namespace Infrastructure.STS.Company.DomainServices
                 _logger.Error(e, "Unknown Exception while finding company uuid from cvr {cvr} for organization with id {organizationId}", organization.Cvr, organization.Id);
                 return new DetailedOperationError<StsError>(OperationFailure.UnknownError, StsError.Unknown, $"STS Organisation threw and unknown exception while searching for uuid by cvr:{organization.Cvr} for organization with id:{organization.Id}");
             }
+        }
+
+        private static soegResponse GetSearchResponse(VirksomhedPortType channel, soegRequest request)
+        {
+            return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(request)).Execute();
         }
 
         private static soegRequest CreateSearchByCvrRequest(Organization organization)

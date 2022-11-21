@@ -4,6 +4,7 @@
     {
         public StsOrganizationAccessStatusResponseDTO AccessStatus { get; set; }
         public bool Connected { get; set; }
+        public bool SubscribesToUpdates { get; set; }
         public int? SynchronizationDepth { get; set; }
         public bool CanCreateConnection { get; set; }
         public bool CanUpdateConnection { get; set; }
