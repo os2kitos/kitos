@@ -4,6 +4,6 @@ namespace Presentation.Web.Models.API.V1.Organizations
 {
     public class ConnectionUpdateConsequencesResponseDTO
     {
-        public IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> Consequences { get; set; }
+        public IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> Consequences { get; set; }
     }
 }

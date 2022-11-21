@@ -150,13 +150,6 @@ namespace Core.ApplicationServices.Organizations
             return Modify(organizationId, organization =>
                 LoadOrganizationUnits(organization)
                     .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude))
-                    .Bind(consequences =>
-                    {
-                        var error = LogChanges(organization.StsOrganizationConnection, consequences);
-                        return error.HasValue 
-                            ? error.Value 
-                            : Result<OrganizationTreeUpdateConsequences, OperationError>.Success(consequences);
-                    })
                     .Select(consequences =>
                     {
                         if (consequences.DeletedExternalUnitsBeingDeleted.Any())
@@ -168,6 +161,13 @@ namespace Core.ApplicationServices.Organizations
                             _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(affectedUnit));
                         }
                         return consequences;
+                    })
+                    .Bind(consequences =>
+                    {
+                        var error = LogChanges(organization.StsOrganizationConnection, consequences);
+                        return error.HasValue 
+                            ? error.Value 
+                            : Result<OrganizationTreeUpdateConsequences, OperationError>.Success(consequences);
                     })
                     .Match(_ => Maybe<OperationError>.None, error => error)
             );

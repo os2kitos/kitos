@@ -11,6 +11,6 @@ namespace Presentation.Web.Models.API.V1.Organizations
         public StsOrganizationChangeLogOriginOption Origin { get; set; }
         public string? Name { get; set; }
         public DateTime LogTime { get; set; }
-        public IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> Consequences { get; set; }
+        public IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> Consequences { get; set; }
     }
 }

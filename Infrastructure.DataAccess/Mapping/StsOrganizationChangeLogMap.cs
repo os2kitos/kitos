@@ -1,6 +1,4 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using System.Security.Cryptography.X509Certificates;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -17,8 +15,14 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("UX_ChangeLogOrigin");
 
+            Property(x => x.LogTime)
+                .IsRequired()
+                .HasIndexAnnotation("UX_LogTime");
+
             Property(x => x.Name)
-                .IsOptional();
+                .HasMaxLength(200)
+                .IsRequired()
+                .HasIndexAnnotation("UX_ChangeLogName");
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
-    public class ConnectionUpdateOrganizationUnitConsequenceResponseDTO
+    public class ConnectionUpdateOrganizationUnitConsequenceDTO
     {
         public Guid Uuid { get; set; }
         public string Name { get; set; }
