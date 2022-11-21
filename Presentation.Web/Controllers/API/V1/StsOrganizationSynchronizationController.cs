@@ -42,6 +42,7 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     Connected = details.Connected,
                     SubscribesToUpdates = details.SubscribesToUpdates,
+                    DateOfLatestCheckBySubscription = details.DateOfLatestCheckBySubscription,
                     SynchronizationDepth = details.SynchronizationDepth,
                     CanCreateConnection = details.CanCreateConnection,
                     CanDeleteConnection = details.CanDeleteConnection,

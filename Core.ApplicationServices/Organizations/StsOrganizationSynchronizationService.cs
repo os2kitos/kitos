@@ -57,6 +57,7 @@ namespace Core.ApplicationServices.Organizations
                     var currentConnectionStatus = ValidateConnection(organization);
                     var isConnected = organization.StsOrganizationConnection?.Connected == true;
                     var subscribesToUpdates = organization.StsOrganizationConnection?.SubscribeToUpdates == true;
+                    var dateOfLatestCheckBySubscription = organization.StsOrganizationConnection?.DateOfLatestCheckBySubscription;
                     var canCreateConnection = currentConnectionStatus.IsNone && organization.StsOrganizationConnection?.Connected != true;
                     var canUpdateConnection = currentConnectionStatus.IsNone && isConnected;
                     return new StsOrganizationSynchronizationDetails
@@ -67,7 +68,8 @@ namespace Core.ApplicationServices.Organizations
                         canUpdateConnection,
                         isConnected,
                         currentConnectionStatus.Match(error => error.Detail, () => default(CheckConnectionError?)),
-                        subscribesToUpdates
+                        subscribesToUpdates,
+                        dateOfLatestCheckBySubscription
                     );
                 });
         }
