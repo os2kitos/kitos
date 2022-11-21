@@ -8,6 +8,11 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public StsOrganizationChangeLogMap()
         {
+            HasRequired(x => x.StsOrganizationConnection)
+                .WithMany(c => c.StsOrganizationChangeLogs)
+                .HasForeignKey(x => x.ConnectionId)
+                .WillCascadeOnDelete(true);
+
             Property(x => x.Origin)
                 .IsRequired()
                 .HasIndexAnnotation("UX_ChangeLogOrigin");

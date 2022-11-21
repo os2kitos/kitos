@@ -141,10 +141,10 @@ namespace Presentation.Web.Controllers.API.V1
                 .DeletedExternalUnitsBeingConvertedToNativeUnits
                 .Select(converted => new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
                 {
-                    Name = converted.Name,
+                    Name = converted.organizationUnit.Name,
                     Category = ConnectionUpdateOrganizationUnitChangeCategory.Converted,
-                    Uuid = converted.ExternalOriginUuid.GetValueOrDefault(),
-                    Description = $"'{converted.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
+                    Uuid = converted.externalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{converted.organizationUnit.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
                 })
                 .ToList();
         }
@@ -155,10 +155,10 @@ namespace Presentation.Web.Controllers.API.V1
                 .DeletedExternalUnitsBeingDeleted
                 .Select(deleted => new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
                 {
-                    Name = deleted.Name,
+                    Name = deleted.organizationUnit.Name,
                     Category = ConnectionUpdateOrganizationUnitChangeCategory.Deleted,
-                    Uuid = deleted.ExternalOriginUuid.GetValueOrDefault(),
-                    Description = $"'{deleted.Name}' slettes."
+                    Uuid = deleted.externalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{deleted.organizationUnit.Name}' slettes."
                 })
                 .ToList();
         }
@@ -231,9 +231,33 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return logs.Select(MapChangeLogResponseDto).ToList();
         }
+
         private static StsOrganizationChangeLogResponseDTO MapChangeLogResponseDto(StsOrganizationChangeLog log)
         {
-            return new StsOrganizationChangeLogResponseDTO(log.Origin.ToStsOrganizationChangeLogOriginOption(), log.Name, log.LogTime, log.ConsequenceLogs);
+            return new StsOrganizationChangeLogResponseDTO
+            {
+                Origin = log.Origin.ToStsOrganizationChangeLogOriginOption(),
+                Name = log.Name,
+                Consequences = MapConsequencesToDtos(log.ConsequenceLogs.ToList()),
+                LogTime = log.LogTime
+            };
+        }
+        
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceResponseDTO> MapConsequencesToDtos(
+            IEnumerable<StsOrganizationConsequenceLog> logs)
+        {
+            return logs.Select(MapConsequenceToDto).ToList();
+        }
+
+        private static ConnectionUpdateOrganizationUnitConsequenceResponseDTO MapConsequenceToDto(StsOrganizationConsequenceLog log)
+        {
+            return new ConnectionUpdateOrganizationUnitConsequenceResponseDTO
+            {
+                Uuid = log.Uuid,
+                Name = log.Name,
+                Category = log.Type.ToConnectionUpdateOrganizationUnitChangeCategory(),
+                Description = log.Description
+            };
         }
         #endregion DTO Mapping
     }

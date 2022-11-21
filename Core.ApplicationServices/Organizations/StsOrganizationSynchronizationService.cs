@@ -150,11 +150,18 @@ namespace Core.ApplicationServices.Organizations
             return Modify(organizationId, organization =>
                 LoadOrganizationUnits(organization)
                     .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude))
+                    .Bind(consequences =>
+                    {
+                        var error = LogChanges(organization.StsOrganizationConnection, consequences);
+                        return error.HasValue 
+                            ? error.Value 
+                            : Result<OrganizationTreeUpdateConsequences, OperationError>.Success(consequences);
+                    })
                     .Select(consequences =>
                     {
                         if (consequences.DeletedExternalUnitsBeingDeleted.Any())
                         {
-                            _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted);
+                            _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList());
                         }
                         foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
                         {
@@ -162,22 +169,15 @@ namespace Core.ApplicationServices.Organizations
                         }
                         return consequences;
                     })
-                    .Bind(consequences =>
-                    {
-                        var error = LogChanges(organization.StsOrganizationConnection, consequences);
-                        return error.HasValue 
-                            ? error.Value 
-                            : Result<Result<OrganizationTreeUpdateConsequences, OperationError>, OperationError>.Success(consequences);
-                    })
                     .Match(_ => Maybe<OperationError>.None, error => error)
             );
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogForOrganization(Guid organizationUuid, int numberOfLastChangeLogs)
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogForOrganization(Guid organizationUuid, int numberOfLastChangeLogs = 0)
         {
             return _organizationService
                 .GetOrganization(organizationUuid)
-                .Select(organization =>
+                .Bind(organization =>
                     organization.StsOrganizationConnection.GetLastNumberOfChangeLogs(numberOfLastChangeLogs));
         }
 
@@ -280,10 +280,10 @@ namespace Core.ApplicationServices.Organizations
                 .DeletedExternalUnitsBeingConvertedToNativeUnits
                 .Select(converted => new StsOrganizationConsequenceLog
                 {
-                    Name = converted.Name,
+                    Name = converted.organizationUnit.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Converted,
-                    Uuid = converted.ExternalOriginUuid.GetValueOrDefault(),
-                    Description = $"'{converted.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
+                    Uuid = converted.externalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{converted.organizationUnit.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
                 })
                 .ToList();
         }
@@ -294,10 +294,10 @@ namespace Core.ApplicationServices.Organizations
                 .DeletedExternalUnitsBeingDeleted
                 .Select(deleted => new StsOrganizationConsequenceLog
                 {
-                    Name = deleted.Name,
+                    Name = deleted.organizationUnit.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Deleted,
-                    Uuid = deleted.ExternalOriginUuid.GetValueOrDefault(),
-                    Description = $"'{deleted.Name}' slettes."
+                    Uuid = deleted.externalOriginUuid.GetValueOrDefault(),
+                    Description = $"'{deleted.organizationUnit.Name}' slettes."
                 })
                 .ToList();
         }

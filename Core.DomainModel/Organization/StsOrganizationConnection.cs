@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.Organization.Strategies;
 
 namespace Core.DomainModel.Organization
@@ -22,7 +23,7 @@ namespace Core.DomainModel.Organization
         /// Determines the optional synchronization depth used during synchronization from STS Organisation
         /// </summary>
         public int? SynchronizationDepth { get; set; }
-        public ICollection<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
+        public virtual ICollection<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
 
         //TODO: https://os2web.atlassian.net/browse/KITOSUDV-3312 adds automatic subscription here
         public DisconnectOrganizationFromOriginResult Disconnect()
@@ -40,11 +41,23 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public IEnumerable<StsOrganizationChangeLog> GetLastNumberOfChangeLogs(int number)
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = 0)
         {
-            return StsOrganizationChangeLogs
+            if (number < 0)
+            {
+                return new OperationError("Number of change logs to get cannot be lower than 0", OperationFailure.BadInput);
+            }
+
+            var query = StsOrganizationChangeLogs
                 .OrderByDescending(x => x.LogTime)
-                .Take(number)
+                .AsQueryable();
+
+            if (number > 0)
+            {
+                query = query.Take(number);
+            }
+
+            return query
                 .ToList();
         }
     }

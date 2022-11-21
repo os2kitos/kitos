@@ -54,6 +54,6 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="organizationUuid"></param>
         /// <param name="numberOfLastChangeLogs"></param>
         /// <returns></returns>
-        Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogForOrganization(Guid organizationUuid, int numberOfLastChangeLogs);
+        Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogForOrganization(Guid organizationUuid, int numberOfLastChangeLogs = 0);
     }
 }

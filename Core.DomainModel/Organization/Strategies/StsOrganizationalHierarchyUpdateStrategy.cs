@@ -79,8 +79,8 @@ namespace Core.DomainModel.Organization.Strategies
                 .Select(uuid => currentTreeByUuid[uuid])
                 .ToDictionary(x => x.Id);
 
-            var removedExternalUnitsWhichMustBeConverted = new List<OrganizationUnit>();
-            var removedExternalUnitsWhichMustBeRemoved = new List<OrganizationUnit>();
+            var removedExternalUnitsWhichMustBeConverted = new List<(Guid?, OrganizationUnit)>();
+            var removedExternalUnitsWhichMustBeRemoved = new List<(Guid?, OrganizationUnit)>();
 
             foreach (var candidateForRemoval in candidatesForRemovalById)
             {
@@ -112,17 +112,17 @@ namespace Core.DomainModel.Organization.Strategies
                 if (removedSubtreeIds.Count != 1)
                 {
                     //Anything left except the candidate, then we must convert the unit to a KITOS-unit?
-                    removedExternalUnitsWhichMustBeConverted.Add(organizationUnit);
+                    removedExternalUnitsWhichMustBeConverted.Add((organizationUnit.ExternalOriginUuid, organizationUnit));
                 }
                 else if (organizationUnit.IsUsed())
                 {
                     //If there is still registrations, we must convert it
-                    removedExternalUnitsWhichMustBeConverted.Add(organizationUnit);
+                    removedExternalUnitsWhichMustBeConverted.Add((organizationUnit.ExternalOriginUuid, organizationUnit));
                 }
                 else
                 {
                     //Safe to remove since there is no remaining sub tree and no remaining registrations tied to it
-                    removedExternalUnitsWhichMustBeRemoved.Add(organizationUnit);
+                    removedExternalUnitsWhichMustBeRemoved.Add((organizationUnit.ExternalOriginUuid ,organizationUnit));
                 }
             }
 
@@ -160,7 +160,7 @@ namespace Core.DomainModel.Organization.Strategies
             //Conversion to native units
             foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
             {
-                unitToNativeUnit.ConvertToNativeKitosUnit();
+                unitToNativeUnit.organizationUnit.ConvertToNativeKitosUnit();
             }
 
             //Addition of new units
@@ -219,7 +219,7 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Deletion of units
-            foreach (var externalUnitToDelete in OrderUnitsToDeleteByLeafToParent(_organization.GetRoot(), consequences.DeletedExternalUnitsBeingDeleted))
+            foreach (var externalUnitToDelete in OrderUnitsToDeleteByLeafToParent(_organization.GetRoot(), consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList()))
             {
                 externalUnitToDelete.ConvertToNativeKitosUnit(); //Convert to KITOS unit before deleting it (external units cannot be deleted)
                 var deleteOrganizationUnitError = _organization.DeleteOrganizationUnit(externalUnitToDelete);

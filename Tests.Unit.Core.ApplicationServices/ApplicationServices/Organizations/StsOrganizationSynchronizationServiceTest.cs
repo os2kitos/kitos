@@ -7,6 +7,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -33,7 +34,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
-        private readonly Mock<Maybe<ActiveUserIdContext>> _activeUserIdContextMock;
+        private readonly ActiveUserIdContext _activeUserIdContext;
         private readonly Mock<IUserRepository> _userRepositoryMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
@@ -46,7 +47,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _transactionManagerMock = new Mock<ITransactionManager>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
-            _activeUserIdContextMock = new Mock<Maybe<ActiveUserIdContext>>();
+            _activeUserIdContext = new ActiveUserIdContext(A<int>());
             _userRepositoryMock = new Mock<IUserRepository>();
 
             _sut = new StsOrganizationSynchronizationService(
@@ -59,7 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _transactionManagerMock.Object,
                 _domainEventsMock.Object,
                 _organizationUnitRepositoryMock.Object,
-                _activeUserIdContextMock.Object,
+                _activeUserIdContext,
                 _userRepositoryMock.Object
                 );
         }
@@ -324,6 +325,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
+            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             var transaction = ExpectTransaction();
 
             //Act
@@ -335,6 +337,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(organization.StsOrganizationConnection.Connected);
             Assert.Equal(newDepth, organization.StsOrganizationConnection.SynchronizationDepth);
             VerifyChangesSaved(transaction, organization);
+
+            var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
+            Assert.Equal(2, changeLog.ConsequenceLogs.Count);
 
             _organizationUnitRepositoryMock.Verify(x => x.RemoveRange(It.Is<IEnumerable<OrganizationUnit>>(units => units.Single() == expectedDeletion)), Times.Once());
             Assert.Equal(2, organization.GetRoot().Children.Count);
@@ -560,6 +565,102 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == unaffectedUnit)), Times.Never());
         }
 
+        [Fact]
+        public void GetChangeLogForOrganization_Returns_All_Logs()
+        {
+            var orgUuid = A<Guid>();
+
+            var logs = new List<StsOrganizationConsequenceLog> { new (), new () };
+            var changeLogs = new List<StsOrganizationChangeLog> { new () { ConsequenceLogs = logs }, new() { ConsequenceLogs = logs } };
+
+            var stsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = true,
+                SynchronizationDepth = A<int>(),
+                StsOrganizationChangeLogs = changeLogs
+            };
+            var organization = new Organization
+            {
+                Uuid = orgUuid,
+                StsOrganizationConnection = stsOrganizationConnection
+            };
+            
+            SetupGetOrganizationReturns(orgUuid, organization);
+
+            var result = _sut.GetChangeLogForOrganization(orgUuid);
+
+            Assert.True(result.Ok);
+            Assert.Equal(2, result.Value.Count());
+        }
+
+        [Fact]
+        public void GetChangeLogForOrganization_Returns_Number_Of_Logs()
+        {
+            var orgUuid = A<Guid>();
+
+            var logs = new List<StsOrganizationConsequenceLog> { new (), new () };
+            var changeLogs = new List<StsOrganizationChangeLog> { new () { ConsequenceLogs = logs }, new() { ConsequenceLogs = logs } };
+
+            var stsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = true,
+                SynchronizationDepth = A<int>(),
+                StsOrganizationChangeLogs = changeLogs
+            };
+            var organization = new Organization
+            {
+                Uuid = orgUuid,
+                StsOrganizationConnection = stsOrganizationConnection
+            };
+
+
+            SetupGetOrganizationReturns(orgUuid, organization);
+
+            var result = _sut.GetChangeLogForOrganization(orgUuid, 1);
+
+            Assert.True(result.Ok);
+            var logResult = Assert.Single(result.Value);
+            ;
+            Assert.Equal(2, logResult.ConsequenceLogs.Count);
+        }
+
+        [Fact]
+        public void GetChangeLogForOrganization_GetOrganization_Returns_OperationError()
+        {
+            var orgUuid = A<Guid>();
+
+            SetupGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
+
+            var result = _sut.GetChangeLogForOrganization(orgUuid, 1);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void GetChangeLogForOrganization_GetOrganization_Returns_BadInput()
+        {
+            var orgUuid = A<Guid>();
+            
+            var stsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = true,
+                SynchronizationDepth = A<int>(),
+            };
+            var organization = new Organization
+            {
+                Uuid = orgUuid,
+                StsOrganizationConnection = stsOrganizationConnection
+            };
+            
+            SetupGetOrganizationReturns(orgUuid, organization);
+
+            var result = _sut.GetChangeLogForOrganization(orgUuid, -1);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
         private void VerifyChangesSaved(Mock<IDatabaseTransaction> transaction, Organization organization)
         {
             _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());
@@ -592,6 +693,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void SetupGetOrganizationReturns(Guid organizationId, Result<Organization, OperationError> organization)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(organizationId, null)).Returns(organization);
+        }
+
+        private void SetupGetUserReturns(int userId, User user)
+        {
+            _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(user);
         }
 
         private void SetupHasPermissionReturns(Organization organization, bool value)

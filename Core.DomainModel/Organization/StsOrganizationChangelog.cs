@@ -10,9 +10,12 @@ namespace Core.DomainModel.Organization
             ConsequenceLogs = new List<StsOrganizationConsequenceLog>();
         }
 
+        public virtual StsOrganizationConnection StsOrganizationConnection { get; set; }
+        public int ConnectionId { get; set; }
+
         public StsOrganizationChangeLogOrigin Origin { get; set; }
         public string Name { get; set; }
         public DateTime LogTime { get; set; }
-        public ICollection<StsOrganizationConsequenceLog> ConsequenceLogs { get; set; }
+        public virtual ICollection<StsOrganizationConsequenceLog> ConsequenceLogs { get; set; }
     }
 }
