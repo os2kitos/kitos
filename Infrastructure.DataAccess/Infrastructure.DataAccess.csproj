@@ -957,9 +957,9 @@
     <Compile Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.designer.cs">
       <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202211210835245_AddedStsOrganizationChangeLog.cs" />
-    <Compile Include="Migrations\202211210835245_AddedStsOrganizationChangeLog.designer.cs">
-      <DependentUpon>202211210835245_AddedStsOrganizationChangeLog.cs</DependentUpon>
+    <Compile Include="Migrations\202211211324593_AddedStsOrganizationChangeLog.cs" />
+    <Compile Include="Migrations\202211211324593_AddedStsOrganizationChangeLog.designer.cs">
+      <DependentUpon>202211211324593_AddedStsOrganizationChangeLog.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1601,8 +1601,8 @@
     <EmbeddedResource Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.resx">
       <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202211210835245_AddedStsOrganizationChangeLog.resx">
-      <DependentUpon>202211210835245_AddedStsOrganizationChangeLog.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202211211324593_AddedStsOrganizationChangeLog.resx">
+      <DependentUpon>202211211324593_AddedStsOrganizationChangeLog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

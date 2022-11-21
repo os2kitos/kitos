@@ -214,14 +214,14 @@ namespace Tests.Unit.Core.Model.Strategies
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted);
+            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted).organizationUnit;
             Assert.Same(expectedRemovedUnit, removedUnit);
             var movedUnits = consequences.OrganizationUnitsBeingMoved.ToList();
             Assert.Equal(expectedParentChanges.Count, movedUnits.Count);
             foreach (var (movedUnit, oldParent, newParent) in movedUnits)
             {
-                Assert.Equal(removedUnit.organizationUnit, oldParent);
-                Assert.Equal(removedUnit.organizationUnit.Parent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
+                Assert.Equal(removedUnit, oldParent);
+                Assert.Equal(removedUnit.Parent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
                 Assert.Contains(movedUnit, expectedParentChanges);
             }
 
@@ -363,13 +363,13 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            var removedUnit = Assert.Single(consequences.Value.DeletedExternalUnitsBeingDeleted);
+            var removedUnit = Assert.Single(consequences.Value.DeletedExternalUnitsBeingDeleted).organizationUnit;
             Assert.Same(expectedRemovedUnit, removedUnit);
             var movedUnits = consequences.Value.OrganizationUnitsBeingMoved.ToList();
             Assert.Equal(expectedParentChangesCount, movedUnits.Count);
             foreach (var (affectedUnit, oldParent, newParent) in movedUnits)
             {
-                Assert.Equal(removedUnit.organizationUnit, oldParent);
+                Assert.Equal(removedUnit, oldParent);
                 Assert.Equal(affectedUnit.Parent?.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
             }
 
@@ -378,7 +378,7 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.Value.AddedExternalOrganizationUnits);
 
             var hierarchy = root.FlattenHierarchy();
-            Assert.Null(hierarchy.FirstOrDefault(x => x.Uuid == removedUnit.organizationUnit.Uuid));
+            Assert.Null(hierarchy.FirstOrDefault(x => x.Uuid == removedUnit.Uuid));
         }
 
         private static void AssertNewUnitsWereDetected(OrganizationTreeUpdateConsequences consequences, IEnumerable<OrganizationUnit> expectedNewUnits, OrganizationUnit expectedSubTree, OrganizationUnit randomParentOfNewSubTree, OrganizationUnit expectedChild)

@@ -14,7 +14,7 @@
                         Id = c.Int(nullable: false, identity: true),
                         ConnectionId = c.Int(nullable: false),
                         Origin = c.Int(nullable: false),
-                        Name = c.String(),
+                        Name = c.String(nullable: false, maxLength: 200),
                         LogTime = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         ObjectOwnerId = c.Int(nullable: false),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
@@ -26,6 +26,8 @@
                 .ForeignKey("dbo.StsOrganizationConnections", t => t.ConnectionId, cascadeDelete: true)
                 .Index(t => t.ConnectionId)
                 .Index(t => t.Origin, name: "UX_ChangeLogOrigin")
+                .Index(t => t.Name, name: "UX_ChangeLogName")
+                .Index(t => t.LogTime, name: "UX_LogTime")
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
@@ -70,6 +72,8 @@
             DropIndex("dbo.StsOrganizationConsequenceLogs", new[] { "ChangeLogId" });
             DropIndex("dbo.StsOrganizationChangeLogs", new[] { "LastChangedByUserId" });
             DropIndex("dbo.StsOrganizationChangeLogs", new[] { "ObjectOwnerId" });
+            DropIndex("dbo.StsOrganizationChangeLogs", "UX_LogTime");
+            DropIndex("dbo.StsOrganizationChangeLogs", "UX_ChangeLogName");
             DropIndex("dbo.StsOrganizationChangeLogs", "UX_ChangeLogOrigin");
             DropIndex("dbo.StsOrganizationChangeLogs", new[] { "ConnectionId" });
             DropTable("dbo.StsOrganizationConsequenceLogs");
