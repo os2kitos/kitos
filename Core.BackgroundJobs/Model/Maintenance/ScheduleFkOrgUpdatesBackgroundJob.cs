@@ -10,6 +10,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Repositories.Organization;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -24,6 +25,7 @@ namespace Core.BackgroundJobs.Model.Maintenance
         private readonly IDatabaseControl _databaseControl;
         private readonly IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private readonly IDomainEvents _domainEvents;
+        private readonly IOperationClock _operationClock;
         private readonly ILogger _logger;
         public string Id => StandardJobIds.ScheduleFkOrgUpdates;
 
@@ -35,7 +37,8 @@ namespace Core.BackgroundJobs.Model.Maintenance
             ITransactionManager transactionManager,
             IDatabaseControl databaseControl,
             IGenericRepository<OrganizationUnit> organizationUnitRepository,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IOperationClock operationClock)
         {
             _hangfireApi = hangfireApi;
             _organizationRepository = organizationRepository;
@@ -45,19 +48,25 @@ namespace Core.BackgroundJobs.Model.Maintenance
             _databaseControl = databaseControl;
             _organizationUnitRepository = organizationUnitRepository;
             _domainEvents = domainEvents;
+            _operationClock = operationClock;
         }
 
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             var uuids = _organizationRepository
                 .GetAll()
-                .Where(x => x.StsOrganizationConnection != null && x.StsOrganizationConnection.SubscribeToUpdates && x.StsOrganizationConnection.SubscribeToUpdates)
+                .Where
+                (x =>
+                    x.StsOrganizationConnection != null &&
+                    x.StsOrganizationConnection.SubscribeToUpdates &&
+                    x.StsOrganizationConnection.SubscribeToUpdates
+                )
                 .Select(x => x.Uuid)
                 .ToList();
 
             var counter = 0;
             var offsetInMinutes = 0;
-            var dateTimeReference = DateTimeOffset.Now;
+            var dateTimeReference = _operationClock.Now;
             foreach (var uuid in uuids)
             {
                 //Add some spread to the start of the synchronizations
