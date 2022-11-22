@@ -18,7 +18,6 @@ namespace Core.BackgroundJobs.Model.Maintenance
     public class ScheduleFkOrgUpdatesBackgroundJob : IAsyncBackgroundJob
     {
         private readonly IHangfireApi _hangfireApi;
-        private readonly IGenericRepository<StsOrganizationConnection> _connectionRepository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IStsOrganizationUnitService _stsOrganizationUnitService;
         private readonly ITransactionManager _transactionManager;
@@ -30,7 +29,6 @@ namespace Core.BackgroundJobs.Model.Maintenance
 
         public ScheduleFkOrgUpdatesBackgroundJob(
             IHangfireApi hangfireApi,
-            IGenericRepository<StsOrganizationConnection> connectionRepository,
             IOrganizationRepository organizationRepository,
             ILogger logger,
             IStsOrganizationUnitService stsOrganizationUnitService,
@@ -40,7 +38,6 @@ namespace Core.BackgroundJobs.Model.Maintenance
             IDomainEvents domainEvents)
         {
             _hangfireApi = hangfireApi;
-            _connectionRepository = connectionRepository;
             _organizationRepository = organizationRepository;
             _logger = logger;
             _stsOrganizationUnitService = stsOrganizationUnitService;
@@ -52,10 +49,10 @@ namespace Core.BackgroundJobs.Model.Maintenance
 
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
-            var uuids = _connectionRepository
-                .AsQueryable()
-                .Where(x => x.Connected && x.SubscribeToUpdates)
-                .Select(x => x.Organization.Uuid)
+            var uuids = _organizationRepository
+                .GetAll()
+                .Where(x => x.StsOrganizationConnection != null && x.StsOrganizationConnection.SubscribeToUpdates && x.StsOrganizationConnection.SubscribeToUpdates)
+                .Select(x => x.Uuid)
                 .ToList();
 
             var counter = 0;
@@ -88,7 +85,7 @@ namespace Core.BackgroundJobs.Model.Maintenance
                 var organization = getOrganizationResult.Value;
                 if (organization.StsOrganizationConnection?.SubscribeToUpdates != true)
                 {
-                    _logger.Warning("Sync job for organization with uuid {uuid} ignored since organization no longer subscribes to updates",organizationUuid);
+                    _logger.Warning("Sync job for organization with uuid {uuid} ignored since organization no longer subscribes to updates", organizationUuid);
                     return;
                 }
                 try
