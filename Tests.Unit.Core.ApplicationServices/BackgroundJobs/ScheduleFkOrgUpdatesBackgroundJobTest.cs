@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.BackgroundJobs.Model.Maintenance;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Time;
@@ -33,12 +34,8 @@ namespace Tests.Unit.Core.BackgroundJobs
                 _hangfireApiMock.Object,
                 _organizationRepositoryMock.Object,
                 Mock.Of<ILogger>(),
-                null,
-                null,
-                null,
-                null,
-                null,
-                _operationClockMock.Object
+                _operationClockMock.Object,
+                Mock.Of<ICommandBus>()
             );
         }
 
@@ -69,7 +66,7 @@ namespace Tests.Unit.Core.BackgroundJobs
             Assert.True(result.Ok);
             _hangfireApiMock.Verify(x => x.Schedule(It.IsAny<Expression<Action>>(), It.IsAny<DateTimeOffset>()), Times.Exactly(4));
             VerifyJobScheduledAt(expectedResult1, _now); //first one runs immediately
-            VerifyJobScheduledAt(expectedResult2,_now.AddMinutes(1)); //next two are scheduled to run in parallel 1 minute from now
+            VerifyJobScheduledAt(expectedResult2, _now.AddMinutes(1)); //next two are scheduled to run in parallel 1 minute from now
             VerifyJobScheduledAt(expectedResult3, _now.AddMinutes(1));
             VerifyJobScheduledAt(expectedResult4, _now.AddMinutes(2)); //fourth is pushed another minute
         }
