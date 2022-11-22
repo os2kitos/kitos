@@ -63,7 +63,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             foreach (var uuid in uuids)
             {
                 //Add some spread to the start of the synchronizations
-                var offset = dateTimeReference.AddMinutes(startOffsetInMinutes);
+                var offset = dateTimeReference.AddMinutes(startOffsetInMinutes); //TODO: Consider the interval - how many can start at the time
                 _hangfireApi.Schedule(() => PerformImportFromFKOrganisation(uuid), offset);
                 startOffsetInMinutes++;
             }
