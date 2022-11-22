@@ -58,14 +58,16 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 .Select(x => x.Organization.Uuid)
                 .ToList();
 
-            var startOffsetInMinutes = 0;
+            var counter = 0;
+            var offsetInMinutes = 0;
             var dateTimeReference = DateTimeOffset.Now;
             foreach (var uuid in uuids)
             {
                 //Add some spread to the start of the synchronizations
-                var offset = dateTimeReference.AddMinutes(startOffsetInMinutes); //TODO: Consider the interval - how many can start at the time
+                offsetInMinutes += (counter % 2); // allow two in parallel
+                var offset = dateTimeReference.AddMinutes(offsetInMinutes);
                 _hangfireApi.Schedule(() => PerformImportFromFKOrganisation(uuid), offset);
-                startOffsetInMinutes++;
+                counter++;
             }
 
             return Task.FromResult(Result<string, OperationError>.Success($"Scheduled {uuids.Count} sync jobs"));
@@ -86,7 +88,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 var organization = getOrganizationResult.Value;
                 if (organization.StsOrganizationConnection?.SubscribeToUpdates != true)
                 {
-                    _logger.Warning("Sync job for organization with uuid {uuid} ignored since organization no longer subscribes to updates");
+                    _logger.Warning("Sync job for organization with uuid {uuid} ignored since organization no longer subscribes to updates",organizationUuid);
                     return;
                 }
                 try
