@@ -9,6 +9,7 @@ using Core.DomainServices;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
 using Serilog;
+using Core.DomainServices.Context;
 
 namespace Core.ApplicationServices.Organizations.Handlers
 {
@@ -20,6 +21,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IDomainEvents _domainEvents;
         private readonly IDatabaseControl _databaseControl;
         private readonly ITransactionManager _transactionManager;
+        private readonly Maybe<ActiveUserIdContext> _userContext;
 
         public AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler(
             IStsOrganizationUnitService stsOrganizationUnitService,
@@ -27,7 +29,8 @@ namespace Core.ApplicationServices.Organizations.Handlers
             ILogger logger,
             IDomainEvents domainEvents,
             IDatabaseControl databaseControl,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            Maybe<ActiveUserIdContext> userContext)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationUnitRepository = organizationUnitRepository;
@@ -35,6 +38,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _domainEvents = domainEvents;
             _databaseControl = databaseControl;
             _transactionManager = transactionManager;
+            _userContext = userContext;
         }
 
         public Maybe<OperationError> Execute(AuthorizedUpdateOrganizationFromFKOrganisationCommand command)
@@ -43,6 +47,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             using var transaction = _transactionManager.Begin();
             try
             {
+                //Load the external tree
                 var organizationTree = _stsOrganizationUnitService.ResolveOrganizationTree(organization);
                 if (organizationTree.Failed)
                 {
@@ -51,6 +56,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     return new OperationError($"Failed to resolve org tree:{error.Message.GetValueOrFallback("")}:{error.Detail:G}:{error.FailureType:G}", error.FailureType);
                 }
 
+                //Import the external tree into the organization
                 var updateResult = organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, organizationTree.Value, command.SynchronizationDepth, command.SubscribeToChanges);
                 if (updateResult.Failed)
                 {
@@ -60,8 +66,8 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     return new OperationError($"Failed to import org tree:{error.Message.GetValueOrFallback("")}:{error.FailureType:G}", error.FailureType);
                 }
 
+                //React on import consequences
                 var consequences = updateResult.Value;
-
                 if (consequences.DeletedExternalUnitsBeingDeleted.Any())
                 {
                     _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted);
@@ -70,7 +76,11 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 {
                     _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(affectedUnit));
                 }
-                organization.StsOrganizationConnection.DateOfLatestCheckBySubscription = DateTime.Now;
+
+                if (IsBackgroundImport())
+                {
+                    organization.StsOrganizationConnection.DateOfLatestCheckBySubscription = DateTime.Now;
+                }
                 //TODO: Add entry to the change log - only if there are any consequences - otherwise ignore it!
 
                 _databaseControl.SaveChanges();
@@ -84,6 +94,11 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 transaction.Rollback();
                 return new OperationError("Exception during import", OperationFailure.UnknownError);
             }
+        }
+
+        private bool IsBackgroundImport()
+        {
+            return _userContext.IsNone;
         }
     }
 }
