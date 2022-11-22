@@ -29,6 +29,8 @@ namespace Core.ApplicationServices.Organizations
         private readonly IAuthorizationContext _authorizationContext;
         private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
         private readonly IUserRepository _userRepository;
+        private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
+        private readonly IGenericRepository<StsOrganizationConsequenceLog> _stsConsequenceLogRepository;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
@@ -41,7 +43,8 @@ namespace Core.ApplicationServices.Organizations
             IDomainEvents domainEvents,
             IGenericRepository<OrganizationUnit> organizationUnitRepository,
             Maybe<ActiveUserIdContext> activeUserIdContext, 
-            IUserRepository userRepository)
+            IUserRepository userRepository, 
+            IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository, IGenericRepository<StsOrganizationConsequenceLog> stsConsequenceLogRepository)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -54,6 +57,8 @@ namespace Core.ApplicationServices.Organizations
             _authorizationContext = authorizationContext;
             _activeUserIdContext = activeUserIdContext;
             _userRepository = userRepository;
+            _stsChangeLogRepository = stsChangeLogRepository;
+            _stsConsequenceLogRepository = stsConsequenceLogRepository;
         }
 
         public Result<StsOrganizationSynchronizationDetails, OperationError> GetSynchronizationDetails(Guid organizationId)
@@ -166,21 +171,40 @@ namespace Core.ApplicationServices.Organizations
                     })
                     .Bind(consequences =>
                     {
-                        var error = LogChanges(organization.StsOrganizationConnection, consequences);
-                        return error.HasValue 
-                            ? error.Value 
-                            : Result<OrganizationTreeUpdateConsequences, OperationError>.Success(consequences);
+                        return organization.GetStsOrganizationConnection()
+                            .Match
+                            (
+                                connection => LogChanges(connection, consequences),
+                                () => new OperationError(
+                                    $"Organization with uuid: {organizationId} is not connected to FK organization",
+                                    OperationFailure.BadState)
+                            )
+                            .Match
+                            (
+                                error => error,
+                                () => Result<OrganizationTreeUpdateConsequences, OperationError>.Success(consequences)
+                            );
                     })
                     .Match(_ => Maybe<OperationError>.None, error => error)
             );
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogForOrganization(Guid organizationUuid, int numberOfLastChangeLogs = 0)
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs = 0)
         {
-            return _organizationService
-                .GetOrganization(organizationUuid)
-                .Bind(organization =>
-                    organization.StsOrganizationConnection.GetLastNumberOfChangeLogs(numberOfLastChangeLogs));
+            return GetOrganizationWithImportPermission(organizationUuid)
+                .Bind(organization => organization.GetStsOrganizationConnectionLogs(numberOfChangeLogs));
+        }
+
+        public IEnumerable<StsOrganizationConsequenceLog> ConvertConsequencesToConsequenceLogs(OrganizationTreeUpdateConsequences consequences)
+        {
+            var logs = new List<StsOrganizationConsequenceLog>();
+            logs.AddRange(MapAddedOrganizationUnits(consequences));
+            logs.AddRange(MapRenamedOrganizationUnits(consequences));
+            logs.AddRange(MapMovedOrganizationUnits(consequences));
+            logs.AddRange(MapRemovedOrganizationUnits(consequences));
+            logs.AddRange(MapConvertedOrganizationUnits(consequences));
+
+            return logs;
         }
 
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
@@ -257,21 +281,27 @@ namespace Core.ApplicationServices.Organizations
                     return new OperationError($"User with id: {userId} was not found", OperationFailure.NotFound);
 
                 changeLog.Origin = StsOrganizationChangeLogOrigin.User;
-                changeLog.Name = $"{user.GetFullName()} {user.Email}";
+                changeLog.UserId = userId;
             }
 
-            var logs = new List<StsOrganizationConsequenceLog>();
-            logs.AddRange(MapAddedOrganizationUnits(consequences));
-            logs.AddRange(MapRenamedOrganizationUnits(consequences));
-            logs.AddRange(MapMovedOrganizationUnits(consequences));
-            logs.AddRange(MapRemovedOrganizationUnits(consequences));
-            logs.AddRange(MapConvertedOrganizationUnits(consequences));
-
-
+            var logs = ConvertConsequencesToConsequenceLogs(consequences).ToList();
             changeLog.ConsequenceLogs = logs;
             changeLog.LogTime = DateTime.Now;
             
-            connection.StsOrganizationChangeLogs.Add(changeLog);
+            connection.AddNewLog(changeLog)
+                .Select
+                (
+                    logToRemove =>
+                    {
+                        var consequenceLogs = logToRemove.GetLogs();
+
+                        _stsConsequenceLogRepository.RemoveRange(consequenceLogs);
+                        _stsChangeLogRepository.Delete(logToRemove);
+                        _stsChangeLogRepository.Save();
+
+                        return logToRemove;
+                    }
+                );
 
             return Maybe<OperationError>.None;
         }
@@ -284,7 +314,7 @@ namespace Core.ApplicationServices.Organizations
                 {
                     Name = converted.organizationUnit.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Converted,
-                    Uuid = converted.externalOriginUuid.GetValueOrDefault(),
+                    Uuid = converted.externalOriginUuid,
                     Description = $"'{converted.organizationUnit.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
                 })
                 .ToList();
@@ -298,7 +328,7 @@ namespace Core.ApplicationServices.Organizations
                 {
                     Name = deleted.organizationUnit.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Deleted,
-                    Uuid = deleted.externalOriginUuid.GetValueOrDefault(),
+                    Uuid = deleted.externalOriginUuid,
                     Description = $"'{deleted.organizationUnit.Name}' slettes."
                 })
                 .ToList();

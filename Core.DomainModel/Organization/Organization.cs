@@ -320,6 +320,21 @@ namespace Core.DomainModel.Organization
             return strategy.PerformUpdate(filteredTree);
         }
 
+        public Maybe<StsOrganizationConnection> GetStsOrganizationConnection()
+        {
+            return StsOrganizationConnection;
+        }
+
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetStsOrganizationConnectionLogs(int numberOfLogs)
+        {
+            return GetStsOrganizationConnection()
+                .Match
+                (
+                    connection => connection.GetLastNumberOfChangeLogs(numberOfLogs),
+                    () => new OperationError($"Organization with uuid: {Uuid} is not connected to FK organization", OperationFailure.BadState)
+                );
+        }
+
         /// <summary>
         /// Adds a organization unit
         /// </summary>
@@ -466,6 +481,8 @@ namespace Core.DomainModel.Organization
 
             return Maybe<OperationError>.None;
         }
+
+
 
         private static bool MatchRoot(OrganizationUnit unit)
         {

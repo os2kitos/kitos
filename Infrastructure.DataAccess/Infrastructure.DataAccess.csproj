@@ -961,9 +961,9 @@
     <Compile Include="Migrations\202211210847408_StsSyncState_With_Subscription.designer.cs">
       <DependentUpon>202211210847408_StsSyncState_With_Subscription.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202211211413155_AddedStsOrganizationChangeLog.cs" />
-    <Compile Include="Migrations\202211211413155_AddedStsOrganizationChangeLog.designer.cs">
-      <DependentUpon>202211211413155_AddedStsOrganizationChangeLog.cs</DependentUpon>
+    <Compile Include="Migrations\202211220944563_AddedStsOrganizationChangeLog.cs" />
+    <Compile Include="Migrations\202211220944563_AddedStsOrganizationChangeLog.designer.cs">
+      <DependentUpon>202211220944563_AddedStsOrganizationChangeLog.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1608,8 +1608,8 @@
     <EmbeddedResource Include="Migrations\202211210847408_StsSyncState_With_Subscription.resx">
       <DependentUpon>202211210847408_StsSyncState_With_Subscription.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202211211413155_AddedStsOrganizationChangeLog.resx">
-      <DependentUpon>202211211413155_AddedStsOrganizationChangeLog.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202211220944563_AddedStsOrganizationChangeLog.resx">
+      <DependentUpon>202211220944563_AddedStsOrganizationChangeLog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

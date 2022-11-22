@@ -31,6 +31,7 @@ namespace Core.DomainModel.Organization
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
             organizationUnits.ForEach(unit => unit.ConvertToNativeKitosUnit());
+            RemoveAllLogs();
 
             Connected = false;
             SubscribeToUpdates = false;
@@ -43,24 +44,44 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = 0)
+        public Maybe<StsOrganizationChangeLog> AddNewLog(StsOrganizationChangeLog newLog)
         {
-            if (number < 0)
+            StsOrganizationChangeLogs.Add(newLog);
+
+            return StsOrganizationChangeLogs.Count <= 5 
+                ? Maybe<StsOrganizationChangeLog>.None 
+                : RemoveOldestLog();
+        }
+
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number)
+        {
+            if (number <= 0)
             {
                 return new OperationError("Number of change logs to get cannot be lower than 0", OperationFailure.BadInput);
             }
 
-            var query = StsOrganizationChangeLogs
+            return StsOrganizationChangeLogs
                 .OrderByDescending(x => x.LogTime)
-                .AsQueryable();
-
-            if (number > 0)
-            {
-                query = query.Take(number);
-            }
-
-            return query
+                .Take(number)
                 .ToList();
+        }
+
+        private void RemoveAllLogs()
+        {
+            var changeLogs = StsOrganizationChangeLogs.ToList();
+            foreach (var changeLog in changeLogs)
+            {
+                changeLog.RemoveAllConsequences();
+                StsOrganizationChangeLogs.Remove(changeLog);
+            }
+        }
+
+        private StsOrganizationChangeLog RemoveOldestLog()
+        {
+            var logToRemove = StsOrganizationChangeLogs.OrderBy(x => x.LogTime).FirstOrDefault();
+            StsOrganizationChangeLogs.Remove(logToRemove);
+
+            return logToRemove;
         }
     }
 }

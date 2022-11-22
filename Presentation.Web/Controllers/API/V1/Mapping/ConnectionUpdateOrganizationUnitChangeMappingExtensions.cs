@@ -35,12 +35,5 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
                 ? result
                 : throw new ArgumentException($@"Unmapped choice:{value:G}", nameof(value));
         }
-
-        public static ConnectionUpdateOrganizationUnitChangeType ToConnectionUpdateOrganizationUnitChangeType(this ConnectionUpdateOrganizationUnitChangeCategory value)
-        {
-            return DataToApiMap.TryGetValue(value, out var result)
-                ? result
-                : throw new ArgumentException($@"Unmapped domain value:{value:G}", nameof(value));
-        }
     }
 }

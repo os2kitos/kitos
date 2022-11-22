@@ -36,6 +36,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
         private readonly ActiveUserIdContext _activeUserIdContext;
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
+        private readonly Mock<IGenericRepository<StsOrganizationConsequenceLog>> _stsOrganizationConsequenceLogMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -49,6 +51,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
             _activeUserIdContext = new ActiveUserIdContext(A<int>());
             _userRepositoryMock = new Mock<IUserRepository>();
+            _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
+            _stsOrganizationConsequenceLogMock = new Mock<IGenericRepository<StsOrganizationConsequenceLog>>();
 
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
@@ -61,8 +65,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _domainEventsMock.Object,
                 _organizationUnitRepositoryMock.Object,
                 _activeUserIdContext,
-                _userRepositoryMock.Object
-                );
+                _userRepositoryMock.Object,
+                _stsOrganziationChangeLogRepositoryMock.Object,
+                _stsOrganizationConsequenceLogMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -592,7 +597,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             
             SetupGetOrganizationReturns(orgUuid, organization);
 
-            var result = _sut.GetChangeLogForOrganization(orgUuid);
+            var result = _sut.GetChangeLogs(orgUuid);
 
             Assert.True(result.Ok);
             Assert.Equal(2, result.Value.Count());
@@ -621,7 +626,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             SetupGetOrganizationReturns(orgUuid, organization);
 
-            var result = _sut.GetChangeLogForOrganization(orgUuid, 1);
+            var result = _sut.GetChangeLogs(orgUuid, 1);
 
             Assert.True(result.Ok);
             var logResult = Assert.Single(result.Value);
@@ -636,7 +641,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             SetupGetOrganizationReturns(orgUuid, new OperationError(OperationFailure.NotFound));
 
-            var result = _sut.GetChangeLogForOrganization(orgUuid, 1);
+            var result = _sut.GetChangeLogs(orgUuid, 1);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error);
@@ -660,7 +665,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             
             SetupGetOrganizationReturns(orgUuid, organization);
 
-            var result = _sut.GetChangeLogForOrganization(orgUuid, -1);
+            var result = _sut.GetChangeLogs(orgUuid, -1);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
