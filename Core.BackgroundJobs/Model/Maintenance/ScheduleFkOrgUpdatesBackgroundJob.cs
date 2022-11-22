@@ -13,7 +13,7 @@ using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
-namespace Core.BackgroundJobs.Model.ReadModels
+namespace Core.BackgroundJobs.Model.Maintenance
 {
     public class ScheduleFkOrgUpdatesBackgroundJob : IAsyncBackgroundJob
     {
