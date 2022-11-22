@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Events;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Context;
@@ -102,21 +104,26 @@ namespace Core.ApplicationServices.Organizations
             return Modify(organizationId, organization =>
             {
                 return LoadOrganizationUnits(organization)
-                    .Match
-                    (
-                        importRoot =>
-                        {
-                            var error = organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude, subscribeToUpdates);
-                            if (error.HasValue)
+                    .Bind(importRoot => ConnectToExternalOrganizationHierarchy(organization, importRoot, levelsToInclude, subscribeToUpdates))
+                    .Bind
+                        (
+                            importRoot =>
                             {
-                                _logger.Error("Failed to import org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Value.FailureType, error.Value.Message.GetValueOrFallback(""));
-                                return new OperationError("Failed to import sub tree", OperationFailure.UnknownError);
-                            }
+                                var addedUnits = organization.GetRoot().FlattenHierarchy().Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation);
+                                var unitsToImport = importRoot.Flatten();
+                                
+                                var consequences = new OrganizationTreeUpdateConsequences(
+                                    new List<(Guid, OrganizationUnit)>(), 
+                                    new List<(Guid, OrganizationUnit)>(),
+                                    GetCreateConnectionConsequences(importRoot, unitsToImport, addedUnits), 
+                                    new List<(OrganizationUnit affectedUnit, string oldName, string newName)>(), 
+                                    new List<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>());
 
-                            return Maybe<OperationError>.None;
-                        },
-                        error => error
-                    );
+                                return GetStsOrganizationConnectionAndLogChanges(organization, consequences)
+                                    .Match(error => error, () => Result<ExternalOrganizationUnit, OperationError>.Success(importRoot));
+                            }
+                        )
+                    .MatchFailure();
             });
         }
 
@@ -171,14 +178,7 @@ namespace Core.ApplicationServices.Organizations
                     })
                     .Bind(consequences =>
                     {
-                        return organization.GetStsOrganizationConnection()
-                            .Match
-                            (
-                                connection => LogChanges(connection, consequences),
-                                () => new OperationError(
-                                    $"Organization with uuid: {organizationId} is not connected to FK organization",
-                                    OperationFailure.BadState)
-                            )
+                        return GetStsOrganizationConnectionAndLogChanges(organization, consequences)
                             .Match
                             (
                                 error => error,
@@ -189,7 +189,7 @@ namespace Core.ApplicationServices.Organizations
             );
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs = 0)
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
         {
             return GetOrganizationWithImportPermission(organizationUuid)
                 .Bind(organization => organization.GetStsOrganizationConnectionLogs(numberOfChangeLogs));
@@ -269,6 +269,28 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
+        private Result<ExternalOrganizationUnit, OperationError> ConnectToExternalOrganizationHierarchy(
+            Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude, bool subscribeToUpdates)
+        {
+            return organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude, subscribeToUpdates)
+                .Match
+                (
+                    error => error,
+                    () => Result<ExternalOrganizationUnit, OperationError>.Success(importRoot));
+        }
+
+        private Maybe<OperationError> GetStsOrganizationConnectionAndLogChanges(Organization organization, OrganizationTreeUpdateConsequences consequences)
+        {
+            return organization.GetStsOrganizationConnection()
+                .Match
+                (
+                    connection => LogChanges(connection, consequences),
+                    () => new OperationError(
+                        $"Organization with uuid: {organization.Uuid} is not connected to FK organization",
+                        OperationFailure.BadState)
+                );
+        }
+
         private Maybe<OperationError> LogChanges(StsOrganizationConnection connection, OrganizationTreeUpdateConsequences consequences)
         {
             var changeLog = new StsOrganizationChangeLog { Origin = StsOrganizationChangeLogOrigin.Background };
@@ -304,6 +326,38 @@ namespace Core.ApplicationServices.Organizations
                 );
 
             return Maybe<OperationError>.None;
+        }
+
+        private IEnumerable<(ExternalOrganizationUnit child, ExternalOrganizationUnit parent)> GetCreateConnectionConsequences(
+            ExternalOrganizationUnit root, IEnumerable<ExternalOrganizationUnit> externalUnits, IEnumerable<OrganizationUnit> units)
+        {
+
+            var currentTreeByUuid = units
+                .Where(unit => unit.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
+
+            if (currentTreeByUuid.Count == 0)
+            {
+                throw new InvalidOperationException("No organization units from STS Organisation found in the current hierarchy");
+            }
+
+            var importedTreeByUuid = externalUnits
+                .ToDictionary(x => x.Uuid);
+
+            var importedTreeToParent = importedTreeByUuid
+                .Values
+                .SelectMany(parent => parent.Children.Select(child => (child, parent)))
+                .ToDictionary(x => x.child.Uuid, x => x.parent);
+
+            importedTreeToParent.Add(root.Uuid, null); //Add the root as that will not be part of the collection
+
+            var additions = new List<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)>();
+            foreach (var newUnitUuid in importedTreeByUuid.Keys.ToList())
+            {
+                var imported = importedTreeByUuid[newUnitUuid];
+                additions.Add((imported, importedTreeToParent[newUnitUuid]));
+            }
+            return additions;
         }
 
         private static IEnumerable<StsOrganizationConsequenceLog> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)

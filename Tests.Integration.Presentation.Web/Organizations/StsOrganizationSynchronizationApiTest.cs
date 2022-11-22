@@ -659,15 +659,20 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Addition consequences
             var additionLogs = logsList.FirstOrDefault();
             Assert.NotNull(additionLogs);
+            var additionLogsConsequences = additionLogs.Consequences.ToList();
 
-            Assert.Equal(additionConsequences.Count, additionLogs.Consequences.Count());
+            Assert.Equal(additionConsequences.Count, additionLogsConsequences.Count);
             AssertConsequenceLogs(additionConsequences, additionLogs);
 
             //Get second item in the list
             var otherLogs = logsList[1];
             Assert.NotNull(otherLogs);
+            var otherLogsConsequences = otherLogs.Consequences.ToList();
 
-            Assert.Equal(otherConsequences.Count, otherLogs.Consequences.Count());
+            Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, otherLogsConsequences.Select(x => x.Category).ToList());
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, otherLogsConsequences.Select(x => x.Category).ToList());
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, otherLogsConsequences.Select(x => x.Category).ToList());
 
             AssertConsequenceLogs(otherConsequences, otherLogs);
 
