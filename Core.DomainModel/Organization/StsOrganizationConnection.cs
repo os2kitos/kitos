@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.DomainModel.Constants;
 using Core.DomainModel.Organization.Strategies;
 
 namespace Core.DomainModel.Organization
@@ -27,15 +28,17 @@ namespace Core.DomainModel.Organization
 
 
         public bool SubscribeToUpdates { get; set; }
+        
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
             organizationUnits.ForEach(unit => unit.ConvertToNativeKitosUnit());
+            var removedLogs = RemoveAllLogs();
 
             Connected = false;
             SubscribeToUpdates = false;
             SynchronizationDepth = null;
-            return new DisconnectOrganizationFromOriginResult(organizationUnits);
+            return new DisconnectOrganizationFromOriginResult(organizationUnits, removedLogs);
         }
 
         public IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy()
@@ -43,24 +46,47 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = 0)
+        public StsOrganizationConnectionImportLogResult AddNewLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
         {
-            if (number < 0)
+            var newLogsList = newLogs.ToList();
+            foreach (var newLog in newLogsList)
+            {
+                StsOrganizationChangeLogs.Add(newLog);
+            }
+
+            return RemoveOldestLogs(newLogsList);
+        }
+
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs)
+        {
+            if (number <= 0)
             {
                 return new OperationError("Number of change logs to get cannot be lower than 0", OperationFailure.BadInput);
             }
 
-            var query = StsOrganizationChangeLogs
+            return StsOrganizationChangeLogs
                 .OrderByDescending(x => x.LogTime)
-                .AsQueryable();
+                .Take(number)
+                .ToList();
+        }
 
-            if (number > 0)
+        private IEnumerable<StsOrganizationChangeLog> RemoveAllLogs()
+        {
+            var changeLogs = StsOrganizationChangeLogs.ToList();
+            foreach (var changeLog in changeLogs)
             {
-                query = query.Take(number);
+                StsOrganizationChangeLogs.Remove(changeLog);
             }
 
-            return query
-                .ToList();
+            return changeLogs;
+        }
+
+        private StsOrganizationConnectionImportLogResult RemoveOldestLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
+        {
+            var logsToRemove = StsOrganizationChangeLogs.OrderByDescending(x => x.LogTime).Skip(StsOrganizationConnectionConstants.TotalNumberOfLogs).ToList();
+            logsToRemove.ForEach(log => StsOrganizationChangeLogs.Remove(log));
+
+            return new StsOrganizationConnectionImportLogResult(newLogs, logsToRemove);
         }
     }
 }

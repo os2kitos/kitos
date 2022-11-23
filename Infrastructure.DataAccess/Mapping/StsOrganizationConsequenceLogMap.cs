@@ -13,11 +13,11 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.Uuid)
                 .IsRequired()
-                .HasIndexAnnotation("UX_Consequence_Uuid");
+                .HasIndexAnnotation("IX_StsOrganizationConsequenceUuid");
 
             Property(x => x.Type)
                 .IsRequired()
-                .HasIndexAnnotation("UX_Consequence_Type");
+                .HasIndexAnnotation("IX_StsOrganizationConsequenceType");
 
             Property(x => x.Name)
                 .IsRequired();

@@ -49,8 +49,14 @@ namespace Core.ApplicationServices.Organizations
         /// Gets the last x change logs for the organization
         /// </summary>
         /// <param name="organizationUuid"></param>
-        /// <param name="numberOfLastChangeLogs"></param>
+        /// <param name="numberOfChangeLogs"></param>
         /// <returns></returns>
-        Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogForOrganization(Guid organizationUuid, int numberOfLastChangeLogs = 0);
+        Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs);
+        /// <summary>
+        /// Converts consequences to consequence logs
+        /// </summary>
+        /// <param name="consequences"></param>
+        /// <returns></returns>
+        IEnumerable<StsOrganizationConsequenceLog> ConvertConsequencesToConsequenceLogs(OrganizationTreeUpdateConsequences consequences);
     }
 }

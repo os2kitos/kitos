@@ -556,81 +556,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
             const int secondRequestLevels = 3;
             using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, firstRequestLevels);
 
-            //Act
-            using var consequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            //Addition consequences
+            using var additionConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, additionConsequencesResponse.StatusCode);
+            var additionConsequencesBody = await additionConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var additionConsequences = additionConsequencesBody.Consequences.ToList();
 
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            //Update consequences in order to log addition consequences
+            using var additionPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, additionPutResponse.StatusCode);
 
-            using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
-            var logs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
-            var log = Assert.Single(logs);
-
-            Assert.Equal(consequences.Consequences.Count(), log.Consequences.Count());
-            foreach (var consequence in consequences.Consequences)
-            {
-                var logConsequence = log.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid);
-                Assert.NotNull(logConsequence);
-
-                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
-                Assert.Equal(consequence.Category, logConsequence.Category);
-                Assert.Equal(consequence.Name, logConsequence.Name);
-                Assert.Equal(consequence.Description, logConsequence.Description);
-            }
-        }
-
-        [Fact]
-        public async Task Can_GET_LOGS_With_Removal_Consequences()
-        {
-            //Arrange
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
-            const int firstRequestLevels = 3;
-            const int secondRequestLevels = 2;
-            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, firstRequestLevels);
-            
-            //Act
-            using var consequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
-
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
-            
-            using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
-            var logs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
-            var log = Assert.Single(logs);
-
-            Assert.Equal(consequences.Consequences.Count(), log.Consequences.Count());
-            foreach (var consequence in consequences.Consequences)
-            {
-                var logConsequence = log.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid);
-                Assert.NotNull(logConsequence);
-
-                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
-                Assert.Equal(consequence.Category, logConsequence.Category);
-                Assert.Equal(consequence.Name, logConsequence.Name);
-                Assert.Equal(consequence.Description, logConsequence.Description);
-            }
-        }
-
-        [Fact]
-        public async Task Can_GET_LOGS_With_Rename_Consequences()
-        {
-            //Arrange
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
-            const int levels = 2;
-            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels);
-            var uuidsAndNewNamesOfRenamedUnits = new List<(Guid uuid, string name)>();
+            //Rename consequences
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
             {
                 var renamedUnits = repo
@@ -644,48 +580,43 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 {
                     var originalName = organizationUnit.Name;
                     organizationUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
-                    uuidsAndNewNamesOfRenamedUnits.Add((organizationUnit.Uuid, originalName));
                 }
             });
 
-            //Act
-            using var consequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
-            Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            //Conversion consequences
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var expectedConversionUuid = Guid.NewGuid();
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                expectedConversionUuid = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid &&
+                                x.Origin == OrganizationUnitOrigin.STS_Organisation && !x.Children.Any())
+                    .ToList()
+                    .RandomItem()
+                    .Uuid;
+            });
+            
+            //Make sure it is in use so it will not be deleted, but converted
+            await ItContractV2Helper.PostContractAsync(globalAdminToken.Token,
+                new CreateNewContractRequestDTO()
+                {
+                    Name = A<string>(),
+                    OrganizationUuid = targetOrgUuid,
+                    Responsible = new() { OrganizationUnitUuid = expectedConversionUuid }
+                });
 
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
+            using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
+            var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var otherConsequences = otherConsequencesBody.Consequences.ToList();
+
+            //Log deletion, renaming and conversion changes
+            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
 
-            using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
-            var logs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
-            var log = Assert.Single(logs);
-
-            Assert.Equal(consequences.Consequences.Count(), log.Consequences.Count());
-            foreach (var consequence in consequences.Consequences)
-            {
-                var logConsequence = log.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid);
-                Assert.NotNull(logConsequence);
-
-                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
-                Assert.Equal(consequence.Category, logConsequence.Category);
-                Assert.Equal(consequence.Name, logConsequence.Name);
-                Assert.Equal(consequence.Description, logConsequence.Description);
-            }
-        }
-
-        [Fact]
-        public async Task Can_GET_LOGS_With_Relocation_Consequences()
-        {
-            //Arrange
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
-            const int levels = 2;
+            //Relocation consequences
             var uuidOfExpectedMoval = Guid.NewGuid();
-            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels);
-            (Guid expectedMoval, Guid expectedParent) expectedMoval = (Guid.Empty, Guid.Empty);
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
             {
                 var twoLeafs = repo
@@ -698,8 +629,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 var firstLeaf = twoLeafs.First();
                 var secondLeaf = twoLeafs.Last();
 
-                expectedMoval = (secondLeaf.Uuid, secondLeaf.Parent.Uuid); //Save original parent that we expect to be restored
-
                 //Make first leaf parent of second leaf
                 secondLeaf.ParentId = firstLeaf.Id;
 
@@ -708,91 +637,53 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 organization.AddOrganizationUnit(new OrganizationUnit { Organization = organization, Name = "Native test unit", Uuid = uuidOfExpectedMoval, ObjectOwner = secondLeaf.ObjectOwner, LastChangedByUser = secondLeaf.LastChangedByUser }, secondLeaf);
             });
 
+            using var relocationConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, relocationConsequencesResponse.StatusCode);
+            var relocationConsequencesBody = await relocationConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var relocationConsequences = relocationConsequencesBody.Consequences.ToList();
+
+            //Log relocation changes
+            using var relocationPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, relocationPutResponse.StatusCode);
+
             //Act
-            using var consequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
-            Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
-
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
-            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
-
             using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
-            var logs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
-            var log = Assert.Single(logs);
+            var deserializedLogs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
+            var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
 
-            Assert.Equal(consequences.Consequences.Count(), log.Consequences.Count());
-            foreach (var consequence in consequences.Consequences)
-            {
-                var logConsequence = log.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid);
-                Assert.NotNull(logConsequence);
+            //3 updates + create
+            Assert.Equal(4, logsList.Count);
 
-                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
-                Assert.Equal(consequence.Category, logConsequence.Category);
-                Assert.Equal(consequence.Name, logConsequence.Name);
-                Assert.Equal(consequence.Description, logConsequence.Description);
-            }
-        }
+            //Addition consequences
+            var additionLogs = logsList[1];
+            Assert.NotNull(additionLogs);
+            var additionLogsConsequences = additionLogs.Consequences.ToList();
 
-    
-        [Fact]
-        public async Task Can_GET_LOGS_With_Conversion_Consequences()
-        {
-            //Arrange
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
-            const int levels = 2;
-            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels);
-            var expectedConversionUuid = Guid.NewGuid();
-            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
-            {
-                expectedConversionUuid = repo
-                    .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid &&
-                                x.Origin == OrganizationUnitOrigin.STS_Organisation && !x.Children.Any())
-                    .ToList()
-                    .RandomItem()
-                    .Uuid;
-            });
+            Assert.Equal(additionConsequences.Count, additionLogsConsequences.Count);
+            AssertConsequenceLogs(additionConsequences, additionLogs);
 
-            //Make sure it is in use so it will not be deleted, but converted
-            await ItContractV2Helper.PostContractAsync(globalAdminToken.Token,
-                new CreateNewContractRequestDTO()
-                {
-                    Name = A<string>(),
-                    OrganizationUuid = targetOrgUuid,
-                    Responsible = new() { OrganizationUnitUuid = expectedConversionUuid }
-                });
+            //Get second item in the list
+            var otherLogs = logsList[2];
+            Assert.NotNull(otherLogs);
+            var otherLogsConsequences = otherLogs.Consequences.ToList();
 
-            //Act
-            using var consequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
-            Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, otherLogsConsequences.Select(x => x.Category).ToList());
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, otherLogsConsequences.Select(x => x.Category).ToList());
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, otherLogsConsequences.Select(x => x.Category).ToList());
 
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
-            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            AssertConsequenceLogs(otherConsequences, otherLogs);
 
-            using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
+            //Get third item in the list
+            var relocationLogs = logsList[3];
+            Assert.NotNull(relocationLogs);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
-            var logs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
-            var log = Assert.Single(logs);
+            Assert.Equal(relocationConsequences.Count, relocationLogs.Consequences.Count());
 
-            Assert.Equal(consequences.Consequences.Count(), log.Consequences.Count());
-            foreach (var consequence in consequences.Consequences)
-            {
-                var logConsequence = log.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid);
-                Assert.NotNull(logConsequence);
-
-                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
-                Assert.Equal(consequence.Category, logConsequence.Category);
-                Assert.Equal(consequence.Name, logConsequence.Name);
-                Assert.Equal(consequence.Description, logConsequence.Description);
-            }
+            AssertConsequenceLogs(relocationConsequences, relocationLogs);
         }
 
         private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)
@@ -861,6 +752,22 @@ namespace Tests.Integration.Presentation.Web.Organizations
             }
         }
 
+        private static void AssertConsequenceLogs(
+            IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> consequences,
+            StsOrganizationChangeLogResponseDTO logs)
+        {
+            foreach (var consequence in consequences)
+            {
+                var logConsequence = logs.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid && x.Category == consequence.Category);
+                Assert.NotNull(logConsequence);
+
+                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
+                Assert.Equal(consequence.Category, logConsequence.Category);
+                Assert.Equal(consequence.Name, logConsequence.Name);
+                Assert.Equal(consequence.Description, logConsequence.Description);
+            }
+        }
+
         private static int CountMaxLevels(StsOrganizationOrgUnitDTO unit)
         {
             const int currentLevelContribution = 1;
@@ -917,11 +824,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
             });
         }
 
-        private static async Task<HttpResponseMessage> SendGetLogsAsync(Guid targetOrgUuid, int numberOfLastChangeLogs, Cookie cookie)
+        private static async Task<HttpResponseMessage> SendGetLogsAsync(Guid targetOrgUuid, int numberOfChangeLogs, Cookie cookie)
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
-                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/changelog/{numberOfLastChangeLogs}");
+                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/change-log?numberOfChangeLogs={numberOfChangeLogs}");
             return await HttpApi.GetWithCookieAsync(postUrl, cookie);
         }
     }

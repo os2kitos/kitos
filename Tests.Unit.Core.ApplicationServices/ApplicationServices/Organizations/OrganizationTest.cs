@@ -426,6 +426,192 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
         }
 
+        [Fact]
+        public void Can_Add_ExternalImportLog()
+        {
+            //Arrange
+            var log = new StsOrganizationChangeLog{Id = A<int>()};
+            _sut.StsOrganizationConnection = new StsOrganizationConnection() {Connected = true};
+
+            //Act
+            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, log);
+
+            //Assert
+            Assert.True(result.Ok);
+            var logResult = result.Value;
+            Assert.Empty(logResult.RemovedChangeLogs);
+
+            var savedLog = Assert.Single(_sut.StsOrganizationConnection.StsOrganizationChangeLogs);
+            Assert.Equal(log.Id, savedLog.Id);
+        }
+
+        [Fact]
+        public void Add_ExternalImportLog_Removes_Oldest_Log_If_More_Than_5_Logs_Are_Present()
+        {
+            //Arrange
+            var log = new StsOrganizationChangeLog(){Id = A<int>(), LogTime = DateTime.Now};
+            var oldestLog = new StsOrganizationChangeLog {Id = A<int>(), LogTime = DateTime.Now.AddDays(-A<int>())};
+            _sut.StsOrganizationConnection = new StsOrganizationConnection()
+            {
+                Connected = true,
+                StsOrganizationChangeLogs =
+                {
+                    new StsOrganizationChangeLog{Id = A<int>(), LogTime = DateTime.Now},
+                    new StsOrganizationChangeLog{Id = A<int>(), LogTime = DateTime.Now},
+                    new StsOrganizationChangeLog{Id = A<int>(), LogTime = DateTime.Now},
+                    new StsOrganizationChangeLog{Id = A<int>(), LogTime = DateTime.Now},
+                    oldestLog
+                }
+            };
+
+            //Act
+            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, log);
+
+            //Assert
+            Assert.True(result.Ok);
+            var logResult = result.Value;
+            var removedLog = Assert.Single(logResult.RemovedChangeLogs);
+            Assert.Equal(oldestLog.Id, removedLog.Id);
+
+            Assert.Contains(log.Id, _sut.StsOrganizationConnection.StsOrganizationChangeLogs.Select(x => x.Id));
+        }
+
+        [Fact]
+        public void Add_ExternalImportLog_Returns_BadState_If_Not_Connected()
+        {
+            //Arrange
+            _sut.StsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = false,
+            };
+
+            //Act
+            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, new StsOrganizationChangeLog());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Add_ExternalImportLog_Returns_BadInput_If_Origin_Is_Kitos()
+        {
+            //Arrange
+            var origin = OrganizationUnitOrigin.Kitos;
+            //Act
+            var result = _sut.AddExternalImportLog(origin, new StsOrganizationChangeLog());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Add_ExternalImportLog_Returns_BadInput_If_Connection_Is_Null()
+        {
+            //Arrange
+            _sut.StsOrganizationConnection = null;
+
+            //Act
+            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, new StsOrganizationChangeLog());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetStsOrganizationConnectionEntryLogs_Returns_BadState_If_Not_Connected()
+        {
+            //Arrange
+            _sut.StsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = false,
+            };
+
+            //Act
+            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetStsOrganizationConnectionEntryLogs_Returns_BadInput_If_Origin_Is_Kitos()
+        {
+            //Arrange
+            var origin = OrganizationUnitOrigin.Kitos;
+
+            //Act
+            var result = _sut.GetStsOrganizationConnectionEntryLogs(origin, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetStsOrganizationConnectionEntryLogs_Returns_BadState_If_Connection_Is_Null()
+        {
+            //Arrange
+            _sut.StsOrganizationConnection = null;
+
+            //Act
+            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-10)]
+        public void GetStsOrganizationConnectionEntryLogs_Returns_BadInput_If_NumberOfLogs_Is_Lower_Than_One(int numberOfLogs)
+        {
+            //Arrange
+            _sut.StsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = true,
+            };
+
+            //Act
+            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(5)]
+        public void GetStsOrganizationConnectionEntryLogs_Returns_Logs(int numberOfLogs)
+        {
+            //Arrange
+
+            _sut.StsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = true,
+                StsOrganizationChangeLogs = new List<StsOrganizationChangeLog>
+                {
+                    new (){ LogTime = DateTime.Now.AddDays(1) },
+                    new (){ LogTime = DateTime.Now.AddDays(2) },
+                    new (){ LogTime = DateTime.Now.AddDays(3) },
+                    new (){ LogTime = DateTime.Now.AddDays(4) },
+                    new (){ LogTime = DateTime.Now.AddDays(5) }
+                }
+            };
+
+            //Act
+            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(numberOfLogs, result.Value.Count());
+        }
+
         private OrganizationUnit CreateOrganizationUnit()
         {
             return new OrganizationUnit
