@@ -81,7 +81,7 @@
                         <h3>
                             {{ chosenOrgUnit.name }}
                             <span class="text-muted" data-ng-show="chosenOrgUnit.localId">({{ chosenOrgUnit.localId }})</span>
-                            <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
+                            <span class="text-muted">({{::currentOrganizationName}})</span>
 
                         </h3>
                         <p class="text-muted">Oprettet af {{ chosenOrgUnit.objectOwnerFullName }}</p>
