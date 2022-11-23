@@ -1,11 +1,12 @@
 ﻿module Kitos.Services.Organization {
     export interface IStsOrganizationSyncService {
         getConnectionStatus(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>;
-        createConnection(organizationUuidid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
+        createConnection(organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
         getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>;
         getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>;
-        disconnect(organizationUuidid: string): ng.IPromise<boolean>;
-        updateConnection(organizationUuidid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
+        disconnect(organizationUuid: string): ng.IPromise<boolean>;
+        updateConnection(organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
+        getConnectionChangeLogs(organizationUuid: string, numberOfLogs: number): ng.IPromise<Array<Models.Api.Organization.ConnectionChangeLogDTO>>;
     }
 
     export class StsOrganizationSyncService implements IStsOrganizationSyncService {
@@ -72,38 +73,42 @@
                 });
         }
 
-        createConnection(organizationUuidid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void> {
+        createConnection(organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void> {
             return this.apiUseCaseFactory.createCreation("Forbindelse til FK Organisation", () => {
-                return this.genericApiWrapper.post<void>(`${this.getBasePath(organizationUuidid)}/connection`, {
+                return this.genericApiWrapper.post<void>(`${this.getBasePath(organizationUuid)}/connection`, {
                     synchronizationDepth: synchronizationDepth,
                     subscribeToUpdates: subscribesToUpdates
                 });
             }).executeAsync(() => {
                 //Clear cache after
-                this.purgeCache(organizationUuidid);
+                this.purgeCache(organizationUuid);
             });
         }
 
-        disconnect(organizationUuidid: string): ng.IPromise<boolean> {
+        disconnect(organizationUuid: string): ng.IPromise<boolean> {
             return this.apiUseCaseFactory.createDeletion("Forbindelse til FK Organisation", () => {
-                return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuidid)}/connection`);
+                return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuid)}/connection`);
             }).executeAsync((result) => {
                 //Clear cache after
-                this.purgeCache(organizationUuidid);
+                this.purgeCache(organizationUuid);
                 return result;
             });
         }
 
-        updateConnection(organizationUuidid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void> {
+        updateConnection(organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void> {
             return this.apiUseCaseFactory.createUpdate("Forbindelse til FK Organisation", () => {
-                return this.genericApiWrapper.put(`${this.getBasePath(organizationUuidid)}/connection`, {
+                return this.genericApiWrapper.put(`${this.getBasePath(organizationUuid)}/connection`, {
                     synchronizationDepth: synchronizationDepth,
                     subscribeToUpdates: subscribesToUpdates
                 });
             }).executeAsync(() => {
                 //Clear cache after
-                this.purgeCache(organizationUuidid);
+                this.purgeCache(organizationUuid);
             });
+        }
+
+        getConnectionChangeLogs(organizationUuid: string, numberOfLogs: number): ng.IPromise<Array<Models.Api.Organization.ConnectionChangeLogDTO>> {
+            return this.genericApiWrapper.getDataFromUrl<Array<Models.Api.Organization.ConnectionChangeLogDTO>>(`${this.getBasePath(organizationUuid)}/connection/change-log?numberOfChangeLogs=${numberOfLogs}`);
         }
     }
 
