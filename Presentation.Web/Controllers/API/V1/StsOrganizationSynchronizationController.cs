@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V1.Mapping;
@@ -131,7 +132,7 @@ namespace Presentation.Web.Controllers.API.V1
         #region DTO Mapping
         private ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
         {
-            var logs = _stsOrganizationSynchronizationService.ConvertConsequencesToConsequenceLogs(consequences);
+            var logs = consequences.ConvertConsequencesToConsequenceLogs();
             var dtos = MapConsequenceLogsToDtos(logs);
 
             return new ConnectionUpdateConsequencesResponseDTO

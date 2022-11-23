@@ -46,22 +46,23 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public StsOrganizationConnectionImportLogResult AddNewLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
+        public StsOrganizationConnectionAddNewLogsResult AddNewLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
         {
             var newLogsList = newLogs.ToList();
             foreach (var newLog in newLogsList)
             {
                 StsOrganizationChangeLogs.Add(newLog);
             }
+            var removedLogs = RemoveOldestLogs(newLogsList);
 
-            return RemoveOldestLogs(newLogsList);
+            return new StsOrganizationConnectionAddNewLogsResult(removedLogs);
         }
 
         public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs)
         {
             if (number <= 0)
             {
-                return new OperationError("Number of change logs to get cannot be lower than 0", OperationFailure.BadInput);
+                return new OperationError("Number of change logs to get cannot be lower than 0", OperationFailure.BadState);
             }
 
             return StsOrganizationChangeLogs
@@ -81,12 +82,12 @@ namespace Core.DomainModel.Organization
             return changeLogs;
         }
 
-        private StsOrganizationConnectionImportLogResult RemoveOldestLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
+        private IEnumerable<StsOrganizationChangeLog> RemoveOldestLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
         {
             var logsToRemove = StsOrganizationChangeLogs.OrderByDescending(x => x.LogTime).Skip(StsOrganizationConnectionConstants.TotalNumberOfLogs).ToList();
             logsToRemove.ForEach(log => StsOrganizationChangeLogs.Remove(log));
 
-            return new StsOrganizationConnectionImportLogResult(newLogs, logsToRemove);
+            return logsToRemove;
         }
     }
 }

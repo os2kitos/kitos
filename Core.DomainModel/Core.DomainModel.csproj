@@ -104,7 +104,7 @@
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />
     <Compile Include="Organization\StsOrganizationChangeLog.cs" />
-    <Compile Include="Organization\StsOrganizationConnectionImportLogResult.cs" />
+    <Compile Include="Organization\StsOrganizationConnectionAddNewLogsResult.cs" />
     <Compile Include="Organization\StsOrganizationConsequenceLog.cs" />
     <Compile Include="Organization\UnitAccessRights.cs" />
     <Compile Include="Organization\UnitAccessRightsWithUnitData.cs" />
