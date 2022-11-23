@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.DomainModel.Constants;
 using Core.DomainModel.Organization.Strategies;
 
 namespace Core.DomainModel.Organization
@@ -27,9 +28,7 @@ namespace Core.DomainModel.Organization
 
 
         public bool SubscribeToUpdates { get; set; }
-
-        private const int totalNumberOfLogs = 5;
-
+        
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
@@ -58,7 +57,7 @@ namespace Core.DomainModel.Organization
             return RemoveOldestLogs(newLogsList);
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = totalNumberOfLogs)
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs)
         {
             if (number <= 0)
             {
@@ -84,7 +83,7 @@ namespace Core.DomainModel.Organization
 
         private StsOrganizationConnectionImportLogResult RemoveOldestLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
         {
-            var logsToRemove = StsOrganizationChangeLogs.OrderByDescending(x => x.LogTime).Skip(totalNumberOfLogs).ToList();
+            var logsToRemove = StsOrganizationChangeLogs.OrderByDescending(x => x.LogTime).Skip(StsOrganizationConnectionConstants.TotalNumberOfLogs).ToList();
             logsToRemove.ForEach(log => StsOrganizationChangeLogs.Remove(log));
 
             return new StsOrganizationConnectionImportLogResult(newLogs, logsToRemove);

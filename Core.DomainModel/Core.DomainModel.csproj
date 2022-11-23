@@ -57,6 +57,7 @@
     <Compile Include="Commands\ICommandBus.cs" />
     <Compile Include="Commands\RemoveOrganizationUnitRegistrationsCommand.cs" />
     <Compile Include="Commands\RemoveUserFromKitosCommand.cs" />
+    <Compile Include="Constants\StsOrganizationConnectionConstants.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
     <Compile Include="Extensions\ExternalOrganizationUnitExtensions.cs" />

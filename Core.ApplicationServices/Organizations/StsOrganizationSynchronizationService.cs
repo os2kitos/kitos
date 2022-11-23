@@ -185,7 +185,7 @@ namespace Core.ApplicationServices.Organizations
                                 {
                                     foreach (var removedLog in importLogResult.RemovedChangeLogs)
                                     {
-                                        //if a log is part of the AddedChangeLogs, it wasn't yet not saved to the DB
+                                        //if a log is part of the AddedChangeLogs (there can only be 5 logs present) it wasn't yet saved to the DB
                                         if (importLogResult.AddedChangeLogs.Contains(removedLog))
                                         {
                                             continue;
@@ -309,8 +309,7 @@ namespace Core.ApplicationServices.Organizations
                 changeLog.UserId = userId;
             }
 
-            var logs = ConvertConsequencesToConsequenceLogs(consequences).ToList();
-            changeLog.ConsequenceLogs = logs;
+            changeLog.ConsequenceLogs = ConvertConsequencesToConsequenceLogs(consequences).ToList();
             changeLog.LogTime = DateTime.Now;
             
             return changeLog;
