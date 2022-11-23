@@ -15,19 +15,5 @@ namespace Core.DomainModel.Organization
         public StsOrganizationChangeLogOrigin Origin { get; set; }
         public DateTime LogTime { get; set; }
         public virtual ICollection<StsOrganizationConsequenceLog> ConsequenceLogs { get; set; }
-
-        public IEnumerable<StsOrganizationConsequenceLog> GetLogs()
-        {
-            return ConsequenceLogs.ToList();
-        }
-
-        public void RemoveAllConsequences()
-        {
-            var consequences = GetLogs();
-            foreach (var log in consequences)
-            {
-                ConsequenceLogs.Remove(log);
-            }
-        }
     }
 }

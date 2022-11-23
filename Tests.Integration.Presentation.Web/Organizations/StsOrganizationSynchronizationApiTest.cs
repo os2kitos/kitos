@@ -654,10 +654,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var deserializedLogs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
             var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
 
-            Assert.Equal(3, logsList.Count);
+            //3 updates + create
+            Assert.Equal(4, logsList.Count);
 
             //Addition consequences
-            var additionLogs = logsList.FirstOrDefault();
+            var additionLogs = logsList[1];
             Assert.NotNull(additionLogs);
             var additionLogsConsequences = additionLogs.Consequences.ToList();
 
@@ -665,7 +666,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertConsequenceLogs(additionConsequences, additionLogs);
 
             //Get second item in the list
-            var otherLogs = logsList[1];
+            var otherLogs = logsList[2];
             Assert.NotNull(otherLogs);
             var otherLogsConsequences = otherLogs.Consequences.ToList();
 
@@ -677,7 +678,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertConsequenceLogs(otherConsequences, otherLogs);
 
             //Get third item in the list
-            var relocationLogs = logsList[2];
+            var relocationLogs = logsList[3];
             Assert.NotNull(relocationLogs);
 
             Assert.Equal(relocationConsequences.Count, relocationLogs.Consequences.Count());

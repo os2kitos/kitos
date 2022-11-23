@@ -32,7 +32,6 @@ namespace Core.ApplicationServices.Organizations
         private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
         private readonly IUserRepository _userRepository;
         private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
-        private readonly IGenericRepository<StsOrganizationConsequenceLog> _stsConsequenceLogRepository;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
@@ -44,9 +43,9 @@ namespace Core.ApplicationServices.Organizations
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
             IGenericRepository<OrganizationUnit> organizationUnitRepository,
-            Maybe<ActiveUserIdContext> activeUserIdContext, 
-            IUserRepository userRepository, 
-            IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository, IGenericRepository<StsOrganizationConsequenceLog> stsConsequenceLogRepository)
+            Maybe<ActiveUserIdContext> activeUserIdContext,
+            IUserRepository userRepository,
+            IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -60,7 +59,6 @@ namespace Core.ApplicationServices.Organizations
             _activeUserIdContext = activeUserIdContext;
             _userRepository = userRepository;
             _stsChangeLogRepository = stsChangeLogRepository;
-            _stsConsequenceLogRepository = stsConsequenceLogRepository;
         }
 
         public Result<StsOrganizationSynchronizationDetails, OperationError> GetSynchronizationDetails(Guid organizationId)
@@ -109,18 +107,17 @@ namespace Core.ApplicationServices.Organizations
                         (
                             importRoot =>
                             {
-                                var addedUnits = organization.GetRoot().FlattenHierarchy().Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation);
                                 var unitsToImport = importRoot.Flatten();
-                                
+                                var importedTreeToParent = importRoot.ToParentMap(importRoot.ToLookupByUuid());
                                 var consequences = new OrganizationTreeUpdateConsequences(
-                                    new List<(Guid, OrganizationUnit)>(), 
-                                    new List<(Guid, OrganizationUnit)>(),
-                                    GetCreateConnectionConsequences(importRoot, unitsToImport, addedUnits), 
-                                    new List<(OrganizationUnit affectedUnit, string oldName, string newName)>(), 
-                                    new List<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>());
+                                     Enumerable.Empty<(Guid, OrganizationUnit)>(),
+                                     Enumerable.Empty<(Guid, OrganizationUnit)>(),
+                                    unitsToImport.Select(unit => (unit, importedTreeToParent[unit.Uuid])).ToList(),
+                                     Enumerable.Empty<(OrganizationUnit affectedUnit, string oldName, string newName)>(),
+                                    Enumerable.Empty<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>());
 
-                                return GetStsOrganizationConnectionAndLogChanges(organization, consequences)
-                                    .Match(error => error, () => Result<ExternalOrganizationUnit, OperationError>.Success(importRoot));
+                                return WithLogEntries(consequences)
+                                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries));
                             }
                         )
                     .MatchFailure();
@@ -138,6 +135,8 @@ namespace Core.ApplicationServices.Organizations
                 }
 
                 var disconnectionResult = result.Value;
+                _stsChangeLogRepository.RemoveRange(disconnectionResult.RemovedChangeLogs);
+
                 foreach (var convertedUnit in disconnectionResult.ConvertedUnits)
                 {
                     _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(convertedUnit));
@@ -176,13 +175,29 @@ namespace Core.ApplicationServices.Organizations
                         }
                         return consequences;
                     })
-                    .Bind(consequences =>
+                    .Bind(WithLogEntries)
+                    .Bind(logEntries =>
                     {
-                        return GetStsOrganizationConnectionAndLogChanges(organization, consequences)
-                            .Match
+                        return organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries)
+                            .Match<Result<StsOrganizationChangeLog, OperationError>>
                             (
-                                error => error,
-                                () => Result<OrganizationTreeUpdateConsequences, OperationError>.Success(consequences)
+                                importLogResult =>
+                                {
+                                    foreach (var removedLog in importLogResult.RemovedChangeLogs)
+                                    {
+                                        //if a log is part of the AddedChangeLogs, it wasn't yet not saved to the DB
+                                        if (importLogResult.AddedChangeLogs.Contains(removedLog))
+                                        {
+                                            continue;
+                                        }
+                                        
+                                        _stsChangeLogRepository.Delete(removedLog);
+                                    }
+                                    _stsChangeLogRepository.Save();
+
+                                    return logEntries;
+                                },
+                                error => error
                             );
                     })
                     .Match(_ => Maybe<OperationError>.None, error => error)
@@ -192,7 +207,7 @@ namespace Core.ApplicationServices.Organizations
         public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
         {
             return GetOrganizationWithImportPermission(organizationUuid)
-                .Bind(organization => organization.GetStsOrganizationConnectionLogs(numberOfChangeLogs));
+                .Bind(organization => organization.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfChangeLogs));
         }
 
         public IEnumerable<StsOrganizationConsequenceLog> ConvertConsequencesToConsequenceLogs(OrganizationTreeUpdateConsequences consequences)
@@ -279,19 +294,7 @@ namespace Core.ApplicationServices.Organizations
                     () => Result<ExternalOrganizationUnit, OperationError>.Success(importRoot));
         }
 
-        private Maybe<OperationError> GetStsOrganizationConnectionAndLogChanges(Organization organization, OrganizationTreeUpdateConsequences consequences)
-        {
-            return organization.GetStsOrganizationConnection()
-                .Match
-                (
-                    connection => LogChanges(connection, consequences),
-                    () => new OperationError(
-                        $"Organization with uuid: {organization.Uuid} is not connected to FK organization",
-                        OperationFailure.BadState)
-                );
-        }
-
-        private Maybe<OperationError> LogChanges(StsOrganizationConnection connection, OrganizationTreeUpdateConsequences consequences)
+        private Result<StsOrganizationChangeLog, OperationError> WithLogEntries(OrganizationTreeUpdateConsequences consequences)
         {
             var changeLog = new StsOrganizationChangeLog { Origin = StsOrganizationChangeLogOrigin.Background };
 
@@ -310,54 +313,7 @@ namespace Core.ApplicationServices.Organizations
             changeLog.ConsequenceLogs = logs;
             changeLog.LogTime = DateTime.Now;
             
-            connection.AddNewLog(changeLog)
-                .Select
-                (
-                    logToRemove =>
-                    {
-                        var consequenceLogs = logToRemove.GetLogs();
-
-                        _stsConsequenceLogRepository.RemoveRange(consequenceLogs);
-                        _stsChangeLogRepository.Delete(logToRemove);
-                        _stsChangeLogRepository.Save();
-
-                        return logToRemove;
-                    }
-                );
-
-            return Maybe<OperationError>.None;
-        }
-
-        private IEnumerable<(ExternalOrganizationUnit child, ExternalOrganizationUnit parent)> GetCreateConnectionConsequences(
-            ExternalOrganizationUnit root, IEnumerable<ExternalOrganizationUnit> externalUnits, IEnumerable<OrganizationUnit> units)
-        {
-
-            var currentTreeByUuid = units
-                .Where(unit => unit.Origin == OrganizationUnitOrigin.STS_Organisation)
-                .ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
-
-            if (currentTreeByUuid.Count == 0)
-            {
-                throw new InvalidOperationException("No organization units from STS Organisation found in the current hierarchy");
-            }
-
-            var importedTreeByUuid = externalUnits
-                .ToDictionary(x => x.Uuid);
-
-            var importedTreeToParent = importedTreeByUuid
-                .Values
-                .SelectMany(parent => parent.Children.Select(child => (child, parent)))
-                .ToDictionary(x => x.child.Uuid, x => x.parent);
-
-            importedTreeToParent.Add(root.Uuid, null); //Add the root as that will not be part of the collection
-
-            var additions = new List<(ExternalOrganizationUnit unitToAdd, ExternalOrganizationUnit parent)>();
-            foreach (var newUnitUuid in importedTreeByUuid.Keys.ToList())
-            {
-                var imported = importedTreeByUuid[newUnitUuid];
-                additions.Add((imported, importedTreeToParent[newUnitUuid]));
-            }
-            return additions;
+            return changeLog;
         }
 
         private static IEnumerable<StsOrganizationConsequenceLog> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
@@ -433,7 +389,7 @@ namespace Core.ApplicationServices.Organizations
                     Name = added.unitToAdd.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Added,
                     Uuid = added.unitToAdd.Uuid,
-                    Description = $"'{added.unitToAdd.Name}' tilføjes som underenhed til '{added.parent.Name}'"
+                    Description = $"'{added.unitToAdd.Name}' tilføjes som underenhed til '{added.parent?.Name}'"
                 }
                 )
                 .ToList();

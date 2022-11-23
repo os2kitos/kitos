@@ -295,8 +295,41 @@ namespace Core.DomainModel.Organization
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
-            IExternalOrganizationalHierarchyUpdateStrategy strategy;
-            //Pre-validate
+            return GetStsOrganizationConnection(origin)
+                .Match
+                (
+                    connection =>
+                    {
+                        var strategy = connection.GetUpdateStrategy();
+
+                        var childLevelsToInclude =
+                            levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
+                        var filteredTree = root.Copy(childLevelsToInclude);
+                        StsOrganizationConnection.SynchronizationDepth =
+                            levelsIncluded.Match(levels => (int?) levels, () => default);
+                        StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
+
+                        return strategy.PerformUpdate(filteredTree);
+                    },
+                    error => error
+                );
+        }
+
+        public Result<StsOrganizationConnectionImportLogResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
+            StsOrganizationChangeLog changeLogToAdd)
+        {
+            return GetStsOrganizationConnection(origin)
+                .Bind<StsOrganizationConnectionImportLogResult>(connection => connection.AddNewLogs(changeLogToAdd.WrapAsEnumerable()));
+        }
+
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
+        {
+            return GetStsOrganizationConnection(origin)
+                .Bind(connection => connection.GetLastNumberOfChangeLogs(numberOfLogs));
+        }
+
+        private Result<StsOrganizationConnection, OperationError> GetStsOrganizationConnection(OrganizationUnitOrigin origin)
+        {
             switch (origin)
             {
                 case OrganizationUnitOrigin.STS_Organisation:
@@ -304,35 +337,14 @@ namespace Core.DomainModel.Organization
                     {
                         return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.BadState);
                     }
-                    strategy = StsOrganizationConnection.GetUpdateStrategy();
-                    break;
+
+                    return StsOrganizationConnection;
                 case OrganizationUnitOrigin.Kitos:
                     return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
-            var filteredTree = root.Copy(childLevelsToInclude);
-            StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
-            StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
-
-            return strategy.PerformUpdate(filteredTree);
-        }
-
-        public Maybe<StsOrganizationConnection> GetStsOrganizationConnection()
-        {
-            return StsOrganizationConnection;
-        }
-
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetStsOrganizationConnectionLogs(int numberOfLogs)
-        {
-            return GetStsOrganizationConnection()
-                .Match
-                (
-                    connection => connection.GetLastNumberOfChangeLogs(numberOfLogs),
-                    () => new OperationError($"Organization with uuid: {Uuid} is not connected to FK organization", OperationFailure.BadState)
-                );
         }
 
         /// <summary>

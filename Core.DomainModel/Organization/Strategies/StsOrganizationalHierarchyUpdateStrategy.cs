@@ -27,16 +27,9 @@ namespace Core.DomainModel.Organization.Strategies
                 throw new InvalidOperationException("No organization units from STS Organisation found in the current hierarchy");
             }
 
-            var importedTreeByUuid = root
-                .Flatten()
-                .ToDictionary(x => x.Uuid);
+            var importedTreeByUuid = root.ToLookupByUuid();
 
-            var importedTreeToParent = importedTreeByUuid
-                .Values
-                .SelectMany(parent => parent.Children.Select(child => (child, parent)))
-                .ToDictionary(x => x.child.Uuid, x => x.parent);
-
-            importedTreeToParent.Add(root.Uuid, null); //Add the root as that will not be part of the collection
+            var importedTreeToParent = root.ToParentMap(importedTreeByUuid);
 
             //Keys in both collections
             var commonKeys = currentTreeByUuid.Keys.Intersect(importedTreeByUuid.Keys).ToList();

@@ -27,16 +27,19 @@ namespace Core.DomainModel.Organization
 
 
         public bool SubscribeToUpdates { get; set; }
+
+        private const int totalNumberOfLogs = 5;
+
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
             organizationUnits.ForEach(unit => unit.ConvertToNativeKitosUnit());
-            RemoveAllLogs();
+            var removedLogs = RemoveAllLogs();
 
             Connected = false;
             SubscribeToUpdates = false;
             SynchronizationDepth = null;
-            return new DisconnectOrganizationFromOriginResult(organizationUnits);
+            return new DisconnectOrganizationFromOriginResult(organizationUnits, removedLogs);
         }
 
         public IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy()
@@ -44,16 +47,18 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public Maybe<StsOrganizationChangeLog> AddNewLog(StsOrganizationChangeLog newLog)
+        public StsOrganizationConnectionImportLogResult AddNewLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
         {
-            StsOrganizationChangeLogs.Add(newLog);
+            var newLogsList = newLogs.ToList();
+            foreach (var newLog in newLogsList)
+            {
+                StsOrganizationChangeLogs.Add(newLog);
+            }
 
-            return StsOrganizationChangeLogs.Count <= 5 
-                ? Maybe<StsOrganizationChangeLog>.None 
-                : RemoveOldestLog();
+            return RemoveOldestLogs(newLogsList);
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number)
+        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = totalNumberOfLogs)
         {
             if (number <= 0)
             {
@@ -66,22 +71,23 @@ namespace Core.DomainModel.Organization
                 .ToList();
         }
 
-        private void RemoveAllLogs()
+        private IEnumerable<StsOrganizationChangeLog> RemoveAllLogs()
         {
             var changeLogs = StsOrganizationChangeLogs.ToList();
             foreach (var changeLog in changeLogs)
             {
-                changeLog.RemoveAllConsequences();
                 StsOrganizationChangeLogs.Remove(changeLog);
             }
+
+            return changeLogs;
         }
 
-        private StsOrganizationChangeLog RemoveOldestLog()
+        private StsOrganizationConnectionImportLogResult RemoveOldestLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
         {
-            var logToRemove = StsOrganizationChangeLogs.OrderBy(x => x.LogTime).FirstOrDefault();
-            StsOrganizationChangeLogs.Remove(logToRemove);
+            var logsToRemove = StsOrganizationChangeLogs.OrderByDescending(x => x.LogTime).Skip(totalNumberOfLogs).ToList();
+            logsToRemove.ForEach(log => StsOrganizationChangeLogs.Remove(log));
 
-            return logToRemove;
+            return new StsOrganizationConnectionImportLogResult(newLogs, logsToRemove);
         }
     }
 }

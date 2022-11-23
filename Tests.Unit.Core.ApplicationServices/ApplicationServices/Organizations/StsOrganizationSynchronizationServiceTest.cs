@@ -38,7 +38,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly ActiveUserIdContext _activeUserIdContext;
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
-        private readonly Mock<IGenericRepository<StsOrganizationConsequenceLog>> _stsOrganizationConsequenceLogMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -53,7 +52,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _activeUserIdContext = new ActiveUserIdContext(A<int>());
             _userRepositoryMock = new Mock<IUserRepository>();
             _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
-            _stsOrganizationConsequenceLogMock = new Mock<IGenericRepository<StsOrganizationConsequenceLog>>();
 
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
@@ -67,8 +65,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _organizationUnitRepositoryMock.Object,
                 _activeUserIdContext,
                 _userRepositoryMock.Object,
-                _stsOrganziationChangeLogRepositoryMock.Object,
-                _stsOrganizationConsequenceLogMock.Object);
+                _stsOrganziationChangeLogRepositoryMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -219,9 +216,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             //Assert
             Assert.False(error.HasValue);
-            var connectionMaybe = organization.GetStsOrganizationConnection();
-            Assert.True(connectionMaybe.HasValue);
-            var connection = connectionMaybe.Value;
+            var connection = organization.StsOrganizationConnection;
             Assert.True(connection.Connected);
             Assert.Equal(subscribe, connection.SubscribeToUpdates);
             Assert.Equal(onlyRoot ? 1 : (int?)null, connection.SynchronizationDepth);
