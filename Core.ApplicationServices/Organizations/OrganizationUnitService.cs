@@ -282,6 +282,7 @@ namespace Core.ApplicationServices.Organizations
             const bool canInfoAdditionalfieldsBeModified = true;
             var canBeRearranged = false;
             var canBeDeleted = false;
+            var canCvrBeModified = false;
 
             if (unit.IsNativeKitosUnit())
             {

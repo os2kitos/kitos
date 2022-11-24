@@ -30,11 +30,9 @@
                     controller: CurrentOrganizationController,
                     controllerAs: "currentOrgCtrl",
                     resolve: {
-                        organization: ["$http", "userService", ($http: ng.IHttpService, userService) => {
+                        organization: ["organizationApiService", "userService", (organizationApiService: Services.IOrganizationApiService, userService) => {
                             return userService.getUser().then((user) => {
-                                return $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organization/" + user.currentOrganizationId).then((result) => {
-                                    return result.data.response;
-                                });
+                                return organizationApiService.getOrganization(user.currentOrganizationId);
                             });
                         }],
                         user: [

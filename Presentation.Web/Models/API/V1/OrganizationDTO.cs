@@ -14,6 +14,7 @@ namespace Presentation.Web.Models.API.V1
         public int TypeId { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public ConfigDTO Config { get; set; }
+        public bool CanCvrBeModified { get; set; }
 
         public OrgUnitSimpleDTO Root { get; set; }
         public DateTime LastChanged { get; set; }

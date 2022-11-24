@@ -4,7 +4,9 @@ using System.Net.Http;
 using System.Security;
 using System.Web;
 using System.Web.Http;
+using System.Web.UI.WebControls;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -21,13 +23,16 @@ namespace Presentation.Web.Controllers.API.V1
     public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
+        private readonly IOrganizationalUserContext _activeUserContext;
 
         public OrganizationController(
             IGenericRepository<Organization> repository,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IOrganizationalUserContext activeUserContext)
             : base(repository)
         {
             _organizationService = organizationService;
+            _activeUserContext = activeUserContext;
         }
 
         public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
@@ -63,6 +68,34 @@ namespace Presentation.Web.Controllers.API.V1
                         .ToList();
 
                 return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
+        public override HttpResponseMessage GetSingle(int id)
+        {
+            try
+            {
+                var item = Repository.GetByKey(id);
+
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowRead(item))
+                {
+                    return Forbidden();
+                }
+
+                var isGlobalAdmin = _activeUserContext.IsGlobalAdmin();
+                var dto = Map(item);
+                dto.CanCvrBeModified = isGlobalAdmin;
+
+                return Ok(dto);
             }
             catch (Exception e)
             {
@@ -107,6 +140,18 @@ namespace Presentation.Web.Controllers.API.V1
                 if (typeId > 0)
                 {
                     if (!_organizationService.CanChangeOrganizationType(organization, (OrganizationTypeKeys)typeId))
+                    {
+                        return Forbidden();
+                    }
+                }
+            }
+            if (obj.TryGetValue("cvr", out var jtoken))
+            {
+                var cvr = jtoken.Value<string>();
+
+                if (!string.Equals(cvr, organization.Cvr))
+                {
+                    if (!_activeUserContext.IsGlobalAdmin())
                     {
                         return Forbidden();
                     }

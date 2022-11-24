@@ -6,7 +6,7 @@
                 <div class="form-group">
                     <label class="control-label small">CVR-nummer</label>
                     <input type="text"
-                           data-ng-disabled="!ctrl.hasWriteAccess"
+                           data-ng-disabled="!ctrl.hasWriteAccess || !ctrl.organization.canCvrBeModified"
                            data-autosave="{{ctrl.updateOrgUrl}}"
                            class="form-control input-sm"
                            data-field="cvr"

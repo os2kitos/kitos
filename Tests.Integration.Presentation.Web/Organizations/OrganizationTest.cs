@@ -67,7 +67,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var name = A<string>();
-            var cvr = (A<int>() % 9999999999).ToString("D10");
+            var cvr = CreateNewCvr();
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
@@ -93,7 +93,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
             var name = A<string>();
-            var cvr = (A<int>() % 9999999999).ToString("D10");
+            var cvr = CreateNewCvr();
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
@@ -109,7 +109,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Arrange
             var login = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var nameOrg1 = A<string>();
-            var cvrOrg1 = (A<int>() % 9999999999).ToString("D10");
+            var cvrOrg1 = CreateNewCvr();
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
@@ -126,6 +126,51 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
             Assert.True(resultFilteredByName.Exists(prp => prp.Name.Contains(nameOrg1)));
+        }
+
+        [Fact]
+        public async Task Can_Update_Organization()
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var organizationName = A<string>();
+            var cvr = CreateNewCvr();
+            const AccessModifier accessModifier = AccessModifier.Public;
+
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, cvr, OrganizationTypeKeys.Kommune, accessModifier, login);
+
+            var newName = A<string>();
+            var newCvr = CreateNewCvr();
+
+            //Act
+            var result = await OrganizationHelper.UpdateAsync(organization.Id, TestEnvironment.DefaultOrganizationId, newName, newCvr, login);
+
+            Assert.Equal(newName, result.Name);
+            Assert.Equal(newCvr, result.Cvr);
+        }
+
+        [Fact]
+        public async Task Update_Organization_Cvr_Returns_Forbidden_When_LocalAdmin()
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
+            var organizationName = A<string>();
+            var cvr = CreateNewCvr();
+            const AccessModifier accessModifier = AccessModifier.Public;
+
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, cvr, OrganizationTypeKeys.Kommune, accessModifier);
+
+            var newCvr = CreateNewCvr();
+
+            //Act
+            var result = await OrganizationHelper.SendUpdateAsync(organization.Id, TestEnvironment.DefaultOrganizationId, organizationName, newCvr, login);
+
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        private string CreateNewCvr()
+        {
+            return (A<int>() % 9999999999).ToString("D10");
         }
     }
 }
