@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
@@ -17,6 +19,34 @@ namespace Tests.Integration.Presentation.Web.Tools
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/OrganizationUnit?organization={orgId}");
 
             using var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<OrgUnitDTO>();
+        }
+
+        public static async Task<OrgUnitDTO> PatchOrganizationUnitsAsync(
+            int orgId,
+            int unitId,
+            int? parentChange = null,
+            string nameChange = null,
+            int? eanChange = null,
+            string localIdChange = null,
+            Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var orgUnitUrl = TestEnvironment.CreateUrl($"api/organizationUnit/{unitId}?organizationId={orgId}");
+
+            dynamic body = new ExpandoObject();
+            if (parentChange.HasValue)
+                body.parentId = parentChange.Value;
+            if (nameChange != null)
+                body.name = nameChange;
+            if (eanChange.HasValue)
+                body.ean = eanChange.Value;
+            if (localIdChange != null)
+                body.localId = localIdChange;
+
+            using HttpResponseMessage response = await HttpApi.PatchWithCookieAsync(orgUnitUrl, cookie, body);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsKitosApiResponseAsync<OrgUnitDTO>();

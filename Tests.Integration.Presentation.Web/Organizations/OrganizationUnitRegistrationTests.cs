@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations
 {
-    public class OrganizationUnitTests: WithAutoFixture
+    public class OrganizationUnitRegistrationTests: WithAutoFixture
     {
         [Fact]
         public async Task GlobalAdmin_Has_All_AccessRights()

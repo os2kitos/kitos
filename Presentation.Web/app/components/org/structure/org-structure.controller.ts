@@ -6,6 +6,11 @@
                 templateUrl: "app/components/org/structure/org-structure.view.html",
                 controller: "org.StructureCtrl",
                 resolve: {
+                    currentOrganization: [
+                        "$http", "user", ($http: ng.IHttpService, user) => $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organization/" + user.currentOrganizationId).then((result) => {
+                            return result.data.response;
+                        })
+                    ],
                     rootNodeOfOrganization: [
                         "$http", "user", ($http: ng.IHttpService, user) => $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
                             return result.data.response;
@@ -33,7 +38,7 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitService",
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitService","currentOrganization",
         function ($scope,
             $http: ng.IHttpService,
             $modal,
@@ -47,7 +52,8 @@
             authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
             select2LoadingService: Kitos.Services.ISelect2LoadingService,
             inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
-            organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
+            organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService,
+            currentOrganization) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -58,13 +64,10 @@
                 take: 15
             };
 
-            //cache
-            var orgs = [];
-
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
             $scope.hasWriteAccess = hasWriteAccess;
-
+            $scope.currentOrganizationName = currentOrganization.name;
             $scope.orgUnitRoles = orgUnitRoles;
             $scope.activeOrgRoles = localOrgUnitRoles;
             $scope.orgRoles = {};
@@ -152,22 +155,6 @@
 
                 if ($scope.chosenOrgUnit === node) return;
 
-                //get organization related to the org unit
-                if (!node.organization) {
-                    //try get from cache
-                    if (orgs[node.organizationId]) {
-                        node.organization = orgs[node.organizationId];
-                    } else {
-                        //else get from server
-                        $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organization/" + node.organizationId).then((result) => {
-                            node.organization = result.data.response;
-
-                            //save to cache
-                            orgs[node.organizationId] = result.data.response;
-                        });
-                    }
-                }
-
                 // reset pagination
                 $scope.rightsPagination = {
                     skip: 0,
@@ -178,23 +165,25 @@
             };
 
             function loadRights(node) {
-                //get org rights on the org unit and subtree
-                $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + node.id + "?paged&take=" + $scope.rightsPagination.take + "&skip=" + $scope.rightsPagination.skip).then((result) => {
-                    var paginationHeader = JSON.parse(result.headers("X-Pagination"));
-                    $scope.totalRightsCountCopy = paginationHeader.TotalCount;
-                    node.orgRights = result.data.response;
+                if (node) {
+                    //get org rights on the org unit and subtree
+                    $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + node.id + "?paged&take=" + $scope.rightsPagination.take + "&skip=" + $scope.rightsPagination.skip).then((result) => {
+                        var paginationHeader = JSON.parse(result.headers("X-Pagination"));
+                        $scope.totalRightsCountCopy = paginationHeader.TotalCount;
+                        node.orgRights = result.data.response;
 
-                    var count = 0;
-                    _.each(node.orgRights, function (right: { userForSelect; roleForSelect; user; roleId; show; objectId; }) {
-                        right.userForSelect = { id: right.user.id, text: right.user.fullName };
-                        right.roleForSelect = right.roleId;
-                        right.show = $scope.showChildren || belongsToChosenNode(node, right);
-                        if (right.show)
-                            count++;
+                        var count = 0;
+                        _.each(node.orgRights, function (right: { userForSelect; roleForSelect; user; roleId; show; objectId; }) {
+                            right.userForSelect = { id: right.user.id, text: right.user.fullName };
+                            right.roleForSelect = right.roleId;
+                            right.show = $scope.showChildren || belongsToChosenNode(node, right);
+                            if (right.show)
+                                count++;
+                        });
+
+                        $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
                     });
-
-                    $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
-                });
+                }
 
                 $scope.chosenOrgUnit = node;
             }
@@ -234,7 +223,7 @@
                 var uId = $scope.selectedUser.id;
 
                 if (!oId || !rId || !uId) return;
-
+                
                 var data = {
                     "roleId": rId,
                     "userId": uId
@@ -414,7 +403,7 @@
                                 orgId: unit.organizationId,
                                 isRoot: unit.parentId == undefined,
                                 uuid: unit.uuid,
-                                orgUuid: unit.organization.uuid,
+                                orgUuid: currentOrganization.uuid,
                                 isFkOrganizationUnit: unit.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                             } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
 
@@ -444,7 +433,7 @@
                             $modalScope.canDeviceIdBeModified = false;
                             $modalScope.canDelete = false;
 
-                            organizationUnitService.getUnitAccessRights(unit.organization.uuid, unit.uuid)
+                            organizationUnitService.getUnitAccessRights(currentOrganization.uuid, unit.uuid)
                                 .then(res => {
                                     $modalScope.canDelete = res.canBeDeleted;
                                     $modalScope.canChangeName = res.canNameBeModified;
@@ -601,7 +590,7 @@
 
                                 $modalScope.submitting = true;
 
-                                organizationUnitService.deleteOrganizationUnit(unit.organization.uuid, unit.uuid)
+                                organizationUnitService.deleteOrganizationUnit(currentOrganization.uuid, unit.uuid)
                                     .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();
@@ -716,7 +705,7 @@
 
                 if ($scope.isReordering) {
                     $scope.loadingAccessRights = true;
-                    organizationUnitService.getUnitAccessRightsForOrganization(rootNodeOfOrganization.organization.uuid)
+                    organizationUnitService.getUnitAccessRightsForOrganization(currentOrganization.uuid)
                         .then(response => {
                             const rightsMap = response.reduce((rights, next) => {
                                     rights[next.unitId] = next;
