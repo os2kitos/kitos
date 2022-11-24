@@ -547,7 +547,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
-        public async Task Can_GET_LOGS_With_Addition_Consequences()
+        public async Task Can_GET_LOGS()
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

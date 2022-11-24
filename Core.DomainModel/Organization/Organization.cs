@@ -292,11 +292,11 @@ namespace Core.DomainModel.Organization
                 );
         }
 
-        public Result<StsOrganizationConnectionImportLogResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
+        public Result<StsOrganizationConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
             StsOrganizationChangeLog changeLogToAdd)
         {
             return GetStsOrganizationConnection(origin)
-                .Bind<StsOrganizationConnectionImportLogResult>(connection => connection.AddNewLogs(changeLogToAdd.WrapAsEnumerable()));
+                .Bind<StsOrganizationConnectionAddNewLogsResult>(connection => connection.AddNewLogs(changeLogToAdd.WrapAsEnumerable()));
         }
 
         public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)

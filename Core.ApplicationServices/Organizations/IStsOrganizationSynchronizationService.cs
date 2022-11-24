@@ -52,11 +52,5 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="numberOfChangeLogs"></param>
         /// <returns></returns>
         Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs);
-        /// <summary>
-        /// Converts consequences to consequence logs
-        /// </summary>
-        /// <param name="consequences"></param>
-        /// <returns></returns>
-        IEnumerable<StsOrganizationConsequenceLog> ConvertConsequencesToConsequenceLogs(OrganizationTreeUpdateConsequences consequences);
     }
 }
