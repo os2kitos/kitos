@@ -568,7 +568,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Theory]
         [InlineData(0)]
         [InlineData(-10)]
-        public void GetStsOrganizationConnectionEntryLogs_Returns_BadInput_If_NumberOfLogs_Is_Lower_Than_One(int numberOfLogs)
+        public void GetStsOrganizationConnectionEntryLogs_Returns_BadState_If_NumberOfLogs_Is_Lower_Than_One(int numberOfLogs)
         {
             //Arrange
             _sut.StsOrganizationConnection = new StsOrganizationConnection
@@ -581,7 +581,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
         }
 
         [Theory]
