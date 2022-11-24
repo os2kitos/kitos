@@ -721,8 +721,7 @@
                             const rightsMap = response.reduce((rights, next) => {
                                     rights[next.unitId] = next;
                                     return rights;
-                                },
-                                {});
+                                }, {})
                             applyAccessRights(rootNodeOfOrganization, rightsMap);
                             $scope.loadingAccessRights = false;
                         }, error => {

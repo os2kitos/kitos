@@ -6,20 +6,18 @@
             bindings: {
                 organizationUuid: "@"
             },
-            controller: FkOrganizationImportChangeLogController,
+            controller: FkOrganizationImportChangeLogRootController,
             controllerAs: "ctrl",
             templateUrl: `app/components/local-config/import/fk-organization-import-change-logs-root.view.html`
         };
     }
 
-    interface IFkOrganizationImportChangeLogController extends ng.IComponentController, Utility.KendoGrid.IGridViewAccess<IConsequenceRow> {
+    interface IFkOrganizationImportChangeLogRootController {
         organizationUuid: string;
     }
 
-    class FkOrganizationImportChangeLogController implements IFkOrganizationImportChangeLogController {
+    class FkOrganizationImportChangeLogRootController implements IFkOrganizationImportChangeLogRootController {
         organizationUuid: string | null = null;
-        mainGrid: IKendoGrid<IConsequenceRow>;
-        mainGridOptions: IKendoGridOptions<IConsequenceRow>;
 
         changeLogs: Array<Models.Api.Organization.ConnectionChangeLogDTO> = [];
         selectedChangeLog: Models.Api.Organization.ConnectionChangeLogDTO;
@@ -28,12 +26,13 @@
 
         selectChangeLogModel = {};
 
-        private readonly numberOfLogs = 5;
+        private readonly maxNumberOfLogs = 5;
 
-        static $inject: string[] = ["stsOrganizationSyncService", "select2LoadingService"];
+        static $inject: string[] = ["stsOrganizationSyncService", "select2LoadingService", "notify"];
         constructor(
             private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService,
-            private readonly select2LoadingService: Services.ISelect2LoadingService) {
+            private readonly select2LoadingService: Services.ISelect2LoadingService,
+            private readonly  notify) {
         }
 
         $onInit() {
@@ -42,7 +41,7 @@
                 return;
             }
 
-            this.stsOrganizationSyncService.getConnectionChangeLogs(this.organizationUuid, this.numberOfLogs)
+            this.stsOrganizationSyncService.getConnectionChangeLogs(this.organizationUuid, this.maxNumberOfLogs)
                 .then(
                     response => {
                         this.changeLogs.pushArray(response);
@@ -51,6 +50,7 @@
                     },
                     error => {
                         console.log(error);
+                        this.notify.addErrorMessage("Failed to get the change logs");
                     });
 
         }

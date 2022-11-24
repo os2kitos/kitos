@@ -6,7 +6,7 @@
             bindings: {
                 changeLog: "<"
             },
-            controller: FkOrganizationImportChangeLogLogController,
+            controller: FkOrganizationImportChangeLogController,
             controllerAs: "ctrl",
             templateUrl: `app/components/local-config/import/fk-organization-import-change-log.view.html`
         };
@@ -16,7 +16,7 @@
         changeLog: Models.Api.Organization.ConnectionChangeLogDTO
     }
 
-    class FkOrganizationImportChangeLogLogController implements IFkOrganizationImportChangeLogController {
+    class FkOrganizationImportChangeLogController implements IFkOrganizationImportChangeLogController {
         changeLog: Models.Api.Organization.ConnectionChangeLogDTO | null = null;
         responsibleEntityText: string;
         logTime: string;
