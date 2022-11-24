@@ -86,9 +86,8 @@ namespace Presentation.Web.Controllers.API.V1
                     return Forbidden();
                 }
 
-                var isGlobalAdmin = _organizationService.CanActiveUserModifyCvr(item);
                 var dto = Map(item);
-                dto.CanCvrBeModified = isGlobalAdmin;
+                dto.CanCvrBeModified = _organizationService.CanActiveUserModifyCvr(item);
 
                 return Ok(dto);
             }
