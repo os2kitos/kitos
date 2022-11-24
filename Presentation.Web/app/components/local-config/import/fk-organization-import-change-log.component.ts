@@ -20,6 +20,8 @@
         changeLog: Models.Api.Organization.ConnectionChangeLogDTO | null = null;
         mainGrid: IKendoGrid<IConsequenceRow>;
         mainGridOptions: IKendoGridOptions<IConsequenceRow>;
+        responsibleEntityText: string;
+        logTime: string;
 
         static $inject: string[] = [];
 
@@ -29,7 +31,8 @@
                 return;
             }
 
-
+            this.responsibleEntityText = Helpers.ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(this.changeLog);
+            this.logTime = Helpers.RenderFieldsHelper.renderDate(this.changeLog.logTime);
         }
     }
 

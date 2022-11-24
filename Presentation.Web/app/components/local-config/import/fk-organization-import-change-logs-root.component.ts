@@ -21,10 +21,11 @@
         mainGrid: IKendoGrid<IConsequenceRow>;
         mainGridOptions: IKendoGridOptions<IConsequenceRow>;
 
-        changeLogs: Array<Models.Api.Organization.ConnectionChangeLogDTO>;
+        changeLogs: Array<Models.Api.Organization.ConnectionChangeLogDTO> = [];
         selectedChangeLog: Models.Api.Organization.ConnectionChangeLogDTO;
         isChangeLogSelected = false;
-        selectChangeLogModel: any;
+        isChangeLogLoaded = false;
+        selectChangeLogModel = {};
 
         private readonly numberOfLogs = 5;
 
@@ -42,28 +43,32 @@
 
             this.stsOrganizationSyncService.getConnectionChangeLogs(this.organizationUuid, this.numberOfLogs)
                 .then(
-                    response => this.changeLogs.pushArray(response),
+                    response => {
+                        this.changeLogs.pushArray(response);
+                        this.bindChangeLogModel();
+                        this.isChangeLogLoaded = true;
+                    },
                     error => {
                         console.log(error);
                     });
+
         }
 
         bindChangeLogModel() {
             var optionMap = Helpers.ConnectionChangeLogHelper.createDictionaryFromChangeLogList(this.changeLogs);
             let existingChoice = null;
-            if (!this.selectedChangeLog.id) {
+            if (this.selectedChangeLog?.id) {
                 existingChoice = this.selectedChangeLog;
 
                 if (!optionMap[existingChoice.id]) {
                     optionMap[existingChoice.id] = {
-                        text: Helpers.ConnectionChangeLogHelper.getDropdownTextBasedOnOrigin(existingChoice),
+                        text: Helpers.ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(existingChoice),
                         id: existingChoice.id,
                         disabled: true,
                         optionalObjectContext: existingChoice
                     }
                 }
             }
-
 
             const options = this.changeLogs.map(option => optionMap[option.id]);
 
@@ -76,42 +81,6 @@
                 }
             };
         }
-
-        /*function bindCriticalities(contract: any) {
-
-            const optionMap = Kitos.Helpers.OptionEntityHelper.createDictionaryFromOptionList(criticalityOptions);
-
-            //If selected state is expired, add it for presentation reasons
-            let existingChoice = null;
-            if (contract.criticalityId !== undefined && contract.criticalityId !== null) {
-                existingChoice = {
-                    id: contract.criticalityId,
-                    name: `${contract.criticalityName} (udgået)`
-                };
-
-                if (!optionMap[existingChoice.id]) {
-                    optionMap[existingChoice.id] = {
-                        text: existingChoice.name,
-                        id: existingChoice.id,
-                        disabled: true,
-                        optionalObjectContext: existingChoice
-                    }
-                }
-            }
-
-            const options = criticalityOptions.map(option => optionMap[option.Id]);
-
-            $scope.criticality = {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
-                elementSelected: (newElement) => {
-                    var payload = { criticalityId: newElement ? newElement.id : null };
-                    $scope.contract.criticalityId = newElement?.id;
-                    patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
-                }
-            };
-        }*/
-
     }
 
     angular.module("app")

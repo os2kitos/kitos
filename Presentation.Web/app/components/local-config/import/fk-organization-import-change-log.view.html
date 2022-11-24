@@ -1,1 +1,30 @@
-﻿<fk-orgnization-import-consequences-log data-consequences="ctrl.changeLog.consequences"></fk-orgnization-import-consequences-log>
+﻿<table class="full-width table">
+    <thead>
+        <tr>
+            <th>
+                <h6>Ansvarlig</h6>
+            </th>
+            <th>
+                <h6>Number of updates</h6>
+            </th>
+            <th>
+                <h6>Update date</h6>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <input type="text" disabled="disabled" class="form-control input-sm" value="{{ ctrl.responsibleEntityText }}" />
+            </td>
+            <td>
+                <input type="text" disabled="disabled" class="form-control input-sm" value="{{ ctrl.changeLog.consequences.length }}" />
+            </td>
+            <td>
+                <input type="text" disabled="disabled" class="form-control input-sm" value="{{ ctrl.logTime }}" />
+            </td>
+        </tr>
+</table>
+<div class="margin-top-sm">
+    <fk-orgnization-import-consequences-log data-consequences="ctrl.changeLog.consequences"></fk-orgnization-import-consequences-log>
+</div>

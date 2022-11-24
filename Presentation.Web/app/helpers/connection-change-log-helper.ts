@@ -4,15 +4,17 @@
             return changeLogs.reduce((acc, next, _) => {
                 acc[next.id] = {
                     id: next.id,
-                    text: ConnectionChangeLogHelper.getDropdownTextBasedOnOrigin(next),
+                    text: ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(next),
                     optionalObjectContext: next
                 };
                 return acc;
             }, {});
         }
 
-        static getDropdownTextBasedOnOrigin(changeLog: Models.Api.Organization.ConnectionChangeLogDTO): string {
-            return changeLog.origin === Models.Api.Organization.ConnectionChangeLogOrigin.Background ? "FK Organisation" : `${changeLog.user.name} (${changeLog.user.email})`
+        static getResponsibleEntityTextBasedOnOrigin(changeLog: Models.Api.Organization.ConnectionChangeLogDTO): string {
+            return changeLog.origin === Models.Api.Organization.ConnectionChangeLogOrigin.Background
+                ? "FK Organisation"
+                : `${changeLog.user.name} (${changeLog.user.email})`;
         }
     }
 }

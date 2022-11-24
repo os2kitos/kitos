@@ -1,5 +1,5 @@
 ﻿
-<div class="form-group">
+<div class="form-group" ng-if="ctrl.isChangeLogLoaded">
     <label for="select-change-log" class="control-label small">Select a changelog</label>
     <single-select-select2 id="select-change-log" ng-model="ctrl.selectChangeLogModel"/>
 </div>
