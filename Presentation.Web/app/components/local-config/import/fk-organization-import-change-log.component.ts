@@ -12,17 +12,15 @@
         };
     }
     
-    interface IFkOrganizationImportChangeLogController extends ng.IComponentController, Utility.KendoGrid.IGridViewAccess<IConsequenceRow> {
+    interface IFkOrganizationImportChangeLogController{
         changeLog: Models.Api.Organization.ConnectionChangeLogDTO
     }
 
     class FkOrganizationImportChangeLogLogController implements IFkOrganizationImportChangeLogController {
         changeLog: Models.Api.Organization.ConnectionChangeLogDTO | null = null;
-        mainGrid: IKendoGrid<IConsequenceRow>;
-        mainGridOptions: IKendoGridOptions<IConsequenceRow>;
         responsibleEntityText: string;
         logTime: string;
-
+        
         static $inject: string[] = [];
 
         $onInit() {

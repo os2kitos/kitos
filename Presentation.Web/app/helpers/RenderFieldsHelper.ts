@@ -68,6 +68,10 @@
             return ExcelExportHelper.renderDate(date);
         }
 
+        static renderDateWithTime(date: Date | string | undefined | null) {
+            return ExcelExportHelper.renderDateWithTime(date);
+        }
+
         static renderActiveNotActive(value: boolean) {
             return value ? RenderFieldsHelper.texts.active : RenderFieldsHelper.texts.notActive;
         }

@@ -6,7 +6,7 @@
             bindings: {
                 organizationUuid: "@"
             },
-            controller: FkOrganizationImportChangeLogLogController,
+            controller: FkOrganizationImportChangeLogController,
             controllerAs: "ctrl",
             templateUrl: `app/components/local-config/import/fk-organization-import-change-logs-root.view.html`
         };
@@ -16,15 +16,16 @@
         organizationUuid: string;
     }
 
-    class FkOrganizationImportChangeLogLogController implements IFkOrganizationImportChangeLogController {
+    class FkOrganizationImportChangeLogController implements IFkOrganizationImportChangeLogController {
         organizationUuid: string | null = null;
         mainGrid: IKendoGrid<IConsequenceRow>;
         mainGridOptions: IKendoGridOptions<IConsequenceRow>;
 
         changeLogs: Array<Models.Api.Organization.ConnectionChangeLogDTO> = [];
         selectedChangeLog: Models.Api.Organization.ConnectionChangeLogDTO;
-        isChangeLogSelected = false;
+
         isChangeLogLoaded = false;
+
         selectChangeLogModel = {};
 
         private readonly numberOfLogs = 5;
@@ -56,28 +57,16 @@
 
         bindChangeLogModel() {
             var optionMap = Helpers.ConnectionChangeLogHelper.createDictionaryFromChangeLogList(this.changeLogs);
-            let existingChoice = null;
-            if (this.selectedChangeLog?.id) {
-                existingChoice = this.selectedChangeLog;
-
-                if (!optionMap[existingChoice.id]) {
-                    optionMap[existingChoice.id] = {
-                        text: Helpers.ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(existingChoice),
-                        id: existingChoice.id,
-                        disabled: true,
-                        optionalObjectContext: existingChoice
-                    }
-                }
-            }
-
             const options = this.changeLogs.map(option => optionMap[option.id]);
 
             this.selectChangeLogModel = {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
+                selectedElement: this.selectedChangeLog && optionMap[this.selectedChangeLog.id],
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(
+                    () => options,
+                    true,
+                    (changeLog: { optionalObjectContext: Models.Api.Organization.ConnectionChangeLogDTO }) => Helpers.Select2OptionsFormatHelper.formatChangeLog(changeLog.optionalObjectContext)),
                 elementSelected: (newElement) => {
                     this.selectedChangeLog = newElement.optionalObjectContext;
-                    this.isChangeLogSelected = true;
                 }
             };
         }

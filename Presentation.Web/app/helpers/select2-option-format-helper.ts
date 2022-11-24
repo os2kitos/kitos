@@ -12,6 +12,13 @@
             return Select2OptionsFormatHelper.formatText(org.text, org.optionalObjectContext?.cvrNumber);
         }
 
+        public static formatChangeLog(changeLog: Models.Api.Organization.ConnectionChangeLogDTO): string {
+            const dateText = Helpers.RenderFieldsHelper.renderDateWithTime(changeLog.logTime);
+            const responsibleEntityText = Helpers.ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(changeLog);
+
+            return Select2OptionsFormatHelper.formatText(dateText, responsibleEntityText);
+        }
+
         public static addIndentationToUnitChildren(orgUnit: Models.Api.Organization.OrganizationUnit, indentationLevel: number): Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[] {
             const options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[] = [];
             Select2OptionsFormatHelper.visitUnit(orgUnit, indentationLevel, options);

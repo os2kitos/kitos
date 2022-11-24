@@ -7,7 +7,7 @@
         loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean, formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string);
         loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string);
         select2LocalData(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[]);
-        select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
+        select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean, formatResults?: (input) => string);
         select2MultipleLocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
         select2LocalDataFormatted(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], formatResults: (input: Models.ViewModel.Generic.ISelect2Model) => string, allowClear?: boolean);
     }
@@ -35,11 +35,12 @@
             };
         }
 
-        select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear = true) {
+        select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear = true, formatResults?: (input) => string) {
             return {
                 minimumResultsForSearch: Infinity,
                 data: () => ({ "results": dataFn() }),
-                allowClear: allowClear
+                allowClear: allowClear,
+                formatResult: formatResults
             };
         }
 
