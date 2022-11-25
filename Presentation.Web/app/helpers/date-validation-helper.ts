@@ -23,6 +23,16 @@
                     endDateFieldName);
         }
 
+        static validateDate(date: string, notify, fieldName: string) {
+            const formatDateString = Kitos.Constants.DateFormat.EnglishDateFormat;
+            const formattedDate = date ? moment(date, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]) : null;
+
+            if (formattedDate == null) {
+                return true;
+            }
+            return DateValidationHelper.checkIfDateIsValid(formattedDate, notify, fieldName);
+        }
+
         static checkIfStartDateIsSmallerThanEndDate(startDate: moment.Moment, endDate: moment.Moment, notify, startDateFieldName: string, endDateFieldName: string): boolean {
             if (startDate > endDate) {
                 notify.addErrorMessage(`Den indtastede \"${endDateFieldName}\" er før \"${startDateFieldName}\".`);
