@@ -40,6 +40,7 @@
             orgUnit.children.forEach(child => {
                 return Select2OptionsFormatHelper.visitUnit(child, indentationLevel + 1, options);
             });
+
         }
     }
 }

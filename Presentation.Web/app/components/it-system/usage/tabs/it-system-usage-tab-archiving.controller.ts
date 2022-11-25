@@ -187,9 +187,7 @@
                 notify.addSuccessMessage("Feltet er opdateret!");
             }
 
-            $scope.datepickerOptions = {
-                format: Kitos.Constants.DateFormat.OtherDanishDateFormat
-            };
+            $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
         }]);
 
 })(angular, app);
