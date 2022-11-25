@@ -12,11 +12,24 @@
             return Select2OptionsFormatHelper.formatText(org.text, org.optionalObjectContext?.cvrNumber);
         }
 
-        public static addIndentationToUnitChildren(orgUnit: Models.Api.Organization.OrganizationUnit, indentationLevel: number): Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[] {
+        public static addIndentationToUnitChildren(orgUnit: Models.Api.Organization.OrganizationUnit, indentationLevel: number, idToSkip?: number): Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[] {
             const options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[] = [];
-            Select2OptionsFormatHelper.visitUnit(orgUnit, indentationLevel, options);
+            Select2OptionsFormatHelper.visitUnit(orgUnit, indentationLevel, options, idToSkip);
 
             return options;
+        }
+
+        public static formatIndentation(result: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<any>): string {
+            function visit(text: string, indentationLevel: number): string {
+                if (indentationLevel <= 0) {
+                    return text;
+                }
+                //indentation is four non breaking spaces
+                return visit("&nbsp&nbsp&nbsp&nbsp" + text, indentationLevel - 1);
+            }
+
+            const formattedResult = visit(result.text, result.indentationLevel);
+            return formattedResult;
         }
 
         private static formatText(text: string, subText?: string): string {
@@ -26,8 +39,13 @@
             }
             return result;
         }
+
         
-        private static visitUnit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number, options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[]) {
+        private static visitUnit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number, options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Models.Api.Organization.OrganizationUnit>[], unitIdToSkip?: number) {
+            if (unitIdToSkip && orgUnit.id === unitIdToSkip) {
+                return;
+            }
+
             const option = {
                 id: String(orgUnit.id),
                 text: orgUnit.name,
@@ -38,7 +56,7 @@
             options.push(option);
 
             orgUnit.children.forEach(child => {
-                return Select2OptionsFormatHelper.visitUnit(child, indentationLevel + 1, options);
+                return Select2OptionsFormatHelper.visitUnit(child, indentationLevel + 1, options, unitIdToSkip);
             });
 
         }
