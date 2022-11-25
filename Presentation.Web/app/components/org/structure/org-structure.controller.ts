@@ -639,7 +639,7 @@
 
                                 $modalScope.parentSelect = {
                                     selectedElement: existingChoice,
-                                    select2Config: select2LoadingService.select2LocalDataFormattedWithIndentation(() => orgUnitsOptions, Kitos.Helpers.Select2OptionsFormatHelper.formatIndentation),
+                                    select2Config: select2LoadingService.select2LocalDataFormattedIndentation(() => orgUnitsOptions, Kitos.Helpers.Select2OptionsFormatHelper.formatIndentation),
                                     elementSelected: (newElement) => {
                                         if (!!newElement) {
                                             $modalScope.orgUnit.newParent = newElement.id;
