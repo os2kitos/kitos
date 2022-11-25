@@ -130,9 +130,9 @@ namespace Core.ApplicationServices.Organizations
                 _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType, organization.Id));
         }
 
-        public bool CanActiveUserModifyCvr(Organization organization)
+        public bool CanActiveUserModifyCvr()
         {
-            return _authorizationContext.AllowReads(organization) && _userContext.IsGlobalAdmin();
+            return _userContext.IsGlobalAdmin();
         }
 
         public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)
