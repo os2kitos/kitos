@@ -82,7 +82,7 @@
                 let dateList = [];
                 let dateNotList = [];
                 _.each($scope.archivePeriods, x => {
-                    var formatDateString = Kitos.Constants.DateFormat.EnglishDateFormat;// "YYYY-MM-DD";
+                    var formatDateString = Kitos.Constants.DateFormat.EnglishDateFormat;
                     if (moment().isBetween(moment(x.StartDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day'), moment(x.EndDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day'), null, '[]')) {
                         dateList.push(x);
                     } else {
