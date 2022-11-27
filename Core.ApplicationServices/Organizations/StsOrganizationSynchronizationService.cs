@@ -31,7 +31,6 @@ namespace Core.ApplicationServices.Organizations
         private readonly IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
-        private readonly IUserRepository _userRepository;
         private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
 
         public StsOrganizationSynchronizationService(
@@ -45,7 +44,6 @@ namespace Core.ApplicationServices.Organizations
             IDomainEvents domainEvents,
             IGenericRepository<OrganizationUnit> organizationUnitRepository,
             Maybe<ActiveUserIdContext> activeUserIdContext,
-            IUserRepository userRepository,
             IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
@@ -58,7 +56,6 @@ namespace Core.ApplicationServices.Organizations
             _organizationUnitRepository = organizationUnitRepository;
             _authorizationContext = authorizationContext;
             _activeUserIdContext = activeUserIdContext;
-            _userRepository = userRepository;
             _stsChangeLogRepository = stsChangeLogRepository;
         }
 
@@ -104,7 +101,7 @@ namespace Core.ApplicationServices.Organizations
             {
                 return LoadOrganizationUnits(organization)
                     .Bind(importRoot => ConnectToExternalOrganizationHierarchy(organization, importRoot, levelsToInclude, subscribeToUpdates))
-                    .Bind
+                    .Select
                         (
                             importRoot =>
                             {
@@ -116,11 +113,11 @@ namespace Core.ApplicationServices.Organizations
                                     unitsToImport.Select(unit => (unit, importedTreeToParent[unit.Uuid])).ToList(),
                                      Enumerable.Empty<(OrganizationUnit affectedUnit, string oldName, string newName)>(),
                                     Enumerable.Empty<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>());
-
-                                return WithLogEntries(consequences)
-                                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries));
+                                return consequences;
                             }
                         )
+                    .Bind(WithLogEntries)
+                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
                     .MatchFailure();
             });
         }
@@ -177,22 +174,16 @@ namespace Core.ApplicationServices.Organizations
                         return consequences;
                     })
                     .Bind(WithLogEntries)
-                    .Bind(logEntries =>
+                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
+                    .Match(importLogResult =>
                     {
-                        return organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries)
-                            .Match<Result<StsOrganizationChangeLog, OperationError>>
-                            (
-                                importLogResult =>
-                                {
-                                    _stsChangeLogRepository.RemoveRange(importLogResult.RemovedChangeLogs);
-                                    _stsChangeLogRepository.Save();
+                        if (importLogResult.RemovedChangeLogs.Any())
+                        {
+                            _stsChangeLogRepository.RemoveRange(importLogResult.RemovedChangeLogs);
+                        }
 
-                                    return logEntries;
-                                },
-                                error => error
-                            );
-                    })
-                    .Match(_ => Maybe<OperationError>.None, error => error)
+                        return Maybe<OperationError>.None;
+                    }, error => error)
             );
         }
 
@@ -264,7 +255,7 @@ namespace Core.ApplicationServices.Organizations
             return Maybe<OperationError>.None;
         }
 
-        private Result<ExternalOrganizationUnit, OperationError> ConnectToExternalOrganizationHierarchy(
+        private static Result<ExternalOrganizationUnit, OperationError> ConnectToExternalOrganizationHierarchy(
             Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude, subscribeToUpdates)
@@ -281,10 +272,6 @@ namespace Core.ApplicationServices.Organizations
             if (_activeUserIdContext.HasValue)
             {
                 var userId = _activeUserIdContext.Value.ActiveUserId;
-                var user = _userRepository.GetById(userId);
-                if (user == null)
-                    return new OperationError($"User with id: {userId} was not found", OperationFailure.NotFound);
-
                 changeLog.Origin = StsOrganizationChangeLogOrigin.User;
                 changeLog.UserId = userId;
             }

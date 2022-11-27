@@ -6,7 +6,7 @@ namespace Core.DomainModel.Organization
     {
         public StsOrganizationConnectionAddNewLogsResult(IEnumerable<StsOrganizationChangeLog> removedChangeLogs)
         {
-            RemovedChangeLogs = removedChangeLogs;
+            RemovedChangeLogs = removedChangeLogs ?? new List<StsOrganizationChangeLog>();
         }
 
         public IEnumerable<StsOrganizationChangeLog> RemovedChangeLogs { get; }

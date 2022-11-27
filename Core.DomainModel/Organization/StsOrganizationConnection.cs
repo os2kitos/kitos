@@ -84,7 +84,11 @@ namespace Core.DomainModel.Organization
 
         private IEnumerable<StsOrganizationChangeLog> RemoveOldestLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
         {
-            var logsToRemove = StsOrganizationChangeLogs.OrderByDescending(x => x.LogTime).Skip(StsOrganizationConnectionConstants.TotalNumberOfLogs).ToList();
+            var logsToRemove = StsOrganizationChangeLogs
+                .OrderByDescending(x => x.LogTime)
+                .Skip(StsOrganizationConnectionConstants.TotalNumberOfLogs)
+                .ToList();
+
             logsToRemove.ForEach(log => StsOrganizationChangeLogs.Remove(log));
 
             return logsToRemove;

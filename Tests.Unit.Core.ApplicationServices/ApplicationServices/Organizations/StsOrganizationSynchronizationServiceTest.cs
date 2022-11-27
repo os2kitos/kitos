@@ -7,7 +7,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
-using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -36,7 +35,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
         private readonly ActiveUserIdContext _activeUserIdContext;
-        private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
@@ -50,7 +48,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
             _activeUserIdContext = new ActiveUserIdContext(A<int>());
-            _userRepositoryMock = new Mock<IUserRepository>();
             _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
 
             _sut = new StsOrganizationSynchronizationService(
@@ -64,7 +61,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _domainEventsMock.Object,
                 _organizationUnitRepositoryMock.Object,
                 _activeUserIdContext,
-                _userRepositoryMock.Object,
                 _stsOrganziationChangeLogRepositoryMock.Object);
         }
 
@@ -208,7 +204,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             var transaction = ExpectTransaction();
 
             //Act
@@ -338,7 +333,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             var transaction = ExpectTransaction();
 
             //Act
@@ -603,7 +597,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -640,7 +633,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -677,7 +669,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -716,7 +707,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -758,7 +748,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -864,11 +853,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void SetupGetOrganizationReturns(Guid organizationId, Result<Organization, OperationError> organization)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(organizationId, null)).Returns(organization);
-        }
-
-        private void SetupGetUserReturns(int userId, User user)
-        {
-            _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(user);
         }
 
         private void SetupHasPermissionReturns(Organization organization, bool value)
