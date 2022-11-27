@@ -122,7 +122,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("connection/change-log")]
-        public HttpResponseMessage GetLastNumberOfChangeLogsForOrganization(Guid organizationId, int numberOfChangeLogs)
+        public HttpResponseMessage GetChangeLogs(Guid organizationId, int numberOfChangeLogs)
         {
             return _stsOrganizationSynchronizationService.GetChangeLogs(organizationId, numberOfChangeLogs)
                 .Select(MapChangeLogResponseDtos)
@@ -132,16 +132,24 @@ namespace Presentation.Web.Controllers.API.V1
         #region DTO Mapping
         private ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
         {
-            var logs = consequences.ConvertConsequencesToConsequenceLogs();
-            var dtos = MapConsequenceLogsToDtos(logs);
+            var logEntries = consequences
+                .ConvertConsequencesToConsequenceLogs()
+                .Transform(MapConsequenceLogsToDtos)
+                .Transform(OrderLogEntries);
 
             return new ConnectionUpdateConsequencesResponseDTO
             {
-                Consequences = dtos
-                    .OrderBy(x => x.Name)
-                    .ThenBy(x => x.Category)
-                    .ToList()
+                Consequences = logEntries
             };
+        }
+
+        private static List<ConnectionUpdateOrganizationUnitConsequenceDTO> OrderLogEntries(IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> logEntries)
+        {
+            var consequenceDtos = logEntries
+                .OrderBy(x => x.Name)
+                .ThenBy(x => x.Category)
+                .ToList();
+            return consequenceDtos;
         }
 
         private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
@@ -176,7 +184,9 @@ namespace Presentation.Web.Controllers.API.V1
         private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(
             IEnumerable<StsOrganizationConsequenceLog> logs)
         {
-            return logs.Select(MapConsequenceToDto).ToList();
+            return logs
+                .Select(MapConsequenceToDto)
+                .Transform(OrderLogEntries);
         }
 
         private static ConnectionUpdateOrganizationUnitConsequenceDTO MapConsequenceToDto(StsOrganizationConsequenceLog log)
