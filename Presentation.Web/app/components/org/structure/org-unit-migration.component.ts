@@ -2,7 +2,7 @@
     "use strict";
 
     function setupComponent(): ng.IComponentOptions {
-        return{
+        return {
             bindings: {
                 organizationId: "<",
                 organizationUuid: "@",
@@ -67,7 +67,7 @@
         contractTableConfig: IMigrationTableColumn[];
         relevantSystemTableConfig: IMigrationTableColumn[];
         responsibleSystemTableConfig: IMigrationTableColumn[];
-        
+
         static $inject: string[] = ["organizationUnitService", "organizationApiService", "notify"];
         constructor(private readonly organizationUnitService: Services.Organization.IOrganizationUnitService,
             private readonly organizationApiService: Services.IOrganizationApiService,
@@ -179,7 +179,7 @@
         updateAnySelections() {
             let anySelectionsFound = false;
             let allSelectionsFound = false;
-            
+
             const roots = this.getAllRoots();
             var totalRegistrations = 0;
             roots.forEach(root => totalRegistrations += root.children.length);
@@ -313,13 +313,17 @@
                 this.responsibleSystemRegistrations.root.children);
         }
 
+        private sortByText(input: Models.ViewModel.Organization.IOrganizationUnitRegistration[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
+            return input.sort((a, b) => a.text.localeCompare(b.text, 'da-DK'));
+        }
+
         private getData(): ng.IPromise<void> {
             return this.organizationUnitService.getRegistrations(this.organizationUuid, this.unitUuid).then(response => {
-                this.roles.root.children = this.mapDtoWithUserFullNameToOptions(response.organizationUnitRights);
+                this.roles.root.children = this.sortByText(this.mapDtoWithUserFullNameToOptions(response.organizationUnitRights));
                 this.getPaymentOptions(response.payments);
-                this.contractRegistrations.root.children = this.mapOrganizationDtoToOptions(response.itContractRegistrations);
-                this.relevantSystemRegistrations.root.children = this.mapOrganizationDtoWithEnabledToOptions(response.relevantSystems);
-                this.responsibleSystemRegistrations.root.children = this.mapOrganizationDtoWithEnabledToOptions(response.responsibleSystems);
+                this.contractRegistrations.root.children = this.sortByText(this.mapOrganizationDtoToOptions(response.itContractRegistrations));
+                this.relevantSystemRegistrations.root.children = this.sortByText(this.mapOrganizationDtoWithEnabledToOptions(response.relevantSystems));
+                this.responsibleSystemRegistrations.root.children = this.sortByText(this.mapOrganizationDtoWithEnabledToOptions(response.responsibleSystems));
                 this.checkIsAnyDataPresent();
             }, error => {
                 console.error(error);
@@ -350,7 +354,7 @@
             return this.stateParameters.checkIsRootBusy();
         }
 
-        private setIsBusy(value: boolean): void{
+        private setIsBusy(value: boolean): void {
             this.stateParameters.setRootIsBusy(value);
         }
 
@@ -386,8 +390,8 @@
         private createPaymentTableConfig(title: string): IMigrationTableColumn[] {
             return [
                 { title: "Index", property: "index", type: MigrationTableColumnType.Text },
-                { title: "Kontraktnavn", property: "objectText", type: MigrationTableColumnType.Link },
-                { title: title, property: "text", type: MigrationTableColumnType.Text }
+                { title: "Kontraktnavn", property: "text", type: MigrationTableColumnType.Link },
+                { title: title, property: "objectText", type: MigrationTableColumnType.Text }
             ] as IMigrationTableColumn[];
         }
 
@@ -430,17 +434,17 @@
                 externalPayments = externalPayments.concat(this.mapPaymentsToOptions(payment.itContract, payment.externalPayments));
             });
 
-            this.internalPayments.root.children = internalPayments;
-            this.externalPayments.root.children = externalPayments;
+            this.internalPayments.root.children = this.sortByText(internalPayments);
+            this.externalPayments.root.children = this.sortByText(externalPayments);
         }
 
         private mapPaymentsToOptions(contract: Models.Generic.NamedEntity.NamedEntityDTO, payments: Models.Generic.NamedEntity.NamedEntityDTO[]): Models.ViewModel.Organization.IOrganizationUnitRegistration[] {
             return payments.map((element, index) => {
                 return {
                     id: element.id,
-                    text: element.name,
+                    text: contract.name,
                     targetPageObjectId: contract.id,
-                    objectText: contract.name,
+                    objectText: element.name,
                     index: index + 1,
                     optionalObjectContext: contract
                 } as Models.ViewModel.Organization.IOrganizationUnitRegistration;
