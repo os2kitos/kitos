@@ -120,41 +120,50 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
-                JToken jtoken;
-                if (obj.TryGetValue("parentId", out jtoken))
+                var unit = Repository
+                    .AsQueryable()
+                    .ById(id);
+                if (unit == null)
+                {
+                    return BadRequest($"Unit with id: {id} was not found");
+                }
+
+                var accessRightsResult = _organizationUnitService.GetAccessRights(unit.Organization.Uuid, unit.Uuid);
+                if (accessRightsResult.Failed)
+                {
+                    return FromOperationError(accessRightsResult.Error);
+                }
+                var accessRights = accessRightsResult.Value;
+
+                if (obj.TryGetValue("parentId", out var jtoken))
                 {
                     var parentId = jtoken.Value<int>();
 
-                    var unit = Repository
-                        .AsQueryable()
-                        .ById(id);
-                    if (unit == null)
+                    if (parentId != unit.ParentId.GetValueOrDefault())
                     {
-                        return BadRequest($"Unit with id: {id} was not found");
+                        if (!accessRights.CanBeRearranged)
+                        {
+                            return BadRequest("Unit cannot change its parent");
+                        }
                     }
-                    if (parentId == unit.ParentId.GetValueOrDefault())
-                    {
-                        return Ok();
-                    }
-                    var accessRightsResult = _organizationUnitService.GetAccessRights(unit.Organization.Uuid, unit.Uuid);
-                    if (accessRightsResult.Failed)
-                    {
-                        return FromOperationError(accessRightsResult.Error);
-                    }
-
-                    var accessRights = accessRightsResult.Value;
-                    if (!accessRights.CanBeRearranged)
-                    {
-                        return BadRequest("Unit cannot change its parent");
-                    }
-
                     //if the new parent is actually a descendant of the item, don't update - this would create a loop!
                     if (_orgUnitService.DescendsFrom(parentId, id))
                     {
                         return Conflict("OrgUnit loop detected");
                     }
                 }
+                if (obj.TryGetValue("name", out jtoken))
+                {
+                    var newName = jtoken.Value<string>();
 
+                    if (newName != unit.Name)
+                    {
+                        if (!accessRights.CanBeRenamed)
+                        {
+                            return BadRequest("Unit cannot be renamed");
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {

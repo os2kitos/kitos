@@ -1343,7 +1343,6 @@
     <Content Include="app\shared\helpText\helpTextModal.view.html" />
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
-    <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
@@ -1427,7 +1426,6 @@
     <Content Include="app\components\global-admin\global-admin-global-admins.view.html" />
     <Content Include="app\components\global-admin\global-admin-local-admins.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations.view.html" />
-    <Content Include="app\shared\optionList\optionList.view.html" />
     <Content Include="app\components\global-admin\global-admin-system.view.html" />
     <Content Include="app\components\global-admin\global-admin-contract.view.html" />
     <Content Include="app\components\global-admin\global-admin-org.view.html" />
