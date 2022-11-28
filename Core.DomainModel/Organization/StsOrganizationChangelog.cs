@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Core.DomainModel.Organization
 {
-    public class StsOrganizationChangeLog: Entity, IExternalConnectionChangelog
+    public class StsOrganizationChangeLog : Entity, IExternalConnectionChangelog
     {
         public StsOrganizationChangeLog()
         {
@@ -16,10 +16,10 @@ namespace Core.DomainModel.Organization
 
         public virtual User ResponsibleUser { get; set; }
         public int? ResponsibleUserId { get; set; }
-        
+
         public ExternalOrganizationChangeLogOrigin Origin { get; set; }
         public DateTime LogTime { get; set; }
-        public virtual IEnumerable<IExternalConnectionChangeLogEntry> Entries { get; set; }
+        public virtual ICollection<StsOrganizationConsequenceLog> Entries { get; set; }
 
         public IEnumerable<IExternalConnectionChangeLogEntry> GetEntries()
         {

@@ -9,8 +9,7 @@ namespace Core.DomainModel.Organization
         ExternalOrganizationChangeLogOrigin Origin { get; }
 
         DateTime LogTime { get; }
-
-        IEnumerable<IExternalConnectionChangeLogEntry> Entries { get; }
+        IEnumerable<IExternalConnectionChangeLogEntry> GetEntries();
     }
 
 }

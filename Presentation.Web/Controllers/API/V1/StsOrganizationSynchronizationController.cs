@@ -176,7 +176,7 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 Origin = log.Origin.ToStsOrganizationChangeLogOriginOption(),
                 User = log.ResponsibleUser.MapToUserWithEmailDTO(),
-                Consequences = MapConsequenceLogsToDtos(log.Entries),
+                Consequences = MapConsequenceLogsToDtos(log.GetEntries()),
                 LogTime = log.LogTime
             };
         }
