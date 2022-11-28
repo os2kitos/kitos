@@ -100,7 +100,7 @@
     <Compile Include="Organization\Strategies\IExternalOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\Strategies\StsOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\PaymentRegistrationDetails.cs" />
-    <Compile Include="Organization\StsOrganizationChangeLogOrigin.cs" />
+    <Compile Include="Organization\ExternalOrganizationChangeLogOrigin.cs" />
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />
     <Compile Include="Organization\StsOrganizationChangeLog.cs" />

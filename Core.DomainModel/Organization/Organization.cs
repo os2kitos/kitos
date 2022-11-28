@@ -197,7 +197,7 @@ namespace Core.DomainModel.Organization
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind<OrganizationTreeUpdateConsequences>(connection =>
                 {
                     var strategy = StsOrganizationConnection.GetUpdateStrategy();
@@ -260,7 +260,7 @@ namespace Core.DomainModel.Organization
 
         public Result<DisconnectOrganizationFromOriginResult, OperationError> DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin origin)
         {
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind<DisconnectOrganizationFromOriginResult>(connection => connection.Disconnect());
         }
 
@@ -272,7 +272,7 @@ namespace Core.DomainModel.Organization
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind
                 (
                     connection =>
@@ -282,10 +282,13 @@ namespace Core.DomainModel.Organization
                         var childLevelsToInclude =
                             levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
                         var filteredTree = root.Copy(childLevelsToInclude);
-
-                        connection.SynchronizationDepth =
-                            levelsIncluded.Match(levels => (int?) levels, () => default);
-                        connection.SubscribeToUpdates = subscribeToUpdates;
+                        connection.UpdateSynchronizationDepth(levelsIncluded.Match(levels => (int?) levels, () => default));
+                        if (subscribeToUpdates != connection.SubscribeToUpdates)
+                        {
+                            var subscriptionResult = connection.SubscribeToUpdates ? 
+                                connection.Subscribe() : 
+                                connection.Unsubscribe();
+                        }
 
                         return strategy.PerformUpdate(filteredTree);
                     }
@@ -295,17 +298,17 @@ namespace Core.DomainModel.Organization
         public Result<StsOrganizationConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
             StsOrganizationChangeLog changeLogToAdd)
         {
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind<StsOrganizationConnectionAddNewLogsResult>(connection => connection.AddNewLog(changeLogToAdd));
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
         {
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind(connection => connection.GetLastNumberOfChangeLogs(numberOfLogs));
         }
 
-        private Result<StsOrganizationConnection, OperationError> GetStsOrganizationConnection(OrganizationUnitOrigin origin)
+        private Result<IExternalOrganizationalHierarchyConnection, OperationError> GetExternalConnection(OrganizationUnitOrigin origin)
         {
             switch (origin)
             {
