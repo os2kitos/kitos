@@ -7,10 +7,24 @@ using Core.DomainModel.Organization.Strategies;
 namespace Core.DomainModel.Organization
 {
 
+    public interface IExternalOrganizationalHierarchyConnection
+    {
+        bool Connected { get; }
+        public int? SynchronizationDepth { get; }
+        IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy();
+        bool SubscribeToUpdates { get; }
+        StsOrganizationConnectionAddNewLogsResult AddNewLogs(IEnumerable<StsOrganizationChangeLog> newLogs);
+        Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs);
+        DisconnectOrganizationFromOriginResult Disconnect();
+        Maybe<OperationError> Subscribe();
+        Maybe<OperationError> Unsubscribe();
+        Maybe<OperationError> UpdateSynchronizationDepth(int? synchronizationDepth);
+    }
+
     /// <summary>
     /// Determines the properties of the organization's connection to STS Organisation
     /// </summary>
-    public class StsOrganizationConnection : Entity, IOwnedByOrganization
+    public class StsOrganizationConnection : Entity, IOwnedByOrganization, IExternalOrganizationalHierarchyConnection
     {
         public StsOrganizationConnection()
         {
@@ -28,7 +42,7 @@ namespace Core.DomainModel.Organization
 
 
         public bool SubscribeToUpdates { get; set; }
-        
+
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
             var organizationUnits = Organization.OrgUnits.Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();

@@ -267,12 +267,12 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<StsOrganizationChangeLog, OperationError> WithLogEntries(OrganizationTreeUpdateConsequences consequences)
         {
-            var changeLog = new StsOrganizationChangeLog { Origin = StsOrganizationChangeLogOrigin.Background };
+            var changeLog = new StsOrganizationChangeLog { Origin = ExternalOrganizationChangeLogOrigin.Background };
 
             if (_activeUserIdContext.HasValue)
             {
                 var userId = _activeUserIdContext.Value.ActiveUserId;
-                changeLog.Origin = StsOrganizationChangeLogOrigin.User;
+                changeLog.Origin = ExternalOrganizationChangeLogOrigin.User;
                 changeLog.UserId = userId;
             }
 
