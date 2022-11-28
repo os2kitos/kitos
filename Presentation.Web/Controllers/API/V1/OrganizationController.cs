@@ -87,7 +87,13 @@ namespace Presentation.Web.Controllers.API.V1
                 }
 
                 var dto = Map(item);
-                dto.CanCvrBeModified = _organizationService.CanActiveUserModifyCvr();
+                var result = _organizationService.CanActiveUserModifyCvr(item.Uuid);
+                if (result.Failed)
+                {
+                    return Forbidden();
+                }
+
+                dto.CanCvrBeModified = result.Value;
 
                 return Ok(dto);
             }
@@ -145,7 +151,8 @@ namespace Presentation.Web.Controllers.API.V1
 
                 if (!string.Equals(cvr, organization.Cvr))
                 {
-                    if (!_organizationService.CanActiveUserModifyCvr())
+                    var result = _organizationService.CanActiveUserModifyCvr(organization.Uuid);
+                    if (!result.Failed)
                     {
                         return Forbidden();
                     }

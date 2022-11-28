@@ -45,6 +45,6 @@ namespace Core.ApplicationServices.Organizations
         Maybe<OperationError> RemoveOrganization(Guid organizationUuid, bool enforceDeletion);
 
         Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId);
-        bool CanActiveUserModifyCvr();
+        Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid);
     }
 }
