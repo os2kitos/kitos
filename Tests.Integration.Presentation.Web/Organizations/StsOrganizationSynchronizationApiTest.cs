@@ -608,55 +608,31 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Relocation consequences
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
             {
-                /*var twoLeafs = repo
+                var rootLeaf = repo
                     .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid 
-                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
-                                && !x.Children.Any())
-                    .ToList()
-                    .RandomItems(2)
-                    .ToList();*/
-
-                //var firstLeaf = twoLeafs.First();
-                //var secondLeaf = twoLeafs.Last();
-
-                var firstLeaf = repo
-                    .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid 
-                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
-                                && !x.Children.Any())
+                    .Where(x => x.Organization.Uuid == targetOrgUuid
+                                && x.Parent != null
+                                && x.Children.Any())
                     .RandomItem();
 
                 var secondLeaf = repo
                     .AsQueryable()
                     .Where(x => x.Organization.Uuid == targetOrgUuid 
                                 && x.Origin == OrganizationUnitOrigin.STS_Organisation
-                                && !x.Children.Any()
-                                && x.Parent.Uuid != firstLeaf.Parent.Uuid)
+                                && x.Parent != null
+                                && x.Children.Any()
+                                && x.Uuid != rootLeaf.Uuid)
                     .RandomItem();
-
-                //var firstLeaf = twoLeafs.First();
-                //var secondLeaf = twoLeafs.Last();
-
-                //Make first leaf parent of second leaf
-                secondLeaf.ParentId = firstLeaf.Id;
+                
+                secondLeaf.ParentId = rootLeaf.Id;
             }); 
             
-            /*using var relocationConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, relocationConsequencesResponse.StatusCode);
-            var relocationConsequencesBody = await relocationConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
-            var relocationConsequences = relocationConsequencesBody.Consequences.ToList();
-
-            //Log relocation changes
-            using var relocationPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, relocationPutResponse.StatusCode);*/
-
             using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
             var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             var otherConsequences = otherConsequencesBody.Consequences.ToList();
 
-            //Log deletion, renaming and conversion changes
+            //Log deletion, renaming, conversion and relocation changes
             using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
             
@@ -691,14 +667,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, otherLogsConsequences.Select(x => x.Category).ToList());
 
             AssertConsequenceLogs(otherConsequences, otherLogs);
-
-            //Get third item in the list
-            /*var relocationLogs = logsList[3];
-            Assert.NotNull(relocationLogs);
-
-            Assert.Equal(relocationConsequences.Count, relocationLogs.Consequences.Count());
-
-            AssertConsequenceLogs(relocationConsequences, relocationLogs);*/
         }
 
         private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)

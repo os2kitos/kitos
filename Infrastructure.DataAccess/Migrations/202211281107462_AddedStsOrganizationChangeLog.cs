@@ -13,7 +13,7 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         StsOrganizationConnectionId = c.Int(nullable: false),
-                        UserId = c.Int(),
+                        ResponsibleUserId = c.Int(),
                         Origin = c.Int(nullable: false),
                         LogTime = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         ObjectOwnerId = c.Int(nullable: false),
@@ -23,10 +23,10 @@
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.User", t => t.LastChangedByUserId)
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
+                .ForeignKey("dbo.User", t => t.ResponsibleUserId)
                 .ForeignKey("dbo.StsOrganizationConnections", t => t.StsOrganizationConnectionId, cascadeDelete: true)
-                .ForeignKey("dbo.User", t => t.UserId)
                 .Index(t => t.StsOrganizationConnectionId)
-                .Index(t => t.UserId, name: "IX_ChangeLogName")
+                .Index(t => t.ResponsibleUserId, name: "IX_ChangeLogName")
                 .Index(t => t.Origin, name: "IX_ChangeLogOrigin")
                 .Index(t => t.LogTime)
                 .Index(t => t.ObjectOwnerId)
@@ -60,8 +60,8 @@
         
         public override void Down()
         {
-            DropForeignKey("dbo.StsOrganizationChangeLogs", "UserId", "dbo.User");
             DropForeignKey("dbo.StsOrganizationChangeLogs", "StsOrganizationConnectionId", "dbo.StsOrganizationConnections");
+            DropForeignKey("dbo.StsOrganizationChangeLogs", "ResponsibleUserId", "dbo.User");
             DropForeignKey("dbo.StsOrganizationChangeLogs", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.StsOrganizationChangeLogs", "LastChangedByUserId", "dbo.User");
             DropForeignKey("dbo.StsOrganizationConsequenceLogs", "ObjectOwnerId", "dbo.User");

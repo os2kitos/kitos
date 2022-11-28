@@ -44,6 +44,6 @@ namespace Core.ApplicationServices.Organizations
         /// Gets the last x change logs for the organization
         /// </summary>
         /// <returns></returns>
-        Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs);
+        Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs);
     }
 }

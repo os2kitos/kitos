@@ -94,6 +94,9 @@
     <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Organization\ConnectionUpdateOrganizationUnitChangeType.cs" />
     <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
+    <Compile Include="Organization\IExternalConnectionChangelog.cs" />
+    <Compile Include="Organization\IExternalConnectionChangeLogEntry.cs" />
+    <Compile Include="Organization\IExternalOrganizationalHierarchyConnection.cs" />
     <Compile Include="Organization\OrganizationTreeUpdateConsequences.cs" />
     <Compile Include="Organization\OrganizationUnitRegistrationDetails.cs" />
     <Compile Include="Organization\OrganizationUnitOrigin.cs" />

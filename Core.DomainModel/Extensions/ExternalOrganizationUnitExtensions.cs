@@ -8,7 +8,7 @@ namespace Core.DomainModel.Extensions
     public static class ExternalOrganizationUnitExtensions
     {
         /// <summary>
-        /// Maps root external organization unit to 
+        /// Maps root external organization unit to parent tree
         /// </summary>
         /// <param name="root"></param>
         /// <param name="importedTreeByUuid"></param>

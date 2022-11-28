@@ -19,11 +19,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("IX_LogTime");
 
-            HasOptional(x => x.User)
+            HasOptional(x => x.ResponsibleUser)
                 .WithMany(x => x.StsOrganizationChangeLogs)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.ResponsibleUserId);
 
-            Property(x => x.UserId)
+            Property(x => x.ResponsibleUserId)
                 .IsOptional()
                 .HasIndexAnnotation("IX_ChangeLogName");
         }

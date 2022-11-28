@@ -233,7 +233,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Verify that the logs were added
             var logs = connection.StsOrganizationChangeLogs.ToList();
             var log = Assert.Single(logs);
-            foreach (var consequenceLog in log.ConsequenceLogs)
+            foreach (var consequenceLog in log.Entries)
             {
                 Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, consequenceLog.Type);
             }
@@ -610,7 +610,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Renamed, log.Type);
         }
         
@@ -646,7 +646,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, log.Type);
         }
 
@@ -682,7 +682,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Deleted, log.Type);
         }
 
@@ -720,7 +720,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Converted, log.Type);
         }
 
@@ -761,7 +761,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Moved, log.Type);
         }
 
@@ -771,7 +771,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var orgUuid = A<Guid>();
 
             var logs = new List<StsOrganizationConsequenceLog> { new (), new () };
-            var changeLogs = new List<StsOrganizationChangeLog> { new () { ConsequenceLogs = logs }, new() { ConsequenceLogs = logs } };
+            var changeLogs = new List<StsOrganizationChangeLog> { new () { Entries = logs }, new() { Entries = logs } };
 
             var stsOrganizationConnection = new StsOrganizationConnection
             {
@@ -793,7 +793,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(result.Ok);
             var logResult = Assert.Single(result.Value);
             ;
-            Assert.Equal(2, logResult.ConsequenceLogs.Count);
+            Assert.Equal(2, logResult.Entries.Count());
         }
 
         [Fact]

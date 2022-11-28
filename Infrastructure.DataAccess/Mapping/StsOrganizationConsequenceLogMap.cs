@@ -7,7 +7,7 @@ namespace Infrastructure.DataAccess.Mapping
         public StsOrganizationConsequenceLogMap()
         {
             HasRequired(x => x.ChangeLog)
-                .WithMany(x => x.ConsequenceLogs)
+                .WithMany(x => x.Entries)
                 .HasForeignKey(x => x.ChangeLogId)
                 .WillCascadeOnDelete(true);
 

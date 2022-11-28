@@ -165,31 +165,31 @@ namespace Presentation.Web.Controllers.API.V1
                     .ToList()
             };
         }
-        private static IEnumerable<StsOrganizationChangeLogResponseDTO> MapChangeLogResponseDtos(IEnumerable<StsOrganizationChangeLog> logs)
+        private static IEnumerable<StsOrganizationChangeLogResponseDTO> MapChangeLogResponseDtos(IEnumerable<IExternalConnectionChangelog> logs)
         {
             return logs.Select(MapChangeLogResponseDto).ToList();
         }
 
-        private static StsOrganizationChangeLogResponseDTO MapChangeLogResponseDto(StsOrganizationChangeLog log)
+        private static StsOrganizationChangeLogResponseDTO MapChangeLogResponseDto(IExternalConnectionChangelog log)
         {
             return new StsOrganizationChangeLogResponseDTO
             {
                 Origin = log.Origin.ToStsOrganizationChangeLogOriginOption(),
-                User = log.User.MapToUserWithEmailDTO(),
-                Consequences = MapConsequenceLogsToDtos(log.ConsequenceLogs),
+                User = log.ResponsibleUser.MapToUserWithEmailDTO(),
+                Consequences = MapConsequenceLogsToDtos(log.Entries),
                 LogTime = log.LogTime
             };
         }
         
         private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(
-            IEnumerable<StsOrganizationConsequenceLog> logs)
+            IEnumerable<IExternalConnectionChangeLogEntry> logs)
         {
             return logs
                 .Select(MapConsequenceToDto)
                 .Transform(OrderLogEntries);
         }
 
-        private static ConnectionUpdateOrganizationUnitConsequenceDTO MapConsequenceToDto(StsOrganizationConsequenceLog log)
+        private static ConnectionUpdateOrganizationUnitConsequenceDTO MapConsequenceToDto(IExternalConnectionChangeLogEntry log)
         {
             return new ConnectionUpdateOrganizationUnitConsequenceDTO
             {

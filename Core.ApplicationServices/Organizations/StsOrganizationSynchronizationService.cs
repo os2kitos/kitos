@@ -194,7 +194,7 @@ namespace Core.ApplicationServices.Organizations
             );
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
         {
             return GetOrganizationWithImportPermission(organizationUuid)
                 .Bind(organization => organization.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfChangeLogs));
@@ -280,10 +280,10 @@ namespace Core.ApplicationServices.Organizations
             {
                 var userId = _activeUserIdContext.Value.ActiveUserId;
                 changeLog.Origin = ExternalOrganizationChangeLogOrigin.User;
-                changeLog.UserId = userId;
+                changeLog.ResponsibleUserId = userId;
             }
 
-            changeLog.ConsequenceLogs = consequences.ConvertConsequencesToConsequenceLogs().ToList();
+            changeLog.Entries = consequences.ConvertConsequencesToConsequenceLogs().ToList();
             changeLog.LogTime = _operationClock.Now;
             
             return changeLog;

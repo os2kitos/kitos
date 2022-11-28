@@ -6,21 +6,6 @@ using Core.DomainModel.Organization.Strategies;
 
 namespace Core.DomainModel.Organization
 {
-
-    public interface IExternalOrganizationalHierarchyConnection
-    {
-        bool Connected { get; }
-        public int? SynchronizationDepth { get; }
-        IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy();
-        bool SubscribeToUpdates { get; }
-        StsOrganizationConnectionAddNewLogsResult AddNewLogs(IEnumerable<StsOrganizationChangeLog> newLogs);
-        Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs);
-        DisconnectOrganizationFromOriginResult Disconnect();
-        Maybe<OperationError> Subscribe();
-        Maybe<OperationError> Unsubscribe();
-        Maybe<OperationError> UpdateSynchronizationDepth(int? synchronizationDepth);
-    }
-
     /// <summary>
     /// Determines the properties of the organization's connection to STS Organisation
     /// </summary>
@@ -55,6 +40,38 @@ namespace Core.DomainModel.Organization
             return new DisconnectOrganizationFromOriginResult(organizationUnits, removedLogs);
         }
 
+        public void Connect()
+        {
+            Connected = true;
+        }
+
+        public Maybe<OperationError> Subscribe()
+        {
+            if (!Connected)
+                return new OperationError("Organization isn't connected to the sts service", OperationFailure.BadState);
+
+            SubscribeToUpdates = true;
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> Unsubscribe()
+        {
+            if(!Connected)
+                return new OperationError("Organization isn't connected to the sts service", OperationFailure.BadState);
+
+            SubscribeToUpdates = false;
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateSynchronizationDepth(int? synchronizationDepth)
+        {
+            if (!Connected)
+                return new OperationError("Organization isn't connected to the sts service", OperationFailure.BadState);
+
+            SynchronizationDepth = synchronizationDepth;
+            return Maybe<OperationError>.None;
+        }
+
         public IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy()
         {
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
@@ -68,7 +85,7 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationConnectionAddNewLogsResult(removedLogs);
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs)
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs)
         {
             if (number <= 0)
             {

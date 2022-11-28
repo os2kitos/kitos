@@ -13,7 +13,6 @@ using Core.DomainModel.Notification;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
 
-
 // ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.Organization
@@ -250,8 +249,19 @@ namespace Core.DomainModel.Organization
                     () =>
                     {
                         StsOrganizationConnection ??= new StsOrganizationConnection();
-                        StsOrganizationConnection.Connected = true;
-                        StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
+                        StsOrganizationConnection.Connect(); 
+
+                        if (subscribeToUpdates != StsOrganizationConnection.SubscribeToUpdates)
+                        {
+                            var subscriptionError = StsOrganizationConnection.SubscribeToUpdates ?
+                                StsOrganizationConnection.Subscribe() :
+                                StsOrganizationConnection.Unsubscribe();
+                            if (subscriptionError.HasValue)
+                            {
+                                return subscriptionError.Value;
+                            }
+                        }
+
                         StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
                         return Maybe<OperationError>.None;
                     }
@@ -273,26 +283,25 @@ namespace Core.DomainModel.Organization
             if (root == null) throw new ArgumentNullException(nameof(root));
 
             return GetExternalConnection(origin)
-                .Bind
-                (
-                    connection =>
-                    {
-                        var strategy = connection.GetUpdateStrategy();
+                .Bind(connection =>
+                {
+                    var strategy = connection.GetUpdateStrategy();
 
-                        var childLevelsToInclude =
-                            levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
-                        var filteredTree = root.Copy(childLevelsToInclude);
-                        connection.UpdateSynchronizationDepth(levelsIncluded.Match(levels => (int?) levels, () => default));
-                        if (subscribeToUpdates != connection.SubscribeToUpdates)
-                        {
-                            var subscriptionResult = connection.SubscribeToUpdates ? 
-                                connection.Subscribe() : 
-                                connection.Unsubscribe();
-                        }
+                    var childLevelsToInclude =
+                        levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
+                    var filteredTree = root.Copy(childLevelsToInclude);
+                    connection.UpdateSynchronizationDepth(levelsIncluded.Match(levels => (int?) levels,
+                        () => default));
 
+                    if (subscribeToUpdates == StsOrganizationConnection.SubscribeToUpdates)
                         return strategy.PerformUpdate(filteredTree);
-                    }
-                );
+
+                    var subscriptionError = StsOrganizationConnection.SubscribeToUpdates
+                        ? StsOrganizationConnection.Subscribe()
+                        : StsOrganizationConnection.Unsubscribe();
+                    return subscriptionError.Match(
+                        error => error, () => strategy.PerformUpdate(filteredTree));
+                });
         }
 
         public Result<StsOrganizationConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
