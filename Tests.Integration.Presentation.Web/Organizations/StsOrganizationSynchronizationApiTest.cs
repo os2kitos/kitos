@@ -578,7 +578,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
                 foreach (var organizationUnit in renamedUnits)
                 {
-                    var originalName = organizationUnit.Name;
                     organizationUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
                 }
             });
@@ -603,8 +602,54 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 {
                     Name = A<string>(),
                     OrganizationUuid = targetOrgUuid,
-                    Responsible = new() { OrganizationUnitUuid = expectedConversionUuid }
+                    Responsible = new ContractResponsibleDataWriteRequestDTO { OrganizationUnitUuid = expectedConversionUuid }
                 });
+
+            //Relocation consequences
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                /*var twoLeafs = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid 
+                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                && !x.Children.Any())
+                    .ToList()
+                    .RandomItems(2)
+                    .ToList();*/
+
+                //var firstLeaf = twoLeafs.First();
+                //var secondLeaf = twoLeafs.Last();
+
+                var firstLeaf = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid 
+                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                && !x.Children.Any())
+                    .RandomItem();
+
+                var secondLeaf = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid 
+                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                && !x.Children.Any()
+                                && x.Parent.Uuid != firstLeaf.Parent.Uuid)
+                    .RandomItem();
+
+                //var firstLeaf = twoLeafs.First();
+                //var secondLeaf = twoLeafs.Last();
+
+                //Make first leaf parent of second leaf
+                secondLeaf.ParentId = firstLeaf.Id;
+            }); 
+            
+            /*using var relocationConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, relocationConsequencesResponse.StatusCode);
+            var relocationConsequencesBody = await relocationConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var relocationConsequences = relocationConsequencesBody.Consequences.ToList();
+
+            //Log relocation changes
+            using var relocationPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, relocationPutResponse.StatusCode);*/
 
             using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
@@ -614,38 +659,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Log deletion, renaming and conversion changes
             using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
-
-            //Relocation consequences
-            var uuidOfExpectedMoval = Guid.NewGuid();
-            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
-            {
-                var twoLeafs = repo
-                    .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation && !x.Children.Any())
-                    .ToList()
-                    .RandomItems(2)
-                    .ToList();
-
-                var firstLeaf = twoLeafs.First();
-                var secondLeaf = twoLeafs.Last();
-
-                //Make first leaf parent of second leaf
-                secondLeaf.ParentId = firstLeaf.Id;
-
-                //Add a native units so we can check that it is moved along with the moved unit
-                var organization = secondLeaf.Organization;
-                organization.AddOrganizationUnit(new OrganizationUnit { Organization = organization, Name = "Native test unit", Uuid = uuidOfExpectedMoval, ObjectOwner = secondLeaf.ObjectOwner, LastChangedByUser = secondLeaf.LastChangedByUser }, secondLeaf);
-            });
-
-            using var relocationConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, relocationConsequencesResponse.StatusCode);
-            var relocationConsequencesBody = await relocationConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
-            var relocationConsequences = relocationConsequencesBody.Consequences.ToList();
-
-            //Log relocation changes
-            using var relocationPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, relocationPutResponse.StatusCode);
-
+            
             //Act
             using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
 
@@ -655,7 +669,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
 
             //3 updates + create
-            Assert.Equal(4, logsList.Count);
+            Assert.Equal(3, logsList.Count);
 
             //Addition consequences
             var additionLogs = logsList[1];
@@ -674,16 +688,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, otherLogsConsequences.Select(x => x.Category).ToList());
             Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, otherLogsConsequences.Select(x => x.Category).ToList());
             Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, otherLogsConsequences.Select(x => x.Category).ToList());
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, otherLogsConsequences.Select(x => x.Category).ToList());
 
             AssertConsequenceLogs(otherConsequences, otherLogs);
 
             //Get third item in the list
-            var relocationLogs = logsList[3];
+            /*var relocationLogs = logsList[3];
             Assert.NotNull(relocationLogs);
 
             Assert.Equal(relocationConsequences.Count, relocationLogs.Consequences.Count());
 
-            AssertConsequenceLogs(relocationConsequences, relocationLogs);
+            AssertConsequenceLogs(relocationConsequences, relocationLogs);*/
         }
 
         private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)
@@ -756,7 +771,9 @@ namespace Tests.Integration.Presentation.Web.Organizations
             IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> consequences,
             StsOrganizationChangeLogResponseDTO logs)
         {
-            foreach (var consequence in consequences)
+            var consequencesList = consequences.ToList();
+            Assert.Equal(consequencesList.Count, logs.Consequences.Count());
+            foreach (var consequence in consequencesList)
             {
                 var logConsequence = logs.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid && x.Category == consequence.Category);
                 Assert.NotNull(logConsequence);

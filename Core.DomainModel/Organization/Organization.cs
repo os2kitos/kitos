@@ -10,7 +10,6 @@ using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
-using Core.DomainModel.Organization.Strategies;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
 
@@ -283,9 +282,10 @@ namespace Core.DomainModel.Organization
                         var childLevelsToInclude =
                             levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
                         var filteredTree = root.Copy(childLevelsToInclude);
-                        StsOrganizationConnection.SynchronizationDepth =
+
+                        connection.SynchronizationDepth =
                             levelsIncluded.Match(levels => (int?) levels, () => default);
-                        StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
+                        connection.SubscribeToUpdates = subscribeToUpdates;
 
                         return strategy.PerformUpdate(filteredTree);
                     }
@@ -296,7 +296,7 @@ namespace Core.DomainModel.Organization
             StsOrganizationChangeLog changeLogToAdd)
         {
             return GetStsOrganizationConnection(origin)
-                .Bind<StsOrganizationConnectionAddNewLogsResult>(connection => connection.AddNewLogs(changeLogToAdd.WrapAsEnumerable()));
+                .Bind<StsOrganizationConnectionAddNewLogsResult>(connection => connection.AddNewLog(changeLogToAdd));
         }
 
         public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Core.DomainModel.Organization
 {
     public class StsOrganizationChangeLog: Entity
     {
+        public StsOrganizationChangeLog()
+        {
+            ConsequenceLogs = new List<StsOrganizationConsequenceLog>();
+        }
+
         public virtual StsOrganizationConnection StsOrganizationConnection { get; set; }
         public int StsOrganizationConnectionId { get; set; }
 

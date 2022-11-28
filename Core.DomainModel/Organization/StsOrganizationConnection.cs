@@ -46,14 +46,10 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public StsOrganizationConnectionAddNewLogsResult AddNewLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
+        public StsOrganizationConnectionAddNewLogsResult AddNewLog(StsOrganizationChangeLog newLog)
         {
-            var newLogsList = newLogs.ToList();
-            foreach (var newLog in newLogsList)
-            {
-                StsOrganizationChangeLogs.Add(newLog);
-            }
-            var removedLogs = RemoveOldestLogs(newLogsList);
+            StsOrganizationChangeLogs.Add(newLog);
+            var removedLogs = RemoveOldestLogs();
 
             return new StsOrganizationConnectionAddNewLogsResult(removedLogs);
         }
@@ -62,7 +58,7 @@ namespace Core.DomainModel.Organization
         {
             if (number <= 0)
             {
-                return new OperationError("Number of change logs to get cannot be lower than 0", OperationFailure.BadState);
+                return new OperationError("Number of change logs to get cannot be larger than 0", OperationFailure.BadState);
             }
 
             return StsOrganizationChangeLogs
@@ -82,7 +78,7 @@ namespace Core.DomainModel.Organization
             return changeLogs;
         }
 
-        private IEnumerable<StsOrganizationChangeLog> RemoveOldestLogs(IEnumerable<StsOrganizationChangeLog> newLogs)
+        private IEnumerable<StsOrganizationChangeLog> RemoveOldestLogs()
         {
             var logsToRemove = StsOrganizationChangeLogs
                 .OrderByDescending(x => x.LogTime)

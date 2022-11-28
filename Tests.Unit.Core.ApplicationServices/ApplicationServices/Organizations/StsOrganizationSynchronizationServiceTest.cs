@@ -14,6 +14,7 @@ using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -36,6 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
         private readonly ActiveUserIdContext _activeUserIdContext;
         private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
+        private readonly Mock<IOperationClock> _operationClock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -49,6 +51,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
             _activeUserIdContext = new ActiveUserIdContext(A<int>());
             _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
+            _operationClock = new Mock<IOperationClock>();
 
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
@@ -61,7 +64,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _domainEventsMock.Object,
                 _organizationUnitRepositoryMock.Object,
                 _activeUserIdContext,
-                _stsOrganziationChangeLogRepositoryMock.Object);
+                _stsOrganziationChangeLogRepositoryMock.Object,
+                _operationClock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

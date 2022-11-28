@@ -14,6 +14,7 @@ using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -32,6 +33,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IAuthorizationContext _authorizationContext;
         private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
         private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
+        private readonly IOperationClock _operationClock;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
@@ -44,7 +46,8 @@ namespace Core.ApplicationServices.Organizations
             IDomainEvents domainEvents,
             IGenericRepository<OrganizationUnit> organizationUnitRepository,
             Maybe<ActiveUserIdContext> activeUserIdContext,
-            IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository)
+            IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository, 
+            IOperationClock operationClock)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -57,6 +60,7 @@ namespace Core.ApplicationServices.Organizations
             _authorizationContext = authorizationContext;
             _activeUserIdContext = activeUserIdContext;
             _stsChangeLogRepository = stsChangeLogRepository;
+            _operationClock = operationClock;
         }
 
         public Result<StsOrganizationSynchronizationDetails, OperationError> GetSynchronizationDetails(Guid organizationId)
@@ -133,7 +137,10 @@ namespace Core.ApplicationServices.Organizations
                 }
 
                 var disconnectionResult = result.Value;
-                _stsChangeLogRepository.RemoveRange(disconnectionResult.RemovedChangeLogs);
+                if (disconnectionResult.RemovedChangeLogs.Any())
+                {
+                    _stsChangeLogRepository.RemoveRange(disconnectionResult.RemovedChangeLogs);
+                }
 
                 foreach (var convertedUnit in disconnectionResult.ConvertedUnits)
                 {
@@ -277,7 +284,7 @@ namespace Core.ApplicationServices.Organizations
             }
 
             changeLog.ConsequenceLogs = consequences.ConvertConsequencesToConsequenceLogs().ToList();
-            changeLog.LogTime = DateTime.Now;
+            changeLog.LogTime = _operationClock.Now;
             
             return changeLog;
         }
