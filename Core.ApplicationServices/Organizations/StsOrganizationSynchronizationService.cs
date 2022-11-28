@@ -163,6 +163,11 @@ namespace Core.ApplicationServices.Organizations
             );
         }
 
+        public Maybe<OperationError> UnsubscribeFromAutomaticUpdates(Guid organizationId)
+        {
+            return Modify(organizationId, organization => organization.UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin.STS_Organisation));
+        }
+
 
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {

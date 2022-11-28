@@ -15,6 +15,7 @@
     enum CommandCategory {
         Create = "create",
         Update = "update",
+        Unsubscribe = "unsubscribe",
         Delete = "delete"
     }
 
@@ -109,13 +110,37 @@
                             });
                     }
                 });
+                if (result.subscribesToUpdates) {
+                    newCommands.push({
+                        id: "breakSubscription",
+                        text: "Afbryd automatisk import",
+                        category: CommandCategory.Unsubscribe,
+                        enabled: result.canUpdateConnection,
+                        onClick: () => {
+                            if (confirm("Afbryd automatisk import af ændringer fra FK Organistion?")) {
+                                this.busy = true;
+                                this.stsOrganizationSyncService
+                                    .unsubscribeFromAutomaticUpdates(this.currentOrganizationUuid)
+                                    .then(success => {
+                                        if (success) {
+                                            this.loadState();
+                                        } else {
+                                            this.busy = false;
+                                        }
+                                    }, _ => {
+                                        this.busy = false;
+                                    });
+                            }
+                        }
+                    });
+                }
                 newCommands.push({
                     id: "breakSync",
-                    text: "Afbryd",
+                    text: "Bryd forbindelsen til FK Organisation",
                     category: CommandCategory.Delete,
                     enabled: result.canDeleteConnection,
                     onClick: () => {
-                        if (confirm("Afbryd forbindelsen til FK Organisation? Ved afbrydelse af forbindelsen, konverteres alle organisationsenheder til KITOS enheder, hvorefter de frit kan redigeres.")) {
+                        if (confirm("Bryd forbindelsen til FK Organisation? Ved afbrydelse af forbindelsen, konverteres alle organisationsenheder til KITOS enheder, hvorefter de frit kan redigeres.")) {
                             this.busy = true;
                             this.stsOrganizationSyncService
                                 .disconnect(this.currentOrganizationUuid)

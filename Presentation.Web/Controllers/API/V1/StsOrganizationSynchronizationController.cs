@@ -85,6 +85,15 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(FromOperationError, Ok);
         }
 
+        [HttpDelete]
+        [Route("connection/subscription")]
+        public HttpResponseMessage DeleteSubscription(Guid organizationId)
+        {
+            return _stsOrganizationSynchronizationService
+                .UnsubscribeFromAutomaticUpdates(organizationId)
+                .Match(FromOperationError, Ok);
+        }
+
         [HttpGet]
         [Route("connection/update")]
         public HttpResponseMessage GetUpdateConsequences(Guid organizationId, int? synchronizationDepth = null)

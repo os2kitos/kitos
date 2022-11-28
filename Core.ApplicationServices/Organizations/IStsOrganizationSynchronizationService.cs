@@ -44,5 +44,10 @@ namespace Core.ApplicationServices.Organizations
         /// </summary>
         /// <returns></returns>
         Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates);
+        /// <summary>
+        /// Unsubscribes from automatic updates from STS Organization
+        /// </summary>
+        /// <returns></returns>
+        Maybe<OperationError> UnsubscribeFromAutomaticUpdates(Guid organizationId);
     }
 }

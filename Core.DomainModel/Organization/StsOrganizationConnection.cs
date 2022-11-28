@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.Organization.Strategies;
 
 namespace Core.DomainModel.Organization
@@ -42,6 +43,17 @@ namespace Core.DomainModel.Organization
         public IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy()
         {
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
+        }
+
+        public Maybe<OperationError> UnsubscribeFromAutomaticUpdates()
+        {
+            if (!Connected)
+            {
+                return new OperationError("Not connected", OperationFailure.BadState);
+            }
+
+            SubscribeToUpdates = false;
+            return Maybe<OperationError>.None;
         }
     }
 }

@@ -4,6 +4,7 @@
         createConnection(organizationUuidid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
         getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>;
         getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>;
+        unsubscribeFromAutomaticUpdates(organizationUuidid: string): ng.IPromise<boolean>;
         disconnect(organizationUuidid: string): ng.IPromise<boolean>;
         updateConnection(organizationUuidid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
     }
@@ -79,7 +80,6 @@
                     subscribeToUpdates: subscribesToUpdates
                 });
             }).executeAsync(() => {
-                //Clear cache after
                 this.purgeCache(organizationUuidid);
             });
         }
@@ -88,7 +88,6 @@
             return this.apiUseCaseFactory.createDeletion("Forbindelse til FK Organisation", () => {
                 return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuidid)}/connection`);
             }).executeAsync((result) => {
-                //Clear cache after
                 this.purgeCache(organizationUuidid);
                 return result;
             });
@@ -101,8 +100,16 @@
                     subscribeToUpdates: subscribesToUpdates
                 });
             }).executeAsync(() => {
-                //Clear cache after
                 this.purgeCache(organizationUuidid);
+            });
+        }
+
+        unsubscribeFromAutomaticUpdates(organizationUuidid: string): ng.IPromise<boolean> {
+            return this.apiUseCaseFactory.createUpdate("Automatisk import af opdateringer", () => {
+                return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuidid)}/connection/subscription`);
+            }).executeAsync((success) => {
+                this.purgeCache(organizationUuidid);
+                return success;
             });
         }
     }

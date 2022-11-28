@@ -40,7 +40,7 @@
 <div class="form-group" ng-if="ctrl.commands && ctrl.commands.length > 0">
     <button ng-repeat="command in ctrl.commands" data-disabled-on-busy id="command.id"
             class="btn right-margin-5px"
-            ng-class="{'btn-primary': command.category === 'create' || command.category === 'update' , 'btn-danger': command.category == 'delete'}"
+            ng-class="{'btn-primary': command.category === 'create' || command.category === 'update' , 'btn-danger': command.category == 'delete', 'btn-warning': command.category == 'unsubscribe'}"
             ng-click="command.onClick()"
             ng-disabled="!command.enabled || ctrl.busy">
         {{::command.text}}
