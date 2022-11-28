@@ -35,9 +35,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var kitosContext = TestEnvironment.GetDatabase();
             using var repository = new GenericRepository<TModel>(kitosContext);
 
-            mutate(repository);
+            try
+            {
+                mutate(repository);
 
-            repository.Save();
+                repository.Save();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         /// <summary>

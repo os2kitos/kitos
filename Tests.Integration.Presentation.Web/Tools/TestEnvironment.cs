@@ -1,7 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure.Interception;
+using Core.Abstractions.Types;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Context;
+using Core.DomainServices.Time;
 using Infrastructure.DataAccess;
+using Infrastructure.DataAccess.Interceptors;
+using Moq;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -23,6 +30,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         static TestEnvironment()
         {
+            //Fake the interception for EF in the text context
+            DbInterception.Add(new EFEntityInterceptor(() => new OperationClock(), () => Maybe<ActiveUserIdContext>.None, () => Mock.Of<IFallbackUserResolver>(x => x.Resolve() == new User() { Id = DefaultUserId })));
+
             var testEnvironment = GetEnvironmentVariable("KitosTestEnvironment", false);
             if (string.IsNullOrWhiteSpace(testEnvironment))
             {
