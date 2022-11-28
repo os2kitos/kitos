@@ -42,7 +42,7 @@ namespace Core.BackgroundJobs.Model.Maintenance
                 .Where
                 (x =>
                     x.StsOrganizationConnection != null &&
-                    x.StsOrganizationConnection.SubscribeToUpdates &&
+                    x.StsOrganizationConnection.Connected &&
                     x.StsOrganizationConnection.SubscribeToUpdates
                 )
                 .Select(x => x.Uuid)
