@@ -197,7 +197,7 @@ namespace Core.ApplicationServices.Organizations
         public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
         {
             return GetOrganizationWithImportPermission(organizationUuid)
-                .Bind(organization => organization.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfChangeLogs));
+                .Bind(organization => organization.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfChangeLogs));
         }
 
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)

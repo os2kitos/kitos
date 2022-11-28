@@ -571,7 +571,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             {
                 var renamedUnits = repo
                     .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                    .Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation && x.Children.Any())
                     .ToList()
                     .RandomItems(2)
                     .ToList();
@@ -608,7 +608,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Relocation consequences
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
             {
-                var rootLeaf = repo
+                var parentLeaf = repo
                     .AsQueryable()
                     .Where(x => x.Organization.Uuid == targetOrgUuid
                                 && x.Parent != null
@@ -621,10 +621,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
                                 && x.Origin == OrganizationUnitOrigin.STS_Organisation
                                 && x.Parent != null
                                 && x.Children.Any()
-                                && x.Uuid != rootLeaf.Uuid)
+                                && x.Uuid != parentLeaf.Uuid)
                     .RandomItem();
                 
-                secondLeaf.ParentId = rootLeaf.Id;
+                secondLeaf.ParentId = parentLeaf.Id;
             }); 
             
             using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
@@ -644,7 +644,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var deserializedLogs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
             var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
 
-            //3 updates + create
+            //2 updates + create
             Assert.Equal(3, logsList.Count);
 
             //Addition consequences
@@ -656,7 +656,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertConsequenceLogs(additionConsequences, additionLogs);
 
             //Get second item in the list
-            var otherLogs = logsList[2];
+            var otherLogs = logsList.Last();
             Assert.NotNull(otherLogs);
             var otherLogsConsequences = otherLogs.Consequences.ToList();
 

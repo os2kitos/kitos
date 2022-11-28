@@ -57,7 +57,7 @@
     <Compile Include="Commands\ICommandBus.cs" />
     <Compile Include="Commands\RemoveOrganizationUnitRegistrationsCommand.cs" />
     <Compile Include="Commands\RemoveUserFromKitosCommand.cs" />
-    <Compile Include="Constants\StsOrganizationConnectionConstants.cs" />
+    <Compile Include="Constants\ExternalConnectionConstants.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
     <Compile Include="Extensions\ExternalOrganizationUnitExtensions.cs" />
@@ -107,7 +107,7 @@
     <Compile Include="Organization\StsOrganizationConnection.cs" />
     <Compile Include="Organization\ExternalOrganizationUnit.cs" />
     <Compile Include="Organization\StsOrganizationChangeLog.cs" />
-    <Compile Include="Organization\StsOrganizationConnectionAddNewLogsResult.cs" />
+    <Compile Include="Organization\ExternalConnectionAddNewLogsResult.cs" />
     <Compile Include="Organization\StsOrganizationConsequenceLog.cs" />
     <Compile Include="Organization\UnitAccessRights.cs" />
     <Compile Include="Organization\UnitAccessRightsWithUnitData.cs" />

@@ -253,7 +253,7 @@ namespace Core.DomainModel.Organization
 
                         if (subscribeToUpdates != StsOrganizationConnection.SubscribeToUpdates)
                         {
-                            var subscriptionError = StsOrganizationConnection.SubscribeToUpdates ?
+                            var subscriptionError = subscribeToUpdates ?
                                 StsOrganizationConnection.Subscribe() :
                                 StsOrganizationConnection.Unsubscribe();
                             if (subscriptionError.HasValue)
@@ -304,14 +304,14 @@ namespace Core.DomainModel.Organization
                 });
         }
 
-        public Result<StsOrganizationConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
+        public Result<ExternalConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
             StsOrganizationChangeLog changeLogToAdd)
         {
             return GetExternalConnection(origin)
-                .Bind<StsOrganizationConnectionAddNewLogsResult>(connection => connection.AddNewLog(changeLogToAdd));
+                .Bind<ExternalConnectionAddNewLogsResult>(connection => connection.AddNewLog(changeLogToAdd));
         }
 
-        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetExternalConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
         {
             return GetExternalConnection(origin)
                 .Bind(connection => connection.GetLastNumberOfChangeLogs(numberOfLogs));

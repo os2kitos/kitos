@@ -2,9 +2,9 @@
 
 namespace Core.DomainModel.Organization
 {
-    public class StsOrganizationConnectionAddNewLogsResult
+    public class ExternalConnectionAddNewLogsResult
     {
-        public StsOrganizationConnectionAddNewLogsResult(IEnumerable<StsOrganizationChangeLog> removedChangeLogs)
+        public ExternalConnectionAddNewLogsResult(IEnumerable<StsOrganizationChangeLog> removedChangeLogs)
         {
             RemovedChangeLogs = removedChangeLogs ?? new List<StsOrganizationChangeLog>();
         }

@@ -530,7 +530,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
 
             //Assert
             Assert.True(result.Failed);
@@ -544,7 +544,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var origin = OrganizationUnitOrigin.Kitos;
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(origin, A<int>());
+            var result = _sut.GetExternalConnectionEntryLogs(origin, A<int>());
 
             //Assert
             Assert.True(result.Failed);
@@ -558,7 +558,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _sut.StsOrganizationConnection = null;
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
 
             //Assert
             Assert.True(result.Failed);
@@ -577,7 +577,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
 
             //Assert
             Assert.True(result.Failed);
@@ -605,7 +605,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
 
             //Assert
             Assert.True(result.Ok);

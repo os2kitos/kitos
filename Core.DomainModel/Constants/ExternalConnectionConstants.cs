@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.Constants
 {
-    public class StsOrganizationConnectionConstants
+    public class ExternalConnectionConstants
     {
         public const int TotalNumberOfLogs = 5;
     }

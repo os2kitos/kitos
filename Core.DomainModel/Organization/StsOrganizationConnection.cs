@@ -77,15 +77,15 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public StsOrganizationConnectionAddNewLogsResult AddNewLog(StsOrganizationChangeLog newLog)
+        public ExternalConnectionAddNewLogsResult AddNewLog(StsOrganizationChangeLog newLog)
         {
             StsOrganizationChangeLogs.Add(newLog);
             var removedLogs = RemoveOldestLogs();
 
-            return new StsOrganizationConnectionAddNewLogsResult(removedLogs);
+            return new ExternalConnectionAddNewLogsResult(removedLogs);
         }
 
-        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetLastNumberOfChangeLogs(int number = StsOrganizationConnectionConstants.TotalNumberOfLogs)
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetLastNumberOfChangeLogs(int number = ExternalConnectionConstants.TotalNumberOfLogs)
         {
             if (number <= 0)
             {
@@ -113,7 +113,7 @@ namespace Core.DomainModel.Organization
         {
             var logsToRemove = StsOrganizationChangeLogs
                 .OrderByDescending(x => x.LogTime)
-                .Skip(StsOrganizationConnectionConstants.TotalNumberOfLogs)
+                .Skip(ExternalConnectionConstants.TotalNumberOfLogs)
                 .ToList();
 
             logsToRemove.ForEach(log => StsOrganizationChangeLogs.Remove(log));
