@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
@@ -504,7 +505,22 @@ namespace Tests.Integration.Presentation.Web.Organizations
             using var getResponse = await SendGetConnectionStatusAsync(targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
             var dto = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
             Assert.Equal(!initiallySubscribe, dto.SubscribesToUpdates);
+        }
 
+        [Fact]
+        public async Task Can_DELETE_Subscription()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr, true, true);
+
+            //Act
+            using var putResponse = await SendDeleteSubscriptionAsync(targetOrgUuid, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            var subscriptionRemoved = DatabaseAccess.MapFromEntitySet<Organization,bool>(r=>r.AsQueryable().ByUuid(targetOrgUuid).StsOrganizationConnection?.SubscribeToUpdates == false);
+            Assert.True(subscriptionRemoved);
         }
 
         [Fact]
@@ -588,9 +604,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return targetOrgUuid;
         }
 
-        private async Task<Guid> CreateOrgWithCvr(string cvr)
+        private async Task<Guid> CreateOrgWithCvr(string cvr, bool fakeInitialConnection = false, bool fakeInitialSubscription = false)
         {
             var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, $"StsSync_{A<Guid>():N}", cvr, OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            if (fakeInitialConnection)
+            {
+                DatabaseAccess.MutateEntitySet<Organization>(repo =>
+                {
+                    var organization = repo.AsQueryable().ByUuid(org.Uuid);
+                    organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, new ExternalOrganizationUnit(Guid.NewGuid(), "FAKE ROOT", new Dictionary<string, string>(), new List<ExternalOrganizationUnit>()), Maybe<int>.Some(1), fakeInitialSubscription);
+                });
+            }
             return org.Uuid;
         }
 
@@ -666,6 +690,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 SynchronizationDepth = levels,
                 SubscribeToUpdates = subscribe
             });
+        }
+
+        private static async Task<HttpResponseMessage> SendDeleteSubscriptionAsync(Guid targetOrgUuid, Cookie cookie)
+        {
+            var postUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/subscription");
+            return await HttpApi.DeleteWithCookieAsync(postUrl, cookie);
         }
     }
 }
