@@ -121,7 +121,7 @@ namespace Core.ApplicationServices.Organizations
                             }
                         )
                     .Bind(WithLogEntries)
-                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
+                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, MapToExternalConnectionAddNewLogInput(logEntries)))
                     .MatchFailure();
             });
         }
@@ -181,7 +181,7 @@ namespace Core.ApplicationServices.Organizations
                         return consequences;
                     })
                     .Bind(WithLogEntries)
-                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
+                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, MapToExternalConnectionAddNewLogInput(logEntries)))
                     .Match(importLogResult =>
                     {
                         if (importLogResult.RemovedChangeLogs.Any())
@@ -287,6 +287,18 @@ namespace Core.ApplicationServices.Organizations
             changeLog.LogTime = _operationClock.Now;
             
             return changeLog;
+        }
+
+        private static ExternalConnectionAddNewLogInput MapToExternalConnectionAddNewLogInput(
+            StsOrganizationChangeLog stsLog)
+        {
+            return new ExternalConnectionAddNewLogInput(stsLog.ResponsibleUserId, stsLog.ResponsibleType, stsLog.LogTime, MapToExternalConnectionAddNewLogEntryInput(stsLog.Entries));
+        }
+
+        private static IEnumerable<ExternalConnectionAddNewLogEntryInput> MapToExternalConnectionAddNewLogEntryInput(
+            IEnumerable<StsOrganizationConsequenceLog> entry)
+        {
+            return entry.Select(x => new ExternalConnectionAddNewLogEntryInput(x.ExternalUnitUuid, x.Name, x.Type, x.Description));
         }
     }
 }

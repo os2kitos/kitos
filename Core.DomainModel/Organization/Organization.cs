@@ -304,11 +304,10 @@ namespace Core.DomainModel.Organization
                 });
         }
 
-        public Result<ExternalConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
-            StsOrganizationChangeLog changeLogToAdd)
+        public Result<ExternalConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin, ExternalConnectionAddNewLogInput changeLogToAdd)
         {
             return GetExternalConnection(origin)
-                .Bind<ExternalConnectionAddNewLogsResult>(connection => connection.AddNewLog(MapToExternalConnectionAddNewLogInput(changeLogToAdd)));
+                .Bind<ExternalConnectionAddNewLogsResult>(connection => connection.AddNewLog(changeLogToAdd));
         }
 
         public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetExternalConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
@@ -481,18 +480,6 @@ namespace Core.DomainModel.Organization
             OrgUnits.Remove(unitToDelete);
 
             return Maybe<OperationError>.None;
-        }
-
-        private static ExternalConnectionAddNewLogInput MapToExternalConnectionAddNewLogInput(
-            StsOrganizationChangeLog stsLog)
-        {
-            return new ExternalConnectionAddNewLogInput(stsLog.ResponsibleUserId, stsLog.ResponsibleType, stsLog.LogTime, MapToExternalConnectionAddNewLogEntryInput(stsLog.Entries));
-        }
-
-        private static IEnumerable<ExternalConnectionAddNewLogEntryInput> MapToExternalConnectionAddNewLogEntryInput(
-            IEnumerable<StsOrganizationConsequenceLog> entry)
-        {
-            return entry.Select(x => new ExternalConnectionAddNewLogEntryInput(x.ExternalUnitUuid, x.Name, x.Type, x.Description));
         }
 
         private static bool MatchRoot(OrganizationUnit unit)
