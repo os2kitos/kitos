@@ -16,7 +16,7 @@
                                 id: String(orgUnit.id),
                                 text: orgUnit.name,
                                 indentationLevel: indentationLevel,
-                                optionalExtraObject: orgUnit.ean
+                                optionalObjectContext: orgUnit.ean
                             };
 
                             options.push(option);
@@ -150,7 +150,7 @@
                     stream.ean = " - ";
 
                     if (stream.organizationUnitId !== null && stream.organizationUnitId !== undefined) {
-                        stream.ean = stream.organizationUnitId.optionalExtraObject;
+                        stream.ean = stream.organizationUnitId.optionalObjectContext;
                     }
                 };
                 stream.updateEan = updateEan;

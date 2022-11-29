@@ -50,7 +50,7 @@
                 id: String(orgUnit.id),
                 text: orgUnit.name,
                 indentationLevel: indentationLevel,
-                optionalExtraObject: orgUnit
+                optionalObjectContext: orgUnit
             };
 
             options.push(option);
