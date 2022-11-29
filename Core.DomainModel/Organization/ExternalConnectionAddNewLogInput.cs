@@ -16,6 +16,6 @@ namespace Core.DomainModel.Organization
         public int? ResponsibleUserId { get; }
         public ExternalOrganizationChangeLogResponsible ResponsibleType { get; }
         public DateTime LogTime { get; }
-        public IEnumerable<ExternalConnectionAddNewLogEntryInput> Entries { get; set; }
+        public IEnumerable<ExternalConnectionAddNewLogEntryInput> Entries { get; }
     }
 }
