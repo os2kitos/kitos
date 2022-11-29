@@ -70,39 +70,6 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
-        public override HttpResponseMessage GetSingle(int id)
-        {
-            try
-            {
-                var item = Repository.GetByKey(id);
-
-                if (item == null)
-                {
-                    return NotFound();
-                }
-
-                if (!AllowRead(item))
-                {
-                    return Forbidden();
-                }
-
-                var dto = Map(item);
-                var result = _organizationService.CanActiveUserModifyCvr(item.Uuid);
-                if (result.Failed)
-                {
-                    return Forbidden();
-                }
-
-                dto.CanCvrBeModified = result.Value;
-
-                return Ok(dto);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         protected override bool AllowCreate<T>(int organizationId, IEntity entity)
         {
             return AuthorizationContext.AllowCreate<Organization>(organizationId);
@@ -151,8 +118,11 @@ namespace Presentation.Web.Controllers.API.V1
 
                 if (!string.Equals(cvr, organization.Cvr))
                 {
-                    var result = _organizationService.CanActiveUserModifyCvr(organization.Uuid);
-                    if (!result.Failed)
+                    var canEdit = _organizationService
+                        .CanActiveUserModifyCvr(organization.Uuid)
+                        .Match(canEdit => canEdit, _ => false);
+
+                    if (!canEdit)
                     {
                         return Forbidden();
                     }

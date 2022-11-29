@@ -132,9 +132,8 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid)
         {
-            var organization = GetOrganization(organizationUuid);
-
-            return _userContext.IsGlobalAdmin();
+            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(_ => _userContext.IsGlobalAdmin());
         }
 
         public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)

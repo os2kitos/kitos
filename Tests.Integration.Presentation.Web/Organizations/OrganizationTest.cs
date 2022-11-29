@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -166,6 +167,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var result = await OrganizationHelper.SendUpdateAsync(organization.Id, TestEnvironment.DefaultOrganizationId, organizationName, newCvr, login);
 
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            var cvrFromDb = DatabaseAccess.MapFromEntitySet<Organization, string>(x => x.AsQueryable().ById(organization.Id).Cvr);
+            Assert.Equal(cvr, cvrFromDb);
         }
 
         private string CreateNewCvr()
