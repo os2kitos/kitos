@@ -93,7 +93,7 @@
                         title: "Dato",
                         width: 50,
                         template: (dataItem: Models.UserNotification.UserNotificationDTO) => {
-                            return moment(dataItem.created).format("DD-MM-YYYY");
+                            return moment(dataItem.created).format(Constants.DateFormat.DanishDateFormat);
                         },
                         attributes: { "class": "fixed-grid-left-padding" },
                         sortable: false

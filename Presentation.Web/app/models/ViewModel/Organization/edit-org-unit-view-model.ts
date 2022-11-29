@@ -2,6 +2,7 @@
 
     export interface IEditOrgUnitViewModel {
         id: number,
+        uuid: string,
         oldName: string,
         newName: string,
         newEan: string,

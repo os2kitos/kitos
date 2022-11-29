@@ -82,7 +82,7 @@
                 let dateList = [];
                 let dateNotList = [];
                 _.each($scope.archivePeriods, x => {
-                    var formatDateString = "YYYY-MM-DD";
+                    var formatDateString = Kitos.Constants.DateFormat.EnglishDateFormat;
                     if (moment().isBetween(moment(x.StartDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day'), moment(x.EndDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day'), null, '[]')) {
                         dateList.push(x);
                     } else {
@@ -116,21 +116,14 @@
 
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
+                
+                var startDate = $scope.archivePeriod.startDate;
+                var endDate = $scope.archivePeriod.endDate;
 
-                var startDate = moment($scope.archivePeriod.startDate, Kitos.Constants.DateFormat.DanishDateFormat);
-                var endDate = moment($scope.archivePeriod.endDate, Kitos.Constants.DateFormat.DanishDateFormat);
-                var startDateValid = !startDate.isValid() || isNaN(startDate.valueOf()) || startDate.year() < 1000 || startDate.year() > 2099;
-                var endDateValid = !endDate.isValid() || isNaN(endDate.valueOf()) || endDate.year() < 1000 || endDate.year() > 2099;
-                var dateCheck = startDate.startOf('day') >= endDate.endOf('day');
-                if (startDateValid || endDateValid) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig."); { return; };
-                }
-                else if (dateCheck) {
-                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen."); { return; };
-                }
-                else {
-                    startDate = startDate.format("YYYY-MM-DD");
-                    endDate = endDate.format("YYYY-MM-DD");
+                if (Kitos.Helpers.DateValidationHelper.validateValidityPeriod(startDate, endDate, notify, "Startdato", "Slutdato")) {
+                    startDate = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(startDate);
+                    endDate= Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(endDate);
+
                     var payload = {};
                     payload["StartDate"] = startDate;
                     payload["EndDate"] = endDate;
@@ -173,28 +166,26 @@
             }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
 
             $scope.patchDatePeriode = (field, value, id) => {
-                var formatDateString = "YYYY-MM-DD";
-
-                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 var dateObject = $scope.archivePeriods.filter(x => x.Id === id);
-                var dateObjectStart = moment(dateObject[0].StartDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day');
-                var dateObjectEnd = moment(dateObject[0].EndDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day');
-                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                if (dateObject.length === 0) {
+                    console.log(`Archive period with id: ${id} wasn't found`);
+                    notify.addSuccessMessage("Feltet er opdateret!");
+                    return;
                 }
-                else if (dateObjectStart >= dateObjectEnd) {
-                    $scope.archivePeriods = archivePeriod;
-                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
-                }
-                else {
-                    date = date.format("YYYY-MM-DD");
+
+                var dateStart = dateObject[0].StartDate;
+                var dateEnd = dateObject[0].EndDate;
+
+                if (Kitos.Helpers.DateValidationHelper.validateValidityPeriod(dateStart, dateEnd, notify, "Startdato", "Slutdato")) {
+                    const dateString = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                     var payload = {};
-                    payload[field] = date;
+                    payload[field] = dateString;
                     sortDate();
                     $http.patch(`odata/ArchivePeriods(${id})`, payload).finally(reload);
                     notify.addSuccessMessage("Datoen er opdateret!");
                 }
             }
+
             $scope.patchPeriode = (field, value, id) => {
                 var payload = {};
                 payload[field] = value;
@@ -202,9 +193,7 @@
                 notify.addSuccessMessage("Feltet er opdateret!");
             }
 
-            $scope.datepickerOptions = {
-                format: "dd-MM-yyyy"
-            };
+            $scope.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
         }]);
 
 })(angular, app);

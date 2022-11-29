@@ -32,9 +32,8 @@
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
                     const emailMatchRegex = "([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
                     $scope.multipleEmailValidationRegex = `^(${emailMatchRegex}(((,)( )*)${emailMatchRegex})*)$`;
-
-                    var payloadDateFormat = "YYYY-MM-DD";
-                    var allowedDateFormats = [Constants.DateFormat.DanishDateFormat, payloadDateFormat];
+                    
+                    var allowedDateFormats = [Constants.DateFormat.DanishDateFormat, Constants.DateFormat.EnglishDateFormat];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles.length > 0) {
@@ -103,10 +102,12 @@
                         if (isCurrentAdviceRecurring()) {
                             payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
-                            payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
+                            payload.AlarmDate = Helpers.DateStringFormat.fromDanishToEnglishFormat($scope.startDate);
 
                             //Stopdate is optional so only parse it if present
-                            payload.StopDate = $scope.stopDate ? moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat) : null;
+                            payload.StopDate = $scope.stopDate
+                                ? Helpers.DateStringFormat.fromDanishToEnglishFormat($scope.stopDate)
+                                : null;
                         }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
