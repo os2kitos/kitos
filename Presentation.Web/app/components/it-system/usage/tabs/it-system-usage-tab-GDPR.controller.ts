@@ -86,7 +86,7 @@
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
                                 , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                     }
-                    else if (Kitos.Helpers.DateValidationHelper.validateDate(value, notify, fieldName)) {
+                    else if (Kitos.Helpers.DateValidationHelper.validateDateInput(value, notify, fieldName, true)) {
                         var date = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                         payload[field] = date;
                         itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)

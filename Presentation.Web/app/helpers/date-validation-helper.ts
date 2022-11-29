@@ -23,13 +23,14 @@
                     endDateFieldName);
         }
 
-        static validateDate(date: string, notify, fieldName: string) {
-            const formatDateString = Kitos.Constants.DateFormat.EnglishDateFormat;
-            const formattedDate = date ? moment(date, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]) : null;
-
-            if (formattedDate == null) {
+        static validateDateInput(date: string, notify, fieldName: string, emptyDateIsValid: boolean) {
+            if (!date && emptyDateIsValid) {
                 return true;
             }
+            
+            const formatDateString = Kitos.Constants.DateFormat.EnglishDateFormat;
+            const formattedDate = moment(date, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]);
+
             return DateValidationHelper.checkIfDateIsValid(formattedDate, notify, fieldName);
         }
 

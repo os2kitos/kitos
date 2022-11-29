@@ -156,7 +156,7 @@
                     payload[field] = null;
                     patch(payload, url);
                 }
-                else if (Kitos.Helpers.DateValidationHelper.validateDate(value, notify, fieldName)) {
+                else if (Kitos.Helpers.DateValidationHelper.validateDateInput(value, notify, fieldName, true)) {
                     const dateString = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                     payload[field] = dateString;
                     patch(payload, url);
