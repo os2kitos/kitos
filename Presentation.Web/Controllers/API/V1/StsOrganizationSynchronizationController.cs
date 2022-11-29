@@ -181,12 +181,12 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
         
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(
-            IEnumerable<IExternalConnectionChangeLogEntry> logs)
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(IEnumerable<IExternalConnectionChangeLogEntry> logs)
         {
             return logs
                 .Select(MapConsequenceToDto)
-                .Transform(OrderLogEntries);
+                .Transform(OrderLogEntries)
+                .ToList();
         }
 
         private static ConnectionUpdateOrganizationUnitConsequenceDTO MapConsequenceToDto(IExternalConnectionChangeLogEntry log)
