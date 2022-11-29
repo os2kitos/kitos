@@ -14,7 +14,7 @@
                         Id = c.Int(nullable: false, identity: true),
                         StsOrganizationConnectionId = c.Int(nullable: false),
                         ResponsibleUserId = c.Int(),
-                        Origin = c.Int(nullable: false),
+                        ResponsibleType = c.Int(nullable: false),
                         LogTime = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         ObjectOwnerId = c.Int(nullable: false),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
@@ -27,7 +27,7 @@
                 .ForeignKey("dbo.StsOrganizationConnections", t => t.StsOrganizationConnectionId, cascadeDelete: true)
                 .Index(t => t.StsOrganizationConnectionId)
                 .Index(t => t.ResponsibleUserId, name: "IX_ChangeLogName")
-                .Index(t => t.Origin, name: "IX_ChangeLogOrigin")
+                .Index(t => t.ResponsibleType, name: "IX_ChangeLogResponsibleType")
                 .Index(t => t.LogTime)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
@@ -38,7 +38,7 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         ChangeLogId = c.Int(nullable: false),
-                        Uuid = c.Guid(nullable: false),
+                        ExternalUnitUuid = c.Guid(nullable: false),
                         Name = c.String(nullable: false),
                         Type = c.Int(nullable: false),
                         Description = c.String(nullable: false),
@@ -51,7 +51,7 @@
                 .ForeignKey("dbo.User", t => t.LastChangedByUserId)
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ChangeLogId)
-                .Index(t => t.Uuid, name: "IX_StsOrganizationConsequenceUuid")
+                .Index(t => t.ExternalUnitUuid, name: "IX_StsOrganizationConsequenceUuid")
                 .Index(t => t.Type, name: "IX_StsOrganizationConsequenceType")
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
@@ -75,7 +75,7 @@
             DropIndex("dbo.StsOrganizationChangeLogs", new[] { "LastChangedByUserId" });
             DropIndex("dbo.StsOrganizationChangeLogs", new[] { "ObjectOwnerId" });
             DropIndex("dbo.StsOrganizationChangeLogs", new[] { "LogTime" });
-            DropIndex("dbo.StsOrganizationChangeLogs", "IX_ChangeLogOrigin");
+            DropIndex("dbo.StsOrganizationChangeLogs", "IX_ChangeLogResponsibleType");
             DropIndex("dbo.StsOrganizationChangeLogs", "IX_ChangeLogName");
             DropIndex("dbo.StsOrganizationChangeLogs", new[] { "StsOrganizationConnectionId" });
             DropTable("dbo.StsOrganizationConsequenceLogs");

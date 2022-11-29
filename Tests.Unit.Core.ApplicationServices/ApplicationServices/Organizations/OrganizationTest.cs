@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using Core.Abstractions.Types;
+using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -442,14 +443,13 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Empty(logResult.RemovedChangeLogs);
 
             var savedLog = Assert.Single(_sut.StsOrganizationConnection.StsOrganizationChangeLogs);
-            Assert.Equal(log.Id, savedLog.Id);
         }
 
         [Fact]
         public void Add_ExternalImportLog_Removes_Oldest_Log_If_More_Than_5_Logs_Are_Present()
         {
             //Arrange
-            var log = new StsOrganizationChangeLog(){Id = A<int>(), LogTime = DateTime.Now};
+            var log = new StsOrganizationChangeLog(){LogTime = DateTime.Now};
             var oldestLog = new StsOrganizationChangeLog {Id = A<int>(), LogTime = DateTime.Now.AddDays(-A<int>())};
             _sut.StsOrganizationConnection = new StsOrganizationConnection()
             {
@@ -473,7 +473,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var removedLog = Assert.Single(logResult.RemovedChangeLogs);
             Assert.Equal(oldestLog.Id, removedLog.Id);
 
-            Assert.Contains(log.Id, _sut.StsOrganizationConnection.StsOrganizationChangeLogs.Select(x => x.Id));
+            Assert.Equal(ExternalConnectionConstants.TotalNumberOfLogs, _sut.StsOrganizationConnection.StsOrganizationChangeLogs.Count);
         }
 
         [Fact]

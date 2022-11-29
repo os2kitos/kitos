@@ -174,7 +174,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return new StsOrganizationChangeLogResponseDTO
             {
-                Origin = log.Origin.ToStsOrganizationChangeLogOriginOption(),
+                Origin = log.ResponsibleType.ToStsOrganizationChangeLogOriginOption(),
                 User = log.ResponsibleUser.MapToUserWithEmailDTO(),
                 Consequences = MapConsequenceLogsToDtos(log.GetEntries()),
                 LogTime = log.LogTime
@@ -193,7 +193,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return new ConnectionUpdateOrganizationUnitConsequenceDTO
             {
-                Uuid = log.Uuid,
+                Uuid = log.ExternalUnitUuid,
                 Name = log.Name,
                 Category = log.Type.ToConnectionUpdateOrganizationUnitChangeCategory(),
                 Description = log.Description

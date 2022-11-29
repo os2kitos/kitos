@@ -17,7 +17,7 @@ namespace Core.DomainModel.Organization
         public virtual User ResponsibleUser { get; set; }
         public int? ResponsibleUserId { get; set; }
 
-        public ExternalOrganizationChangeLogOrigin Origin { get; set; }
+        public ExternalOrganizationChangeLogResponsible ResponsibleType { get; set; }
         public DateTime LogTime { get; set; }
         public virtual ICollection<StsOrganizationConsequenceLog> Entries { get; set; }
 

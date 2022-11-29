@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
@@ -567,19 +568,18 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, additionPutResponse.StatusCode);
 
             //Rename consequences
+            var renamedUnit = new OrganizationUnit();
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
             {
-                var renamedUnits = repo
+                renamedUnit = repo
                     .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation && x.Children.Any())
-                    .ToList()
-                    .RandomItems(2)
-                    .ToList();
+                    .FirstOrDefault(x => x.Organization.Uuid == targetOrgUuid
+                                          && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                          && x.Parent != null
+                                          && x.Children.Any());
 
-                foreach (var organizationUnit in renamedUnits)
-                {
-                    organizationUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
-                }
+                Assert.NotNull(renamedUnit);
+                renamedUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
             });
 
             //Conversion consequences
@@ -590,12 +590,14 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 expectedConversionUuid = repo
                     .AsQueryable()
                     .Where(x => x.Organization.Uuid == targetOrgUuid &&
-                                x.Origin == OrganizationUnitOrigin.STS_Organisation && !x.Children.Any())
+                                x.Origin == OrganizationUnitOrigin.STS_Organisation 
+                                && x.Parent != null
+                                && !x.Children.Any())
                     .ToList()
                     .RandomItem()
                     .Uuid;
             });
-            
+
             //Make sure it is in use so it will not be deleted, but converted
             await ItContractV2Helper.PostContractAsync(globalAdminToken.Token,
                 new CreateNewContractRequestDTO()
@@ -612,7 +614,9 @@ namespace Tests.Integration.Presentation.Web.Organizations
                     .AsQueryable()
                     .Where(x => x.Organization.Uuid == targetOrgUuid
                                 && x.Parent != null
-                                && x.Children.Any())
+                                && x.Children.Any()
+                                && x.Uuid != renamedUnit.Uuid
+                                && x.Uuid != expectedConversionUuid)
                     .RandomItem();
 
                 var secondLeaf = repo
@@ -621,7 +625,9 @@ namespace Tests.Integration.Presentation.Web.Organizations
                                 && x.Origin == OrganizationUnitOrigin.STS_Organisation
                                 && x.Parent != null
                                 && x.Children.Any()
-                                && x.Uuid != parentLeaf.Uuid)
+                                && x.Uuid != parentLeaf.Uuid
+                                && x.Uuid != renamedUnit.Uuid
+                                && x.Uuid != expectedConversionUuid)
                     .RandomItem();
                 
                 secondLeaf.ParentId = parentLeaf.Id;
@@ -661,10 +667,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var otherLogsConsequences = otherLogs.Consequences.ToList();
 
             Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, otherLogsConsequences.Select(x => x.Category).ToList());
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, otherLogsConsequences.Select(x => x.Category).ToList());
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, otherLogsConsequences.Select(x => x.Category).ToList());
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, otherLogsConsequences.Select(x => x.Category).ToList());
+            var consequenceCategories = otherLogsConsequences.Select(x => x.Category).ToList();
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, consequenceCategories);
 
             AssertConsequenceLogs(otherConsequences, otherLogs);
         }

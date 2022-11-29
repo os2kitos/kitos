@@ -6,7 +6,7 @@ namespace Core.DomainModel.Organization
     public interface IExternalConnectionChangelog
     {
         User ResponsibleUser { get; }
-        ExternalOrganizationChangeLogOrigin Origin { get; }
+        ExternalOrganizationChangeLogResponsible ResponsibleType { get; }
 
         DateTime LogTime { get; }
         IEnumerable<IExternalConnectionChangeLogEntry> GetEntries();

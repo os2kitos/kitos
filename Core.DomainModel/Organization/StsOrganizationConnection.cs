@@ -77,8 +77,25 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public ExternalConnectionAddNewLogsResult AddNewLog(StsOrganizationChangeLog newLog)
+        public ExternalConnectionAddNewLogsResult AddNewLog(ExternalConnectionAddNewLogInput newLogInput)
         {
+            var newLogEntries = newLogInput.Entries.Select(x =>
+                new StsOrganizationConsequenceLog
+                {
+                    Description = x.Description,
+                    ExternalUnitUuid = x.Uuid,
+                    Name = x.Name,
+                    Type = x.Type
+                }
+            ).ToList();
+            var newLog = new StsOrganizationChangeLog
+            {
+                ResponsibleUserId = newLogInput.ResponsibleUserId,
+                ResponsibleType = newLogInput.ResponsibleType,
+                LogTime = newLogInput.LogTime,
+                Entries = newLogEntries
+            };
+
             StsOrganizationChangeLogs.Add(newLog);
             var removedLogs = RemoveOldestLogs();
 

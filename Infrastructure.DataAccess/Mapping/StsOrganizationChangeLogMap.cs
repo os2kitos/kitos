@@ -11,9 +11,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(x => x.StsOrganizationConnectionId)
                 .WillCascadeOnDelete(true);
 
-            Property(x => x.Origin)
+            Property(x => x.ResponsibleType)
                 .IsRequired()
-                .HasIndexAnnotation("IX_ChangeLogOrigin");
+                .HasIndexAnnotation("IX_ChangeLogResponsibleType");
 
             Property(x => x.LogTime)
                 .IsRequired()

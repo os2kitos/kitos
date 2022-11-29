@@ -11,7 +11,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(x => x.ChangeLogId)
                 .WillCascadeOnDelete(true);
 
-            Property(x => x.Uuid)
+            Property(x => x.ExternalUnitUuid)
                 .IsRequired()
                 .HasIndexAnnotation("IX_StsOrganizationConsequenceUuid");
 
