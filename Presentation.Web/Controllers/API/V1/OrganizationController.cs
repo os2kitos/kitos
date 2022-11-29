@@ -112,6 +112,22 @@ namespace Presentation.Web.Controllers.API.V1
                     }
                 }
             }
+            if (obj.TryGetValue("cvr", out var jtoken))
+            {
+                var cvr = jtoken.Value<string>();
+
+                if (!string.Equals(cvr, organization.Cvr))
+                {
+                    var canEdit = _organizationService
+                        .CanActiveUserModifyCvr(organization.Uuid)
+                        .Match(canEdit => canEdit, _ => false);
+
+                    if (!canEdit)
+                    {
+                        return Forbidden();
+                    }
+                }
+            }
 
             return base.Patch(id, organizationId, obj);
         }

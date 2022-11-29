@@ -64,6 +64,29 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/contactPerson/{contactPersonId}?organizationId={organizationId}"), cookie, body);
         }
 
+        public static async Task<OrganizationDTO> UpdateAsync(int organizationId, int owningOrganizationId, string name, string cvr, Cookie optionalLogin = null)
+        {
+            using var createdResponse = await SendUpdateAsync(organizationId, owningOrganizationId, name, cvr, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, createdResponse.StatusCode);
+            var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<OrganizationDTO>();
+
+            return response;
+        }
+
+        public static async Task<HttpResponseMessage> SendUpdateAsync(int organizationId, int owningOrganizationId, string name, string cvr, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new
+            {
+                organizationId = organizationId,
+                name = name,
+                cvr = cvr
+            };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/organization/{organizationId}?organizationId={owningOrganizationId}"), cookie, body);
+        }
+
         public static async Task<OrganizationDTO> CreateOrganizationAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
             using var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, name, cvr, type, accessModifier, optionalLogin);
