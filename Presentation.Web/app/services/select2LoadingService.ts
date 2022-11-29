@@ -9,7 +9,7 @@
         select2LocalData(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[]);
         select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
         select2MultipleLocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
-        select2LocalDataFormatted(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], formatResults: (input: Models.ViewModel.Generic.ISelect2Model) => string, allowClear?: boolean);
+        select2LocalDataFormatted<TVm extends Models.ViewModel.Generic.ISelect2Model<string | number>>(dataFn: () => TVm[], formatResults: (input: TVm) => string, allowClear?: boolean): any;
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
@@ -27,7 +27,7 @@
             };
         }
 
-        select2LocalDataFormatted(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], formatResults: (input) => string, allowClear= true) {
+        select2LocalDataFormatted<TVm extends Models.ViewModel.Generic.ISelect2Model<string | number>>(dataFn: () => TVm[], formatResults: (input: TVm) => string, allowClear?: boolean) {
             return {
                 data: () => ({ "results": dataFn() }),
                 allowClear: allowClear,
@@ -76,7 +76,7 @@
                     }
                 }
             };
-            if (!! formatResult) {
+            if (!!formatResult) {
                 config.formatResult = formatResult;
             }
             return config;
@@ -119,7 +119,7 @@
                     quietMillis: Select2LoadingService.defaultQuietMillis,
                     transport(queryParams) {
                         const extraParams = paramArray ? `&${paramArray.join("&")}` : "";
-                         const res = self.$http.get(url + "?" + nameContentQueryParamName + "=" + encodeURIComponent(queryParams.data.query) + extraParams).then(queryParams.success, () => null);
+                        const res = self.$http.get(url + "?" + nameContentQueryParamName + "=" + encodeURIComponent(queryParams.data.query) + extraParams).then(queryParams.success, () => null);
                         return res;
                     },
 
