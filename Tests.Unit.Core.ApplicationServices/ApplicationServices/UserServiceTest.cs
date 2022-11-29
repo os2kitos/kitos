@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
-using Core.ApplicationServices.Rights;
 using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
@@ -37,7 +36,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IOrganizationalUserContext> _organizationalUserContextMock;
-        private readonly Mock<IUserRightsService> _userRightsService;
         private readonly Mock<ICommandBus> _commandBusMock;
 
         public UserServiceTest()
