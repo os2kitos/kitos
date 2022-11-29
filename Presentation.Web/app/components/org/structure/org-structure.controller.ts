@@ -6,7 +6,12 @@
                 templateUrl: "app/components/org/structure/org-structure.view.html",
                 controller: "org.StructureCtrl",
                 resolve: {
-                    orgUnits: [
+                    currentOrganization: [
+                        "$http", "user", ($http: ng.IHttpService, user) => $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organization/" + user.currentOrganizationId).then((result) => {
+                            return result.data.response;
+                        })
+                    ],
+                    rootNodeOfOrganization: [
                         "$http", "user", ($http: ng.IHttpService, user) => $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
                             return result.data.response;
                         })
@@ -33,8 +38,22 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, select2LoadingService: Kitos.Services.ISelect2LoadingService, inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitService","currentOrganization",
+        function ($scope,
+            $http: ng.IHttpService,
+            $modal,
+            $state,
+            notify,
+            rootNodeOfOrganization: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
+            localOrgUnitRoles,
+            orgUnitRoles,
+            user,
+            hasWriteAccess,
+            authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
+            select2LoadingService: Kitos.Services.ISelect2LoadingService,
+            inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService,
+            currentOrganization) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -45,19 +64,21 @@
                 take: 15
             };
 
-            //cache
-            var orgs = [];
-
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
             $scope.hasWriteAccess = hasWriteAccess;
-
+            $scope.currentOrganizationName = currentOrganization.name;
             $scope.orgUnitRoles = orgUnitRoles;
             $scope.activeOrgRoles = localOrgUnitRoles;
             $scope.orgRoles = {};
             _.each(localOrgUnitRoles, function (orgRole: { Id }) {
                 $scope.orgRoles[orgRole.Id] = orgRole;
             });
+            $scope.showDifferenceBetweenOrgUnitOrigin =
+                // User is an admin with edit rights to the hierarchy
+                (user.isGlobalAdmin || user.isLocalAdmin) &&
+                // Hierarchy root has been synced from a different source than KITOS
+                rootNodeOfOrganization.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos;
 
 
             function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit) {
@@ -110,7 +131,7 @@
             }
 
             function loadUnits() {
-                var rootNode = orgUnits;
+                var rootNode = rootNodeOfOrganization;
                 $scope.nodes = [rootNode];
 
                 flattenAndSave(rootNode, false, null);
@@ -134,22 +155,6 @@
 
                 if ($scope.chosenOrgUnit === node) return;
 
-                //get organization related to the org unit
-                if (!node.organization) {
-                    //try get from cache
-                    if (orgs[node.organizationId]) {
-                        node.organization = orgs[node.organizationId];
-                    } else {
-                        //else get from server
-                        $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organization/" + node.organizationId).then((result) => {
-                            node.organization = result.data.response;
-
-                            //save to cache
-                            orgs[node.organizationId] = result.data.response;
-                        });
-                    }
-                }
-
                 // reset pagination
                 $scope.rightsPagination = {
                     skip: 0,
@@ -157,27 +162,28 @@
                 };
 
                 loadRights(node);
-                loadTasks();
             };
 
             function loadRights(node) {
-                //get org rights on the org unit and subtree
-                $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + node.id + "?paged&take=" + $scope.rightsPagination.take + "&skip=" + $scope.rightsPagination.skip).then((result) => {
-                    var paginationHeader = JSON.parse(result.headers("X-Pagination"));
-                    $scope.totalRightsCountCopy = paginationHeader.TotalCount;
-                    node.orgRights = result.data.response;
+                if (node) {
+                    //get org rights on the org unit and subtree
+                    $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + node.id + "?paged&take=" + $scope.rightsPagination.take + "&skip=" + $scope.rightsPagination.skip).then((result) => {
+                        var paginationHeader = JSON.parse(result.headers("X-Pagination"));
+                        $scope.totalRightsCountCopy = paginationHeader.TotalCount;
+                        node.orgRights = result.data.response;
 
-                    var count = 0;
-                    _.each(node.orgRights, function (right: { userForSelect; roleForSelect; user; roleId; show; objectId; }) {
-                        right.userForSelect = { id: right.user.id, text: right.user.fullName };
-                        right.roleForSelect = right.roleId;
-                        right.show = $scope.showChildren || belongsToChosenNode(node, right);
-                        if (right.show)
-                            count++;
+                        var count = 0;
+                        _.each(node.orgRights, function (right: { userForSelect; roleForSelect; user; roleId; show; objectId; }) {
+                            right.userForSelect = { id: right.user.id, text: right.user.fullName };
+                            right.roleForSelect = right.roleId;
+                            right.show = $scope.showChildren || belongsToChosenNode(node, right);
+                            if (right.show)
+                                count++;
+                        });
+
+                        $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
                     });
-
-                    $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
-                });
+                }
 
                 $scope.chosenOrgUnit = node;
             }
@@ -217,7 +223,7 @@
                 var uId = $scope.selectedUser.id;
 
                 if (!oId || !rId || !uId) return;
-
+                
                 var data = {
                     "roleId": rId,
                     "userId": uId
@@ -337,11 +343,19 @@
                 $scope.rightSortBy = val;
             };
 
+            function getSupplementaryTextForEditDialog(unit: Kitos.Models.Api.Organization.IOrganizationUnitDto): string | null {
+                if (unit.origin === Kitos.Models.Api.Organization.OrganizationUnitOrigin.STS_Organisation) {
+                    return "Enheden synkroniseres fra FK Organisation og nogle felter kan derfor ikke redigeres i KITOS";
+                }
+                return null;
+            }
+
             $scope.editUnit = function (unit) {
                 var modal = $modal.open({
                     templateUrl: "app/components/org/structure/org-structure-modal-edit.view.html",
+                    windowClass: "modal fade in wide-modal",
                     controller: [
-                        "$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
+                        "$scope", "$uibModalInstance", "autofocus", "organizationUnitService", function ($modalScope, $modalInstance, autofocus, organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService) {
                             autofocus();
 
                             // edit or create-new mode
@@ -365,7 +379,9 @@
                                         ean: node.ean,
                                         localId: node.localId,
                                         parentId: node.parentId,
-                                        organizationId: node.organizationId
+                                        organizationId: node.organizationId,
+                                        externalOriginUuid: node.externalOriginUuid,
+                                        origin: node.origin
                                     });
 
                                 _.each(node.children, filter);
@@ -378,11 +394,17 @@
                                 id: unit.id,
                                 oldName: unit.name,
                                 newName: unit.name,
+                                oldEan: unit.ean,
                                 newEan: unit.ean,
+                                oldLocalId: unit.localId,
                                 localId: unit.localId,
+                                oldParent: unit.parentId,
                                 newParent: unit.parentId,
                                 orgId: unit.organizationId,
-                                isRoot: unit.parentId == undefined
+                                isRoot: unit.parentId == undefined,
+                                uuid: unit.uuid,
+                                orgUuid: currentOrganization.uuid,
+                                isFkOrganizationUnit: unit.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                             } as Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel;
 
                             if ($modalScope.orgUnit.isRoot) {
@@ -393,7 +415,9 @@
                                         ean: unit.ean,
                                         localId: unit.localId,
                                         parentId: unit.parentId,
-                                        organizationId: unit.organizationId
+                                        organizationId: unit.organizationId,
+                                        externalOriginUuid: unit.externalOriginUuid,
+                                        origin: unit.origin
                                     });
                             }
 
@@ -401,7 +425,22 @@
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
-                            $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
+                            $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
+
+                            $modalScope.canChangeParent = false;
+                            $modalScope.canChangeName = false;
+                            $modalScope.canEanBeModified = false;
+                            $modalScope.canDeviceIdBeModified = false;
+                            $modalScope.canDelete = false;
+
+                            organizationUnitService.getUnitAccessRights(currentOrganization.uuid, unit.uuid)
+                                .then(res => {
+                                    $modalScope.canDelete = res.canBeDeleted;
+                                    $modalScope.canChangeName = res.canNameBeModified;
+                                    $modalScope.canEanBeModified = res.canEanBeModified;
+                                    $modalScope.canDeviceIdBeModified = res.canDeviceIdBeModified;
+                                    $modalScope.canChangeParent = res.canBeRearranged;
+                                });
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting
@@ -411,6 +450,14 @@
                                 var parent = $modalScope.orgUnit.newParent;
                                 var ean = $modalScope.orgUnit.newEan;
                                 var localId = $modalScope.orgUnit.localId;
+
+                                var hasChange = false;
+                                if (name !== $modalScope.orgUnit.oldName ||
+                                    ean !== $modalScope.orgUnit.oldEan ||
+                                    localId !== $modalScope.orgUnit.oldLocalId) {
+                                    hasChange = true;
+                                }
+
 
                                 if (!name) return;
 
@@ -434,7 +481,22 @@
                                 }).then((result) => {
                                     notify.addSuccessMessage(name + " er ændret.");
 
-                                    $modalInstance.close(result.data.response);
+
+                                    var resultTypes = [];
+
+                                    if (parent !== $modalScope.orgUnit.oldParent) {
+                                        resultTypes.push(Kitos.Models.ViewModel.Organization
+                                            .OrganizationUnitEditResultType.UnitRelocated);
+                                    } else {
+                                        if (hasRegistrationChanges) {
+                                            resultTypes.push(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged);
+                                        }
+                                        if (hasChange) {
+                                            resultTypes.push(Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.FieldsChanged);
+                                        }
+                                    }
+
+                                    $modalInstance.close(createResult(resultTypes, result.data.response));
                                     inMemoryCacheService.clear();
                                 },
                                     (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
@@ -464,7 +526,8 @@
                                     "parentId": parent,
                                     "organizationId": orgId,
                                     "ean": ean,
-                                    "localId": localId
+                                    "localId": localId,
+                                    "origin": Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                                 };
 
                                 $modalScope.submitting = true;
@@ -476,7 +539,7 @@
                                 }).then((result) => {
                                     notify.addSuccessMessage(name + " er gemt.");
 
-                                    $modalInstance.close(result.data.response);
+                                    $modalInstance.close(createResult([Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.SubUnitCreated], result.data.response));
                                     inMemoryCacheService.clear();
                                 },
                                     (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
@@ -496,9 +559,30 @@
                                 $modalScope.newOrgUnit = {
                                     name: "",
                                     parent: $modalScope.orgUnit.id,
-                                    orgId: $modalScope.orgUnit.orgId
+                                    orgId: $modalScope.orgUnit.orgId,
+                                    origin: Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos
                                 };
                             };
+
+                            var hasRegistrationChanges = false;
+
+                            $modalScope.setIsBusy = (value: boolean): void => {
+                                $modalScope.submitting = value;
+                            }
+
+                            $modalScope.checkIsBusy = (): boolean => {
+                                return $modalScope.submitting;
+                            }
+
+                            $modalScope.registrationsChanged = () => {
+                                hasRegistrationChanges = true;
+                            }
+
+                            $modalScope.stateParameters = {
+                                setRootIsBusy: (value: boolean) => $modalScope.setIsBusy(value),
+                                checkIsRootBusy: () => $modalScope.checkIsBusy(),
+                                registrationsChanged: () => $modalScope.registrationsChanged(),
+                            } as Kitos.Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
 
                             $modalScope.delete = function () {
                                 //don't allow duplicate submitting
@@ -506,26 +590,27 @@
 
                                 $modalScope.submitting = true;
 
-                                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" +
-                                    unit.id +
-                                    "?organizationId=" +
-                                    user.currentOrganizationId).then((result) => {
+                                organizationUnitService.deleteOrganizationUnit(currentOrganization.uuid, unit.uuid)
+                                    .then((result) => {
                                         notify.addSuccessMessage(unit.name + " er slettet!");
                                         inMemoryCacheService.clear();
-                                        $modalInstance.close();
-                                    },
-                                        (error) => {
-                                            $modalScope.submitting = false;
+                                        $modalInstance.close(createResult([Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitDeleted]));
+                                    }, (error) => {
+                                        $modalScope.submitting = false;
 
-                                            notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
+                                        notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
                                                             Organisationsenheden bliver brugt som reference i en eller flere IT Systemer og/eller IT Kontrakter.<br /><br />
                                                             Fjern referencen for at kunne slette denne enhed.`);
-                                        });
+                                    });
 
                             };
 
                             $modalScope.cancel = function () {
-                                $modalInstance.dismiss("cancel");
+                                if (hasRegistrationChanges) {
+                                    $modalInstance.close(createResult([Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged], unit));
+                                    return;
+                                }
+                                $modalInstance.close(createResult());
                             };
 
                             function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {
@@ -560,175 +645,88 @@
                                     }
                                 };
                             }
+
+                            function createResult(types: Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType[] = null, unit = null): Kitos.Models.ViewModel.Organization.IOrganizationUnitEditResult {
+                                let resultTypes = types;
+                                if (!resultTypes) {
+                                    resultTypes = [];
+                                }
+                                return {
+                                    types: resultTypes,
+                                    scopeToUnit: unit
+                                };
+                            }
                         }
                     ]
                 });
 
-                modal.result.then(function (returnedUnit) {
-                    $state.go($state.current, {}, { reload: true });
-                    loadUnits();
+                modal.result.then((result: Kitos.Models.ViewModel.Organization.IOrganizationUnitEditResult) => {
+                    result.types.forEach(type => {
+                        switch (type) {
+                            case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.SubUnitCreated:
+                            case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitRelocated:
+                            case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.UnitDeleted:
+                                $state.go($state.current, {}, { reload: true });
+                                break;
+                            case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.FieldsChanged:
+                                const currentNode = $scope.orgUnits[result.scopeToUnit.id];
+                                if (!currentNode) {
+                                    return;
+                                }
+
+                                currentNode.name = result.scopeToUnit.name;
+                                currentNode.ean = result.scopeToUnit.ean;
+                                currentNode.localId = result.scopeToUnit.localId;
+                                break;
+                            case Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType.RightsChanged:
+                                const node = $scope.orgUnits[result.scopeToUnit.id];
+                                if (!node) {
+                                    return;
+                                }
+
+                                loadRights(node);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
                 });
             };
 
-            $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
-                $scope.pagination.skip = 0;
-                loadTasks();
-            });
-
-            $scope.$watchCollection("pagination", loadTasks);
             $scope.$watchCollection("rightsPagination", function () {
                 loadRights($scope.chosenOrgUnit);
             });
 
-            // default kle mode
-            $scope.showAllTasks = true;
-            // default kle sort order
-            $scope.pagination.orderBy = "taskKey";
-
-            // change between show all tasks and only show active tasks
-            $scope.changeTaskView = function () {
-                $scope.showAllTasks = !$scope.showAllTasks;
-                $scope.pagination.orderBy = $scope.showAllTasks ? "taskKey" : "taskRef.taskKey";
-                $scope.pagination.skip = 0;
-                loadTasks();
-            };
-
-            function loadTasks() {
-                if (!$scope.chosenOrgUnit) return;
-
-                var url = "api/organizationUnit/" + $scope.chosenOrgUnit.id;
-
-                if ($scope.showAllTasks) url += "?tasks";
-                else url += "?usages";
-
-                url += "&taskGroup=" + $scope.selectedTaskGroup;
-                url += "&skip=" + $scope.pagination.skip + "&take=" + $scope.pagination.take;
-
-                if ($scope.pagination.orderBy) {
-                    url += "&orderBy=" + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += "&descending=" + $scope.pagination.descending;
-                }
-
-                $http.get<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
-                    $scope.taskRefUsageList = result.data.response;
-
-                    var paginationHeader = JSON.parse(result.headers("X-Pagination"));
-                    $scope.totalCount = paginationHeader.TotalCount;
-                    decorateTasks();
-                }, (error) => {
-                    notify.addErrorMessage("Kunne ikke hente opgaver!");
-                });
-            }
-
-            function addUsage(refUsage, showMessage) {
-                if (showMessage) var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-
-                const url = `api/taskUsage`;
-
-                const payload = {
-                    taskRefId: refUsage.taskRef.id,
-                    orgUnitId: $scope.chosenOrgUnit.id
-                };
-
-                $http.post<Kitos.API.Models.IApiWrapper<any>>(url, payload).then((result) => {
-                    refUsage.usage = result.data.response;
-                    if (showMessage) msg.toSuccessMessage("Tilknytningen er oprettet");
-                }, (error) => {
-                    if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
-                });
-            }
-
-            function removeUsage(refUsage, showMessage) {
-                if (showMessage) var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-
-                const url = `api/taskUsage/${refUsage.usage.id}?organizationId=${user.currentOrganizationId}`;
-
-                $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
-                    refUsage.usage = null;
-                    if (showMessage) msg.toSuccessMessage("Tilknytningen er fjernet");
-                }, (error) => {
-                    if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
-                });
-            }
-
-            function decorateTasks() {
-                _.each($scope.taskRefUsageList, function (refUsage: { toggleUsage; usage; toggleStar; }) {
-                    refUsage.toggleUsage = function () {
-                        if (refUsage.usage) {
-                            removeUsage(refUsage, true);
-                        } else {
-                            addUsage(refUsage, true);
-                        }
-                    };
-
-                    refUsage.toggleStar = function () {
-                        if (!refUsage.usage) return;
-
-                        var payload = {
-                            starred: !refUsage.usage.starred
-                        };
-
-                        var url = "api/taskUsage/" + refUsage.usage.id;
-                        var msg = notify.addInfoMessage("Opdaterer...", false);
-                        $http<Kitos.API.Models.IApiWrapper<any>>({ method: "PATCH", url: url + "?organizationId=" + user.currentOrganizationId, data: payload }).then(() => {
-                            refUsage.usage.starred = !refUsage.usage.starred;
-                            msg.toSuccessMessage("Feltet er opdateret");
-                        }, (error) => {
-                            msg.toErrorMessage("Fejl!");
-                        });
-                    };
-                });
-            }
-
-            $scope.selectAllTasks = function () {
-                _.each($scope.taskRefUsageList, function (refUsage: { usage }) {
-                    if (!refUsage.usage) {
-                        addUsage(refUsage, false);
-                    }
-                });
-            };
-
-            $scope.removeAllTasks = function () {
-                _.each($scope.taskRefUsageList, function (refUsage: { usage }) {
-                    if (refUsage.usage) {
-                        removeUsage(refUsage, false);
-                    }
-                });
-            };
-
-            $scope.selectTaskGroup = function () {
-                var url = "api/taskusage/taskGroup?orgUnitId=" + $scope.chosenOrgUnit.id + "&taskId=" + $scope.selectedTaskGroup;
-
-                var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-                $http.post<Kitos.API.Models.IApiWrapper<any>>(url, null).then((result) => {
-                    msg.toSuccessMessage("Tilknytningen er oprettet");
-                    reload();
-                }, (error) => {
-                    msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
-                });
-            };
-
-            $scope.removeTaskGroup = function () {
-                var url = "api/taskusage?orgUnitId=" + $scope.chosenOrgUnit.id + "&taskId=" + $scope.selectedTaskGroup;
-
-                var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-                $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then(() => {
-                    msg.toSuccessMessage("Tilknytningen er fjernet");
-                    reload();
-                }, (error) => {
-                    msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
-                });
-            };
-
-            function reload() {
-                $state.go(".", null, { reload: true });
-            }
-
-            $scope.dragEnabled = false;
+            $scope.isReordering = false;
+            $scope.loadingAccessRights = false;
 
             $scope.toggleDrag = function () {
-                $scope.dragEnabled = !$scope.dragEnabled;
+                $scope.isReordering = !$scope.isReordering;
+
+                if ($scope.isReordering) {
+                    $scope.loadingAccessRights = true;
+                    organizationUnitService.getUnitAccessRightsForOrganization(currentOrganization.uuid)
+                        .then(response => {
+                            const rightsMap = response.reduce((rights, next) => {
+                                rights[next.unitId] = next;
+                                return rights;
+                            }, {})
+                            applyAccessRights(rootNodeOfOrganization, rightsMap);
+                            $scope.loadingAccessRights = false;
+                        }, error => {
+                            notify.addErrorMessage("Kunne ikke indlæse rettighederne for organisationsenheden");
+                            console.log(error);
+                            $scope.loadingAccessRights = false;
+                            $scope.isReordering = false;
+                        });
+                }
             };
+
+            function applyAccessRights(unit: Kitos.Models.ViewModel.Organization.IOrganizationUnitReorderViewModel,
+                accessRights: { [key: number]: Kitos.Models.Api.Organization.UnitAccessRightsWithUnitIdDto }) {
+                unit.draggable = accessRights[unit.id]?.canBeRearranged === true;
+                unit.children.forEach(child => applyAccessRights(child, accessRights));
+            }
 
             $scope.treeOptions = {
                 accept: function (sourceNodeScope, destNodesScope, destIndex) {
@@ -756,7 +754,7 @@
                         var msg = notify.addInfoMessage("Opdaterer...", false);
                         $http<Kitos.API.Models.IApiWrapper<any>>({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).then(() => {
                             msg.toSuccessMessage("Enheden er opdateret");
-                            $scope.chooseOrgUnit(orgUnits);
+                            $scope.chooseOrgUnit(rootNodeOfOrganization);
                         }, (error) => {
                             msg.toErrorMessage("Fejl!");
                         });

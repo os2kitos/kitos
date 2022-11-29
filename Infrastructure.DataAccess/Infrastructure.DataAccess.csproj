@@ -95,6 +95,7 @@
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
+    <Compile Include="Mapping\StsOrganizationConnectionMap.cs" />
     <Compile Include="Mapping\StsOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
@@ -134,7 +135,6 @@
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />
-    <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRoleMap.cs" />
@@ -939,8 +939,26 @@
     <Compile Include="Migrations\202209290951403_Add_SystemActive_To_ItSystemUsageOverview.designer.cs">
       <DependentUpon>202209290951403_Add_SystemActive_To_ItSystemUsageOverview.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202210050759373_Remove_TaskUsage.cs" />
+    <Compile Include="Migrations\202210050759373_Remove_TaskUsage.designer.cs">
+      <DependentUpon>202210050759373_Remove_TaskUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202210051041189_RemovedEmailBeforeDeletion.cs" />
+    <Compile Include="Migrations\202210051041189_RemovedEmailBeforeDeletion.designer.cs">
+      <DependentUpon>202210051041189_RemovedEmailBeforeDeletion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202210060603461_Add_Sts_Org_Import_Tables.cs" />
+    <Compile Include="Migrations\202210060603461_Add_Sts_Org_Import_Tables.designer.cs">
+      <DependentUpon>202210060603461_Add_Sts_Org_Import_Tables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.cs" />
+    <Compile Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.designer.cs">
+      <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
+    <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
+    <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Get_Users_To_Preserve.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />
     <Compile Include="Services\EntityFrameworkContextDatabaseControl.cs" />
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
@@ -1565,6 +1583,18 @@
     <EmbeddedResource Include="Migrations\202209290951403_Add_SystemActive_To_ItSystemUsageOverview.resx">
       <DependentUpon>202209290951403_Add_SystemActive_To_ItSystemUsageOverview.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202210050759373_Remove_TaskUsage.resx">
+      <DependentUpon>202210050759373_Remove_TaskUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202210051041189_RemovedEmailBeforeDeletion.resx">
+      <DependentUpon>202210051041189_RemovedEmailBeforeDeletion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202210060603461_Add_Sts_Org_Import_Tables.resx">
+      <DependentUpon>202210060603461_Add_Sts_Org_Import_Tables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202210271249212_Removed_Delegated_SystemUsages.resx">
+      <DependentUpon>202210271249212_Removed_Delegated_SystemUsages.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1581,7 +1611,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration.sql" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Users_Not_Associated_With_Any_Org.sql" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
   </ItemGroup>
@@ -1651,6 +1683,7 @@
     <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\ProdHangfireAdviceUpdate.sql" />
     <None Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\UpdateHangfireWithNewJobs.sql" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -124,7 +124,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advice\AdviceSequentialTest.cs" />
     <Compile Include="Advice\AdviceTest.cs" />
+    <Compile Include="Advice\AdviceTestBase.cs" />
     <Compile Include="Authorization\GetOrganizationsTests.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
@@ -132,6 +134,8 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
+    <Compile Include="Organizations\OrganizationUnitTests.cs" />
+    <Compile Include="Organizations\OrganizationUnitRegistrationTests.cs" />
     <Compile Include="Organizations\OrganizationSequentialTests.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
@@ -153,7 +157,6 @@
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
     <Compile Include="KLE\KleUpdateIntegrationTests.cs" />
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />
-    <Compile Include="KLE\TaskUsageIntegrityInput.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUnitsApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
@@ -209,13 +212,13 @@
     <Compile Include="Tools\Model\RightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
     <Compile Include="Tools\OrganizationHelper.cs" />
+    <Compile Include="Tools\OrganizationRegistrationHelper.cs" />
     <Compile Include="Tools\OrganizationUnitHelper.cs" />
     <Compile Include="Tools\ReadModelTestTools.cs" />
     <Compile Include="Tools\ReferencesHelper.cs" />
     <Compile Include="Tools\External\Rights\RightsHelper.cs" />
     <Compile Include="Tools\SsoIdentityHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
-    <Compile Include="Tools\TaskUsageHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\External\ItSystemV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationV2Helper.cs" />
@@ -239,7 +242,7 @@
       <Name>Core.ApplicationServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">

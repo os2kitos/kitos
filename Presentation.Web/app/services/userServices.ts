@@ -26,6 +26,7 @@
 
         currentOrganization: string;
         currentOrganizationId: number;
+        currentOrganizationUuid: string;
         currentOrganizationName: string;
         currentConfig: any;
     }
@@ -124,6 +125,7 @@
                 defaultOrganizationUnitId: defaultOrgUnitId,
                 currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,
+                currentOrganizationUuid: currOrg.uuid,
                 currentOrganizationName: currOrg.name,
                 currentConfig: currOrg.config
             };
@@ -500,19 +502,19 @@
 
         getUsersWithRightsholderAccess() {
             return this.$http
-                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithOrganizationName[]>>("api/user/with-rightsholder-access")
+                .get<API.Models.IApiWrapper<Models.Api.IUserWithOrganizationName[]>>("api/user/with-rightsholder-access")
                 .then(result => result.data.response);
         }
 
         getUsersWithCrossAccess() {
             return this.$http
-                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/with-cross-organization-permissions")
+                .get<API.Models.IApiWrapper<Models.Api.IUserWithCrossAccess[]>>("api/user/with-cross-organization-permissions")
                 .then(result => result.data.response);
         }
 
         deleteUser(id: number) {
             return this.$http
-                .delete(`api/user/${id}`);
+                .delete(`api/v1/user/delete/${id}`);
         }
 
         searchUsers(query: string) {

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
+using Core.DomainModel.Organization.Strategies;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
 
@@ -126,6 +128,7 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<UIModuleCustomization> UIModuleCustomizations { get; set; }
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ArchiveSupplierForItSystems { get; set; }
+        public virtual StsOrganizationConnection StsOrganizationConnection { get; set; }
 
 
         /// <summary>
@@ -141,7 +144,7 @@ namespace Core.DomainModel.Organization
         /// <returns></returns>
         public OrganizationUnit GetRoot()
         {
-            return OrgUnits.FirstOrDefault(u => u.Parent == null);
+            return OrgUnits.FirstOrDefault(MatchRoot);
         }
 
         public IEnumerable<int> GetOrganizationIds() => new[] { Id };
@@ -151,11 +154,16 @@ namespace Core.DomainModel.Organization
             return OrgUnits.FirstOrDefault(unit => unit.Uuid == organizationUnitId);
         }
 
+        public IEnumerable<OrganizationUnit> GetAllOrganizationUnits()
+        {
+            return OrgUnits.ToList();
+        }
+
         public Maybe<UIModuleCustomization> GetUiModuleCustomization(string module)
         {
             if (module == null)
                 throw new ArgumentNullException(nameof(module));
-            
+
             return UIModuleCustomizations
                 .SingleOrDefault(config => config.Module == module)
                 .FromNullable();
@@ -164,17 +172,17 @@ namespace Core.DomainModel.Organization
         public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, IEnumerable<CustomizedUINode> nodes)
         {
             if (string.IsNullOrEmpty(module))
-                throw new ArgumentNullException("Module parameter cannot be null");
+                throw new ArgumentNullException(nameof(module));
             if (nodes == null)
-                throw new ArgumentNullException("Nodes parameter cannot be null");
-            
+                throw new ArgumentNullException(nameof(nodes));
+
             var uiNodes = nodes.ToList();
             var customizedUiNodes = uiNodes.ToList();
-            
+
             var moduleCustomization = GetUiModuleCustomization(module).GetValueOrDefault();
             if (moduleCustomization == null)
             {
-                moduleCustomization = new UIModuleCustomization {Organization = this, Module = module};
+                moduleCustomization = new UIModuleCustomization { Organization = this, Module = module };
                 UIModuleCustomizations.Add(moduleCustomization);
             }
 
@@ -184,6 +192,274 @@ namespace Core.DomainModel.Organization
                 return nodeUpdateResult.Value;
 
             return moduleCustomization;
+        }
+
+        public Result<OrganizationTreeUpdateConsequences, OperationError> ComputeExternalOrganizationHierarchyUpdateConsequences(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        {
+            if (root == null) throw new ArgumentNullException(nameof(root));
+
+            IExternalOrganizationalHierarchyUpdateStrategy strategy;
+            //Pre-validate
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+                    if (StsOrganizationConnection?.Connected != true)
+                    {
+                        return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.Conflict);
+                    }
+                    strategy = StsOrganizationConnection.GetUpdateStrategy();
+                    break;
+                case OrganizationUnitOrigin.Kitos:
+                    return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
+            var filteredTree = root.Copy(childLevelsToInclude);
+
+            return strategy.ComputeUpdate(filteredTree);
+        }
+
+        public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+            //Pre-validate
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+                    if (StsOrganizationConnection?.Connected == true)
+                    {
+                        return new OperationError($"Already connected to {origin:G}", OperationFailure.Conflict);
+                    }
+                    break;
+                case OrganizationUnitOrigin.Kitos:
+                    return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return GetRoot()
+                .FromNullable()
+                .Match
+                (
+                    currentOrgRoot =>
+                    {
+                        var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //Subtract one since first level is the root
+                        return currentOrgRoot.ImportNewExternalOrganizationOrgTree(origin, root.Copy(childLevelsToInclude));
+                    },
+                    () => new OperationError("Unable to load current root", OperationFailure.UnknownError)
+                ).Match
+                (error => error,
+                    () =>
+                    {
+                        StsOrganizationConnection ??= new StsOrganizationConnection();
+                        StsOrganizationConnection.Connected = true;
+                        StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
+                        return Maybe<OperationError>.None;
+                    }
+                );
+        }
+
+        public Result<DisconnectOrganizationFromOriginResult, OperationError> DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin origin)
+        {
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+
+                    if (StsOrganizationConnection?.Connected != true)
+                    {
+                        return new OperationError("Not connected", OperationFailure.BadState);
+                    }
+                    return StsOrganizationConnection.Disconnect();
+                case OrganizationUnitOrigin.Kitos:
+                    return new OperationError("Kitos is not an external source and cannot be disconnected", OperationFailure.BadInput);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public Result<OrganizationTreeUpdateConsequences, OperationError> UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        {
+            if (root == null) throw new ArgumentNullException(nameof(root));
+
+            IExternalOrganizationalHierarchyUpdateStrategy strategy;
+            //Pre-validate
+            switch (origin)
+            {
+                case OrganizationUnitOrigin.STS_Organisation:
+                    if (StsOrganizationConnection?.Connected != true)
+                    {
+                        return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.BadState);
+                    }
+                    strategy = StsOrganizationConnection.GetUpdateStrategy();
+                    break;
+                case OrganizationUnitOrigin.Kitos:
+                    return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
+            var filteredTree = root.Copy(childLevelsToInclude);
+            StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
+
+            return strategy.PerformUpdate(filteredTree);
+        }
+
+        /// <summary>
+        /// Adds a organization unit
+        /// </summary>
+        /// <param name="newUnit"></param>
+        /// <param name="parentUnit">If set to None, the new unit will be added to the organization root</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Maybe<OperationError> AddOrganizationUnit(OrganizationUnit newUnit, Maybe<OrganizationUnit> parentUnit)
+        {
+            if (newUnit == null) throw new ArgumentNullException(nameof(newUnit));
+            if (parentUnit == null) throw new ArgumentNullException(nameof(parentUnit));
+            var actualParent = parentUnit.GetValueOrFallback(GetRoot());
+            if (newUnit == actualParent)
+            {
+                return new OperationError("new unit is the same as the parent", OperationFailure.BadInput);
+            }
+
+            if (actualParent.Organization != this)
+            {
+                return new OperationError("Parent unit is from a different organization", OperationFailure.BadInput);
+            }
+
+            var duplicateUnit = GetOrganizationUnit(newUnit.Uuid);
+            if (duplicateUnit.HasValue)
+            {
+                return new OperationError("Unit already added", OperationFailure.BadInput);
+            }
+
+            if (GetOrganizationUnit(actualParent.Uuid).IsNone)
+            {
+                return new OperationError("Parent unit has not been added to the organization", OperationFailure.BadInput);
+            }
+
+            var addedError = actualParent.AddChild(newUnit);
+            if (addedError.IsNone)
+            {
+                newUnit.Organization = this;
+                OrgUnits.Add(newUnit);
+            }
+
+            return addedError;
+        }
+
+        public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit, bool includeSubtree)
+        {
+            if (movedUnit == null) throw new ArgumentNullException(nameof(movedUnit));
+            if (oldParentUnit == null) throw new ArgumentNullException(nameof(oldParentUnit));
+            if (newParentUnit == null) throw new ArgumentNullException(nameof(newParentUnit));
+            if (GetOrganizationUnit(movedUnit.Uuid).IsNone)
+            {
+                return new OperationError($"Moved unit with uuid {movedUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
+            }
+
+            if (GetOrganizationUnit(oldParentUnit.Uuid).IsNone)
+            {
+                return new OperationError($"old parent unit with uuid {oldParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
+            }
+
+            if (GetOrganizationUnit(newParentUnit.Uuid).IsNone)
+            {
+                return new OperationError($"new parent unit with uuid {newParentUnit.Uuid} does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
+            }
+
+            if (movedUnit == oldParentUnit)
+            {
+                return new OperationError($"moved unit equals old parent unit with uuid {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (movedUnit == newParentUnit)
+            {
+                return new OperationError($"moved unit equals new parent unit with uuid {movedUnit.Uuid} in organization with uuid {Uuid}", OperationFailure.BadInput);
+            }
+
+            if (movedUnit == GetRoot())
+            {
+                return new OperationError($"Cannot move the organization root", OperationFailure.BadInput);
+            }
+
+            if (!includeSubtree)
+            {
+                //If sub tree is not part of the move, move the children to the moved unit's parent
+                var movedUnitParent = movedUnit.Parent;
+                foreach (var child in movedUnit.Children.ToList())
+                {
+                    RelocateOrganizationUnit(child, movedUnit, movedUnitParent, true);
+                }
+            }
+            else
+            {
+                //If subtree is to be moved along with it, then the target unit cannot be a descendant of the moved unit
+                if (movedUnit.FlattenHierarchy().Contains(newParentUnit))
+                {
+                    return new OperationError($"newParentUnit with uuid {newParentUnit.Uuid} is a descendant of org unit with uuid {movedUnit.Uuid}", OperationFailure.BadInput);
+                }
+            }
+
+            var removeChildError = oldParentUnit.RemoveChild(movedUnit);
+
+            if (removeChildError.HasValue)
+            {
+                return removeChildError.Value;
+            }
+
+            return newParentUnit.AddChild(movedUnit);
+        }
+
+        public Maybe<OperationError> DeleteOrganizationUnit(OrganizationUnit unitToDelete)
+        {
+            if (unitToDelete == null) throw new ArgumentNullException(nameof(unitToDelete));
+            var organizationUnit = GetOrganizationUnit(unitToDelete.Uuid);
+            if (organizationUnit.IsNone)
+            {
+                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} Does not belong to this organization with uuid {Uuid}", OperationFailure.NotFound);
+            }
+
+            if (unitToDelete.IsUsed())
+            {
+                return new OperationError($"Unit to delete with uuid {unitToDelete.Uuid} from organization with uuid {Uuid} cannot be deleted as it is still in use!", OperationFailure.BadInput);
+            }
+
+            if (unitToDelete == GetRoot())
+            {
+                return new OperationError("Cannot delete the organization root", OperationFailure.BadInput);
+            }
+
+            //Migrate any children to the parent!
+            foreach (var child in unitToDelete.Children.ToList())
+            {
+                var relocateOrganizationUnitError = RelocateOrganizationUnit(child, unitToDelete, unitToDelete.Parent, true);
+                if (relocateOrganizationUnitError.HasValue)
+                {
+                    return relocateOrganizationUnitError;
+                }
+            }
+
+            var removeChildError = unitToDelete.Parent.RemoveChild(unitToDelete);
+
+            if (removeChildError.HasValue)
+            {
+                return removeChildError;
+            }
+
+            OrgUnits.Remove(unitToDelete);
+
+            return Maybe<OperationError>.None;
+        }
+
+        private static bool MatchRoot(OrganizationUnit unit)
+        {
+            return unit.Parent == null;
         }
     }
 }

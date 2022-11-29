@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-
+using Core.DomainModel.Organization;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -299,6 +300,87 @@ namespace Tests.Unit.Core.Model
 
             //Assert
             AssertErrorResult(result, "Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+        }
+
+        [Fact]
+        public void Can_Remove_OrganizationalUsage()
+        {
+            var unitId = A<int>();
+            var responsibleUsage = new ItSystemUsageOrgUnitUsage() {OrganizationUnitId = unitId, OrganizationUnit = new OrganizationUnit{ Id = unitId }};
+            var usage = new ItSystemUsage()
+            {
+                UsedBy = new List<ItSystemUsageOrgUnitUsage>{ responsibleUsage },
+                ResponsibleUsage = responsibleUsage,
+            };
+
+            var result = usage.RemoveResponsibleOrganizationUnit();
+
+            Assert.False(result.HasValue);
+            Assert.Null(usage.ResponsibleUsage);
+        }
+
+        [Fact]
+        public void Can_Remove_UsedByUnit()
+        {
+            var unitUuid = A<Guid>();
+            var unit = new OrganizationUnit {Uuid = unitUuid};
+            var usage = new ItSystemUsage
+            {
+                UsedBy = new List<ItSystemUsageOrgUnitUsage>{ new() { OrganizationUnit = unit } },
+                Organization = new Organization
+                {
+                    OrgUnits = new List<OrganizationUnit>{ unit }
+                }
+            };
+
+            var result = usage.RemoveUsedByUnit(unitUuid);
+
+            Assert.False(result.HasValue);
+            Assert.Empty(usage.UsedBy);
+        }
+
+        [Fact]
+        public void Can_Transfer_OrganizationalUsage()
+        {
+            var unitUuid = A<Guid>();
+            var targetUnitUuid = A<Guid>();
+            var unit = new OrganizationUnit {Uuid = unitUuid};
+            var targetUnit = new OrganizationUnit {Uuid = targetUnitUuid};
+            var responsibleUsage = new ItSystemUsageOrgUnitUsage { OrganizationUnit = unit };
+            var usage = new ItSystemUsage
+            {
+                UsedBy = new List<ItSystemUsageOrgUnitUsage> { responsibleUsage },
+                ResponsibleUsage = responsibleUsage,
+                Organization = new Organization {OrgUnits = new List<OrganizationUnit> { unit, targetUnit }}
+            };
+
+            var result = usage.TransferResponsibleOrganizationalUnit(targetUnitUuid);
+
+            Assert.False(result.HasValue);
+            Assert.Equal(targetUnit.Id, usage.ResponsibleUsage.OrganizationUnit.Id);
+        }
+
+        [Fact]
+        public void Can_Transfer_UsedByUnit()
+        {
+            var unitUuid = A<Guid>();
+            var targetUnitUuid = A<Guid>();
+            var unit = new OrganizationUnit { Uuid = unitUuid};
+            var targetUnit = new OrganizationUnit { Uuid = targetUnitUuid};
+            var usage = new ItSystemUsage
+            {
+                Organization = new Organization()
+                {
+                    OrgUnits = new List<OrganizationUnit>{unit, targetUnit} 
+                },
+                UsedBy = new List<ItSystemUsageOrgUnitUsage> { new() { OrganizationUnit = unit } }
+            };
+
+            var result = usage.TransferUsedByUnit(unitUuid, targetUnitUuid);
+
+            Assert.False(result.HasValue);
+            Assert.DoesNotContain(unitUuid, usage.UsedBy.Select(x => x.OrganizationUnit.Uuid));
+            Assert.Contains(targetUnitUuid, usage.UsedBy.Select(x => x.OrganizationUnit.Uuid));
         }
 
         [Theory]

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
@@ -41,5 +41,14 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
             return Ok(result);
         }
+
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, OrganizationUnit entity) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Patch(int key, Delta<OrganizationUnit> delta) => throw new NotSupportedException();
     }
 }

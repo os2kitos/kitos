@@ -52,7 +52,16 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\ICommandHandler.cs" />
+    <Compile Include="Commands\ICommandBus.cs" />
+    <Compile Include="Commands\RemoveOrganizationUnitRegistrationsCommand.cs" />
+    <Compile Include="Commands\RemoveUserFromKitosCommand.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
+    <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
+    <Compile Include="Extensions\ExternalOrganizationUnitExtensions.cs" />
+    <Compile Include="Extensions\HierarchyExtensions.cs" />
+    <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
@@ -82,6 +91,17 @@
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
+    <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
+    <Compile Include="Organization\OrganizationTreeUpdateConsequences.cs" />
+    <Compile Include="Organization\OrganizationUnitRegistrationDetails.cs" />
+    <Compile Include="Organization\OrganizationUnitOrigin.cs" />
+    <Compile Include="Organization\Strategies\IExternalOrganizationalHierarchyUpdateStrategy.cs" />
+    <Compile Include="Organization\Strategies\StsOrganizationalHierarchyUpdateStrategy.cs" />
+    <Compile Include="Organization\PaymentRegistrationDetails.cs" />
+    <Compile Include="Organization\StsOrganizationConnection.cs" />
+    <Compile Include="Organization\ExternalOrganizationUnit.cs" />
+    <Compile Include="Organization\UnitAccessRights.cs" />
+    <Compile Include="Organization\UnitAccessRightsWithUnitData.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
@@ -238,7 +258,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
-    <Compile Include="Organization\TaskUsage.cs" />
     <Compile Include="Qa\References\BrokenExternalReferencesReport.cs" />
     <Compile Include="Qa\References\BrokenLinkCause.cs" />
     <Compile Include="Qa\References\BrokenLinkInInterface.cs" />
@@ -262,7 +281,9 @@
     <Compile Include="UIConfiguration\UIModuleCustomization.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationConstraints.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Users\AuthenticationScheme.cs" />
     <Compile Include="Users\UserConstraints.cs" />
+    <Compile Include="Users\OrganizationalUserDeletionStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

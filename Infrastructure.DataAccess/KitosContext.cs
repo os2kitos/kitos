@@ -80,7 +80,6 @@ namespace Infrastructure.DataAccess
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<TerminationDeadlineType> TerminationDeadlineTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
-        public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<ArchivePeriod> ArchivePeriods { get; set; }
@@ -159,6 +158,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractOverviewReadModelItSystemUsage> ItContractOverviewReadModelItSystemUsages { get; set; }
         public DbSet<ItContractOverviewRoleAssignmentReadModel> ItContractOverviewRoleAssignmentReadModels { get; set; }
         public DbSet<ItContractOverviewReadModelSystemRelation> ItContractOverviewReadModelSystemRelations { get; set; }
+        public DbSet<StsOrganizationConnection> StsOrganizationConnections { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -204,7 +204,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PurchaseFormTypeMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
-            modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());
             modelBuilder.Configurations.Add(new TerminationDeadlineTypeMap());
             modelBuilder.Configurations.Add(new UserMap());
@@ -256,6 +255,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractOverviewReadModelItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractOverviewRoleAssignmentReadModelMap());
             modelBuilder.Configurations.Add(new ItContractOverviewReadModelSystemRelationMap());
+            modelBuilder.Configurations.Add(new StsOrganizationConnectionMap());
         }
     }
 }

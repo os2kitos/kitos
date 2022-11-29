@@ -41,10 +41,15 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-cross-organization-permissions"), cookie);
         }
 
-        public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null, int organizationId = 0)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/user/{userId}"), cookie);
+            var request = $"api/v1/user/delete/{userId}";
+            if (organizationId != 0)
+            {
+                return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl(request + $"/{organizationId}"), cookie);
+            }
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl(request), cookie);
         }
 
         public static async Task<List<UserWithEmailDTO>> SearchUsersAsync(string query, Cookie optionalLogin = null)

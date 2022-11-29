@@ -55,7 +55,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
         public bool IsActiveAccordingToLifeCycle => CheckLifeCycleValidity().IsNone;
-        public bool IsActiveAccordingToMainContract=> CheckContractValidity().IsNone;
+        public bool IsActiveAccordingToMainContract => CheckContractValidity().IsNone;
 
         /// <summary>
         ///     When the system began. (indgået)
@@ -610,7 +610,8 @@ namespace Core.DomainModel.ItSystemUsage
             if (organizationUnits.Select(x => x.Uuid).Distinct().Count() != organizationUnits.Count)
                 return new OperationError("No duplicates allowed in using org units", OperationFailure.BadInput);
 
-            if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
+            var responsibleOrgUnitIsValid = responsibleOrgUnit.Select(responsible=>organizationUnits.Any(unit=>responsible == unit)).GetValueOrFallback(true);
+            if (!responsibleOrgUnitIsValid)
                 return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
 
             var newOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage
@@ -626,6 +627,105 @@ namespace Core.DomainModel.ItSystemUsage
                 .GetValueOrDefault();
 
             return Maybe<OperationError>.None;
+        }
+
+        private Maybe<ItSystemUsageOrgUnitUsage> GetOrganizationUnitUsage(int organizationUnitId)
+        {
+            return UsedBy.FirstOrDefault(ub => ub.OrganizationUnit.Id == organizationUnitId);
+        }
+
+        public Maybe<OperationError> RemoveResponsibleOrganizationUnit()
+        {
+            return UpdateOrganizationalUsage(GetUsedByOrganizationUnits(), Maybe<OrganizationUnit>.None);
+        }
+
+        public Maybe<OperationError> RemoveUsedByUnit(Guid unitUuid)
+        {
+            var unitResult = GetOrganizationUnit(unitUuid);
+            if (unitResult.IsNone)
+            {
+                return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+            }
+            var unit = unitResult.Value;
+
+            var selectedUnit = GetOrganizationUnitUsage(unit.Id);
+            if (selectedUnit.IsNone)
+            {
+                return new OperationError($"Unit with id: {unit.Id} was not found", OperationFailure.NotFound);
+            }
+
+            var remainingUnits = GetUsedByOrganizationUnits().Where(x => x.Id != unit.Id);
+            Maybe<OrganizationUnit> responsibleUnit = ResponsibleUsage?.OrganizationUnit;
+
+            if (responsibleUnit.Select(organizationUnit => organizationUnit.Id == unit.Id).GetValueOrFallback(false))
+            {
+                responsibleUnit = Maybe<OrganizationUnit>.None;
+            }
+
+            return UpdateOrganizationalUsage(remainingUnits, responsibleUnit);
+        }
+
+        public Maybe<OperationError> TransferResponsibleOrganizationalUnit(Guid targetUnitUuid)
+        {
+            var targetUnitResult = GetOrganizationUnit(targetUnitUuid);
+            if (targetUnitResult.IsNone)
+            {
+                return new OperationError($"Organization unit with uuid: {targetUnitUuid} not found", OperationFailure.NotFound);
+            }
+            var targetUnit = targetUnitResult.Value;
+
+            if (targetUnit.Id == ResponsibleUsage?.OrganizationUnitId)
+            {
+                return Maybe<OperationError>.None;
+            }
+
+            var usedByOrganizationUnits = GetUsedByOrganizationUnits().ToList();
+
+            if (usedByOrganizationUnits.Any(x => x.Id == targetUnit.Id) == false)
+            {
+                usedByOrganizationUnits.Add(targetUnit);
+            }
+
+            return UpdateOrganizationalUsage(usedByOrganizationUnits, targetUnit);
+        }
+
+        public Maybe<OperationError> TransferUsedByUnit(Guid unitUuid, Guid targetUnitUuid)
+        {
+            if (unitUuid == targetUnitUuid)
+            {
+                return Maybe<OperationError>.None;
+            }
+
+            var targetUnitResult = GetOrganizationUnit(targetUnitUuid);
+            if (targetUnitResult.IsNone)
+            {
+                return new OperationError($"Organization unit with uuid: {targetUnitUuid} was not found", OperationFailure.NotFound);
+            }
+            var targetUnit = targetUnitResult.Value;
+
+            var unitResult = GetOrganizationUnit(unitUuid);
+            if (unitResult.IsNone)
+            {
+                return new OperationError($"Organization unit with uuid: {unitUuid} was not found", OperationFailure.NotFound);
+            }
+            var unit = unitResult.Value;
+
+            var selectedUnit = GetOrganizationUnitUsage(unit.Id);
+            if (selectedUnit.IsNone)
+                return new OperationError($"UsedBy organization unit with Id: {unit.Id} was not found", OperationFailure.NotFound);
+
+            var relevantUnits = GetUsedByOrganizationUnits().Where(x => x.Id != unit.Id).ToList();
+            if (relevantUnits.Any(x => x.Id == targetUnit.Id) == false)
+            {
+                relevantUnits.Add(targetUnit);
+            }
+
+            if (unit.Id == ResponsibleUsage?.OrganizationUnit?.Id)
+            {
+                return UpdateOrganizationalUsage(relevantUnits, Maybe<OrganizationUnit>.None);
+            }
+
+            return UpdateOrganizationalUsage(relevantUnits, ResponsibleUsage?.OrganizationUnit);
         }
 
         public Maybe<OperationError> UpdateKLEDeviations(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)
@@ -872,6 +972,16 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             return new ItSystemUsageValidationResult(errors);
+        }
+
+        private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)
+        {
+            return Organization.GetOrganizationUnit(uuid);
+        }
+
+        private IEnumerable<OrganizationUnit> GetUsedByOrganizationUnits()
+        {
+            return UsedBy.Select(x => x.OrganizationUnit).ToList();
         }
 
         private IEnumerable<ItSystemUsageValidationError> CheckDatesValidity(DateTime todayReference)

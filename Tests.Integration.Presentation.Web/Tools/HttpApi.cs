@@ -406,15 +406,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             if (CookiesCache.TryGetValue(userCredentials.Username, out var cachedCookie))
                 return cachedCookie;
 
-            var url = TestEnvironment.CreateUrl("api/authorize");
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
-
-            using var cookieResponse = await WithRetryPolicy(async () =>
-            {
-                var request = CreatePostMessage(url, loginDto);
-
-                return await SendWithCSRFToken(request);
-            });
+            var cookieResponse = await SendGetCookieAsync(userCredentials);
 
             Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
             var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
@@ -423,10 +415,23 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var cookie = new Cookie(cookieName, cookieValue)
             {
-                Domain = url.Host
+                Domain = cookieResponse.RequestMessage.RequestUri.Host
             };
             CookiesCache.TryAdd(userCredentials.Username, cookie);
             return cookie;
+        }
+
+        public static async Task<HttpResponseMessage> SendGetCookieAsync(KitosCredentials userCredentials)
+        {
+            var url = TestEnvironment.CreateUrl("api/authorize");
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
+
+            return await WithRetryPolicy(async () =>
+            {
+                var request = CreatePostMessage(url, loginDto);
+
+                return await SendWithCSRFToken(request);
+            });
         }
 
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role, bool acceptUnAuthorized = false)
@@ -528,13 +533,6 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             using var patch = await PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto);
             Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
-        }
-
-        public static async Task DeleteUserAsync(int id)
-        {
-            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await DeleteWithCookieAsync(TestEnvironment.CreateUrl("api/user/" + id), cookie);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         public static readonly string OdataDateTimeFormat = "O"; //ISO 8601

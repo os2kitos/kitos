@@ -21,8 +21,6 @@
         OwnedByOrganizationUnit: IOrganizationUnit;
         Parent: ITaskRef;
         Children: Array<ITaskRef>;
-        /** Usages of this task */
-        Usages: Array<ITaskUsage>;
         /** ItSystems which have been marked with this task */
         ItSystems: Array<IItSystem>;
         /** ItSystemUsages which have been marked with this task */

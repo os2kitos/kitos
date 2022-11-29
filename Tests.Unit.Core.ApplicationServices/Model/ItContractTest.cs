@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
@@ -657,7 +658,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_Start_Date_Has_Not_Passed(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract()
             {
                 Concluded = now.AddDays(1),
@@ -680,7 +681,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_End_Date_Has_Passed(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract()
             {
                 ExpirationDate = now.AddDays(-1),
@@ -703,7 +704,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_Termination_Deadline_Has_Passed_With_No_TerminationPeriod(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract()
             {
                 Terminated = now.AddDays(-1),
@@ -726,7 +727,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Error_If_Termination_Deadline_Has_Passed_With_And_TerminationPeriod_Passed(bool enforceValid)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var terminationDeadline = new Random(A<int>()).Next(1, 12);
             var sut = new ItContract()
             {
@@ -755,7 +756,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Termination_Deadline_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract
             {
                 Terminated = now.AddDays(dayOffset),
@@ -778,7 +779,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Termination_Deadline_Passed_But_TerminationPeriod_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var terminationDeadline = new Random(A<int>()).Next(1, 12);
             var sut = new ItContract
             {
@@ -806,7 +807,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Start_Date_Has_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract
             {
                 Concluded = now.AddDays(dayOffset),
@@ -830,7 +831,7 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_End_Date_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = A<DateTime>().Date;
+            var now = CreateValidDate();
             var sut = new ItContract
             {
                 ExpirationDate = now.AddDays(dayOffset),
@@ -844,6 +845,227 @@ namespace Tests.Unit.Core.Model
             Assert.True(result.Result);//If not enforced valid we expect the value to be false
             Assert.Equal(enforceValid, result.EnforcedValid);
             Assert.Empty(result.ValidationErrors);
+        }
+
+        [Fact]
+        public void Can_Get_All_Payments()
+        {
+            var externalEconomyId = A<int>();
+            var internalEconomyId = A<int>();
+            var contract = new ItContract()
+            {
+                ExternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = externalEconomyId
+                    }
+                },
+                InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = internalEconomyId
+                    }
+                }
+            };
+            const int expectedNumberOfPayments = 2;
+
+            var result = contract.GetAllPayments().ToList();
+
+            Assert.Equal(expectedNumberOfPayments, result.Count);
+            Assert.Contains(externalEconomyId, result.Select(x => x.Id));
+            Assert.Contains(internalEconomyId, result.Select(x => x.Id));
+        }
+
+        [Fact]
+        public void Can_Get_Internal_Payments_By_UnitId()
+        {
+            var internalEconomyId = A<int>();
+            var unitId = A<int>();
+            var contract = new ItContract()
+            {
+                InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = internalEconomyId,
+                        OrganizationUnitId = unitId
+                    },
+                    new()
+                    {
+                        Id = A<int>(),
+                        OrganizationUnitId = A<int>()
+                    }
+                }
+            };
+
+            var result = contract.GetInternalPaymentsForUnit(unitId).ToList();
+
+            Assert.Single(result);
+            Assert.Contains(internalEconomyId, result.Select(x => x.Id));
+            Assert.Contains(unitId, result.Select(x => x.OrganizationUnitId));
+        }
+
+        [Fact]
+        public void Can_Get_External_Payments_By_UnitId()
+        {
+            var externalEconomyId = A<int>();
+            var unitId = A<int>();
+            var contract = new ItContract()
+            {
+                ExternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = externalEconomyId,
+                        OrganizationUnitId = unitId
+                    },
+                    new()
+                    {
+                        Id = A<int>(),
+                        OrganizationUnitId = A<int>()
+                    }
+                }
+            };
+
+            var result = contract.GetExternalPaymentsForUnit(unitId).ToList();
+
+            Assert.Single(result);
+            Assert.Contains(externalEconomyId, result.Select(x => x.Id));
+            Assert.Contains(unitId, result.Select(x => x.OrganizationUnitId));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Reset_EconomyStream(bool isInternal)
+        {
+            var id = A<int>();
+            var unit = new OrganizationUnit {Id = A<int>()};
+            var contract = new ItContract();
+            if (isInternal)
+            {
+                contract.InternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = id,
+                        OrganizationUnit = unit,
+                    }
+                };
+            }
+            else
+            {
+                contract.ExternEconomyStreams = new List<EconomyStream>
+                {
+                    new()
+                    {
+                        Id = id,
+                        OrganizationUnit = unit,
+                    }
+                };
+            }
+
+            var error = contract.ResetEconomyStreamOrganizationUnit(id, isInternal);
+
+            Assert.True(error.IsNone);
+            if (isInternal)
+            {
+                var intern = contract.InternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(intern);
+                Assert.Null(intern.OrganizationUnit);
+            }
+            else
+            {
+                var external = contract.ExternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(external);
+                Assert.Null(external.OrganizationUnit);
+            }
+        }
+
+        [Fact]
+        public void Remove_EconomyStream_Returns_NotFound()
+        {
+            var id = A<int>();
+            var contract = new ItContract();
+            var expectedErrorMessage = $"EconomyStream with id: {id} was not found";
+
+            var error = contract.ResetEconomyStreamOrganizationUnit(id, A<bool>());
+
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+            Assert.Equal(expectedErrorMessage, error.Value.Message);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Transfer_EconomyStream(bool isInternal)
+        {
+            var id = A<int>();
+            var unit = new OrganizationUnit {Id = A<int>()};
+            var targetUnit = new OrganizationUnit {Uuid = A<Guid>()};
+            var contract = new ItContract()
+            {
+                Organization = new Organization()
+                {
+                    OrgUnits = new List<OrganizationUnit>()
+                    {
+                        targetUnit
+                    }
+                }
+            };
+            var economyStream = new EconomyStream
+            {
+                Id = id,
+                OrganizationUnit = unit,
+            };
+
+            if (isInternal)
+            {
+                contract.InternEconomyStreams = new List<EconomyStream> { economyStream };
+            }
+            else
+            {
+                contract.ExternEconomyStreams = new List<EconomyStream> { economyStream };
+            }
+
+            var error = contract.TransferEconomyStream(id, targetUnit.Uuid, isInternal);
+
+            Assert.True(error.IsNone);
+            if (isInternal)
+            {
+                var intern = contract.InternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(intern);
+                Assert.Equal(intern.OrganizationUnit.Uuid, targetUnit.Uuid);
+            }
+            else
+            {
+                var external = contract.ExternEconomyStreams.FirstOrDefault();
+                Assert.NotNull(external);
+                Assert.Equal(external.OrganizationUnit.Uuid, targetUnit.Uuid);
+            }
+        }
+
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Transfer_EconomyStream_Returns_NotFound(bool isInternal)
+        {
+            var id = A<int>();
+            var contract = new ItContract(){Organization = new Organization()};
+
+            var error = contract.TransferEconomyStream(id, A<Guid>(), isInternal);
+
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+        }
+
+        private DateTime CreateValidDate()
+        {
+            return DateTime.Now.AddMonths(new Random(A<int>()).Next(-30, 30));
         }
     }
 }

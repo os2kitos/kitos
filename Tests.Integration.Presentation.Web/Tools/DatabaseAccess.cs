@@ -59,7 +59,12 @@ namespace Tests.Integration.Presentation.Web.Tools
         /// <returns></returns>
         public static Guid GetEntityUuid<T>(int dbId) where T : class, IHasUuid, IHasId
         {
-            return DatabaseAccess.MapFromEntitySet<T, Guid>(x => x.AsQueryable().ById(dbId).Uuid);
+            return MapFromEntitySet<T, Guid>(x => x.AsQueryable().ById(dbId).Uuid);
+        }
+
+        public static int GetEntityId<T>(Guid uuid) where T : class, IHasUuid, IHasId
+        {
+            return MapFromEntitySet<T, int>(x => x.AsQueryable().ByUuid(uuid).Id);
         }
     }
 }

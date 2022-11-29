@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Contracts;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Queries;
 
 
@@ -26,6 +27,10 @@ namespace Core.ApplicationServices.Contract
         Maybe<OperationError> ValidateNewName(int contractId, string name);
         IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions);
         Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId);
-        Result<IEnumerable<(int year, int quarter)>,OperationError> GetAppliedProcurementPlans(int organizationId);
+        Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlans(int organizationId);
+        Maybe<OperationError> SetResponsibleUnit(int contractId, Guid targetUnitUuid);
+        Maybe<OperationError> RemoveResponsibleUnit(int contractId);
+        Maybe<OperationError> RemovePaymentResponsibleUnits(int contractId, bool isInternal, IEnumerable<int> paymentIds);
+        Maybe<OperationError> TransferPayments(int contractId, Guid targetUnitUuid, bool isInternal, IEnumerable<int> paymentIds);
     }
 }

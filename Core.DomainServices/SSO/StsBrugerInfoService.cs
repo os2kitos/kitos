@@ -78,7 +78,7 @@ namespace Core.DomainServices.SSO
                 var stdOutput = laesResponseResult.LaesResponse1?.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
-                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                var stsError = stdOutput?.StatusKode.ParseStsErrorFromStandardResultCode() ?? Maybe<StsError>.None;
                 if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested user '{uuid}' from cvr '{cvrNumber}' was not found. STS Bruger endpoint returned '{returnCode}:{errorCode}'";
 
@@ -179,7 +179,7 @@ namespace Core.DomainServices.SSO
                 var stdOutput = laesResponse.LaesResponse1?.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
-                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                var stsError = stdOutput?.StatusKode.ParseStsErrorFromStandardResultCode() ?? Maybe<StsError>.None;
                 if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested email address '{emailAdresseUuid}' from cvr '{cvrNumber}' was not found. STS Adresse endpoint returned '{returnCode}:{errorCode}'";
 
@@ -237,7 +237,7 @@ namespace Core.DomainServices.SSO
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
 
-                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                var stsError = stdOutput?.StatusKode.ParseStsErrorFromStandardResultCode() ?? Maybe<StsError>.None;
                 if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested person '{personUuid}' from cvr '{cvrNumber}' was not found. STS Person endpoint returned '{returnCode}:{errorCode}'";
 

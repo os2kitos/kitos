@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 // ReSharper disable VirtualMemberCallInConstructor
@@ -14,12 +17,25 @@ namespace Core.DomainModel.Organization
         public const int MaxNameLength = 100;
         public OrganizationUnit()
         {
-            TaskUsages = new List<TaskUsage>();
             OwnedTasks = new List<TaskRef>();
             DefaultUsers = new List<OrganizationRight>();
             Using = new List<ItSystemUsageOrgUnitUsage>();
-            Uuid = Guid.NewGuid();
+            var uuid = Guid.NewGuid();
+            Uuid = uuid;
+            Origin = OrganizationUnitOrigin.Kitos;
+            Children = new List<OrganizationUnit>();
+            ResponsibleForItContracts = new List<ItContract.ItContract>();
+            EconomyStreams = new List<EconomyStream>();
         }
+
+        /// <summary>
+        /// Determines the origin of the organization unit
+        /// </summary>
+        public OrganizationUnitOrigin Origin { get; set; }
+        /// <summary>
+        /// Determines the optional external origin-specific uuid
+        /// </summary>
+        public Guid? ExternalOriginUuid { get; set; }
 
         public string LocalId { get; set; }
 
@@ -42,24 +58,10 @@ namespace Core.DomainModel.Organization
         /// The organization which the unit belongs to.
         /// </summary>
         public virtual Organization Organization { get; set; }
-
-        /// <summary>
-        /// The usage of task on this Organization Unit.
-        /// Should be a subset of the TaskUsages of the parent department.
-        /// </summary>
-        public virtual ICollection<TaskUsage> TaskUsages { get; set; }
-
         /// <summary>
         /// Local tasks that was created in this unit
         /// </summary>
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
-        /// <summary>
-        /// Gets or sets the delegated system usages.
-        /// </summary>
-        /// <value>
-        /// The delegated system usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
 
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.
@@ -112,5 +114,135 @@ namespace Core.DomainModel.Organization
         }
 
         public Guid Uuid { get; set; }
+
+        public Maybe<OperationError> ImportNewExternalOrganizationOrgTree(OrganizationUnitOrigin origin, ExternalOrganizationUnit importRoot)
+        {
+            if (importRoot == null)
+            {
+                throw new ArgumentNullException(nameof(importRoot));
+            }
+            if (Origin == origin)
+            {
+                return new OperationError("Org unit already connected. Please do an update in stead", OperationFailure.BadState);
+            }
+
+            //Switch the origin of the root
+            Origin = origin;
+            ExternalOriginUuid = importRoot.Uuid;
+            Name = importRoot.Name;
+
+            foreach (var organizationUnit in importRoot.Children.Select(child => child.ToOrganizationUnit(origin, Organization)).ToList())
+            {
+                Children.Add(organizationUnit);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ConvertToNativeKitosUnit()
+        {
+            if (Origin == OrganizationUnitOrigin.Kitos)
+            {
+                throw new InvalidOperationException("Already a KITOS unit");
+            }
+
+            Origin = OrganizationUnitOrigin.Kitos;
+            ExternalOriginUuid = null;
+        }
+
+        public bool IsNativeKitosUnit()
+        {
+            return Origin == OrganizationUnitOrigin.Kitos;
+        }
+
+        public bool IsUsed()
+        {
+            return Using.Any() || EconomyStreams.Any() || ResponsibleForItContracts.Any() || Rights.Any();
+        }
+
+        public Maybe<OperationError> AddChild(OrganizationUnit child)
+        {
+            if (child == null) throw new ArgumentNullException(nameof(child));
+
+            if (child.Organization != Organization)
+            {
+                return new OperationError($"child with uuid {child.Uuid} is from a different organization", OperationFailure.BadInput);
+            }
+
+            if (Children.Any(c => c.Uuid == child.Uuid))
+            {
+                return new OperationError($"child with uuid {child.Uuid} already added", OperationFailure.BadInput);
+            }
+
+            Children.Add(child);
+            child.Parent = this;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateName(string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                return new OperationError($"newName must be defined in this unit with id {Id}", OperationFailure.BadInput);
+            }
+
+            if (newName.Length > MaxNameLength)
+            {
+                return new OperationError($"newName exceeds the max length of {MaxNameLength}", OperationFailure.BadInput);
+            }
+
+            Name = newName;
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemoveChild(OrganizationUnit child)
+        {
+            if (child == null) throw new ArgumentNullException(nameof(child));
+            if (!Children.Remove(child))
+            {
+                return new OperationError($"Child with id:{child.Id} could not be removed from this unit with id {Id} as it is not a child of this unit", OperationFailure.BadInput);
+            }
+
+            child.ResetParent();
+            return Maybe<OperationError>.None;
+        }
+
+        public OrganizationUnitRegistrationDetails GetUnitRegistrations()
+        {
+            return new OrganizationUnitRegistrationDetails
+            (
+                Rights.ToList(),
+                ResponsibleForItContracts.ToList(),
+                GetUnitPayments().ToList(),
+                Using.Where(x => x.ResponsibleItSystemUsage != null).Select(x => x.ResponsibleItSystemUsage).ToList(),
+                Using.Select(x => x.ItSystemUsage).ToList()
+            );
+        }
+
+        public Maybe<OrganizationUnitRight> GetRight(int rightId)
+        {
+            return Rights.FirstOrDefault(x => x.Id == rightId);
+        }
+
+        private IEnumerable<PaymentRegistrationDetails> GetUnitPayments()
+        {
+            var internContracts = EconomyStreams.Where(x => x.InternPaymentFor != null).Select(x => x.InternPaymentFor).ToList();
+            var externContracts = EconomyStreams.Where(x => x.ExternPaymentFor != null).Select(x => x.ExternPaymentFor).ToList();
+            var contracts = internContracts.Concat(externContracts).GroupBy(x => x.Id).Select(x => x.First()).ToList();
+
+            return contracts
+                .Select(itContract =>
+                    new PaymentRegistrationDetails(
+                        itContract,
+                        itContract.GetInternalPaymentsForUnit(Id),
+                        itContract.GetExternalPaymentsForUnit(Id)))
+                .ToList();
+        }
+
+        public void ResetParent()
+        {
+            Parent = null;
+        }
     }
 }

@@ -82,7 +82,7 @@ namespace Tests.Integration.Presentation.Web.Users
 
             // Act
             var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organization.Id}/users/{userWithRoles.userId}/roles/range/transfer");
-            using var deleteResult = await HttpApi.PatchWithCookieAsync(url, globalAdminCookie,
+            using var patchResult = await HttpApi.PatchWithCookieAsync(url, globalAdminCookie,
                 new TransferRightsRequestDTO
                 {
                     ToUserId = anotherUser.userId,
@@ -90,6 +90,7 @@ namespace Tests.Integration.Presentation.Web.Users
                     BusinessRights = resultAfterAssign.Rights
                 });
             // Assert
+            Assert.Equal(HttpStatusCode.OK,patchResult.StatusCode);
             var getAfterTransferOriginalUser = await GetUserRolesAsync(organization, userWithRoles, globalAdminCookie);
             var getAfterTransferReceivingUser = await GetUserRolesAsync(organization, anotherUser, globalAdminCookie);
             AssertGetRolesResult(getAfterTransferOriginalUser, Enumerable.Empty<OrganizationRole>(), Enumerable.Empty<BusinessRoleScope>());

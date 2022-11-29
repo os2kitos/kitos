@@ -33,58 +33,49 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IReferenceService> _referenceService;
-        private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
-        private readonly Mock<IOptionsService<ItContract, CriticalityType>> _criticalityOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, ItContractType>> _contractTypeOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, ItContractTemplateType>> _contractTemplateOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, PurchaseFormType>> _purchaseFromOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, ProcurementStrategyType>> _procurementStrategyOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, PaymentModelType>> _paymentModelOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, PaymentFreqencyType>> _paymentFreqencyOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, OptionExtendType>> _optionExtendOptionsServiceMock;
-        private readonly Mock<IOptionsService<ItContract, TerminationDeadlineType>> _terminationDeadlineOptionsServiceMock;
 
         public ItContractServiceTest()
         {
             _contractRepository = new Mock<IItContractRepository>();
-            _economyStreamRepository = new Mock<IGenericRepository<EconomyStream>>();
             _transactionManager = new Mock<ITransactionManager>();
             _domainEvents = new Mock<IDomainEvents>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _referenceService = new Mock<IReferenceService>();
-            _logger = new Mock<ILogger>();
+            var logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
-            _criticalityOptionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
-            _contractTypeOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractType>>();
-            _contractTemplateOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractTemplateType>>();
-            _purchaseFromOptionsServiceMock = new Mock<IOptionsService<ItContract, PurchaseFormType>>();
-            _procurementStrategyOptionsServiceMock = new Mock<IOptionsService<ItContract, ProcurementStrategyType>>();
-            _paymentModelOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentModelType>>();
-            _paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
-            _optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
-            _terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
+            var criticalityOptionsServiceMock = new Mock<IOptionsService<ItContract, CriticalityType>>();
+            var contractTypeOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractType>>();
+            var contractTemplateOptionsServiceMock = new Mock<IOptionsService<ItContract, ItContractTemplateType>>();
+            var purchaseFromOptionsServiceMock = new Mock<IOptionsService<ItContract, PurchaseFormType>>();
+            var procurementStrategyOptionsServiceMock = new Mock<IOptionsService<ItContract, ProcurementStrategyType>>();
+            var paymentModelOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentModelType>>();
+            var paymentFreqencyOptionsServiceMock = new Mock<IOptionsService<ItContract, PaymentFreqencyType>>();
+            var optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
+            var terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
+            _economyStreamRepository = new Mock<IGenericRepository<EconomyStream>>();
+
             _sut = new ItContractService(
                 _contractRepository.Object,
-                _economyStreamRepository.Object,
                 _referenceService.Object,
                 _transactionManager.Object,
                 _domainEvents.Object,
                 _authorizationContext.Object,
-                _logger.Object,
+                logger.Object,
                 _contractDataProcessingRegistrationAssignmentService.Object,
                 _userContextMock.Object,
-                _criticalityOptionsServiceMock.Object,
-                _contractTypeOptionsServiceMock.Object,
-                _contractTemplateOptionsServiceMock.Object,
-                _purchaseFromOptionsServiceMock.Object,
-                _procurementStrategyOptionsServiceMock.Object,
-                _paymentModelOptionsServiceMock.Object,
-                _paymentFreqencyOptionsServiceMock.Object,
-                _optionExtendOptionsServiceMock.Object,
-                _terminationDeadlineOptionsServiceMock.Object);
+                criticalityOptionsServiceMock.Object,
+                contractTypeOptionsServiceMock.Object,
+                contractTemplateOptionsServiceMock.Object,
+                purchaseFromOptionsServiceMock.Object,
+                procurementStrategyOptionsServiceMock.Object,
+                paymentModelOptionsServiceMock.Object,
+                paymentFreqencyOptionsServiceMock.Object,
+                optionExtendOptionsServiceMock.Object,
+                terminationDeadlineOptionsServiceMock.Object,
+                _economyStreamRepository.Object);
         }
 
         [Fact]
@@ -143,7 +134,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var result = _sut.Delete(contractId);
 
             //Assert
-            Assert.True(result.Ok);
+            Assert.True(result.Ok); 
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(It.IsAny<EconomyStream>()), Times.Exactly(4));
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(externEconomyStream1), Times.Once);
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(externEconomyStream2), Times.Once);
@@ -558,19 +549,224 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.Equal(expectedResult, activePlans);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_RemovePaymentResponsibleUnits(bool isInternal)
+        {
+            //Arrange
+            var id = A<int>();
+            var contract = new ItContract();
+            var economyStreamId = A<int>();
+            var economyStreamIdList = new List<int>() {economyStreamId};
+            var economyStream = new EconomyStream(){Id = economyStreamId};
+
+            if (isInternal)
+            {
+                contract.InternEconomyStreams.Add(economyStream);
+            }
+            else
+            {
+                contract.ExternEconomyStreams.Add(economyStream);
+            }
+
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.RemovePaymentResponsibleUnits(id, isInternal, economyStreamIdList);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _contractRepository.Verify(x => x.Update(contract));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Cannot_RemovePaymentResponsibleUnits_If_Contract_Is_Not_Found(bool isInternal)
+        {
+            Test_Command_Which_Fails_With_Contract_NotFound(id => _sut.RemovePaymentResponsibleUnits(id, isInternal, new List<int>()));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Cannot_RemovePaymentResponsibleUnits_If_Write_Access_Is_Denied(bool isInternal)
+        {
+            Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.RemovePaymentResponsibleUnits(id, isInternal, new List<int>()));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_TransferPayments(bool isInternal)
+        {
+            //Arrange
+            var id = A<int>();
+            var targetUnitUuid = A<Guid>();
+            var contract = SetupContractWithOrganizationAndUnit(id, targetUnitUuid);
+
+            var economyStreamId = A<int>();
+            var economyStreamIdList = new List<int> {economyStreamId};
+            var economyStream = new EconomyStream {Id = economyStreamId};
+
+            if (isInternal)
+            {
+                contract.InternEconomyStreams.Add(economyStream);
+            }
+            else
+            {
+                contract.ExternEconomyStreams.Add(economyStream);
+            }
+
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.TransferPayments(id, targetUnitUuid, isInternal, economyStreamIdList);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _contractRepository.Verify(x => x.Update(contract));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Cannot_TransferPayments_If_Contract_Is_Not_Found(bool isInternal)
+        {
+            Test_Command_Which_Fails_With_Contract_NotFound(id => _sut.TransferPayments(id, A<Guid>(), isInternal, new List<int>()));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Cannot_TransferPayments_If_Write_Access_Is_Denied(bool isInternal)
+        {
+            Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.TransferPayments(id, A<Guid>(), isInternal, new List<int>()));
+        }
+
+        [Fact]
+        public void Can_SetResponsibleUnit()
+        {
+            //Arrange
+            var id = A<int>();
+            var targetUnitUuid = A<Guid>();
+            var contract = SetupContractWithOrganizationAndUnit(id, targetUnitUuid);
+
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.SetResponsibleUnit(id, targetUnitUuid);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _contractRepository.Verify(x => x.Update(contract));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_SetResponsibleUnit_If_Contract_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Contract_NotFound(id => _sut.SetResponsibleUnit(id, A<Guid>()));
+        }
+
+        [Fact]
+        public void Cannot_SetResponsibleUnit_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.SetResponsibleUnit(id, A<Guid>()));
+        }
+
+        [Fact]
+        public void Can_RemoveResponsibleUnit()
+        {
+            //Arrange
+            var id = A<int>();
+            var targetUnitUuid = A<Guid>();
+            var contract = SetupContractWithOrganizationAndUnit(id, targetUnitUuid);
+
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.RemoveResponsibleUnit(id);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _contractRepository.Verify(x => x.Update(contract));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_RemoveResponsibleUnit_If_Contract_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Contract_NotFound(id => _sut.RemoveResponsibleUnit(id));
+        }
+
+        [Fact]
+        public void Cannot_RemoveResponsibleUnit_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.RemoveResponsibleUnit(id));
+        }
+
         private void ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel crossOrganizationReadAccessLevel)
         {
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(crossOrganizationReadAccessLevel);
         }
 
-        private List<ItContract> CreateListOfContracts(int numberOfItems)
+        private IEnumerable<ItContract> CreateListOfContracts(int numberOfItems)
         {
             var contracts = new List<ItContract>();
-            for (int i = 0; i < numberOfItems; i++)
+            for (var i = 0; i < numberOfItems; i++)
             {
                 contracts.Add(new ItContract() { Id = A<int>() });
             }
             return contracts;
+        }
+
+        private ItContract SetupContractWithOrganizationAndUnit(int id, Guid unitUuid)
+        {
+            var contract = CreateContract(id);
+            contract.Organization = CreateOrganization();
+            contract.Organization.OrgUnits.Add(CreateOrganizationUnit(unitUuid));
+
+            return contract;
+        }
+
+        private ItContract CreateContract(int id)
+        {
+            return new ItContract()
+            {
+                Id = id
+            };
+        }
+
+        private Organization CreateOrganization()
+        {
+            return new Organization()
+            {
+                OrgUnits = new List<OrganizationUnit>()
+            };
+        }
+
+        private OrganizationUnit CreateOrganizationUnit(Guid uuid)
+        {
+            return new OrganizationUnit
+            {
+                Uuid = uuid
+            };
         }
 
         private EconomyStream CreateEconomyStream()
@@ -655,6 +851,45 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Contract not found" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Contract_NotFound(Func<int, Maybe<OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetContractReturns(id, null);
+
+            //Act
+            var error = command(id);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+        }
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Missing Write access" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(Func<int, Maybe<OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            var contract = new ItContract();
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, false);
+
+            //Act
+            var result = command(id);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
     }
 }

@@ -31,28 +31,9 @@
                                 .create(Kitos.Services.LocalOptions.LocalOptionType.ProcurementStrategyTypes).getAll()
                     ],
                     orgUnits: [
-                        '$http', 'contract', function ($http, contract) {
-                            return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
-                                var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = [];
-
-                                function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
-                                    var option = {
-                                        id: String(orgUnit.id),
-                                        text: orgUnit.name,
-                                        indentationLevel: indentationLevel
-                                    };
-
-                                    options.push(option);
-
-                                    _.each(orgUnit.children, function (child) {
-                                        return visit(child, indentationLevel + 1);
-                                    });
-
-                                }
-                                visit(result.data.response, 0);
-                                return options;
-                            });
-                        }
+                        "organizationApiService", "contract", (organizationApiService: Kitos.Services.IOrganizationApiService, contract) =>
+                            organizationApiService.getOrganizationUnit(contract.organizationId).then(result =>
+                                Kitos.Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0))
                     ],
                     kitosUsers: [
                         '$http', 'user', '_', function ($http, user, _) {

@@ -1,4 +1,3 @@
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -9,7 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Properties
             this.Property(x => x.OrganizationId).HasUniqueIndexAnnotation("UX_LocalId", 0);
-            this.Property(x => x.LocalId).HasMaxLength(100).HasUniqueIndexAnnotation("UX_LocalId", 1);
+            this.Property(x => x.LocalId).HasMaxLength(OrganizationUnit.MaxNameLength).HasUniqueIndexAnnotation("UX_LocalId", 1);
 
             // Table & Column Mappings
             this.ToTable("OrganizationUnit");
@@ -33,6 +32,16 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_OrganizationUnit_UUID", 0);
+
+
+            Property(x => x.ExternalOriginUuid)
+                .IsOptional()
+                //Non-unique index since it's an external origin uuid determined by an external system
+                .HasIndexAnnotation("IX_OrganizationUnit_UUID");
+
+            Property(x => x.Origin)
+                .IsRequired()
+                .HasIndexAnnotation("IX_OrganizationUnit_Origin");
         }
     }
 }
