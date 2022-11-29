@@ -3,6 +3,7 @@
 
     export interface IOrganizationApiService {
         getOrganization(id: number): angular.IPromise<Models.Api.Organization.Organization>;
+        getPermissions(uuid: string): angular.IPromise<Models.Api.Organization.OrganizationPermissionsDTO>;
         getOrganizationDeleteConflicts(uuid: string) : angular.IPromise<Models.Api.Organization.OrganizationDeleteConflicts>;
         getOrganizationUnit(organizationId: number): angular.IPromise<Models.Api.Organization.OrganizationUnit>;
         deleteOrganization(uuid: string, enforce : boolean): angular.IPromise<boolean>;
@@ -29,7 +30,11 @@
         static $inject: string[] = ["$http"];
         private readonly apiWrapper: Services.Generic.ApiWrapper;
         constructor($http: ng.IHttpService) {
-            this.apiWrapper = new Services.Generic.ApiWrapper($http);
+            this.apiWrapper = new Services.Generic.ApiWrapper($http); 
+        }
+
+        getPermissions(uuid: string): ng.IPromise<Models.Api.Organization.OrganizationPermissionsDTO> {
+            return this.apiWrapper.getDataFromUrl<Models.Api.Organization.OrganizationPermissionsDTO>(`api/v1/organizations/${uuid}/permissions`);
         }
     }
 

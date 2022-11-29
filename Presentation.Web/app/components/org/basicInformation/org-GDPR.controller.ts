@@ -3,32 +3,38 @@
 
     class OrganizationGDPRController {
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess",
-            "organization", "dataResponsible", "dataProtectionAdvisor", "contactPerson", "emailExists"];
+        public static $inject: string[] = [
+            "$http",
+            "$scope",
+            "user",
+            "hasWriteAccess",
+            "organization",
+            "dataResponsible",
+            "dataProtectionAdvisor",
+            "contactPerson",
+            "emailExists",
+            "canEditCvr"
+        ];
         public updateOrgUrl: string;
         public updatedataProtectionAdvisorUrl: string;
         public updatedataResponsibleUrl: string;
         public updateContactPersonUrl: string;
-
+        public canCvrBeModified: boolean;
         public _$scope: any;
         public _contactPerson: any;
         public _user: any;
 
         constructor(
             private $http: ng.IHttpService,
-            private $timeout: ng.ITimeoutService,
-            private _: ILoDashWithMixins,
-            private $: JQueryStatic,
-            private $state: ng.ui.IStateService,
-            private $scope,
-            private notify,
-            private user,
+            $scope,
+            user,
             private hasWriteAccess,
             private organization,
             private dataResponsible,
             private dataProtectionAdvisor,
             private contactPerson,
-            private emailExists: boolean) {
+            emailExists: boolean,
+            canEditCvr: boolean) {
 
             this.hasWriteAccess = hasWriteAccess;
             this.organization = organization;
@@ -43,9 +49,10 @@
 
             this._contactPerson = contactPerson;
             this._user = user;
+            this.canCvrBeModified = canEditCvr;
 
             if (this.hasWriteAccess) {
-                this._$scope.$watch("_emailExists", ((newValue, oldValue) => {
+                this._$scope.$watch("_emailExists", ((newValue, _) => {
                     if (newValue) {
                         this.$http.get<any>('odata/GetUserByEmail(email=\'' + this.contactPerson.email + '\')')
                             .then((result) => {
@@ -78,8 +85,8 @@
                     ],
                     userAccessRights: ["authorizationServiceFactory", "user",
                         (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, user) =>
-                        authorizationServiceFactory
-                        .createOrganizationAuthorization()
+                            authorizationServiceFactory
+                                .createOrganizationAuthorization()
                                 .getAuthorizationForItem(user.currentOrganizationId)
                     ],
                     hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
@@ -89,12 +96,12 @@
                             .then(function (result) {
                                 return result.data.response;
                             });
-                }],
+                    }],
                     dataResponsible: ['$http', 'organization', function ($http, organization) {
                         return $http.get('api/dataResponsible/' + organization.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
+                            .then(function (result) {
+                                return result.data.response;
+                            });
                     }],
                     dataProtectionAdvisor: ['$http', 'organization', function ($http, organization) {
                         //get by org id
@@ -115,10 +122,16 @@
                         if (contactPerson != null) {
                             return $http.get('/odata/Users/Users.IsEmailAvailable(email=\'' + contactPerson.email + '\')')
                                 .then(function (response) {
-                                    if (response.data.value) {return false;} else {return true;};
+                                    if (response.data.value) { return false; } else { return true; };
                                 });
-                       }
-                      return false;
+                        }
+                        return false;
+                    }],
+                    canEditCvr: ['organizationApiService', 'user', function (organizationApiService: Services.IOrganizationApiService, user) {
+                        //get by org id
+                        return organizationApiService
+                            .getPermissions(user.currentOrganizationUuid)
+                            .then(permissions => permissions.canEditCvr);
                     }]
                 }
             });
