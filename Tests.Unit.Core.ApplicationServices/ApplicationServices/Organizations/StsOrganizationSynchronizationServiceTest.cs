@@ -7,7 +7,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
-using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -15,6 +14,7 @@ using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -36,8 +36,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
         private readonly ActiveUserIdContext _activeUserIdContext;
-        private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
+        private readonly Mock<IOperationClock> _operationClock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -50,8 +50,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
             _activeUserIdContext = new ActiveUserIdContext(A<int>());
-            _userRepositoryMock = new Mock<IUserRepository>();
             _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
+            _operationClock = new Mock<IOperationClock>();
 
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
@@ -64,8 +64,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _domainEventsMock.Object,
                 _organizationUnitRepositoryMock.Object,
                 _activeUserIdContext,
-                _userRepositoryMock.Object,
-                _stsOrganziationChangeLogRepositoryMock.Object);
+                _stsOrganziationChangeLogRepositoryMock.Object,
+                _operationClock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -208,7 +208,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             var transaction = ExpectTransaction();
 
             //Act
@@ -234,7 +233,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Verify that the logs were added
             var logs = connection.StsOrganizationChangeLogs.ToList();
             var log = Assert.Single(logs);
-            foreach (var consequenceLog in log.ConsequenceLogs)
+            foreach (var consequenceLog in log.Entries)
             {
                 Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, consequenceLog.Type);
             }
@@ -338,7 +337,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             var transaction = ExpectTransaction();
 
             //Act
@@ -603,7 +601,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -613,7 +610,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Renamed, log.Type);
         }
         
@@ -640,7 +637,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -650,7 +646,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, log.Type);
         }
 
@@ -677,7 +673,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -687,7 +682,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Deleted, log.Type);
         }
 
@@ -716,7 +711,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -726,7 +720,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Converted, log.Type);
         }
 
@@ -758,7 +752,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            SetupGetUserReturns(_activeUserIdContext.ActiveUserId, new User());
             ExpectTransaction();
 
             //Act
@@ -768,7 +761,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.False(error.HasValue);
 
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
-            var log = Assert.Single(changeLog.ConsequenceLogs);
+            var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Moved, log.Type);
         }
 
@@ -778,7 +771,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var orgUuid = A<Guid>();
 
             var logs = new List<StsOrganizationConsequenceLog> { new (), new () };
-            var changeLogs = new List<StsOrganizationChangeLog> { new () { ConsequenceLogs = logs }, new() { ConsequenceLogs = logs } };
+            var changeLogs = new List<StsOrganizationChangeLog> { new () { Entries = logs }, new() { Entries = logs } };
 
             var stsOrganizationConnection = new StsOrganizationConnection
             {
@@ -800,7 +793,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(result.Ok);
             var logResult = Assert.Single(result.Value);
             ;
-            Assert.Equal(2, logResult.ConsequenceLogs.Count);
+            Assert.Equal(2, logResult.GetEntries().Count());
         }
 
         [Fact]
@@ -864,11 +857,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void SetupGetOrganizationReturns(Guid organizationId, Result<Organization, OperationError> organization)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(organizationId, null)).Returns(organization);
-        }
-
-        private void SetupGetUserReturns(int userId, User user)
-        {
-            _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(user);
         }
 
         private void SetupHasPermissionReturns(Organization organization, bool value)

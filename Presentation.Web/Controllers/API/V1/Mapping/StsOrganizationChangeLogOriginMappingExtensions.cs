@@ -9,15 +9,15 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
 {
     public static class StsOrganizationChangeLogOriginMappingExtensions
     {
-        private static readonly IReadOnlyDictionary<StsOrganizationChangeLogOrigin, StsOrganizationChangeLogOriginOption> ApiToDataMap;
-        private static readonly IReadOnlyDictionary<StsOrganizationChangeLogOriginOption, StsOrganizationChangeLogOrigin> DataToApiMap;
+        private static readonly IReadOnlyDictionary<ExternalOrganizationChangeLogResponsible, StsOrganizationChangeLogOriginOption> ApiToDataMap;
+        private static readonly IReadOnlyDictionary<StsOrganizationChangeLogOriginOption, ExternalOrganizationChangeLogResponsible> DataToApiMap;
 
         static StsOrganizationChangeLogOriginMappingExtensions()
         {
-            ApiToDataMap = new Dictionary<StsOrganizationChangeLogOrigin, StsOrganizationChangeLogOriginOption>
+            ApiToDataMap = new Dictionary<ExternalOrganizationChangeLogResponsible, StsOrganizationChangeLogOriginOption>
             {
-                { StsOrganizationChangeLogOrigin.Background, StsOrganizationChangeLogOriginOption.Background},
-                { StsOrganizationChangeLogOrigin.User, StsOrganizationChangeLogOriginOption.User },
+                { ExternalOrganizationChangeLogResponsible.Background, StsOrganizationChangeLogOriginOption.Background},
+                { ExternalOrganizationChangeLogResponsible.User, StsOrganizationChangeLogOriginOption.User },
             }.AsReadOnly();
 
             DataToApiMap = ApiToDataMap
@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
                 .AsReadOnly();
         }
 
-        public static StsOrganizationChangeLogOriginOption ToStsOrganizationChangeLogOriginOption(this StsOrganizationChangeLogOrigin value)
+        public static StsOrganizationChangeLogOriginOption ToStsOrganizationChangeLogOriginOption(this ExternalOrganizationChangeLogResponsible value)
         {
             return ApiToDataMap.TryGetValue(value, out var result)
                 ? result

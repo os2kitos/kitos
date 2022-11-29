@@ -122,7 +122,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("connection/change-log")]
-        public HttpResponseMessage GetLastNumberOfChangeLogsForOrganization(Guid organizationId, int numberOfChangeLogs)
+        public HttpResponseMessage GetChangeLogs(Guid organizationId, int numberOfChangeLogs)
         {
             return _stsOrganizationSynchronizationService.GetChangeLogs(organizationId, numberOfChangeLogs)
                 .Select(MapChangeLogResponseDtos)
@@ -132,16 +132,24 @@ namespace Presentation.Web.Controllers.API.V1
         #region DTO Mapping
         private ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
         {
-            var logs = consequences.ConvertConsequencesToConsequenceLogs();
-            var dtos = MapConsequenceLogsToDtos(logs);
+            var logEntries = consequences
+                .ConvertConsequencesToConsequenceLogs()
+                .Transform(MapConsequenceLogsToDtos)
+                .Transform(OrderLogEntries);
 
             return new ConnectionUpdateConsequencesResponseDTO
             {
-                Consequences = dtos
-                    .OrderBy(x => x.Name)
-                    .ThenBy(x => x.Category)
-                    .ToList()
+                Consequences = logEntries
             };
+        }
+
+        private static List<ConnectionUpdateOrganizationUnitConsequenceDTO> OrderLogEntries(IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> logEntries)
+        {
+            var consequenceDtos = logEntries
+                .OrderBy(x => x.Name)
+                .ThenBy(x => x.Category)
+                .ToList();
+            return consequenceDtos;
         }
 
         private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
@@ -157,34 +165,36 @@ namespace Presentation.Web.Controllers.API.V1
                     .ToList()
             };
         }
-        private static IEnumerable<StsOrganizationChangeLogResponseDTO> MapChangeLogResponseDtos(IEnumerable<StsOrganizationChangeLog> logs)
+        private static IEnumerable<StsOrganizationChangeLogResponseDTO> MapChangeLogResponseDtos(IEnumerable<IExternalConnectionChangelog> logs)
         {
             return logs.Select(MapChangeLogResponseDto).ToList();
         }
 
-        private static StsOrganizationChangeLogResponseDTO MapChangeLogResponseDto(StsOrganizationChangeLog log)
+        private static StsOrganizationChangeLogResponseDTO MapChangeLogResponseDto(IExternalConnectionChangelog log)
         {
             return new StsOrganizationChangeLogResponseDTO
             {
                 Id = log.Id,
-                Origin = log.Origin.ToStsOrganizationChangeLogOriginOption(),
-                User = log.User.MapToUserWithEmailDTO(),
-                Consequences = MapConsequenceLogsToDtos(log.ConsequenceLogs),
+                Origin = log.ResponsibleType.ToStsOrganizationChangeLogOriginOption(),
+                User = log.ResponsibleUser.MapToUserWithEmailDTO(),
+                Consequences = MapConsequenceLogsToDtos(log.GetEntries()),
                 LogTime = log.LogTime
             };
         }
         
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(
-            IEnumerable<StsOrganizationConsequenceLog> logs)
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(IEnumerable<IExternalConnectionChangeLogEntry> logs)
         {
-            return logs.Select(MapConsequenceToDto).ToList();
+            return logs
+                .Select(MapConsequenceToDto)
+                .Transform(OrderLogEntries)
+                .ToList();
         }
 
-        private static ConnectionUpdateOrganizationUnitConsequenceDTO MapConsequenceToDto(StsOrganizationConsequenceLog log)
+        private static ConnectionUpdateOrganizationUnitConsequenceDTO MapConsequenceToDto(IExternalConnectionChangeLogEntry log)
         {
             return new ConnectionUpdateOrganizationUnitConsequenceDTO
             {
-                Uuid = log.Uuid,
+                Uuid = log.ExternalUnitUuid,
                 Name = log.Name,
                 Category = log.Type.ToConnectionUpdateOrganizationUnitChangeCategory(),
                 Description = log.Description

@@ -10,10 +10,8 @@ using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
-using Core.DomainModel.Organization.Strategies;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
-
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -198,7 +196,7 @@ namespace Core.DomainModel.Organization
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind<OrganizationTreeUpdateConsequences>(connection =>
                 {
                     var strategy = StsOrganizationConnection.GetUpdateStrategy();
@@ -251,8 +249,19 @@ namespace Core.DomainModel.Organization
                     () =>
                     {
                         StsOrganizationConnection ??= new StsOrganizationConnection();
-                        StsOrganizationConnection.Connected = true;
-                        StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
+                        StsOrganizationConnection.Connect(); 
+
+                        if (subscribeToUpdates != StsOrganizationConnection.SubscribeToUpdates)
+                        {
+                            var subscriptionError = subscribeToUpdates ?
+                                StsOrganizationConnection.Subscribe() :
+                                StsOrganizationConnection.Unsubscribe();
+                            if (subscriptionError.HasValue)
+                            {
+                                return subscriptionError.Value;
+                            }
+                        }
+
                         StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
                         return Maybe<OperationError>.None;
                     }
@@ -261,7 +270,7 @@ namespace Core.DomainModel.Organization
 
         public Result<DisconnectOrganizationFromOriginResult, OperationError> DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin origin)
         {
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind<DisconnectOrganizationFromOriginResult>(connection => connection.Disconnect());
         }
 
@@ -273,39 +282,41 @@ namespace Core.DomainModel.Organization
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
-            return GetStsOrganizationConnection(origin)
-                .Bind
-                (
-                    connection =>
-                    {
-                        var strategy = connection.GetUpdateStrategy();
+            return GetExternalConnection(origin)
+                .Bind(connection =>
+                {
+                    var strategy = connection.GetUpdateStrategy();
 
-                        var childLevelsToInclude =
-                            levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
-                        var filteredTree = root.Copy(childLevelsToInclude);
-                        StsOrganizationConnection.SynchronizationDepth =
-                            levelsIncluded.Match(levels => (int?) levels, () => default);
-                        StsOrganizationConnection.SubscribeToUpdates = subscribeToUpdates;
+                    var childLevelsToInclude =
+                        levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
+                    var filteredTree = root.Copy(childLevelsToInclude);
+                    connection.UpdateSynchronizationDepth(levelsIncluded.Match(levels => (int?) levels,
+                        () => default));
 
+                    if (subscribeToUpdates == StsOrganizationConnection.SubscribeToUpdates)
                         return strategy.PerformUpdate(filteredTree);
-                    }
-                );
+
+                    var subscriptionError = subscribeToUpdates
+                        ? StsOrganizationConnection.Subscribe()
+                        : StsOrganizationConnection.Unsubscribe();
+                    return subscriptionError.Match(
+                        error => error, () => strategy.PerformUpdate(filteredTree));
+                });
         }
 
-        public Result<StsOrganizationConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin,
-            StsOrganizationChangeLog changeLogToAdd)
+        public Result<ExternalConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin, ExternalConnectionAddNewLogInput changeLogToAdd)
         {
-            return GetStsOrganizationConnection(origin)
-                .Bind<StsOrganizationConnectionAddNewLogsResult>(connection => connection.AddNewLogs(changeLogToAdd.WrapAsEnumerable()));
+            return GetExternalConnection(origin)
+                .Bind(connection => connection.AddNewLog(changeLogToAdd));
         }
 
-        public Result<IEnumerable<StsOrganizationChangeLog>, OperationError> GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetExternalConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
         {
-            return GetStsOrganizationConnection(origin)
+            return GetExternalConnection(origin)
                 .Bind(connection => connection.GetLastNumberOfChangeLogs(numberOfLogs));
         }
 
-        private Result<StsOrganizationConnection, OperationError> GetStsOrganizationConnection(OrganizationUnitOrigin origin)
+        private Result<IExternalOrganizationalHierarchyConnection, OperationError> GetExternalConnection(OrganizationUnitOrigin origin)
         {
             switch (origin)
             {
@@ -470,8 +481,6 @@ namespace Core.DomainModel.Organization
 
             return Maybe<OperationError>.None;
         }
-
-
 
         private static bool MatchRoot(OrganizationUnit unit)
         {

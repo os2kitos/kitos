@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using Core.Abstractions.Types;
+using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -430,7 +431,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         public void Can_Add_ExternalImportLog()
         {
             //Arrange
-            var log = new StsOrganizationChangeLog{Id = A<int>()};
+            var log = CreateNewChangeLogInput();
             _sut.StsOrganizationConnection = new StsOrganizationConnection() {Connected = true};
 
             //Act
@@ -442,14 +443,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Empty(logResult.RemovedChangeLogs);
 
             var savedLog = Assert.Single(_sut.StsOrganizationConnection.StsOrganizationChangeLogs);
-            Assert.Equal(log.Id, savedLog.Id);
         }
 
         [Fact]
         public void Add_ExternalImportLog_Removes_Oldest_Log_If_More_Than_5_Logs_Are_Present()
         {
             //Arrange
-            var log = new StsOrganizationChangeLog(){Id = A<int>(), LogTime = DateTime.Now};
+            var log = CreateNewChangeLogInput();
+
             var oldestLog = new StsOrganizationChangeLog {Id = A<int>(), LogTime = DateTime.Now.AddDays(-A<int>())};
             _sut.StsOrganizationConnection = new StsOrganizationConnection()
             {
@@ -473,7 +474,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var removedLog = Assert.Single(logResult.RemovedChangeLogs);
             Assert.Equal(oldestLog.Id, removedLog.Id);
 
-            Assert.Contains(log.Id, _sut.StsOrganizationConnection.StsOrganizationChangeLogs.Select(x => x.Id));
+            Assert.Equal(ExternalConnectionConstants.TotalNumberOfLogs, _sut.StsOrganizationConnection.StsOrganizationChangeLogs.Count);
         }
 
         [Fact]
@@ -486,7 +487,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             //Act
-            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, new StsOrganizationChangeLog());
+            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, CreateNewChangeLogInput());
 
             //Assert
             Assert.True(result.Failed);
@@ -499,7 +500,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Arrange
             var origin = OrganizationUnitOrigin.Kitos;
             //Act
-            var result = _sut.AddExternalImportLog(origin, new StsOrganizationChangeLog());
+            var result = _sut.AddExternalImportLog(origin, CreateNewChangeLogInput());
 
             //Assert
             Assert.True(result.Failed);
@@ -513,7 +514,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _sut.StsOrganizationConnection = null;
 
             //Act
-            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, new StsOrganizationChangeLog());
+            var result = _sut.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, CreateNewChangeLogInput());
 
             //Assert
             Assert.True(result.Failed);
@@ -530,7 +531,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
 
             //Assert
             Assert.True(result.Failed);
@@ -544,7 +545,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var origin = OrganizationUnitOrigin.Kitos;
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(origin, A<int>());
+            var result = _sut.GetExternalConnectionEntryLogs(origin, A<int>());
 
             //Assert
             Assert.True(result.Failed);
@@ -558,7 +559,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _sut.StsOrganizationConnection = null;
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, A<int>());
 
             //Assert
             Assert.True(result.Failed);
@@ -568,7 +569,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Theory]
         [InlineData(0)]
         [InlineData(-10)]
-        public void GetStsOrganizationConnectionEntryLogs_Returns_BadState_If_NumberOfLogs_Is_Lower_Than_One(int numberOfLogs)
+        public void GetStsOrganizationConnectionEntryLogs_Returns_BadInput_If_NumberOfLogs_Is_Lower_Than_One(int numberOfLogs)
         {
             //Arrange
             _sut.StsOrganizationConnection = new StsOrganizationConnection
@@ -577,11 +578,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
         [Theory]
@@ -605,7 +606,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             };
 
             //Act
-            var result = _sut.GetStsOrganizationConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
+            var result = _sut.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfLogs);
 
             //Assert
             Assert.True(result.Ok);
@@ -645,6 +646,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                     AssertImportedTree(childrenToImport[i], importedUnits[i], remainingLevelsToImport);
                 }
             }
+        }
+
+        private ExternalConnectionAddNewLogInput CreateNewChangeLogInput()
+        {
+            return new ExternalConnectionAddNewLogInput(A<int?>(), A<ExternalOrganizationChangeLogResponsible>(), DateTime.Now, new List<ExternalConnectionAddNewLogEntryInput>());
         }
 
         private ExternalOrganizationUnit CreateExternalOrganizationUnit(params ExternalOrganizationUnit[] children)

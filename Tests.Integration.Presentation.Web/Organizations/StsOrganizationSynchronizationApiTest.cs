@@ -567,20 +567,18 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, additionPutResponse.StatusCode);
 
             //Rename consequences
+            var renamedUnit = new OrganizationUnit();
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
             {
-                var renamedUnits = repo
+                renamedUnit = repo
                     .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation)
-                    .ToList()
-                    .RandomItems(2)
-                    .ToList();
+                    .FirstOrDefault(x => x.Organization.Uuid == targetOrgUuid
+                                          && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                          && x.Parent != null
+                                          && x.Children.Any());
 
-                foreach (var organizationUnit in renamedUnits)
-                {
-                    var originalName = organizationUnit.Name;
-                    organizationUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
-                }
+                Assert.NotNull(renamedUnit);
+                renamedUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
             });
 
             //Conversion consequences
@@ -591,61 +589,58 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 expectedConversionUuid = repo
                     .AsQueryable()
                     .Where(x => x.Organization.Uuid == targetOrgUuid &&
-                                x.Origin == OrganizationUnitOrigin.STS_Organisation && !x.Children.Any())
+                                x.Origin == OrganizationUnitOrigin.STS_Organisation 
+                                && x.Parent != null
+                                && !x.Children.Any())
                     .ToList()
                     .RandomItem()
                     .Uuid;
             });
-            
+
             //Make sure it is in use so it will not be deleted, but converted
             await ItContractV2Helper.PostContractAsync(globalAdminToken.Token,
                 new CreateNewContractRequestDTO()
                 {
                     Name = A<string>(),
                     OrganizationUuid = targetOrgUuid,
-                    Responsible = new() { OrganizationUnitUuid = expectedConversionUuid }
+                    Responsible = new ContractResponsibleDataWriteRequestDTO { OrganizationUnitUuid = expectedConversionUuid }
                 });
 
+            //Relocation consequences
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                var parentLeaf = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid
+                                && x.Parent != null
+                                && x.Children.Any()
+                                && x.Uuid != renamedUnit.Uuid
+                                && x.Uuid != expectedConversionUuid)
+                    .RandomItem();
+
+                var secondLeaf = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid 
+                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                && x.Parent != null
+                                && x.Children.Any()
+                                && x.Uuid != parentLeaf.Uuid
+                                && x.Uuid != renamedUnit.Uuid
+                                && x.Uuid != expectedConversionUuid)
+                    .RandomItem();
+                
+                secondLeaf.ParentId = parentLeaf.Id;
+            }); 
+            
             using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
             var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             var otherConsequences = otherConsequencesBody.Consequences.ToList();
 
-            //Log deletion, renaming and conversion changes
+            //Log deletion, renaming, conversion and relocation changes
             using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
-
-            //Relocation consequences
-            var uuidOfExpectedMoval = Guid.NewGuid();
-            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
-            {
-                var twoLeafs = repo
-                    .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation && !x.Children.Any())
-                    .ToList()
-                    .RandomItems(2)
-                    .ToList();
-
-                var firstLeaf = twoLeafs.First();
-                var secondLeaf = twoLeafs.Last();
-
-                //Make first leaf parent of second leaf
-                secondLeaf.ParentId = firstLeaf.Id;
-
-                //Add a native units so we can check that it is moved along with the moved unit
-                var organization = secondLeaf.Organization;
-                organization.AddOrganizationUnit(new OrganizationUnit { Organization = organization, Name = "Native test unit", Uuid = uuidOfExpectedMoval, ObjectOwner = secondLeaf.ObjectOwner, LastChangedByUser = secondLeaf.LastChangedByUser }, secondLeaf);
-            });
-
-            using var relocationConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, relocationConsequencesResponse.StatusCode);
-            var relocationConsequencesBody = await relocationConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
-            var relocationConsequences = relocationConsequencesBody.Consequences.ToList();
-
-            //Log relocation changes
-            using var relocationPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
-            Assert.Equal(HttpStatusCode.OK, relocationPutResponse.StatusCode);
-
+            
             //Act
             using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
 
@@ -654,8 +649,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var deserializedLogs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
             var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
 
-            //3 updates + create
-            Assert.Equal(4, logsList.Count);
+            //2 updates + create
+            Assert.Equal(3, logsList.Count);
 
             //Addition consequences
             var additionLogs = logsList[1];
@@ -666,24 +661,18 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertConsequenceLogs(additionConsequences, additionLogs);
 
             //Get second item in the list
-            var otherLogs = logsList[2];
+            var otherLogs = logsList.Last();
             Assert.NotNull(otherLogs);
             var otherLogsConsequences = otherLogs.Consequences.ToList();
 
             Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, otherLogsConsequences.Select(x => x.Category).ToList());
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, otherLogsConsequences.Select(x => x.Category).ToList());
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, otherLogsConsequences.Select(x => x.Category).ToList());
+            var consequenceCategories = otherLogsConsequences.Select(x => x.Category).ToList();
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, consequenceCategories);
 
             AssertConsequenceLogs(otherConsequences, otherLogs);
-
-            //Get third item in the list
-            var relocationLogs = logsList[3];
-            Assert.NotNull(relocationLogs);
-
-            Assert.Equal(relocationConsequences.Count, relocationLogs.Consequences.Count());
-
-            AssertConsequenceLogs(relocationConsequences, relocationLogs);
         }
 
         private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)
@@ -756,7 +745,9 @@ namespace Tests.Integration.Presentation.Web.Organizations
             IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> consequences,
             StsOrganizationChangeLogResponseDTO logs)
         {
-            foreach (var consequence in consequences)
+            var consequencesList = consequences.ToList();
+            Assert.Equal(consequencesList.Count, logs.Consequences.Count());
+            foreach (var consequence in consequencesList)
             {
                 var logConsequence = logs.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid && x.Category == consequence.Category);
                 Assert.NotNull(logConsequence);

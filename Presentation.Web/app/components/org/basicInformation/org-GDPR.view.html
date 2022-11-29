@@ -6,13 +6,13 @@
                 <div class="form-group">
                     <label class="control-label small">CVR-nummer</label>
                     <input type="text"
-                           data-ng-disabled="!ctrl.hasWriteAccess"
+                           data-ng-disabled="!ctrl.canCvrBeModified"
                            data-autosave="{{ctrl.updateOrgUrl}}"
                            class="form-control input-sm"
                            data-field="cvr"
                            data-ng-model="ctrl.organization.cvr"
-                           data-placeholder="CVR-nummer" 
-                           maxlength="10"/>
+                           data-placeholder="CVR-nummer"
+                           maxlength="10" />
                 </div>
 
                 <div class="form-group">
@@ -76,8 +76,8 @@
                            class="form-control input-sm"
                            data-field="cvr"
                            data-ng-model="ctrl.dataResponsible.cvr"
-                           data-placeholder="CVR-nummer" 
-                           maxlength="10"/>
+                           data-placeholder="CVR-nummer"
+                           maxlength="10" />
                 </div>
 
                 <div class="form-group">
@@ -180,8 +180,8 @@
                 </div>
             </div>
         </div>
-       </div>
     </div>
+</div>
 
 <!--Contact person-->
 <div class="object-section-container">
@@ -207,7 +207,7 @@
                            class="form-control input-sm"
                            data-field="lastName"
                            data-ng-model="ctrl.contactPerson.lastName"
-                           data-placeholder="Efternavn"/>
+                           data-placeholder="Efternavn" />
                 </div>
             </div>
             <div class="col-md-6">
@@ -227,12 +227,12 @@
                         E-mail (Fremsøg eksisterende bruger)
                     </label>
                     <div>
-                        <input type="text" 
+                        <input type="text"
                                data-ng-disabled="!ctrl.hasWriteAccess"
-                               name="contactPersonEmail" 
-                               data-ng-model="ctrl._contactPerson.email" 
-                               class="form-control" 
-                               data-unique-email-contactperson 
+                               name="contactPersonEmail"
+                               data-ng-model="ctrl._contactPerson.email"
+                               class="form-control"
+                               data-unique-email-contactperson
                                data-autosave="{{ctrl.updateContactPersonUrl}}"
                                data-field="email">
                         <span class="glyphicon form-control-feedback"></span>

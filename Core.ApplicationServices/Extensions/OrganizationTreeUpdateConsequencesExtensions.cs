@@ -26,7 +26,7 @@ namespace Core.ApplicationServices.Extensions
                 {
                     Name = converted.organizationUnit.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Converted,
-                    Uuid = converted.externalOriginUuid,
+                    ExternalUnitUuid = converted.externalOriginUuid,
                     Description = $"'{converted.organizationUnit.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
                 })
                 .ToList();
@@ -40,7 +40,7 @@ namespace Core.ApplicationServices.Extensions
                 {
                     Name = deleted.organizationUnit.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Deleted,
-                    Uuid = deleted.externalOriginUuid,
+                    ExternalUnitUuid = deleted.externalOriginUuid,
                     Description = $"'{deleted.organizationUnit.Name}' slettes."
                 })
                 .ToList();
@@ -57,7 +57,7 @@ namespace Core.ApplicationServices.Extensions
                     {
                         Name = movedUnit.Name,
                         Type = ConnectionUpdateOrganizationUnitChangeType.Moved,
-                        Uuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        ExternalUnitUuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
                         Description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
                     };
                 })
@@ -75,7 +75,7 @@ namespace Core.ApplicationServices.Extensions
                     {
                         Name = oldName,
                         Type = ConnectionUpdateOrganizationUnitChangeType.Renamed,
-                        Uuid = affectedUnit.ExternalOriginUuid.GetValueOrDefault(),
+                        ExternalUnitUuid = affectedUnit.ExternalOriginUuid.GetValueOrDefault(),
                         Description = $"'{oldName}' omdøbes til '{newName}'"
                     };
                 })
@@ -90,7 +90,7 @@ namespace Core.ApplicationServices.Extensions
                 {
                     Name = added.unitToAdd.Name,
                     Type = ConnectionUpdateOrganizationUnitChangeType.Added,
-                    Uuid = added.unitToAdd.Uuid,
+                    ExternalUnitUuid = added.unitToAdd.Uuid,
                     Description = $"'{added.unitToAdd.Name}' tilføjes som underenhed til '{added.parent?.Name}'"
                 }
                 )
