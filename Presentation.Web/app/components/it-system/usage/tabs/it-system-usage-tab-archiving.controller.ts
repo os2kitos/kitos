@@ -167,6 +167,12 @@
 
             $scope.patchDatePeriode = (field, value, id) => {
                 var dateObject = $scope.archivePeriods.filter(x => x.Id === id);
+                if (dateObject.length === 0) {
+                    console.log(`Archive period with id: ${id} wasn't found`);
+                    notify.addSuccessMessage("Feltet er opdateret!");
+                    return;
+                }
+
                 var dateStart = dateObject[0].StartDate;
                 var dateEnd = dateObject[0].EndDate;
 
