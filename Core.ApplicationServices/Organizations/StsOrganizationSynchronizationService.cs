@@ -121,7 +121,7 @@ namespace Core.ApplicationServices.Organizations
                             }
                         )
                     .Bind(WithLogEntries)
-                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, MapToExternalConnectionAddNewLogInput(logEntries)))
+                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
                     .MatchFailure();
             });
         }
@@ -181,7 +181,7 @@ namespace Core.ApplicationServices.Organizations
                         return consequences;
                     })
                     .Bind(WithLogEntries)
-                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, MapToExternalConnectionAddNewLogInput(logEntries)))
+                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
                     .Match(importLogResult =>
                     {
                         if (importLogResult.RemovedChangeLogs.Any())
@@ -272,27 +272,21 @@ namespace Core.ApplicationServices.Organizations
                     () => Result<ExternalOrganizationUnit, OperationError>.Success(importRoot));
         }
 
-        private Result<StsOrganizationChangeLog, OperationError> WithLogEntries(OrganizationTreeUpdateConsequences consequences)
+        private Result<ExternalConnectionAddNewLogInput, OperationError> WithLogEntries(OrganizationTreeUpdateConsequences consequences)
         {
-            var changeLog = new StsOrganizationChangeLog { ResponsibleType = ExternalOrganizationChangeLogResponsible.Background };
-
+            var changeLogType = ExternalOrganizationChangeLogResponsible.Background;
+            int? changeLogUserId = null;
             if (_activeUserIdContext.HasValue)
             {
                 var userId = _activeUserIdContext.Value.ActiveUserId;
-                changeLog.ResponsibleType = ExternalOrganizationChangeLogResponsible.User;
-                changeLog.ResponsibleUserId = userId;
+                changeLogType = ExternalOrganizationChangeLogResponsible.User;
+                changeLogUserId = userId;
             }
 
-            changeLog.Entries = consequences.ConvertConsequencesToConsequenceLogs().ToList();
-            changeLog.LogTime = _operationClock.Now;
+            var changeLogEntries = consequences.ConvertConsequencesToConsequenceLogs().ToList();
+            var changeLogLogTime = _operationClock.Now;
             
-            return changeLog;
-        }
-
-        private static ExternalConnectionAddNewLogInput MapToExternalConnectionAddNewLogInput(
-            StsOrganizationChangeLog stsLog)
-        {
-            return new ExternalConnectionAddNewLogInput(stsLog.ResponsibleUserId, stsLog.ResponsibleType, stsLog.LogTime, MapToExternalConnectionAddNewLogEntryInput(stsLog.Entries));
+            return new ExternalConnectionAddNewLogInput(changeLogUserId, changeLogType, changeLogLogTime, MapToExternalConnectionAddNewLogEntryInput(changeLogEntries));
         }
 
         private static IEnumerable<ExternalConnectionAddNewLogEntryInput> MapToExternalConnectionAddNewLogEntryInput(

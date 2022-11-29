@@ -11,7 +11,7 @@ namespace Core.DomainModel.Organization
         public int? SynchronizationDepth { get; }
         IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy();
         bool SubscribeToUpdates { get; }
-        ExternalConnectionAddNewLogsResult AddNewLog(ExternalConnectionAddNewLogInput newLog);
+        Result<ExternalConnectionAddNewLogsResult, OperationError> AddNewLog(ExternalConnectionAddNewLogInput newLog);
         Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetLastNumberOfChangeLogs(int number = ExternalConnectionConstants.TotalNumberOfLogs);
         DisconnectOrganizationFromOriginResult Disconnect();
         void Connect();

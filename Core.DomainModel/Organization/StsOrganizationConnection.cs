@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.Constants;
@@ -77,8 +78,16 @@ namespace Core.DomainModel.Organization
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
 
-        public ExternalConnectionAddNewLogsResult AddNewLog(ExternalConnectionAddNewLogInput newLogInput)
+        public Result<ExternalConnectionAddNewLogsResult, OperationError> AddNewLog(ExternalConnectionAddNewLogInput newLogInput)
         {
+            if (newLogInput == null)
+            {
+                throw new ArgumentNullException(nameof(newLogInput));
+            }
+            if (!Connected)
+            {
+                return new OperationError("Organization not connected to the sts organizaiton", OperationFailure.BadState);
+            }
             var newLogEntries = newLogInput.Entries.Select(x =>
                 new StsOrganizationConsequenceLog
                 {
@@ -104,6 +113,10 @@ namespace Core.DomainModel.Organization
 
         public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetLastNumberOfChangeLogs(int number = ExternalConnectionConstants.TotalNumberOfLogs)
         {
+            if (!Connected)
+            {
+                return new OperationError("Organization not connected to the sts organizaiton", OperationFailure.BadState);
+            }
             if (number <= 0)
             {
                 return new OperationError("Number of change logs to get cannot be larger than 0", OperationFailure.BadState);

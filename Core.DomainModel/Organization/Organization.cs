@@ -307,7 +307,7 @@ namespace Core.DomainModel.Organization
         public Result<ExternalConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin, ExternalConnectionAddNewLogInput changeLogToAdd)
         {
             return GetExternalConnection(origin)
-                .Bind<ExternalConnectionAddNewLogsResult>(connection => connection.AddNewLog(changeLogToAdd));
+                .Bind(connection => connection.AddNewLog(changeLogToAdd));
         }
 
         public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetExternalConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
