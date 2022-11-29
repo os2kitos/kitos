@@ -296,7 +296,7 @@ namespace Core.DomainModel.Organization
                     if (subscribeToUpdates == StsOrganizationConnection.SubscribeToUpdates)
                         return strategy.PerformUpdate(filteredTree);
 
-                    var subscriptionError = StsOrganizationConnection.SubscribeToUpdates
+                    var subscriptionError = subscribeToUpdates
                         ? StsOrganizationConnection.Subscribe()
                         : StsOrganizationConnection.Unsubscribe();
                     return subscriptionError.Match(
