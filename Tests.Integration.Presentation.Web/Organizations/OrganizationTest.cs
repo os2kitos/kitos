@@ -164,7 +164,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var newCvr = CreateNewCvr();
 
             //Act
-            var result = await OrganizationHelper.SendUpdateAsync(organization.Id, TestEnvironment.DefaultOrganizationId, organizationName, newCvr, login);
+            using var result = await OrganizationHelper.SendUpdateAsync(organization.Id, TestEnvironment.DefaultOrganizationId, organizationName, newCvr, login);
 
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             var cvrFromDb = DatabaseAccess.MapFromEntitySet<Organization, string>(x => x.AsQueryable().ById(organization.Id).Cvr);
