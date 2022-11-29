@@ -14,5 +14,10 @@
             }
             return { errorMessage: "Ugyldigt dato format" };
         }
+
+        static fromDanishToEnglishFormat(dateString: string): string {
+            return moment(dateString, [Kitos.Constants.DateFormat.DanishDateFormat, Kitos.Constants.DateFormat.EnglishDateFormat]).format(Constants.DateFormat.EnglishDateFormat);
+
+        }
     }
 }

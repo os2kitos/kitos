@@ -78,7 +78,7 @@
                                    data-k-options="deadlinesVm.datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="deadlinesVm.contract.irrevocableTo"
-                                   ng-blur="deadlinesVm.patchDate('irrevocableTo', contract.irrevocableTo)"
+                                   ng-blur="deadlinesVm.patchDate('irrevocableTo', contract.irrevocableTo, 'Uopsigelig til')"
                                    data-field="irrevocableTo">
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                                    data-k-options="deadlinesVm.datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="deadlinesVm.contract.terminated"
-                                   ng-blur="deadlinesVm.patchDate('terminated', contract.terminated)"
+                                   ng-blur="deadlinesVm.patchDate('terminated', contract.terminated, 'Kontrakten opsagt')"
                                    data-field="terminated">
                         </div>
 
