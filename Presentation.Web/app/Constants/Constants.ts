@@ -25,7 +25,6 @@
     }
 
     export class DateFormat {
-        static readonly DanishDateFormatWithTime = "DD-MM-YYYY HH:mm:ss";
         static readonly DanishDateFormat = "DD-MM-YYYY";
         static readonly EnglishDateFormat = "YYYY-MM-DD";
 

@@ -4,7 +4,7 @@
             return changeLogs.reduce((acc, next, _) => {
                 acc[next.id] = {
                     id: next.id,
-                    text: `${RenderFieldsHelper.renderDateWithTime(next.logTime)} - ${ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(next)}`,
+                    text: `${RenderFieldsHelper.renderDate(next.logTime)} - ${ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(next)}`,
                     optionalObjectContext: next
                 };
                 return acc;

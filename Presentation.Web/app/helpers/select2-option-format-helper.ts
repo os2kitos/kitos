@@ -13,7 +13,7 @@
         }
 
         public static formatChangeLog(changeLog: Models.Api.Organization.ConnectionChangeLogDTO): string {
-            const dateText = Helpers.RenderFieldsHelper.renderDateWithTime(changeLog.logTime);
+            const dateText = Helpers.RenderFieldsHelper.renderDate(changeLog.logTime);
             const responsibleEntityText = Helpers.ConnectionChangeLogHelper.getResponsibleEntityTextBasedOnOrigin(changeLog);
 
             return Select2OptionsFormatHelper.formatText(dateText, responsibleEntityText);

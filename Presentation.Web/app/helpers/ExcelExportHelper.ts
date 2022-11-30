@@ -67,13 +67,6 @@
             return ExcelExportHelper.noValueFallback;
         }
 
-        static renderDateWithTime(date: Date | string) {
-            if (!!date && moment(date).format(Constants.DateFormat.DanishDateFormatWithTime) !== "01-01-0001 01:01:01") {
-                return moment(date).format(Constants.DateFormat.DanishDateFormatWithTime);
-            }
-            return ExcelExportHelper.noValueFallback;
-        }
-
         static convertColorsToDanish(color: string) {
             if (color === null || _.isUndefined(color)) {
                 return ExcelExportHelper.noValueFallback;

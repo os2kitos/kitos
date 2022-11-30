@@ -1,28 +1,16 @@
-﻿<table class="full-width table">
+﻿<table class="table table-striped">
     <thead>
         <tr>
-            <th>
-                <h6>Ansvarlig</h6>
-            </th>
-            <th>
-                <h6>Number of updates</h6>
-            </th>
-            <th>
-                <h6>Update date</h6>
-            </th>
+            <th width="33%">Ansvarlig</th>
+            <th width="33%">Number of updates</th>
+            <th width="33%">Update date</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>
-                <input type="text" disabled="disabled" class="form-control input-sm" value="{{ ctrl.responsibleEntityText }}" />
-            </td>
-            <td>
-                <input type="text" disabled="disabled" class="form-control input-sm" value="{{ ctrl.changeLog.consequences.length }}" />
-            </td>
-            <td>
-                <input type="text" disabled="disabled" class="form-control input-sm" value="{{ ctrl.logTime }}" />
-            </td>
+            <td>{{ ctrl.responsibleEntityText }}</td>
+            <td>{{ ctrl.changeLog.consequences.length }}</td>
+            <td>{{ ctrl.logTime }}</td>
         </tr>
 </table>
 <div class="margin-top-sm">
