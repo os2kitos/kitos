@@ -320,8 +320,13 @@ namespace Tests.Unit.Core.Model.Strategies
                             CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,
                                 new []
                                 {
-                                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
-                                })
+                                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,new[]
+                                    {
+                                        CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                                    })
+                                }),
+                            CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation),
+                            CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
                         })
                 });
             var externalTree = ConvertToExternalTree(root); //the complete tree
@@ -351,11 +356,11 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(expected.Uuid, actual.Uuid);
             var expectedChildren = expected.Children.ToDictionary(x => x.Uuid);
             var actualChildren = actual.Children.ToDictionary(x => x.Uuid);
-            Assert.Equivalent(expectedChildren.Keys, actualChildren.Keys,true);
-            
+            Assert.Equivalent(expectedChildren.Keys, actualChildren.Keys, true);
+
             foreach (var expectedChild in expectedChildren)
             {
-                AssertHierarchies(expectedChild.Value, actualChildren[expectedChild.Key],level+1);
+                AssertHierarchies(expectedChild.Value, actualChildren[expectedChild.Key], level + 1);
             }
         }
 

@@ -249,7 +249,7 @@ namespace Core.DomainModel.Organization
                     () =>
                     {
                         StsOrganizationConnection ??= new StsOrganizationConnection();
-                        StsOrganizationConnection.Connect(); 
+                        StsOrganizationConnection.Connect();
 
                         if (subscribeToUpdates != StsOrganizationConnection.SubscribeToUpdates)
                         {
@@ -290,7 +290,7 @@ namespace Core.DomainModel.Organization
                     var childLevelsToInclude =
                         levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
                     var filteredTree = root.Copy(childLevelsToInclude);
-                    connection.UpdateSynchronizationDepth(levelsIncluded.Match(levels => (int?) levels,
+                    connection.UpdateSynchronizationDepth(levelsIncluded.Match(levels => (int?)levels,
                         () => default));
 
                     if (subscribeToUpdates == StsOrganizationConnection.SubscribeToUpdates)
@@ -425,7 +425,7 @@ namespace Core.DomainModel.Organization
             else
             {
                 //If subtree is to be moved along with it, then the target unit cannot be a descendant of the moved unit
-                if (movedUnit.FlattenHierarchy().Contains(newParentUnit))
+                if (movedUnit.SearchSubTree(unit => unit.Uuid == newParentUnit.Uuid).HasValue)
                 {
                     return new OperationError($"newParentUnit with uuid {newParentUnit.Uuid} is a descendant of org unit with uuid {movedUnit.Uuid}", OperationFailure.BadInput);
                 }
