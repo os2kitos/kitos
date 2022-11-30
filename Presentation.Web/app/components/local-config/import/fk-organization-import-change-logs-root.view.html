@@ -3,11 +3,6 @@
     <label for="select-change-log" class="control-label small">Select a changelog</label>
     <single-select-select2 id="select-change-log" ng-model="ctrl.selectChangeLogModel"/>
 </div>
-<!--<div ng-repeat="changeLog in ctrl.changeLogs">
-    <div ng-hide="ctrl.selectedChangeLog === changeLog.id">
-        <fk-organization-import-change-log data-change-log="changeLog"/>
-    </div>
-</div>-->
 <div ng-repeat="changeLog in ctrl.changeLogs">
     <div ng-hide="ctrl.selectedChangeLog === null || ctrl.selectedChangeLog.id !== changeLog.id">
         <fk-organization-import-change-log data-change-log="changeLog"/>

@@ -710,9 +710,9 @@
                     organizationUnitService.getUnitAccessRightsForOrganization(currentOrganization.uuid)
                         .then(response => {
                             const rightsMap = response.reduce((rights, next) => {
-                                    rights[next.unitId] = next;
-                                    return rights;
-                                }, {})
+                                rights[next.unitId] = next;
+                                return rights;
+                            }, {})
                             applyAccessRights(rootNodeOfOrganization, rightsMap);
                             $scope.loadingAccessRights = false;
                         }, error => {
