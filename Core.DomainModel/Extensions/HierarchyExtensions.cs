@@ -102,5 +102,29 @@ namespace Core.DomainModel.Extensions
                 currentRoot = currentParent;
             }
         }
+
+        public static Maybe<TEntity> SearchSubTree<TEntity>(this TEntity root, Predicate<TEntity> condition) where TEntity : class, IHierarchy<TEntity>
+        {
+            var unreached = new Queue<TEntity>();
+
+            unreached.Enqueue(root);
+
+            //Process one level at the time
+            while (unreached.Count > 0)
+            {
+                var orgUnit = unreached.Dequeue();
+                if (condition(orgUnit))
+                {
+                    return orgUnit;
+                }
+
+                foreach (var child in orgUnit.Children)
+                {
+                    unreached.Enqueue(child);
+                }
+            }
+
+            return Maybe<TEntity>.None;
+        }
     }
 }
