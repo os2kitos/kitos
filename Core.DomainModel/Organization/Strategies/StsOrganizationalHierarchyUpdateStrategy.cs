@@ -27,16 +27,9 @@ namespace Core.DomainModel.Organization.Strategies
                 throw new InvalidOperationException("No organization units from STS Organisation found in the current hierarchy");
             }
 
-            var importedTreeByUuid = root
-                .Flatten()
-                .ToDictionary(x => x.Uuid);
+            var importedTreeByUuid = root.ToLookupByUuid();
 
-            var importedTreeToParent = importedTreeByUuid
-                .Values
-                .SelectMany(parent => parent.Children.Select(child => (child, parent)))
-                .ToDictionary(x => x.child.Uuid, x => x.parent);
-
-            importedTreeToParent.Add(root.Uuid, null); //Add the root as that will not be part of the collection
+            var importedTreeToParent = root.ToParentMap(importedTreeByUuid);
 
             //Keys in both collections
             var commonKeys = currentTreeByUuid.Keys.Intersect(importedTreeByUuid.Keys).ToList();
@@ -79,8 +72,8 @@ namespace Core.DomainModel.Organization.Strategies
                 .Select(uuid => currentTreeByUuid[uuid])
                 .ToDictionary(x => x.Id);
 
-            var removedExternalUnitsWhichMustBeConverted = new List<OrganizationUnit>();
-            var removedExternalUnitsWhichMustBeRemoved = new List<OrganizationUnit>();
+            var removedExternalUnitsWhichMustBeConverted = new List<(Guid, OrganizationUnit)>();
+            var removedExternalUnitsWhichMustBeRemoved = new List<(Guid, OrganizationUnit)>();
 
             foreach (var candidateForRemoval in candidatesForRemovalById)
             {
@@ -109,20 +102,21 @@ namespace Core.DomainModel.Organization.Strategies
                     removedSubtreeIds.Remove(removedItem.Key);
                 }
 
+                var externalOriginUuid = organizationUnit.ExternalOriginUuid.GetValueOrDefault();
                 if (removedSubtreeIds.Count != 1)
                 {
                     //Anything left except the candidate, then we must convert the unit to a KITOS-unit?
-                    removedExternalUnitsWhichMustBeConverted.Add(organizationUnit);
+                    removedExternalUnitsWhichMustBeConverted.Add((externalOriginUuid, organizationUnit));
                 }
                 else if (organizationUnit.IsUsed())
                 {
                     //If there is still registrations, we must convert it
-                    removedExternalUnitsWhichMustBeConverted.Add(organizationUnit);
+                    removedExternalUnitsWhichMustBeConverted.Add((externalOriginUuid, organizationUnit));
                 }
                 else
                 {
                     //Safe to remove since there is no remaining sub tree and no remaining registrations tied to it
-                    removedExternalUnitsWhichMustBeRemoved.Add(organizationUnit);
+                    removedExternalUnitsWhichMustBeRemoved.Add((externalOriginUuid, organizationUnit));
                 }
             }
 
@@ -160,7 +154,7 @@ namespace Core.DomainModel.Organization.Strategies
             //Conversion to native units
             foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
             {
-                unitToNativeUnit.ConvertToNativeKitosUnit();
+                unitToNativeUnit.organizationUnit.ConvertToNativeKitosUnit();
             }
 
             //Addition of new units
@@ -219,7 +213,7 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Deletion of units
-            foreach (var externalUnitToDelete in OrderUnitsToDeleteByLeafToParent(_organization.GetRoot(), consequences.DeletedExternalUnitsBeingDeleted))
+            foreach (var externalUnitToDelete in OrderUnitsToDeleteByLeafToParent(_organization.GetRoot(), consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList()))
             {
                 externalUnitToDelete.ConvertToNativeKitosUnit(); //Convert to KITOS unit before deleting it (external units cannot be deleted)
                 var deleteOrganizationUnitError = _organization.DeleteOrganizationUnit(externalUnitToDelete);

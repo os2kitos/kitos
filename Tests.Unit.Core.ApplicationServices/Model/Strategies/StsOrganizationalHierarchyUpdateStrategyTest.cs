@@ -214,7 +214,7 @@ namespace Tests.Unit.Core.Model.Strategies
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted);
+            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted).organizationUnit;
             Assert.Same(expectedRemovedUnit, removedUnit);
             var movedUnits = consequences.OrganizationUnitsBeingMoved.ToList();
             Assert.Equal(expectedParentChanges.Count, movedUnits.Count);
@@ -363,7 +363,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            var removedUnit = Assert.Single(consequences.Value.DeletedExternalUnitsBeingDeleted);
+            var removedUnit = Assert.Single(consequences.Value.DeletedExternalUnitsBeingDeleted).organizationUnit;
             Assert.Same(expectedRemovedUnit, removedUnit);
             var movedUnits = consequences.Value.OrganizationUnitsBeingMoved.ToList();
             Assert.Equal(expectedParentChangesCount, movedUnits.Count);
@@ -440,11 +440,11 @@ namespace Tests.Unit.Core.Model.Strategies
 
         private static OrganizationUnit AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit nodeExpectedToBeConverted, IEnumerable<OrganizationUnit> expectedRemovedUnits)
         {
-            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits).organizationUnit;
             Assert.Same(nodeExpectedToBeConverted, organizationUnit);
 
             var expectedRemovedItems = expectedRemovedUnits.OrderBy(unit => unit.Id);
-            var actualRemovedItems = consequences.DeletedExternalUnitsBeingDeleted.OrderBy(unit => unit.Id);
+            var actualRemovedItems = consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).OrderBy(unit => unit.Id);
             Assert.Equal(expectedRemovedItems, actualRemovedItems);
 
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
@@ -457,7 +457,7 @@ namespace Tests.Unit.Core.Model.Strategies
         private static void AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(
             OrganizationTreeUpdateConsequences consequences, OrganizationUnit removedNodeInUse)
         {
-            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits).organizationUnit;
             Assert.Same(removedNodeInUse, organizationUnit);
 
             Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
@@ -469,7 +469,7 @@ namespace Tests.Unit.Core.Model.Strategies
         private static void AssertUnitsWhichAreDeletedWereDetected(OrganizationTreeUpdateConsequences consequences,
             OrganizationUnit expectedRemovedUnit)
         {
-            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted);
+            var removedUnit = Assert.Single(consequences.DeletedExternalUnitsBeingDeleted).organizationUnit;
             Assert.Same(expectedRemovedUnit, removedUnit);
 
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);

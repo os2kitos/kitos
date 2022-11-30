@@ -33,6 +33,7 @@ namespace Core.DomainModel
             FailedAttempts = 0;
             Uuid = Guid.NewGuid();
             DataProcessingRegistrationRights = new List<DataProcessingRegistrationRight>();
+            StsOrganizationChangeLogs = new List<StsOrganizationChangeLog>();
         }
 
         public string Name { get; set; }
@@ -117,6 +118,7 @@ namespace Core.DomainModel
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
 
         public virtual ICollection<SsoUserIdentity> SsoIdentities { get; set; }
+        public virtual ICollection<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
 
         /// <summary>
         /// Rights withing dpa

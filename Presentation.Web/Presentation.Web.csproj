@@ -405,7 +405,9 @@
     <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
@@ -434,6 +436,8 @@
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationUnitDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogOriginOption.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\TransferOrganizationUnitRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\UnitAccessRightsDTO.cs" />

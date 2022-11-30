@@ -546,6 +546,135 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Null(convertedUnit.ExternalOriginUuid);
         }
 
+        [Fact]
+        public async Task Can_GET_LOGS()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int firstRequestLevels = 2;
+            const int secondRequestLevels = 3;
+            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, firstRequestLevels);
+
+            //Addition consequences
+            using var additionConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, additionConsequencesResponse.StatusCode);
+            var additionConsequencesBody = await additionConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var additionConsequences = additionConsequencesBody.Consequences.ToList();
+
+            //Update consequences in order to log addition consequences
+            using var additionPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, additionPutResponse.StatusCode);
+
+            //Rename consequences
+            var renamedUnit = new OrganizationUnit();
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                renamedUnit = repo
+                    .AsQueryable()
+                    .FirstOrDefault(x => x.Organization.Uuid == targetOrgUuid
+                                          && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                          && x.Parent != null
+                                          && x.Children.Any());
+
+                Assert.NotNull(renamedUnit);
+                renamedUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
+            });
+
+            //Conversion consequences
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var expectedConversionUuid = Guid.NewGuid();
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                expectedConversionUuid = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid &&
+                                x.Origin == OrganizationUnitOrigin.STS_Organisation 
+                                && x.Parent != null
+                                && !x.Children.Any())
+                    .ToList()
+                    .RandomItem()
+                    .Uuid;
+            });
+
+            //Make sure it is in use so it will not be deleted, but converted
+            await ItContractV2Helper.PostContractAsync(globalAdminToken.Token,
+                new CreateNewContractRequestDTO()
+                {
+                    Name = A<string>(),
+                    OrganizationUuid = targetOrgUuid,
+                    Responsible = new ContractResponsibleDataWriteRequestDTO { OrganizationUnitUuid = expectedConversionUuid }
+                });
+
+            //Relocation consequences
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                var parentLeaf = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid
+                                && x.Parent != null
+                                && x.Children.Any()
+                                && x.Uuid != renamedUnit.Uuid
+                                && x.Uuid != expectedConversionUuid)
+                    .RandomItem();
+
+                var secondLeaf = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid 
+                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                && x.Parent != null
+                                && x.Children.Any()
+                                && x.Uuid != parentLeaf.Uuid
+                                && x.Uuid != renamedUnit.Uuid
+                                && x.Uuid != expectedConversionUuid)
+                    .RandomItem();
+                
+                secondLeaf.ParentId = parentLeaf.Id;
+            }); 
+            
+            using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
+            var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var otherConsequences = otherConsequencesBody.Consequences.ToList();
+
+            //Log deletion, renaming, conversion and relocation changes
+            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            
+            //Act
+            using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
+            var deserializedLogs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
+            var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
+
+            //2 updates + create
+            Assert.Equal(3, logsList.Count);
+
+            //Addition consequences
+            var additionLogs = logsList[1];
+            Assert.NotNull(additionLogs);
+            var additionLogsConsequences = additionLogs.Consequences.ToList();
+
+            Assert.Equal(additionConsequences.Count, additionLogsConsequences.Count);
+            AssertConsequenceLogs(additionConsequences, additionLogs);
+
+            //Get second item in the list
+            var otherLogs = logsList.Last();
+            Assert.NotNull(otherLogs);
+            var otherLogsConsequences = otherLogs.Consequences.ToList();
+
+            Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
+            var consequenceCategories = otherLogsConsequences.Select(x => x.Category).ToList();
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, consequenceCategories);
+
+            AssertConsequenceLogs(otherConsequences, otherLogs);
+        }
+
         private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)
         {
             Assert.Equal(treeToImport.Name, importedTree.Name);
@@ -612,6 +741,24 @@ namespace Tests.Integration.Presentation.Web.Organizations
             }
         }
 
+        private static void AssertConsequenceLogs(
+            IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> consequences,
+            StsOrganizationChangeLogResponseDTO logs)
+        {
+            var consequencesList = consequences.ToList();
+            Assert.Equal(consequencesList.Count, logs.Consequences.Count());
+            foreach (var consequence in consequencesList)
+            {
+                var logConsequence = logs.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid && x.Category == consequence.Category);
+                Assert.NotNull(logConsequence);
+
+                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
+                Assert.Equal(consequence.Category, logConsequence.Category);
+                Assert.Equal(consequence.Name, logConsequence.Name);
+                Assert.Equal(consequence.Description, logConsequence.Description);
+            }
+        }
+
         private static int CountMaxLevels(StsOrganizationOrgUnitDTO unit)
         {
             const int currentLevelContribution = 1;
@@ -666,6 +813,14 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 SynchronizationDepth = levels,
                 SubscribeToUpdates = subscribe
             });
+        }
+
+        private static async Task<HttpResponseMessage> SendGetLogsAsync(Guid targetOrgUuid, int numberOfChangeLogs, Cookie cookie)
+        {
+            var postUrl =
+                TestEnvironment.CreateUrl(
+                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/change-log?numberOfChangeLogs={numberOfChangeLogs}");
+            return await HttpApi.GetWithCookieAsync(postUrl, cookie);
         }
     }
 }

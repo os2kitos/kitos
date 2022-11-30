@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Organizations;
 
@@ -118,101 +120,36 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(FromOperationError, Ok);
         }
 
-        #region DTO Mapping
-        private static ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
+        [HttpGet]
+        [Route("connection/change-log")]
+        public HttpResponseMessage GetChangeLogs(Guid organizationId, int numberOfChangeLogs)
         {
-            var dtos = new List<ConnectionUpdateOrganizationUnitConsequenceDTO>();
-            dtos.AddRange(MapAddedOrganizationUnits(consequences));
-            dtos.AddRange(MapRenamedOrganizationUnits(consequences));
-            dtos.AddRange(MapMovedOrganizationUnits(consequences));
-            dtos.AddRange(MapRemovedOrganizationUnits(consequences));
-            dtos.AddRange(MapConvertedOrganizationUnits(consequences));
+            return _stsOrganizationSynchronizationService.GetChangeLogs(organizationId, numberOfChangeLogs)
+                .Select(MapChangeLogResponseDtos)
+                .Match(Ok, FromOperationError);
+        }
+
+        #region DTO Mapping
+        private ConnectionUpdateConsequencesResponseDTO MapUpdateConsequencesResponseDTO(OrganizationTreeUpdateConsequences consequences)
+        {
+            var logEntries = consequences
+                .ConvertConsequencesToConsequenceLogs()
+                .Transform(MapConsequenceLogsToDtos)
+                .Transform(OrderLogEntries);
+
             return new ConnectionUpdateConsequencesResponseDTO
             {
-                Consequences = dtos
-                    .OrderBy(x => x.Name)
-                    .ThenBy(x => x.Category)
-                    .ToList()
+                Consequences = logEntries
             };
         }
 
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
+        private static List<ConnectionUpdateOrganizationUnitConsequenceDTO> OrderLogEntries(IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> logEntries)
         {
-            return consequences
-                .DeletedExternalUnitsBeingConvertedToNativeUnits
-                .Select(converted => new ConnectionUpdateOrganizationUnitConsequenceDTO
-                {
-                    Name = converted.Name,
-                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Converted,
-                    Uuid = converted.ExternalOriginUuid.GetValueOrDefault(),
-                    Description = $"'{converted.Name}' er slettet i FK Organisation men konverteres til KITOS enhed, da den anvendes aktivt i KITOS."
-                })
+            var consequenceDtos = logEntries
+                .OrderBy(x => x.Name)
+                .ThenBy(x => x.Category)
                 .ToList();
-        }
-
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRemovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
-        {
-            return consequences
-                .DeletedExternalUnitsBeingDeleted
-                .Select(deleted => new ConnectionUpdateOrganizationUnitConsequenceDTO
-                {
-                    Name = deleted.Name,
-                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Deleted,
-                    Uuid = deleted.ExternalOriginUuid.GetValueOrDefault(),
-                    Description = $"'{deleted.Name}' slettes."
-                })
-                .ToList();
-        }
-
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapMovedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
-        {
-            return consequences
-                .OrganizationUnitsBeingMoved
-                .Select(moved =>
-                {
-                    var (movedUnit, oldParent, newParent) = moved;
-                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
-                    {
-                        Name = movedUnit.Name,
-                        Category = ConnectionUpdateOrganizationUnitChangeCategory.Moved,
-                        Uuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
-                        Description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
-                    };
-                })
-                .ToList();
-        }
-
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapRenamedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
-        {
-            return consequences
-                .OrganizationUnitsBeingRenamed
-                .Select(renamed =>
-                {
-                    var (affectedUnit, oldName, newName) = renamed;
-                    return new ConnectionUpdateOrganizationUnitConsequenceDTO
-                    {
-                        Name = oldName,
-                        Category = ConnectionUpdateOrganizationUnitChangeCategory.Renamed,
-                        Uuid = affectedUnit.ExternalOriginUuid.GetValueOrDefault(),
-                        Description = $"'{oldName}' omdøbes til '{newName}'"
-                    };
-                })
-                .ToList();
-        }
-
-        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapAddedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
-        {
-            return consequences
-                .AddedExternalOrganizationUnits
-                .Select(added => new ConnectionUpdateOrganizationUnitConsequenceDTO
-                {
-                    Name = added.unitToAdd.Name,
-                    Category = ConnectionUpdateOrganizationUnitChangeCategory.Added,
-                    Uuid = added.unitToAdd.Uuid,
-                    Description = $"'{added.unitToAdd.Name}' tilføjes som underenhed til '{added.parent.Name}'"
-                }
-                )
-                .ToList();
+            return consequenceDtos;
         }
 
         private static StsOrganizationOrgUnitDTO MapOrganizationUnitDTO(ExternalOrganizationUnit organizationUnit)
@@ -226,6 +163,40 @@ namespace Presentation.Web.Controllers.API.V1
                     .OrderBy(x => x.Name)
                     .Select(MapOrganizationUnitDTO)
                     .ToList()
+            };
+        }
+        private static IEnumerable<StsOrganizationChangeLogResponseDTO> MapChangeLogResponseDtos(IEnumerable<IExternalConnectionChangelog> logs)
+        {
+            return logs.Select(MapChangeLogResponseDto).ToList();
+        }
+
+        private static StsOrganizationChangeLogResponseDTO MapChangeLogResponseDto(IExternalConnectionChangelog log)
+        {
+            return new StsOrganizationChangeLogResponseDTO
+            {
+                Origin = log.ResponsibleType.ToStsOrganizationChangeLogOriginOption(),
+                User = log.ResponsibleUser.MapToUserWithEmailDTO(),
+                Consequences = MapConsequenceLogsToDtos(log.GetEntries()),
+                LogTime = log.LogTime
+            };
+        }
+        
+        private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(IEnumerable<IExternalConnectionChangeLogEntry> logs)
+        {
+            return logs
+                .Select(MapConsequenceToDto)
+                .Transform(OrderLogEntries)
+                .ToList();
+        }
+
+        private static ConnectionUpdateOrganizationUnitConsequenceDTO MapConsequenceToDto(IExternalConnectionChangeLogEntry log)
+        {
+            return new ConnectionUpdateOrganizationUnitConsequenceDTO
+            {
+                Uuid = log.ExternalUnitUuid,
+                Name = log.Name,
+                Category = log.Type.ToConnectionUpdateOrganizationUnitChangeCategory(),
+                Description = log.Description
             };
         }
         #endregion DTO Mapping
