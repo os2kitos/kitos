@@ -1065,7 +1065,7 @@ namespace Tests.Unit.Core.Model
 
         private DateTime CreateValidDate()
         {
-            return DateTime.Now.AddMonths(new Random(A<int>()).Next(-30, 30));
+            return DateTime.Now.Date.AddMonths(new Random(A<int>()).Next(-30, 30));
         }
     }
 }

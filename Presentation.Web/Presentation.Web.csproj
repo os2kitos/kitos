@@ -377,6 +377,7 @@
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-change-category.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-consequence-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-consequences-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-permissions-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-origin.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-org-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-registration-dto.ts" />
@@ -404,11 +405,14 @@
     <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
+    <Compile Include="Controllers\API\V1\OrganizationPermissionsController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitPermissionsController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitRegistrationController.cs" />
@@ -428,9 +432,12 @@
     <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangeOrganizationUnitRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\OrganizationPermissionsDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationUnitDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogOriginOption.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\TransferOrganizationUnitRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\UnitAccessRightsDTO.cs" />

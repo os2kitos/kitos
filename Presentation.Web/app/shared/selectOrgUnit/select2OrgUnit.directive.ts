@@ -5,21 +5,8 @@
         "$scope",
         "select2LoadingService",
         ($scope: any, select2LoadingService: Kitos.Services.Select2LoadingService) => {
-            $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => $scope.options, formatResults, $scope.allowClear);
-
-            function formatResults(result: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<any>): string {
-                function visit(text: string, indentationLevel: number): string {
-                    if (indentationLevel <= 0) {
-                        return text;
-                    }
-                    //indentation is four non breaking spaces
-                    return visit("&nbsp&nbsp&nbsp&nbsp" + text, indentationLevel - 1);
-                }
-
-                var formattedResult = visit(result.text, result.indentationLevel);
-                return formattedResult;
-            }
-    }]);
+            $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => $scope.options, Kitos.Helpers.Select2OptionsFormatHelper.formatIndentation, $scope.allowClear);
+        }]);
 
     app.directive("select2OrgUnit", [
         function () {

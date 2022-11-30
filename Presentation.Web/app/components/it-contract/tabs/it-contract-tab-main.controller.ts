@@ -252,7 +252,7 @@
                             .then(_ => reloadValidationStatus());
                     }
                     else if (Kitos.Helpers.DateValidationHelper.validateValidityPeriod(concluded, expirationDate, notify, "Gyldig fra", "Gyldig til")) {
-                        const dateString = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, Kitos.Constants.DateFormat.EnglishDateFormat]).format(Kitos.Constants.DateFormat.EnglishDateFormat);
+                        const dateString = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                         payload[field] = dateString;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId)
                             .then(_ => reloadValidationStatus());

@@ -78,18 +78,16 @@
                             , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 }
 
-                $scope.patchDate = (field, value) => {
-                    var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
+                $scope.patchDate = (field, value, fieldName) => {
                     var payload = {};
-                    if (value === "" || value == undefined) {
+                    if (!value) {
                         payload[field] = null;
                         itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
                                 , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
-                    } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                    } else {
-                        date = date.format("YYYY-MM-DD");
+                    }
+                    else if (Kitos.Helpers.DateValidationHelper.validateDateInput(value, notify, fieldName, true)) {
+                        var date = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                         payload[field] = date;
                         itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")

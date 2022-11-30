@@ -233,7 +233,7 @@
                                        data-k-options="datepickerOptions"
                                        ng-disabled="!hasWriteAccess"
                                        ng-model="usage.userSupervisionDate"
-                                       ng-blur="patchDate('UserSupervisionDate', usage.userSupervisionDate)">
+                                       ng-blur="patchDate('UserSupervisionDate', usage.userSupervisionDate, 'Dato for seneste brugerkontrol')">
                                 <span id="helpBlockRisk" class="help-block small">Eksempelvis "25-04-2017"</span>
                             </div>
 
@@ -287,7 +287,7 @@
                                    data-k-options="datepickerOptions"
                                    ng-disabled="!hasWriteAccess"
                                    ng-model="usage.riskAssesmentDate"
-                                   ng-blur="patchDate('riskAssesmentDate', usage.riskAssesmentDate)"
+                                   ng-blur="patchDate('riskAssesmentDate', usage.riskAssesmentDate, 'Dato for seneste risikovurdering')"
                                    data-field="riskAssesmentDate">
                             <span id="helpBlockRisk" class="help-block small">Eksempelvis "25-04-2017"</span>
                         </div>
@@ -363,7 +363,7 @@
                                        data-k-options="datepickerOptions"
                                        ng-disabled="!hasWriteAccess"
                                        ng-model="usage.dpiaDateFor"
-                                       ng-blur="patchDate('DPIADateFor', usage.dpiaDateFor)"
+                                       ng-blur="patchDate('DPIADateFor', usage.dpiaDateFor, 'Dato for den seneste DPIA')"
                                        data-field="DPIADateFor">
                                 <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "25-04-2017"</span>
                             </div>
@@ -417,7 +417,7 @@
                                    data-k-options="datepickerOptions"
                                    ng-disabled="!hasWriteAccess"
                                    ng-model="usage.dpiaDeleteDate"
-                                   ng-blur="patchDate('DPIAdeleteDate', usage.dpiaDeleteDate)"
+                                   ng-blur="patchDate('DPIAdeleteDate', usage.dpiaDeleteDate, 'Dato for hvornår der må foretages sletning af data i systemet næste gang')"
                                    data-field="DPIAdeleteDate">
                             <span id="helpBlockDeleteDPIA" class="help-block small">Eksempelvis "25-04-2017"</span>
                         </div>

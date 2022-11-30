@@ -16,7 +16,7 @@
                                 id: String(orgUnit.id),
                                 text: orgUnit.name,
                                 indentationLevel: indentationLevel,
-                                optionalExtraObject: orgUnit.ean
+                                optionalObjectContext: orgUnit.ean
                             };
 
                             options.push(option);
@@ -65,15 +65,7 @@
             vm.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.paymentModel);
             vm.isExtPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.extPayment);
             vm.isIntPaymentEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy.children.intPayment);
-
-            function convertDate(value: string): moment.Moment {
-                return moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-            }
-
-            function isDateInvalid(date: moment.Moment) {
-                return !date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099;
-            }
-
+            
             vm.patchPaymentModelDate = (field, value) => {
                 function patchContract(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
@@ -85,22 +77,18 @@
                         });
                 }
 
-                const date = convertDate(value);
+                var payload = {};
+                const url = vm.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId;
+
                 if (value === "") {
-                    var payload = {};
                     payload[field] = null;
-                    patchContract(payload, vm.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
+                    patchContract(payload, url);
                 } else if (value == null) {
 
-                } else if (isDateInvalid(date)) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
-
-                }
-                else {
-                    const dateString = date.format("YYYY-MM-DD");
-                    var payload = {};
+                } else if (Kitos.Helpers.DateValidationHelper.validateDateInput(value, notify, "Driftsvederlag påbegyndt", false)){
+                    const dateString = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                     payload[field] = dateString;
-                    patchContract(payload, vm.patchPaymentModelUrl + "?organizationId=" + user.currentOrganizationId);
+                    patchContract(payload, url);
                 }
             }
 
@@ -150,7 +138,7 @@
                     stream.ean = " - ";
 
                     if (stream.organizationUnitId !== null && stream.organizationUnitId !== undefined) {
-                        stream.ean = stream.organizationUnitId.optionalExtraObject;
+                        stream.ean = stream.organizationUnitId.optionalObjectContext;
                     }
                 };
                 stream.updateEan = updateEan;
@@ -179,21 +167,17 @@
             vm.newIntern = () => {
                 postStream("InternPaymentForId", "OrganizationId");
             };
-            vm.patchDate = (field, value, id) => {
-                const date = convertDate(value);
-                if (value === "") {
-                    var payload = {};
-                    payload[field] = null;
-                    patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
-                } else if (isDateInvalid(date)) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+            vm.patchDate= (field, value, id, fieldName) => {
+                const url = `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`;
+                var payload = {};
 
-                }
-                else {
-                    const dateString = date.format("YYYY-MM-DD");
-                    var payload = {};
+                if (!value) {
+                    payload[field] = null;
+                    patch(payload, url);
+                } else if (Kitos.Helpers.DateValidationHelper.validateDateInput(value, notify, fieldName, true)){
+                    const dateString = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                     payload[field] = dateString;
-                    patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
+                    patch(payload, url);
                 }
             }
             function patch(payload, url) {
