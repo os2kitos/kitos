@@ -196,7 +196,7 @@ namespace Core.DomainModel.Organization.Strategies
 
                 if (movedUnit.SearchSubTree(unit => unit.ExternalOriginUuid.GetValueOrDefault() == newParent.Uuid).HasValue)
                 {
-                    //Wait while the sub tree is processed so that we don't break reloaction rules and not lose any retained child relations
+                    //Wait while the sub tree is processed so that we don't break relocation rules and not lose any retained child relations
                     processingQueue.Enqueue((movedUnit, oldParent, newParent));
                 }
                 else
