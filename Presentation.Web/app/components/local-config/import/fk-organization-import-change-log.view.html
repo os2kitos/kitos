@@ -8,11 +8,11 @@
     </thead>
     <tbody>
         <tr>
-            <td>{{ ctrl.responsibleEntityText }}</td>
-            <td>{{ ctrl.changeLog.consequences.length }}</td>
-            <td>{{ ctrl.logTime }}</td>
+            <td>{{:: ctrl.responsibleEntityText }}</td>
+            <td>{{:: ctrl.changeLog.consequences.length }}</td>
+            <td>{{:: ctrl.logTime }}</td>
         </tr>
 </table>
 <div class="margin-top-sm">
-    <fk-orgnization-import-consequences-log consequences="ctrl.changeLog.consequences"></fk-orgnization-import-consequences-log>
+    <fk-orgnization-import-consequences-log data-consequences="ctrl.changeLog.consequences"/>
 </div>

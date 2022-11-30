@@ -5,7 +5,6 @@ namespace Core.DomainModel.Organization
 {
     public interface IExternalConnectionChangelog
     {
-        int Id { get; }
         User ResponsibleUser { get; }
         ExternalOrganizationChangeLogResponsible ResponsibleType { get; }
 

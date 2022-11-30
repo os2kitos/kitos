@@ -12,6 +12,12 @@
         };
     }
 
+    interface ISelect2ChangeLogModel {
+        selectedElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO>;
+        select2Config: any,
+        elementSelected: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO>) => void;
+    }
+
     interface IFkOrganizationImportChangeLogRootController {
         organizationUuid: string;
     }
@@ -20,19 +26,18 @@
         organizationUuid: string | null = null;
 
         changeLogs: Array<Models.Api.Organization.ConnectionChangeLogDTO> = [];
-        selectedChangeLog: Models.Api.Organization.ConnectionChangeLogDTO;
+        selectedChangeLog: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO> | null = null;
 
         isChangeLogLoaded = false;
 
-        selectChangeLogModel = {};
+        selectChangeLogModel: ISelect2ChangeLogModel;
 
         private readonly maxNumberOfLogs = 5;
 
-        static $inject: string[] = ["stsOrganizationSyncService", "select2LoadingService", "notify"];
+        static $inject: string[] = ["stsOrganizationSyncService", "select2LoadingService"];
         constructor(
             private readonly stsOrganizationSyncService: Services.Organization.IStsOrganizationSyncService,
-            private readonly select2LoadingService: Services.ISelect2LoadingService,
-            private readonly  notify) {
+            private readonly select2LoadingService: Services.ISelect2LoadingService) {
         }
 
         $onInit() {
@@ -45,12 +50,13 @@
                 .then(
                     response => {
                         this.changeLogs.pushArray(response);
+                        this.changeLogs.forEach((x, index) => x.id = index);
+
                         this.bindChangeLogModel();
                         this.isChangeLogLoaded = true;
                     },
                     error => {
                         console.log(error);
-                        this.notify.addErrorMessage("Failed to get the change logs");
                     });
 
         }
@@ -58,15 +64,15 @@
         bindChangeLogModel() {
             var optionMap = Helpers.ConnectionChangeLogHelper.createDictionaryFromChangeLogList(this.changeLogs);
             const options = this.changeLogs.map(option => optionMap[option.id]);
-
+            
             this.selectChangeLogModel = {
-                selectedElement: this.selectedChangeLog && optionMap[this.selectedChangeLog.id],
+                selectedElement: this.selectedChangeLog,
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(
                     () => options,
                     true,
                     (changeLog: { optionalObjectContext: Models.Api.Organization.ConnectionChangeLogDTO }) => Helpers.Select2OptionsFormatHelper.formatChangeLog(changeLog.optionalObjectContext)),
-                elementSelected: (newElement) => {
-                    this.selectedChangeLog = newElement.optionalObjectContext;
+                elementSelected: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO>) => {
+                    this.selectedChangeLog = newElement;
                 }
             };
         }

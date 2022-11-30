@@ -13,15 +13,15 @@
     }
     
     interface IFkOrganizationImportChangeLogController{
-        changeLog: Models.Api.Organization.ConnectionChangeLogDTO
+        changeLog: Models.Api.Organization.ConnectionChangeLogDTO;
+        responsibleEntityText: string;
+        logTime: string;
     }
 
     class FkOrganizationImportChangeLogController implements IFkOrganizationImportChangeLogController {
         changeLog: Models.Api.Organization.ConnectionChangeLogDTO | null = null;
-        responsibleEntityText: string;
-        logTime: string;
-        
-        static $inject: string[] = [];
+        responsibleEntityText: string | null = null;
+        logTime: string | null = null;
 
         $onInit() {
             if (!this.changeLog) {
