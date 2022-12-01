@@ -489,17 +489,12 @@ namespace Core.DomainModel.Organization
 
         public Maybe<OperationError> UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin origin)
         {
-            switch (origin)
-            {
-                case OrganizationUnitOrigin.STS_Organisation:
-                    return StsOrganizationConnection == null
-                        ? new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.BadState)
-                        : StsOrganizationConnection.UnsubscribeFromAutomaticUpdates();
-                case OrganizationUnitOrigin.Kitos:
-                    return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return GetExternalConnection(origin)
+                .Match
+                (
+                    connection => connection.Unsubscribe(),
+                    error => error
+                );
         }
     }
 }

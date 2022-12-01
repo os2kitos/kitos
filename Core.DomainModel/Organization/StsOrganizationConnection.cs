@@ -86,17 +86,6 @@ namespace Core.DomainModel.Organization
         {
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
-
-        public Maybe<OperationError> UnsubscribeFromAutomaticUpdates()
-        {
-            if (!Connected)
-            {
-                return new OperationError("Not connected", OperationFailure.BadState);
-            }
-
-            SubscribeToUpdates = false;
-            return Maybe<OperationError>.None;
-		}
 		
         public Result<ExternalConnectionAddNewLogsResult, OperationError> AddNewLog(ExternalConnectionAddNewLogInput newLogInput)
         {
