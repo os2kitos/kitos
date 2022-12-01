@@ -5,11 +5,13 @@ using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using System;
 using System.Linq;
+using Core.ApplicationServices.Extensions;
 using Core.DomainServices;
 using Core.DomainServices.Organizations;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 using Core.DomainServices.Context;
+using Core.DomainServices.Time;
 
 namespace Core.ApplicationServices.Organizations.Handlers
 {
@@ -22,6 +24,9 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IDatabaseControl _databaseControl;
         private readonly ITransactionManager _transactionManager;
         private readonly Maybe<ActiveUserIdContext> _userContext;
+        private readonly IOperationClock _operationClock;
+        private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
+        private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
 
         public AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler(
             IStsOrganizationUnitService stsOrganizationUnitService,
@@ -30,7 +35,10 @@ namespace Core.ApplicationServices.Organizations.Handlers
             IDomainEvents domainEvents,
             IDatabaseControl databaseControl,
             ITransactionManager transactionManager,
-            Maybe<ActiveUserIdContext> userContext)
+            Maybe<ActiveUserIdContext> userContext,
+            IOperationClock operationClock,
+            Maybe<ActiveUserIdContext> activeUserIdContext,
+            IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationUnitRepository = organizationUnitRepository;
@@ -39,8 +47,12 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _databaseControl = databaseControl;
             _transactionManager = transactionManager;
             _userContext = userContext;
+            _operationClock = operationClock;
+            _activeUserIdContext = activeUserIdContext;
+            _stsChangeLogRepository = stsChangeLogRepository;
         }
 
+        //TODO: Migrate tests for this
         public Maybe<OperationError> Execute(AuthorizedUpdateOrganizationFromFKOrganisationCommand command)
         {
             var organization = command.Organization;
@@ -57,6 +69,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 }
 
                 //Import the external tree into the organization
+                //TODO: See if addition can be handled in the update method in stead!
                 var updateResult = organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, organizationTree.Value, command.SynchronizationDepth, command.SubscribeToChanges);
                 if (updateResult.Failed)
                 {
@@ -79,9 +92,25 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
                 if (IsBackgroundImport())
                 {
+                    //TODO: Fix that
                     organization.StsOrganizationConnection.DateOfLatestCheckBySubscription = DateTime.Now;
                 }
-                //TODO: Add entry to the change log - only if there are any consequences - otherwise ignore it!
+
+                var logEntries = consequences.ToLogEntries(_activeUserIdContext, _operationClock);
+                var addLogResult = organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries);
+                if (addLogResult.Failed)
+                {
+                    var error = addLogResult.Error;
+                    _logger.Error("Failed adding change log while importing org tree for organization with uuid {uuid}. Failed with: {code}:{message}", command.Organization.Uuid, error.FailureType, error.Message);
+                    transaction.Rollback();
+                    return error;
+                }
+
+                var addNewLogsResult = addLogResult.Value;
+                if (addNewLogsResult.RemovedChangeLogs.Any())
+                {
+                    _stsChangeLogRepository.RemoveRange(addNewLogsResult.RemovedChangeLogs);
+                }
 
                 _databaseControl.SaveChanges();
                 transaction.Commit();

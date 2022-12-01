@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
@@ -29,11 +30,11 @@ namespace Core.ApplicationServices.Organizations
         private readonly IDatabaseControl _databaseControl;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
-        private readonly IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
         private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
         private readonly IOperationClock _operationClock;
+        private readonly ICommandBus _commandBus;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
@@ -44,10 +45,10 @@ namespace Core.ApplicationServices.Organizations
             IDatabaseControl databaseControl,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IGenericRepository<OrganizationUnit> organizationUnitRepository,
             Maybe<ActiveUserIdContext> activeUserIdContext,
             IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository,
-            IOperationClock operationClock)
+            IOperationClock operationClock,
+            ICommandBus commandBus)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -56,11 +57,11 @@ namespace Core.ApplicationServices.Organizations
             _databaseControl = databaseControl;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
-            _organizationUnitRepository = organizationUnitRepository;
             _authorizationContext = authorizationContext;
             _activeUserIdContext = activeUserIdContext;
             _stsChangeLogRepository = stsChangeLogRepository;
             _operationClock = operationClock;
+            _commandBus = commandBus;
         }
 
         public Result<StsOrganizationSynchronizationDetails, OperationError> GetSynchronizationDetails(Guid organizationId)
@@ -108,7 +109,7 @@ namespace Core.ApplicationServices.Organizations
                 return LoadOrganizationUnits(organization)
                     .Bind(importRoot => ConnectToExternalOrganizationHierarchy(organization, importRoot, levelsToInclude, subscribeToUpdates))
                     .Select(ToConnectionConsequences)
-                    .Select(ToLogEntries)
+                    .Select(x => x.ToLogEntries(_activeUserIdContext, _operationClock))
                     .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
                     .MatchFailure();
             });
@@ -154,31 +155,7 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return Modify(organizationId, organization =>
-                LoadOrganizationUnits(organization)
-                    .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude, subscribeToUpdates))
-                    .Select(consequences =>
-                    {
-                        if (consequences.DeletedExternalUnitsBeingDeleted.Any())
-                        {
-                            _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList());
-                        }
-                        foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
-                        {
-                            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(affectedUnit));
-                        }
-                        return consequences;
-                    })
-                    .Select(ToLogEntries)
-                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
-                    .Match(importLogResult =>
-                    {
-                        if (importLogResult.RemovedChangeLogs.Any())
-                        {
-                            _stsChangeLogRepository.RemoveRange(importLogResult.RemovedChangeLogs);
-                        }
-
-                        return Maybe<OperationError>.None;
-                    }, error => error)
+                _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, OperationError>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, levelsToInclude, subscribeToUpdates))
             );
         }
 
@@ -265,30 +242,6 @@ namespace Core.ApplicationServices.Organizations
                     error => error,
                     () => Result<ExternalOrganizationUnit, OperationError>.Success(importRoot)
                 );
-        }
-
-        private ExternalConnectionAddNewLogInput ToLogEntries(OrganizationTreeUpdateConsequences consequences)
-        {
-            var changeLogType = ExternalOrganizationChangeLogResponsible.Background;
-            int? changeLogUserId = null;
-            if (_activeUserIdContext.HasValue)
-            {
-                var userId = _activeUserIdContext.Value.ActiveUserId;
-                changeLogType = ExternalOrganizationChangeLogResponsible.User;
-                changeLogUserId = userId;
-            }
-
-            var changeLogEntries = consequences.ConvertConsequencesToConsequenceLogs().ToList();
-            var changeLogLogTime = _operationClock.Now;
-
-            return new ExternalConnectionAddNewLogInput(changeLogUserId, changeLogType, changeLogLogTime, MapToExternalConnectionAddNewLogEntryInput(changeLogEntries));
-        }
-
-        private static IEnumerable<ExternalConnectionAddNewLogEntryInput> MapToExternalConnectionAddNewLogEntryInput(IEnumerable<StsOrganizationConsequenceLog> entry)
-        {
-            return entry
-                .Select(x => new ExternalConnectionAddNewLogEntryInput(x.ExternalUnitUuid, x.Name, x.Type, x.Description))
-                .ToList();
         }
 
         private static OrganizationTreeUpdateConsequences ToConnectionConsequences(ExternalOrganizationUnit importRoot)

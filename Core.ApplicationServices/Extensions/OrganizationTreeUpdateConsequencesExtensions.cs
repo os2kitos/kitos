@@ -1,4 +1,7 @@
-﻿using Core.DomainModel.Organization;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel.Organization;
+using Core.DomainServices.Context;
+using Core.DomainServices.Time;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,6 +9,30 @@ namespace Core.ApplicationServices.Extensions
 {
     public static class OrganizationTreeUpdateConsequencesExtensions
     {
+        public static ExternalConnectionAddNewLogInput ToLogEntries(this OrganizationTreeUpdateConsequences consequences, Maybe<ActiveUserIdContext> activeUserIdContext, IOperationClock operationClock)
+        {
+            var changeLogType = ExternalOrganizationChangeLogResponsible.Background;
+            int? changeLogUserId = null;
+            if (activeUserIdContext.HasValue)
+            {
+                var userId = activeUserIdContext.Value.ActiveUserId;
+                changeLogType = ExternalOrganizationChangeLogResponsible.User;
+                changeLogUserId = userId;
+            }
+
+            var changeLogEntries = consequences.ConvertConsequencesToConsequenceLogs().ToList();
+            var changeLogLogTime = operationClock.Now;
+
+            return new ExternalConnectionAddNewLogInput(changeLogUserId, changeLogType, changeLogLogTime, MapToExternalConnectionAddNewLogEntryInput(changeLogEntries));
+        }
+
+        private static IEnumerable<ExternalConnectionAddNewLogEntryInput> MapToExternalConnectionAddNewLogEntryInput(IEnumerable<StsOrganizationConsequenceLog> entry)
+        {
+            return entry
+                .Select(x => new ExternalConnectionAddNewLogEntryInput(x.ExternalUnitUuid, x.Name, x.Type, x.Description))
+                .ToList();
+        }
+
         public static IEnumerable<StsOrganizationConsequenceLog> ConvertConsequencesToConsequenceLogs(this OrganizationTreeUpdateConsequences consequences)
         {
             var logs = new List<StsOrganizationConsequenceLog>();
