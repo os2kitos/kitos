@@ -30,6 +30,19 @@
     </div>
 
 </div>
+<div ng-if="ctrl.synchronizationStatus !== null && ctrl.synchronizationStatus.connected">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a id="expand_collapse_change_log" class="task-fold control-label" data-ng-click="isExpanded = !isExpanded">
+                <span>Ændringslog</span>
+                <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isExpanded, 'fa-plus-square-o': !isExpanded}"></i>
+            </a>
+        </div>
+        <div ng-if="isExpanded" class="panel-body">
+            <fk-organization-import-change-logs-root data-organization-uuid="{{::ctrl.currentOrganizationUuid}}" />
+        </div>
+    </div>
+</div>
 <div class="form-group" ng-if="ctrl.commands && ctrl.commands.length > 0">
     <button ng-repeat="command in ctrl.commands" data-disabled-on-busy id="command.id"
             class="btn right-margin-5px"
