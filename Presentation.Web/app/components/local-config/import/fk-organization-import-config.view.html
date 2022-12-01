@@ -39,7 +39,7 @@
             </a>
         </div>
         <div ng-if="isExpanded" class="panel-body">
-            <fk-organization-import-change-logs-root data-organization-uuid="ctrl.currentOrganizationUuid" />
+            <fk-organization-import-change-logs-root data-organization-uuid="{{::ctrl.currentOrganizationUuid}}" />
         </div>
     </div>
 </div>
