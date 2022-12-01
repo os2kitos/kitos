@@ -1,13 +1,8 @@
 ﻿using System;
-<<<<<<< HEAD
 using System.Linq;
 using Core.Abstractions.Types;
-=======
 using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Types;
 using Core.DomainModel.Constants;
->>>>>>> 1859ae04b5fbda0785c07a575c24e50e7d632bab
 using Core.DomainModel.Organization.Strategies;
 
 namespace Core.DomainModel.Organization

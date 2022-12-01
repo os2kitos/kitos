@@ -8,7 +8,7 @@ namespace Core.BackgroundJobs.Services
     {
         public void ScheduleLinkCheckForImmediateExecution()
         {
-            RecurringJob.Trigger(StandardJobIds.CheckExternalLinks);
+            RecurringJob.TriggerJob(StandardJobIds.CheckExternalLinks);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 var consequences = updateResult.Value;
                 if (consequences.DeletedExternalUnitsBeingDeleted.Any())
                 {
-                    _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted);
+                    _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList());
                 }
                 foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
                 {
