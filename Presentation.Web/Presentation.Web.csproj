@@ -356,6 +356,8 @@
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-change-log.component.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-change-logs-root.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config-import-modal.dialog.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-consequences-log.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
@@ -365,6 +367,7 @@
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
     <TypeScriptCompile Include="app\Configs\kendo-date-picker-options.ts" />
     <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\connection-change-log-helper.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
@@ -374,6 +377,8 @@
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-origin.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-change-category.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-consequence-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-consequences-response-dto.ts" />
@@ -392,6 +397,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-connection-change-logs.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-unit-migration.ts" />
     <TypeScriptCompile Include="app\models\users\user-deletion-strategy-type.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\feature-toggle\feature-toggle-view-model.ts" />
@@ -679,6 +685,8 @@
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-change-log.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-change-logs-root.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-consequences-log.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config-import-modal.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config.view.html" />
