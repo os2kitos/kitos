@@ -10,17 +10,21 @@ using Core.DomainModel.Organization.Strategies;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Tests.Unit.Core.Model.Strategies
 {
     public class StsOrganizationalHierarchyUpdateStrategyTest : WithAutoFixture
     {
+        private readonly ITestOutputHelper _testOutputHelper;
         private readonly StsOrganizationalHierarchyUpdateStrategy _sut;
         private readonly Organization _organization;
         private int _nextOrgUnitId;
 
-        public StsOrganizationalHierarchyUpdateStrategyTest()
+        public StsOrganizationalHierarchyUpdateStrategyTest(ITestOutputHelper testOutputHelper)
         {
+            _testOutputHelper = testOutputHelper;
             _organization = new Organization();
             _sut = new StsOrganizationalHierarchyUpdateStrategy(_organization);
             _nextOrgUnitId = 0;
@@ -28,7 +32,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
         private int GetNewOrgUnitId() => _nextOrgUnitId++;
 
-        private void PrepareConnectedOrganization()
+        private void PrepareConnectedOrganization(OrganizationUnit predefinedRoot = null)
         {
             _organization.StsOrganizationConnection = new StsOrganizationConnection
             {
@@ -36,7 +40,7 @@ namespace Tests.Unit.Core.Model.Strategies
                 Organization = _organization
             };
 
-            var organizationUnit = CreateOrganizationUnit
+            var organizationUnit = predefinedRoot ?? CreateOrganizationUnit
             (
                 OrganizationUnitOrigin.STS_Organisation, new[]
                 {
@@ -241,7 +245,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            Assert.ProperSubset(root.FlattenHierarchy().Where(x=>x.Origin == OrganizationUnitOrigin.STS_Organisation).Select(x=>x.ExternalOriginUuid.GetValueOrDefault()).ToHashSet(),expectedNewUnits.Select(x=>x.ExternalOriginUuid.GetValueOrDefault()).ToHashSet());
+            Assert.ProperSubset(root.FlattenHierarchy().Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation).Select(x => x.ExternalOriginUuid.GetValueOrDefault()).ToHashSet(), expectedNewUnits.Select(x => x.ExternalOriginUuid.GetValueOrDefault()).ToHashSet());
         }
 
         [Fact]
@@ -255,7 +259,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            Assert.Equal(expectedNewName,randomItemToRename.Name);
+            Assert.Equal(expectedNewName, randomItemToRename.Name);
         }
 
         [Fact]
@@ -300,7 +304,64 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            Assert.Equal(newItem.ExternalOriginUuid.GetValueOrDefault(),randomLeafMovedToNewlyImportedItem.Parent.ExternalOriginUuid.GetValueOrDefault());
+            Assert.Equal(newItem.ExternalOriginUuid.GetValueOrDefault(), randomLeafMovedToNewlyImportedItem.Parent.ExternalOriginUuid.GetValueOrDefault());
+        }
+
+        [Fact]
+        public void PerformUpdate_Updates_Units_Moved_To_Newly_Added_Parent_And_Sub_Tree_Is_Moved_Along()
+        {
+            //Arrange
+            var root = CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,
+                new[]
+                {
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,
+                        new []
+                        {
+                            CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,
+                                new []
+                                {
+                                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,new[]
+                                    {
+                                        CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                                    })
+                                }),
+                            CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation),
+                            CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                        })
+                });
+            var externalTree = ConvertToExternalTree(root); //the complete tree
+            var childToRemove = root.FlattenHierarchy().Skip(1).First();
+            foreach (var grandChild in childToRemove.Children.ToList())
+            {
+                childToRemove.RemoveChild(grandChild);
+                root.AddChild(grandChild);
+            }
+            root.RemoveChild(childToRemove); // the current tree is missing a link -> we expect the final tree to be 100% like the external tree including sub trees
+
+
+            PrepareConnectedOrganization(root);
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            Assert.True(consequences.Ok);
+            AssertHierarchies(externalTree, ConvertToExternalTree(_organization.GetRoot()));
+        }
+
+        private void AssertHierarchies(ExternalOrganizationUnit expected, ExternalOrganizationUnit actual, int level = 1)
+        {
+            _testOutputHelper.WriteLine("Testing hierarchy consistency at level {0} currently evaluating expected node:{1} ({2})", level, expected.Name, expected.Uuid);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Uuid, actual.Uuid);
+            var expectedChildren = expected.Children.ToDictionary(x => x.Uuid);
+            var actualChildren = actual.Children.ToDictionary(x => x.Uuid);
+            Assert.Equivalent(expectedChildren.Keys, actualChildren.Keys, true);
+
+            foreach (var expectedChild in expectedChildren)
+            {
+                AssertHierarchies(expectedChild.Value, actualChildren[expectedChild.Key], level + 1);
+            }
         }
 
         [Fact]
@@ -314,9 +375,9 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             Assert.True(consequences.Ok);
-            Assert.DoesNotContain(root.FlattenHierarchy(),child=>expectedRemovedUnits.Contains(child));
+            Assert.DoesNotContain(root.FlattenHierarchy(), child => expectedRemovedUnits.Contains(child));
             var actualConverted = Assert.Single(root.FlattenHierarchy().Where(x => x == nodeExpectedToBeConverted));
-            Assert.Equal(OrganizationUnitOrigin.Kitos,actualConverted.Origin);
+            Assert.Equal(OrganizationUnitOrigin.Kitos, actualConverted.Origin);
             Assert.Null(actualConverted.ExternalOriginUuid);
         }
 
@@ -410,7 +471,9 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(expectedNewName, newName);
         }
 
-        private static (OrganizationUnit movedUnit, ExternalOrganizationUnit newParent) AssertUnitsToMoveToExistingParentsWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit randomLeafWhichMustBeMovedToRoot, OrganizationUnit expectedNewParent)
+        private static void AssertUnitsToMoveToExistingParentsWereDetected(
+            OrganizationTreeUpdateConsequences consequences, OrganizationUnit randomLeafWhichMustBeMovedToRoot,
+            OrganizationUnit expectedNewParent)
         {
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
             Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
@@ -420,8 +483,6 @@ namespace Tests.Unit.Core.Model.Strategies
             var (movedUnit, _, newParent) = Assert.Single(consequences.OrganizationUnitsBeingMoved);
             Assert.Equal(randomLeafWhichMustBeMovedToRoot, movedUnit);
             Assert.Equal(expectedNewParent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
-
-            return new ValueTuple<OrganizationUnit, ExternalOrganizationUnit>(movedUnit, newParent);
         }
 
         private static void AssertUnitsToMoveToNewlyAddedParentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit root, OrganizationUnit exptectedNewItem, OrganizationUnit expectedMovedUnit)
@@ -438,7 +499,9 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(unitToAdd.Uuid, newParent.Uuid);
         }
 
-        private static OrganizationUnit AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit nodeExpectedToBeConverted, IEnumerable<OrganizationUnit> expectedRemovedUnits)
+        private static void AssertUnitsWhichAreConvertedSinceTheyContainRetainedSubTreeContentWereDetected(
+            OrganizationTreeUpdateConsequences consequences, OrganizationUnit nodeExpectedToBeConverted,
+            IEnumerable<OrganizationUnit> expectedRemovedUnits)
         {
             var organizationUnit = Assert.Single(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits).organizationUnit;
             Assert.Same(nodeExpectedToBeConverted, organizationUnit);
@@ -450,8 +513,6 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.OrganizationUnitsBeingRenamed);
             Assert.Empty(consequences.AddedExternalOrganizationUnits);
             Assert.Empty(consequences.OrganizationUnitsBeingMoved);
-
-            return organizationUnit;
         }
 
         private static void AssertUnitsWhichAreConvertedSinceTheyAreStillInUseWereDetected(

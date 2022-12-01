@@ -179,8 +179,10 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Relocation of existing units
-            foreach (var (movedUnit, oldParent, newParent) in consequences.OrganizationUnitsBeingMoved)
+            var processingQueue = new Queue<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>(consequences.OrganizationUnitsBeingMoved);
+            while (processingQueue.Any())
             {
+                var (movedUnit, oldParent, newParent) = processingQueue.Dequeue();
                 if (!currentTreeByUuid.TryGetValue(oldParent.ExternalOriginUuid.GetValueOrDefault(), out var oldParentUnit))
                 {
                     return new OperationError($"Old parent unit with uuid {oldParent.Uuid} could not be found", OperationFailure.BadInput);
@@ -192,22 +194,17 @@ namespace Core.DomainModel.Organization.Strategies
 
                 }
 
-                var nativeUnitsCreatedUnderMovedExternalUnit = movedUnit.Children.Where(child=>child.Origin == OrganizationUnitOrigin.Kitos).ToList();
-                
-                //Move the moved unit without affecting the subtree (let the consequences decide that)
-                var relocationError = _organization.RelocateOrganizationUnit(movedUnit, oldParentUnit, newParentUnit, false);
-                if (relocationError.HasValue)
+                if (movedUnit.SearchSubTree(unit => unit.ExternalOriginUuid.GetValueOrDefault() == newParent.Uuid).HasValue)
                 {
-                    return relocationError.Value;
+                    //Wait while the sub tree is processed so that we don't break relocation rules and not lose any retained child relations
+                    processingQueue.Enqueue((movedUnit, oldParent, newParent));
                 }
-                //Make sure that "native" children created on the moved unit "tags along" as opposed to connected units which should only be moved if moved in fk org
-                foreach (var child in nativeUnitsCreatedUnderMovedExternalUnit)
+                else
                 {
-                    //Only native nodes can exist as children to native units, so reloacte the sub tree
-                    var childRelocationError = _organization.RelocateOrganizationUnit(child, child.Parent, movedUnit, true);
-                    if (childRelocationError.HasValue)
+                    var relocationError = _organization.RelocateOrganizationUnit(movedUnit, oldParentUnit, newParentUnit, true);
+                    if (relocationError.HasValue)
                     {
-                        return childRelocationError.Value;
+                        return relocationError.Value;
                     }
                 }
             }
