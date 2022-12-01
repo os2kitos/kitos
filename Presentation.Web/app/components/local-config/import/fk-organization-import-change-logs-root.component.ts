@@ -13,9 +13,9 @@
     }
 
     interface ISelect2ChangeLogModel {
-        selectedElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO>;
+        selectedElement: Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel>;
         select2Config: any,
-        elementSelected: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO>) => void;
+        elementSelected: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel>) => void;
     }
 
     interface IFkOrganizationImportChangeLogRootController {
@@ -25,8 +25,8 @@
     class FkOrganizationImportChangeLogRootController implements IFkOrganizationImportChangeLogRootController {
         organizationUuid: string | null = null;
 
-        changeLogs: Array<Models.Api.Organization.ConnectionChangeLogDTO> = [];
-        selectedChangeLog: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO> | null = null;
+        changeLogs: Array<Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel> = [];
+        selectedChangeLog: Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel> | null = null;
 
         isChangeLogLoaded = false;
 
@@ -70,8 +70,8 @@
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(
                     () => options,
                     true,
-                    (changeLog: { optionalObjectContext: Models.Api.Organization.ConnectionChangeLogDTO }) => Helpers.Select2OptionsFormatHelper.formatChangeLog(changeLog.optionalObjectContext)),
-                elementSelected: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO>) => {
+                    (changeLog: { optionalObjectContext: Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel }) => Helpers.Select2OptionsFormatHelper.formatChangeLog(changeLog.optionalObjectContext)),
+                elementSelected: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel>) => {
                     this.selectedChangeLog = newElement;
                 }
             };

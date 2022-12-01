@@ -1,6 +1,6 @@
 ﻿module Kitos.Helpers {
     export class ConnectionChangeLogHelper {
-        static createDictionaryFromChangeLogList(changeLogs: Array<Models.Api.Organization.ConnectionChangeLogDTO>): {[key: number]: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Organization.ConnectionChangeLogDTO>} {
+        static createDictionaryFromChangeLogList(changeLogs: Array<Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel>): { [key: number]: Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.ViewModel.Organization.IFkOrganizationConnectionChangeLogsViewModel>} {
             return changeLogs.reduce((acc, next, _) => {
                 acc[next.id] = {
                     id: next.id,
