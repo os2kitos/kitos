@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.ScheduledJobs;
@@ -81,7 +82,7 @@ namespace Core.BackgroundJobs.Model.Maintenance
 
                 try
                 {
-                    var command = new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, organization.StsOrganizationConnection.SynchronizationDepth, true);
+                    var command = new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, organization.StsOrganizationConnection.SynchronizationDepth.FromNullableValueType(), true);
                     var error = _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(command);
                     if (error.HasValue)
                     {

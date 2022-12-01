@@ -185,7 +185,7 @@ namespace Presentation.Web.Controllers.API.V1
             return new StsOrganizationChangeLogResponseDTO
             {
                 Origin = log.ResponsibleType.ToStsOrganizationChangeLogOriginOption(),
-                User = log.ResponsibleUser.MapToUserWithEmailDTO(),
+                User = log.ResponsibleUser.FromNullable().Select(x=>x.MapToUserWithEmailDTO()).GetValueOrDefault(),
                 Consequences = MapConsequenceLogsToDtos(log.GetEntries()),
                 LogTime = log.LogTime
             };
