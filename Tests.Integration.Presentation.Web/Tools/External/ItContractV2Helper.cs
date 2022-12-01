@@ -80,7 +80,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<ItContractResponseDTO> PostContractAsync(string token, CreateNewContractRequestDTO dto)
         {
             using var result = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts"), dto, token);
-            var res = await result.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
             return await result.ReadResponseBodyAsAsync<ItContractResponseDTO>();
         }
