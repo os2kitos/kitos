@@ -566,71 +566,46 @@ namespace Tests.Integration.Presentation.Web.Organizations
             using var additionPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, additionPutResponse.StatusCode);
 
-            //Rename consequences
-            var renamedUnit = new OrganizationUnit();
-            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
-            {
-                renamedUnit = repo
-                    .AsQueryable()
-                    .FirstOrDefault(x => x.Organization.Uuid == targetOrgUuid
-                                          && x.Origin == OrganizationUnitOrigin.STS_Organisation
-                                          && x.Parent != null
-                                          && x.Children.Any());
-
-                Assert.NotNull(renamedUnit);
-                renamedUnit.Name += "_rn1"; //change name so we expect an update to restore the old names
-            });
-
-            //Conversion consequences
-            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            //Setup other consequences
             var expectedConversionUuid = Guid.NewGuid();
             DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
             {
-                expectedConversionUuid = repo
+                var availableUnits = repo
                     .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid &&
-                                x.Origin == OrganizationUnitOrigin.STS_Organisation 
+                    .Where(x => x.Organization.Uuid == targetOrgUuid
+                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
                                 && x.Parent != null
-                                && !x.Children.Any())
-                    .ToList()
-                    .RandomItem()
-                    .Uuid;
+                                && x.Children.Any())
+                    .ToList();
+
+                var unitToRename = availableUnits.FirstOrDefault();
+                Assert.NotNull(unitToRename);
+                availableUnits.Remove(unitToRename);
+
+                var unitToMove = availableUnits.FirstOrDefault();
+                Assert.NotNull(unitToMove);
+                availableUnits.Remove(unitToMove);
+
+                var targetUnit = availableUnits.FirstOrDefault(x => x.Id != unitToMove.ParentId);
+                Assert.NotNull(targetUnit);
+
+                //Since the unitToRename won't be moved and all of it's children are meant for deletion select a unit to convert from there
+                var unitToConvert = unitToRename.Children.FirstOrDefault();
+                Assert.NotNull(unitToConvert);
+                expectedConversionUuid = unitToConvert.Uuid;
+
+                unitToRename.Name += "_rn1"; //change name so we expect an update to restore the old names
+                unitToMove.ParentId = targetUnit.Id;
             });
 
-            //Make sure it is in use so it will not be deleted, but converted
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             await ItContractV2Helper.PostContractAsync(globalAdminToken.Token,
-                new CreateNewContractRequestDTO()
+                new CreateNewContractRequestDTO
                 {
                     Name = A<string>(),
                     OrganizationUuid = targetOrgUuid,
                     Responsible = new ContractResponsibleDataWriteRequestDTO { OrganizationUnitUuid = expectedConversionUuid }
                 });
-
-            //Relocation consequences
-            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
-            {
-                var parentLeaf = repo
-                    .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid
-                                && x.Parent != null
-                                && x.Children.Any()
-                                && x.Uuid != renamedUnit.Uuid
-                                && x.Uuid != expectedConversionUuid)
-                    .RandomItem();
-
-                var secondLeaf = repo
-                    .AsQueryable()
-                    .Where(x => x.Organization.Uuid == targetOrgUuid 
-                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
-                                && x.Parent != null
-                                && x.Children.Any()
-                                && x.Uuid != parentLeaf.Uuid
-                                && x.Uuid != renamedUnit.Uuid
-                                && x.Uuid != expectedConversionUuid)
-                    .RandomItem();
-                
-                secondLeaf.ParentId = parentLeaf.Id;
-            }); 
             
             using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
