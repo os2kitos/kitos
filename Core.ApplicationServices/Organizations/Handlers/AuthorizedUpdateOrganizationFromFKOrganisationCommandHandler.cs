@@ -49,7 +49,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _stsChangeLogRepository = stsChangeLogRepository;
         }
 
-        //TODO: Migrate tests for this
         public Maybe<OperationError> Execute(AuthorizedUpdateOrganizationFromFKOrganisationCommand command)
         {
             var organization = command.Organization;
@@ -66,7 +65,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 }
 
                 //Import the external tree into the organization
-                //TODO: See if addition can be handled in the update method in stead!
                 var updateResult = organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, organizationTree.Value, command.SynchronizationDepth, command.SubscribeToChanges);
                 if (updateResult.Failed)
                 {
@@ -89,7 +87,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
                 if (IsBackgroundImport())
                 {
-                    //TODO: Fix that
                     organization.StsOrganizationConnection.DateOfLatestCheckBySubscription = DateTime.Now;
                 }
 
