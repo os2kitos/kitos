@@ -155,7 +155,7 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return Modify(organizationId, organization =>
-                _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, OperationError>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, levelsToInclude, subscribeToUpdates))
+                _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, levelsToInclude, subscribeToUpdates))
             );
         }
 
