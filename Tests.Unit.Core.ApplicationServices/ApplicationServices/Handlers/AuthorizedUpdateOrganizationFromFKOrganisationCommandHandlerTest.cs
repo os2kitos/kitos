@@ -38,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Performs_Update_Of_Existing_Synchronized_Tree()
+        public void Execute_Performs_Update_Of_Existing_Synchronized_Tree()
         {
             //Arrange
             var organization = new Organization();
@@ -87,7 +87,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Fails_If_Not_Already_Connected()
+        public void Execute_Fails_If_Not_Already_Connected()
         {
             //Arrange
             var organization = new Organization();
@@ -112,7 +112,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Fails_If_LoadOrgUnits_Fail()
+        public void Execute_Fails_If_LoadOrgUnits_Fail()
         {
             //Arrange
             var organization = new Organization();
@@ -137,7 +137,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Logs_Rename_Changes()
+        public void Execute_Logs_Rename_Changes()
         {
             //Arrange
             var organization = new Organization();
@@ -171,7 +171,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Logs_Addition_Changes()
+        public void Execute_Logs_Addition_Changes()
         {
             //Arrange
             var organization = new Organization();
@@ -204,7 +204,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Logs_Deletion_Changes()
+        public void Execute_Logs_Deletion_Changes()
         {
             //Arrange
             var organization = new Organization();
@@ -237,7 +237,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Logs_Conversion_Changes()
+        public void Execute_Logs_Conversion_Changes()
         {
             //Arrange
             var organization = new Organization();
@@ -272,7 +272,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
         }
 
         [Fact]
-        public void UpdateConnection_Logs_Relocation_Changes()
+        public void Execute_Logs_Relocation_Changes()
         {
             //Arrange
             var organization = new Organization();

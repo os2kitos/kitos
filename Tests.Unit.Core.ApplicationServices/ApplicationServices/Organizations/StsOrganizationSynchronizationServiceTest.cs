@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
@@ -36,6 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly ActiveUserIdContext _activeUserIdContext;
         private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
         private readonly Mock<IOperationClock> _operationClock;
+        private readonly Mock<ICommandBus> _commandButMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -50,6 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
             _operationClock = new Mock<IOperationClock>();
 
+            _commandButMock = new Mock<ICommandBus>();
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
                 _stsOrganizationUnitService.Object,
@@ -62,7 +66,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _activeUserIdContext,
                 _stsOrganziationChangeLogRepositoryMock.Object,
                 _operationClock.Object,
-                new Mock<ICommandBus>().Object);
+                _commandButMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -466,66 +470,65 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == unaffectedUnit)), Times.Never());
         }
 
-        //TODO: rewrite to check for command call
-        //[Fact]
-        //public void UpdateConnection_Performs_Update_Of_Existing_Synchronized_Tree()
-        //{
-        //    //Arrange
-        //    var organizationId = A<Guid>();
-        //    var organization = new Organization();
-        //    organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
-        //    const int oldDepth = 2;
-        //    const int newDepth = 3;
-        //    organization.StsOrganizationConnection = new StsOrganizationConnection
-        //    {
-        //        Organization = organization,
-        //        Connected = true,
-        //        SynchronizationDepth = oldDepth
-        //    };
-        //    //Add some children to the root
-        //    organization.AddOrganizationUnit(CreateOrganizationUnit(organization, true), organization.GetRoot());
-        //    organization.AddOrganizationUnit(CreateOrganizationUnit(organization, true), organization.GetRoot());
+        [Fact]
+        public void UpdateConnection_Performs_Update_Of_Existing_Synchronized_Tree()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
 
-        //    // In the external tree, ensure that the last leaf is missing - this should track a deleted unit. 
-        //    // Extensive testing of the import algorithm is not part of this test but part of StsOrganizationalHierarchyUpdateStrategyTest.cs
-        //    // We just need to see that the app service deletes deleted units from db
-        //    var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
+            var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
 
-        //    //add the leaf that will be removed because it is missing in the external tree
-        //    var expectedDeletion = CreateOrganizationUnit(organization, true);
-        //    organization.AddOrganizationUnit(expectedDeletion, organization.GetRoot());
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            SetupResolveOrganizationTreeReturns(organization, externalRoot);
+            var transaction = ExpectTransaction();
+            var levelsToInclude = new Random().Next(1, 100);
+            var subscribeToUpdates = A<bool>();
+            SetupExecuteUpdateCommand(subscribeToUpdates, levelsToInclude, organization, Maybe<OperationError>.None);
 
-        //    //Track a rename on the root and check that an event is raised
-        //    organization.GetRoot().UpdateName(A<string>());
+            //Act
+            var error = _sut.UpdateConnection(organizationId, levelsToInclude, subscribeToUpdates);
 
-        //    SetupGetOrganizationReturns(organizationId, organization);
-        //    SetupHasPermissionReturns(organization, true);
-        //    SetupResolveOrganizationTreeReturns(organization, externalRoot);
-        //    var transaction = ExpectTransaction();
+            //Assert
+            Assert.False(error.HasValue);
+            VerifyChangesSaved(transaction, organization);
+        }
 
-        //    //Act
-        //    var error = _sut.UpdateConnection(organizationId, newDepth, false);
+        [Fact]
+        public void UpdateConnection_Fails_If_Command_Fails()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
 
-        //    //Assert
-        //    Assert.False(error.HasValue);
-        //    Assert.NotNull(organization.StsOrganizationConnection);
-        //    Assert.True(organization.StsOrganizationConnection.Connected);
-        //    Assert.Equal(newDepth, organization.StsOrganizationConnection.SynchronizationDepth);
-        //    VerifyChangesSaved(transaction, organization);
+            var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
 
-        //    _organizationUnitRepositoryMock.Verify(x => x.RemoveRange(It.Is<IEnumerable<OrganizationUnit>>(units => units.Single() == expectedDeletion)), Times.Once());
-        //    Assert.Equal(2, organization.GetRoot().Children.Count);
-        //    Assert.DoesNotContain(expectedDeletion, organization.GetRoot().Children);
-        //    _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(ev => ev.Entity == organization.GetRoot())), Times.Once());
-        //}
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            SetupResolveOrganizationTreeReturns(organization, externalRoot);
+            var transaction = ExpectTransaction();
+            var levelsToInclude = new Random().Next(1, 100);
+            var subscribeToUpdates = A<bool>();
+            SetupExecuteUpdateCommand(subscribeToUpdates, levelsToInclude, organization, A<OperationError>());
+
+            //Act
+            var error = _sut.UpdateConnection(organizationId, levelsToInclude, subscribeToUpdates);
+
+            //Assert
+            Assert.True(error.HasValue);
+            VerifyChangesNotSaved(transaction, organization);
+        }
 
         [Fact]
         public void GetChangeLogForOrganization_Returns_Number_Of_Logs()
         {
             var orgUuid = A<Guid>();
 
-            var logs = new List<StsOrganizationConsequenceLog> { new (), new () };
-            var changeLogs = new List<StsOrganizationChangeLog> { new () { Entries = logs }, new() { Entries = logs } };
+            var logs = new List<StsOrganizationConsequenceLog> { new(), new() };
+            var changeLogs = new List<StsOrganizationChangeLog> { new() { Entries = logs }, new() { Entries = logs } };
 
             var stsOrganizationConnection = new StsOrganizationConnection
             {
@@ -675,6 +678,15 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 root.Name, new Dictionary<string, string>(),
                 root.Children.Select(ToExternalOrganizationUnit).ToList()
             );
+        }
+
+        private void SetupExecuteUpdateCommand(bool subscribeToUpdates, int levelsToInclude, Organization organization, Maybe<OperationError> result)
+        {
+            _commandButMock.Setup(x =>
+                x.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(
+                    It.Is<AuthorizedUpdateOrganizationFromFKOrganisationCommand>(c =>
+                        c.SubscribeToChanges == subscribeToUpdates && c.SynchronizationDepth.Value == levelsToInclude &&
+                        c.Organization == organization))).Returns(result);
         }
     }
 }
