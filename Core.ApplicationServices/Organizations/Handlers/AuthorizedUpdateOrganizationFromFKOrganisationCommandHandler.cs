@@ -25,7 +25,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly ITransactionManager _transactionManager;
         private readonly Maybe<ActiveUserIdContext> _userContext;
         private readonly IOperationClock _operationClock;
-        private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
         private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
 
         public AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler(
@@ -37,7 +36,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             ITransactionManager transactionManager,
             Maybe<ActiveUserIdContext> userContext,
             IOperationClock operationClock,
-            Maybe<ActiveUserIdContext> activeUserIdContext,
             IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
@@ -48,7 +46,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _transactionManager = transactionManager;
             _userContext = userContext;
             _operationClock = operationClock;
-            _activeUserIdContext = activeUserIdContext;
             _stsChangeLogRepository = stsChangeLogRepository;
         }
 
@@ -96,7 +93,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     organization.StsOrganizationConnection.DateOfLatestCheckBySubscription = DateTime.Now;
                 }
 
-                var logEntries = consequences.ToLogEntries(_activeUserIdContext, _operationClock);
+                var logEntries = consequences.ToLogEntries(_userContext, _operationClock);
                 var addLogResult = organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries);
                 if (addLogResult.Failed)
                 {
@@ -107,11 +104,13 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 }
 
                 var addNewLogsResult = addLogResult.Value;
-                if (addNewLogsResult.RemovedChangeLogs.Any())
+                var removedChangeLogs = addNewLogsResult.RemovedChangeLogs.OfType<StsOrganizationChangeLog>().ToList();
+                if (removedChangeLogs.Any())
                 {
-                    _stsChangeLogRepository.RemoveRange(addNewLogsResult.RemovedChangeLogs);
+                    _stsChangeLogRepository.RemoveRange(removedChangeLogs);
                 }
-
+                
+                _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
                 return Maybe<OperationError>.None;

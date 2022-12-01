@@ -516,7 +516,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(result.Ok);
             var logResult = result.Value;
             var removedLog = Assert.Single(logResult.RemovedChangeLogs);
-            Assert.Equal(oldestLog.Id, removedLog.Id);
+            Assert.Equal(oldestLog, removedLog);
 
             Assert.Equal(ExternalConnectionConstants.TotalNumberOfLogs, _sut.StsOrganizationConnection.StsOrganizationChangeLogs.Count);
         }
