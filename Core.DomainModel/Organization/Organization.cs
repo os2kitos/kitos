@@ -199,7 +199,7 @@ namespace Core.DomainModel.Organization
             return GetExternalConnection(origin)
                 .Bind<OrganizationTreeUpdateConsequences>(connection =>
                 {
-                    var strategy = StsOrganizationConnection.GetUpdateStrategy();
+                    var strategy = connection.GetUpdateStrategy();
 
                     var childLevelsToInclude =
                         levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
