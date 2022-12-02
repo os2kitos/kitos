@@ -76,6 +76,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
                 //React on import consequences
                 var consequences = updateResult.Value;
+
                 if (consequences.DeletedExternalUnitsBeingDeleted.Any())
                 {
                     _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList());
@@ -91,22 +92,27 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 }
 
                 var logEntries = consequences.ToLogEntries(_userContext, _operationClock);
-                var addLogResult = organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries);
-                if (addLogResult.Failed)
+
+                //We only add a change log entry if any changes were detected
+                if (logEntries.Entries.Any())
                 {
-                    var error = addLogResult.Error;
-                    _logger.Error("Failed adding change log while importing org tree for organization with uuid {uuid}. Failed with: {code}:{message}", command.Organization.Uuid, error.FailureType, error.Message);
-                    transaction.Rollback();
-                    return error;
+                    var addLogResult = organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries);
+                    if (addLogResult.Failed)
+                    {
+                        var error = addLogResult.Error;
+                        _logger.Error("Failed adding change log while importing org tree for organization with uuid {uuid}. Failed with: {code}:{message}", command.Organization.Uuid, error.FailureType, error.Message);
+                        transaction.Rollback();
+                        return error;
+                    }
+
+                    var addNewLogsResult = addLogResult.Value;
+                    var removedChangeLogs = addNewLogsResult.RemovedChangeLogs.OfType<StsOrganizationChangeLog>().ToList();
+                    if (removedChangeLogs.Any())
+                    {
+                        _stsChangeLogRepository.RemoveRange(removedChangeLogs);
+                    }
                 }
 
-                var addNewLogsResult = addLogResult.Value;
-                var removedChangeLogs = addNewLogsResult.RemovedChangeLogs.OfType<StsOrganizationChangeLog>().ToList();
-                if (removedChangeLogs.Any())
-                {
-                    _stsChangeLogRepository.RemoveRange(removedChangeLogs);
-                }
-                
                 _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
