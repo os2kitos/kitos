@@ -44,6 +44,7 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     Connected = details.Connected,
                     SubscribesToUpdates = details.SubscribesToUpdates,
+                    DateOfLatestCheckBySubscription = details.DateOfLatestCheckBySubscription,
                     SynchronizationDepth = details.SynchronizationDepth,
                     CanCreateConnection = details.CanCreateConnection,
                     CanDeleteConnection = details.CanDeleteConnection,
@@ -83,6 +84,15 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return _stsOrganizationSynchronizationService
                 .Disconnect(organizationId)
+                .Match(FromOperationError, Ok);
+        }
+
+        [HttpDelete]
+        [Route("connection/subscription")]
+        public HttpResponseMessage DeleteSubscription(Guid organizationId)
+        {
+            return _stsOrganizationSynchronizationService
+                .UnsubscribeFromAutomaticUpdates(organizationId)
                 .Match(FromOperationError, Ok);
         }
 
@@ -175,7 +185,7 @@ namespace Presentation.Web.Controllers.API.V1
             return new StsOrganizationChangeLogResponseDTO
             {
                 Origin = log.ResponsibleType.ToStsOrganizationChangeLogOriginOption(),
-                User = log.ResponsibleUser.MapToUserWithEmailDTO(),
+                User = log.ResponsibleUser.FromNullable().Select(x=>x.MapToUserWithEmailDTO()).GetValueOrDefault(),
                 Consequences = MapConsequenceLogsToDtos(log.GetEntries()),
                 LogTime = log.LogTime
             };

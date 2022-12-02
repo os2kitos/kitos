@@ -4,11 +4,11 @@ namespace Core.DomainModel.Organization
 {
     public class ExternalConnectionAddNewLogsResult
     {
-        public ExternalConnectionAddNewLogsResult(IEnumerable<StsOrganizationChangeLog> removedChangeLogs)
+        public ExternalConnectionAddNewLogsResult(IEnumerable<IExternalConnectionChangelog> removedChangeLogs)
         {
-            RemovedChangeLogs = removedChangeLogs ?? new List<StsOrganizationChangeLog>();
+            RemovedChangeLogs = removedChangeLogs ?? new List<IExternalConnectionChangelog>();
         }
 
-        public IEnumerable<StsOrganizationChangeLog> RemovedChangeLogs { get; }
+        public IEnumerable<IExternalConnectionChangelog> RemovedChangeLogs { get; }
     }
 }

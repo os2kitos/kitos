@@ -17,5 +17,6 @@ namespace Infrastructure.Services.BackgroundJobs
         Task LaunchPurgeOrphanedHangfireJobs(CancellationToken token);
         Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default);
         Task LaunchUpdateStaleContractRmAsync(CancellationToken token = default);
+        Task LaunchUpdateFkOrgSync(CancellationToken token = default);
     }
 }

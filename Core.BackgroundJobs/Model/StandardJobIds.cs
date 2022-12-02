@@ -16,6 +16,7 @@
         public static readonly string PurgeDuplicatePendingReadModelUpdates = $"{NamePrefix}purge-duplicate-read-model-updates";
         public static readonly string ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState = $"{NamePrefix}fix-stale-itsystem-usage-rms";
         public static readonly string ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState = $"{NamePrefix}fix-stale-itcontract-rms";
+        public static readonly string ScheduleFkOrgUpdates = $"{NamePrefix}schedule-fk-org-updates";
         public static readonly string PurgeOrphanedHangfireJobs = $"{NamePrefix}purge-orphaned-hangfire-jobs";
     }
 }

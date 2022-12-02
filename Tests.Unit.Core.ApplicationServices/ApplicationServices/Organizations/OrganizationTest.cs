@@ -32,7 +32,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _sut.StsOrganizationConnection = new StsOrganizationConnection() { Connected = true };
 
             //Act
-            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, CreateExternalOrganizationUnit(), Maybe<int>.None,false);
+            var error = _sut.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, CreateExternalOrganizationUnit(), Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -67,8 +67,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(1,true)]
-        [InlineData(2,false)]
+        [InlineData(1, true)]
+        [InlineData(2, false)]
         public void ImportNewExternalOrganizationOrgTree_Imports_Restricted_Subtree_If_No_Constraint_And_Registers_Sts_Org_Connection(int importedLevels, bool subscribesToUpdates)
         {
             //Arrange
@@ -92,6 +92,50 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(subscribesToUpdates, _sut.StsOrganizationConnection.SubscribeToUpdates);
             Assert.True(_sut.StsOrganizationConnection.Connected);
             AssertImportedTree(fullImportTree, rootFromOrg, importedLevels);
+        }
+
+        [Fact]
+        public void UnsubscribeFromAutomaticUpdates_Fails_StsConnection_Is_Not_Set()
+        {
+            //Act
+            var error = _sut.UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin.STS_Organisation);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void UnsubscribeFromAutomaticUpdates_Fails_StsConnection_Is_Not_Connected()
+        {
+            //Arrange
+            _sut.StsOrganizationConnection = new StsOrganizationConnection();
+
+            //Act
+            var error = _sut.UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin.STS_Organisation);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void UnsubscribeFromAutomaticUpdates_Succeeds()
+        {
+            //Arrange
+            _sut.StsOrganizationConnection = new StsOrganizationConnection()
+            {
+                Connected = true,
+                SubscribeToUpdates = true
+            };
+
+            //Act
+            var error = _sut.UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin.STS_Organisation);
+
+            //Assert
+            Assert.False(error.HasValue);
+            Assert.False(_sut.StsOrganizationConnection.SubscribeToUpdates);
+            Assert.True(_sut.StsOrganizationConnection.Connected);
         }
 
         [Fact]
@@ -472,7 +516,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(result.Ok);
             var logResult = result.Value;
             var removedLog = Assert.Single(logResult.RemovedChangeLogs);
-            Assert.Equal(oldestLog.Id, removedLog.Id);
+            Assert.Equal(oldestLog, removedLog);
 
             Assert.Equal(ExternalConnectionConstants.TotalNumberOfLogs, _sut.StsOrganizationConnection.StsOrganizationChangeLogs.Count);
         }

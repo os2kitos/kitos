@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using System.Collections.Generic;
 using Core.DomainModel.Constants;
 using Core.DomainModel.Organization.Strategies;
 
@@ -24,10 +24,17 @@ namespace Core.DomainModel.Organization
         /// Determines the optional synchronization depth used during synchronization from STS Organisation
         /// </summary>
         public int? SynchronizationDepth { get; set; }
-        public virtual ICollection<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
-
-
+        /// <summary>
+        /// Determines if the organization subscribes to automatic updates from STS Organisation
+        /// </summary>
         public bool SubscribeToUpdates { get; set; }
+        /// <summary>
+        /// The latest data where changes were checked due to an automatic subscription
+        /// This will be null if <see cref="SubscribeToUpdates"/> is false or no automatic check has run yet.
+        /// </summary>
+        public DateTime? DateOfLatestCheckBySubscription { get; set; }
+
+        public virtual ICollection<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
 
         public DisconnectOrganizationFromOriginResult Disconnect()
         {
@@ -38,6 +45,8 @@ namespace Core.DomainModel.Organization
             Connected = false;
             SubscribeToUpdates = false;
             SynchronizationDepth = null;
+            DateOfLatestCheckBySubscription = null;
+			
             return new DisconnectOrganizationFromOriginResult(organizationUnits, removedLogs);
         }
 
@@ -77,7 +86,7 @@ namespace Core.DomainModel.Organization
         {
             return new StsOrganizationalHierarchyUpdateStrategy(Organization);
         }
-
+		
         public Result<ExternalConnectionAddNewLogsResult, OperationError> AddNewLog(ExternalConnectionAddNewLogInput newLogInput)
         {
             if (newLogInput == null)

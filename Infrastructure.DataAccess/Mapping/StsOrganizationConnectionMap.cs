@@ -16,6 +16,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.SubscribeToUpdates)
                 .IsRequired()
                 .HasIndexAnnotation("IX_Required");
+
+            Property(x => x.DateOfLatestCheckBySubscription)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DateOfLatestCheckBySubscription");
         }
     }
 }

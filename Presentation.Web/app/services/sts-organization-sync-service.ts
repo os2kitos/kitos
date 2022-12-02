@@ -4,6 +4,7 @@
         createConnection(organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
         getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>;
         getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>;
+        unsubscribeFromAutomaticUpdates(organizationUuid: string): ng.IPromise<boolean>;
         disconnect(organizationUuid: string): ng.IPromise<boolean>;
         updateConnection(organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
         getConnectionChangeLogs(organizationUuid: string, numberOfLogs: number): ng.IPromise<Array<Models.Api.Organization.ConnectionChangeLogDTO>>;
@@ -102,8 +103,16 @@
                     subscribeToUpdates: subscribesToUpdates
                 });
             }).executeAsync(() => {
-                //Clear cache after
                 this.purgeCache(organizationUuid);
+            });
+        }
+
+        unsubscribeFromAutomaticUpdates(organizationUuid: string): ng.IPromise<boolean> {
+            return this.apiUseCaseFactory.createUpdate("Automatisk import af opdateringer", () => {
+                return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuid)}/connection/subscription`);
+            }).executeAsync((success) => {
+                this.purgeCache(organizationUuid);
+                return success;
             });
         }
 

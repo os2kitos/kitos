@@ -27,6 +27,7 @@ namespace Core.BackgroundJobs.Services
         private readonly RebuildItContractOverviewReadModelsBatchJob _rebuildItContractOverviewReadModelsBatchJob;
         private readonly ScheduleItContractOverviewReadModelUpdates _scheduleItContractOverviewReadModelUpdates;
         private readonly ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState _contractOverviewReadModelsWhichChangesActiveState;
+        private readonly ScheduleFkOrgUpdatesBackgroundJob _scheduleFkOrgUpdatesBackgroundJob;
 
         public BackgroundJobLauncher(
             ILogger logger,
@@ -38,10 +39,11 @@ namespace Core.BackgroundJobs.Services
             IRebuildReadModelsJobFactory rebuildReadModelsJobFactory,
             PurgeDuplicatePendingReadModelUpdates purgeDuplicatePendingReadModelUpdates,
             ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState scheduleUpdatesForItSystemUsageReadModelsWhichChangesActive,
-            PurgeOrphanedHangfireJobs purgeOrphanedHangfireJobs, 
+            PurgeOrphanedHangfireJobs purgeOrphanedHangfireJobs,
             RebuildItContractOverviewReadModelsBatchJob rebuildItContractOverviewReadModelsBatchJob,
-            ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates, 
-            ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState contractOverviewReadModelsWhichChangesActiveState)
+            ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates,
+            ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState contractOverviewReadModelsWhichChangesActiveState,
+            ScheduleFkOrgUpdatesBackgroundJob scheduleFkOrgUpdatesBackgroundJob)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -56,6 +58,7 @@ namespace Core.BackgroundJobs.Services
             _rebuildItContractOverviewReadModelsBatchJob = rebuildItContractOverviewReadModelsBatchJob;
             _scheduleItContractOverviewReadModelUpdates = scheduleItContractOverviewReadModelUpdates;
             _contractOverviewReadModelsWhichChangesActiveState = contractOverviewReadModelsWhichChangesActiveState;
+            _scheduleFkOrgUpdatesBackgroundJob = scheduleFkOrgUpdatesBackgroundJob;
         }
 
         public async Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default)
@@ -66,6 +69,11 @@ namespace Core.BackgroundJobs.Services
         public async Task LaunchUpdateStaleContractRmAsync(CancellationToken token = default)
         {
             await Launch(_contractOverviewReadModelsWhichChangesActiveState, token);
+        }
+
+        public async Task LaunchUpdateFkOrgSync(CancellationToken token = default)
+        {
+            await Launch(_scheduleFkOrgUpdatesBackgroundJob, token);
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)

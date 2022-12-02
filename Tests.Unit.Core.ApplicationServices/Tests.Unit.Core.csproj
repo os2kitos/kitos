@@ -193,6 +193,7 @@
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
+    <Compile Include="ApplicationServices\Handlers\AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest.cs" />
     <Compile Include="ApplicationServices\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationUnitServiceTest.cs" />
@@ -217,6 +218,7 @@
     <Compile Include="ApplicationServices\UIModuleCustomizationTest\UIModuleCustomizationTests.cs" />
     <Compile Include="ApplicationServices\UserRightsServiceTest.cs" />
     <Compile Include="ApplicationServices\UserServiceTest.cs" />
+    <Compile Include="BackgroundJobs\ScheduleFkOrgUpdatesBackgroundJobTest.cs" />
     <Compile Include="BackgroundJobs\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveStateTest.cs" />
     <Compile Include="DomainServices\Contract\ItContractOverviewReadModelUpdateTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />

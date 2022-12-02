@@ -486,5 +486,15 @@ namespace Core.DomainModel.Organization
         {
             return unit.Parent == null;
         }
+
+        public Maybe<OperationError> UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin origin)
+        {
+            return GetExternalConnection(origin)
+                .Match
+                (
+                    connection => connection.Unsubscribe(),
+                    error => error
+                );
+        }
     }
 }
