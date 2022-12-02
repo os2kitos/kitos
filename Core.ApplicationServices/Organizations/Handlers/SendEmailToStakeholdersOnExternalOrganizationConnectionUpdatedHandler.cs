@@ -84,8 +84,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 message.To.Add(receiver.Email);
             }
 
-            _mailClient.Send(message);
-
             return message;
         }
     }
