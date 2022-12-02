@@ -96,6 +96,7 @@
     <Compile Include="Organization\DisconnectOrganizationFromOriginResult.cs" />
     <Compile Include="Organization\ExternalConnectionAddNewLogEntryInput.cs" />
     <Compile Include="Organization\ExternalConnectionAddNewLogInput.cs" />
+    <Compile Include="Organization\ExternalOrganizationConnectionUpdated.cs" />
     <Compile Include="Organization\IExternalConnectionChangelog.cs" />
     <Compile Include="Organization\IExternalConnectionChangeLogEntry.cs" />
     <Compile Include="Organization\IExternalOrganizationalHierarchyConnection.cs" />

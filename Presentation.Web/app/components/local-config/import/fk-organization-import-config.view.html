@@ -43,6 +43,9 @@
             <a id="expand_collapse_change_log" class="task-fold control-label" data-ng-click="isExpanded = !isExpanded">
                 <span>Ændringslog</span>
                 <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isExpanded, 'fa-plus-square-o': !isExpanded}"></i>
+                <span ng-if="!vm.fkOrgHierarchy.availableLevels" class="help-block small">
+                    Ændringer ifm. de seneste fem import operationer der indeholdte ændringer
+                </span>
             </a>
         </div>
         <div ng-if="isExpanded" class="panel-body">
