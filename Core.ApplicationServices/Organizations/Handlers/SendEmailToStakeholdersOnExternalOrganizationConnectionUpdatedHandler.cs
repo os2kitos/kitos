@@ -58,7 +58,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             }
         }
 
-        public MailMessage CreateMessage(IEnumerable<User> receivers, Organization organization)
+        private MailMessage CreateMessage(IEnumerable<User> receivers, Organization organization)
         {
             var mailContent = $"<p>Din organisation '{organization.Name}' har automatisk indlæst opdateringer fra FK Organisation.</p>" +
                               "<p>" +
