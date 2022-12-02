@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
-using System.Web;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Infrastructure.Services.Configuration;
 using Serilog;
 
 namespace Core.ApplicationServices.Organizations.Handlers
@@ -16,11 +16,13 @@ namespace Core.ApplicationServices.Organizations.Handlers
     {
         private readonly IMailClient _mailClient;
         private readonly ILogger _logger;
+        private readonly string _changeLogLink;
 
-        public SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandler(IMailClient mailClient, ILogger logger)
+        public SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandler(IMailClient mailClient, ILogger logger, KitosUrl baseUrl)
         {
             _mailClient = mailClient;
             _logger = logger;
+            _changeLogLink = new Uri(baseUrl.Url, "/#/local-config/import/organization").AbsoluteUri;
         }
 
         public void Handle(ExternalOrganizationConnectionUpdated domainEvent)
@@ -35,7 +37,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     logEntries.Any();
                 if (shouldHandle)
                 {
-
                     if (logEntries.Any())
                     {
                         var localAdmins = organization.GetUsersWithRole(OrganizationRole.LocalAdmin).ToList();
@@ -59,18 +60,21 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
         public MailMessage CreateMessage(IEnumerable<User> receivers, Organization organization)
         {
-            var mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
-                              "<p><a href='" + resetLink +
-                              "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
-                              "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
-                              "<p><a href='" + KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
-                              "<p>Bemærk at denne mail ikke kan besvares.</p>";
-            var mailSubject = $"{organization.Name} i KITOS har modtaget opdateringer fra FK Organisation";
+            var mailContent = $"<p>Din organisation '{organization.Name}' har automatisk indlæst opdateringer fra FK Organisation.</p>" +
+                              "<p>" +
+                                $"<a href='{_changeLogLink}' target='_blank'>" +
+                                    "Klik her for at se ændringsloggen" +
+                                "</a>." +
+                              "</p>" +
+                              "<p>" +
+                                "Bemærk at denne mail ikke kan besvares." +
+                              "</p>";
+            var mailSubject = $"{organization.Name} i KITOS har automatisk indlæst opdateringer fra FK Organisation";
 
             var message = new MailMessage
             {
                 Subject = mailSubject,
-                Body = content ?? mailContent,
+                Body = mailContent,
                 IsBodyHtml = true,
                 BodyEncoding = Encoding.UTF8,
             };
