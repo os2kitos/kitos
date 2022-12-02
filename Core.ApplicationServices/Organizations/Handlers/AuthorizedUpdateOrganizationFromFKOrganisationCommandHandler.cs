@@ -116,6 +116,9 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
+
+                _domainEvents.Raise(new ExternalOrganizationConnectionUpdated(organization, organization.StsOrganizationConnection, logEntries));
+
                 return Maybe<OperationError>.None;
 
             }

@@ -28,6 +28,9 @@ namespace Core.DomainModel.Organization
         /// Determines if the organization subscribes to automatic updates from STS Organisation
         /// </summary>
         public bool SubscribeToUpdates { get; set; }
+
+        public OrganizationUnitOrigin Origin => OrganizationUnitOrigin.STS_Organisation;
+
         /// <summary>
         /// The latest data where changes were checked due to an automatic subscription
         /// This will be null if <see cref="SubscribeToUpdates"/> is false or no automatic check has run yet.

@@ -496,5 +496,14 @@ namespace Core.DomainModel.Organization
                     error => error
                 );
         }
+
+        public IEnumerable<User> GetUsersWithRole(OrganizationRole role)
+        {
+            return Rights
+                .Where(x => x.Role == role)
+                .Select(x => x.User)
+                .ToList()
+                .AsReadOnly();
+        }
     }
 }
