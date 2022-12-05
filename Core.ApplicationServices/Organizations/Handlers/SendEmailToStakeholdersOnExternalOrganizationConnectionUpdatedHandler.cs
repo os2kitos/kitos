@@ -39,7 +39,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 {
                     if (logEntries.Any())
                     {
-                        var localAdmins = organization.GetUsersWithRole(OrganizationRole.LocalAdmin).ToList();
+                        var localAdmins = organization.GetUsersWithRole(OrganizationRole.LocalAdmin, false).ToList();
                         if (localAdmins.Any())
                         {
                             var message = CreateMessage(localAdmins, organization);
