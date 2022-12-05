@@ -497,10 +497,14 @@ namespace Core.DomainModel.Organization
                 );
         }
 
-        public IEnumerable<User> GetUsersWithRole(OrganizationRole role)
+        public IEnumerable<User> GetUsersWithRole(OrganizationRole role, bool includeApiUsers = false)
         {
-            return Rights
-                .Where(x => x.Role == role)
+            var query = Rights.Where(x => x.Role == role);
+            if (!includeApiUsers)
+            {
+                query = query.Where(right => right.User.HasApiAccess != true);
+            }
+            return query
                 .Select(x => x.User)
                 .ToList()
                 .AsReadOnly();
