@@ -22,6 +22,7 @@
 
     export class Select2 {
         static readonly EmptyField = "\u00a0";
+        static readonly UnitIndentation = "\u00a0";
     }
 
     export class DateFormat {

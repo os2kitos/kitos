@@ -33,7 +33,7 @@
                 }
 
                 //indentation is four non breaking spaces
-                return visit(text, indentationLevel - 1, addUnitOriginIndication, isKitosUnit, indentationText + "&nbsp&nbsp&nbsp&nbsp");
+                return visit(text, indentationLevel - 1, addUnitOriginIndication, isKitosUnit, indentationText + Constants.Select2.UnitIndentation);
             }
 
             let isKitosUnit = true;

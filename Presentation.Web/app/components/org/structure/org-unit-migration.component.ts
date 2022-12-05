@@ -97,11 +97,9 @@
             this.setupOptions();
             this.getData();
 
-            var self = this;
             this.orgUnits = [];
             this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
-                self.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
-                console.log(self.orgUnits);
+                this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
                 this.isUnitsDataLoaded = true;
             });
         }

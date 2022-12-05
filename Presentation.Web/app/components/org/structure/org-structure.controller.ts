@@ -616,8 +616,7 @@
                                 $modalInstance.close(createResult());
                             };
 
-                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.
-                                IEditOrgUnitViewModel) {
+                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel) {
 
                                 const root = $scope.nodes[0];
                                 const idToSkip = root.id === currentUnit.id ? null : currentUnit.id;
