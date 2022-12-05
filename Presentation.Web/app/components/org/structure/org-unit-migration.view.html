@@ -1,4 +1,4 @@
-﻿<div ng-if="ctrl.isAnyDataPresent">
+﻿<div ng-if="ctrl.isAnyDataPresent && ctrl.isUnitsDataLoaded">
     <div class="container">
         <div class="col-xs-12 form-group">
             <select2-org-unit data-uuid="selectedOrgId"
@@ -6,7 +6,8 @@
                               data-placeholder="Vælg organisationsenhed"
                               data-options="ctrl.orgUnits"
                               data-ng-model="ctrl.selectedOrg"
-                              data-on-change="ctrl.setSelectedOrg()">
+                              data-on-change="ctrl.setSelectedOrg()"
+                              data-render-unit-origin-indication="true">
             </select2-org-unit>
         </div>
     </div>
@@ -27,3 +28,5 @@
 </div>
 
 <h5 ng-if="ctrl.isAnyDataPresent === false">Der er ikke nogle registreringer der anvender '{{ctrl.unitName}}'</h5>
+
+<span ng-if="(!ctrl.isAnyDataPresent && ctrl.isAnyDataPresent !== false) && !ctrl.isUnitsDataLoaded" class="pull-left"><progress-spinner data-show-text="true" data-custom-text="Indlæser rettigheder (kan tage tid) ..." /></span>

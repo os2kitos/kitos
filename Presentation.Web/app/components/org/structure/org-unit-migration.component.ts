@@ -51,6 +51,7 @@
         targetUnitSelected = false;
         shouldTransferBtnBeEnabled = false;
         isAnyDataPresent: boolean | null = null;
+        isUnitsDataLoaded: boolean = false;
 
         roles: IOrganizationUnitMigrationOptions;
         internalPayments: IOrganizationUnitMigrationOptions;
@@ -96,9 +97,12 @@
             this.setupOptions();
             this.getData();
 
+            var self = this;
             this.orgUnits = [];
             this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
-                this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
+                self.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
+                console.log(self.orgUnits);
+                this.isUnitsDataLoaded = true;
             });
         }
 

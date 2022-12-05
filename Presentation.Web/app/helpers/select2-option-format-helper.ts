@@ -26,17 +26,33 @@
             return options;
         }
 
-        public static formatIndentation(result: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<any>): string {
-            function visit(text: string, indentationLevel: number): string {
+        public static formatIndentation(result: Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<any>, addUnitOriginIndication: boolean = false): string {
+            function visit(text: string, indentationLevel: number, addUnitOriginIndication: boolean, isKitosUnit: boolean = false, indentationText: string = ""): string {
                 if (indentationLevel <= 0) {
-                    return text;
+                    return addUnitOriginIndication === false ? indentationText + text : Select2OptionsFormatHelper.formatIndentationWithOriginText(text, indentationText, isKitosUnit);
                 }
+
                 //indentation is four non breaking spaces
-                return visit("&nbsp&nbsp&nbsp&nbsp" + text, indentationLevel - 1);
+                return visit(text, indentationLevel - 1, addUnitOriginIndication, isKitosUnit, indentationText + "&nbsp&nbsp&nbsp&nbsp");
             }
 
-            const formattedResult = visit(result.text, result.indentationLevel);
+            let isKitosUnit = true;
+            if (addUnitOriginIndication) {
+                if (result.optionalObjectContext?.externalOriginUuid) {
+                    isKitosUnit = false;
+                }
+            }
+
+            const formattedResult = visit(result.text, result.indentationLevel, addUnitOriginIndication, isKitosUnit);
             return formattedResult;
+        }
+
+        private static formatIndentationWithOriginText(text: string, indentationText: string, isKitosUnit: boolean) {
+            if (isKitosUnit) {
+                return `<div><span class="org-structure-legend-square org-structure-legend-color-native-unit right-margin-5px"></span>${indentationText}${text}</div>`;
+            }
+
+            return `<div><span class="org-structure-legend-square org-structure-legend-color-fk-org-unit right-margin-5px"></span>${indentationText}${text}</div>`;
         }
 
         private static formatText(text: string, subText?: string): string {
