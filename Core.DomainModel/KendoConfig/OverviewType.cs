@@ -4,5 +4,6 @@
     {
         ItSystemUsage = 0,
         ItContract = 1,
+        DataProcessingRegistration = 2
     }
 }
