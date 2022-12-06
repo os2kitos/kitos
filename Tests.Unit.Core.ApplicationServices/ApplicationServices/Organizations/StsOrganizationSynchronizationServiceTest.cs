@@ -38,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly ActiveUserIdContext _activeUserIdContext;
         private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
         private readonly Mock<IOperationClock> _operationClock;
-        private readonly Mock<ICommandBus> _commandButMock;
+        private readonly Mock<ICommandBus> _commandBusMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -53,7 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
             _operationClock = new Mock<IOperationClock>();
 
-            _commandButMock = new Mock<ICommandBus>();
+            _commandBusMock = new Mock<ICommandBus>();
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
                 _stsOrganizationUnitService.Object,
@@ -66,7 +66,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _activeUserIdContext,
                 _stsOrganziationChangeLogRepositoryMock.Object,
                 _operationClock.Object,
-                _commandButMock.Object);
+                _commandBusMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -355,7 +355,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(getOrganizationError.FailureType, error.Value.FailureType);
             VerifyChangesNotSaved(transaction, organization, false);
         }
-        //TODO: Test pre-purge
+
         [Fact]
         public void Disconnect_Returns_Fails_If_GetOrganization_Returns_Error()
         {
@@ -365,7 +365,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, getOrganizationError);
 
             //Act
-            var error = _sut.Disconnect(organizationId,false);
+            var error = _sut.Disconnect(organizationId, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -382,7 +382,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupHasPermissionReturns(organization, false);
 
             //Act
-            var error = _sut.Disconnect(organizationId,false);
+            var error = _sut.Disconnect(organizationId, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -409,9 +409,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Disconnect_Succeeds_And_Converts_All_Imported_Org_Units_To_Kitos_Units(bool subscribeBeforeDisconnect)
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        public void Disconnect_Succeeds_And_Converts_All_Imported_Org_Units_To_Kitos_Units(bool subscribeBeforeDisconnect, bool purgeUnusedUnits)
         {
             //Arrange
             var organizationId = A<Guid>();
@@ -448,10 +448,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
+            if (purgeUnusedUnits)
+            {
+                SetupExecuteUpdateCommand(false, 1, organization, Maybe<OperationError>.None);
+            }
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Disconnect(organizationId, false);
+            var error = _sut.Disconnect(organizationId, purgeUnusedUnits);
 
             //Assert
             Assert.False(error.HasValue);
@@ -468,6 +472,12 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == affectedUnit1)), Times.Once());
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == affectedUnit2)), Times.Once());
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == unaffectedUnit)), Times.Never());
+            _commandBusMock.Verify(x =>
+                    x.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(
+                        It.Is<AuthorizedUpdateOrganizationFromFKOrganisationCommand>(c =>
+                            c.SubscribeToChanges == false && c.SynchronizationDepth.Value == 1 &&
+                            c.Organization == organization && c.PreloadedExternalTree.HasValue == purgeUnusedUnits)),
+                purgeUnusedUnits ? Times.Once() : Times.Never());
         }
 
         [Fact]
@@ -682,7 +692,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
         private void SetupExecuteUpdateCommand(bool subscribeToUpdates, int levelsToInclude, Organization organization, Maybe<OperationError> result)
         {
-            _commandButMock.Setup(x =>
+            _commandBusMock.Setup(x =>
                 x.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(
                     It.Is<AuthorizedUpdateOrganizationFromFKOrganisationCommand>(c =>
                         c.SubscribeToChanges == subscribeToUpdates && c.SynchronizationDepth.Value == levelsToInclude &&
