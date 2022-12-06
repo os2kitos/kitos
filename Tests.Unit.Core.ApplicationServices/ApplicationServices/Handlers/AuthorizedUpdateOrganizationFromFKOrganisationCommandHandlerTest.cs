@@ -37,8 +37,10 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             CreateSut(Maybe<ActiveUserIdContext>.None);
         }
 
-        [Fact]
-        public void Execute_Performs_Update_Of_Existing_Synchronized_Tree()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Execute_Performs_Update_Of_Existing_Synchronized_Tree(bool withPreloadedExternalRoot)
         {
             //Arrange
             var organization = new Organization();
@@ -67,11 +69,16 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             //Track a rename on the root and check that an event is raised
             organization.GetRoot().UpdateName(A<string>());
 
-            SetupResolveOrganizationTreeReturns(organization, externalRoot);
+            var preloadedExternalRoot = withPreloadedExternalRoot ? externalRoot : Maybe<ExternalOrganizationUnit>.None;
+
+            if (!withPreloadedExternalRoot)
+            {
+                SetupResolveOrganizationTreeReturns(organization, externalRoot);
+            }
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false,Maybe<ExternalOrganizationUnit>.None));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false, preloadedExternalRoot));
 
             //Assert
             Assert.False(error.HasValue);
@@ -83,6 +90,11 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             _organizationUnitRepositoryMock.Verify(x => x.RemoveRange(It.Is<IEnumerable<OrganizationUnit>>(units => units.Single() == expectedDeletion)), Times.Once());
             Assert.Equal(2, organization.GetRoot().Children.Count);
             Assert.DoesNotContain(expectedDeletion, organization.GetRoot().Children);
+            if (withPreloadedExternalRoot)
+            {
+                //If external tree is provided beforehand, we expect the service not to be called
+                _stsOrganizationUnitService.Verify(x => x.ResolveOrganizationTree(organization), Times.Never());
+            }
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(ev => ev.Entity == organization.GetRoot())), Times.Once());
         }
 
@@ -133,7 +145,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             //Assert
             Assert.True(error.HasValue);
             Assert.Equal(resolveOrgUnitsError.FailureType, error.Value.FailureType);
-            VerifyChangesNotSaved(transaction, organization,false);
+            VerifyChangesNotSaved(transaction, organization, false);
         }
 
         [Fact]
@@ -270,7 +282,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Converted, log.Type);
         }
-        //TODO: Test with preloaded org
+
         [Fact]
         public void Execute_Logs_Relocation_Changes()
         {
