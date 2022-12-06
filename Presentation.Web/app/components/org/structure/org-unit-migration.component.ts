@@ -50,7 +50,8 @@
         allSelections = false;
         targetUnitSelected = false;
         shouldTransferBtnBeEnabled = false;
-        isAnyDataPresent: boolean | null = null;
+        isAnyDataPresent: boolean = false;
+        loading: boolean = true;
 
         roles: IOrganizationUnitMigrationOptions;
         internalPayments: IOrganizationUnitMigrationOptions;
@@ -94,12 +95,22 @@
 
             this.createTableConfigurations();
             this.setupOptions();
-            this.getData();
-
-            this.orgUnits = [];
-            this.organizationApiService.getOrganizationUnit(this.organizationId).then(result => {
-                this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
-            });
+            const loadOrgUnitsP = this.organizationApiService.getOrganizationUnit(this.organizationId);
+            this.getData()
+                .then(_ => {
+                    this.orgUnits = [];
+                    return loadOrgUnitsP
+                        .then(result => {
+                            this.orgUnits = this.orgUnits.concat(Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(result, 0));
+                        });
+                })
+                .then(_ => {
+                    this.loading = false;
+                }, error => {
+                    console.log(error);
+                    this.loading = false;
+                }
+                );
         }
 
         deleteSelected() {
