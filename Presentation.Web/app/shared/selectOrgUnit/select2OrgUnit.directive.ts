@@ -8,8 +8,8 @@
 
             const options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Kitos.Models.Api.Organization.OrganizationUnit>[] = $scope.options;
             if ($scope.renderUnitOriginIndication === true) {
-                const externalUnits = $scope.options.filter(x => x.optionalObjectContext?.externalOriginUuid !== null);
-                if (externalUnits.length > 0) {
+                const hasExternalUnits = options.some(x => x.optionalObjectContext?.externalOriginUuid !== null);
+                if (hasExternalUnits) {
                     $scope.hasExternalUnits = true;
                     $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => options, unit => Kitos.Helpers.Select2OptionsFormatHelper.formatIndentation(unit, true), $scope.allowClear);
                     return;
