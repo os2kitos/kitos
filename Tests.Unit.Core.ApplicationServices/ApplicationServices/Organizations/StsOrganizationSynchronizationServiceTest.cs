@@ -355,7 +355,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(getOrganizationError.FailureType, error.Value.FailureType);
             VerifyChangesNotSaved(transaction, organization, false);
         }
-
+        //TODO: Test pre-purge
         [Fact]
         public void Disconnect_Returns_Fails_If_GetOrganization_Returns_Error()
         {
@@ -365,7 +365,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, getOrganizationError);
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId,false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -382,7 +382,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupHasPermissionReturns(organization, false);
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId,false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -400,7 +400,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -451,7 +451,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId, false);
 
             //Assert
             Assert.False(error.HasValue);

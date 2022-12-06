@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -115,10 +116,20 @@ namespace Core.ApplicationServices.Organizations
             });
         }
 
-        public Maybe<OperationError> Disconnect(Guid organizationId)
+        public Maybe<OperationError> Disconnect(Guid organizationId, bool purgeUnusedExternalOrganizationUnits)
         {
             return Modify(organizationId, organization =>
             {
+                if (purgeUnusedExternalOrganizationUnits)
+                {
+                    //Perform sync to level 1 before disconnecting and let the update functionality deal with the consequence calculations
+                    var purgeError = _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, 1, false, ToExternalUnitWithoutChildren(organization.GetRoot())));
+                    if (purgeError.HasValue)
+                    {
+                        _logger.Error("Failed to sync to level 1 prior to disconnecting from FK Org in organization {id}. Error: {code}:{message}", organizationId, purgeError.Value.FailureType, purgeError.Value.Message.GetValueOrDefault());
+                        return purgeError;
+                    }
+                }
                 var result = organization.DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin.STS_Organisation);
                 if (result.Failed)
                 {
@@ -139,6 +150,12 @@ namespace Core.ApplicationServices.Organizations
             });
         }
 
+        private static ExternalOrganizationUnit ToExternalUnitWithoutChildren(OrganizationUnit unit)
+        {
+            return new ExternalOrganizationUnit(unit.ExternalOriginUuid.GetValueOrDefault(), unit.Name,
+                new Dictionary<string, string>(), Array.Empty<ExternalOrganizationUnit>());
+        }
+
         public Result<OrganizationTreeUpdateConsequences, OperationError> GetConnectionExternalHierarchyUpdateConsequences(Guid organizationId, Maybe<int> levelsToInclude)
         {
             return GetOrganizationWithImportPermission(organizationId)
@@ -155,7 +172,7 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return Modify(organizationId, organization =>
-                _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, levelsToInclude, subscribeToUpdates))
+                _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, levelsToInclude, subscribeToUpdates, Maybe<ExternalOrganizationUnit>.None))
             );
         }
 

@@ -71,7 +71,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false,Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.False(error.HasValue);
@@ -103,7 +103,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, 3, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, 3, false, Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.True(error.HasValue);
@@ -128,7 +128,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, 3, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, 3, false, Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.True(error.HasValue);
@@ -160,7 +160,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false, Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.False(error.HasValue);
@@ -193,7 +193,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false, Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.False(error.HasValue);
@@ -226,7 +226,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false, Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.False(error.HasValue);
@@ -261,7 +261,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, newDepth, false, Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.False(error.HasValue);
@@ -270,7 +270,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Converted, log.Type);
         }
-
+        //TODO: Test with preloaded org
         [Fact]
         public void Execute_Logs_Relocation_Changes()
         {
@@ -299,7 +299,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             ExpectTransaction();
 
             //Act
-            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, depth, false));
+            var error = _sut.Execute(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, depth, false, Maybe<ExternalOrganizationUnit>.None));
 
             //Assert
             Assert.False(error.HasValue);

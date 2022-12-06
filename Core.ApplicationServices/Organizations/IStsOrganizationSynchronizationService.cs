@@ -27,9 +27,8 @@ namespace Core.ApplicationServices.Organizations
         /// <summary>
         /// Disconnect the KITOS organization from STS Organisation
         /// </summary>
-        /// <param name="organizationId"></param>
         /// <returns></returns>
-        Maybe<OperationError> Disconnect(Guid organizationId);
+        Maybe<OperationError> Disconnect(Guid organizationId, bool purgeUnusedExternalOrganizationUnits = false);
         /// <summary>
         /// Retrieves a view of the consequences of updating the synchronized hierarchy from that which exists in STS Organization
         /// </summary>

@@ -438,6 +438,7 @@
     <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangeOrganizationUnitRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\DisconnectFromStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationPermissionsDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationUnitDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />

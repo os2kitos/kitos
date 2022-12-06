@@ -55,8 +55,11 @@ namespace Core.ApplicationServices.Organizations.Handlers
             using var transaction = _transactionManager.Begin();
             try
             {
-                //Load the external tree
-                var organizationTree = _stsOrganizationUnitService.ResolveOrganizationTree(organization);
+                //Load the external tree if not already provided
+                var organizationTree = command
+                    .PreloadedExternalTree
+                    .Match(tree => tree, () => _stsOrganizationUnitService.ResolveOrganizationTree(organization));
+
                 if (organizationTree.Failed)
                 {
                     var error = organizationTree.Error;

@@ -143,7 +143,7 @@
                         if (confirm("Bryd forbindelsen til FK Organisation? Ved afbrydelse af forbindelsen, konverteres alle organisationsenheder til KITOS enheder, hvorefter de frit kan redigeres.")) {
                             this.busy = true;
                             this.stsOrganizationSyncService
-                                .disconnect(this.currentOrganizationUuid)
+                                .disconnect(this.currentOrganizationUuid, false)
                                 .then(success => {
                                     if (success) {
                                         this.loadState();
