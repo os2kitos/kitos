@@ -68,10 +68,7 @@
         }
 
         static renderBoolean(value: boolean) {
-            if (value) {
-                return "Ja";
-            }
-            return "Nej";
+           return value ? "Ja" : "Nej";
         }
 
         static convertColorsToDanish(color: string) {
