@@ -780,8 +780,12 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Termination_Deadline_Passed_But_TerminationPeriod_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var validDate = CreateValidDate();
-            var now = new DateTime(validDate.Year, validDate.Month, 1); //make sure the date is always the first day of the month, so there is no month "conversion" error (e.g. when subtracting a month from 31.10 the result would be 30.09 which would cause an error)
+            var validDate = new DateTime(2022, 11, 30);//CreateValidDate();
+
+            //make sure the day is present in every month, so there is no month "conversion" error
+            //e.g. when subtracting a month from 31.10 the result would be 30.09 which would cause an error (notice the day difference)
+            var randomDay = new Random(A<int>()).Next(1, 28);
+            var now = new DateTime(validDate.Year, validDate.Month, randomDay);
             var terminationDeadline = new Random(A<int>()).Next(1, 12);
             
             var sut = new ItContract
