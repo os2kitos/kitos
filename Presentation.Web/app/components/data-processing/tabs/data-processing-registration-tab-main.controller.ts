@@ -164,7 +164,7 @@
                 }
             };
             this.enableSelectionOfInsecureThirdCountries = this.dataProcessingRegistration.transferToInsecureThirdCountries === Models.Api.Shared.YesNoUndecidedOption.Yes;
-            
+
             this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
                 config => this.insecureThirdCountries = config,
                 () => this.dataProcessingRegistration.insecureThirdCountries,
@@ -174,9 +174,9 @@
                 this.hasWriteAccess,
                 null,
                 () => {
-                    const selectedCountries = this.
-                        dataProcessingRegistration.
-                        insecureThirdCountries
+                    const selectedCountries = this
+                        .dataProcessingRegistration
+                        .insecureThirdCountries
                         .reduce((acc, next, _) => {
                             acc[next.id] = next;
                             return acc;
