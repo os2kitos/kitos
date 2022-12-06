@@ -37,7 +37,7 @@
                         <li collapsed="true" data-ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
                         </li>
                     </ol>
-                
+
                 </script>
                 <div ng-if="!loadingAccessRights">
                     <div ui-tree="treeOptions" data-drag-enabled="false" ng-if="!isReordering">
@@ -50,13 +50,9 @@
                             <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
                         </ol>
                     </div>
-                    <div class="org-structure-legend" ng-if="showDifferenceBetweenOrgUnitOrigin">
-                        <div>
-                            <span class="org-structure-legend-color org-structure-legend-color-native-unit"></span> Enheder oprettet i KITOS
-                        </div>
-                        <div>
-                            <span class="org-structure-legend-color org-structure-legend-color-fk-org-unit"></span> Enheder synkroniseret fra FK Organisation
-                        </div>
+                    <div class="org-structure-legend org-structure-legend-wrapper" ng-if="showDifferenceBetweenOrgUnitOrigin">
+                        <div><span class="org-structure-legend-square org-structure-legend-color-native-unit"></span> Enheder oprettet i KITOS</div>
+                        <div><span class="org-structure-legend-square org-structure-legend-color-fk-org-unit"></span> Enheder synkroniseret fra FK Organisation</div>
                     </div>
                 </div>
 
@@ -87,7 +83,7 @@
                         <p class="text-muted">Oprettet af {{ chosenOrgUnit.objectOwnerFullName }}</p>
                     </div>
                 </div>
-                
+
                 <!-- Organization Roles -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
