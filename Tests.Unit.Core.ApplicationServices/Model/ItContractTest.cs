@@ -9,7 +9,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Tests.Unit.Core.Model
 {
