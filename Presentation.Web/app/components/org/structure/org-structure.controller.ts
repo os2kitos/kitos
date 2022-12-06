@@ -423,8 +423,6 @@
                                     });
                             }
 
-                            bindParentSelect($modalScope.orgUnit);
-
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
                             $modalScope.supplementaryText = getSupplementaryTextForEditDialog(unit);
@@ -442,7 +440,10 @@
                                     $modalScope.canEanBeModified = res.canEanBeModified;
                                     $modalScope.canDeviceIdBeModified = res.canDeviceIdBeModified;
                                     $modalScope.canChangeParent = res.canBeRearranged;
+                                    $modalScope.areRightsLoaded = true;
                                 });
+
+                            bindParentSelect($modalScope.orgUnit);
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting
@@ -621,7 +622,7 @@
                                 const idToSkip = root.id === currentUnit.id ? null : currentUnit.id;
                                 const orgUnitsOptions = Kitos.Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(root, 0, idToSkip);
 
-                                let existingChoice: { id: string; text: string };
+                                let existingChoice: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Kitos.Models.Api.Organization.OrganizationUnit>;
                                 if (currentUnit.isRoot) {
                                     const rootNodes = orgUnitsOptions.filter(x => x.id === String(currentUnit.id));
                                     if (rootNodes.length < 1)
@@ -637,12 +638,28 @@
                                     existingChoice = parentNode;
                                 }
 
-                                $modalScope.parentSelect = {
-                                    selectedElement: existingChoice,
-                                    select2Config: select2LoadingService.select2LocalDataFormatted(() => orgUnitsOptions, Kitos.Helpers.Select2OptionsFormatHelper.formatIndentation),
-                                    elementSelected: (newElement) => {
-                                        if (!!newElement) {
-                                            $modalScope.orgUnit.newParent = newElement.id;
+                                $modalScope.existingParentChoice = existingChoice;
+
+                                $modalScope.orgStructureSelectDropdownConfig = {
+                                    selectedElement: { id: existingChoice.id, text: existingChoice.text },
+                                    options: orgUnitsOptions.map(item => {
+                                        return {
+                                            id: item.id,
+                                            text: item.text,
+                                            indentationLevel: item.indentationLevel,
+                                            optionalObjectContext: {
+                                                externalOriginUuid: item.optionalObjectContext?.externalOriginUuid
+                                            }
+                                        }
+                                    }),
+                                    onSelected: () => {
+                                        var selectedElement = $modalScope.orgStructureSelectDropdownConfig?.selectedElement;
+                                        if (!selectedElement) {
+                                            return;
+                                        }
+                                        if (selectedElement.id !== $modalScope.existingParentChoice?.id) {
+                                            $modalScope.orgUnit.newParent = selectedElement.id;
+                                            $modalScope.existingParentChoice = selectedElement;
                                         }
                                     }
                                 }
