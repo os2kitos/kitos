@@ -32,16 +32,20 @@
             "hasWriteAccess",
             "notify",
             "gridStateService",
+            "exportGridToExcelService",
+            "$timeout"
         ];
 
         constructor(
-            $scope: ng.IScope,
-            private $state: ng.ui.IStateService,
-            private _: ILoDashWithMixins,
-            private user,
-            private hasWriteAccess,
-            private notify,
-            private gridStateService: Services.IGridStateFactory) {
+            private readonly $scope: ng.IScope,
+            private readonly $state: ng.ui.IStateService,
+            private readonly _: ILoDashWithMixins,
+            private readonly user,
+            private readonly hasWriteAccess,
+            private readonly notify,
+            private readonly gridStateService: Services.IGridStateFactory,
+            private readonly exportGridToExcelService: Services.System.ExportGridToExcelService,
+            private readonly $timeout: ng.ITimeoutService) {
             this.hasWriteAccess = hasWriteAccess;
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
@@ -224,6 +228,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
+                excelExport: (e: any) => this.exportToExcel(e),
                 height: window.innerHeight - 200,
                 detailTemplate: (dataItem) => `<uib-tabset active="0">
                     <uib-tab index="0" heading="Organisation roller"><user-organization-unit-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-organization-unit-roles></uib-tab>
@@ -278,7 +283,7 @@
                         field: "LastAdvisDate", title: "Advis", width: 110,
                         persistId: "advisdate", 
                         template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
-                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? dataItem.LastAdvisDate.toDateString() : "",
+                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? Kitos.Helpers.ExcelExportHelper.renderDate(dataItem.LastAdvisDate) : "",
                         hidden: false,
                         filterable: false
                     },
@@ -307,6 +312,17 @@
                             }
                             return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
                         },
+                        excelTemplate: (dataItem) => {
+                            var rightNames = "";
+                            dataItem.OrganizationUnitRights.forEach((right, index) => {
+                                rightNames += right.Role.Name;
+                                if (index < dataItem.OrganizationUnitRights.length - 1) {
+                                    rightNames += ", ";
+                                }
+                            });
+
+                            return rightNames;
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -318,7 +334,6 @@
                         }
                     },
                     {
-
                         field: "hasApi", title: "API bruger", width: 96,
                         persistId: "apiaccess", 
                         attributes: { "class": "text-center", "data-element-type": "userObject" },
@@ -326,6 +341,7 @@
                             "data-element-type": "userHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasApiAccess),
+                        excelTemplate: (dataItem) => dataItem.hasApi ? "Ja" : "Nej",
                         hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
@@ -336,6 +352,7 @@
                         persistId: "localadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
+                        excelTemplate: (dataItem) => dataItem.isLocalAdmin ? "Ja" : "Nej",
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -345,6 +362,7 @@
                         persistId: "orgadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
+                        excelTemplate: (dataItem) => dataItem.isOrgAdmin ? "Ja" : "Nej",
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -354,6 +372,7 @@
                         persistId: "systemadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
+                        excelTemplate: (dataItem) => dataItem.isSystemAdmin ? "Ja" : "Nej",
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -363,6 +382,7 @@
                         persistId: "contractadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
+                        excelTemplate: (dataItem) => dataItem.isContractAdmin ? "Ja" : "Nej",
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -376,6 +396,7 @@
                             "data-element-type": "rightsHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
+                        excelTemplate: (dataItem) => dataItem.isRightsHolder ? "Ja" : "Nej",
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -390,6 +411,7 @@
                             "data-element-type": "stakeHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasStakeHolderAccess),
+                        excelTemplate: (dataItem) => dataItem.HasStakeHolderAccess ? "Ja" : "Nej",
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -404,6 +426,11 @@
                 ]
             };
 
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                mainGridOptions.toolbar);
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
@@ -417,6 +444,13 @@
             }
 
             this.mainGridOptions = mainGridOptions;
+        }
+
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
+        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         public onEdit(entityId) {
