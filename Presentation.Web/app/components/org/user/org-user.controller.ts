@@ -312,17 +312,7 @@
                             }
                             return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
                         },
-                        excelTemplate: (dataItem) => {
-                            var rightNames = "";
-                            dataItem.OrganizationUnitRights.forEach((right, index) => {
-                                rightNames += right.Role.Name;
-                                if (index < dataItem.OrganizationUnitRights.length - 1) {
-                                    rightNames += ", ";
-                                }
-                            });
-
-                            return rightNames;
-                        },
+                        excelTemplate: (dataItem) => dataItem.OrganizationUnitRights.map(right => right.Role.Name).join(", "),
                         hidden: true,
                         filterable: {
                             cell: {
@@ -341,7 +331,7 @@
                             "data-element-type": "userHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasApiAccess),
-                        excelTemplate: (dataItem) => dataItem.hasApi ? "Ja" : "Nej",
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasApiAccess),
                         hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
@@ -352,7 +342,7 @@
                         persistId: "localadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
-                        excelTemplate: (dataItem) => dataItem.isLocalAdmin ? "Ja" : "Nej",
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isLocalAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -362,7 +352,7 @@
                         persistId: "orgadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
-                        excelTemplate: (dataItem) => dataItem.isOrgAdmin ? "Ja" : "Nej",
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isOrgAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -372,7 +362,7 @@
                         persistId: "systemadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
-                        excelTemplate: (dataItem) => dataItem.isSystemAdmin ? "Ja" : "Nej",
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isSystemAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -382,7 +372,7 @@
                         persistId: "contractadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
-                        excelTemplate: (dataItem) => dataItem.isContractAdmin ? "Ja" : "Nej",
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isContractAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -396,7 +386,7 @@
                             "data-element-type": "rightsHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
-                        excelTemplate: (dataItem) => dataItem.isRightsHolder ? "Ja" : "Nej",
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isRightsHolder),
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -411,7 +401,7 @@
                             "data-element-type": "stakeHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasStakeHolderAccess),
-                        excelTemplate: (dataItem) => dataItem.HasStakeHolderAccess ? "Ja" : "Nej",
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasStakeHolderAccess),
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -426,7 +416,7 @@
                 ]
             };
 
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => { return {} },
                 () => this.mainGrid,
                 this.$scope,
                 mainGridOptions.toolbar);
@@ -445,12 +435,9 @@
 
             this.mainGridOptions = mainGridOptions;
         }
-
-        private readonly excelConfig: Models.IExcelConfig = {
-        };
-
+        
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, { });
         }
 
         public onEdit(entityId) {
