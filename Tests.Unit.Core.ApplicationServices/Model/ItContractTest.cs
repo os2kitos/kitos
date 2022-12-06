@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Tests.Unit.Core.Model
 {
@@ -779,8 +780,10 @@ namespace Tests.Unit.Core.Model
         public void Validate_Returns_Success_If_Termination_Deadline_Passed_But_TerminationPeriod_Has_Not_Passed(bool enforceValid, int dayOffset)
         {
             //Arrange
-            var now = CreateValidDate();
+            var validDate = CreateValidDate();
+            var now = new DateTime(validDate.Year, validDate.Month, 1); //make sure the date is always the first day of the month, so there is no month "conversion" error (e.g. when subtracting a month from 31.10 the result would be 30.09 which would cause an error)
             var terminationDeadline = new Random(A<int>()).Next(1, 12);
+            
             var sut = new ItContract
             {
                 Terminated = now.AddMonths(-1 * terminationDeadline).AddDays(dayOffset),
@@ -788,12 +791,12 @@ namespace Tests.Unit.Core.Model
                 TerminationDeadline = new TerminationDeadlineType
                 {
                     Name = terminationDeadline.ToString("D")
-                },
+                }
             };
 
             //Act
             var result = sut.Validate(now);
-
+            
             //Assert
             Assert.True(result.Result);//If not enforced valid we expect the value to be false
             Assert.Equal(enforceValid, result.EnforcedValid);
