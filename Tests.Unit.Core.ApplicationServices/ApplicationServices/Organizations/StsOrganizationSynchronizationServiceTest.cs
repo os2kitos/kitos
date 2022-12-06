@@ -481,6 +481,27 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Fact]
+        public void Disconnect_Fails_If_Purge_Command_Fails()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
+
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            var transaction = ExpectTransaction();
+            SetupExecuteUpdateCommand(false, 1, organization, A<OperationError>());
+
+            //Act
+            var error = _sut.Disconnect(organizationId, true);
+
+            //Assert
+            Assert.True(error.HasValue);
+            VerifyChangesNotSaved(transaction, organization);
+        }
+
+        [Fact]
         public void UpdateConnection_Performs_Update_Of_Existing_Synchronized_Tree()
         {
             //Arrange
