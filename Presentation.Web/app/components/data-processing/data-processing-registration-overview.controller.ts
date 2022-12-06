@@ -69,6 +69,7 @@
                 kendoGridLauncherFactory
                     .create<Models.DataProcessing.IDataProcessingRegistration>()
                     .withScope($scope)
+                    .withOverviewType(Models.Generic.OverviewType.DataProcessingRegistration)
                     .withGridBinding(this)
                     .withUser(user)
                     .withEntityTypeName("Databehandling")
