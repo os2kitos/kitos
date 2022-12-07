@@ -654,7 +654,6 @@
                         ]
                             , false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderBoolean(dataItem.IsHoldingDocument))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderBoolean(dataItem.IsHoldingDocument))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
