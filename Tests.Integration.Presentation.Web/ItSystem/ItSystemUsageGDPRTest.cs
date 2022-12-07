@@ -326,7 +326,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertHostedAt(expected.HostedAt, actual.HostedAt);
             if (expected.RiskAssesmentDate.HasValue)
             {
-                Assert.Equal(expected.RiskAssesmentDate.GetValueOrDefault().ConvertToDanishFormatDateString(), actual.RiskAssessmentDate);
+                var riskAssessmentDateString = $"'{expected.RiskAssesmentDate.GetValueOrDefault().ConvertToDanishFormatDateString()}'";
+                Assert.Equal(riskAssessmentDateString, actual.RiskAssessmentDate);
             }
             else
             {
