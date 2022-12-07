@@ -416,7 +416,7 @@
                 ]
             };
 
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => { return {} },
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
                 () => this.mainGrid,
                 this.$scope,
                 mainGridOptions.toolbar);
@@ -435,9 +435,12 @@
 
             this.mainGridOptions = mainGridOptions;
         }
+
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
         
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, { });
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         public onEdit(entityId) {
