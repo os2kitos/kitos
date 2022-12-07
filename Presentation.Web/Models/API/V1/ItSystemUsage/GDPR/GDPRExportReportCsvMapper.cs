@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Core.ApplicationServices.Extensions;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Models.Application.Csv;
@@ -62,7 +63,7 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
 
         private static string MapDateTime(DateTime? input)
         {
-            return input == null ? "" : input.GetValueOrDefault().ToShortDateString();
+            return input == null ? "" : input.GetValueOrDefault().ConvertToDanishFormatDateString();
         }
 
         private static string MapSensitiveDataTypes(IEnumerable<string> input)

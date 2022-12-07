@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.ApplicationServices.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -325,7 +326,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertHostedAt(expected.HostedAt, actual.HostedAt);
             if (expected.RiskAssesmentDate.HasValue)
             {
-                Assert.Equal(expected.RiskAssesmentDate.GetValueOrDefault().ToShortDateString(), actual.RiskAssessmentDate);
+                Assert.Equal(expected.RiskAssesmentDate.GetValueOrDefault().ConvertToDanishFormatDateString(), actual.RiskAssessmentDate);
             }
             else
             {
@@ -494,7 +495,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public string DirectoryUrl { get; set; }
         [Name("Foretaget risikovurdering")]
         public string RiskAssessment { get; set; }
-        [Name("RiskAssessmentDate <- change the text")]
+        [Name("Dato for seneste risikovurdering")]
         public string RiskAssessmentDate { get; set; }
         [Name("Hvad viste seneste risikovurdering")]
         public string PreRiskAssessment { get; set; }
