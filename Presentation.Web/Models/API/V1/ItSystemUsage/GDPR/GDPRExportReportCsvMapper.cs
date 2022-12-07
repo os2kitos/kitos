@@ -39,6 +39,7 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
                     .WithColumn(GDPRExportReportColumns.DataProcessorContract, x => MapBoolean(x.DataProcessingAgreementConcluded))
                     .WithColumn(GDPRExportReportColumns.LinkToDirectory, x => MapBoolean(x.LinkToDirectory))
                     .WithColumn(GDPRExportReportColumns.RiskAssessment, x => MapDataOption(x.RiskAssessment))
+                    .WithColumn(GDPRExportReportColumns.RiskAssessmentDate, x => MapDateTime(x.RiskAssessmentDate))
                     .WithColumn(GDPRExportReportColumns.PreRiskAssessment, x => MapRiskLevel(x.PreRiskAssessment))
                     .WithColumn(GDPRExportReportColumns.DPIA, x => MapDataOption(x.DPIA))
                     .WithColumn(GDPRExportReportColumns.HostedAt, x => MapHostedAt(x.HostedAt));
@@ -57,6 +58,11 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
         private static string MapBoolean(bool input)
         {
             return input ? Yes : No;
+        }
+
+        private static string MapDateTime(DateTime? input)
+        {
+            return input == null ? "" : input.GetValueOrDefault().ToShortDateString();
         }
 
         private static string MapSensitiveDataTypes(IEnumerable<string> input)
