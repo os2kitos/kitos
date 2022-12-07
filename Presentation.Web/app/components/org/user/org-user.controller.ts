@@ -449,7 +449,7 @@
 
         private fixNameFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            if (column == 'ObjectOwner.Name') {
+            if (column === 'ObjectOwner.Name') {
                 return filterUrl.replace(pattern, `$1concat(concat(ObjectOwner/Name, ' '), ObjectOwner/LastName)$2`);
             }
             return filterUrl.replace(pattern, `$1concat(concat(Name, ' '), LastName)$2`);
