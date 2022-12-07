@@ -124,8 +124,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
             });
         }
 
-        [Fact]
-        public async Task Can_DELETE_Connection()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_DELETE_Connection(bool purge)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -134,13 +136,21 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var connectionUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
             var getUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/snapshot?levels={levels}");
             using var getResponse = await HttpApi.GetWithCookieAsync(getUrl, cookie);
-            var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            var expectedStructureAfterDisconnect = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            if (purge)
+            {
+                //We expect all of the external sub units to have been removed
+                expectedStructureAfterDisconnect.Children = Array.Empty<StsOrganizationOrgUnitDTO>();
+            }
             using var response = await HttpApi.PostWithCookieAsync(connectionUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
                 SynchronizationDepth = levels
             });
             //Act
-            using var deleteResponse = await HttpApi.DeleteWithCookieAsync(connectionUrl, cookie);
+            using var deleteResponse = await HttpApi.DeleteWithCookieAsync(connectionUrl, cookie,new DisconnectFromStsOrganizationRequestDTO()
+            {
+                PurgeUnusedExternalUnits = purge
+            });
 
             //Assert
             DatabaseAccess.MapFromEntitySet<Organization, bool>(orgs =>
@@ -152,7 +162,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 Assert.Null(organization.StsOrganizationConnection.SynchronizationDepth);
 
                 //Assert that the imported stuff is till there - just converted to kitos units
-                AssertImportedTree(expectedImport, dbRoot, OrganizationUnitOrigin.Kitos);
+                AssertImportedTree(expectedStructureAfterDisconnect, dbRoot, OrganizationUnitOrigin.Kitos);
                 return true;
             });
 

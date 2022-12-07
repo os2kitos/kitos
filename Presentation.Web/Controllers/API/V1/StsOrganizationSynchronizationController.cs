@@ -80,10 +80,15 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpDelete]
         [Route("connection")]
-        public HttpResponseMessage Disconnect(Guid organizationId)
+        public HttpResponseMessage Disconnect(Guid organizationId, [FromBody] DisconnectFromStsOrganizationRequestDTO request)
         {
+            if (request == null)
+            {
+                return BadRequest("request is null");
+            }
+
             return _stsOrganizationSynchronizationService
-                .Disconnect(organizationId)
+                .Disconnect(organizationId, request.PurgeUnusedExternalUnits)
                 .Match(FromOperationError, Ok);
         }
 
@@ -185,12 +190,12 @@ namespace Presentation.Web.Controllers.API.V1
             return new StsOrganizationChangeLogResponseDTO
             {
                 Origin = log.ResponsibleType.ToStsOrganizationChangeLogOriginOption(),
-                User = log.ResponsibleUser.FromNullable().Select(x=>x.MapToUserWithEmailDTO()).GetValueOrDefault(),
+                User = log.ResponsibleUser.FromNullable().Select(x => x.MapToUserWithEmailDTO()).GetValueOrDefault(),
                 Consequences = MapConsequenceLogsToDtos(log.GetEntries()),
                 LogTime = log.LogTime
             };
         }
-        
+
         private static IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> MapConsequenceLogsToDtos(IEnumerable<IExternalConnectionChangeLogEntry> logs)
         {
             return logs
