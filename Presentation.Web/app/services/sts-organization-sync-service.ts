@@ -5,7 +5,7 @@
         getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>;
         getSnapshot(organizationUuid: string): ng.IPromise<Models.Api.Organization.StsOrganizationOrgUnitDTO>;
         unsubscribeFromAutomaticUpdates(organizationUuid: string): ng.IPromise<boolean>;
-        disconnect(organizationUuid: string): ng.IPromise<boolean>;
+        disconnect(organizationUuid: string, purgeUnusedExternalUnits: boolean): ng.IPromise<boolean>;
         updateConnection(organizationUuid: string, synchronizationDepth: number | null, subscribesToUpdates: boolean): ng.IPromise<void>;
         getConnectionChangeLogs(organizationUuid: string, numberOfLogs: number): ng.IPromise<Array<Models.Api.Organization.ConnectionChangeLogDTO>>;
     }
@@ -86,9 +86,12 @@
             });
         }
 
-        disconnect(organizationUuid: string): ng.IPromise<boolean> {
+        disconnect(organizationUuid: string, purgeUnusedExternalUnits: boolean): ng.IPromise<boolean> {
             return this.apiUseCaseFactory.createDeletion("Forbindelse til FK Organisation", () => {
-                return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuid)}/connection`);
+                return this.genericApiWrapper.delete(`${this.getBasePath(organizationUuid)}/connection`,
+                    {
+                        purgeUnusedExternalUnits: purgeUnusedExternalUnits
+                    });
             }).executeAsync((result) => {
                 //Clear cache after
                 this.purgeCache(organizationUuid);

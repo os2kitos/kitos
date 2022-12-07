@@ -7,6 +7,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.Commands;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Time;
 using Serilog;
@@ -82,11 +83,11 @@ namespace Core.BackgroundJobs.Model.Maintenance
 
                 try
                 {
-                    var command = new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, organization.StsOrganizationConnection.SynchronizationDepth.FromNullableValueType(), true);
+                    var command = new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, organization.StsOrganizationConnection.SynchronizationDepth.FromNullableValueType(), true, Maybe<ExternalOrganizationUnit>.None);
                     var error = _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(command);
                     if (error.HasValue)
                     {
-                        _logger.Error("Error while automatically importing from FK org into org with uuid {uuid}. Error: {error}", organization, error.Select(e=>e.ToString()).GetValueOrDefault());
+                        _logger.Error("Error while automatically importing from FK org into org with uuid {uuid}. Error: {error}", organization, error.Select(e => e.ToString()).GetValueOrDefault());
                     }
                 }
                 catch (Exception e)
