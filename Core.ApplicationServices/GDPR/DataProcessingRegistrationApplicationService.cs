@@ -459,7 +459,6 @@ namespace Core.ApplicationServices.GDPR
             return authorizedAction(registration);
         }
 
-
         public Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption isOversightCompleted)
         {
             return Modify<DataProcessingRegistration>(id, registration =>
@@ -469,6 +468,16 @@ namespace Core.ApplicationServices.GDPR
                 {
                     oversightDates.Value.ToList().ForEach(_dataProcessingRegistrationOversightDateRepository.Delete);
                 }
+                return registration;
+            });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightScheduledInspectionDate(int id, DateTime? oversightScheduledInspectionDate)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.SetOversightScheduledInspectionDate(oversightScheduledInspectionDate);
+                
                 return registration;
             });
         }

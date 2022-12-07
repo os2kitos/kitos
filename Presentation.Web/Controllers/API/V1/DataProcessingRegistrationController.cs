@@ -663,6 +663,22 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpPatch]
+        [Route("{id}/oversight-scheduled-inspection-date")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightScheduledInspectionDate(int id, [FromBody] SingleValueDTO<DateTime?> scheduledInspectionDate)
+        {
+            if (scheduledInspectionDate == null)
+                return BadRequest(nameof(scheduledInspectionDate) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightScheduledInspectionDate(id, scheduledInspectionDate.Value)
+                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
+        }
+
+        [HttpPatch]
         [Route("{id}/oversight-date/assign")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -917,6 +933,7 @@ namespace Presentation.Web.Controllers.API.V1
                         OversightRemark = oversightDate.OversightRemark
                     })
                     .ToArray(),
+                OversightScheduledInspectionDate = value.OversightScheduledInspectionDate,
                 LastChangedAt = value.LastChanged,
                 LastChangedByName = value.LastChangedByUser?.GetFullName()
             };
