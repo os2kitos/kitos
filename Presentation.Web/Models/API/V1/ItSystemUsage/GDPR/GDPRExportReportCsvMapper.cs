@@ -63,7 +63,7 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
 
         private static string MapDateTime(DateTime? input)
         {
-            return input == null ? "" : input.GetValueOrDefault().ConvertToDanishFormatDateString();
+            return input == null ? "" : $"'{input.GetValueOrDefault().ConvertToDanishFormatDateString()}'";
         }
 
         private static string MapSensitiveDataTypes(IEnumerable<string> input)
