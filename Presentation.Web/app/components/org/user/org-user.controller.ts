@@ -303,7 +303,7 @@
                         }
                     },
                     {
-                        field: "OrganizationUnitRights.Role", title: "Roller", width: 150,
+                        field: "OrganizationUnitRights.Role", title: "Organisationsroller", width: 150,
                         persistId: "role", 
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
@@ -436,6 +436,7 @@
             this.mainGridOptions = mainGridOptions;
         }
 
+        //NOTE: Stores the visibility parameters, and is used by the excel dropdown commands before invoking exportToExcel()..
         private readonly excelConfig: Models.IExcelConfig = {
         };
         
