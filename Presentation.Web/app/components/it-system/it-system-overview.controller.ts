@@ -653,8 +653,8 @@
                             }
                         ]
                             , false)
-                        .withRendering(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
-                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderBoolean(dataItem.IsHoldingDocument))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderBoolean(dataItem.IsHoldingDocument))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
@@ -819,7 +819,6 @@
                         .withTitle("Risk assessment date <- change the text")
                         .withId("LatestRiskAssessmentDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                        .withoutSorting()   //NOTICE: NO sorting OR filtering on computed field!
                         .withStandardWidth(170)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.RiskAssessmentDate)));
