@@ -199,6 +199,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(usage.isBusinessCritical, gdprExportReport.BusinessCritical);
             Assert.Equal(usage.DPIA, gdprExportReport.DPIA);
             Assert.Equal(usage.riskAssessment, gdprExportReport.RiskAssessment);
+            Assert.Equal(usage.riskAssesmentDate, gdprExportReport.RiskAssessmentDate);
             Assert.Equal(usage.preriskAssessment, gdprExportReport.PreRiskAssessment);
 
             if (!string.IsNullOrEmpty(usage.LinkToDirectoryUrl))
@@ -314,6 +315,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 isBusinessCritical = A<DataOptions>(),
                 DPIA = A<DataOptions>(),
                 riskAssessment = A<DataOptions>(),
+                riskAssesmentDate = A<DateTime>(),
                 LinkToDirectoryUrl = A<string>(),
                 HostedAt = A<HostedAt>(),
                 preriskAssessment = A<RiskLevel>(),

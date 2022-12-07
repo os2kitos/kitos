@@ -203,6 +203,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ArchiveDuty = A<ArchiveDutyTypes>(),
                 Registertype = A<bool>(),
                 riskAssessment = DataOptions.YES,
+                riskAssesmentDate = A<DateTime>(),
                 RiskSupervisionDocumentationUrlName = A<string>(),
                 RiskSupervisionDocumentationUrl = A<string>(),
                 LinkToDirectoryUrlName = A<string>(),
@@ -304,6 +305,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.LinkToDirectoryUrl, readModel.LinkToDirectoryUrl);
             Assert.Equal(systemUsage.GeneralPurpose, readModel.GeneralPurpose);
             Assert.Equal(systemUsage.HostedAt, readModel.HostedAt);
+            Assert.Equal(systemUsage.riskAssesmentDate, readModel.RiskAssessmentDate);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
