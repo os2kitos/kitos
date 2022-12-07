@@ -10,7 +10,8 @@
             allowRemoval: boolean,
             searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<T>[]>,
             fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<T>[],
-            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<T>) => string)
+            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<T>) => string,
+            allowFixedValueRangeSearch?: boolean)
             : void;
     }
 
@@ -30,13 +31,18 @@
             allowRemoval: boolean,
             searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>,
             fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[],
-            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<TElement>) => string) {
+            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<TElement>) => string,
+            allowFixedValueRangeSearch?: boolean ) {
 
             let select2Config;
             if (!!searchFunc) {
                 select2Config = this.select2LoadingService.loadSelect2WithDataSource(searchFunc, false, formatResult);
             } else if (!!fixedValueRange) {
-                select2Config = this.select2LoadingService.select2LocalDataNoSearch(() => fixedValueRange(), false);
+                if (allowFixedValueRangeSearch) {
+                    select2Config = this.select2LoadingService.select2LocalData(() => fixedValueRange());
+                } else {
+                    select2Config = this.select2LoadingService.select2LocalDataNoSearch(() => fixedValueRange(), false);
+                }
             } else {
                 throw new Error("Either searchFunc or fixedValueRange must be provided");
             }
@@ -55,6 +61,7 @@
             setField(configuration);
         }
     }
+
 
     app.service("bindingService", BindingService);
 }
