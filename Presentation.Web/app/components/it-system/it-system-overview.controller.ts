@@ -654,7 +654,6 @@
                         ]
                             , false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderBoolean(dataItem.IsHoldingDocument))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderBoolean(dataItem.IsHoldingDocument))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
@@ -666,7 +665,6 @@
                         .withStandardWidth(170)
                         .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
@@ -816,12 +814,11 @@
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("RiskAssessmentDate")
-                        .withTitle("Risk assessment date <- change the text")
+                        .withTitle("Dato for seneste risikovurdering")
                         .withId("LatestRiskAssessmentDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withStandardWidth(170)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.RiskAssessmentDate)));
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate)));
 
             //Launch kendo grid
             launcher.launch();

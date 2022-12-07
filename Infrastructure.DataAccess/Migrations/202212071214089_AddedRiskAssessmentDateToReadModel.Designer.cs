@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202212070659101_AddedRiskAssessmentDateToReadModel"; }
+            get { return "202212071214089_AddedRiskAssessmentDateToReadModel"; }
         }
         
         string IMigrationMetadata.Source
