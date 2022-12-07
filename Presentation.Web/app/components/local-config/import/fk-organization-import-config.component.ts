@@ -51,10 +51,11 @@
         commands: Array<IFkOrganizationCommand> | null = null;
         busy: boolean = false;
 
-        static $inject: string[] = ["stsOrganizationSyncService", "fkOrganisationImportDialogFactory"];
+        static $inject: string[] = ["stsOrganizationSyncService", "fkOrganisationImportDialogFactory", "genericPromptFactory"];
         constructor(
             private readonly stsOrganizationSyncService: Kitos.Services.Organization.IStsOrganizationSyncService,
-            private readonly fkOrganisationImportDialogFactory: Kitos.LocalAdmin.FkOrganisation.Modals.IFKOrganisationImportDialogFactory) {
+            private readonly fkOrganisationImportDialogFactory: Kitos.LocalAdmin.FkOrganisation.Modals.IFKOrganisationImportDialogFactory,
+            private readonly genericPromptFactory: Kitos.Shared.Generic.Prompt.IGenericPromptFactory) {
         }
 
         $onInit() {
@@ -95,6 +96,7 @@
 
         private bindCommands(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
             const newCommands: Array<IFkOrganizationCommand> = [];
+
             if (result.connected) {
                 newCommands.push({
                     id: "updateSync",
@@ -134,26 +136,45 @@
                         }
                     });
                 }
+
                 newCommands.push({
                     id: "breakSync",
                     text: "Bryd forbindelsen til FK Organisation",
                     category: CommandCategory.Delete,
                     enabled: result.canDeleteConnection,
                     onClick: () => {
-                        if (confirm("Bryd forbindelsen til FK Organisation? Ved afbrydelse af forbindelsen, konverteres alle organisationsenheder til KITOS enheder, hvorefter de frit kan redigeres.")) {
-                            this.busy = true;
-                            this.stsOrganizationSyncService
-                                .disconnect(this.currentOrganizationUuid, false)
-                                .then(success => {
-                                    if (success) {
-                                        this.loadState();
-                                    } else {
-                                        this.busy = false;
-                                    }
-                                }, _ => {
-                                    this.busy = false;
-                                });
-                        }
+                        this.genericPromptFactory.open<boolean>({
+                            title: "Bryd forbindelsen til FK Organisation",
+                            bodyTemplatePath: "app/components/local-config/import/fk-organization-import-break-connection-prompt.view.html",
+                            includeStandardCancelButton: true,
+                            commands: [{
+                                category: Shared.Generic.Prompt.GenericCommandCategory.Primary,
+                                text: "Slet ubrugte organisationseneheder",
+                                value: true
+                            },
+                            {
+                                category: Shared.Generic.Prompt.GenericCommandCategory.Primary,
+                                text: "Bevar organisationshierarkiet",
+                                value: false
+                                }]
+                        }).result.then((purgeOnDisconnect: boolean) => {
+                            {
+                                if (purgeOnDisconnect != undefined) {
+                                    this.busy = true;
+                                    this.stsOrganizationSyncService
+                                        .disconnect(this.currentOrganizationUuid, purgeOnDisconnect)
+                                        .then(success => {
+                                            if (success) {
+                                                this.loadState();
+                                            } else {
+                                                this.busy = false;
+                                            }
+                                        }, _ => {
+                                            this.busy = false;
+                                        });
+                                }
+                            }
+                        });
                     }
                 });
             } else {

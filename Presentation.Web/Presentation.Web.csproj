@@ -688,6 +688,7 @@
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-change-log.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-change-logs-root.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-break-connection-prompt.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-consequences-log.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config-import-modal.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config.view.html" />
@@ -700,6 +701,7 @@
     <Content Include="app\components\user-notification\user-notification-modal.view.html" />
     <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
+    <Content Include="app\shared\generic-prompt\generic-prompt.view.html" />
     <Content Include="app\shared\helpText\inlineHelpText.view.html" />
     <Content Include="app\shared\helpText\field-help-text.view.html" />
     <Content Include="app\shared\organization-tree\organization-tree-node.view.html" />
@@ -956,6 +958,7 @@
     <TypeScriptCompile Include="app\shared\cache\in-memory-cache.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
     <TypeScriptCompile Include="app\shared\EntityMapper.ts" />
+    <TypeScriptCompile Include="app\shared\generic-prompt\generic-prompt.dialog.ts" />
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
