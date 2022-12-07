@@ -812,7 +812,17 @@
                         .withId("note")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering());
+                        .withSourceValueEchoRendering())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("RiskAssessmentDate")
+                        .withTitle("Risk assessment date <- change the text")
+                        .withId("LatestRiskAssessmentDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withoutSorting()   //NOTICE: NO sorting OR filtering on computed field!
+                        .withStandardWidth(170)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.RiskAssessmentDate)));
 
             //Launch kendo grid
             launcher.launch();
