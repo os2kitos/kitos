@@ -817,6 +817,7 @@
                         .withTitle("Dato for seneste risikovurdering")
                         .withId("LatestRiskAssessmentDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withStandardWidth(170)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate)));
 
