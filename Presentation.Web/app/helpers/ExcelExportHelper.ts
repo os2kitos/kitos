@@ -67,6 +67,10 @@
             return ExcelExportHelper.noValueFallback;
         }
 
+        static renderBoolean(value: boolean) {
+           return value ? "Ja" : "Nej";
+        }
+
         static convertColorsToDanish(color: string) {
             if (color === null || _.isUndefined(color)) {
                 return ExcelExportHelper.noValueFallback;

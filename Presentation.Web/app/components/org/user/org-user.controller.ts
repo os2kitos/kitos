@@ -32,16 +32,20 @@
             "hasWriteAccess",
             "notify",
             "gridStateService",
+            "exportGridToExcelService",
+            "$timeout"
         ];
 
         constructor(
-            $scope: ng.IScope,
-            private $state: ng.ui.IStateService,
-            private _: ILoDashWithMixins,
-            private user,
-            private hasWriteAccess,
-            private notify,
-            private gridStateService: Services.IGridStateFactory) {
+            private readonly $scope: ng.IScope,
+            private readonly $state: ng.ui.IStateService,
+            private readonly _: ILoDashWithMixins,
+            private readonly user,
+            private readonly hasWriteAccess,
+            private readonly notify,
+            private readonly gridStateService: Services.IGridStateFactory,
+            private readonly exportGridToExcelService: Services.System.ExportGridToExcelService,
+            private readonly $timeout: ng.ITimeoutService) {
             this.hasWriteAccess = hasWriteAccess;
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
@@ -224,6 +228,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
+                excelExport: (e: any) => this.exportToExcel(e),
                 height: window.innerHeight - 200,
                 detailTemplate: (dataItem) => `<uib-tabset active="0">
                     <uib-tab index="0" heading="Organisation roller"><user-organization-unit-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-organization-unit-roles></uib-tab>
@@ -278,7 +283,7 @@
                         field: "LastAdvisDate", title: "Advis", width: 110,
                         persistId: "advisdate", 
                         template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
-                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? dataItem.LastAdvisDate.toDateString() : "",
+                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? Kitos.Helpers.ExcelExportHelper.renderDate(dataItem.LastAdvisDate) : "",
                         hidden: false,
                         filterable: false
                     },
@@ -298,7 +303,7 @@
                         }
                     },
                     {
-                        field: "OrganizationUnitRights.Role", title: "Roller", width: 150,
+                        field: "OrganizationUnitRights.Role", title: "Organisationsroller", width: 150,
                         persistId: "role", 
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
@@ -307,6 +312,7 @@
                             }
                             return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
                         },
+                        excelTemplate: (dataItem) => dataItem.OrganizationUnitRights.map(right => right.Role.Name).join(", "),
                         hidden: true,
                         filterable: {
                             cell: {
@@ -318,7 +324,6 @@
                         }
                     },
                     {
-
                         field: "hasApi", title: "API bruger", width: 96,
                         persistId: "apiaccess", 
                         attributes: { "class": "text-center", "data-element-type": "userObject" },
@@ -326,6 +331,7 @@
                             "data-element-type": "userHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasApiAccess),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasApiAccess),
                         hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
@@ -336,6 +342,7 @@
                         persistId: "localadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isLocalAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -345,6 +352,7 @@
                         persistId: "orgadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isOrgAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -354,6 +362,7 @@
                         persistId: "systemadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isSystemAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -363,6 +372,7 @@
                         persistId: "contractadminrole", 
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isContractAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -376,6 +386,7 @@
                             "data-element-type": "rightsHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isRightsHolder),
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -390,6 +401,7 @@
                             "data-element-type": "stakeHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasStakeHolderAccess),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasStakeHolderAccess),
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -403,6 +415,11 @@
                     }
                 ]
             };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                mainGridOptions.toolbar);
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({
@@ -419,13 +436,21 @@
             this.mainGridOptions = mainGridOptions;
         }
 
+        //NOTE: Stores the visibility parameters, and is used by the excel dropdown commands before invoking exportToExcel()..
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+        
+        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
+        }
+
         public onEdit(entityId) {
             this.$state.go("organization.user.edit", { id: entityId });
         }
 
         private fixNameFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            if (column == 'ObjectOwner.Name') {
+            if (column === 'ObjectOwner.Name') {
                 return filterUrl.replace(pattern, `$1concat(concat(ObjectOwner/Name, ' '), ObjectOwner/LastName)$2`);
             }
             return filterUrl.replace(pattern, `$1concat(concat(Name, ' '), LastName)$2`);
