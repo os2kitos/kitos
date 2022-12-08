@@ -334,6 +334,32 @@ namespace Core.ApplicationServices.SystemUsage
             }).MatchFailure();
         }
 
+        public Maybe<OperationError> AddPersonalDataOption(int id, GDPRPersonalDataOption option)
+        {
+            return Modify(id, system =>
+            {
+                return system.AddPersonalData(option)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
+            }).MatchFailure();
+        }
+
+        public Maybe<OperationError> RemovePersonalDataOption(int id, GDPRPersonalDataOption option)
+        {
+            return Modify(id, system =>
+            {
+                return system.RemovePersonalData(option)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
+            }).MatchFailure();
+        }
+
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)
         {
             return _authorizationContext.AllowReads(usage) ? Result<ItSystemUsage, OperationError>.Success(usage) : new OperationError(OperationFailure.Forbidden);

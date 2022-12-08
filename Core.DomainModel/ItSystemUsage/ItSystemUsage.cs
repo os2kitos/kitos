@@ -141,6 +141,7 @@ namespace Core.DomainModel.ItSystemUsage
         public int? ArchiveTypeId { get; set; }
         public virtual ArchiveType ArchiveType { get; set; }
 
+        public ICollection<GDPRPersonalDataOption> PersonalData { get; set; }
         public int? SensitiveDataTypeId { get; set; }
         public virtual SensitiveDataType SensitiveDataType { get; set; }
 
@@ -972,6 +973,29 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             return new ItSystemUsageValidationResult(errors);
+        }
+
+        public Maybe<OperationError> AddPersonalData(GDPRPersonalDataOption option)
+        {
+            if (SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA) == false)
+            {
+                return new OperationError("You cannot add a new PersonalData option before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
+            }
+            
+            if(PersonalData.Contains(option))
+                return Maybe<OperationError>.None;
+
+            PersonalData.Add(option);
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemovePersonalData(GDPRPersonalDataOption option)
+        {
+            if (!PersonalData.Contains(option))
+                return new OperationError("PersonalData option wasn't found", OperationFailure.NotFound);
+
+            PersonalData.Remove(option);
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)

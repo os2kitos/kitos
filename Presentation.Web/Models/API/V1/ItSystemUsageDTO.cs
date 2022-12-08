@@ -4,6 +4,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
+using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 
 namespace Presentation.Web.Models.API.V1
 {
@@ -76,6 +77,7 @@ namespace Presentation.Web.Models.API.V1
         public string LinkToDirectoryUrlName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
 
+        public IEnumerable<GDPRPersonalDataChoice> PersonalData { get; set; }
         public ICollection<ItSystemUsageSensitiveDataLevelDTO> SensitiveDataLevels { get; set; }
 
         public DataOptions? Precautions { get; set; }

@@ -6,9 +6,9 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
     {
         public static CsvColumnIdentity SystemUuid = new CsvColumnIdentity(nameof(SystemUuid), "UUID");
         public static CsvColumnIdentity SystemName = new CsvColumnIdentity(nameof(SystemName), "Navn");
-        public static CsvColumnIdentity NoData = new CsvColumnIdentity(nameof(NoData), "Ingen persondata");
-        public static CsvColumnIdentity PersonalData = new CsvColumnIdentity(nameof(PersonalData), "Almindelige persondata");
-        public static CsvColumnIdentity SensitiveData = new CsvColumnIdentity(nameof(SensitiveData), "Følsomme persondata");
+        public static CsvColumnIdentity NoData = new CsvColumnIdentity(nameof(NoData), "Ingen personoplysninger");
+        public static CsvColumnIdentity PersonalData = new CsvColumnIdentity(nameof(PersonalData), "Almindelige personoplysninger");
+        public static CsvColumnIdentity SensitiveData = new CsvColumnIdentity(nameof(SensitiveData), "Følsomme personoplysninger");
         public static CsvColumnIdentity ChosenSensitiveData = new CsvColumnIdentity(nameof(ChosenSensitiveData), "Valgte følsomme persondata");
         public static CsvColumnIdentity LegalData = new CsvColumnIdentity(nameof(LegalData), "Straffesager og lovovertrædelser");
         public static CsvColumnIdentity BusinessCritical = new CsvColumnIdentity(nameof(BusinessCritical), "Forretningskritisk IT-System");
