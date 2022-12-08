@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.ApplicationServices.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using CsvHelper.Configuration.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -84,6 +84,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Assert
             Assert.NotNull(itSystemUsageDTO.RiskAssessment);
             Assert.Equal(dataOption, itSystemUsageDTO.RiskAssessment.Value);
+        }
+
+        [Fact]
+        public async Task Can_Change_RiskAssessmentDate()
+        {
+            //Arrange
+            var date = A<DateTime>();
+            var body = new { RiskAssesmentDate = date };
+
+            //Act
+            var itSystemUsageDto = await Create_System_Usage_And_Change_Value_By_Body(body);
+
+            //Assert
+            Assert.NotNull(itSystemUsageDto.RiskAssesmentDate);
+            Assert.Equal(date, itSystemUsageDto.RiskAssesmentDate.Value);
         }
 
         [Fact]
@@ -260,6 +275,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 IsBusinessCritical = A<DataOptions>(),
                 DataProcessorControl = A<DataOptions>(),
                 RiskAssessment = A<DataOptions>(),
+                RiskAssesmentDate = A<DateTime>(),
                 PreRiskAssessment = A<RiskLevel>(),
                 DPIA = A<DataOptions>()
 
@@ -279,7 +295,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var gdprExportReport = Assert.Single(report.Where(x => x.Name == system.Name));
             AssertCorrectGdprExportReport(expectedUsage, gdprExportReport, true);
             AssertSensitiveDataLevel(sensitiveDataLevel, gdprExportReport);
-
         }
 
         [Fact]
@@ -309,6 +324,16 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertDataOption(expected.DPIA, actual.DPIA);
             AssertRiskLevel(expected.PreRiskAssessment, actual.PreRiskAssessment);
             AssertHostedAt(expected.HostedAt, actual.HostedAt);
+            if (expected.RiskAssesmentDate.HasValue)
+            {
+                var riskAssessmentDateString = $"'{expected.RiskAssesmentDate.GetValueOrDefault().ConvertToDanishFormatDateString()}'";
+                Assert.Equal(riskAssessmentDateString, actual.RiskAssessmentDate);
+            }
+            else
+            {
+                Assert.Empty(actual.RiskAssessmentDate);
+            }
+
             if (hasConcludedDataProcessingAgreement)
             {
                 AssertYes(actual.Datahandler);
@@ -471,6 +496,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public string DirectoryUrl { get; set; }
         [Name("Foretaget risikovurdering")]
         public string RiskAssessment { get; set; }
+        [Name("Dato for seneste risikovurdering")]
+        public string RiskAssessmentDate { get; set; }
         [Name("Hvad viste seneste risikovurdering")]
         public string PreRiskAssessment { get; set; }
         [Name("Gennemført DPIA / Konsekvensanalyse")]

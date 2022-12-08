@@ -1,5 +1,4 @@
 ﻿using System.Data.Entity.ModelConfiguration;
-using System.Security.Cryptography.X509Certificates;
 using Core.DomainModel.GDPR;
 
 namespace Infrastructure.DataAccess.Mapping

@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using Presentation.Web.Infrastructure.Attributes;
@@ -44,7 +45,7 @@ namespace Presentation.Web.Controllers.API.V1
                     new KLEStatusDTO
                     {
                         UpToDate = result.Value.UpToDate,
-                        Version = result.Value.Published.ToString("dd-MM-yyyy")
+                        Version = result.Value.Published.ConvertToDanishFormatDateString()
                     }) :
                 FromOperationFailure(result.Error);
         }

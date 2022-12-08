@@ -228,6 +228,8 @@ namespace Core.DomainServices.SystemUsage
 
             destination.DataProcessingRegistrationsConcludedAsCsv = string.Join(", ", isAgreementConcludedList.Select(x => x.Value.GetReadableName()));
 
+            destination.RiskAssessmentDate = source.riskAssesmentDate;
+
             static string CreateDataProcessingRegistrationKey(int Id) => $"I:{Id}";
 
             var incomingDataProcessingRegistrations = source.AssociatedDataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.Id));

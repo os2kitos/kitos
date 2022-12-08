@@ -653,8 +653,7 @@
                             }
                         ]
                             , false)
-                        .withRendering(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
-                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderBoolean(dataItem.IsHoldingDocument))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
@@ -666,7 +665,6 @@
                         .withStandardWidth(170)
                         .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
@@ -812,7 +810,16 @@
                         .withId("note")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering());
+                        .withSourceValueEchoRendering())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("RiskAssessmentDate")
+                        .withTitle("Dato for seneste risikovurdering")
+                        .withId("LatestRiskAssessmentDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(170)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate)));
 
             //Launch kendo grid
             launcher.launch();
