@@ -16,6 +16,7 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
         public static CsvColumnIdentity DataProcessorControl = new CsvColumnIdentity(nameof(DataProcessorControl), "Tilsyn/kontrol af databehandleren");
         public static CsvColumnIdentity LinkToDirectory = new CsvColumnIdentity(nameof(LinkToDirectory), "Link til fortegnelse");
         public static CsvColumnIdentity RiskAssessment = new CsvColumnIdentity(nameof(RiskAssessment), "Foretaget risikovurdering");
+        public static CsvColumnIdentity RiskAssessmentDate = new CsvColumnIdentity(nameof(RiskAssessmentDate), "Dato for seneste risikovurdering");
         public static CsvColumnIdentity PreRiskAssessment = new CsvColumnIdentity(nameof(PreRiskAssessment), "Hvad viste seneste risikovurdering");
         public static CsvColumnIdentity DPIA = new CsvColumnIdentity(nameof(DPIA), "Gennemført DPIA / Konsekvensanalyse");
         public static CsvColumnIdentity HostedAt = new CsvColumnIdentity(nameof(HostedAt), "IT-Systemet driftes");
