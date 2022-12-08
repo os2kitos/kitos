@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Core.ApplicationServices.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using CsvHelper.Configuration.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -19,8 +21,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemUsageGDPRTest : WithAutoFixture
     {
-
-
         [Fact]
         public async Task Can_Change_HostedAtOptions()
         {
@@ -254,6 +254,45 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var notUpdatedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
                 Assert.Empty(notUpdatedUsage.SensitiveDataLevels);
             }
+        }
+
+        [Fact]
+        public async Task Can_Add_PersonalData()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+            var personalData = A<GDPRPersonalDataChoice>();
+
+            //Act
+            await ItSystemUsageHelper.AddPersonalData(usage.Id, personalData);
+
+            var updatedSystem = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(usage.Id);
+
+            //Assert
+            Assert.Contains(personalData, updatedSystem.PersonalData);
+        }
+
+        [Fact]
+        public async Task Can_Remove_PersonalData()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+            var personalData = A<GDPRPersonalDataChoice>();
+
+            //Act
+            await ItSystemUsageHelper.AddPersonalData(usage.Id, personalData);
+            await ItSystemUsageHelper.RemovePersonalData(usage.Id, personalData);
+
+            var updatedSystem = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(usage.Id);
+
+            //Assert
+            Assert.DoesNotContain(personalData, updatedSystem.PersonalData);
         }
 
         [Fact]

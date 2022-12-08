@@ -15,6 +15,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
+using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 using Tests.Integration.Presentation.Web.ItSystem;
 using Xunit;
 
@@ -45,22 +46,34 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/add"), cookie, sensitiveDataLevel))
-            {
-                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
-                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
-            }
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/add"), cookie, sensitiveDataLevel);
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+            return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
         }
 
         public static async Task<ItSystemUsageSensitiveDataLevelDTO> RemoveSensitiveDataLevel(int systemUsageId, SensitiveDataLevel sensitiveDataLevel)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/remove"), cookie, sensitiveDataLevel))
-            {
-                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
-                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
-            }
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/remove"), cookie, sensitiveDataLevel);
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+            return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
+        }
+
+        public static async Task AddPersonalData(int systemUsageId, GDPRPersonalDataChoice personalDataChoice)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}"), cookie, new {});
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+        }
+
+        public static async Task  RemovePersonalData(int systemUsageId, GDPRPersonalDataChoice personalDataChoice)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using var okResponse = await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}"), cookie);
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
         }
 
         public static async Task<ItSystemUsageSensitiveDataLevelDTO> SendSetActiveRequestAsync(int systemUsageId, int orgId, bool systemUsageActive)
