@@ -32,6 +32,7 @@
             this.bindOversigthOptionsRemark();
             this.bindOversightCompleted();
             this.bindOversightCompletedRemark();
+            this.bindScheduledInspectionDate();
 
             this.bindOversightDates();
             this.modal = $modal;
@@ -47,6 +48,7 @@
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
         shouldShowLatestOversightCompletedDate: boolean;
         oversightDates: Models.ViewModel.GDPR.IOversightDateViewModel[];
+        scheduledInspectionDate: Models.ViewModel.Generic.IDateSelectionViewModel;
 
         private yesIsOversightCompletedValue = new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x => x.id === Models.Api.Shared.YesNoUndecidedOption.Yes)[0];
 
@@ -363,6 +365,26 @@
                     this.bindOversightDates();
                     return success;
                 });
+        }
+        
+        private bindScheduledInspectionDate() {
+            this.scheduledInspectionDate = new Models.ViewModel.Generic.DateSelectionViewModel(
+                this.dataProcessingRegistration.oversightScheduledInspectionDate,
+                (newDate) => this.changeScheduledInspectionDate(newDate));
+        }
+
+        private changeScheduledInspectionDate(scheduledInspection: string) {
+            var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(scheduledInspection);
+            if (!!formattedDate.convertedValue) {
+                return this.apiUseCaseFactory
+                    .createUpdate("Dato for indgåelse af databehandleraftale", () => this.dataProcessingRegistrationService.updateOversightScheduledInspectionDate(this.dataProcessingRegistration.id, formattedDate.convertedValue))
+                    .executeAsync(success => {
+                        this.dataProcessingRegistration.oversightScheduledInspectionDate = scheduledInspection;
+                        this.bindScheduledInspectionDate();
+                        return success;
+                    });
+            }
+            return null;
         }
     }
 
