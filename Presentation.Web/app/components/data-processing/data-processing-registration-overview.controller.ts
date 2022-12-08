@@ -424,7 +424,7 @@
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt)))
                     .withColumn(builder =>
                         builder
-                        .withDataSourceName("ScheduledInspectionDate")
+                        .withDataSourceName("OversightScheduledInspectionDate")
                         .withTitle("Scheduled inspection date title")
                         .withId("scheduledInspectionDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
