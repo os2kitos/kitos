@@ -969,9 +969,9 @@
     <Compile Include="Migrations\202212010827066_AddLatestSubscriptionCheckDateToSts.designer.cs">
       <DependentUpon>202212010827066_AddLatestSubscriptionCheckDateToSts.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202212070934374_OversightScheduledInspectionDateField.cs" />
-    <Compile Include="Migrations\202212070934374_OversightScheduledInspectionDateField.designer.cs">
-      <DependentUpon>202212070934374_OversightScheduledInspectionDateField.cs</DependentUpon>
+    <Compile Include="Migrations\202212080718102_OversightScheduledInspectionDateField.cs" />
+    <Compile Include="Migrations\202212080718102_OversightScheduledInspectionDateField.designer.cs">
+      <DependentUpon>202212080718102_OversightScheduledInspectionDateField.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1622,8 +1622,8 @@
     <EmbeddedResource Include="Migrations\202212010827066_AddLatestSubscriptionCheckDateToSts.resx">
       <DependentUpon>202212010827066_AddLatestSubscriptionCheckDateToSts.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202212070934374_OversightScheduledInspectionDateField.resx">
-      <DependentUpon>202212070934374_OversightScheduledInspectionDateField.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202212080718102_OversightScheduledInspectionDateField.resx">
+      <DependentUpon>202212080718102_OversightScheduledInspectionDateField.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

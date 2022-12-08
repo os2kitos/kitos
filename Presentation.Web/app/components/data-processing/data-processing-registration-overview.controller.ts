@@ -422,6 +422,15 @@
                             .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                             .withInitialVisibility(false)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt)))
+                    .withColumn(builder =>
+                        builder
+                        .withDataSourceName("ScheduledInspectionDate")
+                        .withTitle("Scheduled inspection date title")
+                        .withId("scheduledInspectionDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(170)
+                        .withRendering((dataItem) => Helpers.RenderFieldsHelper.renderDate(dataItem.OversightScheduledInspectionDate)))
                     .withStandardSorting("Name");
 
             dataProcessingRegistrationOptions.roles.forEach(role =>
