@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -9,7 +8,6 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -18,7 +16,6 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -867,6 +864,81 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void RemoveRelevantUnit_Returns_Forbidden()
         {
             Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.RemoveRelevantUnit(id, A<Guid>()));
+        }
+
+        [Fact]
+        public void Can_AddPersonalDataOption()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            itSystemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { new(){ItSystemUsage = itSystemUsage, SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA} };
+
+            var option = A<GDPRPersonalDataOption>();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.AddPersonalDataOption(itSystemUsage.Id, option);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _usageRepository.Verify(x => x.Update(itSystemUsage));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void AddPersonalDataOption_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.AddPersonalDataOption(id, A<GDPRPersonalDataOption>()));
+        }
+
+        [Fact]
+        public void AddPersonalDataOption_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.AddPersonalDataOption(id, A<GDPRPersonalDataOption>()));
+        }
+
+        [Fact]
+        public void Can_RemovePersonalDataOption()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            itSystemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { new(){ItSystemUsage = itSystemUsage, SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA} };
+
+            var option = A<GDPRPersonalDataOption>();
+            itSystemUsage.PersonalDataOptions = new List<ItSystemUsagePersonalData> { new(){ItSystemUsage = itSystemUsage, PersonalData= option} };
+            
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var error = _sut.RemovePersonalDataOption(itSystemUsage.Id, option);
+
+            //Assert
+            Assert.True(error.IsNone);
+            _usageRepository.Verify(x => x.Update(itSystemUsage));
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void RemovePersonalDataOption_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.RemovePersonalDataOption(id, A<GDPRPersonalDataOption>()));
+        }
+
+        [Fact]
+        public void RemovePersonalDataOption_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.RemovePersonalDataOption(id, A<GDPRPersonalDataOption>()));
         }
 
         private static void AssertArchivePeriod(ArchivePeriod expected, ArchivePeriod actual)

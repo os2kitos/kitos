@@ -293,6 +293,33 @@ namespace Tests.Unit.Core.Model
         }
 
         [Fact]
+        public void Remove_PersonalData_From_SensitiveData_Clears_PersonalData()
+        {
+            //Arrange
+            var sensitiveDataLevel = SensitiveDataLevel.PERSONALDATA;
+            var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = _sut,
+                SensitivityDataLevel = sensitiveDataLevel,
+            };
+            _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
+
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData{PersonalData= GDPRPersonalDataOption.CprNumber});
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData=GDPRPersonalDataOption.OtherPrivateMatters});
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData = GDPRPersonalDataOption.SocialProblems});
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(sensitiveDataLevel);
+
+            //Assert
+            Assert.True(result.Ok);
+            var usageSensitiveDataLevel = result.Value;
+            Assert.Equal(preAddedSensitiveDataLevel, usageSensitiveDataLevel);
+            Assert.Empty(_sut.SensitiveDataLevels);
+            Assert.Empty(_sut.PersonalDataOptions);
+        }
+
+        [Fact]
         public void RemoveSensitiveData_Fails_With_NotFound_If_Sensitivity_Level_Does_Not_Exist()
         {
             //Act
@@ -458,6 +485,131 @@ namespace Tests.Unit.Core.Model
             var validity = itSystemUsage.CheckSystemValidity();
 
             Assert.True(validity.Result);
+        }
+
+        [Fact]
+        public void AddPersonalData_Adds_PersonalData()
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>
+                {
+                    new() {SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA}
+                }
+            };
+            var personalDataOption = A<GDPRPersonalDataOption>();
+
+            var error = itSystemUsage.AddPersonalData(personalDataOption);
+
+            Assert.False(error.HasValue);
+            Assert.Contains(personalDataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData));
+        }
+
+        [Fact]
+        public void AddPersonalData_Returns_BadState()
+        {
+            var itSystemUsage = new ItSystemUsage();
+            var personalDataOption = A<GDPRPersonalDataOption>();
+
+            var error = itSystemUsage.AddPersonalData(personalDataOption);
+
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void AddPersonalData_Returns_NoError_If_Data_Already_Present()
+        {
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            var itSystemUsage = new ItSystemUsage
+            {
+                SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>
+                {
+                    new() {SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA}
+                },
+                PersonalDataOptions = new List<ItSystemUsagePersonalData>()
+                {
+                    new(){PersonalData = personalDataOption}
+                }
+            };
+
+            var error = itSystemUsage.AddPersonalData(personalDataOption);
+
+            Assert.False(error.HasValue);
+            Assert.Contains(personalDataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData));
+        }
+
+        [Fact]
+        public void RemovePersonalData_Removes_PersonalData()
+        {
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            var itSystemUsage = new ItSystemUsage
+            {
+                SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>
+                {
+                    new() {SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA}
+                },
+                PersonalDataOptions = new List<ItSystemUsagePersonalData>()
+                {
+                 new(){PersonalData = personalDataOption}
+                }
+            };
+
+            var error = itSystemUsage.RemovePersonalData(personalDataOption);
+
+            Assert.False(error.HasValue);
+            Assert.DoesNotContain(personalDataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData));
+        }
+
+        [Fact]
+        public void RemovePersonalData_Returns_BadState()
+        {
+            var itSystemUsage = new ItSystemUsage();
+            var personalDataOption = A<GDPRPersonalDataOption>();
+
+            var error = itSystemUsage.RemovePersonalData(personalDataOption);
+
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void RemovePersonalData_Returns_NotFound()
+        {
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            var itSystemUsage = new ItSystemUsage
+            {
+                SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>
+                {
+                    new() {SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA}
+                }
+            };
+
+            var error = itSystemUsage.RemovePersonalData(personalDataOption);
+
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void ResetPersonalData_Clears_Data()
+        {
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            var itSystemUsage = new ItSystemUsage
+            {
+                SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>
+                {
+                    new() {SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA}
+                },
+                PersonalDataOptions = new List<ItSystemUsagePersonalData>()
+                {
+                    new(){PersonalData = personalDataOption}
+                }
+            };
+
+            itSystemUsage.ResetPersonalData();
+
+            Assert.Empty(itSystemUsage.PersonalDataOptions);
         }
 
         public static readonly object[][] ValidationInvalidData =

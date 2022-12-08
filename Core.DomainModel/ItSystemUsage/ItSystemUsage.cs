@@ -51,6 +51,7 @@ namespace Core.DomainModel.ItSystemUsage
             Uuid = Guid.NewGuid();
             MarkAsDirty();
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
+            PersonalDataOptions = new List<ItSystemUsagePersonalData>();
         }
 
         public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
@@ -141,7 +142,6 @@ namespace Core.DomainModel.ItSystemUsage
         public int? ArchiveTypeId { get; set; }
         public virtual ArchiveType ArchiveType { get; set; }
 
-        public ICollection<GDPRPersonalDataOption> PersonalData { get; set; }
         public int? SensitiveDataTypeId { get; set; }
         public virtual SensitiveDataType SensitiveDataType { get; set; }
 
@@ -251,6 +251,7 @@ namespace Core.DomainModel.ItSystemUsage
         public string LinkToDirectoryUrlName { get; set; }
 
 
+        public virtual ICollection<ItSystemUsagePersonalData> PersonalDataOptions { get; set; }
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
         public DataOptions? precautions { get; set; }
@@ -456,6 +457,10 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);
+            if (dataLevelToRemove.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA)
+            {
+                ResetPersonalData();
+            }
             SensitiveDataLevels.Remove(dataLevelToRemove);
 
             return dataLevelToRemove;
@@ -982,20 +987,32 @@ namespace Core.DomainModel.ItSystemUsage
                 return new OperationError("You cannot add a new PersonalData option before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
             }
             
-            if(PersonalData.Contains(option))
+            if(PersonalDataOptions.Any(x => x.PersonalData == option))
                 return Maybe<OperationError>.None;
 
-            PersonalData.Add(option);
+            var personalDataOption = new ItSystemUsagePersonalData() {ItSystemUsage = this, PersonalData = option};
+            PersonalDataOptions.Add(personalDataOption);
             return Maybe<OperationError>.None;
         }
 
         public Maybe<OperationError> RemovePersonalData(GDPRPersonalDataOption option)
         {
-            if (!PersonalData.Contains(option))
-                return new OperationError("PersonalData option wasn't found", OperationFailure.NotFound);
+            if (SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA) == false)
+            {
+                return new OperationError("You cannot remove any PersonalData options before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
+            }
 
-            PersonalData.Remove(option);
+            var personalDataOption = PersonalDataOptions.FirstOrDefault(x => x.PersonalData == option);
+            if (personalDataOption == null)
+                return new OperationError($"PersonalData: \"{option}\" wasn't found", OperationFailure.NotFound);
+
+            PersonalDataOptions.Remove(personalDataOption);
             return Maybe<OperationError>.None;
+        }
+
+        public void ResetPersonalData()
+        {
+            PersonalDataOptions.Clear();
         }
 
         private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)

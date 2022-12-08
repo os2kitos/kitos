@@ -254,7 +254,7 @@ namespace Presentation.Web
                 .ForMember(dest => dest.MainContractId, opt => opt.MapFrom(src => src.MainContract.ItContractId))
                 .ForMember(dest => dest.MainContractIsActive, opt => opt.MapFrom(src => src.MainContract.ItContract.IsActive))
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
-                .ForMember(dest => dest.PersonalData, opt => opt.MapFrom(src => src.PersonalData.Select(x => x.ToGDPRPersonalDataChoice())))
+                .ForMember(dest => dest.PersonalData, opt => opt.MapFrom(src => src.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice())))
                 .ReverseMap()
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                 .ForMember(dest => dest.Contracts, opt => opt.Ignore())
