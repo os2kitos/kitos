@@ -180,6 +180,7 @@
                                 usr.isSystemAdmin = this.hasRole(usr, Models.OrganizationRole.SystemModuleAdmin);
                                 usr.isContractAdmin = this.hasRole(usr, Models.OrganizationRole.ContractModuleAdmin);
                                 usr.isRightsHolder = this.hasRole(usr, Models.OrganizationRole.RightsHolderAccess);
+                                usr.ObjectOwner ??= { Name: "", LastName:"" } as any;
                             });
                             return response;
                         }
@@ -288,7 +289,7 @@
                         filterable: false
                     },
                     {
-                        field: "ObjectOwner?.Name", title: "Oprettet af", width: 150,
+                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
                         persistId: "createdby",
                         template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                         excelTemplate: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
@@ -303,7 +304,11 @@
                         }
                     },
                     {
-                        field: "OrganizationUnitRights.Role", title: "Organisationsroller", width: 150,
+                        field: "OrganizationUnitRights.Role",
+                        title: "Organisationsroller",
+                        width: 150,
+                        filterable: false,
+                        sortable: false,
                         persistId: "role",
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
@@ -313,15 +318,7 @@
                             return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
                         },
                         excelTemplate: (dataItem) => dataItem.OrganizationUnitRights.map(right => right.Role.Name).join(", "),
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        hidden: true
                     },
                     {
                         field: "hasApi", title: "API bruger", width: 96,
