@@ -58,11 +58,15 @@
                 }
             }
 
-            // hide columns on visual grid
+            // hide/show columns on visual grid
             columns.forEach(column => {
                 if (column.tempVisual) {
                     delete column.tempVisual;
                     e.sender.hideColumn(column);
+                }
+                if (column.tempHidden) {
+                    delete column.tempHidden;
+                    e.sender.showColumn(column);
                 }
             });
 
@@ -74,6 +78,8 @@
         }
 
         private selectColumnsToDisplay(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[], exportOnlyVisibleColumns: boolean) {
+            this.hideUiOnlyColumns(e, columns);
+
             if (!exportOnlyVisibleColumns) {
                 this.showAllRootColumns(e, columns);
             }
@@ -85,9 +91,19 @@
         private showAllRootColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
             _.forEach(columns,
                 column => {
-                    if (column.hidden && column.parentId === undefined) {
+                    if (!column.uiOnlyColumn && column.hidden && column.parentId === undefined) {
                         column.tempVisual = true;
                         e.sender.showColumn(column);
+                    }
+                });
+        }
+
+        private hideUiOnlyColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
+            _.forEach(columns,
+                column => {
+                    if (column.uiOnlyColumn && !column.hidden) {
+                        column.tempHidden = true;
+                        e.sender.hideColumn(column);
                     }
                 });
         }
