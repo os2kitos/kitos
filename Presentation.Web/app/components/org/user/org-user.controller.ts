@@ -288,7 +288,7 @@
                         filterable: false
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
+                        field: "ObjectOwner?.Name", title: "Oprettet af", width: 150,
                         persistId: "createdby", 
                         template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                         excelTemplate: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",

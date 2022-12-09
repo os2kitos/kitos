@@ -42,7 +42,8 @@ namespace Presentation.Web
                           builder.Version("1", "OS2Kitos API - V1")
                               .Description(
                                   "<b><i>OBS: Dokumentation for V2 findes ved at skifte version på dokumentet til 2 øverst på siden</i></b><br/><br/>" +
-                              "<br/>Denne dokumentation udstiller Kitos API'et til brug for applikationsudvikling.<br/><br/>" +
+                                  "<b>BEMÆRK: ADGANG TIL API V1 <ul>LUKKES</ul>. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/><br/>" +
+                              "Denne dokumentation udstiller Kitos API'et til brug for applikationsudvikling.<br/><br/>" +
                               "Den første udgave af API'et (V1) blev udviklet til understøttelse af projektets brugerflade og vil med tiden blive erstattet " +
                               "af et selvstændigt API (V2) udviklet til brug for integration med udefrakommende systemer. " +
                               "Du vil i en periode kunne anvende både V1 og V2. " +
@@ -51,7 +52,8 @@ namespace Presentation.Web
                               "Særligt for V1 gælder der følgende:<br/>" +
                               "ObjectOwnerId, LastChanged og LastChangedByUserId bliver som udgangspunkt sat af systemet automatisk.<br/>" +
                               "Der er udelukkende adgang til læseoperationer i V1. Ved behov for adgang til funktionalitet, der ændrer i data, kontakt da venligst KITOS sekretariatet.<br/><br/>" +
-                              "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/>"
+                              "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/><br/>" +
+                                "<b>BEMÆRK: ADGANG TIL API V1 <ul>LUKKES</ul>. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/>"
                               );
                       });
 
