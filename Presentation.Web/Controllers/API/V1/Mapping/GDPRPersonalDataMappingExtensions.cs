@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
         {
             ApiToDataMap = new Dictionary<GDPRPersonalDataChoice, GDPRPersonalDataOption>
             {
-                { GDPRPersonalDataChoice.CprNumber, GDPRPersonalDataOption.CprNumber},
+                { GDPRPersonalDataChoice.CvrNumber, GDPRPersonalDataOption.CprNumber},
                 { GDPRPersonalDataChoice.OtherPrivateMatters, GDPRPersonalDataOption.OtherPrivateMatters},
                 { GDPRPersonalDataChoice.SocialProblems, GDPRPersonalDataOption.SocialProblems}
             }.AsReadOnly();

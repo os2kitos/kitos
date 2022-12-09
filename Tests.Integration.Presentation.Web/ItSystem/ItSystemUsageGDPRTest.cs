@@ -245,15 +245,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
 
             //Act
-            using (var result = await HttpApi.PatchWithCookieAsync(
+            using var result = await HttpApi.PatchWithCookieAsync(
                 TestEnvironment.CreateUrl(
-                    $"api/v1/itsystemusage/{usage.Id}/sensitivityLevel/remove"), cookie, A<SensitiveDataLevel>()))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-                var notUpdatedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
-                Assert.Empty(notUpdatedUsage.SensitiveDataLevels);
-            }
+                    $"api/v1/itsystemusage/{usage.Id}/sensitivityLevel/remove"), cookie, A<SensitiveDataLevel>());
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+            var notUpdatedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
+            Assert.Empty(notUpdatedUsage.SensitiveDataLevels);
         }
 
         [Fact]
@@ -267,6 +265,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var personalData = A<GDPRPersonalDataChoice>();
 
             //Act
+            await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, SensitiveDataLevel.PERSONALDATA);
             await ItSystemUsageHelper.AddPersonalData(usage.Id, personalData);
 
             var updatedSystem = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(usage.Id);
@@ -286,6 +285,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var personalData = A<GDPRPersonalDataChoice>();
 
             //Act
+            await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, SensitiveDataLevel.PERSONALDATA);
             await ItSystemUsageHelper.AddPersonalData(usage.Id, personalData);
             await ItSystemUsageHelper.RemovePersonalData(usage.Id, personalData);
 
@@ -517,11 +517,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     {
         [Name("Navn")]
         public string Name { get; set; }
-        [Name("Ingen persondata")]
+        [Name("Ingen personoplysninger")]
         public string NoData { get; set; }
-        [Name("Almindelige persondata")]
+        [Name("Almindelige personoplysninger")]
         public string PersonalData { get; set; }
-        [Name("Følsomme persondata")]
+        [Name("Følsomme personoplysninger")]
         public string SensitiveData { get; set; }
         [Name("Straffesager og lovovertrædelser")]
         public string LegalData { get; set; }

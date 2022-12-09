@@ -2,7 +2,7 @@
 {
     public enum GDPRPersonalDataChoice
     {
-        CprNumber = 0,
+        CvrNumber = 0,
         SocialProblems = 1,
         OtherPrivateMatters = 2
     }

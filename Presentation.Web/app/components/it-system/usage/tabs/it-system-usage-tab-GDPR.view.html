@@ -93,6 +93,38 @@
                                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                                 F.eks.: Navn, adresse, telefonummer, e-mailadresse, titel m.m.
                             </span>
+                            <div ng-if="usageViewModel.personalDataSelected">
+                                <div class="checkbox inlineTab">
+                                    <label>
+                                        <input type="checkbox"
+                                               ng-model="usageViewModel.personalDataCvrSelected"
+                                               data-element-type="{{r.Name}}"
+                                               ng-disabled="!hasWriteAccess"
+                                               ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
+                                        {{r.Name}}
+                                    </label>
+                                </div>
+                                <div class="checkbox inlineTab">
+                                    <label>
+                                        <input type="checkbox"
+                                               ng-model="usageViewModel.personalDataSocialProblemsSelected"
+                                               data-element-type="{{r.Name}}"
+                                               ng-disabled="!hasWriteAccess"
+                                               ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
+                                        {{r.Name}}
+                                    </label>
+                                </div>
+                                <div class="checkbox inlineTab">
+                                    <label>
+                                        <input type="checkbox"
+                                               ng-model="usageViewModel.personalDataPrivateMattersSelected"
+                                               data-element-type="{{r.Name}}"
+                                               ng-disabled="!hasWriteAccess"
+                                               ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
+                                        {{r.Name}}
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <div class="checkbox">
                             <label>

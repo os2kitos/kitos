@@ -34,6 +34,7 @@
                 $scope.registerTypes = registerTypes;
                 $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
+                $scope.personalData = Kitos.Models.ViewModel.ItSystemUsage.PersonalDataViewModel.data
 
                 $scope.updateDataLevel = (optionId, checked, optionType) => {
                     var msg = notify.addInfoMessage("Arbejder ...", false);

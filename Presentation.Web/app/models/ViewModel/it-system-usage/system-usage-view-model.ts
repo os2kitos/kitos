@@ -1,11 +1,17 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
-    import Select2OptionViewModel = ViewModel.Generic.Select2OptionViewModel;
     import UpdatedSelect2OptionViewModel = ViewModel.Generic.UpdatedSelect2OptionViewModel;
 
-    export interface ISensitiveDataLevelModel {
-        value: number;
-        textValue: string;
+    export interface IDataLevelModel<T> {
+        value: T;
         text: string;
+    }
+
+    export interface ISensitiveDataLevelModel extends IDataLevelModel<number> {
+        textValue: string;
+    }
+
+    export interface IPersonalDataRecord extends IDataLevelModel<PersonalDataOption> {
+        checked: boolean;
     }
 
     export enum DataOption {
@@ -28,7 +34,11 @@
         EXTERNAL = "2",
     }
 
-
+    export enum PersonalDataOption {
+        CvrNumber = 0,
+        SocialProblems = 1,
+        OtherPrivateMatters = 2
+    }
 
     export class DataOptions {
         options: UpdatedSelect2OptionViewModel<any>[];
@@ -82,6 +92,32 @@
         }
     }
 
+    export class PersonalDataViewModel {
+        static readonly data = {
+            cvr: <ISensitiveDataLevelModel>{ value: PersonalDataOption.CvrNumber, text: "CPR-nr" },
+            personal: <ISensitiveDataLevelModel>{ value: PersonalDataOption.SocialProblems, text: "Væsentlige sociale problemer" },
+            sensitive: <ISensitiveDataLevelModel>{ value: PersonalDataOption.OtherPrivateMatters, text: "Andre rent private forhold" },
+        };
+
+        static getValueToTextMap(value: PersonalDataOption) {
+            return _.reduce(this.data,
+                (acc: any, current) => {
+                    acc[current.value] = current.text;
+
+                    return acc;
+                },
+                <any>{});
+        }
+
+        static mapToPersonalDataRecord(values: PersonalDataOption[]): IPersonalDataRecord[] {
+            return values.map(value => {
+                return {
+                    text: this.getValueToTextMap(value)
+                }
+            })
+        }
+    }
+
     export class HostedAtOptions {
         static readonly options = [
             <UpdatedSelect2OptionViewModel<string>>{ id: HostedAt.UNDECIDED, optionalObjectContext: "UNDECIDED", text: Kitos.Constants.Select2.EmptyField },
@@ -129,6 +165,9 @@
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
         personalDataSelected: boolean;
+        personalDataCvrSelected: boolean;
+        personalDataSocialProblemsSelected: boolean;
+        personalDataPrivateMattersSelected: boolean;
         noDataSelected: boolean;
         id: number;
         organizationId: number;
@@ -167,6 +206,10 @@
             this.personalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.personal.value);
             this.sensitiveDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.sensitive.value);
             this.legalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.legal.value);
+            const personalData = itSystemUsage.personalData;
+            this.personalDataCvrSelected = personalData.some(x => x === PersonalDataOption.CvrNumber);
+            this.personalDataSocialProblemsSelected = personalData.some(x => x === PersonalDataOption.SocialProblems);
+            this.personalDataPrivateMattersSelected = personalData.some(x => x === PersonalDataOption.OtherPrivateMatters);
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
             this.precautions = this.mapDataOption(itSystemUsage.precautions);
