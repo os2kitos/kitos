@@ -659,7 +659,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateIsOversightCompleted(id, completed.Value)
-                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -675,7 +676,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightScheduledInspectionDate(id, scheduledInspectionDate.Value)
-                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -691,7 +693,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .AssignOversightDate(id, createOversightDateDTO.OversightDate, createOversightDateDTO.OversightRemark)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -707,7 +710,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .ModifyOversightDate(id, oversightDateDTO.Id, oversightDateDTO.OversightDate, oversightDateDTO.OversightRemark)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -723,7 +727,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveOversightDate(id, oversightDateId.Value)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]

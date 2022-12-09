@@ -10,7 +10,8 @@
             "select2LoadingService",
             "dataProcessingRegistrationOptions",
             "bindingService",
-            "$uibModal"
+            "$uibModal",
+            "notify"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -23,7 +24,8 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
             private readonly bindingService: Kitos.Services.Generic.IBindingService,
-            private readonly $modal) {
+            private readonly $modal,
+            private readonly notify) {
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindOversightInterval();
@@ -374,10 +376,11 @@
         }
 
         private changeScheduledInspectionDate(scheduledInspection: string) {
-            var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(scheduledInspection);
-            if (!!formattedDate.convertedValue) {
+            if (Helpers.DateValidationHelper.validateDateInput(scheduledInspection, this.notify, "Kommende planlagt tilsyn", true)) {
+                const formattedDate = Helpers.DateStringFormat.fromDanishToEnglishFormat(scheduledInspection);
+
                 return this.apiUseCaseFactory
-                    .createUpdate("Dato for indgåelse af databehandleraftale", () => this.dataProcessingRegistrationService.updateOversightScheduledInspectionDate(this.dataProcessingRegistration.id, formattedDate.convertedValue))
+                    .createUpdate("Dato for indgåelse af databehandleraftale", () => this.dataProcessingRegistrationService.updateOversightScheduledInspectionDate(this.dataProcessingRegistration.id, formattedDate))
                     .executeAsync(success => {
                         this.dataProcessingRegistration.oversightScheduledInspectionDate = scheduledInspection;
                         this.bindScheduledInspectionDate();

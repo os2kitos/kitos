@@ -398,6 +398,15 @@
                                 Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
                     .withColumn(builder =>
                         builder
+                        .withDataSourceName("OversightScheduledInspectionDate")
+                        .withTitle("Kommende planlagt tilsyn")
+                        .withId("scheduledInspectionDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(190)
+                        .withRendering((dataItem) => Helpers.RenderFieldsHelper.renderDate(dataItem.OversightScheduledInspectionDate)))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("LatestOversightDate")
                             .withTitle("Seneste tilsyn")
                             .withId("latestOversightDate")
@@ -422,15 +431,6 @@
                             .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                             .withInitialVisibility(false)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt)))
-                    .withColumn(builder =>
-                        builder
-                        .withDataSourceName("OversightScheduledInspectionDate")
-                        .withTitle("Scheduled inspection date title")
-                        .withId("scheduledInspectionDate")
-                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withStandardWidth(170)
-                        .withRendering((dataItem) => Helpers.RenderFieldsHelper.renderDate(dataItem.OversightScheduledInspectionDate)))
                     .withStandardSorting("Name");
 
             dataProcessingRegistrationOptions.roles.forEach(role =>

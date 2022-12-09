@@ -1368,7 +1368,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void Can_Create_With_OversightScheduledInspectionDate_OversightIntervalRemark(bool inputIsNull)
+        public void Can_Create_OversightIntervalRemark(bool inputIsNull)
         {
             //Arrange
             var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters
@@ -1389,7 +1389,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_Create_With_OversightScheduledInspectionDate_OversightIntervalRemark_If_Update_Fails()
+        public void Cannot_Create_OversightIntervalRemark_If_Update_Fails()
         {
             //Arrange
             var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
@@ -1409,7 +1409,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Can_Create_With_OversightScheduledInspectionDate_OversightIntervalRemark_Set_To_NoChanges()
+        public void Can_Create_OversightIntervalRemark_Set_To_NoChanges()
         {
             //Arrange
             var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
