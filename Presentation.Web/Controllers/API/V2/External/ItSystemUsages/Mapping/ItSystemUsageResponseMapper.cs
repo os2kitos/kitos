@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
@@ -74,6 +75,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     .Where(level => level.HasValue)
                     .Select(level => level.Value)
                     .ToList(),
+                PersonalDataOptions = systemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()),
                 SensitivePersonData = attachedOptions
                     .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
                     .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))

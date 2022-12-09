@@ -93,28 +93,23 @@
     }
 
     export class PersonalDataViewModel {
-        static readonly data = {
-            cvr: <ISensitiveDataLevelModel>{ value: PersonalDataOption.CvrNumber, text: "CPR-nr" },
-            personal: <ISensitiveDataLevelModel>{ value: PersonalDataOption.SocialProblems, text: "Væsentlige sociale problemer" },
-            sensitive: <ISensitiveDataLevelModel>{ value: PersonalDataOption.OtherPrivateMatters, text: "Andre rent private forhold" },
-        };
+        private readonly data = [
+            { value: PersonalDataOption.CvrNumber, text: "CPR-nr" } as IDataLevelModel<PersonalDataOption>,
+            { value: PersonalDataOption.SocialProblems, text: "Væsentlige sociale problemer" } as IDataLevelModel<PersonalDataOption>,
+            { value: PersonalDataOption.OtherPrivateMatters, text: "Andre rent private forhold" } as IDataLevelModel<PersonalDataOption>,
+        ] as IDataLevelModel<PersonalDataOption>[];
 
-        static getValueToTextMap(value: PersonalDataOption) {
-            return _.reduce(this.data,
-                (acc: any, current) => {
-                    acc[current.value] = current.text;
+        options: IPersonalDataRecord[];
 
-                    return acc;
-                },
-                <any>{});
-        }
-
-        static mapToPersonalDataRecord(values: PersonalDataOption[]): IPersonalDataRecord[] {
-            return values.map(value => {
+        constructor(values: PersonalDataOption[]) {
+            this.options = this.data.map(option => {
+                var value = values.some(x => x === option.value);
                 return {
-                    text: this.getValueToTextMap(value)
-                }
-            })
+                    value: option.value,
+                    text: option.text,
+                    checked: value
+                } as IPersonalDataRecord;
+            });
         }
     }
 
@@ -148,6 +143,7 @@
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
         personalDataSelected: boolean;
+        personalData: PersonalDataOption[];
         noDataSelected: boolean;
         isBusinessCritical: DataOption;
         precautions: DataOption;
@@ -165,9 +161,7 @@
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
         personalDataSelected: boolean;
-        personalDataCvrSelected: boolean;
-        personalDataSocialProblemsSelected: boolean;
-        personalDataPrivateMattersSelected: boolean;
+        personalData: PersonalDataOption[];
         noDataSelected: boolean;
         id: number;
         organizationId: number;
@@ -206,10 +200,7 @@
             this.personalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.personal.value);
             this.sensitiveDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.sensitive.value);
             this.legalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.legal.value);
-            const personalData = itSystemUsage.personalData;
-            this.personalDataCvrSelected = personalData.some(x => x === PersonalDataOption.CvrNumber);
-            this.personalDataSocialProblemsSelected = personalData.some(x => x === PersonalDataOption.SocialProblems);
-            this.personalDataPrivateMattersSelected = personalData.some(x => x === PersonalDataOption.OtherPrivateMatters);
+            this.personalData = itSystemUsage.personalData;
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
             this.precautions = this.mapDataOption(itSystemUsage.precautions);

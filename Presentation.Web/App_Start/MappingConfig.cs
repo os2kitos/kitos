@@ -10,6 +10,7 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Controllers.API.V1.Mapping;
+using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystemUsage;

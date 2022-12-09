@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddedPersonalData : IMigrationMetadata
+    public sealed partial class AddedPersonalDataToItSystemUsage : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedPersonalData));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedPersonalDataToItSystemUsage));
         
         string IMigrationMetadata.Id
         {
-            get { return "202212081357238_AddedPersonalData"; }
+            get { return "202212091015025_AddedPersonalDataToItSystemUsage"; }
         }
         
         string IMigrationMetadata.Source

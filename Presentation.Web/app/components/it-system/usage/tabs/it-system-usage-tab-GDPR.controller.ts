@@ -21,7 +21,7 @@
     app.controller("system.GDPR",
         [
             "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "select2LoadingService",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService, moment, notify, registerTypes, sensitivePersonalData, user, select2LoadingService) => {
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, moment, notify, registerTypes, sensitivePersonalData, user, select2LoadingService) => {
                 //Usage is pulled from it-system-usage.controller.ts. This means we only need one request to DB to have usage available 
                 //On all subpages as we can access it from $scope.usage. Same with $scope.usageViewModel.
                 var itSystemUsage = $scope.usage;
@@ -34,7 +34,7 @@
                 $scope.registerTypes = registerTypes;
                 $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
-                $scope.personalData = Kitos.Models.ViewModel.ItSystemUsage.PersonalDataViewModel.data
+                $scope.personalData = new Kitos.Models.ViewModel.ItSystemUsage.PersonalDataViewModel(itSystemUsage.personalData);
 
                 $scope.updateDataLevel = (optionId, checked, optionType) => {
                     var msg = notify.addInfoMessage("Arbejder ...", false);
@@ -69,6 +69,14 @@
                                 msg.toErrorMessage("Fejl!");
                             });
                     }
+                }
+
+                $scope.updatePersonalDate = (record: Kitos.Models.ViewModel.ItSystemUsage.IPersonalDataRecord) => {
+                    if (record.checked) {
+                        itSystemUsageService.patchPersonalData(itSystemUsage.id, record.value);
+                        return;
+                    }
+                    itSystemUsageService.removePersonalData(itSystemUsage.id, record.value);
                 }
 
                 $scope.patch = (field, value) => {
@@ -174,8 +182,13 @@
                     }
                     else {
                         itSystemUsageService.removeDataLevel(itSystemUsage.id, dataLevel)
-                            .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
-                                onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
+                            .then(onSuccess => {
+                                notify.addSuccessMessage("Feltet er opdateret!");
+                                if (dataLevel === Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal.value) {
+                                    $scope.personalData.options.forEach(x => x.checked = false);
+                                }
+                            },
+                            onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
                 }
 

@@ -2,7 +2,7 @@
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Presentation.Web.Controllers.API.V1.Mapping;
+using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;

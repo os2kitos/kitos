@@ -181,6 +181,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.PersonalDataOptions, UpdatePersonalDataOptions))
 
                 //Technical precautions
                 .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.precautions = precautions))
@@ -255,6 +256,26 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return _registerTypeAssignmentService
                 .UpdateAssignedOptions(systemUsage, registerTypeUuids.GetValueOrFallback(new List<Guid>()))
                 .MatchFailure();
+        }
+
+        private static Maybe<OperationError> UpdatePersonalDataOptions(ItSystemUsage systemUsage, Maybe<IEnumerable<GDPRPersonalDataOption>> personalDataOptions)
+        {
+            var newOptions = personalDataOptions.GetValueOrFallback(new List<GDPRPersonalDataOption>()).ToList();
+            var dataBefore = systemUsage.PersonalDataOptions.ToList();
+            foreach (var personalDataOption in newOptions)
+            {
+                var error = systemUsage.AddPersonalData(personalDataOption);
+                if (error.HasValue) return error;
+            }
+
+            var dataToRemove = dataBefore.Except(systemUsage.PersonalDataOptions.ToList()).ToList();
+            foreach (var option in dataToRemove)
+            {
+                var error = systemUsage.RemovePersonalData(option.PersonalData);
+                if(error.HasValue) return error;
+            }
+
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)

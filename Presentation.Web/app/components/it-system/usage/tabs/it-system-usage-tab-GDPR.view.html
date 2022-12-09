@@ -94,34 +94,15 @@
                                 F.eks.: Navn, adresse, telefonummer, e-mailadresse, titel m.m.
                             </span>
                             <div ng-if="usageViewModel.personalDataSelected">
-                                <div class="checkbox inlineTab">
+                                <div class="checkbox inlineTab"
+                                     ng-repeat="dataMember in personalData.options">
                                     <label>
                                         <input type="checkbox"
-                                               ng-model="usageViewModel.personalDataCvrSelected"
-                                               data-element-type="{{r.Name}}"
+                                               ng-model="dataMember.checked"
+                                               data-element-type="{{dataMember.text}}"
                                                ng-disabled="!hasWriteAccess"
-                                               ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
-                                        {{r.Name}}
-                                    </label>
-                                </div>
-                                <div class="checkbox inlineTab">
-                                    <label>
-                                        <input type="checkbox"
-                                               ng-model="usageViewModel.personalDataSocialProblemsSelected"
-                                               data-element-type="{{r.Name}}"
-                                               ng-disabled="!hasWriteAccess"
-                                               ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
-                                        {{r.Name}}
-                                    </label>
-                                </div>
-                                <div class="checkbox inlineTab">
-                                    <label>
-                                        <input type="checkbox"
-                                               ng-model="usageViewModel.personalDataPrivateMattersSelected"
-                                               data-element-type="{{r.Name}}"
-                                               ng-disabled="!hasWriteAccess"
-                                               ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
-                                        {{r.Name}}
+                                               ng-change="updatePersonalDate(dataMember)">
+                                        {{dataMember.text}}
                                     </label>
                                 </div>
                             </div>

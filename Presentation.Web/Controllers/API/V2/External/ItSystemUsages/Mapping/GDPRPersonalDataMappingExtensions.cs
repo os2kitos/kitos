@@ -5,7 +5,7 @@ using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 
-namespace Presentation.Web.Controllers.API.V1.Mapping
+namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public static class GDPRPersonalDataMappingExtensions
     {
