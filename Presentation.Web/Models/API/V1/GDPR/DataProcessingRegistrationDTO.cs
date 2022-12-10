@@ -46,6 +46,7 @@ namespace Presentation.Web.Models.API.V1.GDPR
         public DataProcessingRegistrationOversightDateDTO[] OversightDates { get; set; }
 
         public NamedEntityDTO[] AssociatedContracts { get; set; }
+        public DateTime? OversightScheduledInspectionDate { get; set; }
         public string LastChangedByName { get; set; }
         public DateTime LastChangedAt { get; set; }
 

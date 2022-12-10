@@ -659,7 +659,25 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateIsOversightCompleted(id, completed.Value)
-                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-scheduled-inspection-date")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightScheduledInspectionDate(int id, [FromBody] SingleValueDTO<DateTime?> scheduledInspectionDate)
+        {
+            if (scheduledInspectionDate == null)
+                return BadRequest(nameof(scheduledInspectionDate) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightScheduledInspectionDate(id, scheduledInspectionDate.Value)
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -675,7 +693,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .AssignOversightDate(id, createOversightDateDTO.OversightDate, createOversightDateDTO.OversightRemark)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -691,7 +710,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .ModifyOversightDate(id, oversightDateDTO.Id, oversightDateDTO.OversightDate, oversightDateDTO.OversightRemark)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -707,7 +727,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveOversightDate(id, oversightDateId.Value)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -917,6 +938,7 @@ namespace Presentation.Web.Controllers.API.V1
                         OversightRemark = oversightDate.OversightRemark
                     })
                     .ToArray(),
+                OversightScheduledInspectionDate = value.OversightScheduledInspectionDate,
                 LastChangedAt = value.LastChanged,
                 LastChangedByName = value.LastChangedByUser?.GetFullName()
             };

@@ -15,6 +15,7 @@ namespace Core.ApplicationServices.Model.GDPR.Write
         public OptionalValueChange<string> OversightIntervalRemark { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<YesNoUndecidedOption?> IsOversightCompleted { get; set; } = OptionalValueChange<YesNoUndecidedOption?>.None;
         public OptionalValueChange<string> OversightCompletedRemark { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<DateTime?> OversightScheduledInspectionDate{ get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<Maybe<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>>> OversightDates { get; set; } = OptionalValueChange<Maybe<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>>>.None;
     }
 }

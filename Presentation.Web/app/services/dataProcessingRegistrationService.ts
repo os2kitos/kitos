@@ -38,6 +38,7 @@
         updateOversightOptionRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightCompleted(dataProcessingRegistrationId: number, isOversightCompleted: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightCompletedRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateOversightScheduledInspectionDate(dataProcessingRegistrationId: number, date: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
 
         assignOversightDate(dataProcessingRegistrationId: number, dateTime: string, remark: string): angular.IPromise<IOversightDateResult>;
         updateOversightDate(dataProcessingRegistrationId: number, oversightDateId: number, dateTime: string, remark: string): angular.IPromise<IOversightDateResult>;
@@ -312,6 +313,10 @@
 
         updateOversightCompletedRemark(dataProcessingRegistrationId: number, remark: string) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-completed-remark"), remark);
+        }
+
+        updateOversightScheduledInspectionDate(dataProcessingRegistrationId: number, date: string) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-scheduled-inspection-date"), date);
         }
 
         assignOversightDate(dataProcessingRegistrationId: number, dateTime: string, remark: string) {

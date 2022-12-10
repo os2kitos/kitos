@@ -69,6 +69,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var oversightCompleted = A<YesNoUndecidedOption>();
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
+            var oversightScheduledInspectionDate = A<DateTime>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
 
@@ -78,6 +79,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id, oversightInterval).DisposeAsync();
 
             await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registration.Id, oversightCompleted).DisposeAsync();
+
+            await DataProcessingRegistrationHelper.SendUpdateOversightScheduledInspectionDate(registration.Id, oversightScheduledInspectionDate).DisposeAsync();
 
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(registration.Id);
             var role = businessRoleDtos.First();
@@ -155,6 +158,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(oversightInterval, readModel.OversightInterval);
             Assert.Equal(oversightCompleted, readModel.IsOversightCompleted);
+            Assert.Equal(oversightScheduledInspectionDate, readModel.OversightScheduledInspectionDate);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
             Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);

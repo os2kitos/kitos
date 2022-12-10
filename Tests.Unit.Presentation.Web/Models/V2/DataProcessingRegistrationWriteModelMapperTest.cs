@@ -155,7 +155,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedOversightDataPropertiesInput()
         {
-            return CreateGetUndefinedSectionsInput(7);
+            return CreateGetUndefinedSectionsInput(8);
         }
 
         [Theory]
@@ -353,12 +353,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
          bool noOversightIntervalRemark,
          bool noIsOversightCompleted,
          bool noOversightCompletedRemark,
+         bool noOversightScheduledInspectionDate,
          bool noOversightDates)
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
 
-            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightDates);
+            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightScheduledInspectionDate, noOversightDates);
 
             //Act
             var output = _sut.FromPATCH(input).Oversight.Value;
@@ -382,12 +383,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noOversightIntervalRemark,
             bool noIsOversightCompleted,
             bool noOversightCompletedRemark,
+            bool noOversightScheduledInspectionDate,
             bool noOversightDates)
         {
             //Arrange
             var input = new CreateDataProcessingRegistrationRequestDTO();
 
-            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightDates);
+            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightScheduledInspectionDate, noOversightDates);
 
             //Act
             var output = _sut.FromPOST(input).Oversight.Value;
@@ -411,12 +413,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noOversightIntervalRemark,
             bool noIsOversightCompleted,
             bool noOversightCompletedRemark,
+            bool noOversightScheduledInspectionDate,
             bool noOversightDates)
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
 
-            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightDates);
+            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightScheduledInspectionDate, noOversightDates);
 
             //Act
             var output = _sut.FromPUT(input).Oversight.Value;
@@ -560,6 +563,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.IsOversightCompleted?.ToYesNoUndecidedOption(),
                 AssertPropertyContainsDataChange(output.IsOversightCompleted));
             Assert.Equal(input.OversightCompletedRemark, AssertPropertyContainsDataChange(output.OversightCompletedRemark));
+            Assert.Equal(input.OversightScheduledInspectionDate, AssertPropertyContainsDataChange(output.OversightScheduledInspectionDate));
             AssertOversightDates(input.OversightDates, AssertPropertyContainsDataChange(output.OversightDates));
         }
 
@@ -628,6 +632,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noOversightIntervalRemark,
             bool noIsOversightCompleted,
             bool noOversightCompletedRemark,
+            bool noOversightScheduledInspectionDate,
             bool noOversightDates)
         {
             var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>();
@@ -638,6 +643,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noOversightIntervalRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightIntervalRemark));
             if (noIsOversightCompleted) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.IsOversightCompleted));
             if (noOversightCompletedRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightCompletedRemark));
+            if (noOversightScheduledInspectionDate) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightScheduledInspectionDate));
             if (noOversightDates) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightDates));
 
             _currentHttpRequestMock

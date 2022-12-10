@@ -10,7 +10,8 @@
             "select2LoadingService",
             "dataProcessingRegistrationOptions",
             "bindingService",
-            "$uibModal"
+            "$uibModal",
+            "notify"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -23,7 +24,8 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
             private readonly bindingService: Kitos.Services.Generic.IBindingService,
-            private readonly $modal) {
+            private readonly $modal,
+            private readonly notify) {
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindOversightInterval();
@@ -32,6 +34,7 @@
             this.bindOversigthOptionsRemark();
             this.bindOversightCompleted();
             this.bindOversightCompletedRemark();
+            this.bindScheduledInspectionDate();
 
             this.bindOversightDates();
             this.modal = $modal;
@@ -47,6 +50,7 @@
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
         shouldShowLatestOversightCompletedDate: boolean;
         oversightDates: Models.ViewModel.GDPR.IOversightDateViewModel[];
+        scheduledInspectionDate: Models.ViewModel.Generic.IDateSelectionViewModel;
 
         private yesIsOversightCompletedValue = new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x => x.id === Models.Api.Shared.YesNoUndecidedOption.Yes)[0];
 
@@ -363,6 +367,27 @@
                     this.bindOversightDates();
                     return success;
                 });
+        }
+        
+        private bindScheduledInspectionDate() {
+            this.scheduledInspectionDate = new Models.ViewModel.Generic.DateSelectionViewModel(
+                this.dataProcessingRegistration.oversightScheduledInspectionDate,
+                (newDate) => this.changeScheduledInspectionDate(newDate));
+        }
+
+        private changeScheduledInspectionDate(scheduledInspection: string) {
+            if (Helpers.DateValidationHelper.validateDateInput(scheduledInspection, this.notify, "Kommende planlagt tilsyn", true)) {
+                const formattedDate = Helpers.DateStringFormat.fromDanishToEnglishFormat(scheduledInspection);
+
+                return this.apiUseCaseFactory
+                    .createUpdate("Dato for indgåelse af databehandleraftale", () => this.dataProcessingRegistrationService.updateOversightScheduledInspectionDate(this.dataProcessingRegistration.id, formattedDate))
+                    .executeAsync(success => {
+                        this.dataProcessingRegistration.oversightScheduledInspectionDate = scheduledInspection;
+                        this.bindScheduledInspectionDate();
+                        return success;
+                    });
+            }
+            return null;
         }
     }
 

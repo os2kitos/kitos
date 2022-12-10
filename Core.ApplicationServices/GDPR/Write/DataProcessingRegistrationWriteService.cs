@@ -194,6 +194,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(r => r.WithOptionalUpdate(parameters.OversightIntervalRemark, (registration, remark) => _applicationService.UpdateOversightIntervalRemark(registration.Id, remark)))
                 .Bind(r => r.WithOptionalUpdate(parameters.IsOversightCompleted, (registration, completed) => _applicationService.UpdateIsOversightCompleted(registration.Id, completed ?? YesNoUndecidedOption.Undecided)))
                 .Bind(r => r.WithOptionalUpdate(parameters.OversightCompletedRemark, (registration, remark) => _applicationService.UpdateOversightCompletedRemark(registration.Id, remark)))
+                .Bind(r => r.WithOptionalUpdate(parameters.OversightScheduledInspectionDate, (registration, date) => _applicationService.UpdateOversightScheduledInspectionDate(registration.Id, date)))
                 .Bind(r => r.WithOptionalUpdate(parameters.OversightDates, UpdateOversightDates));
         }
 

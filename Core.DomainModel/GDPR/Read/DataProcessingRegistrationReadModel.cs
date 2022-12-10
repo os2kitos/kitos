@@ -59,6 +59,8 @@ namespace Core.DomainModel.GDPR.Read
 
         public YesNoUndecidedOption? IsOversightCompleted { get; set; }
 
+        public DateTime? OversightScheduledInspectionDate { get; set; }
+
         public string ContractNamesAsCsv { get; set; }
         public int? LastChangedById { get; set; }
         public string LastChangedByName { get; set; }
