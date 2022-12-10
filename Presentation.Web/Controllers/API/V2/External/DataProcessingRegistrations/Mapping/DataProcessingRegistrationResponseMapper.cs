@@ -42,6 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 OversightIntervalRemark = dataProcessingRegistration.OversightIntervalRemark,
                 IsOversightCompleted = MapYesNoUndecided(dataProcessingRegistration.IsOversightCompleted),
                 OversightCompletedRemark = dataProcessingRegistration.OversightCompletedRemark,
+                OversightScheduledInspectionDate = dataProcessingRegistration.OversightScheduledInspectionDate,
                 OversightDates = MapOversightDates(dataProcessingRegistration.OversightDates).ToList()
             };
         }

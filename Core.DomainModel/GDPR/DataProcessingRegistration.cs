@@ -17,7 +17,6 @@ namespace Core.DomainModel.GDPR
     public class DataProcessingRegistration :
         HasRightsEntity<DataProcessingRegistration, DataProcessingRegistrationRight, DataProcessingRegistrationRole>,
         IHasName,
-        IOwnedByOrganization,
         IDataProcessingModule,
         IEntityWithExternalReferences,
         IEntityWithAdvices,
@@ -318,7 +317,15 @@ namespace Core.DomainModel.GDPR
 
         public string OversightCompletedRemark { get; set; }
 
+        public DateTime? OversightScheduledInspectionDate { get; set; }
+
+        public void SetOversightScheduledInspectionDate(DateTime? oversightScheduledInspectionDate)
+        {
+            OversightScheduledInspectionDate = oversightScheduledInspectionDate;
+        }
+
         public virtual ICollection<DataProcessingRegistrationOversightDate> OversightDates { get; set; }
+
 
         public Maybe<IEnumerable<DataProcessingRegistrationOversightDate>> SetOversightCompleted(YesNoUndecidedOption completed)
         {

@@ -43,11 +43,9 @@ namespace Core.DomainServices.GDPR
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
             PatchDataResponsible(source, destination);
+            PatchOversight(source, destination);
             PatchBasisForTransfer(source, destination);
-            PatchOversightOptions(source, destination);
-            PatchIsOversightCompleted(source, destination);
             PatchContracts(source, destination);
-            PatchLatestOversightDate(source, destination);
             PatchLastUpdateBy(source, destination);
         }
 
@@ -58,6 +56,15 @@ namespace Core.DomainServices.GDPR
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
         }
+
+        private void PatchOversight(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.OversightScheduledInspectionDate = source.OversightScheduledInspectionDate;
+            PatchLatestOversightDate(source, destination);
+            PatchIsOversightCompleted(source, destination);
+            PatchOversightOptions(source, destination);
+        }
+
         private void PatchOversightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.OversightOptionNamesAsCsv = string.Join(", ",

@@ -25,6 +25,7 @@
         oversightCompleted: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YesNoUndecidedOption>;
         associatedContracts: Models.Generic.NamedEntity.NamedEntityDTO[];
         oversightDates: IDataProcessingRegistrationOversightDateDTO[];
+        oversightScheduledInspectionDate: string;
     }
 
     export interface IDataProcessingRegistrationOversightDateDTO {

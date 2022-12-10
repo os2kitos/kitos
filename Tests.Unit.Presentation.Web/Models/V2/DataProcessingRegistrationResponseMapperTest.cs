@@ -85,6 +85,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(oversight.OversightIntervalRemark);
             Assert.Null(oversight.IsOversightCompleted);
             Assert.Null(oversight.OversightCompletedRemark);
+            Assert.Null(oversight.OversightScheduledInspectionDate);
             Assert.Empty(oversight.OversightDates);
         }
 
@@ -170,6 +171,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(dpr.OversightIntervalRemark, oversight.OversightIntervalRemark);
             AssertYesNoUndecided(dpr.IsOversightCompleted, oversight.IsOversightCompleted);
             Assert.Equal(dpr.OversightCompletedRemark, oversight.OversightCompletedRemark);
+            Assert.Equal(dpr.OversightScheduledInspectionDate, oversight.OversightScheduledInspectionDate);
             AssertOversightDates(dpr.OversightDates, oversight.OversightDates);
         }
 
@@ -267,8 +269,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             dpr.OversightOptions = withOptionalCrossReferences
                 ? new List<DataProcessingOversightOption>
                     {
-                        new DataProcessingOversightOption(){ Uuid = A<Guid>(), Name = A<string>() },
-                        new DataProcessingOversightOption(){ Uuid = A<Guid>(), Name = A<string>() }
+                        new(){ Uuid = A<Guid>(), Name = A<string>() },
+                        new(){ Uuid = A<Guid>(), Name = A<string>() }
                     }
                 : null;
             dpr.OversightOptionRemark = A<string>();
@@ -276,9 +278,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             dpr.OversightIntervalRemark = A<string>();
             dpr.IsOversightCompleted = A<YesNoUndecidedOption>();
             dpr.OversightCompletedRemark = A<string>();
+            dpr.OversightScheduledInspectionDate = A<DateTime>();
             dpr.OversightDates = new List<DataProcessingRegistrationOversightDate>()
             {
-                new DataProcessingRegistrationOversightDate()
+                new()
                 {
                     Parent = dpr,
                     ParentId = dpr.Id,
@@ -286,7 +289,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     OversightDate = A<DateTime>(),
                     OversightRemark = A<string>()
                 },
-                new DataProcessingRegistrationOversightDate()
+                new()
                 {
                     Parent = dpr,
                     ParentId = dpr.Id,

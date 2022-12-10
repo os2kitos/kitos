@@ -1368,6 +1368,67 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
+        public void Can_Create_OversightIntervalRemark(bool inputIsNull)
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters
+            {
+                OversightScheduledInspectionDate = (inputIsNull ? null : A<DateTime?>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            _dprServiceMock.Setup(x => x.UpdateOversightScheduledInspectionDate(createdRegistration.Id, oversightData.OversightScheduledInspectionDate.NewValue)).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_OversightIntervalRemark_If_Update_Fails()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightScheduledInspectionDate = A<DateTime?>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateOversightScheduledInspectionDate(createdRegistration.Id, oversightData.OversightScheduledInspectionDate.NewValue.GetValueOrDefault())).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_OversightIntervalRemark_Set_To_NoChanges()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightScheduledInspectionDate = OptionalValueChange<DateTime?>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateOversightScheduledInspectionDate(It.IsAny<int>(), It.IsAny<DateTime?>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
         public void Can_Create_With_OversightData_IsOversightCompleted(bool inputIsNull)
         {
             //Arrange
