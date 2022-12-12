@@ -147,21 +147,17 @@
                 }
 
                 $scope.patchDate = (field, value) => {
-                    var date = moment(moment(value, Kitos.Constants.DateFormat.DanishDateFormat, true).format());
-                    if (!value) {
-                        var payload = {};
-                        payload[field] = null;
-                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
-                    } else if (value == null) {
 
-                    } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
-
-                    } else {
-                        var dateString = date.format(Kitos.Constants.DateFormat.EnglishDateFormat);
+                    if (Kitos.Helpers.DateValidationHelper.validateDateInput(value, notify, "dato", true)) {
                         var payload = {};
-                        payload[field] = dateString;
-                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                        if (!value) {
+                            payload[field] = null;
+                            patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                        } else {
+                            const date = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
+                            payload[field] = date;
+                            patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                        }
                     }
                 }
 
