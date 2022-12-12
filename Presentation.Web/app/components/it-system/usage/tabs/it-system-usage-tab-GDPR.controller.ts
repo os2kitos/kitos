@@ -73,10 +73,29 @@
 
                 $scope.updatePersonalDate = (record: Kitos.Models.ViewModel.ItSystemUsage.IPersonalDataRecord) => {
                     if (record.checked) {
-                        itSystemUsageService.patchPersonalData(itSystemUsage.id, record.value);
+                        itSystemUsageService.patchPersonalData(itSystemUsage.id, record.value)
+                            .then(() => updatePersonalDataSelectionValue(record));
                         return;
                     }
-                    itSystemUsageService.removePersonalData(itSystemUsage.id, record.value);
+                    itSystemUsageService.removePersonalData(itSystemUsage.id, record.value)
+                        .then(() => updatePersonalDataSelectionValue(record));
+                }
+
+                function updatePersonalDataSelectionValue(selectedRecord: Kitos.Models.ViewModel.ItSystemUsage.IPersonalDataRecord) {
+                    if (selectedRecord.checked) {
+                        const selectedOptions = itSystemUsage.personalData.filter(x => x === selectedRecord.value);
+                        if (selectedOptions.length === 0) {
+                            itSystemUsage.personalData.push(selectedRecord.value);
+                        }
+                        return;
+                    }
+
+                    const selectedOptions = itSystemUsage.personalData.filter(x => x === selectedRecord.value);
+                    
+                    if (selectedOptions.length === 1) {
+                        const indexOfOption = itSystemUsage.personalData.indexOf(selectedOptions[0]);
+                        itSystemUsage.personalData.splice(indexOfOption, 1);
+                    }
                 }
 
                 $scope.patch = (field, value) => {

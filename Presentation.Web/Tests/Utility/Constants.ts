@@ -171,6 +171,10 @@
     readonly precautionsAccessControlCheckbox = "precautionsAccessControlCheckbox";
     readonly precautionsLogningCheckbox = "precautionsLogningCheckbox";
 
+    readonly personalCvrCheckbox = "CVRCheckbox";
+    readonly personalSocialProblemsCheckbox = "SocialProblemsCheckbox";
+    readonly personalOtherPrivateCheckbox = "OtherPrivateCheckbox";
+
     readonly defaultSensitivData1 = "TestSensitiveData1";
     readonly defaultSensitivData2 = "TestSensitiveData2";
 

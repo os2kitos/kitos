@@ -6,11 +6,11 @@
         text: string;
     }
 
-    export interface ISensitiveDataLevelModel extends IDataLevelModel<number> {
+    export interface ICheckboxLevelModel<T> extends IDataLevelModel<T> {
         textValue: string;
     }
 
-    export interface IPersonalDataRecord extends IDataLevelModel<PersonalDataOption> {
+    export interface IPersonalDataRecord extends ICheckboxLevelModel<PersonalDataOption> {
         checked: boolean;
     }
 
@@ -68,10 +68,10 @@
 
     export class SensitiveDataLevelViewModel {
         static readonly levels = {
-            none: <ISensitiveDataLevelModel>{ value: 0, textValue: "NONE", text: "Ingen personoplysninger" },
-            personal: <ISensitiveDataLevelModel>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige personoplysninger" },
-            sensitive: <ISensitiveDataLevelModel>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme personoplysninger" },
-            legal: <ISensitiveDataLevelModel>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
+            none: <ICheckboxLevelModel<number>>{ value: 0, textValue: "NONE", text: "Ingen personoplysninger" },
+            personal: <ICheckboxLevelModel<number>>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige personoplysninger" },
+            sensitive: <ICheckboxLevelModel<number>>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme personoplysninger" },
+            legal: <ICheckboxLevelModel<number>>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
         };
 
         static readonly levelOrder = {
@@ -94,10 +94,10 @@
 
     export class PersonalDataViewModel {
         private readonly data = [
-            { value: PersonalDataOption.CvrNumber, text: "CPR-nr" } as IDataLevelModel<PersonalDataOption>,
-            { value: PersonalDataOption.SocialProblems, text: "Væsentlige sociale problemer" } as IDataLevelModel<PersonalDataOption>,
-            { value: PersonalDataOption.OtherPrivateMatters, text: "Andre rent private forhold" } as IDataLevelModel<PersonalDataOption>,
-        ] as IDataLevelModel<PersonalDataOption>[];
+            { value: PersonalDataOption.CvrNumber, textValue: "CVR", text: "CVR-nr" } as ICheckboxLevelModel<PersonalDataOption>,
+            { value: PersonalDataOption.SocialProblems, textValue: "SocialProblems", text: "Væsentlige sociale problemer" } as ICheckboxLevelModel<PersonalDataOption>,
+            { value: PersonalDataOption.OtherPrivateMatters, textValue: "OtherPrivate", text: "Andre rent private forhold" } as ICheckboxLevelModel<PersonalDataOption>,
+        ] as ICheckboxLevelModel<PersonalDataOption>[];
 
         options: IPersonalDataRecord[];
 
@@ -107,6 +107,7 @@
                 return {
                     value: option.value,
                     text: option.text,
+                    textValue: option.textValue,
                     checked: value
                 } as IPersonalDataRecord;
             });

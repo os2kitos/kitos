@@ -11,6 +11,9 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
         public static CsvColumnIdentity SensitiveData = new CsvColumnIdentity(nameof(SensitiveData), "Følsomme personoplysninger");
         public static CsvColumnIdentity ChosenSensitiveData = new CsvColumnIdentity(nameof(ChosenSensitiveData), "Valgte følsomme persondata");
         public static CsvColumnIdentity LegalData = new CsvColumnIdentity(nameof(LegalData), "Straffesager og lovovertrædelser");
+        public static CsvColumnIdentity PersonalDataCvr = new CsvColumnIdentity(nameof(PersonalDataCvr), "CVR-nr");
+        public static CsvColumnIdentity PersonalDataSocialProblems = new CsvColumnIdentity(nameof(PersonalDataSocialProblems), "Væsentlige sociale problemer");
+        public static CsvColumnIdentity PersonalDataSocialOtherPrivateMatters = new CsvColumnIdentity(nameof(PersonalDataSocialOtherPrivateMatters), "Andre rent private forhold");
         public static CsvColumnIdentity BusinessCritical = new CsvColumnIdentity(nameof(BusinessCritical), "Forretningskritisk IT-System");
         public static CsvColumnIdentity DataProcessorContract = new CsvColumnIdentity(nameof(DataProcessorContract), "Databehandleraftale");
         public static CsvColumnIdentity DataProcessorControl = new CsvColumnIdentity(nameof(DataProcessorControl), "Tilsyn/kontrol af databehandleren");

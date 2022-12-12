@@ -28,6 +28,18 @@ class ItSystemUsageGDPR {
         return element(this.cssHelper.byDataElementType(this.consts.dataLevelTypeLegalCheckbox));
     }
 
+    static getPersonalCvrCheckBox() {
+        return element(this.cssHelper.byDataElementType(this.consts.personalCvrCheckbox));
+    }
+
+    static getPersonalOtherPrivateCheckBox() {
+        return element(this.cssHelper.byDataElementType(this.consts.personalOtherPrivateCheckbox));
+    }
+
+    static getPersonalSocialProblemsCheckBox() {
+        return element(this.cssHelper.byDataElementType(this.consts.personalSocialProblemsCheckbox));
+    }
+
     static getPrecautionsEncryptionCheckbox() {
         return element(this.cssHelper.byDataElementType(this.consts.precautionsEncryptionCheckbox));
     }

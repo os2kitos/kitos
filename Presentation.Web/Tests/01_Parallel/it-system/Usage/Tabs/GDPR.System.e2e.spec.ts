@@ -51,6 +51,7 @@ describe("Global admin is able to", () => {
                 .then(() => fillOutCheckboxes())
                 .then(() => fillOutDropDown())
                 .then(() => fillOutPrecautionsCheckboxes())
+                .then(() => fillOutPersonalDataCheckboxes())
                 .then(() => fillOutDateFields())
                 .then(() => fillOutTextFields())
                 .then(() => fillOutLinkFields())
@@ -77,6 +78,13 @@ describe("Global admin is able to", () => {
             .then(() => ItSystemUsageGDPRPage.getPrecautionsPseudonomiseringCheckbox().click())
             .then(() => ItSystemUsageGDPRPage.getPrecautionsAccessControlCheckbox().click())
             .then(() => ItSystemUsageGDPRPage.getPrecautionsLogningCheckbox().click())
+            .then(() => browser.waitForAngular());
+    }
+
+    function fillOutPersonalDataCheckboxes() {
+        return ItSystemUsageGDPRPage.getPersonalCvrCheckBox().click()
+            .then(() => ItSystemUsageGDPRPage.getPersonalOtherPrivateCheckBox().click())
+            .then(() => ItSystemUsageGDPRPage.getPersonalSocialProblemsCheckBox().click())
             .then(() => browser.waitForAngular());
     }
 
@@ -156,6 +164,10 @@ describe("Global admin is able to", () => {
         expectCheckboxValue(consts.precautionsPseudonomiseringCheckbox, true);
         expectCheckboxValue(consts.precautionsAccessControlCheckbox, true);
         expectCheckboxValue(consts.precautionsLogningCheckbox, true);
+        console.log("Personal data boxes");
+        expectCheckboxValue(consts.personalCvrCheckbox, true);
+        expectCheckboxValue(consts.personalSocialProblemsCheckbox, true);
+        expectCheckboxValue(consts.personalOtherPrivateCheckbox, true);
     }
 
     function verifyDropDown() {
@@ -191,10 +203,15 @@ describe("Global admin is able to", () => {
         expect(getHrefUrl(ItSystemUsageGDPRPage.getRiskLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getDPIALinkField())).toEqual(testUrl);
         console.log("Checking Name");
+        console.log("First");
         expect(ItSystemUsageGDPRPage.getNoteLinkField().getText()).toEqual(urlNameText);
+        console.log("Second");
         expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getText()).toEqual(urlNameText);
+        console.log("Third");
         expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getText()).toEqual(urlNameText);
+        console.log("Fourth");
         expect(ItSystemUsageGDPRPage.getRiskLinkField().getText()).toEqual(urlNameText);
+        console.log("Fifth");
         expect(ItSystemUsageGDPRPage.getDPIALinkField().getText()).toEqual(urlNameText);
     }
 

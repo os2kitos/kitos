@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Core.ApplicationServices.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
@@ -299,7 +298,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task Can_Get_GDPRExportReport_With_All_Fields_Set()
         {
             //Arrange
-            var sensitiveDataLevel = A<SensitiveDataLevel>();
+            var sensitiveDataLevel = SensitiveDataLevel.PERSONALDATA;
+            var personalDataOption = A<GDPRPersonalDataChoice>();
             var datahandlerContractTypeId = "5";
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
@@ -324,6 +324,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItContractHelper.AddItSystemUsage(contract.Id, usage.Id, organizationId);
             await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitiveDataLevel);
+            await ItSystemUsageHelper.AddPersonalData(usage.Id, personalDataOption);
 
             var expectedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
 
@@ -361,6 +362,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertDataOption(expected.IsBusinessCritical, actual.BusinessCritical);
             AssertDataOption(expected.RiskAssessment, actual.RiskAssessment);
             AssertDataOption(expected.DPIA, actual.DPIA);
+            AssertPersonalData(expected, actual);
             AssertRiskLevel(expected.PreRiskAssessment, actual.PreRiskAssessment);
             AssertHostedAt(expected.HostedAt, actual.HostedAt);
             if (expected.RiskAssesmentDate.HasValue)
@@ -470,6 +472,36 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        private void AssertPersonalData(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual)
+        {
+            if (expected.PersonalData.Contains(GDPRPersonalDataChoice.CvrNumber))
+            {
+                AssertYes(actual.PersonalDataCvr);
+            }
+            else
+            {
+                AssertNo(actual.PersonalDataCvr);
+            }
+
+            if (expected.PersonalData.Contains(GDPRPersonalDataChoice.SocialProblems))
+            {
+                AssertYes(actual.PersonalDataSocialProblems);
+            }
+            else
+            {
+                AssertNo(actual.PersonalDataSocialProblems);
+            }
+
+            if (expected.PersonalData.Contains(GDPRPersonalDataChoice.OtherPrivateMatters))
+            {
+                AssertYes(actual.PersonalDataSocialOtherPrivateMatters);
+            }
+            else
+            {
+                AssertNo(actual.PersonalDataSocialOtherPrivateMatters);
+            }
+        }
+
         private void AssertDataOption(DataOptions? expected, string actual)
         {
             if (expected == null)
@@ -521,6 +553,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public string NoData { get; set; }
         [Name("Almindelige personoplysninger")]
         public string PersonalData { get; set; }
+        [Name("CVR-nr")]
+        public string PersonalDataCvr { get; set; }
+        [Name("Væsentlige sociale problemer")]
+        public string PersonalDataSocialProblems { get; set; }
+        [Name("Andre rent private forhold")]
+        public string PersonalDataSocialOtherPrivateMatters { get; set; }
         [Name("Følsomme personoplysninger")]
         public string SensitiveData { get; set; }
         [Name("Straffesager og lovovertrædelser")]

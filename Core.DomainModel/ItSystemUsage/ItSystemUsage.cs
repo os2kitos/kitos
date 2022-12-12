@@ -997,11 +997,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Maybe<OperationError> RemovePersonalData(GDPRPersonalDataOption option)
         {
-            if (SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA) == false)
-            {
-                return new OperationError("You cannot remove any PersonalData options before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
-            }
-
             var personalDataOption = PersonalDataOptions.FirstOrDefault(x => x.PersonalData == option);
             if (personalDataOption == null)
                 return new OperationError($"PersonalData: \"{option}\" wasn't found", OperationFailure.NotFound);

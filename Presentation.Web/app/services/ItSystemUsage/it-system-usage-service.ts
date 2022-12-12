@@ -65,7 +65,7 @@
         }
 
         patchSystemUsage(systemUsageId: number, orgId: number, payload) {
-            return this.$http.patch(this.getBaseUrl(systemUsageId) + `?organizationId=${orgId}`, payload);
+            return this.$http.patch(`api/itsystemusage/${systemUsageId}?organizationId=${orgId}`, payload);
         }
 
         patchSystem = (id: number, payload: any) => {

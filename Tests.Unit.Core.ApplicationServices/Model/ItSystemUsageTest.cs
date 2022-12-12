@@ -304,7 +304,7 @@ namespace Tests.Unit.Core.Model
             };
             _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
 
-            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData{PersonalData= GDPRPersonalDataOption.CprNumber});
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData{PersonalData= GDPRPersonalDataOption.CvrNumber});
             _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData=GDPRPersonalDataOption.OtherPrivateMatters});
             _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData = GDPRPersonalDataOption.SocialProblems});
 
@@ -559,18 +559,6 @@ namespace Tests.Unit.Core.Model
 
             Assert.False(error.HasValue);
             Assert.DoesNotContain(personalDataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData));
-        }
-
-        [Fact]
-        public void RemovePersonalData_Returns_BadState()
-        {
-            var itSystemUsage = new ItSystemUsage();
-            var personalDataOption = A<GDPRPersonalDataOption>();
-
-            var error = itSystemUsage.RemovePersonalData(personalDataOption);
-
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
         }
 
         [Fact]

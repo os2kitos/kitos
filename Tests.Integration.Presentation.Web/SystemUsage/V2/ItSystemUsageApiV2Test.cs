@@ -804,8 +804,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
-            var gdprVersion1 = await CreateGDPRInputAsync(organization);
             var gdprVersion2 = await CreateGDPRInputAsync(organization);
+            var gdprVersion1 = await CreateGDPRInputAsync(organization);
             var gdprVersion3 = new GDPRWriteRequestDTO();
 
             gdprVersion2.SensitivePersonDataUuids = gdprVersion2.SensitivePersonDataUuids.Take(1).ToList();
@@ -1708,7 +1708,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return (targetInterface.Uuid, targetInterface.Name);
         }
 
-        private async Task<(GeneralDataWriteRequestDTO, OrgUnitDTO, OrganizationUsageWriteRequestDTO, Guid[], Guid[], LocalKLEDeviationsRequestDTO, IEnumerable<ExternalReferenceDataDTO>, IEnumerable<RoleAssignmentRequestDTO>, GDPRWriteRequestDTO, ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
+        private async Task<(GeneralDataWriteRequestDTO, 
+            OrgUnitDTO, 
+            OrganizationUsageWriteRequestDTO, 
+            Guid[], 
+            Guid[],
+            LocalKLEDeviationsRequestDTO, 
+            IEnumerable<ExternalReferenceDataDTO>, 
+            IEnumerable<RoleAssignmentRequestDTO>,
+            GDPRWriteRequestDTO,
+            ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
         {
             var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
             var generalData = CreateGeneralDataWriteRequestDTO(dataClassification.Uuid);
@@ -1862,7 +1871,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     organization.Uuid, 10, 0);
 
             var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
-            gdprInput.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
+            var sensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList();
+            if(sensitivityLevels.Contains(DataSensitivityLevelChoice.PersonData) == false)
+                sensitivityLevels.Add(DataSensitivityLevelChoice.PersonData);
+
+            gdprInput.DataSensitivityLevels = sensitivityLevels; //Must be unique
+            gdprInput.PersonalDataOptions = Many<GDPRPersonalDataChoice>().Distinct().ToList();
             gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
@@ -1895,6 +1909,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(gdprInput.RetentionPeriodDefined, gdprResponse.RetentionPeriodDefined);
             Assert.Equal(gdprInput.NextDataRetentionEvaluationDate, gdprResponse.NextDataRetentionEvaluationDate);
             Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
+            Assert.Equal(gdprInput.PersonalDataOptions ?? new List<GDPRPersonalDataChoice>().OrderBy(x => x), gdprResponse.PersonalDataOptions.OrderBy(x => x));
         }
 
         private static ItSystemUsageValidityWriteRequestDTO CreateValidityInput(DateTime baseDate, LifeCycleStatusChoice lifeCycleStatus)

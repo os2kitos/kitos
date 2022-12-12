@@ -268,7 +268,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 if (error.HasValue) return error;
             }
 
-            var dataToRemove = dataBefore.Except(systemUsage.PersonalDataOptions.ToList()).ToList();
+            var dataToRemove = dataBefore.Except(systemUsage.PersonalDataOptions.Where(x => newOptions.Contains(x.PersonalData)).ToList()).ToList();
             foreach (var option in dataToRemove)
             {
                 var error = systemUsage.RemovePersonalData(option.PersonalData);

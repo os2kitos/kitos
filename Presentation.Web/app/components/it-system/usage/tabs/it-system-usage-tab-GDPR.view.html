@@ -95,14 +95,14 @@
                             </span>
                             <div ng-if="usageViewModel.personalDataSelected">
                                 <div class="checkbox inlineTab"
-                                     ng-repeat="dataMember in personalData.options">
+                                     ng-repeat="option in personalData.options">
                                     <label>
                                         <input type="checkbox"
-                                               ng-model="dataMember.checked"
-                                               data-element-type="{{dataMember.text}}"
+                                               ng-model="option.checked"
+                                               data-element-type="{{option.textValue}}Checkbox"
                                                ng-disabled="!hasWriteAccess"
-                                               ng-change="updatePersonalDate(dataMember)">
-                                        {{dataMember.text}}
+                                               ng-change="updatePersonalDate(option)">
+                                        {{option.text}}
                                     </label>
                                 </div>
                             </div>
