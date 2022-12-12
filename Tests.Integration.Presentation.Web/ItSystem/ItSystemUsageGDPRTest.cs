@@ -200,8 +200,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Act
-            var sensitivityLevelDTO =
-                await ItSystemUsageHelper.RemoveSensitiveDataLevel(usage.Id, sensitivityLevel);
+            var sensitivityLevelDTO = await ItSystemUsageHelper.RemoveSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Assert
             Assert.Equal(sensitivityLevel, sensitivityLevelDTO.DataSensitivityLevel);
@@ -316,6 +315,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertEmptyString(gdprExportReport.SensitiveDataTypes);
         }
 
+        [Fact]
+        public async Task Can_UpdatePlannedRiskAssessmentDate()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var date = A<DateTime>();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+
+            //Act
+            var result = await ItSystemUsageHelper.SetPlannedRiskAssessmentDate(usage.Id, date);
+
+            //Assert
+            Assert.Equal(date, result.PlannedRiskAssessmentDate);
+            var updatedUsage = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(usage.Id);
+            Assert.Equal(date, updatedUsage.PlannedRiskAssessmentDate);
+        }
 
         private void AssertCorrectGdprExportReport(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual, bool hasConcludedDataProcessingAgreement)
         {

@@ -43,5 +43,6 @@ namespace Core.ApplicationServices.SystemUsage
         Maybe<OperationError> TransferRelevantUsage(int systemId, Guid unitUuid, Guid targetUnitUuid);
         Maybe<OperationError> RemoveResponsibleUsage(int id);
         Maybe<OperationError> RemoveRelevantUnit(int id, Guid unitUuid);
+        Result<ItSystemUsage, OperationError> UpdatePlannedRiskAssessmentDate(int id, DateTime? date);
     }
 }

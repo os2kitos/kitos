@@ -280,6 +280,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DataOptions? riskAssessment { get; set; }
         public DateTime? riskAssesmentDate { get; set; }
         public RiskLevel? preriskAssessment { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string noteRisks { get; set; }
@@ -972,6 +973,15 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             return new ItSystemUsageValidationResult(errors);
+        }
+
+        public Maybe<OperationError> SetPlannedRiskAssessmentDate(DateTime? date)
+        {
+            if(riskAssessment != DataOptions.YES)
+                return new OperationError("You cannot update 'PlannedRiskAssessmentDate' if 'RiskAssessment' is not set to 'Yes'", OperationFailure.BadState);
+
+            PlannedRiskAssessmentDate = date;
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)

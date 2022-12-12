@@ -137,9 +137,8 @@ namespace Core.ApplicationServices.SystemUsage
 
         private static bool AllowUsageInTargetOrganization(ItSystemUsage newSystemUsage, ItSystem itSystem)
         {
-            return
-                    newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
-                    itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
+            return newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
+                   itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
         }
 
         public Result<ItSystemUsage, OperationError> Delete(int id)
@@ -332,6 +331,19 @@ namespace Core.ApplicationServices.SystemUsage
                         () => Result<ItSystemUsage, OperationError>.Success(system)
                     );
             }).MatchFailure();
+        }
+
+        public Result<ItSystemUsage, OperationError> UpdatePlannedRiskAssessmentDate(int id, DateTime? date)
+        {
+            return Modify(id, usage =>
+            {
+                return usage.SetPlannedRiskAssessmentDate(date)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<ItSystemUsage, OperationError>.Success(usage)
+                    );
+            });
         }
 
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)

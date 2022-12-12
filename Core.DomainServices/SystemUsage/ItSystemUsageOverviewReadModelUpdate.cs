@@ -267,11 +267,13 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.RiskSupervisionDocumentationName = source.RiskSupervisionDocumentationUrlName;
                 destination.RiskSupervisionDocumentationUrl = source.RiskSupervisionDocumentationUrl;
+                destination.PlannedRiskAssessmentDate = source.PlannedRiskAssessmentDate;
             }
             else
             {
                 destination.RiskSupervisionDocumentationName = null;
                 destination.RiskSupervisionDocumentationUrl = null;
+                destination.PlannedRiskAssessmentDate = null;
             }
         }
 

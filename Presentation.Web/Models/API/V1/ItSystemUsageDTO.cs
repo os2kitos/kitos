@@ -94,6 +94,7 @@ namespace Presentation.Web.Models.API.V1
         public DataOptions? RiskAssessment { get; set; }
         public DateTime? RiskAssesmentDate { get; set; }
         public RiskLevel? PreRiskAssessment { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string NoteRisks { get; set; }

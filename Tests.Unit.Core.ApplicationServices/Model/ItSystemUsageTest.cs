@@ -384,6 +384,36 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_SetPlannedRiskAssessmentDate(bool isInputNull)
+        {
+            var usage = new ItSystemUsage() { riskAssessment = DataOptions.YES, PlannedRiskAssessmentDate = A<DateTime>() };
+            var date = isInputNull ? null : A<DateTime?>();
+
+            var error = usage.SetPlannedRiskAssessmentDate(date);
+
+            Assert.False(error.HasValue);
+            Assert.Equal(date, usage.PlannedRiskAssessmentDate);
+        }
+
+        [Theory]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.UNDECIDED)]
+        [InlineData(null)]
+        public void SetPlannedRiskAssessmentDate_Returns_BadState(DataOptions? riskAssessmentValue)
+        {
+            var usage = new ItSystemUsage() { riskAssessment = riskAssessmentValue, PlannedRiskAssessmentDate = A<DateTime>() };
+            var date = A<DateTime?>();
+
+            var error = usage.SetPlannedRiskAssessmentDate(date);
+
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
+        }
+
+        [Theory]
         [InlineData(0, 9, UserCount.BELOWTEN)]
         [InlineData(10, 50, UserCount.TENTOFIFTY)]
         [InlineData(50, 100, UserCount.FIFTYTOHUNDRED)]
