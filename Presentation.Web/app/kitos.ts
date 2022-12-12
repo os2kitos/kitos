@@ -1,14 +1,16 @@
 ﻿module Kitos {
     export interface IRootScope extends ng.IRootScopeService {
-        page: { title: string};
+        page: { title: string };
     }
 
     export interface IKendoGridColumn<TDataSource> extends kendo.ui.GridColumn {
         persistId: string;
         tempVisual?: boolean;
+        tempHidden?: boolean;
         isAvailable?: boolean;
         excelTemplate?(dataItem: TDataSource): string;
-        template?: ((dataItem: TDataSource) => string)|string;
+        template?: ((dataItem: TDataSource) => string) | string;
+        uiOnlyColumn?: boolean;
     }
 
     export interface IKendoGridToolbarItem extends kendo.ui.GridToolbarItem {
@@ -18,7 +20,7 @@
     export interface IKendoGridOptions<TDataSource> extends kendo.ui.GridOptions {
         toolbar?: IKendoGridToolbarItem[];
         columns?: IKendoGridColumn<TDataSource>[];
-        detailTemplate?: ((dataItem: TDataSource) => string)|string;
+        detailTemplate?: ((dataItem: TDataSource) => string) | string;
     }
 
     export interface IKendoGrid<TDataSource> extends kendo.ui.Grid {
@@ -62,7 +64,7 @@
     }
 
     export interface AuthRoles extends ng.ui.IStateProvider {
-        authRoles: [Models.OrganizationRole|"GlobalAdmin"];
+        authRoles: [Models.OrganizationRole | "GlobalAdmin"];
         noAuth: string;
         name: string;
     }

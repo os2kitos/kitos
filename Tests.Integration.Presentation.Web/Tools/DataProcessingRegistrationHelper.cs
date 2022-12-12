@@ -370,6 +370,15 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-completed"), cookie, body);
         }
 
+        public static async Task<HttpResponseMessage> SendUpdateOversightScheduledInspectionDate(int id, DateTime? date, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<DateTime?> { Value = date };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-scheduled-inspection-date"), cookie, body);
+        }
+
         public static async Task<HttpResponseMessage> SendAssignOversightDateRequestAsync(int id, DateTime dateTime, string remark, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

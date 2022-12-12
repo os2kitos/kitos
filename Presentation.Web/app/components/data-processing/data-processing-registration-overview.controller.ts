@@ -223,6 +223,7 @@
                             .withTitle("Overførsel til usikkert 3. land")
                             .withId("dpTransferToInsecureThirdCountries")
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withStandardWidth(210)
                             .withFixedValueRange(
                                 [
                                     Models.Api.Shared.YesNoUndecidedOption.Yes,
@@ -258,6 +259,7 @@
                             .withTitle("Overførselsgrundlag")
                             .withId("dpBasisForTransfer")
                             .withContentOverflow()
+                            .withStandardWidth(170)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
                                 options,
@@ -297,6 +299,7 @@
                             .withDataSourceName(isAgreementConcludedColumnName)
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")
+                            .withStandardWidth(220)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
                                 [
@@ -320,7 +323,7 @@
                             .withDataSourceName("AgreementConcludedAt")
                             .withTitle("Dato for indgåelse af databehandleraftale")
                             .withId("agreementConcludedAt")
-                            .withStandardWidth(160)
+                            .withStandardWidth(270)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AgreementConcludedAt)))
                     .withColumn(builder =>
@@ -396,6 +399,15 @@
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                                 dataItem.IsOversightCompleted &&
                                 Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
+                    .withColumn(builder =>
+                        builder
+                        .withDataSourceName("OversightScheduledInspectionDate")
+                        .withTitle("Kommende planlagt tilsyn")
+                        .withId("scheduledInspectionDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(190)
+                        .withRendering((dataItem) => Helpers.RenderFieldsHelper.renderDate(dataItem.OversightScheduledInspectionDate)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("LatestOversightDate")

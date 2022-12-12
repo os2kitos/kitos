@@ -955,5 +955,30 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var dtoWithNoOversightDates = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
             Assert.Empty(dtoWithNoOversightDates.OversightDates);
         }
+
+        [Fact]
+        public async Task Can_Assign_And_Remove_OversightScheduledInspectionDate()
+        {
+            //Arrange
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var oversightScheduledInspectionDate = A<DateTime>();
+
+            //Act
+            using var assignResponse = await DataProcessingRegistrationHelper.SendUpdateOversightScheduledInspectionDate(registration.Id, oversightScheduledInspectionDate);
+
+            //Assert - oversight date added
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Equal(dto.OversightScheduledInspectionDate, oversightScheduledInspectionDate);
+
+            //Act - remove
+            using var removeResponse = await DataProcessingRegistrationHelper.SendUpdateOversightScheduledInspectionDate(registration.Id, null);
+
+            //Assert date was removed
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Null(dto.OversightScheduledInspectionDate);
+        }
     }
 }

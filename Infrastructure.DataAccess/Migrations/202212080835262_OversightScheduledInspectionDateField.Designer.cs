@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddedPersonalDataToItSystemUsage : IMigrationMetadata
+    public sealed partial class OversightScheduledInspectionDateField : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedPersonalDataToItSystemUsage));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(OversightScheduledInspectionDateField));
         
         string IMigrationMetadata.Id
         {
-            get { return "202212091015025_AddedPersonalDataToItSystemUsage"; }
+            get { return "202212080835262_OversightScheduledInspectionDateField"; }
         }
         
         string IMigrationMetadata.Source

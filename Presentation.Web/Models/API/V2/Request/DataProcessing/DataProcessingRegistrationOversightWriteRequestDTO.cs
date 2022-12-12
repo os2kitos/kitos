@@ -35,6 +35,10 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         /// </summary>
         public string OversightCompletedRemark { get; set; }
         /// <summary>
+        /// Determines the date of a scheduled inspection
+        /// </summary>
+        public DateTime? OversightScheduledInspectionDate { get; set; }
+        /// <summary>
         /// Specific dates where the oversight activity took place
         /// Constraints:
         ///     - IsOversightCompleted equals yes

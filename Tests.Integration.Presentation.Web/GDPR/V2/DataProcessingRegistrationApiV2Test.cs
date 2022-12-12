@@ -1174,6 +1174,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(expected.OversightIntervalRemark, actual.OversightIntervalRemark);
             Assert.Equal(expected.IsOversightCompleted, actual.IsOversightCompleted);
             Assert.Equal(expected.OversightCompletedRemark, actual.OversightCompletedRemark);
+            Assert.Equal(expected.OversightScheduledInspectionDate, actual.OversightScheduledInspectionDate);
             AssertOversightDates(expected.OversightDates, actual.OversightDates);
         }
 
@@ -1268,6 +1269,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 OversightIntervalRemark = A<string>(),
                 IsOversightCompleted = isOversightCompleted,
                 OversightCompletedRemark = A<string>(),
+                OversightScheduledInspectionDate = A<DateTime>(),
                 OversightDates = oversightDates.ToList()
             };
         }

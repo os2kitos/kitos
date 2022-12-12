@@ -149,6 +149,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                     ? dto.OversightCompletedRemark.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
+                OversightScheduledInspectionDate = rule.MustUpdate(x => x.Oversight.OversightScheduledInspectionDate)
+                    ? dto.OversightScheduledInspectionDate.AsChangedValue()
+                    : OptionalValueChange<DateTime?>.None,
+
                 OversightDates = rule.MustUpdate(x => x.Oversight.OversightDates)
                     ? dto.OversightDates
                         .FromNullable()
