@@ -203,15 +203,10 @@ describe("Global admin is able to", () => {
         expect(getHrefUrl(ItSystemUsageGDPRPage.getRiskLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getDPIALinkField())).toEqual(testUrl);
         console.log("Checking Name");
-        console.log("First");
         expect(ItSystemUsageGDPRPage.getNoteLinkField().getText()).toEqual(urlNameText);
-        console.log("Second");
         expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getText()).toEqual(urlNameText);
-        console.log("Third");
         expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getText()).toEqual(urlNameText);
-        console.log("Fourth");
         expect(ItSystemUsageGDPRPage.getRiskLinkField().getText()).toEqual(urlNameText);
-        console.log("Fifth");
         expect(ItSystemUsageGDPRPage.getDPIALinkField().getText()).toEqual(urlNameText);
     }
 

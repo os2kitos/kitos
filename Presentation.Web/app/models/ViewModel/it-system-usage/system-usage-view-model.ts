@@ -1,16 +1,13 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
     import UpdatedSelect2OptionViewModel = ViewModel.Generic.UpdatedSelect2OptionViewModel;
 
-    export interface IDataLevelModel<T> {
+    export interface ICheckboxLevelModel<T> {
         value: T;
         text: string;
-    }
-
-    export interface ICheckboxLevelModel<T> extends IDataLevelModel<T> {
         textValue: string;
     }
 
-    export interface IPersonalDataRecord extends ICheckboxLevelModel<PersonalDataOption> {
+    export interface IPersonalDataModel extends ICheckboxLevelModel<PersonalDataOption> {
         checked: boolean;
     }
 
@@ -99,7 +96,7 @@
             { value: PersonalDataOption.OtherPrivateMatters, textValue: "OtherPrivate", text: "Andre rent private forhold" } as ICheckboxLevelModel<PersonalDataOption>,
         ] as ICheckboxLevelModel<PersonalDataOption>[];
 
-        options: IPersonalDataRecord[];
+        options: IPersonalDataModel[];
 
         constructor(values: PersonalDataOption[]) {
             this.options = this.data.map(option => {
@@ -109,7 +106,7 @@
                     text: option.text,
                     textValue: option.textValue,
                     checked: value
-                } as IPersonalDataRecord;
+                } as IPersonalDataModel;
             });
         }
     }
