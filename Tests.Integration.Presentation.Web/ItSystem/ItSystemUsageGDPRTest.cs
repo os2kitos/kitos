@@ -500,11 +500,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             if (expected.PersonalData.Contains(GDPRPersonalDataOption.CprNumber))
             {
-                AssertYes(actual.PersonalDataCvr);
+                AssertYes(actual.PersonalDataCpr);
             }
             else
             {
-                AssertNo(actual.PersonalDataCvr);
+                AssertNo(actual.PersonalDataCpr);
             }
 
             if (expected.PersonalData.Contains(GDPRPersonalDataOption.SocialProblems))
@@ -578,7 +578,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [Name("Almindelige personoplysninger")]
         public string PersonalData { get; set; }
         [Name("CPR-nr")]
-        public string PersonalDataCvr { get; set; }
+        public string PersonalDataCpr { get; set; }
         [Name("Væsentlige sociale problemer")]
         public string PersonalDataSocialProblems { get; set; }
         [Name("Andre rent private forhold")]
