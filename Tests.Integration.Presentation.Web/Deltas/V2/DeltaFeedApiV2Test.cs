@@ -126,6 +126,7 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             var systemUsage = await CreateItItSystemUsageAsync(token, organization);
             var contract = await CreateItContractAsync(token, organization);
             var itInterface = await CreateItItInterfaceAsync(token, organization);
+            //TODO: Extend
 
             await DeleteDprAsync(token, dpr);
             await ItContractV2Helper.DeleteContractAsync(token, contract.Uuid);

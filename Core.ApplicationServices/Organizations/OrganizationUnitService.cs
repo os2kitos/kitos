@@ -107,7 +107,6 @@ namespace Core.ApplicationServices.Organizations
             }
             else
             {
-                _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(deleteResult.Value));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }
@@ -441,6 +440,7 @@ namespace Core.ApplicationServices.Organizations
                 return error.Value;
             }
 
+            _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(organizationUnit));
             _repository.DeleteWithReferencePreload(organizationUnit);
             return organizationUnit;
         }

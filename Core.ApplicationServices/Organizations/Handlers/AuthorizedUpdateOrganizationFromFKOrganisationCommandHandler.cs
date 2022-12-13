@@ -82,7 +82,9 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
                 if (consequences.DeletedExternalUnitsBeingDeleted.Any())
                 {
-                    _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList());
+                    var deletedOrganizationUnits = consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList();
+                    deletedOrganizationUnits.ForEach(deletedUnit => _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(deletedUnit)));
+                    _organizationUnitRepository.RemoveRange(deletedOrganizationUnits);
                 }
                 foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
                 {
