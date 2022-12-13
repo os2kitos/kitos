@@ -34,15 +34,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        public static async Task DeleteUnitsAsync(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid}/organization-units/{unitUuid}");
-
-            using var response = await HttpApi.DeleteWithCookieAsync(orgUnitUrl, cookie);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
         public static async Task TransferRegistrationsAsync(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, TransferOrganizationUnitRegistrationRequestDTO body, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

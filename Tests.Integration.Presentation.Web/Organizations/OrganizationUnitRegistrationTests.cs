@@ -24,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
 
             var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
 
@@ -41,7 +41,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
 
             var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
 
@@ -58,7 +58,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
 
             var accessRights = await OrganizationUnitHelper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
 
@@ -76,7 +76,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.GlobalAdmin, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
 
             //Act
             var accessRightsList = await OrganizationUnitHelper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
@@ -100,7 +100,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.LocalAdmin, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
 
             //Act
             var accessRightsList = await OrganizationUnitHelper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
@@ -124,7 +124,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
             var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, OrganizationRole.User, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
 
             //Act
             var accessRightsList = await OrganizationUnitHelper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
@@ -234,7 +234,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = organization.Uuid;
             var (_, _, _, _, _, unit) = await SetupRegistrations(organization.Id);
 
-            await OrganizationRegistrationHelper.DeleteUnitsAsync(organizationId, unit.Uuid);
+            await OrganizationUnitHelper.DeleteUnitAsync(organizationId, unit.Uuid);
 
             var rootOrganizationUnit = await OrganizationUnitHelper.GetOrganizationUnitsAsync(organization.Id);
             Assert.DoesNotContain(unit.Id, rootOrganizationUnit.Children.Select(x => x.Id));
@@ -251,7 +251,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await CreateOrganizationAsync();
             var organizationId = organization.Uuid;
             var (right, contract, externalEconomyStream, internalEconomyStream, usage, unit1) = await SetupRegistrations(organization.Id);
-            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, A<string>());
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
 
             var registrations = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit1.Uuid);
 
@@ -479,7 +479,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var (userId, _, _) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, organizationId);
             var organizationName = A<string>();
 
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, organizationName);
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organizationId, organizationName);
 
             var newRole = new OrganizationUnitRole
             {
