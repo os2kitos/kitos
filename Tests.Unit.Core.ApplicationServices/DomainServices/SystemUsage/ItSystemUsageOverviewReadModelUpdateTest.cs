@@ -536,7 +536,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Assert
             Assert.Null(readModel.RiskSupervisionDocumentationName);
             Assert.Null(readModel.RiskSupervisionDocumentationUrl);
-            Assert.Null(readModel.PlannedRiskAssessmentDate);
         }
 
         [Fact]

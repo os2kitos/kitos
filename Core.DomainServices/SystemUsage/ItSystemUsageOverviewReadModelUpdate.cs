@@ -229,6 +229,7 @@ namespace Core.DomainServices.SystemUsage
             destination.DataProcessingRegistrationsConcludedAsCsv = string.Join(", ", isAgreementConcludedList.Select(x => x.Value.GetReadableName()));
 
             destination.RiskAssessmentDate = source.riskAssesmentDate;
+            destination.PlannedRiskAssessmentDate = source.PlannedRiskAssessmentDate;
 
             static string CreateDataProcessingRegistrationKey(int Id) => $"I:{Id}";
 
@@ -267,13 +268,11 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.RiskSupervisionDocumentationName = source.RiskSupervisionDocumentationUrlName;
                 destination.RiskSupervisionDocumentationUrl = source.RiskSupervisionDocumentationUrl;
-                destination.PlannedRiskAssessmentDate = source.PlannedRiskAssessmentDate;
             }
             else
             {
                 destination.RiskSupervisionDocumentationName = null;
                 destination.RiskSupervisionDocumentationUrl = null;
-                destination.PlannedRiskAssessmentDate = null;
             }
         }
 
