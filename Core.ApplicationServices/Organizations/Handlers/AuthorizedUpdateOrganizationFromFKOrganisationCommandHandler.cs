@@ -68,6 +68,21 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 }
 
                 //Import the external tree into the organization
+                var unitsToBeRemoved = organization
+                    .ComputeExternalOrganizationHierarchyUpdateConsequences(OrganizationUnitOrigin.STS_Organisation, organizationTree.Value, command.SynchronizationDepth)
+                    .Select(x => x.DeletedExternalUnitsBeingDeleted.Select(u => u.organizationUnit).ToList());
+
+                if (unitsToBeRemoved.Ok)
+                {
+                    unitsToBeRemoved.Value.ForEach(unit => _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(unit)));
+                }
+                else
+                {
+                    var error = unitsToBeRemoved.Error;
+                    _logger.Error("Failed importing org tree for organization with uuid {uuid}. Failed during computation of consequences with: {code}:{message}", command.Organization.Uuid, error.FailureType, error.Message);
+                    return new OperationError($"Failed to import org tree during consequence calculation step:{error.Message.GetValueOrFallback("")}:{error.FailureType:G}", error.FailureType);
+                }
+
                 var updateResult = organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, organizationTree.Value, command.SynchronizationDepth, command.SubscribeToChanges);
                 if (updateResult.Failed)
                 {
@@ -83,7 +98,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 if (consequences.DeletedExternalUnitsBeingDeleted.Any())
                 {
                     var deletedOrganizationUnits = consequences.DeletedExternalUnitsBeingDeleted.Select(x => x.organizationUnit).ToList();
-                    deletedOrganizationUnits.ForEach(deletedUnit => _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(deletedUnit)));
                     _organizationUnitRepository.RemoveRange(deletedOrganizationUnits);
                 }
                 foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)

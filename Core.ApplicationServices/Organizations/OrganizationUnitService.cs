@@ -434,13 +434,13 @@ namespace Core.ApplicationServices.Organizations
                 return deleteRegistrationsError.Value;
             }
 
+            _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(organizationUnit));
             var error = organization.DeleteOrganizationUnit(organizationUnit);
             if (error.HasValue)
             {
                 return error.Value;
             }
 
-            _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(organizationUnit));
             _repository.DeleteWithReferencePreload(organizationUnit);
             return organizationUnit;
         }
