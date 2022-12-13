@@ -7,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Tracking;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
@@ -15,7 +16,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations
 {
-    public class OrganizationUnitRegistrationTests: WithAutoFixture
+    public class OrganizationUnitRegistrationTests : WithAutoFixture
     {
         [Fact]
         public async Task GlobalAdmin_Has_All_AccessRights()
@@ -210,7 +211,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             registrationsRootAfterDeletion = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit.Uuid);
             Assert.Empty(registrationsRootAfterDeletion.ItContractRegistrations);
-            
+
             //----Check Responsible unit deletion----
             selectedRegistrations = CreateChangeParametersWithOnlyResponsibleSystems(registrations);
             await OrganizationRegistrationHelper.DeleteSelectedRegistrationsAsync(organizationId, unit.Uuid, selectedRegistrations);
@@ -233,13 +234,15 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organizationId = organization.Uuid;
             var (_, _, _, _, _, unit) = await SetupRegistrations(organization.Id);
 
-            await OrganizationRegistrationHelper.DeleteUnitWithRegistrationsAsync(organizationId, unit.Uuid);
+            await OrganizationRegistrationHelper.DeleteUnitsAsync(organizationId, unit.Uuid);
 
             var rootOrganizationUnit = await OrganizationUnitHelper.GetOrganizationUnitsAsync(organization.Id);
             Assert.DoesNotContain(unit.Id, rootOrganizationUnit.Children.Select(x => x.Id));
 
             using var registrationsResponse = await OrganizationRegistrationHelper.SendGetRegistrationsAsync(organizationId, unit.Uuid);
             Assert.Equal(HttpStatusCode.NotFound, registrationsResponse.StatusCode);
+            var deletionTrackingFound = DatabaseAccess.MapFromEntitySet<LifeCycleTrackingEvent, bool>(all => all.AsQueryable().Any(track => track.EntityUuid == unit.Uuid));
+            Assert.True(deletionTrackingFound);
         }
 
         [Fact]
@@ -261,19 +264,19 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             var registrationsUnit2 = await OrganizationRegistrationHelper.GetRegistrationsAsync(organizationId, unit2.Uuid);
             Assert.NotEmpty(registrationsUnit2.OrganizationUnitRights);
-            
-            var rights = DatabaseAccess.MapFromEntitySet<OrganizationUnitRight, List<OrganizationUnitRight>>(x => 
+
+            var rights = DatabaseAccess.MapFromEntitySet<OrganizationUnitRight, List<OrganizationUnitRight>>(x =>
                 x.AsQueryable()
                 .Where(xc =>
-                    xc.RoleId == right.RoleId 
-                    && xc.ObjectId == unit2.Id 
+                    xc.RoleId == right.RoleId
+                    && xc.ObjectId == unit2.Id
                     && xc.UserId == right.UserId)
                 .ToList());
 
             Assert.Single(rights);
             var newRight = rights.FirstOrDefault();
             Assert.NotEqual(right.Id, newRight.Id);
-            
+
             //----Internal payments----
             selectedRegistrations = CreateChangeParametersWithOnlyInternalPayment(registrations, unit2.Uuid);
             await OrganizationRegistrationHelper.TransferRegistrationsAsync(organizationId, unit1.Uuid, unit2.Uuid, selectedRegistrations);

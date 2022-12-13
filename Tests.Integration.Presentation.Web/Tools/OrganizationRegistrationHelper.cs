@@ -34,7 +34,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        public static async Task DeleteUnitWithRegistrationsAsync(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)
+        public static async Task DeleteUnitsAsync(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid}/organization-units/{unitUuid}");
