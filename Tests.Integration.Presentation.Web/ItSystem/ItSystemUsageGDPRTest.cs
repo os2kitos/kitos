@@ -587,7 +587,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public string SensitiveData { get; set; }
         [Name("Straffesager og lovovertrædelser")]
         public string LegalData { get; set; }
-        [Name("Valgte følsomme persondata")]
+        [Name("Valgte følsomme personoplysninger")]
         public string SensitiveDataTypes { get; set; }
         [Name("Forretningskritisk IT-System")]
         public string BusinessCritical { get; set; }
