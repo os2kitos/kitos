@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Tracking;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
 using Presentation.Web.Models.API.V1;
@@ -147,7 +148,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 SynchronizationDepth = levels
             });
             //Act
-            using var deleteResponse = await HttpApi.DeleteWithCookieAsync(connectionUrl, cookie,new DisconnectFromStsOrganizationRequestDTO()
+            using var deleteResponse = await HttpApi.DeleteWithCookieAsync(connectionUrl, cookie, new DisconnectFromStsOrganizationRequestDTO()
             {
                 PurgeUnusedExternalUnits = purge
             });
@@ -393,6 +394,16 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 .Select(x => x.GetValueOrDefault())
                 .ToList();
 
+            var expectedRemovedUuids = DatabaseAccess.MapFromEntitySet<OrganizationUnit, IEnumerable<Guid>>(repository =>
+                    repository
+                        .AsQueryable()
+                        .Where(unit => unit.Organization.Uuid == targetOrgUuid)
+                        .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                        .Where(x => !expectedUuidsLeft.Contains(x.ExternalOriginUuid.Value))
+                        .Select(x => x.Uuid) //selecting the kitos uuid
+                        .ToList())
+                .ToList();
+
             //Act
             using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
@@ -409,6 +420,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             Assert.Equal(expectedUuidsLeft.Count, actualUuidsLeft.Count);
             Assert.All(expectedUuidsLeft, expected => Assert.Contains(expected, actualUuidsLeft));
+
+            //Ensure that deletions were tracked
+            var trackedDeletions = DatabaseAccess.MapFromEntitySet<LifeCycleTrackingEvent, IEnumerable<Guid>>(repository =>
+                    repository
+                        .AsQueryable()
+                        .Where(unit => expectedRemovedUuids.Contains(unit.EntityUuid))
+                        .Select(x => x.EntityUuid)
+                        .ToList())
+                .ToList();
+            Assert.Equal(expectedRemovedUuids.Count, trackedDeletions.Count);
+            Assert.Contains(trackedDeletions, uuid => expectedRemovedUuids.Contains(uuid));
         }
 
         [Fact]
@@ -529,7 +551,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
-            var subscriptionRemoved = DatabaseAccess.MapFromEntitySet<Organization,bool>(r=>r.AsQueryable().ByUuid(targetOrgUuid).StsOrganizationConnection?.SubscribeToUpdates == false);
+            var subscriptionRemoved = DatabaseAccess.MapFromEntitySet<Organization, bool>(r => r.AsQueryable().ByUuid(targetOrgUuid).StsOrganizationConnection?.SubscribeToUpdates == false);
             Assert.True(subscriptionRemoved);
         }
 
@@ -632,7 +654,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                     OrganizationUuid = targetOrgUuid,
                     Responsible = new ContractResponsibleDataWriteRequestDTO { OrganizationUnitUuid = expectedConversionUuid }
                 });
-            
+
             using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
             var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
@@ -641,7 +663,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Log deletion, renaming, conversion and relocation changes
             using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
-            
+
             //Act
             using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
 
@@ -828,8 +850,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             var postUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/subscription");
             return await HttpApi.DeleteWithCookieAsync(postUrl, cookie);
-		}
-		
+        }
+
         private static async Task<HttpResponseMessage> SendGetLogsAsync(Guid targetOrgUuid, int numberOfChangeLogs, Cookie cookie)
         {
             var postUrl =
