@@ -19,7 +19,6 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -477,7 +476,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         [Theory]
         [InlineData(SensitiveDataLevel.NONE)]
-        [InlineData(SensitiveDataLevel.PERSONALDATA)]
         [InlineData(SensitiveDataLevel.SENSITIVEDATA)]
         [InlineData(SensitiveDataLevel.LEGALDATA)]
         public void RemoveSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
@@ -485,11 +483,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var itSystem = CreateItSystem();
             var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
-            itSystemUsage.SensitiveDataLevels.Add(new ItSystemUsageSensitiveDataLevel()
-            {
-                ItSystemUsage = itSystemUsage,
-                SensitivityDataLevel = sensitiveDataLevel
-            });
+            var usageSensitiveDataLevel = CreateSensitiveDataLevel(itSystemUsage, sensitiveDataLevel);
+            itSystemUsage.SensitiveDataLevels.Add(usageSensitiveDataLevel);
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
 
@@ -500,6 +495,51 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.True(result.Ok);
             var removedSensitiveData = result.Value;
             Assert.Equal(sensitiveDataLevel, removedSensitiveData.SensitivityDataLevel);
+            _sensitiveDataLevelRepository.Verify(x => x.DeleteWithReferencePreload(usageSensitiveDataLevel), Times.Once);
+        }
+
+
+        [Fact]
+        public void RemoveSensitiveData_Returns_Ok_And_Removes_PersonalData()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var sensitiveDataLevel = SensitiveDataLevel.PERSONALDATA;
+            var usageSensitiveDataLevel = CreateSensitiveDataLevel(itSystemUsage, sensitiveDataLevel);
+            
+            itSystemUsage.SensitiveDataLevels.Add(usageSensitiveDataLevel);
+
+            var personalDataOption = new ItSystemUsagePersonalData
+            {
+                ItSystemUsage = itSystemUsage,
+                PersonalData = A<GDPRPersonalDataOption>()
+            };
+            itSystemUsage.PersonalDataOptions.Add(personalDataOption);
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, sensitiveDataLevel);
+
+            //Assert
+            Assert.True(result.Ok);
+            var removedSensitiveData = result.Value;
+            Assert.Equal(sensitiveDataLevel, removedSensitiveData.SensitivityDataLevel);
+            _sensitiveDataLevelRepository.Verify(x => x.DeleteWithReferencePreload(usageSensitiveDataLevel), Times.Once);
+            _personalDataOptionsRepository.Verify(
+                x => x.RemoveRange(It.Is<IEnumerable<ItSystemUsagePersonalData>>(personalDataOptions =>
+                    personalDataOptions.Contains(personalDataOption))), Times.Once);
+        }
+
+        private ItSystemUsageSensitiveDataLevel CreateSensitiveDataLevel(ItSystemUsage usage, SensitiveDataLevel sensitiveDataLevel)
+        {
+            return new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = usage,
+                SensitivityDataLevel = sensitiveDataLevel
+            };
         }
 
         [Fact]
@@ -913,10 +953,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystem = CreateItSystem();
             var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
 
-            itSystemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { new(){ItSystemUsage = itSystemUsage, SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA} };
+            itSystemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { CreateSensitiveDataLevel(itSystemUsage, SensitiveDataLevel.PERSONALDATA) };
 
             var option = A<GDPRPersonalDataOption>();
-            itSystemUsage.PersonalDataOptions = new List<ItSystemUsagePersonalData> { new(){ItSystemUsage = itSystemUsage, PersonalData= option} };
+
+            var personalDataOption = new ItSystemUsagePersonalData { ItSystemUsage = itSystemUsage, PersonalData = option };
+            itSystemUsage.PersonalDataOptions = new List<ItSystemUsagePersonalData> { personalDataOption };
             
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
@@ -929,6 +971,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(error.IsNone);
             _usageRepository.Verify(x => x.Update(itSystemUsage));
+            _personalDataOptionsRepository.Verify(x => x.Delete(personalDataOption));
             transaction.Verify(x => x.Commit());
         }
 
