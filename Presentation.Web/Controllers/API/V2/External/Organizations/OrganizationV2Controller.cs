@@ -10,6 +10,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
@@ -172,6 +173,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// Returns the organization units of an organization if the authenticated user is a member of the organization.
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <param name="nameQuery">Query by text in name or email</param>
         /// <returns>A list og organization unit representations</returns>
         [HttpGet]
@@ -184,6 +186,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         public IHttpActionResult GetOrganizationUnits(
             [NonEmptyGuid] Guid organizationUuid,
             string nameQuery = null,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             var queries = new List<IDomainQuery<OrganizationUnit>>();
@@ -191,9 +194,12 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
             if (!string.IsNullOrWhiteSpace(nameQuery))
                 queries.Add(new QueryByPartOfName<OrganizationUnit>(nameQuery));
 
+            if (changedSinceGtEq.HasValue)
+                queries.Add(new QueryByChangedSinceGtEq<OrganizationUnit>(changedSinceGtEq.Value));
+
             return _organizationService
                 .GetOrganizationUnits(organizationUuid, queries.ToArray())
-                .Select(units => units.OrderBy(unit => unit.Id))
+                .Select(units => units.OrderByDefaultConventions(changedSinceGtEq.HasValue))
                 .Select(units => units.Page(paginationQuery))
                 .Select(units => units.AsEnumerable().Select(ToOrganizationUnitResponseDto).ToList())
                 .Match(Ok, FromOperationError);
@@ -291,10 +297,10 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         private IEnumerable<OrganizationUserRole> MapRoles((Guid organizationUuid, User user) context)
         {
             return (from organizationRole in context.user.GetRolesInOrganization(context.organizationUuid)
-                   select MapRole(organizationRole)
+                    select MapRole(organizationRole)
                 into role
-                   where role.HasValue
-                   select role.Value).ToList();
+                    where role.HasValue
+                    select role.Value).ToList();
         }
 
         private Maybe<OrganizationUserRole> MapRole(OrganizationRole role)
