@@ -975,15 +975,6 @@ namespace Core.DomainModel.ItSystemUsage
             return new ItSystemUsageValidationResult(errors);
         }
 
-        public Maybe<OperationError> SetPlannedRiskAssessmentDate(DateTime? date)
-        {
-            if(riskAssessment != DataOptions.YES)
-                return new OperationError("You cannot update 'PlannedRiskAssessmentDate' if 'RiskAssessment' is not set to 'Yes'", OperationFailure.BadState);
-
-            PlannedRiskAssessmentDate = date;
-            return Maybe<OperationError>.None;
-        }
-
         private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)
         {
             return Organization.GetOrganizationUnit(uuid);

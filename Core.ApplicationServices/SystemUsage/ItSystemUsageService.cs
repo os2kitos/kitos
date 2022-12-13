@@ -333,19 +333,6 @@ namespace Core.ApplicationServices.SystemUsage
             }).MatchFailure();
         }
 
-        public Result<ItSystemUsage, OperationError> UpdatePlannedRiskAssessmentDate(int id, DateTime? date)
-        {
-            return Modify(id, usage =>
-            {
-                return usage.SetPlannedRiskAssessmentDate(date)
-                    .Match
-                    (
-                        error => error,
-                        () => Result<ItSystemUsage, OperationError>.Success(usage)
-                    );
-            });
-        }
-
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)
         {
             return _authorizationContext.AllowReads(usage) ? Result<ItSystemUsage, OperationError>.Success(usage) : new OperationError(OperationFailure.Forbidden);

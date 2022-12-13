@@ -819,7 +819,16 @@
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withStandardWidth(170)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate)));
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("PlannedRiskAssessmentDate")
+                        .withTitle("Dato for planlagt risikovurdering")
+                        .withId("PlannedRiskAssessmentDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(170)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.PlannedRiskAssessmentDate)));
 
             //Launch kendo grid
             launcher.launch();

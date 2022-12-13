@@ -28,7 +28,6 @@ describe("Global admin is able to", () => {
     var noteRiskText = createName("noteRiskText");
     var urlNameText = createName("urlName");
 
-
     beforeAll(() => {
         loginHelper.loginAsGlobalAdmin()
             .then(() => ItSystemCatalogHelper.createSystem(itSystem))
@@ -96,11 +95,11 @@ describe("Global admin is able to", () => {
     function fillOutDateFields() {
         console.log("Entering a date into date fields");
         return ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(dateValue)
+            .then(() => ItSystemUsageGDPRPage.getPlannedRiskAssessmentDateField().sendKeys(dateValue))
             .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dateValue))
             .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(dateValue))
             .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dateValue))
             .then(() => browser.waitForAngular());
-
     }
 
     function fillOutTextFields() {
@@ -171,6 +170,7 @@ describe("Global admin is able to", () => {
     function verifyDateFields() {
         console.log("Verifying date fields");
         expect(getValueAttribute(ItSystemUsageGDPRPage.getRiskAssesmentDateField())).toEqual(dateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getPlannedRiskAssessmentDateField())).toEqual(dateValue);
         expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADateField())).toEqual(dateValue);
         expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADeleteDateField())).toEqual(dateValue);
     }

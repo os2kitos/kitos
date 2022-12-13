@@ -865,18 +865,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.RemoveRelevantUnit(id, A<Guid>()));
         }
 
-        [Fact]
-        public void UpdatePlannedRiskAssessmentDate_Returns_NotFound()
-        {
-            Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.UpdatePlannedRiskAssessmentDate(id, A<DateTime>()).MatchFailure());
-        }
-
-        [Fact]
-        public void UpdatePlannedRiskAssessmentDate_Returns_Forbidden()
-        {
-            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.UpdatePlannedRiskAssessmentDate(id, A<DateTime>()).MatchFailure());
-        }
-
         private static void AssertArchivePeriod(ArchivePeriod expected, ArchivePeriod actual)
         {
             Assert.Equal(expected.StartDate, actual.StartDate);
