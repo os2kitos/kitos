@@ -84,6 +84,7 @@
     <Compile Include="Events\NamedEntityChangedNameEvent.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
     <Compile Include="ItSystemUsage\GDPR\ItSystemUsagePersonalData.cs" />
+    <Compile Include="ItSystemUsage\GDPR\RemoveSensitiveDataLevelResultModel.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageValidationError.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageValidationResult.cs" />
     <Compile Include="ItSystemUsage\LifeCycleStatusType.cs" />

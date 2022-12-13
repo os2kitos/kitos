@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202212121054229_AddedPersonalDataToItSystemUsage"; }
+            get { return "202212130903473_AddedPersonalDataToItSystemUsage"; }
         }
         
         string IMigrationMetadata.Source

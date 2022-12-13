@@ -12,19 +12,19 @@
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
+                        ItSystemUsageId = c.Int(nullable: false),
                         PersonalData = c.Int(nullable: false),
-                        ItSystemUsage_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ItSystemUsage", t => t.ItSystemUsage_Id)
-                .Index(t => t.ItSystemUsage_Id);
+                .ForeignKey("dbo.ItSystemUsage", t => t.ItSystemUsageId, cascadeDelete: true)
+                .Index(t => t.ItSystemUsageId);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.ItSystemUsagePersonalDatas", "ItSystemUsage_Id", "dbo.ItSystemUsage");
-            DropIndex("dbo.ItSystemUsagePersonalDatas", new[] { "ItSystemUsage_Id" });
+            DropForeignKey("dbo.ItSystemUsagePersonalDatas", "ItSystemUsageId", "dbo.ItSystemUsage");
+            DropIndex("dbo.ItSystemUsagePersonalDatas", new[] { "ItSystemUsageId" });
             DropTable("dbo.ItSystemUsagePersonalDatas");
         }
     }

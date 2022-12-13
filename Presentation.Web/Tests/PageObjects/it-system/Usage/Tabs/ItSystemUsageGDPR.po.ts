@@ -28,8 +28,8 @@ class ItSystemUsageGDPR {
         return element(this.cssHelper.byDataElementType(this.consts.dataLevelTypeLegalCheckbox));
     }
 
-    static getPersonalCvrCheckBox() {
-        return element(this.cssHelper.byDataElementType(this.consts.personalCvrCheckbox));
+    static getPersonalCprCheckBox() {
+        return element(this.cssHelper.byDataElementType(this.consts.personalCprCheckbox));
     }
 
     static getPersonalOtherPrivateCheckBox() {

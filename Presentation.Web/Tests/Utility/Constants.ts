@@ -171,7 +171,7 @@
     readonly precautionsAccessControlCheckbox = "precautionsAccessControlCheckbox";
     readonly precautionsLogningCheckbox = "precautionsLogningCheckbox";
 
-    readonly personalCvrCheckbox = "CVRCheckbox";
+    readonly personalCprCheckbox = "CPRCheckbox";
     readonly personalSocialProblemsCheckbox = "SocialProblemsCheckbox";
     readonly personalOtherPrivateCheckbox = "OtherPrivateCheckbox";
 

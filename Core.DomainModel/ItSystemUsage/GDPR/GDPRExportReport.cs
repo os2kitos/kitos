@@ -19,7 +19,7 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public DataOptions? RiskAssessment { get; set; }
         public DateTime? RiskAssessmentDate { get; set; }
         public RiskLevel? PreRiskAssessment { get; set; }
-        public bool PersonalDataCvr { get; set; }
+        public bool PersonalDataCpr { get; set; }
         public bool PersonalDataSocialProblems { get; set; }
         public bool PersonalDataSocialOtherPrivateMatters { get; set; }
         public DataOptions? DPIA { get; set; }

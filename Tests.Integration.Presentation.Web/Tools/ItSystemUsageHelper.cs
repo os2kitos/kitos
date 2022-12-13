@@ -15,7 +15,6 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 using Tests.Integration.Presentation.Web.ItSystem;
 using Xunit;
 
@@ -60,7 +59,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
         }
 
-        public static async Task AddPersonalData(int systemUsageId, GDPRPersonalDataChoice personalDataChoice)
+        public static async Task AddPersonalData(int systemUsageId, GDPRPersonalDataOption personalDataChoice)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -68,7 +67,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
         }
 
-        public static async Task  RemovePersonalData(int systemUsageId, GDPRPersonalDataChoice personalDataChoice)
+        public static async Task  RemovePersonalData(int systemUsageId, GDPRPersonalDataOption personalDataChoice)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 

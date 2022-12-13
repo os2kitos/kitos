@@ -1,8 +1,8 @@
-﻿namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
+﻿namespace Presentation.Web.Models.API.V2.Types.SystemUsage
 {
     public enum GDPRPersonalDataChoice
     {
-        CvrNumber = 0,
+        CprNumber = 0,
         SocialProblems = 1,
         OtherPrivateMatters = 2
     }

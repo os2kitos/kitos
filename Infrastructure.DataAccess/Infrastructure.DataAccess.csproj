@@ -92,6 +92,7 @@
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewTaskRefReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsagePersonalDataOptionsMap.cs" />
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
@@ -977,9 +978,9 @@
     <Compile Include="Migrations\202212080835262_OversightScheduledInspectionDateField.designer.cs">
       <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202212121054229_AddedPersonalDataToItSystemUsage.cs" />
-    <Compile Include="Migrations\202212121054229_AddedPersonalDataToItSystemUsage.designer.cs">
-      <DependentUpon>202212121054229_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
+    <Compile Include="Migrations\202212130903473_AddedPersonalDataToItSystemUsage.cs" />
+    <Compile Include="Migrations\202212130903473_AddedPersonalDataToItSystemUsage.designer.cs">
+      <DependentUpon>202212130903473_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1636,8 +1637,8 @@
     <EmbeddedResource Include="Migrations\202212080835262_OversightScheduledInspectionDateField.resx">
       <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202212121054229_AddedPersonalDataToItSystemUsage.resx">
-      <DependentUpon>202212121054229_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202212130903473_AddedPersonalDataToItSystemUsage.resx">
+      <DependentUpon>202212130903473_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

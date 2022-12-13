@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             ApiToDataMap = new Dictionary<GDPRPersonalDataChoice, GDPRPersonalDataOption>
             {
-                { GDPRPersonalDataChoice.CvrNumber, GDPRPersonalDataOption.CvrNumber},
+                { GDPRPersonalDataChoice.CprNumber, GDPRPersonalDataOption.CprNumber},
                 { GDPRPersonalDataChoice.OtherPrivateMatters, GDPRPersonalDataOption.OtherPrivateMatters},
                 { GDPRPersonalDataChoice.SocialProblems, GDPRPersonalDataOption.SocialProblems}
             }.AsReadOnly();

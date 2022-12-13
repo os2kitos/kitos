@@ -1,11 +1,10 @@
 ﻿using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -55,19 +54,17 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPatch]
         [Route("personalData/{personalDataChoice}")]
-        public HttpResponseMessage AddPersonalData(int id, GDPRPersonalDataChoice personalDataChoice)
+        public HttpResponseMessage AddPersonalData(int id, GDPRPersonalDataOption personalDataChoice)
         {
-            var option = personalDataChoice.ToGDPRPersonalDataOption();
-            return _usageService.AddPersonalDataOption(id, option)
+            return _usageService.AddPersonalDataOption(id, personalDataChoice)
                 .Match(FromOperationError, Ok);
         }
 
         [HttpDelete]
         [Route("personalData/{personalDataChoice}")]
-        public HttpResponseMessage RemovePersonalData(int id, GDPRPersonalDataChoice personalDataChoice)
+        public HttpResponseMessage RemovePersonalData(int id, GDPRPersonalDataOption personalDataChoice)
         {
-            var option = personalDataChoice.ToGDPRPersonalDataOption();
-            return _usageService.RemovePersonalDataOption(id, option)
+            return _usageService.RemovePersonalDataOption(id, personalDataChoice)
                 .Match(FromOperationError, Ok);
         }
 

@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using Core.ApplicationServices.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using CsvHelper.Configuration.Attributes;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -209,6 +209,30 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        public async Task Can_Remove_SensitiveDataLevel_With_PersonalDataOptions()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+            var sensitivityLevel = SensitiveDataLevel.PERSONALDATA;
+            await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            await ItSystemUsageHelper.AddPersonalData(usage.Id, personalDataOption);
+
+            //Act
+            var sensitivityLevelDTO =
+                await ItSystemUsageHelper.RemoveSensitiveDataLevel(usage.Id, sensitivityLevel);
+
+            //Assert
+            Assert.Equal(sensitivityLevel, sensitivityLevelDTO.DataSensitivityLevel);
+            var updatedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
+            Assert.Empty(updatedUsage.SensitiveDataLevels);
+            Assert.Empty(updatedUsage.PersonalData);
+        }
+
+        [Fact]
         public async Task Cannot_Add_SensitiveDataLevel_If_Level_Already_Exists()
         {
             //Arrange
@@ -261,7 +285,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var personalData = A<GDPRPersonalDataChoice>();
+            var personalData = A<GDPRPersonalDataOption>();
 
             //Act
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, SensitiveDataLevel.PERSONALDATA);
@@ -281,7 +305,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var personalData = A<GDPRPersonalDataChoice>();
+            var personalData = A<GDPRPersonalDataOption>();
 
             //Act
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, SensitiveDataLevel.PERSONALDATA);
@@ -299,7 +323,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var sensitiveDataLevel = SensitiveDataLevel.PERSONALDATA;
-            var personalDataOption = A<GDPRPersonalDataChoice>();
+            var personalDataOption = A<GDPRPersonalDataOption>();
             var datahandlerContractTypeId = "5";
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
@@ -474,7 +498,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private void AssertPersonalData(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual)
         {
-            if (expected.PersonalData.Contains(GDPRPersonalDataChoice.CvrNumber))
+            if (expected.PersonalData.Contains(GDPRPersonalDataOption.CprNumber))
             {
                 AssertYes(actual.PersonalDataCvr);
             }
@@ -483,7 +507,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 AssertNo(actual.PersonalDataCvr);
             }
 
-            if (expected.PersonalData.Contains(GDPRPersonalDataChoice.SocialProblems))
+            if (expected.PersonalData.Contains(GDPRPersonalDataOption.SocialProblems))
             {
                 AssertYes(actual.PersonalDataSocialProblems);
             }
@@ -492,7 +516,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 AssertNo(actual.PersonalDataSocialProblems);
             }
 
-            if (expected.PersonalData.Contains(GDPRPersonalDataChoice.OtherPrivateMatters))
+            if (expected.PersonalData.Contains(GDPRPersonalDataOption.OtherPrivateMatters))
             {
                 AssertYes(actual.PersonalDataSocialOtherPrivateMatters);
             }
@@ -553,7 +577,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public string NoData { get; set; }
         [Name("Almindelige personoplysninger")]
         public string PersonalData { get; set; }
-        [Name("CVR-nr")]
+        [Name("CPR-nr")]
         public string PersonalDataCvr { get; set; }
         [Name("Væsentlige sociale problemer")]
         public string PersonalDataSocialProblems { get; set; }

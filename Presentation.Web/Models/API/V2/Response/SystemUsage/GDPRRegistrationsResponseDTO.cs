@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.DomainModel.ItSystemUsage;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 

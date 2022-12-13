@@ -33,6 +33,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly IReferenceService _referenceService;
         private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
+        private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataRepository;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
@@ -44,7 +45,8 @@ namespace Core.ApplicationServices.SystemUsage
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
-            IGenericRepository<ArchivePeriod> archivePeriodRepository)
+            IGenericRepository<ArchivePeriod> archivePeriodRepository, 
+            IGenericRepository<ItSystemUsagePersonalData> personalDataRepository)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -56,6 +58,7 @@ namespace Core.ApplicationServices.SystemUsage
             _userContext = userContext;
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _archivePeriodRepository = archivePeriodRepository;
+            _personalDataRepository = personalDataRepository;
         }
 
         public IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions)
@@ -241,11 +244,18 @@ namespace Core.ApplicationServices.SystemUsage
                 .RemoveSensitiveDataLevel(sensitiveDataLevel)
                 .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
                 (
-                    onSuccess: removedSensitivityLevel =>
+                    onSuccess: removeSensitivityLevelResult =>
                     {
+                        var removedSensitivityLevel = removeSensitivityLevelResult.RemovedRiskLevel;
+                        var removedPersonalDataOptions = removeSensitivityLevelResult.RemovedPersonalDataOptions;
+
                         _sensitiveDataLevelRepository.DeleteWithReferencePreload(removedSensitivityLevel);
+                        _personalDataRepository.RemoveRange(removedPersonalDataOptions);
+
                         _sensitiveDataLevelRepository.Save();
+                        _personalDataRepository.Save();
                         _usageRepository.Save();
+
                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
                         return removedSensitivityLevel;
                     },
@@ -354,8 +364,13 @@ namespace Core.ApplicationServices.SystemUsage
                 return system.RemovePersonalData(option)
                     .Match
                     (
-                        error => error,
-                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                        personalData =>
+                        {
+                            _personalDataRepository.Delete(personalData);
+                            _personalDataRepository.Save();
+                            return Result<ItSystemUsage, OperationError>.Success(system);
+                        },
+                        error => error
                     );
             }).MatchFailure();
         }

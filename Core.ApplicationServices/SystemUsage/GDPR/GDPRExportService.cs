@@ -64,7 +64,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 PersonalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA),
                 SensitiveData = hasSensitiveData,
                 LegalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.LEGALDATA),
-                PersonalDataCvr = input.PersonalDataOptions.Any(x => x.PersonalData == GDPRPersonalDataOption.CvrNumber),
+                PersonalDataCpr = input.PersonalDataOptions.Any(x => x.PersonalData == GDPRPersonalDataOption.CprNumber),
                 PersonalDataSocialProblems = input.PersonalDataOptions.Any(x => x.PersonalData == GDPRPersonalDataOption.SocialProblems),
                 PersonalDataSocialOtherPrivateMatters = input.PersonalDataOptions.Any(x => x.PersonalData == GDPRPersonalDataOption.OtherPrivateMatters),
                 LinkToDirectory = !string.IsNullOrEmpty(input.LinkToDirectoryUrl),

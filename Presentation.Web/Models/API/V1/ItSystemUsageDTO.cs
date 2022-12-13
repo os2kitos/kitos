@@ -77,7 +77,7 @@ namespace Presentation.Web.Models.API.V1
         public string LinkToDirectoryUrlName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
 
-        public IEnumerable<GDPRPersonalDataChoice> PersonalData { get; set; }
+        public IEnumerable<GDPRPersonalDataOption> PersonalData { get; set; }
         public ICollection<ItSystemUsageSensitiveDataLevelDTO> SensitiveDataLevels { get; set; }
 
         public DataOptions? Precautions { get; set; }

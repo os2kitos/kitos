@@ -32,7 +32,7 @@
     }
 
     export enum PersonalDataOption {
-        CvrNumber = 0,
+        CprNumber = 0,
         SocialProblems = 1,
         OtherPrivateMatters = 2
     }
@@ -91,7 +91,7 @@
 
     export class PersonalDataViewModel {
         private readonly data = [
-            { value: PersonalDataOption.CvrNumber, textValue: "CVR", text: "CVR-nr" } as ICheckboxLevelModel<PersonalDataOption>,
+            { value: PersonalDataOption.CprNumber, textValue: "CPR", text: "CPR-nr" } as ICheckboxLevelModel<PersonalDataOption>,
             { value: PersonalDataOption.SocialProblems, textValue: "SocialProblems", text: "Væsentlige sociale problemer" } as ICheckboxLevelModel<PersonalDataOption>,
             { value: PersonalDataOption.OtherPrivateMatters, textValue: "OtherPrivate", text: "Andre rent private forhold" } as ICheckboxLevelModel<PersonalDataOption>,
         ] as ICheckboxLevelModel<PersonalDataOption>[];

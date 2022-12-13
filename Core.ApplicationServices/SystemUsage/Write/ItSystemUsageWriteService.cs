@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
@@ -54,6 +55,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> _sensitivePersonDataAssignmentService;
         private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
+        private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataOptionsRepository;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -76,7 +78,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
             IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
             IItsystemUsageRelationsService systemUsageRelationsService,
-            IEntityIdentityResolver identityResolver)
+            IEntityIdentityResolver identityResolver, 
+            IGenericRepository<ItSystemUsagePersonalData> personalDataOptionsRepository)
         {
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
@@ -99,6 +102,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _archiveTestLocationOptionsService = archiveTestLocationOptionsService;
             _systemUsageRelationsService = systemUsageRelationsService;
             _identityResolver = identityResolver;
+            _personalDataOptionsRepository = personalDataOptionsRepository;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -178,10 +182,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
                    }))
 
                 //Registered data sensitivity
-                .Bind(usage => usage.WithOptionalUpdate(parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage, parameters)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.PersonalDataOptions, UpdatePersonalDataOptions))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.PersonalDataOptions, UpdatePersonalDataOptions))
 
                 //Technical precautions
                 .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.precautions = precautions))
@@ -228,20 +232,23 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
         }
 
-        private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage)
+        private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage, UpdatedSystemUsageGDPRProperties parameters)
         {
             var newLevels = levels.GetValueOrFallback(new List<SensitiveDataLevel>()).ToList();
             var levelsBefore = systemUsage.SensitiveDataLevels.ToList();
-            var error = systemUsage.UpdateDataSensitivityLevels(newLevels);
-            if (error.HasValue)
-                return error;
-
+            var result = systemUsage.UpdateDataSensitivityLevels(newLevels);
+            if (result.Failed)
+                return result.Error;
+            
             var levelsRemoved = levelsBefore.Except(systemUsage.SensitiveDataLevels.ToList()).ToList();
 
             foreach (var removedSensitiveDataLevel in levelsRemoved)
             {
                 _sensitiveDataLevelRepository.Delete(removedSensitiveDataLevel);
             }
+
+            var removedPersonalDataOptions = result.Value;
+            _personalDataOptionsRepository.RemoveRange(removedPersonalDataOptions);
 
             return Maybe<OperationError>.None;
         }
@@ -258,21 +265,27 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .MatchFailure();
         }
 
-        private static Maybe<OperationError> UpdatePersonalDataOptions(ItSystemUsage systemUsage, Maybe<IEnumerable<GDPRPersonalDataOption>> personalDataOptions)
+        private Maybe<OperationError> UpdatePersonalDataOptions(ItSystemUsage systemUsage, Maybe<IEnumerable<GDPRPersonalDataOption>> personalDataOptions)
         {
             var newOptions = personalDataOptions.GetValueOrFallback(new List<GDPRPersonalDataOption>()).ToList();
-            var dataBefore = systemUsage.PersonalDataOptions.ToList();
-            foreach (var personalDataOption in newOptions)
+            var dataBefore = systemUsage.PersonalDataOptions.Select(x => x.PersonalData).ToList();
+
+            var deltaResult = dataBefore.ComputeDelta(newOptions, x => x).ToList();
+
+            var addedItems = deltaResult.Where(x => x.delta == EnumerableExtensions.EnumerableDelta.Added).Select(x => x.item).ToList();
+            foreach (var personalDataOption in addedItems)
             {
-                var error = systemUsage.AddPersonalData(personalDataOption);
-                if (error.HasValue) return error;
+                var error = _systemUsageService.AddPersonalDataOption(systemUsage.Id, personalDataOption);
+                if (error.HasValue) 
+                    return error;
             }
 
-            var dataToRemove = dataBefore.Except(systemUsage.PersonalDataOptions.Where(x => newOptions.Contains(x.PersonalData)).ToList()).ToList();
-            foreach (var option in dataToRemove)
+            var removedItems = deltaResult.Where(x => x.delta == EnumerableExtensions.EnumerableDelta.Removed).Select(x => x.item).ToList();
+            foreach (var option in removedItems)
             {
-                var error = systemUsage.RemovePersonalData(option.PersonalData);
-                if(error.HasValue) return error;
+                var error = _systemUsageService.RemovePersonalDataOption(systemUsage.Id, option);
+                if (error.HasValue)
+                    return error.Value;
             }
 
             return Maybe<OperationError>.None;

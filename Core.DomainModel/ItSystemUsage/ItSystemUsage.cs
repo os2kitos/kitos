@@ -448,22 +448,24 @@ namespace Core.DomainModel.ItSystemUsage
             return newDataLevel;
         }
 
-        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(
+        public Result<RemoveSensitiveDataLevelResultModel, OperationError> RemoveSensitiveDataLevel(
             SensitiveDataLevel sensitiveDataLevel)
         {
             if (!SensitiveDataLevelExists(sensitiveDataLevel))
             {
                 return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
             }
-
+            
             var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);
+
+            var removedPersonalData = new List<ItSystemUsagePersonalData>();
             if (dataLevelToRemove.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA)
             {
-                ResetPersonalData();
+                removedPersonalData = ResetPersonalData().ToList();
             }
             SensitiveDataLevels.Remove(dataLevelToRemove);
 
-            return dataLevelToRemove;
+            return new RemoveSensitiveDataLevelResultModel(dataLevelToRemove, removedPersonalData);
         }
 
         private bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
@@ -882,7 +884,7 @@ namespace Core.DomainModel.ItSystemUsage
             return newPeriod;
         }
 
-        public Maybe<OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
+        public Result<IEnumerable<ItSystemUsagePersonalData>, OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
         {
             if (sensitiveDataLevels == null)
                 throw new ArgumentNullException(nameof(sensitiveDataLevels));
@@ -897,10 +899,16 @@ namespace Core.DomainModel.ItSystemUsage
                 ItSystemUsage = this,
                 SensitivityDataLevel = sensitiveDataLevel
             }).ToList();
+            
+            var removedPersonalData = new List<ItSystemUsagePersonalData>();
+            if (levels.Contains(SensitiveDataLevel.PERSONALDATA) == false)
+            {
+                removedPersonalData = ResetPersonalData().ToList();
+            }
 
             levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
 
-            return Maybe<OperationError>.None;
+            return removedPersonalData;
         }
 
         public Maybe<OperationError> UpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
@@ -982,32 +990,42 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Maybe<OperationError> AddPersonalData(GDPRPersonalDataOption option)
         {
-            if (SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA) == false)
+            if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
             {
                 return new OperationError("You cannot add a new PersonalData option before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
             }
-            
-            if(PersonalDataOptions.Any(x => x.PersonalData == option))
-                return Maybe<OperationError>.None;
+
+            if (PersonalDataOptions.Any(x => x.PersonalData == option))
+            {
+                return new OperationError($"An option with value: '{option}' already exists", OperationFailure.Conflict);
+            }
 
             var personalDataOption = new ItSystemUsagePersonalData() {ItSystemUsage = this, PersonalData = option};
             PersonalDataOptions.Add(personalDataOption);
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> RemovePersonalData(GDPRPersonalDataOption option)
+        public Result<ItSystemUsagePersonalData, OperationError> RemovePersonalData(GDPRPersonalDataOption option)
         {
+            if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
+            {
+                return new OperationError("You cannot remove a PersonalData option before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
+            }
+
             var personalDataOption = PersonalDataOptions.FirstOrDefault(x => x.PersonalData == option);
             if (personalDataOption == null)
                 return new OperationError($"PersonalData: \"{option}\" wasn't found", OperationFailure.NotFound);
 
             PersonalDataOptions.Remove(personalDataOption);
-            return Maybe<OperationError>.None;
+            return personalDataOption;
         }
 
-        public void ResetPersonalData()
+        public IEnumerable<ItSystemUsagePersonalData> ResetPersonalData()
         {
+            var dataBeforeRemoval = PersonalDataOptions.ToList();
             PersonalDataOptions.Clear();
+
+            return dataBeforeRemoval;
         }
 
         private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)

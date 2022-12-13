@@ -38,6 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IGenericRepository<ArchivePeriod>> _archivePeriodRepositoryMock;
+        private readonly Mock<IGenericRepository<ItSystemUsagePersonalData>> _personalDataOptionsRepository;
 
         public ItSystemUsageServiceTest()
         {
@@ -50,6 +51,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _archivePeriodRepositoryMock = new Mock<IGenericRepository<ArchivePeriod>>();
+            _personalDataOptionsRepository = new Mock<IGenericRepository<ItSystemUsagePersonalData>>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -60,7 +62,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _sensitiveDataLevelRepository.Object,
                 _userContextMock.Object,
                 new Mock<IItSystemUsageAttachedOptionRepository>().Object,
-                _archivePeriodRepositoryMock.Object);
+                _archivePeriodRepositoryMock.Object,
+                _personalDataOptionsRepository.Object);
         }
 
         [Fact]
@@ -934,7 +937,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.RemovePersonalDataOption(id, A<GDPRPersonalDataOption>()));
         }
-
+        
         [Fact]
         public void RemovePersonalDataOption_Returns_Forbidden()
         {

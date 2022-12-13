@@ -431,7 +431,7 @@
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
-    <Compile Include="Models\API\V1\ItSystemUsage\GDPR\GDPRPersonalDataChoice.cs" />
+    <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitConsequenceDTO.cs" />

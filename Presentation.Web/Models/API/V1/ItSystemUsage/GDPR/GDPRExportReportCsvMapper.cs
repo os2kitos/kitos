@@ -33,7 +33,7 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
                     .WithColumn(GDPRExportReportColumns.SystemName, x => x.SystemName)
                     .WithColumn(GDPRExportReportColumns.NoData, x => MapBoolean(x.NoData))
                     .WithColumn(GDPRExportReportColumns.PersonalData, x => MapBoolean(x.PersonalData))
-                    .WithColumn(GDPRExportReportColumns.PersonalDataCvr, x => MapBoolean(x.PersonalDataCvr))
+                    .WithColumn(GDPRExportReportColumns.PersonalDataCpr, x => MapBoolean(x.PersonalDataCpr))
                     .WithColumn(GDPRExportReportColumns.PersonalDataSocialProblems, x => MapBoolean(x.PersonalDataSocialProblems))
                     .WithColumn(GDPRExportReportColumns.PersonalDataSocialOtherPrivateMatters, x => MapBoolean(x.PersonalDataSocialOtherPrivateMatters))
                     .WithColumn(GDPRExportReportColumns.SensitiveData, x => MapBoolean(x.SensitiveData))

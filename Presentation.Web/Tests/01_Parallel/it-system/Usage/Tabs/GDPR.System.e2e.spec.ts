@@ -82,7 +82,7 @@ describe("Global admin is able to", () => {
     }
 
     function fillOutPersonalDataCheckboxes() {
-        return ItSystemUsageGDPRPage.getPersonalCvrCheckBox().click()
+        return ItSystemUsageGDPRPage.getPersonalCprCheckBox().click()
             .then(() => ItSystemUsageGDPRPage.getPersonalOtherPrivateCheckBox().click())
             .then(() => ItSystemUsageGDPRPage.getPersonalSocialProblemsCheckBox().click())
             .then(() => browser.waitForAngular());
@@ -165,7 +165,7 @@ describe("Global admin is able to", () => {
         expectCheckboxValue(consts.precautionsAccessControlCheckbox, true);
         expectCheckboxValue(consts.precautionsLogningCheckbox, true);
         console.log("Personal data boxes");
-        expectCheckboxValue(consts.personalCvrCheckbox, true);
+        expectCheckboxValue(consts.personalCprCheckbox, true);
         expectCheckboxValue(consts.personalSocialProblemsCheckbox, true);
         expectCheckboxValue(consts.personalOtherPrivateCheckbox, true);
     }
