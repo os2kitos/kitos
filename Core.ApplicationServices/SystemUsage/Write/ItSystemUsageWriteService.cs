@@ -182,7 +182,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                    }))
 
                 //Registered data sensitivity
-                .Bind(usage => usage.WithOptionalUpdate(parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage, parameters)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.PersonalDataOptions, UpdatePersonalDataOptions))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
@@ -232,7 +232,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
         }
 
-        private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage, UpdatedSystemUsageGDPRProperties parameters)
+        private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage)
         {
             var newLevels = levels.GetValueOrFallback(new List<SensitiveDataLevel>()).ToList();
             var levelsBefore = systemUsage.SensitiveDataLevels.ToList();
@@ -273,9 +273,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var deltaResult = dataBefore.ComputeDelta(newOptions, x => x).ToList();
 
             var addedItems = deltaResult.Where(x => x.delta == EnumerableExtensions.EnumerableDelta.Added).Select(x => x.item).ToList();
-            foreach (var personalDataOption in addedItems)
+            foreach (var option in addedItems)
             {
-                var error = _systemUsageService.AddPersonalDataOption(systemUsage.Id, personalDataOption);
+                var error = _systemUsageService.AddPersonalDataOption(systemUsage.Id, option);
                 if (error.HasValue) 
                     return error;
             }
