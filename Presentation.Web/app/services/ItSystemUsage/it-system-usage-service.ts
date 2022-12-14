@@ -6,7 +6,7 @@
         removeDataLevel(systemUsageId: number, dataLevel: number);
         patchSystemUsage(systemUsageId: number, orgId: number, payload: any);
         patchPersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<void>;
-        removePersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<boolean>;
+        removePersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<void>;
         //Odata kept here to keep all pages working as they used to
         patchSystem(id: number, payload: any);
         getValidationDetails(usageId: number): ng.IPromise<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>;
@@ -52,15 +52,15 @@
             return this.apiUseCaseFactory
                 .createUpdate("Almindelige personoplysninger",
                     () => this.apiWrapper.patch(
-                        this.getPersonalDataUrl(systemUsageId, personalDataValue)))
+                        this.getPersonalDataUrl(systemUsageId, personalDataValue) + "/add"))
                 .executeAsync();
         }
 
-        removePersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<boolean> {
+        removePersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<void> {
             return this.apiUseCaseFactory
                 .createUpdate("Almindelige personoplysninger",
-                    () => this.apiWrapper.delete(
-                        this.getPersonalDataUrl(systemUsageId, personalDataValue)))
+                    () => this.apiWrapper.patch(
+                        this.getPersonalDataUrl(systemUsageId, personalDataValue) + "/remove"))
                 .executeAsync();
         }
 

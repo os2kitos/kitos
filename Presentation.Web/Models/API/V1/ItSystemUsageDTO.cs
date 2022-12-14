@@ -4,7 +4,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 
 namespace Presentation.Web.Models.API.V1
 {

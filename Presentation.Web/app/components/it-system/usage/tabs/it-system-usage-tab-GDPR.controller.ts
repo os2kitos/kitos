@@ -83,18 +83,17 @@
 
                 function updatePersonalDataSelectionValue(selectedRecord: Kitos.Models.ViewModel.ItSystemUsage.IPersonalDataModel) {
                     if (selectedRecord.checked) {
-                        const selectedOptions = itSystemUsage.personalData.filter(x => x === selectedRecord.value);
-                        if (selectedOptions.length === 0) {
+                        const isOptionWithSameValuePresent = itSystemUsage.personalData.some(x => x === selectedRecord.value);
+                        if (isOptionWithSameValuePresent === false) {
                             itSystemUsage.personalData.push(selectedRecord.value);
                         }
                         return;
                     }
 
-                    const selectedOptions = itSystemUsage.personalData.filter(x => x === selectedRecord.value);
+                    const selectedOptionIndex = itSystemUsage.personalData.indexOf(x => x === selectedRecord.value);
                     
-                    if (selectedOptions.length === 1) {
-                        const indexOfOption = itSystemUsage.personalData.indexOf(selectedOptions[0]);
-                        itSystemUsage.personalData.splice(indexOfOption, 1);
+                    if (selectedOptionIndex.length !== 1) {
+                        itSystemUsage.personalData.splice(selectedOptionIndex, 1);
                     }
                 }
 
@@ -204,8 +203,12 @@
                             .then(onSuccess => {
                                 notify.addSuccessMessage("Feltet er opdateret!");
                                 if (dataLevel === Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal.value) {
-                                    $scope.usage.personalData = [];
-                                    $scope.personalData.options.forEach(option => option.checked = false);
+                                    itSystemUsageService.getItSystemUsage(itSystemUsage.id)
+                                        .then(newUsage => {
+                                                $scope.usage.personalData = newUsage.personalData;
+                                            $scope.personalData = new Kitos.Models.ViewModel.ItSystemUsage.PersonalDataViewModel($scope.usage.personalData);
+                                            },
+                                            error => console.log("Failed to load a new it system usage while updating the PersonalData values"));
                                 }
                             },
                             onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));

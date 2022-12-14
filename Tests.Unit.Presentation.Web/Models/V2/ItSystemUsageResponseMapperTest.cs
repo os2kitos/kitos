@@ -274,8 +274,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(dto.GDPR.RiskAssessmentNotes, itSystemUsage.noteRisks);
             AssertRiskLevel(dto.GDPR.RiskAssessmentResult, itSystemUsage.preriskAssessment);
 
-            Assert.Equal(dto.GDPR.PersonalDataOptions.Count(), itSystemUsage.PersonalDataOptions.Count);
-            foreach (var dataOption in dto.GDPR.PersonalDataOptions)
+            Assert.Equal(dto.GDPR.SpecificPersonalData.Count(), itSystemUsage.PersonalDataOptions.Count);
+            foreach (var dataOption in dto.GDPR.SpecificPersonalData)
             {
                 Assert.Contains(dataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()));   
             }

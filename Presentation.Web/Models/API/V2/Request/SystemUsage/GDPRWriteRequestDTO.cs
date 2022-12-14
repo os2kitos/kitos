@@ -21,7 +21,10 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         public IEnumerable<Guid> SensitivePersonDataUuids { get; set; }
-        public IEnumerable<GDPRPersonalDataChoice> PersonalDataOptions { get; set; }
+        /// <summary>
+        /// Constraint: Can only be added if DataSensitivityLevelChoice.PersonData is present
+        /// </summary>
+        public IEnumerable<GDPRPersonalDataChoice> SpecificPersonalData { get; set; }
 
         /// <summary>
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context

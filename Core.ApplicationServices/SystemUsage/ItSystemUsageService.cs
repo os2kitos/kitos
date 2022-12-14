@@ -252,11 +252,10 @@ namespace Core.ApplicationServices.SystemUsage
                         _sensitiveDataLevelRepository.DeleteWithReferencePreload(removedSensitivityLevel);
                         _personalDataRepository.RemoveRange(removedPersonalDataOptions);
 
-                        _sensitiveDataLevelRepository.Save();
-                        _personalDataRepository.Save();
+                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
+
                         _usageRepository.Save();
 
-                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
                         return removedSensitivityLevel;
                     },
                     onFailure: error =>
@@ -351,8 +350,8 @@ namespace Core.ApplicationServices.SystemUsage
                 return system.AddPersonalData(option)
                     .Match
                     (
-                        error => error,
-                        () => Result<ItSystemUsage, OperationError>.Success(system)
+                        _ => Result<ItSystemUsage, OperationError>.Success(system),
+                        error => error
                     );
             }).MatchFailure();
         }
@@ -367,7 +366,6 @@ namespace Core.ApplicationServices.SystemUsage
                         personalData =>
                         {
                             _personalDataRepository.Delete(personalData);
-                            _personalDataRepository.Save();
                             return Result<ItSystemUsage, OperationError>.Success(system);
                         },
                         error => error

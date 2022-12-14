@@ -165,9 +165,9 @@ describe("Global admin is able to", () => {
         expectCheckboxValue(consts.precautionsAccessControlCheckbox, true);
         expectCheckboxValue(consts.precautionsLogningCheckbox, true);
         console.log("Personal data boxes");
-        expectCheckboxValue(consts.personalCprCheckbox, true);
-        expectCheckboxValue(consts.personalSocialProblemsCheckbox, true);
-        expectCheckboxValue(consts.personalOtherPrivateCheckbox, true);
+        expectCheckboxValueById(consts.personalCprCheckbox, true);
+        expectCheckboxValueById(consts.personalSocialProblemsCheckbox, true);
+        expectCheckboxValueById(consts.personalOtherPrivateCheckbox, true);
     }
 
     function verifyDropDown() {
@@ -225,6 +225,11 @@ describe("Global admin is able to", () => {
     function expectCheckboxValue(checkBoxDataElementType: string, toBe: boolean) {
         console.log(`Checking value for ${checkBoxDataElementType} value to be ${toBe}`);
         return expect(element(cssHelper.byDataElementType(checkBoxDataElementType)).isSelected()).toBe(toBe);
+    }
+
+    function expectCheckboxValueById(checkBoxDataElementType: string, toBe: boolean) {
+        console.log(`Checking value for ${checkBoxDataElementType} value to be ${toBe}`);
+        return expect(element(by.id(checkBoxDataElementType)).isSelected()).toBe(toBe);
     }
 
     function expectDropdownValueToEqual(expectedValue: string, idOfDropDownBox: string) {

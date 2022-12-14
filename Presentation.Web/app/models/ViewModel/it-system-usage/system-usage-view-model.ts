@@ -1,13 +1,8 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
     import UpdatedSelect2OptionViewModel = ViewModel.Generic.UpdatedSelect2OptionViewModel;
+    import ISelectedValueViewModel = ViewModel.Generic.ISelectedValueViewModel;
 
-    export interface ICheckboxLevelModel<T> {
-        value: T;
-        text: string;
-        textValue: string;
-    }
-
-    export interface IPersonalDataModel extends ICheckboxLevelModel<PersonalDataOption> {
+    export interface IPersonalDataModel extends ISelectedValueViewModel<PersonalDataOption> {
         checked: boolean;
     }
 
@@ -65,10 +60,10 @@
 
     export class SensitiveDataLevelViewModel {
         static readonly levels = {
-            none: <ICheckboxLevelModel<number>>{ value: 0, textValue: "NONE", text: "Ingen personoplysninger" },
-            personal: <ICheckboxLevelModel<number>>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige personoplysninger" },
-            sensitive: <ICheckboxLevelModel<number>>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme personoplysninger" },
-            legal: <ICheckboxLevelModel<number>>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
+            none: <ISelectedValueViewModel<number>>{ value: 0, textValue: "NONE", text: "Ingen personoplysninger" },
+            personal: <ISelectedValueViewModel<number>>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige personoplysninger" },
+            sensitive: <ISelectedValueViewModel<number>>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme personoplysninger" },
+            legal: <ISelectedValueViewModel<number>>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
         };
 
         static readonly levelOrder = {
@@ -91,10 +86,10 @@
 
     export class PersonalDataViewModel {
         private readonly data = [
-            { value: PersonalDataOption.CprNumber, textValue: "CPR", text: "CPR-nr" } as ICheckboxLevelModel<PersonalDataOption>,
-            { value: PersonalDataOption.SocialProblems, textValue: "SocialProblems", text: "Væsentlige sociale problemer" } as ICheckboxLevelModel<PersonalDataOption>,
-            { value: PersonalDataOption.OtherPrivateMatters, textValue: "OtherPrivate", text: "Andre rent private forhold" } as ICheckboxLevelModel<PersonalDataOption>,
-        ] as ICheckboxLevelModel<PersonalDataOption>[];
+            { value: PersonalDataOption.CprNumber, textValue: "CPR", text: "CPR-nr" } as ISelectedValueViewModel<PersonalDataOption>,
+            { value: PersonalDataOption.SocialProblems, textValue: "SocialProblems", text: "Væsentlige sociale problemer" } as ISelectedValueViewModel<PersonalDataOption>,
+            { value: PersonalDataOption.OtherPrivateMatters, textValue: "OtherPrivate", text: "Andre rent private forhold" } as ISelectedValueViewModel<PersonalDataOption>,
+        ] as ISelectedValueViewModel<PersonalDataOption>[];
 
         options: IPersonalDataModel[];
 

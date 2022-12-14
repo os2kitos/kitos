@@ -53,18 +53,18 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpPatch]
-        [Route("personalData/{personalDataChoice}")]
-        public HttpResponseMessage AddPersonalData(int id, GDPRPersonalDataOption personalDataChoice)
+        [Route("personalData/{personalDataOption}/add")]
+        public HttpResponseMessage AddPersonalData(int id, GDPRPersonalDataOption personalDataOption)
         {
-            return _usageService.AddPersonalDataOption(id, personalDataChoice)
+            return _usageService.AddPersonalDataOption(id, personalDataOption)
                 .Match(FromOperationError, Ok);
         }
 
-        [HttpDelete]
-        [Route("personalData/{personalDataChoice}")]
-        public HttpResponseMessage RemovePersonalData(int id, GDPRPersonalDataOption personalDataChoice)
+        [HttpPatch]
+        [Route("personalData/{personalDataOption}/remove")]
+        public HttpResponseMessage RemovePersonalData(int id, GDPRPersonalDataOption personalDataOption)
         {
-            return _usageService.RemovePersonalDataOption(id, personalDataChoice)
+            return _usageService.RemovePersonalDataOption(id, personalDataOption)
                 .Match(FromOperationError, Ok);
         }
 

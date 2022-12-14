@@ -63,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}"), cookie, new {});
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}/add"), cookie, new {});
             Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
         }
 
@@ -71,7 +71,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using var okResponse = await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}"), cookie);
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}/remove"), cookie, new {});
             Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
         }
 

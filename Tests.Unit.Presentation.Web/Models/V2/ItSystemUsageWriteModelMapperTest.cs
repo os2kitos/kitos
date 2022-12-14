@@ -272,7 +272,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.NextDataRetentionEvaluationDate, AssertPropertyContainsDataChange(mappedGdpr.NextDataRetentionEvaluationDate));
             Assert.Equal(input.DataRetentionEvaluationFrequencyInMonths, AssertPropertyContainsDataChange(mappedGdpr.DataRetentionEvaluationFrequencyInMonths));
             AssertLinkMapping(input.DPIADocumentation, mappedGdpr.DPIADocumentation);
-            Assert.Equal(input.PersonalDataOptions.ToList(), AssertPropertyContainsDataChange(mappedGdpr.PersonalDataOptions).Select(x => x.ToGDPRPersonalDataChoice()));
+            Assert.Equal(input.SpecificPersonalData.ToList(), AssertPropertyContainsDataChange(mappedGdpr.PersonalDataOptions).Select(x => x.ToGDPRPersonalDataChoice()));
         }
 
         [Fact]
@@ -415,7 +415,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = A<GDPRWriteRequestDTO>();
-            input.PersonalDataOptions = null;
+            input.SpecificPersonalData = null;
 
             //Act
             var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
@@ -1150,7 +1150,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noRetentionPeriodDefined) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.RetentionPeriodDefined));
             if (noNextDataRetentionEvaluationDate) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.NextDataRetentionEvaluationDate));
             if (noDataRetentionEvaluationFrequencyInMonths) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.DataRetentionEvaluationFrequencyInMonths));
-            if (noPersonalData) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.PersonalDataOptions));
+            if (noPersonalData) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.SpecificPersonalData));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.GDPR).WrapAsEnumerable().AsParameterMatch())).Returns(GDPRProperties);
         }

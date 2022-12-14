@@ -14,7 +14,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         public SimpleLinkDTO DirectoryDocumentation { get; set; }
         public IEnumerable<DataSensitivityLevelChoice> DataSensitivityLevels { get; set; }
         public IEnumerable<IdentityNamePairResponseDTO> SensitivePersonData { get; set; }
-        public IEnumerable<GDPRPersonalDataChoice> PersonalDataOptions { get; set; }
+        public IEnumerable<GDPRPersonalDataChoice> SpecificPersonalData { get; set; }
         public IEnumerable<IdentityNamePairResponseDTO> RegisteredDataCategories { get; set; }
         public YesNoDontKnowChoice? TechnicalPrecautionsInPlace { get; set; }
         public IEnumerable<TechnicalPrecautionChoice> TechnicalPrecautionsApplied { get; set; }

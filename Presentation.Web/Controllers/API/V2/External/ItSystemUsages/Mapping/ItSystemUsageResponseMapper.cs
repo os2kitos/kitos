@@ -74,7 +74,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     .Where(level => level.HasValue)
                     .Select(level => level.Value)
                     .ToList(),
-                PersonalDataOptions = systemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()),
+                SpecificPersonalData = systemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()).ToList(),
                 SensitivePersonData = attachedOptions
                     .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
                     .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))

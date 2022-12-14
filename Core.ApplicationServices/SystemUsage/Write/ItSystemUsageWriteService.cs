@@ -27,6 +27,7 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
+using dk.nita.saml20.Schema.Core;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -272,20 +273,23 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             var deltaResult = dataBefore.ComputeDelta(newOptions, x => x).ToList();
 
-            var addedItems = deltaResult.Where(x => x.delta == EnumerableExtensions.EnumerableDelta.Added).Select(x => x.item).ToList();
-            foreach (var option in addedItems)
+            foreach (var (delta, item) in deltaResult)
             {
-                var error = _systemUsageService.AddPersonalDataOption(systemUsage.Id, option);
-                if (error.HasValue) 
-                    return error;
-            }
-
-            var removedItems = deltaResult.Where(x => x.delta == EnumerableExtensions.EnumerableDelta.Removed).Select(x => x.item).ToList();
-            foreach (var option in removedItems)
-            {
-                var error = _systemUsageService.RemovePersonalDataOption(systemUsage.Id, option);
-                if (error.HasValue)
-                    return error.Value;
+                switch (delta)
+                {
+                    case EnumerableExtensions.EnumerableDelta.Added:
+                        var additionError = _systemUsageService.AddPersonalDataOption(systemUsage.Id, item);
+                        if (additionError.HasValue) 
+                            return additionError;
+                        break;
+                    case EnumerableExtensions.EnumerableDelta.Removed:
+                        var deletionError = _systemUsageService.RemovePersonalDataOption(systemUsage.Id, item);
+                        if (deletionError.HasValue)
+                            return deletionError.Value;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
             return Maybe<OperationError>.None;

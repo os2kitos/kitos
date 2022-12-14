@@ -461,7 +461,7 @@ namespace Core.DomainModel.ItSystemUsage
             var removedPersonalData = new List<ItSystemUsagePersonalData>();
             if (dataLevelToRemove.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA)
             {
-                removedPersonalData = ResetPersonalData().ToList();
+                removedPersonalData.AddRange(ResetPersonalData());
             }
             SensitiveDataLevels.Remove(dataLevelToRemove);
 
@@ -903,7 +903,7 @@ namespace Core.DomainModel.ItSystemUsage
             var removedPersonalData = new List<ItSystemUsagePersonalData>();
             if (levels.Contains(SensitiveDataLevel.PERSONALDATA) == false)
             {
-                removedPersonalData = ResetPersonalData().ToList();
+                removedPersonalData.AddRange(ResetPersonalData());
             }
 
             levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
@@ -988,44 +988,50 @@ namespace Core.DomainModel.ItSystemUsage
             return new ItSystemUsageValidationResult(errors);
         }
 
-        public Maybe<OperationError> AddPersonalData(GDPRPersonalDataOption option)
+        public Result<ItSystemUsagePersonalData, OperationError> AddPersonalData(GDPRPersonalDataOption option)
         {
             if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
             {
-                return new OperationError("You cannot add a new PersonalData option before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
+                return new OperationError($"You cannot add a new PersonalData option before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
             }
 
-            if (PersonalDataOptions.Any(x => x.PersonalData == option))
+            if (GetPersonalData(option).HasValue)
             {
                 return new OperationError($"An option with value: '{option}' already exists", OperationFailure.Conflict);
             }
 
             var personalDataOption = new ItSystemUsagePersonalData() {ItSystemUsage = this, PersonalData = option};
             PersonalDataOptions.Add(personalDataOption);
-            return Maybe<OperationError>.None;
+            return personalDataOption;
         }
 
         public Result<ItSystemUsagePersonalData, OperationError> RemovePersonalData(GDPRPersonalDataOption option)
         {
             if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
             {
-                return new OperationError("You cannot remove a PersonalData option before adding SensitiveDataLevel.PersonalData", OperationFailure.BadState);
+                return new OperationError($"You cannot remove a PersonalData option before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
             }
 
-            var personalDataOption = PersonalDataOptions.FirstOrDefault(x => x.PersonalData == option);
-            if (personalDataOption == null)
+            var personalDataOptionResult = GetPersonalData(option);
+            if (personalDataOptionResult.IsNone)
                 return new OperationError($"PersonalData: \"{option}\" wasn't found", OperationFailure.NotFound);
 
+            var personalDataOption = personalDataOptionResult.Value;
             PersonalDataOptions.Remove(personalDataOption);
             return personalDataOption;
         }
 
-        public IEnumerable<ItSystemUsagePersonalData> ResetPersonalData()
+        private IEnumerable<ItSystemUsagePersonalData> ResetPersonalData()
         {
             var dataBeforeRemoval = PersonalDataOptions.ToList();
             PersonalDataOptions.Clear();
 
             return dataBeforeRemoval;
+        }
+
+        public Maybe<ItSystemUsagePersonalData> GetPersonalData(GDPRPersonalDataOption option)
+        {
+            return PersonalDataOptions.FirstOrDefault(x => x.PersonalData == option).FromNullable();
         }
 
         private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)

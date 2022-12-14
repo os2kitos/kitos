@@ -98,8 +98,8 @@
                                      ng-repeat="option in personalData.options">
                                     <label>
                                         <input type="checkbox"
+                                               id="{{option.textValue}}Checkbox"
                                                ng-model="option.checked"
-                                               data-element-type="{{option.textValue}}Checkbox"
                                                ng-disabled="!hasWriteAccess"
                                                ng-change="updatePersonalData(option)">
                                         {{option.text}}

@@ -397,6 +397,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Generic\selected-value-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-connection-change-logs.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-unit-migration.ts" />
     <TypeScriptCompile Include="app\models\users\user-deletion-strategy-type.ts" />

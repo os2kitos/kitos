@@ -495,10 +495,10 @@ namespace Tests.Unit.Core.Model
             var personalDataOption = A<GDPRPersonalDataOption>();
 
             //Act
-            var error = itSystemUsage.AddPersonalData(personalDataOption);
+            var result = itSystemUsage.AddPersonalData(personalDataOption);
 
             //Assert
-            Assert.False(error.HasValue);
+            Assert.False(result.Failed);
             Assert.Contains(personalDataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData));
         }
 
@@ -509,11 +509,11 @@ namespace Tests.Unit.Core.Model
             var personalDataOption = A<GDPRPersonalDataOption>();
 
             //Act
-            var error = _sut.AddPersonalData(personalDataOption);
+            var result = _sut.AddPersonalData(personalDataOption);
 
             //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
         }
 
         [Fact]
@@ -524,11 +524,11 @@ namespace Tests.Unit.Core.Model
             var itSystemUsage = CreateItSystemUsageWithSensitiveLevelPersonalData(personalDataOption);
 
             //Act
-            var error = itSystemUsage.AddPersonalData(personalDataOption);
+            var result = itSystemUsage.AddPersonalData(personalDataOption);
 
             //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.Conflict, error.Value.FailureType);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
         }
 
         [Fact]
@@ -560,20 +560,6 @@ namespace Tests.Unit.Core.Model
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-        }
-
-        [Fact]
-        public void ResetPersonalData_Clears_Data()
-        {
-            //Arrange
-            var personalDataOption = A<GDPRPersonalDataOption>();
-            var itSystemUsage = CreateItSystemUsageWithSensitiveLevelPersonalData(personalDataOption);
-
-            //Act
-            itSystemUsage.ResetPersonalData();
-
-            //Assert
-            Assert.Empty(itSystemUsage.PersonalDataOptions);
         }
 
         public static readonly object[][] ValidationInvalidData =

@@ -13,7 +13,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -801,8 +800,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
 
-            var gdprVersion2 = await CreateGDPRInputAsync(organization);
             var gdprVersion1 = await CreateGDPRInputAsync(organization);
+            var gdprVersion2 = await CreateGDPRInputAsync(organization);
             var gdprVersion3 = new GDPRWriteRequestDTO();
 
             gdprVersion2.SensitivePersonDataUuids = gdprVersion2.SensitivePersonDataUuids.Take(1).ToList();
@@ -1875,7 +1874,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 sensitivityLevels.Add(DataSensitivityLevelChoice.PersonData);
 
             gdprInput.DataSensitivityLevels = sensitivityLevels; //Must be unique
-            gdprInput.PersonalDataOptions = Many<GDPRPersonalDataChoice>().Distinct().ToList();
+            gdprInput.SpecificPersonalData = Many<GDPRPersonalDataChoice>().Distinct().ToList();
             gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
@@ -1908,7 +1907,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(gdprInput.RetentionPeriodDefined, gdprResponse.RetentionPeriodDefined);
             Assert.Equal(gdprInput.NextDataRetentionEvaluationDate, gdprResponse.NextDataRetentionEvaluationDate);
             Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
-            Assert.Equal(gdprInput.PersonalDataOptions ?? new List<GDPRPersonalDataChoice>().OrderBy(x => x), gdprResponse.PersonalDataOptions.OrderBy(x => x));
+            Assert.Equal(gdprInput.SpecificPersonalData ?? new List<GDPRPersonalDataChoice>().OrderBy(x => x), gdprResponse.SpecificPersonalData.OrderBy(x => x));
         }
 
         private static ItSystemUsageValidityWriteRequestDTO CreateValidityInput(DateTime baseDate, LifeCycleStatusChoice lifeCycleStatus)

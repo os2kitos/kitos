@@ -29,15 +29,15 @@ class ItSystemUsageGDPR {
     }
 
     static getPersonalCprCheckBox() {
-        return element(this.cssHelper.byDataElementType(this.consts.personalCprCheckbox));
+        return element(by.id(this.consts.personalCprCheckbox));
     }
 
     static getPersonalOtherPrivateCheckBox() {
-        return element(this.cssHelper.byDataElementType(this.consts.personalOtherPrivateCheckbox));
+        return element(by.id(this.consts.personalOtherPrivateCheckbox));
     }
 
     static getPersonalSocialProblemsCheckBox() {
-        return element(this.cssHelper.byDataElementType(this.consts.personalSocialProblemsCheckbox));
+        return element(by.id(this.consts.personalSocialProblemsCheckbox));
     }
 
     static getPrecautionsEncryptionCheckbox() {
