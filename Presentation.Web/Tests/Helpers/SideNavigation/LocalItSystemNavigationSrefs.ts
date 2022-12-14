@@ -3,7 +3,7 @@
     static exposedInterfacesSref = "it-system.usage.interfaces";
     static relationsSref = "it-system.usage.relation";
     static archivingSref = "it-system.usage.archiving";
-    static GPDRSref = "it-system.usage.GDPR";
+    static GDPRSref = "it-system.usage.GDPR";
     static adviceSref = "it-system.usage.advice";
     static rolesSref = "it-system.usage.roles";
     static referencesSref = "it-system.usage.references";
