@@ -38,7 +38,7 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
             .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
             .then(() => verifyRiskAssessmentFieldVisibility(systemName))
-            .then(() => testTabCustomization(systemName, "ItSystemUsages.gdpr", LocalItSystemNavigationSrefs.GPDRSref))
+            .then(() => testTabCustomization(systemName, "ItSystemUsages.gdpr", LocalItSystemNavigationSrefs.GDPRSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.advice", LocalItSystemNavigationSrefs.adviceSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.archiving", LocalItSystemNavigationSrefs.archivingSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.interfaces", LocalItSystemNavigationSrefs.exposedInterfacesSref))
@@ -122,9 +122,9 @@ describe("Local admin is able customize the IT-System usage UI", () => {
     function verifyRiskAssessmentFieldVisibility(systemName: string) {
         console.log(`Testing gdpr.riskAssessment visibility for system: ${systemName}`);
         return navigateToSystemUsage(systemName)
-            .then(() => navigation.findSubMenuElement(LocalItSystemNavigationSrefs.GPDRSref).click())
+            .then(() => navigation.findSubMenuElement(LocalItSystemNavigationSrefs.GDPRSref).click())
             .then(() => Select2Helper.selectWithNoSearch("Ja", consts.gdprRiskAssessmentSelect2Id))
-            .then(() => testFieldCustomization(systemName, "ItSystemUsages.gdpr.plannedRiskAssessmentDate", LocalItSystemNavigationSrefs.GPDRSref, "plannedRiskAssessmentDate"));
+            .then(() => testFieldCustomization(systemName, "ItSystemUsages.gdpr.plannedRiskAssessmentDate", LocalItSystemNavigationSrefs.GDPRSref, "plannedRiskAssessmentDate"));
     }
 
     function createName(prefix: string) {
