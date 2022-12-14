@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.UI.WebControls;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -107,7 +106,6 @@ namespace Core.ApplicationServices.Organizations
             }
             else
             {
-                _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(deleteResult.Value));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }
@@ -435,6 +433,7 @@ namespace Core.ApplicationServices.Organizations
                 return deleteRegistrationsError.Value;
             }
 
+            _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(organizationUnit));
             var error = organization.DeleteOrganizationUnit(organizationUnit);
             if (error.HasValue)
             {
