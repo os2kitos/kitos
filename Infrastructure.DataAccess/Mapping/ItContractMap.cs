@@ -87,6 +87,10 @@ namespace Infrastructure.DataAccess.Mapping
             HasMany(x => x.DataProcessingRegistrations)
                 .WithMany(x => x.AssociatedContracts);
 
+            HasMany(t => t.AssociatedDataProcessingRegistrations)
+                .WithRequired(t => t.ItContract)
+                .HasForeignKey(d => d.ItContractId);
+
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_Contract_Uuid", 0);

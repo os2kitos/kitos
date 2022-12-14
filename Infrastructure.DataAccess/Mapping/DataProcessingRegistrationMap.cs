@@ -70,6 +70,10 @@ namespace Infrastructure.DataAccess.Mapping
             HasMany(x => x.OversightOptions)
                 .WithMany(x => x.References);
 
+            HasOptional(x => x.MainContract)
+                .WithOptionalPrincipal()
+                .WillCascadeOnDelete(false);
+
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_DataProcessingRegistration_Uuid", 0);
