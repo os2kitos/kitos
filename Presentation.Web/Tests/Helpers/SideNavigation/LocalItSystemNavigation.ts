@@ -22,7 +22,7 @@ class LocalItSystemNavigation {
     }
 
     public static openGDPRPage() {
-        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.GPDRSref);
+        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.GDPRSref);
     }
 
     public static openDataProcessingPage() {

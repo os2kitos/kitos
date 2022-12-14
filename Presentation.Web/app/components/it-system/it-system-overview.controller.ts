@@ -267,7 +267,7 @@
             if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)) {
                 launcher = launcher.withToolbarEntry({
                     id: "gdprExportAnchor",
-                    title: "Exportér GPDR data til Excel",
+                    title: "Exportér GDPR data til Excel",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Link,
