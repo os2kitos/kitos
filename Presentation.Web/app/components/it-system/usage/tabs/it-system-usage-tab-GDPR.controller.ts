@@ -205,6 +205,7 @@
                                 notify.addSuccessMessage("Feltet er opdateret!");
                                 if (dataLevel === Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal.value) {
                                     $scope.usage.personalData = [];
+                                    $scope.personalData.options.forEach(option => option.checked = false);
                                 }
                             },
                             onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
