@@ -5,7 +5,8 @@
      */
     export enum CustomizableKitosModule {
         ItSystemUsage = "ItSystemUsages",
-        ItContract = "ItContracts"
+        ItContract = "ItContracts",
+        DataProcessingRegistrations = "DataProcessingRegistrations"
     }
 
     export interface IUICustomizationTreeVisitor {
