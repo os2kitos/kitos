@@ -120,7 +120,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             //Assert
             Assert.True(error.HasValue);
             Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
-            VerifyChangesNotSaved(transaction, organization);
+            VerifyChangesNotSaved(transaction, organization, false);
         }
 
         [Fact]
@@ -230,7 +230,9 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
                 SynchronizationDepth = oldDepth
             };
 
-            organization.AddOrganizationUnit(CreateOrganizationUnit(organization, true), organization.GetRoot());
+            var deletedUnit = CreateOrganizationUnit(organization, true);
+            var deletedUnitExternalUuid = deletedUnit.ExternalOriginUuid;
+            organization.AddOrganizationUnit(deletedUnit, organization.GetRoot());
 
             var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
 
@@ -246,6 +248,8 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             var changeLog = Assert.Single(organization.StsOrganizationConnection.StsOrganizationChangeLogs);
             var log = Assert.Single(changeLog.Entries);
             Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Deleted, log.Type);
+            Assert.Equal(deletedUnitExternalUuid.GetValueOrDefault(),log.ExternalUnitUuid);
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<OrganizationUnit>>(ev => ev.Entity == deletedUnit)));
         }
 
         [Fact]

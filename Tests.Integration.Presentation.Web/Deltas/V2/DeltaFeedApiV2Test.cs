@@ -117,6 +117,7 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
         [InlineData(TrackedEntityTypeChoice.ItSystem)]
         [InlineData(TrackedEntityTypeChoice.ItSystemUsage)]
         [InlineData(TrackedEntityTypeChoice.ItInterface)]
+        [InlineData(TrackedEntityTypeChoice.OrganizationUnit)]
         public async Task GetDeletedItems_With_EntityTypeFilter(TrackedEntityTypeChoice entityType)
         {
             //Arrange
@@ -126,12 +127,14 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             var systemUsage = await CreateItItSystemUsageAsync(token, organization);
             var contract = await CreateItContractAsync(token, organization);
             var itInterface = await CreateItItInterfaceAsync(token, organization);
+            var createdOrgUnit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>(), parentId: organization.Root.Id);
 
             await DeleteDprAsync(token, dpr);
             await ItContractV2Helper.DeleteContractAsync(token, contract.Uuid);
             await ItSystemHelper.DeleteItSystemAsync(system.Id, system.OrganizationId);
             await ItSystemUsageV2Helper.DeleteAsync(token, systemUsage.Uuid);
             await InterfaceHelper.DeleteInterfaceAsync(itInterface.Id);
+            await OrganizationUnitHelper.DeleteUnitAsync(organization.Uuid, createdOrgUnit.Uuid);
 
             //Act
             var dtos = await DeltaFeedV2Helper.GetDeletedEntitiesAsync(token, entityType);
