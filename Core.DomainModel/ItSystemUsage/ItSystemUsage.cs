@@ -992,7 +992,7 @@ namespace Core.DomainModel.ItSystemUsage
         {
             if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
             {
-                return new OperationError($"You cannot add a new PersonalData option before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
+                return new OperationError($"You cannot add {nameof(PersonalDataOptions)} before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
             }
 
             if (GetPersonalData(option).HasValue)
@@ -1009,7 +1009,7 @@ namespace Core.DomainModel.ItSystemUsage
         {
             if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
             {
-                return new OperationError($"You cannot remove a PersonalData option before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
+                return new OperationError($"You cannot remove {nameof(PersonalDataOptions)} before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
             }
 
             var personalDataOptionResult = GetPersonalData(option);
