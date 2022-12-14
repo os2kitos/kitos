@@ -8,5 +8,6 @@
         ItContract = 3,
         DataProcessingRegistration = 4,
         //5 used to be ItProject
+        OrganizationUnit = 6,
     }
 }

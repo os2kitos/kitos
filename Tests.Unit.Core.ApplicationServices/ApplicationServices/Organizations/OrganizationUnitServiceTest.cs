@@ -153,7 +153,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Fact]
-        public void DeleteSelectedOrganizationRegistrations_Returns_NotFound_When_Unit_NotFound()
+        public void DeleteRegistrations_Returns_NotFound_When_Unit_NotFound()
         {
             //Arrange
             var orgUuid = A<Guid>();
@@ -177,7 +177,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Fact]
-        public void DeleteSelectedOrganizationRegistrations_Returns_Forbidden()
+        public void DeleteRegistrations_Returns_Forbidden()
         {
             //Arrange
             var orgUuid = A<Guid>();
@@ -610,6 +610,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(deleteError.IsNone);
             _databaseControl.Verify(x => x.SaveChanges(), Times.Once());
             transaction.Verify(x => x.Commit(), Times.Once());
+            _domainEvents.Verify(x=>x.Raise(It.Is<EntityBeingDeletedEvent<OrganizationUnit>>(ev=>ev.Entity == toRemove)));
         }
 
         [Fact]

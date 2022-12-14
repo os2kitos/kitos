@@ -25,9 +25,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization = await CreateOrganizationAsync();
             var taskRef = DatabaseAccess.MapFromEntitySet<TaskRef, TaskRef>(refs => refs.AsQueryable().First());
             var (_, token) = await CreateApiUser(organization);
-            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
-            var unit1_1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
-            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
+            var unit1_1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), unit1.Id);
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
 
             //Act
             var units = (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid)).ToList();
@@ -49,9 +49,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var rootUnitUnfo = DatabaseAccess.MapFromEntitySet<OrganizationUnit, (Guid, string)>(units => units.AsQueryable().ByOrganizationId(organization.Id).First(x => x.Parent == null).Transform(root => (root.Uuid, root.Name)));
             var (_, token) = await CreateApiUser(organization);
             var nameContent = $"_S_{A<uint>() % 10000}_E_";
-            var matched1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, $"{nameContent}{CreateName()}");
-            await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), matched1.Id); //unmatched
-            var matched2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, $"{CreateName()}{nameContent}");
+            var matched1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, $"{nameContent}{CreateName()}");
+            await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), matched1.Id); //unmatched
+            var matched2 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, $"{CreateName()}{nameContent}");
 
             //Act
             var units = (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, nameQuery: nameContent)).ToList();
@@ -98,7 +98,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization = await CreateOrganizationAsync();
             var rootUnitUnfo = DatabaseAccess.MapFromEntitySet<OrganizationUnit, (Guid, string)>(units => units.AsQueryable().ByOrganizationId(organization.Id).First(x => x.Parent == null).Transform(root => (root.Uuid, root.Name)));
             var (_, token) = await CreateApiUser(organization);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
 
             //Act
             var dto = await OrganizationUnitV2Helper.GetOrganizationUnitAsync(token, organization.Uuid, unit.Uuid);
@@ -114,7 +114,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization1 = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
             var (_, token) = await CreateApiUser(organization2);
-            var unit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization1.Id, CreateName());
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization1.Id, CreateName());
 
             //Act - try to get unit from organization where I have no access
             using var response = await OrganizationUnitV2Helper.SendGetOrganizationUnitAsync(token, organization1.Uuid, unit.Uuid);
