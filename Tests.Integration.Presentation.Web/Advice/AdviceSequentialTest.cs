@@ -20,7 +20,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         {
             //Arrange
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
-            var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Immediate, recipient);
+            var createAdvice = CreateAdvice(Scheduling.Day, AdviceType.Immediate, recipient);
 
             using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
@@ -37,7 +37,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             Assert.Equal(HttpStatusCode.BadRequest, deleteResult.StatusCode);
         }
 
-        private Core.DomainModel.Advice.Advice CreateDefaultAdvice(Scheduling schedule, AdviceType type, AdviceUserRelation recipient)
+        private Core.DomainModel.Advice.Advice CreateAdvice(Scheduling schedule, AdviceType type, AdviceUserRelation recipient)
         {
             return new Core.DomainModel.Advice.Advice
             {

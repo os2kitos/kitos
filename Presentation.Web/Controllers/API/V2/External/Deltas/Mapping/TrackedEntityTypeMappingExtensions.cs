@@ -20,7 +20,8 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas.Mapping
                 { TrackedEntityTypeChoice.ItContract,TrackedEntityType.ItContract },
                 { TrackedEntityTypeChoice.ItSystemUsage,TrackedEntityType.ItSystemUsage },
                 { TrackedEntityTypeChoice.ItSystem,TrackedEntityType.ItSystem },
-                { TrackedEntityTypeChoice.ItInterface,TrackedEntityType.ItInterface }
+                { TrackedEntityTypeChoice.ItInterface,TrackedEntityType.ItInterface },
+                { TrackedEntityTypeChoice.OrganizationUnit,TrackedEntityType.OrganizationUnit }
             }.AsReadOnly();
 
             DataToApiMap = ApiToDataMap

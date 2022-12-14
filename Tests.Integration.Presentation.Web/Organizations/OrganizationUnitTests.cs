@@ -17,8 +17,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Arrange
             var organizationDto = await CreateOrganizationAsync();
             var root = await OrganizationUnitHelper.GetOrganizationUnitsAsync(organizationDto.Id);
-            var newUnit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationDto.Id, A<string>(), root.Id);
-            var newUnit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationDto.Id, A<string>(), root.Id);
+            var newUnit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationDto.Id, A<string>(), root.Id);
+            var newUnit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationDto.Id, A<string>(), root.Id);
 
             var newName = A<string>();
             var newParentId = newUnit2.Id;
