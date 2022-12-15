@@ -106,6 +106,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     ? MapCrossReferences(source.SensitivePersonDataUuids) 
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
+                PersonalDataOptions = rule.MustUpdate(x => x.GDPR.SpecificPersonalData)
+                    ? MapEnumList(source.SpecificPersonalData, GDPRPersonalDataMappingExtensions.ToGDPRPersonalDataOption)
+                    : OptionalValueChange<Maybe<IEnumerable<GDPRPersonalDataOption>>>.None,
+
                 RegisteredDataCategoryUuids = rule.MustUpdate(x => x.GDPR.RegisteredDataCategoryUuids) 
                     ? MapCrossReferences(source.RegisteredDataCategoryUuids) 
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,

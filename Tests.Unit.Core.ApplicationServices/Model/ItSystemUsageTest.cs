@@ -287,9 +287,36 @@ namespace Tests.Unit.Core.Model
             //Assert
             Assert.True(result.Ok);
             var usageSensitiveDataLevel = result.Value;
-            Assert.Equal(preAddedSensitiveDataLevel, usageSensitiveDataLevel);
+            Assert.Equal(preAddedSensitiveDataLevel, usageSensitiveDataLevel.RemovedRiskLevel);
             Assert.Empty(_sut.SensitiveDataLevels);
 
+        }
+
+        [Fact]
+        public void Remove_PersonalData_From_SensitiveData_Clears_PersonalData()
+        {
+            //Arrange
+            var sensitiveDataLevel = SensitiveDataLevel.PERSONALDATA;
+            var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = _sut,
+                SensitivityDataLevel = sensitiveDataLevel,
+            };
+            _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
+
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData{PersonalData= GDPRPersonalDataOption.CprNumber});
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData=GDPRPersonalDataOption.OtherPrivateMatters});
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData = GDPRPersonalDataOption.SocialProblems});
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(sensitiveDataLevel);
+
+            //Assert
+            Assert.True(result.Ok);
+            var usageSensitiveDataLevel = result.Value;
+            Assert.Equal(preAddedSensitiveDataLevel, usageSensitiveDataLevel.RemovedRiskLevel);
+            Assert.Empty(_sut.SensitiveDataLevels);
+            Assert.Empty(_sut.PersonalDataOptions);
         }
 
         [Fact]
@@ -460,6 +487,81 @@ namespace Tests.Unit.Core.Model
             Assert.True(validity.Result);
         }
 
+        [Fact]
+        public void AddPersonalData_Adds_PersonalData()
+        {
+            //Arrange
+            var itSystemUsage = CreateItSystemUsageWithSensitiveLevelPersonalData();
+            var personalDataOption = A<GDPRPersonalDataOption>();
+
+            //Act
+            var result = itSystemUsage.AddPersonalData(personalDataOption);
+
+            //Assert
+            Assert.False(result.Failed);
+            Assert.Contains(personalDataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData));
+        }
+
+        [Fact]
+        public void AddPersonalData_Returns_BadState_If_SensitiveDataPersonalData_Not_Present()
+        {
+            //Arrange
+            var personalDataOption = A<GDPRPersonalDataOption>();
+
+            //Act
+            var result = _sut.AddPersonalData(personalDataOption);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void AddPersonalData_Returns_Conflict_If_Data_Already_Present()
+        {
+            //Arrange
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            var itSystemUsage = CreateItSystemUsageWithSensitiveLevelPersonalData(personalDataOption);
+
+            //Act
+            var result = itSystemUsage.AddPersonalData(personalDataOption);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void RemovePersonalData_Removes_PersonalData()
+        {
+            //Arrange
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            var itSystemUsage = CreateItSystemUsageWithSensitiveLevelPersonalData(personalDataOption);
+
+            //Act
+            var result = itSystemUsage.RemovePersonalData(personalDataOption);
+
+            //Assert
+            Assert.False(result.Failed);
+            Assert.DoesNotContain(personalDataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData));
+            Assert.Equal(personalDataOption, result.Value.PersonalData);
+        }
+
+        [Fact]
+        public void RemovePersonalData_Returns_NotFound()
+        {
+            //Arrange
+            var personalDataOption = A<GDPRPersonalDataOption>();
+            var itSystemUsage = CreateItSystemUsageWithSensitiveLevelPersonalData();
+
+            //Act
+            var result = itSystemUsage.RemovePersonalData(personalDataOption);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
         public static readonly object[][] ValidationInvalidData =
         {
             new object[]
@@ -509,7 +611,7 @@ namespace Tests.Unit.Core.Model
             new object[] { LifeCycleStatusType.PhasingOut, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
         };
         
-        private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)
+        private static void AssertErrorResult<T>(Result<T, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);
             var operationError = result.Error;
@@ -518,5 +620,22 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(message, operationError.Message.Value);
         }
 
+        private static ItSystemUsage CreateItSystemUsageWithSensitiveLevelPersonalData(GDPRPersonalDataOption? personalDataOption = null)
+        {
+            var usage = new ItSystemUsage
+            {
+                SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>
+                {
+                    new() {SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA}
+                }
+            };
+
+            if (personalDataOption.HasValue)
+            {
+                usage.PersonalDataOptions = new List<ItSystemUsagePersonalData>{ new (){PersonalData = personalDataOption.Value}};
+            }
+
+            return usage;
+        }
     }
 }

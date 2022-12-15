@@ -91,8 +91,21 @@
                             </label>
                             <span class="help-block small inlineTab">
                                 <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                F.eks.: Navn, adresse, telefonummer, e-mailadresse, CPR-nr, titel m.m.
+                                F.eks.: Navn, adresse, telefonummer, e-mailadresse, titel m.m.
                             </span>
+                            <div ng-if="usageViewModel.personalDataSelected">
+                                <div class="checkbox inlineTab"
+                                     ng-repeat="option in personalData.options">
+                                    <label>
+                                        <input type="checkbox"
+                                               id="{{::option.textValue}}Checkbox"
+                                               ng-model="option.checked"
+                                               ng-disabled="!hasWriteAccess"
+                                               ng-change="updatePersonalData(option)">
+                                        {{::option.text}}
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <div class="checkbox">
                             <label>

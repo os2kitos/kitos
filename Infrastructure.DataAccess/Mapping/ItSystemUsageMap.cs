@@ -68,6 +68,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.ItSystemUsage)
                 .WillCascadeOnDelete(true);
 
+            HasMany(x => x.PersonalDataOptions)
+                .WithRequired(o => o.ItSystemUsage)
+                .HasForeignKey(o => o.ItSystemUsageId)
+                .WillCascadeOnDelete(true);
+
             Property(x => x.Version)
                 .HasMaxLength(ItSystemUsage.DefaultMaxLength)
                 .HasIndexAnnotation("ItSystemUsage_Index_Version", 0);

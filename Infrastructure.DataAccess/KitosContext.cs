@@ -62,6 +62,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOrgUnitUsage> ItSystemUsageOrgUnitUsages { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
+        public DbSet<ItSystemUsagePersonalData> ItSystemUsagePersonalDataOptions { get; set; }
         public DbSet<ItSystemCategories> ItSystemCategories { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
@@ -223,6 +224,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new BrokenLinkInExternalReferenceMap());
             modelBuilder.Configurations.Add(new BrokenLinkInInterfaceMap());
             modelBuilder.Configurations.Add(new ItSystemUsageSensitiveDataLevelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsagePersonalDataOptionsMap());
             modelBuilder.Configurations.Add(new SsoUserIdentityMap());
             modelBuilder.Configurations.Add(new StsOrganizationIdentityMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationMap());

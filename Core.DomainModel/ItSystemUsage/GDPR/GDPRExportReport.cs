@@ -20,6 +20,9 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public DateTime? RiskAssessmentDate { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
         public RiskLevel? PreRiskAssessment { get; set; }
+        public bool PersonalDataCpr { get; set; }
+        public bool PersonalDataSocialProblems { get; set; }
+        public bool PersonalDataSocialOtherPrivateMatters { get; set; }
         public DataOptions? DPIA { get; set; }
         public HostedAt? HostedAt { get; set; }
     }

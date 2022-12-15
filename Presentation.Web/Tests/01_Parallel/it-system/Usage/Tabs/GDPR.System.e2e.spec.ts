@@ -56,6 +56,7 @@ describe("Global admin is able to", () => {
                 .then(() => fillOutCheckboxes())
                 .then(() => fillOutDropDown())
                 .then(() => fillOutPrecautionsCheckboxes())
+                .then(() => fillOutPersonalDataCheckboxes())
                 .then(() => fillOutDateFields())
                 .then(() => fillOutTextFields())
                 .then(() => fillOutLinkFields())
@@ -82,6 +83,13 @@ describe("Global admin is able to", () => {
             .then(() => ItSystemUsageGDPRPage.getPrecautionsPseudonomiseringCheckbox().click())
             .then(() => ItSystemUsageGDPRPage.getPrecautionsAccessControlCheckbox().click())
             .then(() => ItSystemUsageGDPRPage.getPrecautionsLogningCheckbox().click())
+            .then(() => browser.waitForAngular());
+    }
+
+    function fillOutPersonalDataCheckboxes() {
+        return ItSystemUsageGDPRPage.getPersonalCprCheckBox().click()
+            .then(() => ItSystemUsageGDPRPage.getPersonalOtherPrivateCheckBox().click())
+            .then(() => ItSystemUsageGDPRPage.getPersonalSocialProblemsCheckBox().click())
             .then(() => browser.waitForAngular());
     }
 
@@ -161,6 +169,10 @@ describe("Global admin is able to", () => {
         expectCheckboxValue(consts.precautionsPseudonomiseringCheckbox, true);
         expectCheckboxValue(consts.precautionsAccessControlCheckbox, true);
         expectCheckboxValue(consts.precautionsLogningCheckbox, true);
+        console.log("Personal data boxes");
+        expectCheckboxValueById(consts.personalCprCheckbox, true);
+        expectCheckboxValueById(consts.personalSocialProblemsCheckbox, true);
+        expectCheckboxValueById(consts.personalOtherPrivateCheckbox, true);
     }
 
     function verifyDropDown() {
@@ -220,6 +232,11 @@ describe("Global admin is able to", () => {
     function expectCheckboxValue(checkBoxDataElementType: string, toBe: boolean) {
         console.log(`Checking value for ${checkBoxDataElementType} value to be ${toBe}`);
         return expect(element(cssHelper.byDataElementType(checkBoxDataElementType)).isSelected()).toBe(toBe);
+    }
+
+    function expectCheckboxValueById(checkBoxDataElementType: string, toBe: boolean) {
+        console.log(`Checking value for ${checkBoxDataElementType} value to be ${toBe}`);
+        return expect(element(by.id(checkBoxDataElementType)).isSelected()).toBe(toBe);
     }
 
     function expectDropdownValueToEqual(expectedValue: string, idOfDropDownBox: string) {
