@@ -81,7 +81,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registration.Id, oversightCompleted).DisposeAsync();
 
             await DataProcessingRegistrationHelper.SendUpdateOversightScheduledInspectionDate(registration.Id, oversightScheduledInspectionDate).DisposeAsync();
-
+            
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(registration.Id);
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(registration.Id, role.Id);
@@ -141,6 +141,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var assignDataProcessingResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contractDto.Id, registration.Id);
             Assert.Equal(HttpStatusCode.OK, assignDataProcessingResponse.StatusCode);
 
+            await DataProcessingRegistrationHelper.SendUpdateMainContractRequestAsync(registration.Id, contractDto.Id);
+
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -170,6 +172,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
             Assert.Equal(itSystemDto.Uuid.ToString(), readModel.SystemUuidsAsCsv);
             Assert.Equal(oversightDate, readModel.LatestOversightDate);
+            Assert.Equal(contractDto.Id, readModel.MainContractId);
+            Assert.True(readModel.MainContractIsActive);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

@@ -118,8 +118,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
                 MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
-                    ? (dto.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
-                    : OptionalValueChange<Maybe<Guid>>.None
+                    ? dto.MainContractUuid.AsChangedValue()
+                    : OptionalValueChange<Guid?>.None
             };
         }
 

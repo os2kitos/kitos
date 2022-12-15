@@ -935,6 +935,8 @@ namespace Presentation.Web.Controllers.API.V1
                     .FromNullable()
                     .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
                     .GetValueOrDefault(),
+                MainContractId = value.MainContractId,
+                MainContractIsActive = value.IsActiveAccordingToMainContract,
                 DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>()
                 {
                     Value = value

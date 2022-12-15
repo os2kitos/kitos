@@ -980,5 +980,34 @@ namespace Tests.Integration.Presentation.Web.GDPR
             dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Null(dto.OversightScheduledInspectionDate);
         }
+
+        [Fact]
+        public async Task Can_Assign_And_Remove_MainContract()
+        {
+            //Arrange
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            var contract = await ItContractHelper.CreateContract(A<string>(), organizationId);
+            var assignDprToContractResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract.Id, registration.Id);
+            Assert.Equal(HttpStatusCode.OK, assignDprToContractResponse.StatusCode);
+
+            //Act
+            using var assignResponse = await DataProcessingRegistrationHelper.SendUpdateMainContractRequestAsync(registration.Id, contract.Id);
+
+            //Assert - main contract added
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Equal(dto.MainContractId, contract.Id);
+
+            //Act - remove
+            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveMainContractRequestAsync(registration.Id, contract.Id);
+
+            //Assert - main contract removed
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Null(dto.MainContractId);
+        }
     }
 }

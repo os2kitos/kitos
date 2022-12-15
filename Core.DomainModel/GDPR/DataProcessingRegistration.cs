@@ -359,6 +359,7 @@ namespace Core.DomainModel.GDPR
             if (contract == null)
                 return new OperationError($"Contract with id: {contractId} is not associated with this data processing registration", OperationFailure.NotFound);
 
+            ResetMainContract();
             MainContract = contract;
 
             return Maybe<OperationError>.None;

@@ -333,9 +333,9 @@ namespace Core.ApplicationServices.GDPR.Write
                 .MatchFailure();
         }
 
-        private Result<DataProcessingRegistration, OperationError> UpdateMainContract(DataProcessingRegistration dpr, Maybe<Guid> contractId)
+        private Result<DataProcessingRegistration, OperationError> UpdateMainContract(DataProcessingRegistration dpr, Guid? contractId)
         {
-            if (contractId.IsNone)
+            if (!contractId.HasValue)
             {
                 dpr.ResetMainContract();
                 return dpr;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -77,6 +78,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Empty(general.DataProcessors);
             Assert.Null(general.HasSubDataProcessors);
             Assert.Empty(general.SubDataProcessors);
+            Assert.Null(general.MainContract);
 
             var oversight = dto.Oversight;
             Assert.Empty(oversight.OversightOptions);
@@ -115,6 +117,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOrganizations(dpr.DataProcessors, general.DataProcessors);
             AssertYesNoUndecided(dpr.HasSubDataProcessors, general.HasSubDataProcessors);
             AssertOrganizations(dpr.SubDataProcessors, general.SubDataProcessors);
+            AssertIdentity(dpr.MainContract, general.MainContract);
         }
 
         [Theory]
@@ -334,6 +337,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             dpr.DataProcessors = new List<Organization> { CreateOrganization(), CreateOrganization() };
             dpr.HasSubDataProcessors = A<YesNoUndecidedOption>();
             dpr.SubDataProcessors = new List<Organization> { CreateOrganization(), CreateOrganization() };
+            dpr.MainContract = new ItContract() { Uuid = A<Guid>(), Name = A<string>()};
         }
 
         private void AssignRoles(DataProcessingRegistration dpr)

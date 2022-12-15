@@ -15,6 +15,7 @@ using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
@@ -1009,6 +1010,56 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
+        public void Can_Create_With_GeneralData_MainContract(bool hasMainContract)
+        {
+            //Arrange
+            var inputUuids = hasMainContract ? A<Guid?>() : null;
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                MainContractUuid = inputUuids.AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
+            Assert.NotNull(contract);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, contract.Id);
+            
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_MainContract_If_UpdateMultiAssignment_Fails()
+        {
+            //Arrange
+            var inputUuids = A<Guid?>();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                MainContractUuid = inputUuids.AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
+            Assert.NotNull(contract);
+            var operationError = A<OperationError>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, contract.Id);
+            ExpectCreateDataProcessingRegistrationReturns(A<int>(), parameters, parameters.Name.NewValue, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
         public void Can_Create_With_SystemUsages(bool hasUsages)
         {
             //Arrange
@@ -1977,7 +2028,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createdRegistration = new DataProcessingRegistration
             {
                 Id = A<int>(),
-                Uuid = A<Guid>()
+                Uuid = A<Guid>(),
+                AssociatedContracts = new List<ItContract> { new(){ Id = A<int>()}}
             };
             var transaction = ExpectTransaction();
             var orgDbId = A<int>();

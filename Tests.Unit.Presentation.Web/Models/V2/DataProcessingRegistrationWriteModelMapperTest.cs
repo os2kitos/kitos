@@ -150,7 +150,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedGeneralDataPropertiesInput()
         {
-            return CreateGetUndefinedSectionsInput(11);
+            return CreateGetUndefinedSectionsInput(12);
         }
 
         public static IEnumerable<object[]> GetUndefinedOversightDataPropertiesInput()
@@ -249,11 +249,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noInsecureCountries,
             bool noDataProcessors,
             bool noHasSubDataProcessors,
-            bool noSubDataProcessors)
+            bool noSubDataProcessors, 
+            bool noMainContract)
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
-            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors);
+            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors, noMainContract);
 
             //Act
             var output = _sut.FromPATCH(input).General.Value;
@@ -285,11 +286,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noInsecureCountries,
            bool noDataProcessors,
            bool noHasSubDataProcessors,
-           bool noSubDataProcessors)
+           bool noSubDataProcessors,
+           bool noMainContract)
         {
             //Arrange
             var input = new CreateDataProcessingRegistrationRequestDTO();
-            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors);
+            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors, noMainContract);
 
             //Act
             var output = _sut.FromPOST(input).General.Value;
@@ -321,11 +323,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noInsecureCountries,
             bool noDataProcessors,
             bool noHasSubDataProcessors,
-            bool noSubDataProcessors)
+            bool noSubDataProcessors,
+            bool noMainContract)
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
-            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors);
+            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors, noMainContract);
 
             //Act
             var output = _sut.FromPUT(input).General.Value;
@@ -528,6 +531,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertNullableCollection(input, input.DataProcessorUuids, output.DataProcessorUuids);
             Assert.Equal(input.HasSubDataProcessors?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.HasSubDataProcessors));
             AssertNullableCollection(input, input.SubDataProcessorUuids, output.SubDataProcessorUuids);
+            Assert.Equal(input.MainContractUuid, AssertPropertyContainsDataChange(output.MainContractUuid));
         }
 
         private static void AssertNullableCollection(DataProcessingRegistrationGeneralDataWriteRequestDTO input, IEnumerable<Guid> fromCollection, OptionalValueChange<Maybe<IEnumerable<Guid>>> actualCollection)
@@ -592,7 +596,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noInsecureCountries,
            bool noDataProcessors,
            bool noHasSubDataProcessors,
-           bool noSubDataProcessors)
+           bool noSubDataProcessors,
+           bool noMainContract)
         {
             var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
 
@@ -607,6 +612,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataProcessorUuids));
             if (noHasSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.HasSubDataProcessors));
             if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
+            if (noMainContract) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.MainContractUuid));
 
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General).WrapAsEnumerable().AsParameterMatch()))
