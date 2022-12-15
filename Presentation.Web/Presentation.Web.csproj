@@ -398,6 +398,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\data-processing-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\selected-value-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-connection-change-logs.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-unit-migration.ts" />
@@ -1183,6 +1184,7 @@
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\data-processing-registration.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\local-admin.data-processing-registration.ui-customization.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.it-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.oversight.e2e.spec.ts" />
@@ -1239,6 +1241,7 @@
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigationSrefs.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemUsageHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\ui-customization-test-helper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\CSSLocatorHelper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\kendoToolbarWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\navigationBarWrapper.ts" />

@@ -16,7 +16,8 @@
             "user",
             "userAccessRights",
             "kendoGridLauncherFactory",
-            "dataProcessingRegistrationOptions"
+            "dataProcessingRegistrationOptions",
+            "uiState"
         ];
 
         constructor(
@@ -26,10 +27,16 @@
             user,
             userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
-            dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions) {
+            dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI
+        ) {
 
             //Prepare the page
             $rootScope.page.title = "Databehandling - Overblik";
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.DataProcessingUiCustomizationBluePrint;
+            const isRolesAvailable = uiState.isBluePrintNodeAvailable(blueprint.children.roles);
+            const isExternalReferencesAvailable = uiState.isBluePrintNodeAvailable(blueprint.children.references);
+            const isScheduledInspectionDateAvailable = uiState.isBluePrintNodeAvailable(blueprint.children.oversight.children.scheduledInspectionDate);
 
             // Column names for specific parameter mapping
             const transferToInsecureThirdCountriesColumnName = "TransferToInsecureThirdCountries";
@@ -162,6 +169,7 @@
                             .withDataSourceName("MainReferenceTitle")
                             .withTitle("Reference")
                             .withId("dpReferenceId")
+                            .withInclusionCriterion(() => isExternalReferencesAvailable)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(
                                 dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.MainReferenceTitle,
@@ -174,6 +182,7 @@
                             .withDataSourceName("MainReferenceUserAssignedId")
                             .withTitle("Dokument ID / Sagsnr.")
                             .withId("dpReferenceUserAssignedId")
+                            .withInclusionCriterion(() => isExternalReferencesAvailable)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceId(dataItem.MainReferenceUserAssignedId))
                             .withInitialVisibility(false))
@@ -318,7 +327,7 @@
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(
                                 dataItem.IsAgreementConcluded &&
                                 Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(dataItem.IsAgreementConcluded))))
-                        .withColumn(builder =>
+                    .withColumn(builder =>
                         builder
                             .withDataSourceName("AgreementConcludedAt")
                             .withTitle("Dato for indgåelse af databehandleraftale")
@@ -401,13 +410,14 @@
                                 Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
                     .withColumn(builder =>
                         builder
-                        .withDataSourceName("OversightScheduledInspectionDate")
-                        .withTitle("Kommende planlagt tilsyn")
-                        .withId("scheduledInspectionDate")
-                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withStandardWidth(190)
-                        .withRendering((dataItem) => Helpers.RenderFieldsHelper.renderDate(dataItem.OversightScheduledInspectionDate)))
+                            .withDataSourceName("OversightScheduledInspectionDate")
+                            .withTitle("Kommende planlagt tilsyn")
+                            .withId("scheduledInspectionDate")
+                            .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                            .withStandardWidth(190)
+                            .withInclusionCriterion(() => isScheduledInspectionDateAvailable)
+                            .withRendering((dataItem) => Helpers.RenderFieldsHelper.renderDate(dataItem.OversightScheduledInspectionDate)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("LatestOversightDate")
@@ -436,19 +446,21 @@
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt)))
                     .withStandardSorting("Name");
 
-            dataProcessingRegistrationOptions.roles.forEach(role =>
-                launcher = launcher.withColumn(builder =>
-                    builder
-                        .withDataSourceName(getRoleKey(role))
-                        .withTitle(role.name)
-                        .withId(`dpa${getRoleKey(role)}`)
-                        .withContentOverflow()
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
-                        .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-registration.roles", dataItem.SourceEntityId, dpaRoleIdToUserNamesMap[dataItem.Id][role.id]))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaRoleIdToUserNamesMap[dataItem.Id][role.id])))
-            );
+            if (isRolesAvailable) {
+                dataProcessingRegistrationOptions.roles.forEach(role =>
+                    launcher = launcher.withColumn(builder =>
+                        builder
+                            .withDataSourceName(getRoleKey(role))
+                            .withTitle(role.name)
+                            .withId(`dpa${getRoleKey(role)}`)
+                            .withContentOverflow()
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
+                            .withInitialVisibility(false)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-registration.roles", dataItem.SourceEntityId, dpaRoleIdToUserNamesMap[dataItem.Id][role.id]))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaRoleIdToUserNamesMap[dataItem.Id][role.id])))
+                );
+            }
 
             //Launch kendo grid
             launcher.launch();
@@ -474,6 +486,9 @@
                                 .getOverviewAuthorization()],
                         dataProcessingRegistrationOptions: [
                             "dataProcessingRegistrationService", "user", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, user) => dataProcessingRegistrationService.getApplicableDataProcessingRegistrationOptions(user.currentOrganizationId)
+                        ],
+                        uiState: [
+                            "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.DataProcessingRegistrations)
                         ]
                     }
                 });

@@ -1,6 +1,9 @@
 ﻿<form class="form-horizontal">
     <!-- show/hide-module -->
     <div class="form-group">
+        <div class="col-xs-12">
+            <inline-help-text data-key="local_config_data-processing_ui_customization" data-default-title="Tilpasning af UI" />
+        </div>
         <label class="col-xs-2 control-label">
             Generelt
         </label>
@@ -11,6 +14,15 @@
                     Medtag dette modul
                 </label>
             </div>
+        </div>
+        <div class="margin-top col-xs-12">&nbsp;</div>
+        <label class="col-xs-2 control-label noMargin" ng-if="config.showDataProcessing">
+            Faneblade og felter:
+        </label>
+
+        <!-- Local UI config for Dataprocessing module -->
+        <div class="col-xs-10" ng-if="config.showDataProcessing">
+            <data-local-ui-customization data-customized-module-id="DataProcessingRegistrations" />
         </div>
     </div>
 
