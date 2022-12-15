@@ -4,16 +4,20 @@
     export class EditDataProcessingRegistrationController {
         static $inject: Array<string> = [
             "$rootScope",
-            "userAccessRights"
+            "userAccessRights",
+            "uiState"
         ];
 
         constructor(
             private readonly $rootScope,
-            private readonly userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) {
+            private readonly userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO,
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI        ) {
 
             if (!this.userAccessRights.canDelete) {
                 _.remove(this.$rootScope.page.subnav.buttons, (o: any) => o.dataElementType === "removeDataProcessingRegistrationButton");
             }
+
+            //TODO: Use it along with the module state...
         }
     }
 
@@ -40,6 +44,9 @@
                     ],
                     dataProcessingRegistrationOptions: [
                         "dataProcessingRegistrationService", "user", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, user) => dataProcessingRegistrationService.getApplicableDataProcessingRegistrationOptions(user.currentOrganizationId)
+                    ],
+                    uiState: [
+                        "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.DataProcessingRegistrations)
                     ]
                 }
             });
