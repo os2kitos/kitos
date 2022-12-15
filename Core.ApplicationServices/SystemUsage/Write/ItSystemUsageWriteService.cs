@@ -281,7 +281,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         if (additionError.HasValue)
                         {
                             var error = additionError.Value;
-                            _logger.Error($"{error.FailureType}: {error.Message.GetValueOrDefault()}");
+                            _logger.Error("Failed removing personData {personDataType} from system usage ({uuid}) Error:{errorCode}: {errorMessage}", item, systemUsage.Uuid, error.FailureType, error.Message.GetValueOrFallback(string.Empty));
                             return additionError;
                         }
                         break;
@@ -290,7 +290,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         if (deletionError.HasValue)
                         {
                             var error = deletionError.Value;
-                            _logger.Error($"{error.FailureType}: {error.Message.GetValueOrDefault()}");
+                            _logger.Error("Failed adding personData {personDataType} to system usage ({uuid}) Error:{errorCode}: {errorMessage}",item,systemUsage.Uuid,error.FailureType,error.Message.GetValueOrFallback(string.Empty));
                             return deletionError.Value;
                         }
                         break;
