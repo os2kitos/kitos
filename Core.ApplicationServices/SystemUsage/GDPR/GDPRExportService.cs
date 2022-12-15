@@ -68,6 +68,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 PreRiskAssessment = input.preriskAssessment,
                 RiskAssessment = input.riskAssessment,
                 RiskAssessmentDate = input.riskAssesmentDate,
+                PlannedRiskAssessmentDate = input.PlannedRiskAssessmentDate,
                 SystemName = input.MapItSystemName(),
                 SensitiveDataTypes = hasSensitiveData ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes) : new List<string>()
             };

@@ -1864,6 +1864,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
+            gdprInput.PlannedRiskAssessmentDate = A<DateTime>();
             return gdprInput;
         }
 
@@ -1887,6 +1888,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(gdprInput.RiskAssessmentResult, gdprResponse.RiskAssessmentResult);
             (gdprInput.RiskAssessmentDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.RiskAssessmentDocumentation);
             Assert.Equal(gdprInput.RiskAssessmentNotes, gdprResponse.RiskAssessmentNotes);
+            Assert.Equal(gdprInput.PlannedRiskAssessmentDate, gdprResponse.PlannedRiskAssessmentDate);
             Assert.Equal(gdprInput.DPIAConducted, gdprResponse.DPIAConducted);
             Assert.Equal(gdprInput.DPIADate, gdprResponse.DPIADate);
             (gdprInput.DPIADocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.DPIADocumentation);

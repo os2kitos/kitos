@@ -17,6 +17,12 @@ describe("Global admin is able to", () => {
     var cssHelper = new CssHelper();
 
 
+    var riskAssessmentDateValue = getDate();
+    var plannedRiskAssessmentDateValue = getDate();
+    var dpiaDateDateValue = getDate();
+    var latestRiskAssesment = getDate();
+    var dpiaDeleteDateDateValue = getDate();
+
     var dropdownYes = "Ja";
     var preRiskAssessmentMiddle = "Mellem risiko";
     var hostedValue = "Eksternt";
@@ -27,7 +33,6 @@ describe("Global admin is able to", () => {
     var purposeText = createName("purpose");
     var noteRiskText = createName("noteRiskText");
     var urlNameText = createName("urlName");
-
 
     beforeAll(() => {
         loginHelper.loginAsGlobalAdmin()
@@ -95,12 +100,12 @@ describe("Global admin is able to", () => {
 
     function fillOutDateFields() {
         console.log("Entering a date into date fields");
-        return ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(dateValue)
-            .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dateValue))
+        return ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(riskAssessmentDateValue)
+            .then(() => ItSystemUsageGDPRPage.getPlannedRiskAssessmentDateField().sendKeys(plannedRiskAssessmentDateValue))
+            .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dpiaDateDateValue))
+            .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(latestRiskAssesment))
+            .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dpiaDeleteDateDateValue))
             .then(() => browser.waitForAngular());
-
     }
 
     function fillOutTextFields() {
@@ -171,8 +176,10 @@ describe("Global admin is able to", () => {
     function verifyDateFields() {
         console.log("Verifying date fields");
         expect(getValueAttribute(ItSystemUsageGDPRPage.getRiskAssesmentDateField())).toEqual(dateValue);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADateField())).toEqual(dateValue);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADeleteDateField())).toEqual(dateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getPlannedRiskAssessmentDateField())).toEqual(plannedRiskAssessmentDateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADateField())).toEqual(dpiaDateDateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField())).toEqual(latestRiskAssesment);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADeleteDateField())).toEqual(dpiaDeleteDateDateValue);
     }
 
     function verifyTextFields() {

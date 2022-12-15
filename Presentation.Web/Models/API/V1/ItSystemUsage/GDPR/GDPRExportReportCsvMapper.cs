@@ -41,6 +41,7 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
                     .WithColumn(GDPRExportReportColumns.LinkToDirectory, x => MapBoolean(x.LinkToDirectory))
                     .WithColumn(GDPRExportReportColumns.RiskAssessment, x => MapDataOption(x.RiskAssessment))
                     .WithColumn(GDPRExportReportColumns.RiskAssessmentDate, x => MapDateTime(x.RiskAssessmentDate))
+                    .WithColumn(GDPRExportReportColumns.PlannedRiskAssessmentDate, x => MapDateTime(x.PlannedRiskAssessmentDate))
                     .WithColumn(GDPRExportReportColumns.PreRiskAssessment, x => MapRiskLevel(x.PreRiskAssessment))
                     .WithColumn(GDPRExportReportColumns.DPIA, x => MapDataOption(x.DPIA))
                     .WithColumn(GDPRExportReportColumns.HostedAt, x => MapHostedAt(x.HostedAt));

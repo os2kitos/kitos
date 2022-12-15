@@ -273,6 +273,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertSimpleLink(dto.GDPR.RiskAssessmentDocumentation, itSystemUsage.RiskSupervisionDocumentationUrlName, itSystemUsage.RiskSupervisionDocumentationUrl);
             Assert.Equal(dto.GDPR.RiskAssessmentNotes, itSystemUsage.noteRisks);
             AssertRiskLevel(dto.GDPR.RiskAssessmentResult, itSystemUsage.preriskAssessment);
+            Assert.Equal(dto.GDPR.PlannedRiskAssessmentDate, itSystemUsage.PlannedRiskAssessmentDate);
 
             Assert.Equal(dto.GDPR.SensitivePersonData.Count(),expectedSensitivePersonData.Count);
             Assert.Equal(dto.GDPR.RegisteredDataCategories.Count(),expectedRegisterTypes.Count);
@@ -372,6 +373,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.riskAssesmentDate = A<DateTime>();
             itSystemUsage.RiskSupervisionDocumentationUrlName = A<string>();
             itSystemUsage.RiskSupervisionDocumentationUrl = A<string>();
+            itSystemUsage.PlannedRiskAssessmentDate = A<DateTime>();
             itSystemUsage.noteRisks = A<string>();
             itSystemUsage.preriskAssessment = A<RiskLevel>();
             itSystemUsage.UserSupervision = A<DataOptions>();
