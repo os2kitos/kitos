@@ -1180,6 +1180,7 @@
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\data-processing-registration.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\01_Parallel\data-processing\local-admin.data-processing-registration.ui-customization.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.it-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.oversight.e2e.spec.ts" />
@@ -1236,6 +1237,7 @@
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigationSrefs.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemUsageHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\ui-customization-test-helper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\CSSLocatorHelper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\kendoToolbarWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\navigationBarWrapper.ts" />
