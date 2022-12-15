@@ -140,9 +140,8 @@ namespace Core.ApplicationServices.SystemUsage
 
         private static bool AllowUsageInTargetOrganization(ItSystemUsage newSystemUsage, ItSystem itSystem)
         {
-            return
-                    newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
-                    itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
+            return newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
+                   itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
         }
 
         public Result<ItSystemUsage, OperationError> Delete(int id)

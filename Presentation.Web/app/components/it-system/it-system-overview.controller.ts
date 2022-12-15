@@ -267,7 +267,7 @@
             if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)) {
                 launcher = launcher.withToolbarEntry({
                     id: "gdprExportAnchor",
-                    title: "Exportér GPDR data til Excel",
+                    title: "Exportér GDPR data til Excel",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Link,
@@ -818,8 +818,19 @@
                         .withId("LatestRiskAssessmentDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withStandardWidth(170)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate)));
+                        .withStandardWidth(220)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("PlannedRiskAssessmentDate")
+                        .withTitle("Dato for planlagt risikovurdering")
+                        .withId("PlannedRiskAssessmentDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(220)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.PlannedRiskAssessmentDate))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr.children.plannedRiskAssessmentDate)));
 
             //Launch kendo grid
             launcher.launch();

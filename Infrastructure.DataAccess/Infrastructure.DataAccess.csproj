@@ -978,6 +978,10 @@
     <Compile Include="Migrations\202212080835262_OversightScheduledInspectionDateField.designer.cs">
       <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.cs" />
+    <Compile Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.designer.cs">
+      <DependentUpon>202212121346223_Added_PlannedRiskAssessmentDate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202212130903473_AddedPersonalDataToItSystemUsage.cs" />
     <Compile Include="Migrations\202212130903473_AddedPersonalDataToItSystemUsage.designer.cs">
       <DependentUpon>202212130903473_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
@@ -1636,6 +1640,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202212080835262_OversightScheduledInspectionDateField.resx">
       <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.resx">
+      <DependentUpon>202212121346223_Added_PlannedRiskAssessmentDate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202212130903473_AddedPersonalDataToItSystemUsage.resx">
       <DependentUpon>202212130903473_AddedPersonalDataToItSystemUsage.cs</DependentUpon>

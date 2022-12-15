@@ -251,6 +251,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             return response;
         }
 
+        public static async Task<ItSystemUsageDTO> SetPlannedRiskAssessmentDate(int systemUsageId, DateTime date, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/it-system-usage/{systemUsageId}/gdpr/planned-risk-assessment-date");
+
+            using var response = await HttpApi.PatchWithCookieAsync(url, cookie, date);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
+        }
+
         public static ItSystemUsage CreateItSystemUsageAsync(ItSystemUsage body, Cookie optionalLogin = null)
         {
             body.ObjectOwnerId ??= TestEnvironment.DefaultItSystemId;

@@ -6,12 +6,14 @@ import SystemUsageHelper = require("../../../Helpers/SystemUsageHelper");
 import NavigationHelper = require("../../../Utility/NavigationHelper");
 import LocalItSystemNavigationSrefs = require("../../../Helpers/SideNavigation/LocalItSystemNavigationSrefs");
 import Select2Helper = require("../../../Helpers/Select2Helper");
+import Constants = require("../../../Utility/Constants");
 
 describe("Local admin is able customize the IT-System usage UI", () => {
 
     var loginHelper = new Login();
     var testFixture = new TestFixtureWrapper();
     var navigation = new NavigationHelper();
+    var consts = new Constants();
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
@@ -35,7 +37,8 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             .then(() => navigation.getPage("/#/global-admin/local-admins"))
             .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
             .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
-            .then(() => testTabCustomization(systemName, "ItSystemUsages.gdpr", LocalItSystemNavigationSrefs.GPDRSref))
+            .then(() => verifyRiskAssessmentFieldVisibility(systemName))
+            .then(() => testTabCustomization(systemName, "ItSystemUsages.gdpr", LocalItSystemNavigationSrefs.GDPRSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.advice", LocalItSystemNavigationSrefs.adviceSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.archiving", LocalItSystemNavigationSrefs.archivingSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.interfaces", LocalItSystemNavigationSrefs.exposedInterfacesSref))
@@ -114,6 +117,14 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             .then(() => browser.waitForAngular())
             .then(() => element(by.id(settingId)).click())
             .then(() => browser.waitForAngular());
+    }
+
+    function verifyRiskAssessmentFieldVisibility(systemName: string) {
+        console.log(`Testing gdpr.riskAssessment visibility for system: ${systemName}`);
+        return navigateToSystemUsage(systemName)
+            .then(() => navigation.findSubMenuElement(LocalItSystemNavigationSrefs.GDPRSref).click())
+            .then(() => Select2Helper.selectWithNoSearch("Ja", consts.gdprRiskAssessmentSelect2Id))
+            .then(() => testFieldCustomization(systemName, "ItSystemUsages.gdpr.plannedRiskAssessmentDate", LocalItSystemNavigationSrefs.GDPRSref, "plannedRiskAssessmentDate"));
     }
 
     function createName(prefix: string) {

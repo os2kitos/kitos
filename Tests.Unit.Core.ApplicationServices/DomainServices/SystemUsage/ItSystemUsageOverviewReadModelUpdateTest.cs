@@ -206,6 +206,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 riskAssesmentDate = A<DateTime>(),
                 RiskSupervisionDocumentationUrlName = A<string>(),
                 RiskSupervisionDocumentationUrl = A<string>(),
+                PlannedRiskAssessmentDate = A<DateTime>(),
                 LinkToDirectoryUrlName = A<string>(),
                 LinkToDirectoryUrl = A<string>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
@@ -306,6 +307,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.GeneralPurpose, readModel.GeneralPurpose);
             Assert.Equal(systemUsage.HostedAt, readModel.HostedAt);
             Assert.Equal(systemUsage.riskAssesmentDate, readModel.RiskAssessmentDate);
+            Assert.Equal(systemUsage.PlannedRiskAssessmentDate, readModel.PlannedRiskAssessmentDate);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -522,6 +524,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 riskAssessment = DataOptions.DONTKNOW,
                 RiskSupervisionDocumentationUrlName = A<string>(),
                 RiskSupervisionDocumentationUrl = A<string>(),
+                PlannedRiskAssessmentDate = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
 
@@ -585,6 +588,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 riskAssessment = DataOptions.DONTKNOW,
                 RiskSupervisionDocumentationUrlName = A<string>(),
                 RiskSupervisionDocumentationUrl = A<string>(),
+                PlannedRiskAssessmentDate = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
                 {
                     dpr1,

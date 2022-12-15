@@ -1381,6 +1381,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var riskAssessmentDate = A<DateTime?>();
             var riskAssessmentDoc = A<NamedLink>();
             var riskAssessmentNotes = A<string>();
+            var plannedRiskAssessmentDate = A<DateTime?>();
             var riskAssessmentResult = A<RiskLevel?>();
             var dpiaConducted = A<DataOptions?>();
             var dpiaDate = A<DateTime?>();
@@ -1407,6 +1408,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 RiskAssessmentConductedDate = riskAssessmentDate.AsChangedValue(),
                 RiskAssessmentDocumentation = riskAssessmentDoc.FromNullable().AsChangedValue(),
                 RiskAssessmentNotes = riskAssessmentNotes.AsChangedValue(),
+                PlannedRiskAssessmentDate = plannedRiskAssessmentDate.AsChangedValue(),
                 RiskAssessmentResult = riskAssessmentResult.AsChangedValue(),
                 DPIAConducted = dpiaConducted.AsChangedValue(),
                 DPIADate = dpiaDate.AsChangedValue(),
@@ -2149,6 +2151,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(gdpr.RiskAssessmentConducted.NewValue, actual.riskAssessment);
             Assert.Equal(gdpr.RiskAssessmentConductedDate.NewValue, actual.riskAssesmentDate);
             Assert.Equal(gdpr.RiskAssessmentNotes.NewValue, actual.noteRisks);
+            Assert.Equal(gdpr.PlannedRiskAssessmentDate.NewValue, actual.PlannedRiskAssessmentDate);
             Assert.Equal(gdpr.RiskAssessmentResult.NewValue, actual.preriskAssessment);
             Assert.Equal(gdpr.DPIAConducted.NewValue, actual.DPIA);
             Assert.Equal(gdpr.DPIADate.NewValue, actual.DPIADateFor);
@@ -2218,6 +2221,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     RiskAssessmentConductedDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
                     RiskAssessmentNotes = A<string>().AsChangedValue(),
+                    PlannedRiskAssessmentDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentResult = A<RiskLevel?>().AsChangedValue(),
                     DPIAConducted = A<DataOptions?>().AsChangedValue(),
                     DPIADate = A<DateTime?>().AsChangedValue(),
@@ -2266,6 +2270,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     RiskAssessmentConductedDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
                     RiskAssessmentNotes = "".AsChangedValue(),
+                    PlannedRiskAssessmentDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentResult = new ChangedValue<RiskLevel?>(null),
                     DPIAConducted = new ChangedValue<DataOptions?>(null),
                     DPIADate = new ChangedValue<DateTime?>(null),

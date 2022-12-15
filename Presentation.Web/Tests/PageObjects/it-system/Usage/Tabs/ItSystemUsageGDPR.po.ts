@@ -132,6 +132,10 @@ class ItSystemUsageGDPR {
         return element(by.id(this.consts.gdprRiskAssesmentDateId));
     }
 
+    static getPlannedRiskAssessmentDateField() {
+        return element(by.id(this.consts.gdprPlannedRiskAssesmentDateId));
+    }
+
     static getDPIADateField() {
         return element(by.id(this.consts.gdprDPIADateForId));
     }

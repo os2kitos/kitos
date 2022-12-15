@@ -101,6 +101,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        public async Task Can_Change_PlannedRiskAssessmentDate()
+        {
+            //Arrange
+            var date = A<DateTime>();
+            var body = new { PlannedRiskAssessmentDate = date };
+
+            //Act
+            var itSystemUsageDto = await Create_System_Usage_And_Change_Value_By_Body(body);
+
+            //Assert
+            Assert.NotNull(itSystemUsageDto.PlannedRiskAssessmentDate);
+            Assert.Equal(date, itSystemUsageDto.PlannedRiskAssessmentDate.Value);
+        }
+
+        [Fact]
         public async Task Can_Change_PreRiskAssessment()
         {
             //Arrange
@@ -199,8 +214,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Act
-            var sensitivityLevelDTO =
-                await ItSystemUsageHelper.RemoveSensitiveDataLevel(usage.Id, sensitivityLevel);
+            var sensitivityLevelDTO = await ItSystemUsageHelper.RemoveSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Assert
             Assert.Equal(sensitivityLevel, sensitivityLevelDTO.DataSensitivityLevel);
@@ -339,6 +353,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 DataProcessorControl = A<DataOptions>(),
                 RiskAssessment = A<DataOptions>(),
                 RiskAssesmentDate = A<DateTime>(),
+                PlannedRiskAssessmentDate = A<DateTime>(),
                 PreRiskAssessment = A<RiskLevel>(),
                 DPIA = A<DataOptions>()
 
@@ -380,7 +395,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertEmptyString(gdprExportReport.SensitiveDataTypes);
         }
 
-
         private void AssertCorrectGdprExportReport(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual, bool hasConcludedDataProcessingAgreement)
         {
             AssertDataOption(expected.IsBusinessCritical, actual.BusinessCritical);
@@ -389,15 +403,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertPersonalData(expected, actual);
             AssertRiskLevel(expected.PreRiskAssessment, actual.PreRiskAssessment);
             AssertHostedAt(expected.HostedAt, actual.HostedAt);
-            if (expected.RiskAssesmentDate.HasValue)
-            {
-                var riskAssessmentDateString = $"'{expected.RiskAssesmentDate.GetValueOrDefault().ConvertToDanishFormatDateString()}'";
-                Assert.Equal(riskAssessmentDateString, actual.RiskAssessmentDate);
-            }
-            else
-            {
-                Assert.Empty(actual.RiskAssessmentDate);
-            }
+            AssertDateTime(expected.RiskAssesmentDate, actual.RiskAssessmentDate);
+            AssertDateTime(expected.PlannedRiskAssessmentDate, actual.PlannedRiskAssessmentDate);
 
             if (hasConcludedDataProcessingAgreement)
             {
@@ -567,6 +574,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal("", actual);
         }
 
+        private void AssertDateTime(DateTime? expected, string actual)
+        {
+            if (expected.HasValue)
+            {
+                var expectedDateString = $"'{expected.GetValueOrDefault().ConvertToDanishFormatDateString()}'";
+                Assert.Equal(expectedDateString, actual);
+            }
+            else
+            {
+                Assert.Empty(actual);
+            }
+        }
     }
 
     public class GdprExportReportCsvFormat
@@ -599,6 +618,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public string RiskAssessment { get; set; }
         [Name("Dato for seneste risikovurdering")]
         public string RiskAssessmentDate { get; set; }
+        [Name("Dato for planlagt risikovurdering")]
+        public string PlannedRiskAssessmentDate { get; set; }
         [Name("Hvad viste seneste risikovurdering")]
         public string PreRiskAssessment { get; set; }
         [Name("Gennemført DPIA / Konsekvensanalyse")]

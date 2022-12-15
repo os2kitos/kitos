@@ -18,6 +18,7 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public IEnumerable<string> SensitiveDataTypes { get; set; }
         public DataOptions? RiskAssessment { get; set; }
         public DateTime? RiskAssessmentDate { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         public RiskLevel? PreRiskAssessment { get; set; }
         public bool PersonalDataCpr { get; set; }
         public bool PersonalDataSocialProblems { get; set; }

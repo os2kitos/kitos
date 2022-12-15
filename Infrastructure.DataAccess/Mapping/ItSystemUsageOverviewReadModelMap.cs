@@ -136,6 +136,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                .HasIndexAnnotation("IX_RiskAssessmentDate", 0);
 
+            Property(x => x.PlannedRiskAssessmentDate)
+                .HasIndexAnnotation("IX_PlannedRiskAssessmentDate");
 
             Property(x => x.LastChangedAt)
                 .HasIndexAnnotation("IX_LastChangedAt");

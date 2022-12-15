@@ -158,6 +158,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     ? source.RiskAssessmentNotes.AsChangedValue() 
                     : OptionalValueChange<string>.None,
 
+                PlannedRiskAssessmentDate = rule.MustUpdate(x => x.GDPR.PlannedRiskAssessmentDate)
+                    ? source.PlannedRiskAssessmentDate.AsChangedValue()
+                    :OptionalValueChange<DateTime?>.None,
+
                 DPIAConducted = rule.MustUpdate(x => x.GDPR.DPIAConducted) 
                     ? MapYesNoDontKnow(source.DPIAConducted) 
                     : OptionalValueChange<DataOptions?>.None,

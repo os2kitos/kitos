@@ -267,6 +267,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.RiskAssessmentConductedDate, AssertPropertyContainsDataChange(mappedGdpr.RiskAssessmentConductedDate));
             AssertLinkMapping(input.RiskAssessmentDocumentation, mappedGdpr.RiskAssessmentDocumentation);
             Assert.Equal(input.RiskAssessmentResult, AssertPropertyContainsDataChange(mappedGdpr.RiskAssessmentResult)?.ToRiskLevelChoice());
+            Assert.Equal(input.PlannedRiskAssessmentDate, AssertPropertyContainsDataChange(mappedGdpr.PlannedRiskAssessmentDate));
             Assert.Equal(input.DPIAConducted, AssertPropertyContainsDataChange(mappedGdpr.DPIAConducted)?.ToYesNoDontKnowChoice());
             Assert.Equal(input.DPIADate, AssertPropertyContainsDataChange(mappedGdpr.DPIADate));
             Assert.Equal(input.NextDataRetentionEvaluationDate, AssertPropertyContainsDataChange(mappedGdpr.NextDataRetentionEvaluationDate));
@@ -909,6 +910,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noRiskAssessmentResult,
             bool noRiskAssessmentDocumentation,
             bool noRiskAssessmentNotes,
+            bool noPlannedRiskAssessmentDate,
             bool noDPIAConducted,
             bool noDPIADate,
             bool noDPIADocumentation,
@@ -938,6 +940,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noRiskAssessmentResult,
                 noRiskAssessmentDocumentation,
                 noRiskAssessmentNotes,
+                noPlannedRiskAssessmentDate,
                 noDPIAConducted,
                 noDPIADate,
                 noDPIADocumentation,
@@ -969,6 +972,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noRiskAssessmentResult, gdprSection.RiskAssessmentResult.IsUnchanged);
             Assert.Equal(noRiskAssessmentDocumentation, gdprSection.RiskAssessmentDocumentation.IsUnchanged);
             Assert.Equal(noRiskAssessmentNotes, gdprSection.RiskAssessmentNotes.IsUnchanged);
+            Assert.Equal(noPlannedRiskAssessmentDate, gdprSection.PlannedRiskAssessmentDate.IsUnchanged);
             Assert.Equal(noDPIAConducted, gdprSection.DPIAConducted.IsUnchanged);
             Assert.Equal(noDPIADate, gdprSection.DPIADate.IsUnchanged);
             Assert.Equal(noDPIADocumentation, gdprSection.DPIADocumentation.IsUnchanged);
@@ -999,6 +1003,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noRiskAssessmentResult,
             bool noRiskAssessmentDocumentation,
             bool noRiskAssessmentNotes,
+            bool noPlannedRiskAssessmentDate,
             bool noDPIAConducted,
             bool noDPIADate,
             bool noDPIADocumentation,
@@ -1028,6 +1033,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 noRiskAssessmentResult,
                 noRiskAssessmentDocumentation,
                 noRiskAssessmentNotes,
+                noPlannedRiskAssessmentDate,
                 noDPIAConducted,
                 noDPIADate,
                 noDPIADocumentation,
@@ -1059,6 +1065,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(gdprSection.RiskAssessmentResult.HasChange);
             Assert.True(gdprSection.RiskAssessmentDocumentation.HasChange);
             Assert.True(gdprSection.RiskAssessmentNotes.HasChange);
+            Assert.True(gdprSection.PlannedRiskAssessmentDate.HasChange);
             Assert.True(gdprSection.DPIAConducted.HasChange);
             Assert.True(gdprSection.DPIADate.HasChange);
             Assert.True(gdprSection.DPIADocumentation.HasChange);
@@ -1117,6 +1124,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noRiskAssessmentResult,
             bool noRiskAssessmentDocumentation,
             bool noRiskAssessmentNotes,
+            bool noPlannedRiskAssessmentDate,
             bool noDPIAConducted,
             bool noDPIADate,
             bool noDPIADocumentation,
@@ -1144,6 +1152,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noRiskAssessmentResult) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.RiskAssessmentResult));
             if (noRiskAssessmentDocumentation) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.RiskAssessmentDocumentation));
             if (noRiskAssessmentNotes) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.RiskAssessmentNotes));
+            if (noPlannedRiskAssessmentDate) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.PlannedRiskAssessmentDate));
             if (noDPIAConducted) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.DPIAConducted));
             if (noDPIADate) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.DPIADate));
             if (noDPIADocumentation) GDPRProperties.Remove(nameof(GDPRWriteRequestDTO.DPIADocumentation));

@@ -217,6 +217,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                        systemUsage.RiskSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
                    }))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentNotes, (systemUsage, notes) => systemUsage.noteRisks = notes))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.PlannedRiskAssessmentDate, (systemUsage, date) => systemUsage.PlannedRiskAssessmentDate = date))
 
                 //DPIA
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DPIAConducted, (systemUsage, conducted) => systemUsage.DPIA = conducted))

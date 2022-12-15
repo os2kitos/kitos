@@ -20,8 +20,8 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "select2LoadingService",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, moment, notify, registerTypes, sensitivePersonalData, user, select2LoadingService) => {
+            "$scope", "$http", "$state", "$uibModal", "itSystemUsageService", "notify", "registerTypes", "sensitivePersonalData", "user", "uiState",
+            ($scope, $http, $state, $uibModal, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService, notify, registerTypes, sensitivePersonalData, user, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
                 //Usage is pulled from it-system-usage.controller.ts. This means we only need one request to DB to have usage available 
                 //On all subpages as we can access it from $scope.usage. Same with $scope.usageViewModel.
                 var itSystemUsage = $scope.usage;
@@ -35,6 +35,10 @@
                 $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
                 $scope.personalData = new Kitos.Models.ViewModel.ItSystemUsage.PersonalDataViewModel(itSystemUsage.personalData);
+
+                const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+
+                $scope.showPlannedRiskAssessmentDate = uiState.isBluePrintNodeAvailable(blueprint.children.gdpr.children.plannedRiskAssessmentDate);
 
                 $scope.updateDataLevel = (optionId, checked, optionType) => {
                     var msg = notify.addInfoMessage("Arbejder ...", false);

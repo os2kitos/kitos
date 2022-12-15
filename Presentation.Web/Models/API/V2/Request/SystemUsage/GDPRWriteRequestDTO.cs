@@ -39,6 +39,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         public YesNoDontKnowChoice? RiskAssessmentConducted { get; set; }
         public DateTime? RiskAssessmentConductedDate { get; set; }
         public RiskLevelChoice? RiskAssessmentResult { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         /// <summary>
         /// Constraints:
         /// - Name: 150 characters
