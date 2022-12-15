@@ -20,15 +20,18 @@ describe("Local admin is able customize the DataProcessingRegistration UI", () =
         testFixture.cleanupState();
     });
 
-    it("Disabling tabs will hide the tabs on the DataProcessingRegistration details page", () => {
-
-        const helper = new UiCustomizationTestHelper({
+    function createHelper() {
+        return new UiCustomizationTestHelper({
             createEntity: name => dpaHelper.createDataProcessingRegistration(name),
             navigateToEntity: name => dpaHelper.goToSpecificDataProcessingRegistration(name),
             localAdminArea: "data-processing",
             module: "DataProcessingRegistrations"
         });
+    }
 
+    it("Disabling tabs will hide the tabs on the DataProcessingRegistration details page", () => {
+
+        const helper = createHelper();
         return helper.setupUserAndOrg()
             .then(() => helper.testTabCustomization("DataProcessingRegistrations.roles", "data-processing.edit-registration.roles"))
             .then(() => helper.testTabCustomization("DataProcessingRegistrations.references", "data-processing.edit-registration.reference"))
@@ -37,13 +40,7 @@ describe("Local admin is able customize the DataProcessingRegistration UI", () =
 
     it("Disabling fields will hide the fields on the DataProcessingRegistration details page", () => {
 
-        const helper = new UiCustomizationTestHelper({
-            createEntity: name => dpaHelper.createDataProcessingRegistration(name),
-            navigateToEntity: name => dpaHelper.goToSpecificDataProcessingRegistration(name),
-            localAdminArea: "data-processing",
-            module: "DataProcessingRegistrations"
-        });
-
+        const helper = createHelper();
         return helper.setupUserAndOrg()
             .then(() => helper.testFieldCustomization("DataProcessingRegistrations.oversight.scheduledInspectionDate", "data-processing.edit-registration.oversight", "scheduledInspection"));
     });
