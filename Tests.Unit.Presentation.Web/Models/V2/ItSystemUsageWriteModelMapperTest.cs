@@ -1102,7 +1102,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedGDPRSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(25);
+            return CreateGetUndefinedSectionsInput(26);
         }
 
         private void ConfigureGDPRDataProperties(
