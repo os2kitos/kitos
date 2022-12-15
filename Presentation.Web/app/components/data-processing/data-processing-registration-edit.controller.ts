@@ -5,19 +5,36 @@
         static $inject: Array<string> = [
             "$rootScope",
             "userAccessRights",
-            "uiState"
+            "uiState",
+            "user"
         ];
+
+        isFrontPageEnabled: boolean;
+        isItSystemsEnabled: boolean;
+        isItContractsEnabled: boolean;
+        isOversightEnabled: boolean;
+        isRolesEnabled: boolean;
+        isNotificationsEnabled: boolean;
+        isExternalReferencesEnabled: boolean;
 
         constructor(
             private readonly $rootScope,
             private readonly userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO,
-            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI        ) {
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
+            user) {
 
             if (!this.userAccessRights.canDelete) {
                 _.remove(this.$rootScope.page.subnav.buttons, (o: any) => o.dataElementType === "removeDataProcessingRegistrationButton");
             }
 
-            //TODO: Use it along with the module state...
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.DataProcessingUiCustomizationBluePrint;
+            this.isFrontPageEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage);
+            this.isItSystemsEnabled = user.currentConfig.showItSystemModule && uiState.isBluePrintNodeAvailable(blueprint.children.itSystems);
+            this.isItContractsEnabled = user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(blueprint.children.itContracts);
+            this.isOversightEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.oversight);
+            this.isRolesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.roles);
+            this.isNotificationsEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.notifications);
+            this.isExternalReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.references);
         }
     }
 

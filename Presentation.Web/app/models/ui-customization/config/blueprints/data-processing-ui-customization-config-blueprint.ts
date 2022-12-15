@@ -30,12 +30,12 @@
                 helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
                 readOnly: true,
                 children: {
-                    plannedInspectionDate: {
+                    scheduledInspectionDate: {
                         text: "Kommende planlagt tilsyn"
                     }
                 }
             },
-            Roles: {
+            roles: {
                 text: "Databehandlingsroller"
             },
             notifications: {
