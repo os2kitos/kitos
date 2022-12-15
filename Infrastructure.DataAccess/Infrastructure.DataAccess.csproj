@@ -78,7 +78,6 @@
     <Compile Include="Mapping\DataProcessingDataResponsibleOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
-    <Compile Include="Mapping\ItContractDataProcessingRegistrationMap.cs" />
     <Compile Include="Mapping\ItContractOverviewReadModelDataProcessingAgreementMap.cs" />
     <Compile Include="Mapping\ItContractOverviewReadModelItSystemUsageMap.cs" />
     <Compile Include="Mapping\ItContractOverviewReadModelSystemRelationMap.cs" />

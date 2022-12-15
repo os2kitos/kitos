@@ -506,6 +506,32 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
+        public Result<DataProcessingRegistration, OperationError> UpdateMainContract(int id, int contractId)
+        {
+            return Modify(id, registration =>
+            {
+                return registration.AssignMainContract(contractId)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<DataProcessingRegistration, OperationError>.Success(registration)
+                    );
+            });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id, int contractId)
+        {
+            return Modify(id, registration =>
+            {
+                return registration.RemoveMainContract(contractId)
+                    .Match
+                    (
+                        error => error,
+                        () => Result<DataProcessingRegistration, OperationError>.Success(registration)
+                    );
+            });
+        }
+
         public IQueryable<DataProcessingRegistration> Query(params IDomainQuery<DataProcessingRegistration>[] conditions)
         {
             var baseQuery = _repository.AsQueryable();

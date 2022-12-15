@@ -84,6 +84,9 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.OversightScheduledInspectionDate)
                 .HasIndexAnnotation("IX_DPR_OversightScheduledInspectionDate");
+
+            Property(x => x.MainContractId)
+                .HasIndexAnnotation("IX_DPR_MainContractId", 0);
         }
     }
 }

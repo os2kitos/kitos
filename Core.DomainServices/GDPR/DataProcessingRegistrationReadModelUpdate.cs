@@ -46,6 +46,7 @@ namespace Core.DomainServices.GDPR
             PatchOversight(source, destination);
             PatchBasisForTransfer(source, destination);
             PatchContracts(source, destination);
+            PatchMainContract(source, destination);
             PatchLastUpdateBy(source, destination);
         }
 
@@ -107,6 +108,12 @@ namespace Core.DomainServices.GDPR
         private static void PatchContracts(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.ContractNamesAsCsv = string.Join(", ", source.AssociatedContracts.Select(x => (x.Name)));
+        }
+
+        private static void PatchMainContract(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.MainContractId = source.MainContractId;
+            destination.MainContractIsActive = source.IsActiveAccordingToMainContract;
         }
 
         private static void PatchReference(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

@@ -747,6 +747,38 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/main-contract/update")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchMainContract(int id, [FromBody] SingleValueDTO<int> mainContractionId)
+        {
+            if (mainContractionId == null)
+                return BadRequest(nameof(mainContractionId) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateMainContract(id, mainContractionId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/main-contract/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveMainContract(int id, [FromBody] SingleValueDTO<int> mainContractionId)
+        {
+            if (mainContractionId == null)
+                return BadRequest(nameof(mainContractionId) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveMainContract(id, mainContractionId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(x => x.MapToUserWithEmailDTO());

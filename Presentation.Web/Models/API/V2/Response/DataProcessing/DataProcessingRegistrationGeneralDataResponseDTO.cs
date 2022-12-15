@@ -52,5 +52,10 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// UUID's of the organization entities selected as sub data processors
         /// </summary>
         public IEnumerable<ShallowOrganizationResponseDTO> SubDataProcessors { get; set; }
+
+        /// <summary>
+        /// Defines the master contract for this data processor (many contracts can point to a data processor registration but only one can be the master contract)
+        /// </summary>
+        public IdentityNamePairResponseDTO MainContract { get; set; }
     }
 }

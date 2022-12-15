@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -58,36 +57,6 @@ namespace Core.DomainModel.GDPR
         public string Name { get; set; }
 
         public int OrganizationId { get; set; }
-
-        public virtual ItContractDataProcessingRegistration MainContract { get; set; }
-        
-        public void ResetMainContract()
-        {
-            MainContract?.Track();
-            MainContract = null;
-        }
-
-        public Maybe<OperationError> SetMainContract(ItContract.ItContract contract)
-        {
-            if (contract == null)
-                throw new ArgumentNullException(nameof(contract));
-
-            if (MainContract == null || contract.Id != MainContract.ItContractId)
-            {
-                if (contract.OrganizationId != OrganizationId)
-                    return new OperationError("Contract must belong to same organization as this usage", OperationFailure.BadInput);
-
-                var contractAssociation = AssociatedContracts.FirstOrDefault(c => c.Id == contract.Id);
-
-                if (contractAssociation == null)
-                    return new OperationError("The provided contract is not associated with this system usage", OperationFailure.BadInput);
-
-                ResetMainContract();
-                MainContract = contractAssociation;
-            }
-
-            return Maybe<OperationError>.None;
-        }
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
@@ -371,7 +340,47 @@ namespace Core.DomainModel.GDPR
         }
 
         public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; }
+        public int? MainContractId { get; set; }
+        public virtual ItContract.ItContract MainContract { get; set; }
+        public bool IsActiveAccordingToMainContract => CheckContractValidity();
 
+        public void ResetMainContract()
+        {
+            MainContract?.Track();
+            MainContract = null;
+        }
+
+        public Maybe<OperationError> AssignMainContract(int contractId)
+        {
+            if (MainContract != null && contractId == MainContract.Id)
+                return Maybe<OperationError>.None;
+
+            var contract = AssociatedContracts.FirstOrDefault(c => c.Id == contractId);
+            if (contract == null)
+                return new OperationError($"Contract with id: {contractId} is not associated with this data processing registration", OperationFailure.NotFound);
+
+            MainContract = contract;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemoveMainContract(int contractId)
+        {
+            if (MainContract == null)
+                return Maybe<OperationError>.None;
+
+            if(MainContract.Id != contractId)
+                return new OperationError($"Contract with id: {contractId} is not set as the main contract for this data processing registration", OperationFailure.BadInput);
+
+            ResetMainContract();
+
+            return Maybe<OperationError>.None;
+        }
+
+        private bool CheckContractValidity()
+        {
+            return MainContract?.IsActive == false;
+        }
         public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)
         {
             if (IsOversightCompleted != YesNoUndecidedOption.Yes)
