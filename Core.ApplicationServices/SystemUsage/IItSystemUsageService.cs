@@ -43,5 +43,7 @@ namespace Core.ApplicationServices.SystemUsage
         Maybe<OperationError> TransferRelevantUsage(int systemId, Guid unitUuid, Guid targetUnitUuid);
         Maybe<OperationError> RemoveResponsibleUsage(int id);
         Maybe<OperationError> RemoveRelevantUnit(int id, Guid unitUuid);
+        Maybe<OperationError> AddPersonalDataOption(int id, GDPRPersonalDataOption option);
+        Maybe<OperationError> RemovePersonalDataOption(int id, GDPRPersonalDataOption option);
     }
 }

@@ -93,7 +93,10 @@ namespace Infrastructure.DataAccess
 
         public void RemoveRange(IEnumerable<T> entities)
         {
-            _dbSet.RemoveRange(entities);
+            if (entities.Any())
+            {
+                _dbSet.RemoveRange(entities);
+            }
         }
 
         public void DeleteWithReferencePreload(T entity)

@@ -275,6 +275,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertRiskLevel(dto.GDPR.RiskAssessmentResult, itSystemUsage.preriskAssessment);
             Assert.Equal(dto.GDPR.PlannedRiskAssessmentDate, itSystemUsage.PlannedRiskAssessmentDate);
 
+            Assert.Equal(dto.GDPR.SpecificPersonalData.Count(), itSystemUsage.PersonalDataOptions.Count);
+            foreach (var dataOption in dto.GDPR.SpecificPersonalData)
+            {
+                Assert.Contains(dataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()));   
+            }
+
             Assert.Equal(dto.GDPR.SensitivePersonData.Count(),expectedSensitivePersonData.Count);
             Assert.Equal(dto.GDPR.RegisteredDataCategories.Count(),expectedRegisterTypes.Count);
             foreach (var comparison in expectedSensitivePersonData.OrderBy(x=>x.Name).Zip(dto.GDPR.SensitivePersonData.OrderBy(x=>x.Name), (expected, actual) => new { expected, actual }))
@@ -359,6 +365,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.LinkToDirectoryUrlName = A<string>();
             itSystemUsage.LinkToDirectoryUrl = A<string>();
             itSystemUsage.SensitiveDataLevels = Many<SensitiveDataLevel>().Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel() { SensitivityDataLevel = sensitiveDataLevel }).ToList();
+            itSystemUsage.PersonalDataOptions = Many<GDPRPersonalDataOption>().Select(x => new ItSystemUsagePersonalData(){ PersonalData = x}).ToList();
             itSystemUsage.precautions = A<DataOptions>();
             itSystemUsage.precautionsOptionsAccessControl = A<bool>();
             itSystemUsage.precautionsOptionsEncryption = A<bool>();

@@ -83,9 +83,12 @@
     <Compile Include="Events\IDomainEvents.cs" />
     <Compile Include="Events\NamedEntityChangedNameEvent.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
+    <Compile Include="ItSystemUsage\GDPR\ItSystemUsagePersonalData.cs" />
+    <Compile Include="ItSystemUsage\GDPR\RemoveSensitiveDataLevelResultModel.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageValidationError.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageValidationResult.cs" />
     <Compile Include="ItSystemUsage\LifeCycleStatusType.cs" />
+    <Compile Include="ItSystemUsage\GDPRPersonalDataOption.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="LocalOptions\LocalCriticalityType.cs" />

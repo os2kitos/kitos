@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
@@ -8,7 +9,7 @@ using Presentation.Web.Models.API.V1.ItSystemUsage;
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
-    [RoutePrefix("api/v1/itsystemusage")]
+    [RoutePrefix("api/v1/itsystemusage/{id}/sensitivityLevel")]
     public class ItSystemUsageDataSensitivityLevelController : BaseApiController
     {
         private readonly IItSystemUsageService _usageService;
@@ -25,7 +26,7 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="dataSensitivityLevel"></param>
         /// <returns></returns>
         [HttpPatch]
-        [Route("{id}/sensitivityLevel/add")]
+        [Route("add")]
         public HttpResponseMessage AddSensitivityLevel(int id, [FromBody]SensitiveDataLevel dataSensitivityLevel)
         {
             var result = _usageService.AddSensitiveDataLevel(id, dataSensitivityLevel);
@@ -39,7 +40,7 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpPatch]
-        [Route("{id}/sensitivityLevel/remove")]
+        [Route("remove")]
         public HttpResponseMessage RemoveSensitivityLevel(int id, [FromBody]SensitiveDataLevel dataSensitivityLevel)
         {
             var result = _usageService.RemoveSensitiveDataLevel(id, dataSensitivityLevel);
@@ -49,6 +50,22 @@ namespace Presentation.Web.Controllers.API.V1
                 onSuccess: itSystemUsageDataLevel => Ok(MapSensitiveDataLevelDTO(itSystemUsageDataLevel)),
                 onFailure: FromOperationError
             );
+        }
+
+        [HttpPatch]
+        [Route("personalData/{personalDataOption}/add")]
+        public HttpResponseMessage AddPersonalData(int id, GDPRPersonalDataOption personalDataOption)
+        {
+            return _usageService.AddPersonalDataOption(id, personalDataOption)
+                .Match(FromOperationError, Ok);
+        }
+
+        [HttpPatch]
+        [Route("personalData/{personalDataOption}/remove")]
+        public HttpResponseMessage RemovePersonalData(int id, GDPRPersonalDataOption personalDataOption)
+        {
+            return _usageService.RemovePersonalDataOption(id, personalDataOption)
+                .Match(FromOperationError, Ok);
         }
 
         private static ItSystemUsageSensitiveDataLevelDTO MapSensitiveDataLevelDTO(
