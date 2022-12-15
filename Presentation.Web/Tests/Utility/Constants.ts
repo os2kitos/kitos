@@ -205,6 +205,7 @@
     readonly gdprModalNameField = "gdprModalNameField";
 
     readonly gdprRiskAssesmentDateId = "riskAssesmentDate";
+    readonly gdprPlannedRiskAssesmentDateId = "plannedRiskAssessmentDate";
     readonly gdprDPIADateForId = "DPIADateFor";
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";

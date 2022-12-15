@@ -280,6 +280,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DataOptions? riskAssessment { get; set; }
         public DateTime? riskAssesmentDate { get; set; }
         public RiskLevel? preriskAssessment { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string noteRisks { get; set; }

@@ -818,8 +818,19 @@
                         .withId("LatestRiskAssessmentDate")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
-                        .withStandardWidth(170)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate)));
+                        .withStandardWidth(220)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("PlannedRiskAssessmentDate")
+                        .withTitle("Dato for planlagt risikovurdering")
+                        .withId("PlannedRiskAssessmentDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(220)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.PlannedRiskAssessmentDate))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr.children.plannedRiskAssessmentDate)));
 
             //Launch kendo grid
             launcher.launch();
