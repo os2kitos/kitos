@@ -93,10 +93,9 @@ namespace Infrastructure.DataAccess
 
         public void RemoveRange(IEnumerable<T> entities)
         {
-            var entitiesToRemove = entities.ToList();
-            if (entitiesToRemove.Any())
+            if (entities.Any())
             {
-                _dbSet.RemoveRange(entitiesToRemove);
+                _dbSet.RemoveRange(entities);
             }
         }
 

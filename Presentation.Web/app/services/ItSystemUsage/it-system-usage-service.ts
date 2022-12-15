@@ -5,8 +5,8 @@
         addDataLevel(systemUsageId: number, dataLevel: number);
         removeDataLevel(systemUsageId: number, dataLevel: number);
         patchSystemUsage(systemUsageId: number, orgId: number, payload: any);
-        patchPersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<void>;
-        removePersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<void>;
+        addPersonalData(systemUsageId: number, personalDataValue: Models.Api.ItSystemUsage.PersonalDataOption): ng.IPromise<void>;
+        removePersonalData(systemUsageId: number, personalDataValue: Models.Api.ItSystemUsage.PersonalDataOption): ng.IPromise<void>;
         //Odata kept here to keep all pages working as they used to
         patchSystem(id: number, payload: any);
         getValidationDetails(usageId: number): ng.IPromise<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>;
@@ -28,39 +28,40 @@
         private getSensitivityLevelUrl(systemUsageId: number): string {
             return this.getBaseUrl(systemUsageId) + "/sensitivityLevel";
         }
-        private getPersonalDataUrl(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): string {
+        private getPersonalDataUrl(systemUsageId: number, personalDataValue: Models.Api.ItSystemUsage.PersonalDataOption): string {
             return this.getSensitivityLevelUrl(systemUsageId) + `/personalData/${personalDataValue}`;
         }
+        private readonly personalDataFieldName = "Almindelige personoplysninger";
 
         getValidationDetails(usageId: number): ng.IPromise<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO> {
             return this.$http
-                .get<API.Models.IApiWrapper<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>>(this.getBaseUrl(usageId) + `/validation-details`)
+                .get<API.Models.IApiWrapper<Models.ItSystemUsage.IItSystemUsageValidationDetailsResponseDTO>>(`${this.getBaseUrl(usageId)}/validation-details`)
                 .then(response => {
                     return response.data.response;
                 });
         }
         
         addDataLevel(systemUsageId: number, dataLevel: number) {
-            return this.$http.patch(this.getSensitivityLevelUrl(systemUsageId) + `/add`, dataLevel);
+            return this.$http.patch(`${this.getSensitivityLevelUrl(systemUsageId)}/add`, dataLevel);
         }
 
         removeDataLevel(systemUsageId: number, dataLevel: number) {
-            return this.$http.patch(this.getSensitivityLevelUrl(systemUsageId) + `/remove`, dataLevel);
+            return this.$http.patch(`${this.getSensitivityLevelUrl(systemUsageId)}/remove`, dataLevel);
         }
         
-        patchPersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<void> {
+        addPersonalData(systemUsageId: number, personalDataValue: Models.Api.ItSystemUsage.PersonalDataOption): ng.IPromise<void> {
             return this.apiUseCaseFactory
-                .createUpdate("Almindelige personoplysninger",
+                .createUpdate(this.personalDataFieldName,
                     () => this.apiWrapper.patch(
-                        this.getPersonalDataUrl(systemUsageId, personalDataValue) + "/add"))
+                        `${this.getPersonalDataUrl(systemUsageId, personalDataValue)}/add`))
                 .executeAsync();
         }
 
-        removePersonalData(systemUsageId: number, personalDataValue: Models.ViewModel.ItSystemUsage.PersonalDataOption): ng.IPromise<void> {
+        removePersonalData(systemUsageId: number, personalDataValue: Models.Api.ItSystemUsage.PersonalDataOption): ng.IPromise<void> {
             return this.apiUseCaseFactory
-                .createUpdate("Almindelige personoplysninger",
+                .createUpdate(this.personalDataFieldName,
                     () => this.apiWrapper.patch(
-                        this.getPersonalDataUrl(systemUsageId, personalDataValue) + "/remove"))
+                        `${this.getPersonalDataUrl(systemUsageId, personalDataValue)}/remove`))
                 .executeAsync();
         }
 

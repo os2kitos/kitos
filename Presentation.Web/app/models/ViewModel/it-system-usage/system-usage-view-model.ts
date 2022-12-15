@@ -1,6 +1,7 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
     import UpdatedSelect2OptionViewModel = ViewModel.Generic.UpdatedSelect2OptionViewModel;
     import ISelectedValueViewModel = ViewModel.Generic.ISelectedValueViewModel;
+    import PersonalDataOption = Models.Api.ItSystemUsage.PersonalDataOption;
 
     export interface IPersonalDataModel extends ISelectedValueViewModel<PersonalDataOption> {
         checked: boolean;
@@ -24,12 +25,6 @@
         UNDECIDED = "0",
         ONPREMISE = "1",
         EXTERNAL = "2",
-    }
-
-    export enum PersonalDataOption {
-        CprNumber = 0,
-        SocialProblems = 1,
-        OtherPrivateMatters = 2
     }
 
     export class DataOptions {

@@ -22,7 +22,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// </summary>
         public IEnumerable<Guid> SensitivePersonDataUuids { get; set; }
         /// <summary>
-        /// Constraint: Can only be added if DataSensitivityLevelChoice.PersonData is present
+        /// Constraint: Can only be added if DataSensitivityLevelChoice.PersonData is present in DataSensitivityLevels field
         /// </summary>
         public IEnumerable<GDPRPersonalDataChoice> SpecificPersonalData { get; set; }
 

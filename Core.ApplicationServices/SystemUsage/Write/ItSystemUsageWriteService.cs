@@ -7,7 +7,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
@@ -27,7 +26,6 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
-using dk.nita.saml20.Schema.Core;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -280,16 +278,24 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
                         var additionError = _systemUsageService.AddPersonalDataOption(systemUsage.Id, item);
-                        if (additionError.HasValue) 
+                        if (additionError.HasValue)
+                        {
+                            var error = additionError.Value;
+                            _logger.Error($"{error.FailureType}: {error.Message.GetValueOrDefault()}");
                             return additionError;
+                        }
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
                         var deletionError = _systemUsageService.RemovePersonalDataOption(systemUsage.Id, item);
                         if (deletionError.HasValue)
+                        {
+                            var error = deletionError.Value;
+                            _logger.Error($"{error.FailureType}: {error.Message.GetValueOrDefault()}");
                             return deletionError.Value;
+                        }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(nameof(EnumerableExtensions.EnumerableDelta), delta, "Unknown delta type");
                 }
             }
 

@@ -77,7 +77,7 @@
 
                 $scope.updatePersonalData = (record: Kitos.Models.ViewModel.ItSystemUsage.IPersonalDataModel) => {
                     if (record.checked) {
-                        itSystemUsageService.patchPersonalData(itSystemUsage.id, record.value)
+                        itSystemUsageService.addPersonalData(itSystemUsage.id, record.value)
                             .then(() => updatePersonalDataSelectionValue(record));
                         return;
                     }

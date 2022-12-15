@@ -900,14 +900,14 @@ namespace Core.DomainModel.ItSystemUsage
                 ItSystemUsage = this,
                 SensitivityDataLevel = sensitiveDataLevel
             }).ToList();
-            
+
+            levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
+
             var removedPersonalData = new List<ItSystemUsagePersonalData>();
-            if (levels.Contains(SensitiveDataLevel.PERSONALDATA) == false)
+            if (!SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA))
             {
                 removedPersonalData.AddRange(ResetPersonalData());
             }
-
-            levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
 
             return removedPersonalData;
         }
