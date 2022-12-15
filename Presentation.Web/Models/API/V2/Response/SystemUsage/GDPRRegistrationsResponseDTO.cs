@@ -14,6 +14,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         public SimpleLinkDTO DirectoryDocumentation { get; set; }
         public IEnumerable<DataSensitivityLevelChoice> DataSensitivityLevels { get; set; }
         public IEnumerable<IdentityNamePairResponseDTO> SensitivePersonData { get; set; }
+        public IEnumerable<GDPRPersonalDataChoice> SpecificPersonalData { get; set; }
         public IEnumerable<IdentityNamePairResponseDTO> RegisteredDataCategories { get; set; }
         public YesNoDontKnowChoice? TechnicalPrecautionsInPlace { get; set; }
         public IEnumerable<TechnicalPrecautionChoice> TechnicalPrecautionsApplied { get; set; }
@@ -26,6 +27,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         public RiskLevelChoice? RiskAssessmentResult { get; set; }
         public SimpleLinkDTO RiskAssessmentDocumentation { get; set; }
         public string RiskAssessmentNotes { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         public YesNoDontKnowChoice? DPIAConducted { get; set; }
         public DateTime? DPIADate { get; set; }
         public SimpleLinkDTO DPIADocumentation { get; set; }

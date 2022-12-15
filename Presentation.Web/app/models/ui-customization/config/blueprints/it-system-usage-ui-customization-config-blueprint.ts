@@ -35,7 +35,12 @@
                 helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
             },
             gdpr: {
-                text: "GDPR"
+                text: "GDPR",
+                children: {
+                    plannedRiskAssessmentDate: {
+                        text: "Dato for planlagt risikovurdering"
+                    }
+                }
             },
             systemRoles: {
                 text: "Systemroller"

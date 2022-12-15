@@ -64,10 +64,14 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 PersonalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA),
                 SensitiveData = hasSensitiveData,
                 LegalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.LEGALDATA),
+                PersonalDataCpr = input.GetPersonalData(GDPRPersonalDataOption.CprNumber).HasValue,
+                PersonalDataSocialProblems = input.GetPersonalData(GDPRPersonalDataOption.SocialProblems).HasValue,
+                PersonalDataSocialOtherPrivateMatters = input.GetPersonalData(GDPRPersonalDataOption.OtherPrivateMatters).HasValue,
                 LinkToDirectory = !string.IsNullOrEmpty(input.LinkToDirectoryUrl),
                 PreRiskAssessment = input.preriskAssessment,
                 RiskAssessment = input.riskAssessment,
                 RiskAssessmentDate = input.riskAssesmentDate,
+                PlannedRiskAssessmentDate = input.PlannedRiskAssessmentDate,
                 SystemName = input.MapItSystemName(),
                 SensitiveDataTypes = hasSensitiveData ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes) : new List<string>()
             };

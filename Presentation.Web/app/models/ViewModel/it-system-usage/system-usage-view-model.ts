@@ -1,11 +1,10 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
-    import Select2OptionViewModel = ViewModel.Generic.Select2OptionViewModel;
     import UpdatedSelect2OptionViewModel = ViewModel.Generic.UpdatedSelect2OptionViewModel;
+    import ISelectedValueViewModel = ViewModel.Generic.ISelectedValueViewModel;
+    import PersonalDataOption = Models.Api.ItSystemUsage.PersonalDataOption;
 
-    export interface ISensitiveDataLevelModel {
-        value: number;
-        textValue: string;
-        text: string;
+    export interface IPersonalDataModel extends ISelectedValueViewModel<PersonalDataOption> {
+        checked: boolean;
     }
 
     export enum DataOption {
@@ -27,8 +26,6 @@
         ONPREMISE = "1",
         EXTERNAL = "2",
     }
-
-
 
     export class DataOptions {
         options: UpdatedSelect2OptionViewModel<any>[];
@@ -58,10 +55,10 @@
 
     export class SensitiveDataLevelViewModel {
         static readonly levels = {
-            none: <ISensitiveDataLevelModel>{ value: 0, textValue: "NONE", text: "Ingen persondata" },
-            personal: <ISensitiveDataLevelModel>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige persondata" },
-            sensitive: <ISensitiveDataLevelModel>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme persondata" },
-            legal: <ISensitiveDataLevelModel>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
+            none: <ISelectedValueViewModel<number>>{ value: 0, textValue: "NONE", text: "Ingen personoplysninger" },
+            personal: <ISelectedValueViewModel<number>>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige personoplysninger" },
+            sensitive: <ISelectedValueViewModel<number>>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme personoplysninger" },
+            legal: <ISelectedValueViewModel<number>>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
         };
 
         static readonly levelOrder = {
@@ -79,6 +76,28 @@
                     return acc;
                 },
                 <any>{});
+        }
+    }
+
+    export class PersonalDataViewModel {
+        private readonly data = [
+            { value: PersonalDataOption.CprNumber, textValue: "CPR", text: "CPR-nr" } as ISelectedValueViewModel<PersonalDataOption>,
+            { value: PersonalDataOption.SocialProblems, textValue: "SocialProblems", text: "Væsentlige sociale problemer" } as ISelectedValueViewModel<PersonalDataOption>,
+            { value: PersonalDataOption.OtherPrivateMatters, textValue: "OtherPrivate", text: "Andre rent private forhold" } as ISelectedValueViewModel<PersonalDataOption>,
+        ] as ISelectedValueViewModel<PersonalDataOption>[];
+
+        options: IPersonalDataModel[];
+
+        constructor(values: PersonalDataOption[]) {
+            this.options = this.data.map(option => {
+                var value = values.some(x => x === option.value);
+                return {
+                    value: option.value,
+                    text: option.text,
+                    textValue: option.textValue,
+                    checked: value
+                } as IPersonalDataModel;
+            });
         }
     }
 
@@ -112,6 +131,7 @@
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
         personalDataSelected: boolean;
+        personalData: PersonalDataOption[];
         noDataSelected: boolean;
         isBusinessCritical: DataOption;
         precautions: DataOption;
@@ -129,6 +149,7 @@
         legalDataSelected: boolean;
         sensitiveDataSelected: boolean;
         personalDataSelected: boolean;
+        personalData: PersonalDataOption[];
         noDataSelected: boolean;
         id: number;
         organizationId: number;
@@ -167,6 +188,7 @@
             this.personalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.personal.value);
             this.sensitiveDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.sensitive.value);
             this.legalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.legal.value);
+            this.personalData = itSystemUsage.personalData;
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
             this.precautions = this.mapDataOption(itSystemUsage.precautions);

@@ -17,6 +17,12 @@ describe("Global admin is able to", () => {
     var cssHelper = new CssHelper();
 
 
+    var riskAssessmentDateValue = getDate();
+    var plannedRiskAssessmentDateValue = getDate();
+    var dpiaDateDateValue = getDate();
+    var latestRiskAssesment = getDate();
+    var dpiaDeleteDateDateValue = getDate();
+
     var dropdownYes = "Ja";
     var preRiskAssessmentMiddle = "Mellem risiko";
     var hostedValue = "Eksternt";
@@ -27,7 +33,6 @@ describe("Global admin is able to", () => {
     var purposeText = createName("purpose");
     var noteRiskText = createName("noteRiskText");
     var urlNameText = createName("urlName");
-
 
     beforeAll(() => {
         loginHelper.loginAsGlobalAdmin()
@@ -51,6 +56,7 @@ describe("Global admin is able to", () => {
                 .then(() => fillOutCheckboxes())
                 .then(() => fillOutDropDown())
                 .then(() => fillOutPrecautionsCheckboxes())
+                .then(() => fillOutPersonalDataCheckboxes())
                 .then(() => fillOutDateFields())
                 .then(() => fillOutTextFields())
                 .then(() => fillOutLinkFields())
@@ -80,6 +86,13 @@ describe("Global admin is able to", () => {
             .then(() => browser.waitForAngular());
     }
 
+    function fillOutPersonalDataCheckboxes() {
+        return ItSystemUsageGDPRPage.getPersonalCprCheckBox().click()
+            .then(() => ItSystemUsageGDPRPage.getPersonalOtherPrivateCheckBox().click())
+            .then(() => ItSystemUsageGDPRPage.getPersonalSocialProblemsCheckBox().click())
+            .then(() => browser.waitForAngular());
+    }
+
     function fillOutDropDown() {
         console.log("Selecting values into the dropdown fields");
         return Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprBusinessCriticalSelect2Id)
@@ -95,12 +108,12 @@ describe("Global admin is able to", () => {
 
     function fillOutDateFields() {
         console.log("Entering a date into date fields");
-        return ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(dateValue)
-            .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dateValue))
+        return ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(riskAssessmentDateValue)
+            .then(() => ItSystemUsageGDPRPage.getPlannedRiskAssessmentDateField().sendKeys(plannedRiskAssessmentDateValue))
+            .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dpiaDateDateValue))
+            .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(latestRiskAssesment))
+            .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dpiaDeleteDateDateValue))
             .then(() => browser.waitForAngular());
-
     }
 
     function fillOutTextFields() {
@@ -156,6 +169,10 @@ describe("Global admin is able to", () => {
         expectCheckboxValue(consts.precautionsPseudonomiseringCheckbox, true);
         expectCheckboxValue(consts.precautionsAccessControlCheckbox, true);
         expectCheckboxValue(consts.precautionsLogningCheckbox, true);
+        console.log("Personal data boxes");
+        expectCheckboxValueById(consts.personalCprCheckbox, true);
+        expectCheckboxValueById(consts.personalSocialProblemsCheckbox, true);
+        expectCheckboxValueById(consts.personalOtherPrivateCheckbox, true);
     }
 
     function verifyDropDown() {
@@ -171,8 +188,10 @@ describe("Global admin is able to", () => {
     function verifyDateFields() {
         console.log("Verifying date fields");
         expect(getValueAttribute(ItSystemUsageGDPRPage.getRiskAssesmentDateField())).toEqual(dateValue);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADateField())).toEqual(dateValue);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADeleteDateField())).toEqual(dateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getPlannedRiskAssessmentDateField())).toEqual(plannedRiskAssessmentDateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADateField())).toEqual(dpiaDateDateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField())).toEqual(latestRiskAssesment);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADeleteDateField())).toEqual(dpiaDeleteDateDateValue);
     }
 
     function verifyTextFields() {
@@ -213,6 +232,11 @@ describe("Global admin is able to", () => {
     function expectCheckboxValue(checkBoxDataElementType: string, toBe: boolean) {
         console.log(`Checking value for ${checkBoxDataElementType} value to be ${toBe}`);
         return expect(element(cssHelper.byDataElementType(checkBoxDataElementType)).isSelected()).toBe(toBe);
+    }
+
+    function expectCheckboxValueById(checkBoxDataElementType: string, toBe: boolean) {
+        console.log(`Checking value for ${checkBoxDataElementType} value to be ${toBe}`);
+        return expect(element(by.id(checkBoxDataElementType)).isSelected()).toBe(toBe);
     }
 
     function expectDropdownValueToEqual(expectedValue: string, idOfDropDownBox: string) {

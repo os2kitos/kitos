@@ -171,6 +171,10 @@
     readonly precautionsAccessControlCheckbox = "precautionsAccessControlCheckbox";
     readonly precautionsLogningCheckbox = "precautionsLogningCheckbox";
 
+    readonly personalCprCheckbox = "CPRCheckbox";
+    readonly personalSocialProblemsCheckbox = "SocialProblemsCheckbox";
+    readonly personalOtherPrivateCheckbox = "OtherPrivateCheckbox";
+
     readonly defaultSensitivData1 = "TestSensitiveData1";
     readonly defaultSensitivData2 = "TestSensitiveData2";
 
@@ -205,6 +209,7 @@
     readonly gdprModalNameField = "gdprModalNameField";
 
     readonly gdprRiskAssesmentDateId = "riskAssesmentDate";
+    readonly gdprPlannedRiskAssesmentDateId = "plannedRiskAssessmentDate";
     readonly gdprDPIADateForId = "DPIADateFor";
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";

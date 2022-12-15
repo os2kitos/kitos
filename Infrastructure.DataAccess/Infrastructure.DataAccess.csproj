@@ -92,6 +92,7 @@
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewTaskRefReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsagePersonalDataOptionsMap.cs" />
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
@@ -977,6 +978,14 @@
     <Compile Include="Migrations\202212080835262_OversightScheduledInspectionDateField.designer.cs">
       <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.cs" />
+    <Compile Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.designer.cs">
+      <DependentUpon>202212121346223_Added_PlannedRiskAssessmentDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.cs" />
+    <Compile Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.designer.cs">
+      <DependentUpon>202212150709011_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1631,6 +1640,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202212080835262_OversightScheduledInspectionDateField.resx">
       <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.resx">
+      <DependentUpon>202212121346223_Added_PlannedRiskAssessmentDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.resx">
+      <DependentUpon>202212150709011_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

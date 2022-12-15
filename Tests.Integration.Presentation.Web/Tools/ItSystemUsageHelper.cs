@@ -45,22 +45,34 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/add"), cookie, sensitiveDataLevel))
-            {
-                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
-                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
-            }
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/add"), cookie, sensitiveDataLevel);
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+            return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
         }
 
         public static async Task<ItSystemUsageSensitiveDataLevelDTO> RemoveSensitiveDataLevel(int systemUsageId, SensitiveDataLevel sensitiveDataLevel)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/remove"), cookie, sensitiveDataLevel))
-            {
-                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
-                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
-            }
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/remove"), cookie, sensitiveDataLevel);
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+            return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
+        }
+
+        public static async Task AddPersonalData(int systemUsageId, GDPRPersonalDataOption personalDataChoice)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}/add"), cookie, new {});
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+        }
+
+        public static async Task  RemovePersonalData(int systemUsageId, GDPRPersonalDataOption personalDataChoice)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/personalData/{personalDataChoice}/remove"), cookie, new {});
+            Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
         }
 
         public static async Task<ItSystemUsageSensitiveDataLevelDTO> SendSetActiveRequestAsync(int systemUsageId, int orgId, bool systemUsageActive)
@@ -237,6 +249,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.PatchWithCookieAsync(url, cookie, body);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
+        }
+
+        public static async Task<ItSystemUsageDTO> SetPlannedRiskAssessmentDate(int systemUsageId, DateTime date, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/it-system-usage/{systemUsageId}/gdpr/planned-risk-assessment-date");
+
+            using var response = await HttpApi.PatchWithCookieAsync(url, cookie, date);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
         }
 
         public static ItSystemUsage CreateItSystemUsageAsync(ItSystemUsage body, Cookie optionalLogin = null)
