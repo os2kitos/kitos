@@ -93,7 +93,7 @@ class kendoToolbarWrapper {
             userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader),
             usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeader),
             userRightsHolderAccess: kendo.getColumnHeader(consts.kendoUserRightsHolderHeader),
-            userStakeHolderAccess: kendo.getColumnHeader(consts.kendoUserStakeHolderHeader)
+            userStakeHolderAccess: kendo.getColumnHeader(consts.kendoUserStakeHolderHeader),
 
         };
         return columns;

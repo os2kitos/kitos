@@ -11,11 +11,10 @@
             "dataProcessingRegistrationOptions",
             "bindingService",
             "$uibModal",
-            "notify"
+            "notify",
+            "uiState"
         ];
 
-        private readonly dataProcessingRegistrationId: number;
-        private readonly modal;
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
@@ -24,8 +23,12 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
             private readonly bindingService: Kitos.Services.Generic.IBindingService,
-            private readonly $modal,
-            private readonly notify) {
+            $modal,
+            private readonly notify,
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) {
+
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.DataProcessingUiCustomizationBluePrint;
+            this.showScheduledInspectionDate = uiState.isBluePrintNodeAvailable(blueprint.children.oversight.children.scheduledInspectionDate);
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindOversightInterval();
@@ -40,6 +43,9 @@
             this.modal = $modal;
         }
 
+        private readonly dataProcessingRegistrationId: number;
+        private readonly modal;
+        showScheduledInspectionDate: boolean;
         headerName = this.dataProcessingRegistration.name;
         oversightInterval: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
         oversightIntervalRemark: Models.ViewModel.Generic.IEditTextViewModel;

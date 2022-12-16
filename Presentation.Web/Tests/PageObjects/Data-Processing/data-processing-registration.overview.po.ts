@@ -4,6 +4,7 @@ import KendoToolbarWrapper = require("../../Object-wrappers/KendoToolbarWrapper"
 import KendoLoaderHelper = require("../../Helpers/KendoLoaderHelper");
 import CssLocatorHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import Constants = require("../../Utility/Constants");
+import WaitTimers = require("../../Utility/WaitTimers");
 
 class DataProcessingRegistrationOverviewPageObject implements PageObject {
     private kendoLoaderHelper = new KendoLoaderHelper();
@@ -12,6 +13,7 @@ class DataProcessingRegistrationOverviewPageObject implements PageObject {
     private cssHelper = new CssLocatorHelper();
     private consts = new Constants();
     private kendoToolbarWrapper = new KendoToolbarWrapper();
+    private waitUpTo = new WaitTimers();
 
     getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/data-processing/overview");
@@ -23,6 +25,11 @@ class DataProcessingRegistrationOverviewPageObject implements PageObject {
 
     waitForKendoGrid() {
         return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().dpaName.first());
+    }
+
+    waitForKendoGridControls() {
+        return browser
+            .wait(this.ec.presenceOf(element(this.cssHelper.byDataElementType(this.consts.kendoDpaButtonCreate))), this.waitUpTo.twentySeconds);
     }
 
     getCreateDpaButton() {

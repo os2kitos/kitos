@@ -29,7 +29,7 @@ class DataProcessingRegistrationHelper {
         console.log(`Creating registration with name ${name}`);
         return this.pageObject.getPage()
             .then(() => browser.waitForAngular())
-            .then(() => this.waitForKendo())
+            .then(() => this.waitForKendoGridControls())
             .then(() => this.openNewDpaDialog())
             .then(() => this.enterDpaName(name))
             .then(() => {
@@ -45,7 +45,7 @@ class DataProcessingRegistrationHelper {
         console.log(`Creating registration with name ${name}`);
         return this.pageObject.getPage()
             .then(() => browser.waitForAngular())
-            .then(() => this.waitForKendo())
+            .then(() => this.waitForKendoGridControls())
             .then(() => this.openNewDpaDialog())
             .then(() => this.enterDpaName(name))
             .then(() => {
@@ -260,6 +260,11 @@ class DataProcessingRegistrationHelper {
     private static waitForKendo() {
         console.log("waiting for kendo grid to load");
         return this.pageObject.waitForKendoGrid();
+    }
+
+    private static waitForKendoGridControls() {
+        console.log("waiting for kendo grid to load");
+        return this.pageObject.waitForKendoGridControls();
     }
 
     public static enableTransferToInsecureThirdCountries() {

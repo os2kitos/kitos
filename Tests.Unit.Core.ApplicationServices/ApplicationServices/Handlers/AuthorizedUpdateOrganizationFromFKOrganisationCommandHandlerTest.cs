@@ -23,7 +23,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
 {
     public class AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest : WithAutoFixture
     {
-        private DateTime _now;
+        private readonly DateTime _now = DateTime.Now;
         private AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler _sut;
         private Mock<IStsOrganizationUnitService> _stsOrganizationUnitService;
         private Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
