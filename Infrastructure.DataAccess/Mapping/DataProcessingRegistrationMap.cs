@@ -69,7 +69,7 @@ namespace Infrastructure.DataAccess.Mapping
             //Oversight options
             HasMany(x => x.OversightOptions)
                 .WithMany(x => x.References);
-            
+
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_DataProcessingRegistration_Uuid", 0);

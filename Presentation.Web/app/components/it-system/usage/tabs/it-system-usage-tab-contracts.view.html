@@ -70,8 +70,15 @@
             </tbody>
         </table>
     </div>
-
-    <div id="selectMainContractSection" class="object-section-container" ng-if="showMainContractSelection && showContractIsActive">
+    
+    <div >
+        <main-contract-section data-page-name="IT systemet" 
+                               data-has-write-access="hasWriteAccess" 
+                               data-options="contractsToSelect"
+                               data-contract-id="mainContractId"
+                               data-save="saveMainContract"/>
+    </div>
+    <!-- <div id="selectMainContractSection" class="object-section-container" ng-if="showMainContractSelection && showContractIsActive">
         <div class="panel panel-default">
             <form class="form-horizontal">
                 <div class="form-group row">
@@ -99,5 +106,5 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div>-->
 </div>

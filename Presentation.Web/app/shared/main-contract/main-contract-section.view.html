@@ -1,0 +1,29 @@
+﻿<div id="selectMainContractSection" class="object-section-container">
+    <div class="panel panel-default">
+        <form class="form-horizontal">
+            <div class="form-group row">
+                <label class="col-xs-4 control-label">
+                    Hvilken kontrakt skal afgøre om {{ctrl.pageName}} er aktivt:
+                </label>
+                <div class="col-xs-3">
+                    <select-simple data-id="contract-selector"
+                                   data-placeholder="Ingen kontrakt"
+                                   data-options="ctrl.options"
+                                   data-ng-model="ctrl.contractId"
+                                   data-function="ctrl.saveMainContract"
+                                   data-ng-disabled="!ctrl.hasWriteAccess">
+                    </select-simple>
+                </div>
+                <div class="col-xs-4" data-ng-show="mainContractId !== null">
+                    {{ctrl.pageName}} har nu status som:
+                    <strong class="text-success" ng-show="mainContractIsActive">
+                        Aktivt
+                    </strong>
+                    <strong class="text-danger" ng-hide="mainContractIsActive">
+                        Inaktivt
+                    </strong>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
