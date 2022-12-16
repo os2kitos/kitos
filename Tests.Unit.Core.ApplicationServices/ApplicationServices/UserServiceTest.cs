@@ -261,7 +261,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             var transaction = ExpectTransactionBeginReturns();
             var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
-            ExpectHasDeletePermissionReturns( true);
+            ExpectHasDeletePermissionReturns(true);
             ExpectIsGlobalReturns(true);
             _commandBusMock
                 .Setup(x => x.Execute<RemoveUserFromKitosCommand, Maybe<OperationError>>(
@@ -344,7 +344,7 @@ namespace Tests.Unit.Core.ApplicationServices
             }
 
             var transaction = ExpectTransactionBeginReturns();
-            
+
             ExpectHasDeletePermissionReturns(organizationId, true);
             ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
             ExpectIsGlobalReturns(adminType == OrganizationRole.GlobalAdmin);
@@ -426,6 +426,30 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value);
         }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_GetAdministrativePermissions(bool allowDelete)
+        {
+            //Arrange
+            var organization = new Organization()
+            {
+                Uuid = A<Guid>(),
+                Id = A<int>()
+            };
+            
+            ExpectGetOrganizationReturns(organization.Uuid,organization);
+            ExpectHasDeletePermissionReturns(organization.Id, allowDelete);
+
+            //Act
+            var result = _sut.GetAdministrativePermissions(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(allowDelete,result.Value.AllowDelete);
+        }
+
 
         private void ExpectGetOrganizationAccessReturns(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {

@@ -11,7 +11,6 @@ using System.Security.Cryptography;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Commands;
@@ -312,10 +311,10 @@ namespace Core.ApplicationServices
                 .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
 
-        public Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationId)
+        public Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid)
         {
             return _organizationService
-                .GetOrganization(organizationId)
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
                 .Select(organization => new UserAdministrationPermissions(AllowDelete(organization.Id)));
         }
 
