@@ -33,7 +33,7 @@ namespace Tests.Unit.Core.Model
         }
 
         [Fact]
-        public void AssignMainContract_Returns_NotFound_When_Contract_With_Id_Is_Not_Part_Of_AssociatedContract()
+        public void AssignMainContract_Returns_BadState_When_Contract_With_Id_Is_Not_Part_Of_AssociatedContract()
         {
             //Arrange
             var contractId = A<int>();
@@ -47,7 +47,7 @@ namespace Tests.Unit.Core.Model
 
             //Assert
             Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
             Assert.Null(dpr.MainContract);
         }
 

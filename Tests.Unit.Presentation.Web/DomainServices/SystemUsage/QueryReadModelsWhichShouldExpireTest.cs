@@ -8,6 +8,7 @@ using static Tests.Unit.Presentation.Web.Helpers.ItSystemUsageOverviewReadModelT
 
 namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
 {
+    //System usage query
     public class QueryReadModelsWhichShouldExpireTest : WithAutoFixture
     {
         private readonly DateTime _now;

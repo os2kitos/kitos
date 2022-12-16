@@ -433,7 +433,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await ItContractHelper.AddItSystemUsage(contract2.Id, usageId, organization.Id);
 
             //Act
-            using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid });
             contract1.Active = true;
             await ItContractHelper.PatchContract(contract1.Id, organization.Id, contract1);
 

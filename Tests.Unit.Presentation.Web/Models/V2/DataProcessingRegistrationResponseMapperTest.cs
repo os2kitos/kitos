@@ -79,6 +79,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(general.HasSubDataProcessors);
             Assert.Empty(general.SubDataProcessors);
             Assert.Null(general.MainContract);
+            Assert.True(general.Valid);
 
             var oversight = dto.Oversight;
             Assert.Empty(oversight.OversightOptions);
@@ -118,6 +119,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertYesNoUndecided(dpr.HasSubDataProcessors, general.HasSubDataProcessors);
             AssertOrganizations(dpr.SubDataProcessors, general.SubDataProcessors);
             AssertIdentity(dpr.MainContract, general.MainContract);
+            Assert.Equal(dpr.IsActiveAccordingToMainContract, general.Valid);
         }
 
         [Theory]

@@ -357,7 +357,7 @@ namespace Core.DomainModel.GDPR
 
             var contract = AssociatedContracts.FirstOrDefault(c => c.Id == contractId);
             if (contract == null)
-                return new OperationError($"Contract with id: {contractId} is not associated with this data processing registration", OperationFailure.NotFound);
+                return new OperationError($"Contract with id: {contractId} is not associated with this data processing registration", OperationFailure.BadState);
 
             ResetMainContract();
             MainContract = contract;
@@ -380,8 +380,9 @@ namespace Core.DomainModel.GDPR
 
         private bool CheckContractValidity()
         {
-            return MainContract?.IsActive == false;
+            return MainContract?.IsActive != false;
         }
+
         public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)
         {
             if (IsOversightCompleted != YesNoUndecidedOption.Yes)

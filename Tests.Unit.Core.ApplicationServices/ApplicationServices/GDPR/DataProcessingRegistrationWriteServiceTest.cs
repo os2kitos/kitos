@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using AutoFixture;
 using Core.Abstractions.Extensions;
@@ -1033,7 +1034,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_Create_With_GeneralData_MainContract_If_UpdateMultiAssignment_Fails()
+        public void Cannot_Create_With_GeneralData_MainContract_If_MainContract_Id_Cannot_Be_Resolved()
         {
             //Arrange
             var inputUuids = A<Guid?>();
@@ -1046,15 +1047,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
             Assert.NotNull(contract);
             var operationError = A<OperationError>();
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, contract.Id);
-            ExpectCreateDataProcessingRegistrationReturns(A<int>(), parameters, parameters.Name.NewValue, operationError);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, Maybe<int>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
-            AssertFailureWithKnownError(result, operationError, transaction);
+            AssertFailureWithKnownErrorDetails(result, $"Data responsible option with uuid {generalData.MainContractUuid.NewValue} could not be found", OperationFailure.BadInput, transaction);
         }
 
         [Theory]

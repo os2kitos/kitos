@@ -27,6 +27,8 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
+using System.Diagnostics.Contracts;
+using Presentation.Web.Models.API.V2.Request.Contract;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2
 {
@@ -561,6 +563,71 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             inputDto.HasSubDataProcessors = YesNoUndecidedChoice.Undecided;
             inputDto.TransferToInsecureThirdCountries = YesNoUndecidedChoice.Undecided;
             AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
+        }
+
+        [Fact]
+        public async Task Can_PATCH_MainContract()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var request = new CreateDataProcessingRegistrationRequestDTO()
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            };
+
+            var registration = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            var createContractRequest1 = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                DataProcessingRegistrationUuids = new[] { registration.Uuid }
+            };
+            var createContractRequest2 = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                DataProcessingRegistrationUuids = new[] { registration.Uuid }
+            };
+
+            var contract1 = await ItContractV2Helper.PostContractAsync(token, createContractRequest1);
+            var contract2 = await ItContractV2Helper.PostContractAsync(token, createContractRequest2);
+
+            //Act
+            using var response1 = await DataProcessingRegistrationV2Helper
+                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = contract1.Uuid})
+                .WithExpectedResponseCode(HttpStatusCode.OK);
+            
+            //Assert
+            var updatedDpr = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, registration.Uuid);
+            Assert.Equal(contract1.Uuid, updatedDpr.General.MainContract.Uuid);
+            Assert.Equal(contract1.Name, updatedDpr.General.MainContract.Name);
+            Assert.True(updatedDpr.General.Valid);
+
+            //Act - set to another contract
+            using var response2 = await DataProcessingRegistrationV2Helper
+                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = contract2.Uuid})
+                .WithExpectedResponseCode(HttpStatusCode.OK);
+            using var patchedContract2= await ItContractV2Helper
+                .SendPatchContractGeneralDataAsync(token, contract2.Uuid, new ContractGeneralDataWriteRequestDTO() { Validity = new ContractValidityWriteRequestDTO(){ ValidTo = DateTime.Now.AddMonths(-A<int>())}})
+                .WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            updatedDpr = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, registration.Uuid);
+            Assert.Equal(contract2.Uuid, updatedDpr.General.MainContract.Uuid);
+            Assert.Equal(contract2.Name, updatedDpr.General.MainContract.Name);
+            Assert.False(updatedDpr.General.Valid);
+
+            //Act - set contract to null
+            using var response3 = await DataProcessingRegistrationV2Helper
+                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO {MainContractUuid = null})
+                .WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            updatedDpr = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, registration.Uuid);
+            Assert.Null(updatedDpr.General.MainContract);
+            Assert.True(updatedDpr.General.Valid);
         }
 
         [Fact]

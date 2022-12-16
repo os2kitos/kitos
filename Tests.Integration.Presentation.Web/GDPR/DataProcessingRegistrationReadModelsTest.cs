@@ -196,6 +196,32 @@ namespace Tests.Integration.Presentation.Web.GDPR
         }
 
         [Fact]
+        public async Task ReadModels_MainContract_Is_Updated_When_MainContract_Is_Deleted()
+        {
+            //Arrange
+            var dprName = A<string>();
+            var contractName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organizationId, dprName);
+
+            var contract = await ItContractHelper.CreateContract(contractName, organizationId);
+            using var assignDprResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract.Id, dpr.Id).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var updateMainContractResponse = await DataProcessingRegistrationHelper.SendUpdateMainContractRequestAsync(dpr.Id, contract.Id).WithExpectedResponseCode(HttpStatusCode.OK);
+            
+            await WaitForReadModelQueueDepletion();
+            await ItContractHelper.SendDeleteContractRequestAsync(contract.Id).DisposeAsync();
+            await WaitForReadModelQueueDepletion();
+
+            //Act
+            var readModels = await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, dprName, 1, 0);
+            
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Assert.Null(readModel.MainContractId);
+            Assert.True(readModel.MainContractIsActive);
+        }
+
+        [Fact]
         public async Task ReadModels_Contain_Correct_Dependent_Content()
         {
             //Arrange

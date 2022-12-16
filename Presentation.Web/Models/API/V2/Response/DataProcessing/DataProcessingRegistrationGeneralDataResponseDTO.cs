@@ -54,6 +54,10 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         public IEnumerable<ShallowOrganizationResponseDTO> SubDataProcessors { get; set; }
 
         /// <summary>
+        /// Determines if the entity is considered valid. Validity is determined by the MainContract Validity.
+        /// </summary>
+        public bool Valid { get; set; }
+        /// <summary>
         /// Defines the master contract for this data processor (many contracts can point to a data processor registration but only one can be the master contract)
         /// </summary>
         public IdentityNamePairResponseDTO MainContract { get; set; }

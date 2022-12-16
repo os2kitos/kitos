@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries.DataProcessingRegistrations;
 
 
 namespace Core.DomainServices.Repositories.GDPR
@@ -67,6 +69,25 @@ namespace Core.DomainServices.Repositories.GDPR
                 .AsQueryable()
                 .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId || x.LastChangedById == userId))
                 .Distinct();
+        }
+
+        public IQueryable<DataProcessingRegistrationReadModel> GetReadModelsMustUpdateToChangeActiveState()
+        {
+
+            var now = DateTime.Now;
+            var expiringReadModelIds = _repository
+                .AsQueryable()
+                .Transform(new QueryReadModelsWhichShouldExpire(now).Apply)
+                .Select(x => x.Id);
+
+            var activatingReadModelIds = _repository
+                .AsQueryable()
+                .Transform(new QueryReadModelsWhichShouldBecomeActive(now).Apply)
+                .Select(x => x.Id);
+
+            var idsOfReadModelsWhichMustUpdate = expiringReadModelIds.Concat(activatingReadModelIds).Distinct().ToList();
+
+            return _repository.AsQueryable().ByIds(idsOfReadModelsWhichMustUpdate);
         }
     }
 }
