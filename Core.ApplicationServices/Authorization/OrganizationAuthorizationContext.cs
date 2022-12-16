@@ -486,6 +486,12 @@ namespace Core.ApplicationServices.Authorization
                    IsOrganizationModuleAdmin(organizationId);
         }
 
+        public bool Visit(BulkAdministerRights permission)
+        {
+            var organizationId = permission.OrganizationId;
+            return IsGlobalAdmin() || IsLocalAdmin(organizationId);
+        }
+
         #endregion PERMISSIONS
     }
 }

@@ -57,7 +57,8 @@ namespace Presentation.Web.Controllers.API.V1
                 accessRights.CanEanBeModified,
                 accessRights.CanDeviceIdBeModified,
                 accessRights.CanBeRearranged,
-                accessRights.CanBeDeleted);
+                accessRights.CanBeDeleted,
+                accessRights.CanEditRegistrations);
         }
 
         private static IEnumerable<UnitAccessRightsWithUnitIdDTO> ToUnitAccessRightsDtoWithUnitIdDtos(

@@ -38,7 +38,7 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitService","currentOrganization",
+        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "inMemoryCacheService", "organizationUnitService", "currentOrganization",
         function ($scope,
             $http: ng.IHttpService,
             $modal,
@@ -50,7 +50,6 @@
             user,
             hasWriteAccess,
             authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
-            select2LoadingService: Kitos.Services.ISelect2LoadingService,
             inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
             organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService,
             currentOrganization) {
@@ -223,7 +222,7 @@
                 var uId = $scope.selectedUser.id;
 
                 if (!oId || !rId || !uId) return;
-                
+
                 var data = {
                     "roleId": rId,
                     "userId": uId
@@ -432,6 +431,7 @@
                             $modalScope.canEanBeModified = false;
                             $modalScope.canDeviceIdBeModified = false;
                             $modalScope.canDelete = false;
+                            $modalScope.canEditRegistrations = false;
 
                             organizationUnitService.getUnitAccessRights(currentOrganization.uuid, unit.uuid)
                                 .then(res => {
@@ -440,6 +440,7 @@
                                     $modalScope.canEanBeModified = res.canEanBeModified;
                                     $modalScope.canDeviceIdBeModified = res.canDeviceIdBeModified;
                                     $modalScope.canChangeParent = res.canBeRearranged;
+                                    $modalScope.canEditRegistrations = res.canEditRegistrations;
                                     $modalScope.areRightsLoaded = true;
                                 });
 

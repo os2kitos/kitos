@@ -82,6 +82,7 @@
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
     <Compile Include="Authorization\Permissions\AdministerGlobalPermission.cs" />
+    <Compile Include="Authorization\Permissions\BulkAdministerRights.cs" />
     <Compile Include="Authorization\Permissions\GlobalPermission.cs" />
     <Compile Include="Authorization\Permissions\ImportHierarchyFromStsOrganizationPermission.cs" />
     <Compile Include="Authorization\Permissions\TriggerBrokenReferencesReportPermission.cs" />
