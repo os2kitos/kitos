@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -461,6 +462,71 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Act
             var actual = _sut.HasPermission(new AdministerOrganizationRightPermission(right));
+
+            //Assert
+            Assert.Equal(expectedResult, actual);
+        }
+
+        [Theory]
+        [InlineData(null,false,false)]
+        [InlineData(null,true,false)]
+        [InlineData(OrganizationRole.GlobalAdmin,false,true)]
+        [InlineData(OrganizationRole.GlobalAdmin,true,true)]
+        [InlineData(OrganizationRole.LocalAdmin, false,false)]
+        [InlineData(OrganizationRole.LocalAdmin, true,true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, false,false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, true,false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, true,false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, false,false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, true,false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, false,false)]
+        [InlineData(OrganizationRole.RightsHolderAccess, false,false)]
+        [InlineData(OrganizationRole.RightsHolderAccess, true,false)]
+        public void HasPermission_With_DeleteAnyUserPermission_Returns(OrganizationRole? role, bool hasOrg, bool expectedResult)
+        {
+            //Arrange
+            var organizationId = hasOrg ? A<int>() : default(int?);
+
+            if (role == OrganizationRole.GlobalAdmin)
+            {
+                ExpectUserIsGlobalAdmin(true);
+            }
+            else if (role != null)
+            {
+                ExpectUserHasRoles(organizationId.GetValueOrDefault(), role.Value);
+            }
+
+            //Act
+            var actual = _sut.HasPermission(new DeleteAnyUserPermission(organizationId.FromNullableValueType()));
+
+            //Assert
+            Assert.Equal(expectedResult, actual);
+        }
+
+        [Theory]
+        [InlineData(null, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(OrganizationRole.RightsHolderAccess, false)]
+        public void HasPermission_With_BulkAdministerOrganizationUnitRegistrations_Returns(OrganizationRole? role, bool expectedResult)
+        {
+            //Arrange
+            var organizationId = A<int>();
+
+            if (role == OrganizationRole.GlobalAdmin)
+            {
+                ExpectUserIsGlobalAdmin(true);
+            }
+            else if (role != null)
+            {
+                ExpectUserHasRoles(organizationId, role.Value);
+            }
+
+            //Act
+            var actual = _sut.HasPermission(new BulkAdministerOrganizationUnitRegistrations(organizationId));
 
             //Assert
             Assert.Equal(expectedResult, actual);

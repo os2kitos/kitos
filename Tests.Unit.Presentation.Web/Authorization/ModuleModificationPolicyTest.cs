@@ -80,6 +80,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItContract), false, true, null, true)]
         [InlineData(typeof(Organization), false, true, null, true)]
         [InlineData(typeof(User), false, true, null, true)]
+        [InlineData(typeof(OrganizationUnit), false, true, null, true)]
+        [InlineData(typeof(OrganizationRight), false, true, null, true)]
         // LOCAL ADMIN
         [InlineData(typeof(ItSystem), true, false, null, false)]
         [InlineData(typeof(ItInterface), true, false, null, true)]
@@ -87,6 +89,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItContract), true, false, null, true)]
         [InlineData(typeof(User), true, false, null, true)]
         [InlineData(typeof(Organization), true, false, null, false)]
+        [InlineData(typeof(OrganizationUnit), true, false, null, true)]
+        [InlineData(typeof(OrganizationRight), true, false, null, true)]
         // SYSTEM ADMIN
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.SystemModuleAdmin, true)]
@@ -94,6 +98,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItContract), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(Organization), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(OrganizationUnit), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(OrganizationRight), false, false, OrganizationRole.SystemModuleAdmin, true)]
         // CONTRACT ADMIN
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.ContractModuleAdmin, false)]
@@ -101,6 +107,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItContract), false, false, OrganizationRole.ContractModuleAdmin, true)]
         [InlineData(typeof(Organization), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(OrganizationUnit), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(OrganizationRight), false, false, OrganizationRole.ContractModuleAdmin, true)]
         // ORGANIZATION ADMIN
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
@@ -108,6 +116,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItContract), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(Organization), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
+        [InlineData(typeof(OrganizationUnit), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
+        [InlineData(typeof(OrganizationRight), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
 
         public void Allow_Creation_With_Type_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
