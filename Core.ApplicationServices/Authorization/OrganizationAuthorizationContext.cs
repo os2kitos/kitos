@@ -486,10 +486,16 @@ namespace Core.ApplicationServices.Authorization
                    IsOrganizationModuleAdmin(organizationId);
         }
 
-        public bool Visit(BulkAdministerRights permission)
+        public bool Visit(BulkAdministerOrganizationUnitRegistrations permission)
         {
             var organizationId = permission.OrganizationId;
             return IsGlobalAdmin() || IsLocalAdmin(organizationId);
+        }
+
+        public bool Visit(DeleteAnyUserPermission permission)
+        {
+            var organization = permission.OptionalOrganizationScopeId;
+            return IsGlobalAdmin() || organization.Select(IsLocalAdmin).GetValueOrFallback(false);
         }
 
         #endregion PERMISSIONS

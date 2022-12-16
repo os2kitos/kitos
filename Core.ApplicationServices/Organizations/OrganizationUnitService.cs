@@ -261,7 +261,7 @@ namespace Core.ApplicationServices.Organizations
         private Result<TSuccess, OperationError> ModifyRegistrations<TSuccess>(Guid organizationId, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)
         {
             return Modify(organizationId, unitUuid,
-                (org, orgUnit) => _authorizationContext.HasPermission(new BulkAdministerRights(org.Id))
+                (org, orgUnit) => _authorizationContext.HasPermission(new BulkAdministerOrganizationUnitRegistrations(org.Id))
                     ? mutation(org, orgUnit)
                     : new OperationError("User is not authorized for bulk permission administration", OperationFailure.Forbidden)
                 );
@@ -306,7 +306,7 @@ namespace Core.ApplicationServices.Organizations
                 canBeDeleted = false;
             }
 
-            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canInfoAdditionalfieldsBeModified, canBeRearranged, canBeDeleted, _authorizationContext.HasPermission(new BulkAdministerRights(organization.Id)));
+            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canInfoAdditionalfieldsBeModified, canBeRearranged, canBeDeleted, _authorizationContext.HasPermission(new BulkAdministerOrganizationUnitRegistrations(organization.Id)));
         }
 
         private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)

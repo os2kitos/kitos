@@ -33,7 +33,8 @@
             "notify",
             "gridStateService",
             "exportGridToExcelService",
-            "$timeout"
+            "$timeout",
+            "adminPermissions"
         ];
 
         constructor(
@@ -45,8 +46,8 @@
             private readonly notify,
             private readonly gridStateService: Services.IGridStateFactory,
             private readonly exportGridToExcelService: Services.System.ExportGridToExcelService,
-            private readonly $timeout: ng.ITimeoutService) {
-            this.hasWriteAccess = hasWriteAccess;
+            private readonly $timeout: ng.ITimeoutService,
+            private readonly adminPermissions: Models.Users.UserAdministrationPermissionsDTO) {
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
@@ -112,6 +113,7 @@
         }
 
         private activate() {
+            const allowDelete = this.adminPermissions.allowDelete;
             var mainGridOptions: IKendoGridOptions<IGridModel> = {
                 autoBind: false,
                 dataSource: {
@@ -171,7 +173,6 @@
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
                                 usr.canEdit = this.hasWriteAccess;
-
                                 // remove the user role
                                 this._.remove(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
 
@@ -180,7 +181,7 @@
                                 usr.isSystemAdmin = this.hasRole(usr, Models.OrganizationRole.SystemModuleAdmin);
                                 usr.isContractAdmin = this.hasRole(usr, Models.OrganizationRole.ContractModuleAdmin);
                                 usr.isRightsHolder = this.hasRole(usr, Models.OrganizationRole.RightsHolderAccess);
-                                usr.ObjectOwner ??= { Name: "", LastName:"" } as any;
+                                usr.ObjectOwner ??= { Name: "", LastName: "" } as any;
                             });
                             return response;
                         }
@@ -405,7 +406,7 @@
                         menu: this.user.isGlobalAdmin,
                     },
                     {
-                        template: (dataItem) => dataItem.canEdit ? `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>` : `<a class="k-button k-button-icontext" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-edit"></span>Redigér</a><a class="k-button k-button-icontext" data-user="dataItem" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-delete"></span>Slet</a>`,
+                        template: (dataItem) => `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" ng-if="${dataItem.canEdit}" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" ng-if="${allowDelete}" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>`,
                         field: "Name", //Must bind to something or it corrupts the excel outputs
                         title: " ",
                         filterable: false,
@@ -413,7 +414,8 @@
                         menu: false,
                         width: 176,
                         persistId: "rowCommands",
-                        uiOnlyColumn: true
+                        uiOnlyColumn: true,
+                        isAvailable: this.hasWriteAccess || allowDelete
                     }
                 ]
             };
@@ -486,6 +488,8 @@
                                 .getAuthorizationForItem(user.currentOrganizationId)
                     ],
                     hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
+                    ],
+                    adminPermissions: ["userService", "user", (userService: Services.IUserService, user: Services.IUser) => userService.getPermissions(user.currentOrganizationUuid)
                     ]
                 }
             });

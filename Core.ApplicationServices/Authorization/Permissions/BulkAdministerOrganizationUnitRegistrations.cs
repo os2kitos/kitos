@@ -1,10 +1,10 @@
 ﻿namespace Core.ApplicationServices.Authorization.Permissions
 {
-    public class BulkAdministerRights : Permission
+    public class BulkAdministerOrganizationUnitRegistrations : Permission
     {
         public int OrganizationId { get; }
 
-        public BulkAdministerRights(int organizationId)
+        public BulkAdministerOrganizationUnitRegistrations(int organizationId)
         {
             OrganizationId = organizationId;
         }
