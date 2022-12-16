@@ -12,7 +12,7 @@ namespace Core.DomainServices.Queries.Helpers
                     // 1: Common scenario
                     // Exclude those which were enforced as valid - dates have no effect
                     contract.Active == false &&
-                    // Include systems where concluded (start time) has passed or is not defined
+                    // Include where concluded (start time) has passed or is not defined
                     (contract.Concluded == null || contract.Concluded <= currentTime) &&
                     // Include only if not expired or no expiration defined
                     (contract.ExpirationDate == null || currentTime <= contract.ExpirationDate)

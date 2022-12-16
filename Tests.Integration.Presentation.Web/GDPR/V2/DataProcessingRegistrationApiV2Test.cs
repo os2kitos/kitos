@@ -27,7 +27,6 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
-using System.Diagnostics.Contracts;
 using Presentation.Web.Models.API.V2.Request.Contract;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2

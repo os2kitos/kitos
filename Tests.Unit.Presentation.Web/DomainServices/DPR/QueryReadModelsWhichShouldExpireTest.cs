@@ -22,7 +22,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices.DPR
         }
 
         [Fact]
-        public void Apply_Includes_Systems_Which_Are_Currently_Active_But_Should_Be_Inactive()
+        public void Apply_Includes_DPRs_Which_Are_Currently_Active_But_Should_Be_Inactive()
         {
             var mainContract = new ItContract
             {
