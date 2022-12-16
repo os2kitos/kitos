@@ -577,18 +577,8 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var registration = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
 
-            var createContractRequest1 = new CreateNewContractRequestDTO()
-            {
-                OrganizationUuid = organization.Uuid,
-                Name = CreateName(),
-                DataProcessingRegistrationUuids = new[] { registration.Uuid }
-            };
-            var createContractRequest2 = new CreateNewContractRequestDTO()
-            {
-                OrganizationUuid = organization.Uuid,
-                Name = CreateName(),
-                DataProcessingRegistrationUuids = new[] { registration.Uuid }
-            };
+            var createContractRequest1 = CreateContractWithDprUuids(organization.Uuid, registration.Uuid);
+            var createContractRequest2 = CreateContractWithDprUuids(organization.Uuid, registration.Uuid);
 
             var contract1 = await ItContractV2Helper.PostContractAsync(token, createContractRequest1);
             var contract2 = await ItContractV2Helper.PostContractAsync(token, createContractRequest2);
@@ -608,6 +598,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             using var response2 = await DataProcessingRegistrationV2Helper
                 .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = contract2.Uuid})
                 .WithExpectedResponseCode(HttpStatusCode.OK);
+
             using var patchedContract2= await ItContractV2Helper
                 .SendPatchContractGeneralDataAsync(token, contract2.Uuid, new ContractGeneralDataWriteRequestDTO() { Validity = new ContractValidityWriteRequestDTO(){ ValidTo = DateTime.Now.AddMonths(-A<int>())}})
                 .WithExpectedResponseCode(HttpStatusCode.OK);
@@ -1440,6 +1431,16 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
                 organizationName, string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), orgType, AccessModifier.Public);
             return organization;
+        }
+
+        private CreateNewContractRequestDTO CreateContractWithDprUuids(Guid organizationUuid, params Guid[] dprUuids)
+        {
+            return new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organizationUuid,
+                Name = CreateName(),
+                DataProcessingRegistrationUuids = dprUuids
+            };
         }
 
         private string CreateName()
