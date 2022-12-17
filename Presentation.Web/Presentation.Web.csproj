@@ -417,7 +417,7 @@
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V1\UserAdministrationController.cs" />
+    <Compile Include="Controllers\API\V1\UserAdministrationPermissionsController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\GDPRPersonalDataMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />

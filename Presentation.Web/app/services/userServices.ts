@@ -64,7 +64,7 @@
         }
 
         getPermissions(organizationUuid: string): ng.IPromise<Models.Users.UserAdministrationPermissionsDTO> {
-            return this.genericApiWrapper.getDataFromUrl<Models.Users.UserAdministrationPermissionsDTO>(`api/v1/user/administration/${organizationUuid}/permissions`);
+            return this.genericApiWrapper.getDataFromUrl<Models.Users.UserAdministrationPermissionsDTO>(`api/v1/organizations/${organizationUuid}/administration/users/permissions`);
         }
 
         saveUser = (user, orgAndDefaultUnit) => {

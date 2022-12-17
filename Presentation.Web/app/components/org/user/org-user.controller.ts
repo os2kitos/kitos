@@ -114,6 +114,184 @@
 
         private activate() {
             const allowDelete = this.adminPermissions.allowDelete;
+            const columns: IKendoGridColumn<IGridModel>[] = [
+                {
+                    field: "Name", title: "Navn", width: 230,
+                    persistId: "fullname",
+                    template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
+                    excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
+                    hidden: false,
+                    filterable: {
+                        cell: {
+                            template: customFilter,
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
+                        }
+                    }
+                },
+                {
+                    field: "Email", title: "Email", width: 230,
+                    persistId: "email",
+                    template: (dataItem) => `${dataItem.Email}`,
+                    excelTemplate: (dataItem) => dataItem.Email,
+                    headerAttributes: {
+                        "data-element-type": "userHeaderEmail"
+                    },
+                    attributes: {
+                        "data-element-type": "userEmailObject"
+                    },
+                    hidden: false,
+                    filterable: {
+                        cell: {
+                            template: customFilter,
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
+                        }
+                    }
+                },
+                {
+                    field: "LastAdvisDate", title: "Advis", width: 110,
+                    persistId: "advisdate",
+                    template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
+                    excelTemplate: (dataItem) => dataItem.LastAdvisDate ? Kitos.Helpers.ExcelExportHelper.renderDate(dataItem.LastAdvisDate) : "",
+                    hidden: false,
+                    filterable: false
+                },
+                {
+                    field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
+                    persistId: "createdby",
+                    template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
+                    excelTemplate: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
+                    hidden: false,
+                    filterable: {
+                        cell: {
+                            template: customFilter,
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
+                        }
+                    }
+                },
+                {
+                    field: "OrganizationUnitRights.Role",
+                    title: "Organisationsroller",
+                    width: 150,
+                    filterable: false,
+                    sortable: false,
+                    persistId: "role",
+                    attributes: { "class": "might-overflow" },
+                    template: (dataItem) => {
+                        if (dataItem.OrganizationUnitRights.length == 0) {
+                            return "";
+                        }
+                        return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
+                    },
+                    excelTemplate: (dataItem) => dataItem.OrganizationUnitRights.map(right => right.Role.Name).join(", "),
+                    hidden: true
+                },
+                {
+                    field: "hasApi", title: "API bruger", width: 96,
+                    persistId: "apiaccess",
+                    attributes: { "class": "text-center", "data-element-type": "userObject" },
+                    headerAttributes: {
+                        "data-element-type": "userHeader"
+                    },
+                    template: (dataItem) => setBooleanValue(dataItem.HasApiAccess),
+                    excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasApiAccess),
+                    hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
+                    filterable: false,
+                    sortable: false,
+                    menu: (this.user.isGlobalAdmin || this.user.isLocalAdmin),
+                },
+                {
+                    field: "isLocalAdmin", title: "Lokal Admin", width: 96,
+                    persistId: "localadminrole",
+                    attributes: { "class": "text-center" },
+                    template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
+                    excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isLocalAdmin),
+                    hidden: false,
+                    filterable: false,
+                    sortable: false
+                },
+                {
+                    field: "isOrgAdmin", title: "Organisations Admin", width: 104,
+                    persistId: "orgadminrole",
+                    attributes: { "class": "text-center" },
+                    template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
+                    excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isOrgAdmin),
+                    hidden: false,
+                    filterable: false,
+                    sortable: false
+                },
+                {
+                    field: "isSystemAdmin", title: "System Admin", width: 104,
+                    persistId: "systemadminrole",
+                    attributes: { "class": "text-center" },
+                    template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
+                    excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isSystemAdmin),
+                    hidden: false,
+                    filterable: false,
+                    sortable: false
+                },
+                {
+                    field: "isContractAdmin", title: "Kontrakt Admin", width: 112,
+                    persistId: "contractadminrole",
+                    attributes: { "class": "text-center" },
+                    template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
+                    excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isContractAdmin),
+                    hidden: false,
+                    filterable: false,
+                    sortable: false
+                },
+                {
+
+                    field: "rightsHolder", title: "Rettighedshaveradgang", width: 160,
+                    persistId: "rightsHolder",
+                    attributes: { "class": "text-center", "data-element-type": "rightsHolderObject" },
+                    headerAttributes: {
+                        "data-element-type": "rightsHolderHeader"
+                    },
+                    template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
+                    excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isRightsHolder),
+                    hidden: !this.user.isGlobalAdmin,
+                    filterable: false,
+                    sortable: false,
+                    menu: this.user.isGlobalAdmin,
+                },
+                {
+
+                    field: "stakeHolder", title: "Interessentadgang", width: 160,
+                    persistId: "stakeHolder",
+                    attributes: { "class": "text-center", "data-element-type": "stakeHolderObject" },
+                    headerAttributes: {
+                        "data-element-type": "stakeHolderHeader"
+                    },
+                    template: (dataItem) => setBooleanValue(dataItem.HasStakeHolderAccess),
+                    excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasStakeHolderAccess),
+                    hidden: !this.user.isGlobalAdmin,
+                    filterable: false,
+                    sortable: false,
+                    menu: this.user.isGlobalAdmin,
+                }
+            ];
+            if (this.hasWriteAccess || allowDelete) {
+                columns.push(
+                    {
+                        template: (dataItem) => `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" ng-if="${dataItem.canEdit}" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" ng-if="${allowDelete}" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>`,
+                        field: "Name", //Must bind to something or it corrupts the excel outputs
+                        title: " ",
+                        filterable: false,
+                        sortable: false,
+                        menu: false,
+                        width: 176,
+                        persistId: "rowCommands",
+                        uiOnlyColumn: true,
+                    } 
+                );
+            }
+
             var mainGridOptions: IKendoGridOptions<IGridModel> = {
                 autoBind: false,
                 dataSource: {
@@ -244,180 +422,7 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 page: this.onPaging,
-                columns: [
-                    {
-                        field: "Name", title: "Navn", width: 230,
-                        persistId: "fullname",
-                        template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
-                        excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "Email", title: "Email", width: 230,
-                        persistId: "email",
-                        template: (dataItem) => `${dataItem.Email}`,
-                        excelTemplate: (dataItem) => dataItem.Email,
-                        headerAttributes: {
-                            "data-element-type": "userHeaderEmail"
-                        },
-                        attributes: {
-                            "data-element-type": "userEmailObject"
-                        },
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "LastAdvisDate", title: "Advis", width: 110,
-                        persistId: "advisdate",
-                        template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
-                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? Kitos.Helpers.ExcelExportHelper.renderDate(dataItem.LastAdvisDate) : "",
-                        hidden: false,
-                        filterable: false
-                    },
-                    {
-                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
-                        persistId: "createdby",
-                        template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
-                        excelTemplate: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "OrganizationUnitRights.Role",
-                        title: "Organisationsroller",
-                        width: 150,
-                        filterable: false,
-                        sortable: false,
-                        persistId: "role",
-                        attributes: { "class": "might-overflow" },
-                        template: (dataItem) => {
-                            if (dataItem.OrganizationUnitRights.length == 0) {
-                                return "";
-                            }
-                            return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
-                        },
-                        excelTemplate: (dataItem) => dataItem.OrganizationUnitRights.map(right => right.Role.Name).join(", "),
-                        hidden: true
-                    },
-                    {
-                        field: "hasApi", title: "API bruger", width: 96,
-                        persistId: "apiaccess",
-                        attributes: { "class": "text-center", "data-element-type": "userObject" },
-                        headerAttributes: {
-                            "data-element-type": "userHeader"
-                        },
-                        template: (dataItem) => setBooleanValue(dataItem.HasApiAccess),
-                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasApiAccess),
-                        hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
-                        filterable: false,
-                        sortable: false,
-                        menu: (this.user.isGlobalAdmin || this.user.isLocalAdmin),
-                    },
-                    {
-                        field: "isLocalAdmin", title: "Lokal Admin", width: 96,
-                        persistId: "localadminrole",
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
-                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isLocalAdmin),
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "isOrgAdmin", title: "Organisations Admin", width: 104,
-                        persistId: "orgadminrole",
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
-                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isOrgAdmin),
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "isSystemAdmin", title: "System Admin", width: 104,
-                        persistId: "systemadminrole",
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
-                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isSystemAdmin),
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "isContractAdmin", title: "Kontrakt Admin", width: 112,
-                        persistId: "contractadminrole",
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
-                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isContractAdmin),
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-
-                        field: "rightsHolder", title: "Rettighedshaveradgang", width: 160,
-                        persistId: "rightsHolder",
-                        attributes: { "class": "text-center", "data-element-type": "rightsHolderObject" },
-                        headerAttributes: {
-                            "data-element-type": "rightsHolderHeader"
-                        },
-                        template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
-                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isRightsHolder),
-                        hidden: !this.user.isGlobalAdmin,
-                        filterable: false,
-                        sortable: false,
-                        menu: this.user.isGlobalAdmin,
-                    },
-                    {
-
-                        field: "stakeHolder", title: "Interessentadgang", width: 160,
-                        persistId: "stakeHolder",
-                        attributes: { "class": "text-center", "data-element-type": "stakeHolderObject" },
-                        headerAttributes: {
-                            "data-element-type": "stakeHolderHeader"
-                        },
-                        template: (dataItem) => setBooleanValue(dataItem.HasStakeHolderAccess),
-                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasStakeHolderAccess),
-                        hidden: !this.user.isGlobalAdmin,
-                        filterable: false,
-                        sortable: false,
-                        menu: this.user.isGlobalAdmin,
-                    },
-                    {
-                        template: (dataItem) => `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" ng-if="${dataItem.canEdit}" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" ng-if="${allowDelete}" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>`,
-                        field: "Name", //Must bind to something or it corrupts the excel outputs
-                        title: " ",
-                        filterable: false,
-                        sortable: false,
-                        menu: false,
-                        width: 176,
-                        persistId: "rowCommands",
-                        uiOnlyColumn: true,
-                        isAvailable: this.hasWriteAccess || allowDelete
-                    }
-                ]
+                columns: columns
             };
 
             Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
