@@ -406,36 +406,18 @@ namespace Core.ApplicationServices.Authorization
         {
             var right = permission.Target;
 
-            var result = false;
+            var isGlobalAdmin = IsGlobalAdmin();
+            var hasFullLocalAccess = isGlobalAdmin || IsLocalAdmin(right.OrganizationId);
 
-            if (right.Role == OrganizationRole.GlobalAdmin)
+            return right.Role switch
             {
-                if (HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
-                {
-                    result = true;
-                }
-            }
-            else if (right.Role == OrganizationRole.RightsHolderAccess)
-            {
-                if (IsGlobalAdmin())
-                {
-                    result = true;
-                }
-            }
-            // Only local and global admins can make users local admins
-            else if (right.Role == OrganizationRole.LocalAdmin)
-            {
-                if (IsGlobalAdmin() || IsLocalAdmin(right.OrganizationId))
-                {
-                    result = true;
-                }
-            }
-            else
-            {
-                result = IsGlobalAdmin() || IsLocalAdmin(right.OrganizationId) || IsOrganizationModuleAdmin(right.OrganizationId);
-            }
-
-            return result;
+                OrganizationRole.GlobalAdmin => HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)),
+                OrganizationRole.RightsHolderAccess => isGlobalAdmin,
+                OrganizationRole.LocalAdmin => hasFullLocalAccess,
+                OrganizationRole.User => hasFullLocalAccess || IsOrganizationModuleAdmin(right.OrganizationId),
+                OrganizationRole.OrganizationModuleAdmin => hasFullLocalAccess || IsOrganizationModuleAdmin(right.OrganizationId),
+                _ => hasFullLocalAccess
+            };
         }
 
         bool IPermissionVisitor.Visit(DefineOrganizationTypePermission permission)
@@ -444,11 +426,9 @@ namespace Core.ApplicationServices.Authorization
             {
                 OrganizationTypeKeys.Kommune => IsGlobalAdmin(),
                 OrganizationTypeKeys.AndenOffentligMyndighed => IsGlobalAdmin(),
-                OrganizationTypeKeys.Interessefællesskab => IsGlobalAdmin() ||
-                                                            IsLocalAdmin(permission.ParentOrganizationId),
+                OrganizationTypeKeys.Interessefællesskab => IsGlobalAdmin() || IsLocalAdmin(permission.ParentOrganizationId),
                 OrganizationTypeKeys.Virksomhed => IsGlobalAdmin() || IsLocalAdmin(permission.ParentOrganizationId),
-                _ => throw new ArgumentOutOfRangeException(nameof(permission.TargetOrganizationType),
-                    permission.TargetOrganizationType, "Unmapped organization type")
+                _ => throw new ArgumentOutOfRangeException(nameof(permission.TargetOrganizationType), permission.TargetOrganizationType, "Unmapped organization type")
             };
         }
 

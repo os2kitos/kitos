@@ -109,5 +109,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
+
+        [NonAction]
+        public override IHttpActionResult Patch(int key, Delta<OrganizationRight> delta) => throw new NotSupportedException();
     }
 }

@@ -514,9 +514,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             return userId;
         }
 
-        public static async Task<HttpResponseMessage> SendAssignRoleToUserAsync(int userId, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId)
+        public static async Task<HttpResponseMessage> SendAssignRoleToUserAsync(int userId, OrganizationRole role,int organizationId = TestEnvironment.DefaultOrganizationId, Cookie optionalLoginCookie = null)
         {
-            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = optionalLoginCookie ?? await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var roleDto = new OrgRightDTO
             {
@@ -525,6 +525,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             return await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto);
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveRoleToUserAsync(int rightId, int organizationId = TestEnvironment.DefaultOrganizationId, Cookie optionalLoginCookie = null)
+        {
+            var cookie = optionalLoginCookie ?? await GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await DeleteWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights({rightId})"), cookie);
         }
 
         public static async Task PatchOdataUserAsync(ApiUserDTO userDto, int userId)

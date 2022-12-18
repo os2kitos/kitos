@@ -8,7 +8,7 @@
                 authRoles: ["GlobalAdmin"],
                 resolve: {
                     adminRights: [
-                        "$http", $http => $http.get("api/OrganizationRight/?roleName=LocalAdmin&roleWithName").then(result => result.data.response)
+                        "$http", $http => $http.get("api/OrganizationRight/?allLocalAdmins").then(result => result.data.response)
                     ],
                     user: [
                         "userService", userService => userService.getUser()
