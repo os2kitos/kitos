@@ -76,7 +76,8 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> SendGetUserAdministrationPermissionsRequestAsync(Guid organizationUuid,Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/organizations/${organizationUuid:D}/administration/users/permissions"), cookie);
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid:D}/administration/users/permissions");
+            return await HttpApi.GetWithCookieAsync(url, cookie);
         }
     }
 }
