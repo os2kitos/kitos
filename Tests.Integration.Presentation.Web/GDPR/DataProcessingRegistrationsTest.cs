@@ -1002,7 +1002,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(dto.MainContractId, contract.Id);
 
             //Act - remove
-            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveMainContractRequestAsync(registration.Id, contract.Id);
+            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveMainContractRequestAsync(registration.Id);
 
             //Assert - main contract removed
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);

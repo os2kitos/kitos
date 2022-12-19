@@ -423,13 +423,11 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/main-contract/update"), cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> SendRemoveMainContractRequestAsync(int id, int contractId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendRemoveMainContractRequestAsync(int id, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var body = new SingleValueDTO<int> { Value = contractId };
-
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/main-contract/remove"), cookie, body);
+            
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/main-contract/remove"), cookie, new{});
         }
     }
 }

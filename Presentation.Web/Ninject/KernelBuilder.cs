@@ -117,6 +117,7 @@ using Infrastructure.STS.OrganizationUnit.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
+using Core.ApplicationServices.GDPR.Handlers;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
@@ -390,6 +391,7 @@ namespace Presentation.Web.Ninject
             RegisterCommands<RemoveUserFromKitosCommandHandler>(kernel);
             RegisterCommands<RemoveOrganizationUnitRegistrationsCommandHandler>(kernel);
             RegisterCommands<AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler>(kernel);
+            RegisterCommands<RemoveMainContractFromDataProcessingRegistraitonCommandHandler>(kernel);
         }
 
         private void RegisterCommands<THandler>(IKernel kernel)
