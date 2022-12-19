@@ -10,6 +10,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Model.GDPR;
+using Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
@@ -352,9 +353,11 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest("organizationId must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .AssignSubDataProcessor(id, organizationId.Value)
+                .AssignSubDataProcessor(id, organizationId.Value, Maybe<BasisForTransferParameters>.None)
                 .Match(_ => Ok(), FromOperationError);
         }
+
+        //TODO: Test the New parameters
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/remove")]

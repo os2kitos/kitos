@@ -90,7 +90,8 @@ namespace Core.DomainModel.GDPR
 
         public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
 
-        public virtual ICollection<Organization.Organization> SubDataProcessors { get; set; }
+        public virtual ICollection<Organization.Organization> SubDataProcessors { get; set; } //TODO: Replace this one
+        public virtual ICollection<SubDataProcessor> AssignedSubDataProcessors { get; set; } //TODO: Replace this one
 
         public virtual DataProcessingDataResponsibleOption DataResponsible { get; set; }
         public int? DataResponsible_Id { get; set; }
@@ -122,6 +123,7 @@ namespace Core.DomainModel.GDPR
             return dataProcessor;
         }
 
+        //TODO: Update this one
         public Result<Organization.Organization, OperationError> AssignSubDataProcessor(Organization.Organization dataProcessor)
         {
             if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
@@ -137,6 +139,7 @@ namespace Core.DomainModel.GDPR
             return dataProcessor;
         }
 
+        //TODO: Update this one
         public Result<Organization.Organization, OperationError> RemoveSubDataProcessor(Organization.Organization dataProcessor)
         {
             if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));

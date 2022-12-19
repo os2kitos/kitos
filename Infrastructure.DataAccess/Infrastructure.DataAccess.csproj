@@ -137,6 +137,7 @@
     <Compile Include="Mapping\DataRowMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
+    <Compile Include="Mapping\SubDataProcessorMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />

@@ -25,12 +25,12 @@ namespace Core.DomainServices.GDPR
 
         public Result<Organization, OperationError> AssignDataProcessor(DataProcessingRegistration registration, int organizationId)
         {
-            return ExecuteDataProcessorChange(registration, organizationId, _ => _.AssignDataProcessor);
+            return ExecuteDataProcessorChange<Organization>(registration, organizationId, _ => _.AssignDataProcessor);
         }
 
         public Result<Organization, OperationError> RemoveDataProcessor(DataProcessingRegistration registration, int organizationId)
         {
-            return ExecuteDataProcessorChange(registration, organizationId, _ => _.RemoveDataProcessor);
+            return ExecuteDataProcessorChange<Organization>(registration, organizationId, _ => _.RemoveDataProcessor);
         }
 
         public IQueryable<Organization> GetApplicableSubDataProcessors(DataProcessingRegistration registration)
@@ -38,20 +38,24 @@ namespace Core.DomainServices.GDPR
             return GetApplicable(registration, _ => _.SubDataProcessors);
         }
 
+        //TODO: Change the type here!
         public Result<Organization, OperationError> AssignSubDataProcessor(DataProcessingRegistration registration, int organizationId)
         {
-            return ExecuteDataProcessorChange(registration, organizationId, _ => _.AssignSubDataProcessor);
+            return ExecuteDataProcessorChange<Organization>(registration, organizationId, _ => _.AssignSubDataProcessor);
         }
 
+        //TODO: Change the type
         public Result<Organization, OperationError> RemoveSubDataProcessor(DataProcessingRegistration registration, int organizationId)
         {
-            return ExecuteDataProcessorChange(registration, organizationId, _ => _.RemoveSubDataProcessor);
+            return ExecuteDataProcessorChange<Organization>(registration, organizationId, _ => _.RemoveSubDataProcessor);
         }
 
-        private Result<Organization, OperationError> ExecuteDataProcessorChange(
+        //TODO: Add an update method here or inside the domain in stead
+
+        private Result<TResult, OperationError> ExecuteDataProcessorChange<TResult>(
             DataProcessingRegistration registration,
             int organizationId,
-            Func<DataProcessingRegistration, Func<Organization, Result<Organization, OperationError>>> getCommand)
+            Func<DataProcessingRegistration, Func<Organization, Result<TResult, OperationError>>> getCommand)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
 

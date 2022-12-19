@@ -140,6 +140,8 @@
     <Compile Include="Model\Contracts\Write\ItContractProcurementModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractTerminationParameters.cs" />
+    <Compile Include="Model\GDPR\SubDataProcessor\Write\BasisForTransferParameters.cs" />
+    <Compile Include="Model\GDPR\SubDataProcessor\Write\TransferToInsecureCountryParameters.cs" />
     <Compile Include="Model\GDPR\Write\DataProcessingRegistrationModificationParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationGeneralDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />

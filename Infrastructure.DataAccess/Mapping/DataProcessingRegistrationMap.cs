@@ -50,6 +50,12 @@ namespace Infrastructure.DataAccess.Mapping
             //Sub Data processors
             HasMany(x => x.SubDataProcessors)
                 .WithMany(x => x.SubDataProcessorForDataProcessingRegistrations);
+            //TODO: Kill it
+
+            HasMany(x => x.AssignedSubDataProcessors)
+                .WithRequired(x => x.DataProcessingRegistration)
+                .HasForeignKey(x => x.DataProcessingRegistrationId)
+                .WillCascadeOnDelete(true);
 
             //Transfer to insecure countries
             HasMany(x => x.InsecureCountriesSubjectToDataTransfer)

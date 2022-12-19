@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -295,9 +296,26 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId)
+        public Result<Organization, OperationError> UpdateSubDataProcessor(int id, int organizationId, BasisForTransferParameters basisForTransfer)
         {
-            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.AssignSubDataProcessor(registration, organizationId));
+            throw new NotImplementedException();
+        }
+
+        public Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<BasisForTransferParameters> basisForTransfer)
+        {
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService
+                .AssignSubDataProcessor(registration, organizationId)
+                .Bind
+                (
+                    dpr =>
+                    {
+                        return basisForTransfer.Match //TODO: We should return the created sub data processor in the domain, and then we can just bind to the domain method directly in stead of doing anything
+                        (
+                            parameters => UpdateSubDataProcessor(id, organizationId, parameters),
+                            () => dpr
+                        );
+                    })
+            );
         }
 
         public Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId)
@@ -477,7 +495,7 @@ namespace Core.ApplicationServices.GDPR
             return Modify<DataProcessingRegistration>(id, registration =>
             {
                 registration.SetOversightScheduledInspectionDate(oversightScheduledInspectionDate);
-                
+
                 return registration;
             });
         }
