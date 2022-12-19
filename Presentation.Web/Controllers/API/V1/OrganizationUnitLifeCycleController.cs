@@ -8,7 +8,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/organizations/{organizationUuid}/organization-units/{unitUuid}")]
 
     public class OrganizationUnitLifeCycleController : BaseApiController

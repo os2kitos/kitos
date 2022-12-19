@@ -375,6 +375,7 @@
                                 orgUnits.push(
                                     {
                                         id: node.id,
+                                        uuid: node.uuid,
                                         name: node.name,
                                         ean: node.ean,
                                         localId: node.localId,
@@ -411,6 +412,7 @@
                                 orgUnits.push(
                                     {
                                         id: unit.id,
+                                        uuid: unit.uuid,
                                         name: unit.name,
                                         ean: unit.ean,
                                         localId: unit.localId,
@@ -420,8 +422,6 @@
                                         origin: unit.origin
                                     });
                             }
-
-                            bindParentSelect($modalScope.orgUnit, orgUnits);
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
                             $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
@@ -440,7 +440,10 @@
                                     $modalScope.canEanBeModified = res.canEanBeModified;
                                     $modalScope.canDeviceIdBeModified = res.canDeviceIdBeModified;
                                     $modalScope.canChangeParent = res.canBeRearranged;
+                                    $modalScope.areRightsLoaded = true;
                                 });
+
+                            bindParentSelect($modalScope.orgUnit);
 
                             $modalScope.patch = function () {
                                 // don't allow duplicate submitting
@@ -613,37 +616,53 @@
                                 $modalInstance.close(createResult());
                             };
 
-                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel, otherOrgUnits: Kitos.Models.Api.Organization.IOrganizationUnitDto[]) {
+                            function bindParentSelect(currentUnit: Kitos.Models.ViewModel.Organization.IEditOrgUnitViewModel) {
 
-                                let existingChoice: { id: number; text: string };
+                                const root = $scope.nodes[0];
+                                const idToSkip = root.id === currentUnit.id ? null : currentUnit.id;
+                                const orgUnitsOptions = Kitos.Helpers.Select2OptionsFormatHelper.addIndentationToUnitChildren(root, 0, idToSkip);
+
+                                let existingChoice: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Kitos.Models.Api.Organization.OrganizationUnit>;
                                 if (currentUnit.isRoot) {
-                                    existingChoice = { id: currentUnit.id, text: currentUnit.newName };
+                                    const rootNodes = orgUnitsOptions.filter(x => x.id === String(currentUnit.id));
+                                    if (rootNodes.length < 1)
+                                        return;
+                                    const rootUnit = rootNodes[0];
+                                    existingChoice = rootUnit;
                                 } else {
-                                    const parentNodes = otherOrgUnits.filter(x => x.id === currentUnit.newParent);
+                                    const parentNodes = orgUnitsOptions.filter(x => x.id === String(currentUnit.newParent));
                                     if (parentNodes.length < 1) {
                                         return;
                                     }
                                     const parentNode = parentNodes[0];
-                                    existingChoice = { id: parentNode.id, text: parentNode.name };
+                                    existingChoice = parentNode;
                                 }
 
-                                const options = otherOrgUnits.map(value => {
-                                    return {
-                                        id: value.id,
-                                        text: value.name,
-                                        optionalObjectContext: value
-                                    }
-                                });
+                                $modalScope.existingParentChoice = existingChoice;
 
-                                $modalScope.parentSelect = {
-                                    selectedElement: existingChoice,
-                                    select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, false),
-                                    elementSelected: (newElement) => {
-                                        if (!!newElement) {
-                                            $modalScope.orgUnit.newParent = newElement.id;
+                                $modalScope.orgStructureSelectDropdownConfig = {
+                                    selectedElement: { id: existingChoice.id, text: existingChoice.text },
+                                    options: orgUnitsOptions.map(item => {
+                                        return {
+                                            id: item.id,
+                                            text: item.text,
+                                            indentationLevel: item.indentationLevel,
+                                            optionalObjectContext: {
+                                                externalOriginUuid: item.optionalObjectContext?.externalOriginUuid
+                                            }
+                                        }
+                                    }),
+                                    onSelected: () => {
+                                        var selectedElement = $modalScope.orgStructureSelectDropdownConfig?.selectedElement;
+                                        if (!selectedElement) {
+                                            return;
+                                        }
+                                        if (selectedElement.id !== $modalScope.existingParentChoice?.id) {
+                                            $modalScope.orgUnit.newParent = selectedElement.id;
+                                            $modalScope.existingParentChoice = selectedElement;
                                         }
                                     }
-                                };
+                                }
                             }
 
                             function createResult(types: Kitos.Models.ViewModel.Organization.OrganizationUnitEditResultType[] = null, unit = null): Kitos.Models.ViewModel.Organization.IOrganizationUnitEditResult {

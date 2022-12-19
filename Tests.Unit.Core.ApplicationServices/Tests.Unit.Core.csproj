@@ -193,7 +193,9 @@
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
+    <Compile Include="ApplicationServices\Handlers\AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest.cs" />
     <Compile Include="ApplicationServices\Handlers\RemoveUserFromKitosCommandHandler.cs" />
+    <Compile Include="ApplicationServices\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandlerTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationUnitServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
@@ -217,6 +219,7 @@
     <Compile Include="ApplicationServices\UIModuleCustomizationTest\UIModuleCustomizationTests.cs" />
     <Compile Include="ApplicationServices\UserRightsServiceTest.cs" />
     <Compile Include="ApplicationServices\UserServiceTest.cs" />
+    <Compile Include="BackgroundJobs\ScheduleFkOrgUpdatesBackgroundJobTest.cs" />
     <Compile Include="BackgroundJobs\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveStateTest.cs" />
     <Compile Include="DomainServices\Contract\ItContractOverviewReadModelUpdateTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
@@ -295,10 +298,6 @@
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
       <Name>Core.DomainServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
-      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
-      <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Ninject\Infrastructure.Ninject.csproj">
       <Project>{c01c5f9e-6904-4b4c-94b1-12d7c83f8070}</Project>

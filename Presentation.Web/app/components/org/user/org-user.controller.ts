@@ -1,7 +1,7 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface  IGridModel extends Models.IUser {
+    interface IGridModel extends Models.IUser {
         hasApi: boolean;
         canEdit: boolean;
         isLocalAdmin: boolean;
@@ -32,16 +32,20 @@
             "hasWriteAccess",
             "notify",
             "gridStateService",
+            "exportGridToExcelService",
+            "$timeout"
         ];
 
         constructor(
-            $scope: ng.IScope,
-            private $state: ng.ui.IStateService,
-            private _: ILoDashWithMixins,
-            private user,
-            private hasWriteAccess,
-            private notify,
-            private gridStateService: Services.IGridStateFactory) {
+            private readonly $scope: ng.IScope,
+            private readonly $state: ng.ui.IStateService,
+            private readonly _: ILoDashWithMixins,
+            private readonly user,
+            private readonly hasWriteAccess,
+            private readonly notify,
+            private readonly gridStateService: Services.IGridStateFactory,
+            private readonly exportGridToExcelService: Services.System.ExportGridToExcelService,
+            private readonly $timeout: ng.ITimeoutService) {
             this.hasWriteAccess = hasWriteAccess;
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
@@ -53,7 +57,7 @@
             setTimeout(() => this.activate(), 1);
         }
 
-        private hasRole(user : IGridModel, role: Models.OrganizationRole): boolean {
+        private hasRole(user: IGridModel, role: Models.OrganizationRole): boolean {
             return this._.find(user.OrganizationRights, (right) => right.Role === role) !== undefined;
         }
 
@@ -176,6 +180,7 @@
                                 usr.isSystemAdmin = this.hasRole(usr, Models.OrganizationRole.SystemModuleAdmin);
                                 usr.isContractAdmin = this.hasRole(usr, Models.OrganizationRole.ContractModuleAdmin);
                                 usr.isRightsHolder = this.hasRole(usr, Models.OrganizationRole.RightsHolderAccess);
+                                usr.ObjectOwner ??= { Name: "", LastName:"" } as any;
                             });
                             return response;
                         }
@@ -224,6 +229,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
+                excelExport: (e: any) => this.exportToExcel(e),
                 height: window.innerHeight - 200,
                 detailTemplate: (dataItem) => `<uib-tabset active="0">
                     <uib-tab index="0" heading="Organisation roller"><user-organization-unit-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-organization-unit-roles></uib-tab>
@@ -240,7 +246,7 @@
                 columns: [
                     {
                         field: "Name", title: "Navn", width: 230,
-                        persistId: "fullname", 
+                        persistId: "fullname",
                         template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         hidden: false,
@@ -255,7 +261,7 @@
                     },
                     {
                         field: "Email", title: "Email", width: 230,
-                        persistId: "email", 
+                        persistId: "email",
                         template: (dataItem) => `${dataItem.Email}`,
                         excelTemplate: (dataItem) => dataItem.Email,
                         headerAttributes: {
@@ -276,15 +282,15 @@
                     },
                     {
                         field: "LastAdvisDate", title: "Advis", width: 110,
-                        persistId: "advisdate", 
+                        persistId: "advisdate",
                         template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
-                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? dataItem.LastAdvisDate.toDateString() : "",
+                        excelTemplate: (dataItem) => dataItem.LastAdvisDate ? Kitos.Helpers.ExcelExportHelper.renderDate(dataItem.LastAdvisDate) : "",
                         hidden: false,
                         filterable: false
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
-                        persistId: "createdby", 
+                        persistId: "createdby",
                         template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                         excelTemplate: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                         hidden: false,
@@ -298,8 +304,12 @@
                         }
                     },
                     {
-                        field: "OrganizationUnitRights.Role", title: "Roller", width: 150,
-                        persistId: "role", 
+                        field: "OrganizationUnitRights.Role",
+                        title: "Organisationsroller",
+                        width: 150,
+                        filterable: false,
+                        sortable: false,
+                        persistId: "role",
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
                             if (dataItem.OrganizationUnitRights.length == 0) {
@@ -307,25 +317,18 @@
                             }
                             return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`;
                         },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        excelTemplate: (dataItem) => dataItem.OrganizationUnitRights.map(right => right.Role.Name).join(", "),
+                        hidden: true
                     },
                     {
-
                         field: "hasApi", title: "API bruger", width: 96,
-                        persistId: "apiaccess", 
+                        persistId: "apiaccess",
                         attributes: { "class": "text-center", "data-element-type": "userObject" },
                         headerAttributes: {
                             "data-element-type": "userHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasApiAccess),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasApiAccess),
                         hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
@@ -333,36 +336,40 @@
                     },
                     {
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,
-                        persistId: "localadminrole", 
+                        persistId: "localadminrole",
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isLocalAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
                     },
                     {
                         field: "isOrgAdmin", title: "Organisations Admin", width: 104,
-                        persistId: "orgadminrole", 
+                        persistId: "orgadminrole",
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isOrgAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
                     },
                     {
                         field: "isSystemAdmin", title: "System Admin", width: 104,
-                        persistId: "systemadminrole", 
+                        persistId: "systemadminrole",
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isSystemAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
                     },
                     {
                         field: "isContractAdmin", title: "Kontrakt Admin", width: 112,
-                        persistId: "contractadminrole", 
+                        persistId: "contractadminrole",
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isContractAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -370,12 +377,13 @@
                     {
 
                         field: "rightsHolder", title: "Rettighedshaveradgang", width: 160,
-                        persistId: "rightsHolder", 
+                        persistId: "rightsHolder",
                         attributes: { "class": "text-center", "data-element-type": "rightsHolderObject" },
                         headerAttributes: {
                             "data-element-type": "rightsHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.isRightsHolder),
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -384,12 +392,13 @@
                     {
 
                         field: "stakeHolder", title: "Interessentadgang", width: 160,
-                        persistId: "stakeHolder", 
+                        persistId: "stakeHolder",
                         attributes: { "class": "text-center", "data-element-type": "stakeHolderObject" },
                         headerAttributes: {
                             "data-element-type": "stakeHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.HasStakeHolderAccess),
+                        excelTemplate: (dataItem) => Kitos.Helpers.ExcelExportHelper.renderBoolean(dataItem.HasStakeHolderAccess),
                         hidden: !this.user.isGlobalAdmin,
                         filterable: false,
                         sortable: false,
@@ -397,12 +406,22 @@
                     },
                     {
                         template: (dataItem) => dataItem.canEdit ? `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>` : `<a class="k-button k-button-icontext" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-edit"></span>Redigér</a><a class="k-button k-button-icontext" data-user="dataItem" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-delete"></span>Slet</a>`,
+                        field: "Name", //Must bind to something or it corrupts the excel outputs
                         title: " ",
+                        filterable: false,
+                        sortable: false,
+                        menu: false,
                         width: 176,
-                        persistId: "command"
+                        persistId: "rowCommands",
+                        uiOnlyColumn: true
                     }
                 ]
             };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                mainGridOptions.toolbar);
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({
@@ -419,13 +438,21 @@
             this.mainGridOptions = mainGridOptions;
         }
 
+        //NOTE: Stores the visibility parameters, and is used by the excel dropdown commands before invoking exportToExcel()..
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
+        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
+        }
+
         public onEdit(entityId) {
             this.$state.go("organization.user.edit", { id: entityId });
         }
 
         private fixNameFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            if (column == 'ObjectOwner.Name') {
+            if (column === 'ObjectOwner.Name') {
                 return filterUrl.replace(pattern, `$1concat(concat(ObjectOwner/Name, ' '), ObjectOwner/LastName)$2`);
             }
             return filterUrl.replace(pattern, `$1concat(concat(Name, ' '), LastName)$2`);
@@ -454,14 +481,14 @@
                     ],
                     userAccessRights: ["authorizationServiceFactory", "user",
                         (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, user) =>
-                        authorizationServiceFactory
-                        .createOrganizationAuthorization()
-                        .getAuthorizationForItem(user.currentOrganizationId)
+                            authorizationServiceFactory
+                                .createOrganizationAuthorization()
+                                .getAuthorizationForItem(user.currentOrganizationId)
                     ],
                     hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ]
                 }
             });
         }
-    ]);
+        ]);
 }

@@ -15,6 +15,7 @@
     enum CommandCategory {
         Create = "create",
         Update = "update",
+        Unsubscribe = "unsubscribe",
         Delete = "delete"
     }
 
@@ -28,6 +29,7 @@
 
     interface IFkOrganizationSynchronizationStatus {
         connected: boolean
+        subscribesToUpdates: boolean
         synchronizationDepth: number | null
     }
 
@@ -45,13 +47,15 @@
         accessGranted: boolean | null = null;
         accessError: string | null = null;
         synchronizationStatus: IFkOrganizationSynchronizationStatus | null = null;
+        dateOfLatestSubscriptionCheck: string | null;
         commands: Array<IFkOrganizationCommand> | null = null;
         busy: boolean = false;
 
-        static $inject: string[] = ["stsOrganizationSyncService", "fkOrganisationImportDialogFactory"];
+        static $inject: string[] = ["stsOrganizationSyncService", "fkOrganisationImportDialogFactory", "genericPromptFactory"];
         constructor(
             private readonly stsOrganizationSyncService: Kitos.Services.Organization.IStsOrganizationSyncService,
-            private readonly fkOrganisationImportDialogFactory: Kitos.LocalAdmin.FkOrganisation.Modals.IFKOrganisationImportDialogFactory) {
+            private readonly fkOrganisationImportDialogFactory: Kitos.LocalAdmin.FkOrganisation.Modals.IFKOrganisationImportDialogFactory,
+            private readonly genericPromptFactory: Kitos.Shared.Generic.Prompt.IGenericPromptFactory) {
         }
 
         $onInit() {
@@ -78,6 +82,11 @@
                     this.bindAccessProperties(result);
                     this.bindSynchronizationStatus(result);
                     this.bindCommands(result);
+                    if (result.dateOfLatestCheckBySubscription !== null) {
+                        this.dateOfLatestSubscriptionCheck = Helpers.RenderFieldsHelper.renderDate(result.dateOfLatestCheckBySubscription);
+                    } else {
+                        this.dateOfLatestSubscriptionCheck = result.subscribesToUpdates ? "Ikke tilgængeligt" : "Ikke relevant";
+                    }
                 }, error => {
                     console.error(error);
                     this.accessGranted = false;
@@ -87,6 +96,7 @@
 
         private bindCommands(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
             const newCommands: Array<IFkOrganizationCommand> = [];
+
             if (result.connected) {
                 newCommands.push({
                     id: "updateSync",
@@ -95,33 +105,76 @@
                     enabled: result.canUpdateConnection,
                     onClick: () => {
                         this.fkOrganisationImportDialogFactory
-                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Update, this.currentOrganizationUuid, this.synchronizationStatus.synchronizationDepth)
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Update, this.currentOrganizationUuid, this.synchronizationStatus.synchronizationDepth, this.synchronizationStatus.subscribesToUpdates)
                             .closed.then(() => {
                                 //Reload state from backend if the dialog was closed 
                                 this.loadState();
                             });
                     }
                 });
+                if (result.subscribesToUpdates) {
+                    newCommands.push({
+                        id: "breakSubscription",
+                        text: "Afbryd automatisk import",
+                        category: CommandCategory.Unsubscribe,
+                        enabled: result.canUpdateConnection,
+                        onClick: () => {
+                            if (confirm("Afbryd automatisk import af ændringer fra FK Organistion?")) {
+                                this.busy = true;
+                                this.stsOrganizationSyncService
+                                    .unsubscribeFromAutomaticUpdates(this.currentOrganizationUuid)
+                                    .then(success => {
+                                        if (success) {
+                                            this.loadState();
+                                        } else {
+                                            this.busy = false;
+                                        }
+                                    }, _ => {
+                                        this.busy = false;
+                                    });
+                            }
+                        }
+                    });
+                }
+
                 newCommands.push({
                     id: "breakSync",
-                    text: "Afbryd",
+                    text: "Bryd forbindelsen til FK Organisation",
                     category: CommandCategory.Delete,
                     enabled: result.canDeleteConnection,
                     onClick: () => {
-                        if (confirm("Afbryd forbindelsen til FK Organisation? Ved afbrydelse af forbindelsen, konverteres alle organisationsenheder til KITOS enheder, hvorefter de frit kan redigeres.")) {
-                            this.busy = true;
-                            this.stsOrganizationSyncService
-                                .disconnect(this.currentOrganizationUuid)
-                                .then(success => {
-                                    if (success) {
-                                        this.loadState();
-                                    } else {
-                                        this.busy = false;
-                                    }
-                                }, _ => {
-                                    this.busy = false;
-                                });
-                        }
+                        this.genericPromptFactory.open<boolean>({
+                            title: "Bryd forbindelsen til FK Organisation",
+                            bodyTemplatePath: "app/components/local-config/import/fk-organization-import-break-connection-prompt.view.html",
+                            includeStandardCancelButton: true,
+                            commands: [{
+                                category: Shared.Generic.Prompt.GenericCommandCategory.Primary,
+                                text: "Slet ubrugte organisationseneheder",
+                                value: true
+                            },
+                            {
+                                category: Shared.Generic.Prompt.GenericCommandCategory.Primary,
+                                text: "Bevar organisationshierarkiet",
+                                value: false
+                                }]
+                        }).result.then((purgeOnDisconnect: boolean) => {
+                            {
+                                if (purgeOnDisconnect != undefined) {
+                                    this.busy = true;
+                                    this.stsOrganizationSyncService
+                                        .disconnect(this.currentOrganizationUuid, purgeOnDisconnect)
+                                        .then(success => {
+                                            if (success) {
+                                                this.loadState();
+                                            } else {
+                                                this.busy = false;
+                                            }
+                                        }, _ => {
+                                            this.busy = false;
+                                        });
+                                }
+                            }
+                        });
                     }
                 });
             } else {
@@ -132,7 +185,7 @@
                     enabled: result.canCreateConnection,
                     onClick: () => {
                         this.fkOrganisationImportDialogFactory
-                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null)
+                            .open(Kitos.LocalAdmin.FkOrganisation.Modals.FKOrganisationImportFlow.Create, this.currentOrganizationUuid, null, false)
                             .closed.then(() => {
                                 //Reload state from backend if the dialog was closed 
                                 this.loadState();
@@ -147,7 +200,8 @@
         private bindSynchronizationStatus(result: Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO) {
             this.synchronizationStatus = {
                 connected: result.connected,
-                synchronizationDepth: result.synchronizationDepth
+                synchronizationDepth: result.synchronizationDepth,
+                subscribesToUpdates: result.subscribesToUpdates
             };
         }
 

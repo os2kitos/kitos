@@ -6,12 +6,16 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Context;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -31,7 +35,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IDatabaseControl> _dbControlMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
-        private Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
+        private readonly ActiveUserIdContext _activeUserIdContext;
+        private readonly Mock<IGenericRepository<StsOrganizationChangeLog>> _stsOrganziationChangeLogRepositoryMock;
+        private readonly Mock<IOperationClock> _operationClock;
+        private readonly Mock<ICommandBus> _commandBusMock;
 
         public StsOrganizationSynchronizationServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -42,7 +49,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _dbControlMock = new Mock<IDatabaseControl>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _domainEventsMock = new Mock<IDomainEvents>();
-            _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
+            _activeUserIdContext = new ActiveUserIdContext(A<int>());
+            _stsOrganziationChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
+            _operationClock = new Mock<IOperationClock>();
+
+            _commandBusMock = new Mock<ICommandBus>();
             _sut = new StsOrganizationSynchronizationService(
                 _authorizationContextMock.Object,
                 _stsOrganizationUnitService.Object,
@@ -52,8 +63,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _dbControlMock.Object,
                 _transactionManagerMock.Object,
                 _domainEventsMock.Object,
-                _organizationUnitRepositoryMock.Object
-            );
+                _activeUserIdContext,
+                _stsOrganziationChangeLogRepositoryMock.Object,
+                _operationClock.Object,
+                _commandBusMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -182,9 +195,9 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Connect__Hierarchy_Returns_Success_And_Imports_External_Units_Into_Kitos(bool onlyRoot)
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void Connect_Hierarchy_Returns_Success_And_Imports_External_Units_Into_Kitos(bool onlyRoot, bool subscribe)
         {
             //Arrange
             var organizationId = A<Guid>();
@@ -199,13 +212,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, onlyRoot ? 1 : Maybe<int>.None);
+            var error = _sut.Connect(organizationId, onlyRoot ? 1 : Maybe<int>.None, subscribe);
 
             //Assert
             Assert.False(error.HasValue);
-            Assert.NotNull(organization.StsOrganizationConnection);
-            Assert.True(organization.StsOrganizationConnection.Connected);
-            Assert.Equal(onlyRoot ? 1 : (int?)null, organization.StsOrganizationConnection.SynchronizationDepth);
+            var connection = organization.StsOrganizationConnection;
+            Assert.True(connection.Connected);
+            Assert.Equal(subscribe, connection.SubscribeToUpdates);
+            Assert.Equal(onlyRoot ? 1 : (int?)null, connection.SynchronizationDepth);
             VerifyChangesSaved(transaction, organization);
 
             var kitosOrgRoot = organization.GetRoot();
@@ -216,6 +230,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(externalRoot.Uuid, kitosOrgRoot.ExternalOriginUuid); //verify that origin of he root has changed
             Assert.Equal(externalRoot.Name, kitosOrgRoot.Name); //verify that origin of he root has changed
             Assert.Equal(!onlyRoot, kitosOrgRoot.Children.Any()); //If ony root (level 1) was requested validate the expected effect
+
+            //Verify that the logs were added
+            var logs = connection.StsOrganizationChangeLogs.ToList();
+            var log = Assert.Single(logs);
+            foreach (var consequenceLog in log.Entries)
+            {
+                Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, consequenceLog.Type);
+            }
         }
 
         [Fact]
@@ -232,7 +254,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -253,7 +275,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -274,120 +296,12 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Connect(organizationId, Maybe<int>.None);
+            var error = _sut.Connect(organizationId, Maybe<int>.None, false);
 
             //Assert
             Assert.True(error.HasValue);
             Assert.Null(organization.StsOrganizationConnection);
             VerifyChangesNotSaved(transaction, organization, false);
-        }
-
-        [Fact]
-        public void UpdateConnection_Performs_Update_Of_Existing_Synchronized_Tree()
-        {
-            //Arrange
-            var organizationId = A<Guid>();
-            var organization = new Organization();
-            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
-            const int oldDepth = 2;
-            const int newDepth = 3;
-            organization.StsOrganizationConnection = new StsOrganizationConnection
-            {
-                Organization = organization,
-                Connected = true,
-                SynchronizationDepth = oldDepth
-            };
-            //Add some children to the root
-            organization.AddOrganizationUnit(CreateOrganizationUnit(organization, true), organization.GetRoot());
-            organization.AddOrganizationUnit(CreateOrganizationUnit(organization, true), organization.GetRoot());
-
-            // In the external tree, ensure that the last leaf is missing - this should track a deleted unit. 
-            // Extensive testing of the import algorithm is not part of this test but part of StsOrganizationalHierarchyUpdateStrategyTest.cs
-            // We just need to see that the app service deletes deleted units from db
-            var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
-
-            //add the leaf that will be removed because it is missing in the external tree
-            var expectedDeletion = CreateOrganizationUnit(organization, true);
-            organization.AddOrganizationUnit(expectedDeletion, organization.GetRoot());
-
-            //Track a rename on the root and check that an event is raised
-            organization.GetRoot().UpdateName(A<string>());
-
-            SetupGetOrganizationReturns(organizationId, organization);
-            SetupHasPermissionReturns(organization, true);
-            SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            var transaction = ExpectTransaction();
-
-            //Act
-            var error = _sut.UpdateConnection(organizationId, newDepth);
-
-            //Assert
-            Assert.False(error.HasValue);
-            Assert.NotNull(organization.StsOrganizationConnection);
-            Assert.True(organization.StsOrganizationConnection.Connected);
-            Assert.Equal(newDepth, organization.StsOrganizationConnection.SynchronizationDepth);
-            VerifyChangesSaved(transaction, organization);
-
-            _organizationUnitRepositoryMock.Verify(x => x.RemoveRange(It.Is<IEnumerable<OrganizationUnit>>(units => units.Single() == expectedDeletion)), Times.Once());
-            Assert.Equal(2, organization.GetRoot().Children.Count);
-            Assert.DoesNotContain(expectedDeletion, organization.GetRoot().Children);
-            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(ev => ev.Entity == organization.GetRoot())), Times.Once());
-        }
-
-        [Fact]
-        public void UpdateConnection_Fails_If_Not_Already_Connected()
-        {
-            //Arrange
-            var organizationId = A<Guid>();
-            var organization = new Organization();
-            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
-            organization.StsOrganizationConnection = new StsOrganizationConnection
-            {
-                Organization = organization,
-                Connected = false,
-            };
-            var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
-
-            SetupGetOrganizationReturns(organizationId, organization);
-            SetupHasPermissionReturns(organization, true);
-            SetupResolveOrganizationTreeReturns(organization, externalRoot);
-            var transaction = ExpectTransaction();
-
-            //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
-
-            //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
-            VerifyChangesNotSaved(transaction, organization);
-        }
-
-        [Fact]
-        public void UpdateConnection_Fails_If_LoadOrgUnits_Fail()
-        {
-            //Arrange
-            var organizationId = A<Guid>();
-            var organization = new Organization();
-            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
-            organization.StsOrganizationConnection = new StsOrganizationConnection
-            {
-                Organization = organization,
-                Connected = true,
-            };
-            var resolveOrgUnitsError = A<DetailedOperationError<ResolveOrganizationTreeError>>();
-
-            SetupGetOrganizationReturns(organizationId, organization);
-            SetupHasPermissionReturns(organization, true);
-            SetupResolveOrganizationTreeReturns(organization, resolveOrgUnitsError);
-            var transaction = ExpectTransaction();
-
-            //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
-
-            //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(resolveOrgUnitsError.FailureType, error.Value.FailureType);
-            VerifyChangesNotSaved(transaction, organization);
         }
 
         [Fact]
@@ -408,7 +322,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -434,7 +348,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.UpdateConnection(organizationId, 3);
+            var error = _sut.UpdateConnection(organizationId, 3, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -451,7 +365,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupGetOrganizationReturns(organizationId, getOrganizationError);
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -468,7 +382,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             SetupHasPermissionReturns(organization, false);
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -486,7 +400,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId, false);
 
             //Assert
             Assert.True(error.HasValue);
@@ -494,8 +408,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             transaction.Verify(x => x.Rollback(), Times.Once());
         }
 
-        [Fact]
-        public void Disconnect_Succeeds_And_Converts_All_Imported_Org_Units_To_Kitos_Units()
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        public void Disconnect_Succeeds_And_Converts_All_Imported_Org_Units_To_Kitos_Units(bool subscribeBeforeDisconnect, bool purgeUnusedUnits)
         {
             //Arrange
             var organizationId = A<Guid>();
@@ -516,6 +432,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             {
                 Connected = true,
                 SynchronizationDepth = A<int>(),
+                SubscribeToUpdates = subscribeBeforeDisconnect
             };
             var organization = new Organization
             {
@@ -531,10 +448,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
+            if (purgeUnusedUnits)
+            {
+                SetupExecuteUpdateCommand(false, 1, organization, Maybe<OperationError>.None);
+            }
             var transaction = ExpectTransaction();
 
             //Act
-            var error = _sut.Disconnect(organizationId);
+            var error = _sut.Disconnect(organizationId, purgeUnusedUnits);
 
             //Assert
             Assert.False(error.HasValue);
@@ -542,6 +463,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _dbControlMock.Verify(x => x.SaveChanges(), Times.Once());
             Assert.False(organization.StsOrganizationConnection.Connected);
             Assert.Null(organization.StsOrganizationConnection.SynchronizationDepth);
+            Assert.False(organization.StsOrganizationConnection.SubscribeToUpdates);
             foreach (var organizationUnit in organization.OrgUnits)
             {
                 Assert.Equal(OrganizationUnitOrigin.Kitos, organizationUnit.Origin);
@@ -550,6 +472,145 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == affectedUnit1)), Times.Once());
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == affectedUnit2)), Times.Once());
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<OrganizationUnit>>(u => u.Entity == unaffectedUnit)), Times.Never());
+            _commandBusMock.Verify(x =>
+                    x.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(
+                        It.Is<AuthorizedUpdateOrganizationFromFKOrganisationCommand>(c =>
+                            c.SubscribeToChanges == false && c.SynchronizationDepth.Value == 1 &&
+                            c.Organization == organization && c.PreloadedExternalTree.HasValue == purgeUnusedUnits)),
+                purgeUnusedUnits ? Times.Once() : Times.Never());
+        }
+
+        [Fact]
+        public void Disconnect_Fails_If_Purge_Command_Fails()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
+
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            var transaction = ExpectTransaction();
+            SetupExecuteUpdateCommand(false, 1, organization, A<OperationError>());
+
+            //Act
+            var error = _sut.Disconnect(organizationId, true);
+
+            //Assert
+            Assert.True(error.HasValue);
+            VerifyChangesNotSaved(transaction, organization);
+        }
+
+        [Fact]
+        public void UpdateConnection_Performs_Update_Of_Existing_Synchronized_Tree()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
+
+            var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
+
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            SetupResolveOrganizationTreeReturns(organization, externalRoot);
+            var transaction = ExpectTransaction();
+            var levelsToInclude = new Random().Next(1, 100);
+            var subscribeToUpdates = A<bool>();
+            SetupExecuteUpdateCommand(subscribeToUpdates, levelsToInclude, organization, Maybe<OperationError>.None);
+
+            //Act
+            var error = _sut.UpdateConnection(organizationId, levelsToInclude, subscribeToUpdates);
+
+            //Assert
+            Assert.False(error.HasValue);
+            VerifyChangesSaved(transaction, organization);
+        }
+
+        [Fact]
+        public void UpdateConnection_Fails_If_Command_Fails()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization();
+            organization.OrgUnits.Add(CreateOrganizationUnit(organization, true)); //Add the root
+
+            var externalRoot = organization.GetRoot().Transform(ToExternalOrganizationUnit);
+
+            SetupGetOrganizationReturns(organizationId, organization);
+            SetupHasPermissionReturns(organization, true);
+            SetupResolveOrganizationTreeReturns(organization, externalRoot);
+            var transaction = ExpectTransaction();
+            var levelsToInclude = new Random().Next(1, 100);
+            var subscribeToUpdates = A<bool>();
+            SetupExecuteUpdateCommand(subscribeToUpdates, levelsToInclude, organization, A<OperationError>());
+
+            //Act
+            var error = _sut.UpdateConnection(organizationId, levelsToInclude, subscribeToUpdates);
+
+            //Assert
+            Assert.True(error.HasValue);
+            VerifyChangesNotSaved(transaction, organization);
+        }
+
+        [Fact]
+        public void GetChangeLogForOrganization_Returns_Number_Of_Logs()
+        {
+            var orgUuid = A<Guid>();
+
+            var logs = new List<StsOrganizationConsequenceLog> { new(), new() };
+            var changeLogs = new List<StsOrganizationChangeLog> { new() { Entries = logs }, new() { Entries = logs } };
+
+            var stsOrganizationConnection = new StsOrganizationConnection
+            {
+                Connected = true,
+                SynchronizationDepth = A<int>(),
+                StsOrganizationChangeLogs = changeLogs
+            };
+            var organization = new Organization
+            {
+                Uuid = orgUuid,
+                StsOrganizationConnection = stsOrganizationConnection
+            };
+
+            SetupGetOrganizationReturns(orgUuid, organization);
+            SetupHasPermissionReturns(organization, true);
+
+            var result = _sut.GetChangeLogs(orgUuid, 1);
+
+            Assert.True(result.Ok);
+            var logResult = Assert.Single(result.Value);
+            ;
+            Assert.Equal(2, logResult.GetEntries().Count());
+        }
+
+        [Fact]
+        public void GetChangeLogForOrganization_Fails_If_GetOrganization_Returns_Error()
+        {
+            var orgUuid = A<Guid>();
+            var getOperationError = A<OperationError>();
+
+            SetupGetOrganizationReturns(orgUuid, getOperationError);
+
+            var result = _sut.GetChangeLogs(orgUuid, 1);
+
+            Assert.True(result.Failed);
+            Assert.Equal(getOperationError.FailureType, result.Error);
+        }
+
+        [Fact]
+        public void GetChangeLogForOrganization_Fails_If_UnAuthorized()
+        {
+            var orgUuid = A<Guid>();
+            var organization = new Organization();
+
+            SetupGetOrganizationReturns(orgUuid, organization);
+            SetupHasPermissionReturns(organization, false);
+
+            var result = _sut.GetChangeLogs(orgUuid, 1);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         private void VerifyChangesSaved(Mock<IDatabaseTransaction> transaction, Organization organization)
@@ -648,6 +709,15 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 root.Name, new Dictionary<string, string>(),
                 root.Children.Select(ToExternalOrganizationUnit).ToList()
             );
+        }
+
+        private void SetupExecuteUpdateCommand(bool subscribeToUpdates, int levelsToInclude, Organization organization, Maybe<OperationError> result)
+        {
+            _commandBusMock.Setup(x =>
+                x.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(
+                    It.Is<AuthorizedUpdateOrganizationFromFKOrganisationCommand>(c =>
+                        c.SubscribeToChanges == subscribeToUpdates && c.SynchronizationDepth.Value == levelsToInclude &&
+                        c.Organization == organization))).Returns(result);
         }
     }
 }

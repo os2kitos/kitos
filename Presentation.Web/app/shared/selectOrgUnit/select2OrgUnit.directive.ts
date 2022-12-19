@@ -5,21 +5,19 @@
         "$scope",
         "select2LoadingService",
         ($scope: any, select2LoadingService: Kitos.Services.Select2LoadingService) => {
-            $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => $scope.options, formatResults, $scope.allowClear);
 
-            function formatResults(result: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<any>): string {
-                function visit(text: string, indentationLevel: number): string {
-                    if (indentationLevel <= 0) {
-                        return text;
-                    }
-                    //indentation is four non breaking spaces
-                    return visit("&nbsp&nbsp&nbsp&nbsp" + text, indentationLevel - 1);
+            const options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<Kitos.Models.Api.Organization.OrganizationUnit>[] = $scope.options;
+            if ($scope.renderUnitOriginIndication === true) {
+                const hasExternalUnits = options.some(x => x.optionalObjectContext?.externalOriginUuid !== null);
+                if (hasExternalUnits) {
+                    $scope.hasExternalUnits = true;
+                    $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => options, unit => Kitos.Helpers.Select2OptionsFormatHelper.formatIndentation(unit, true), $scope.allowClear);
+                    return;
                 }
-
-                var formattedResult = visit(result.text, result.indentationLevel);
-                return formattedResult;
             }
-    }]);
+
+            $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => options, unit => Kitos.Helpers.Select2OptionsFormatHelper.formatIndentation(unit, false), $scope.allowClear);
+        }]);
 
     app.directive("select2OrgUnit", [
         function () {
@@ -36,7 +34,8 @@
                     field: "@",
                     disabled: "=ngDisabled",
                     allowClear: "=",
-                    onChange: "&"
+                    onChange: "&",
+                    renderUnitOriginIndication: "="
                 },
                 controller: "select2OrgUnitController",
                 link: function (scope, element, attr, ctrl) {

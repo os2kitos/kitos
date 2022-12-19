@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
@@ -93,18 +94,20 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(expectedError, root.AccessStatus.Error);
         }
 
-        [Fact]
-        public async Task Can_POST_Create_Connection()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_POST_Create_Connection(bool subscribe)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
             const int levels = 2;
-            using var getResponse = await SendGetSnapshotAsync(levels, targetOrgUuid, cookie);
+            using var getResponse = await SendGetSnapshotAsync(levels, targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
             var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
 
             //Act
-            using var response = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels);
+            using var response = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels, subscribe);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -115,13 +118,16 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 Assert.NotNull(organization.StsOrganizationConnection);
                 Assert.True(organization.StsOrganizationConnection.Connected);
                 Assert.Equal(levels, organization.StsOrganizationConnection.SynchronizationDepth);
+                Assert.Equal(subscribe, organization.StsOrganizationConnection.SubscribeToUpdates);
                 AssertImportedTree(expectedImport, dbRoot, OrganizationUnitOrigin.STS_Organisation);
                 return true;
             });
         }
 
-        [Fact]
-        public async Task Can_DELETE_Connection()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_DELETE_Connection(bool purge)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -130,13 +136,21 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var connectionUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
             var getUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/snapshot?levels={levels}");
             using var getResponse = await HttpApi.GetWithCookieAsync(getUrl, cookie);
-            var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            var expectedStructureAfterDisconnect = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            if (purge)
+            {
+                //We expect all of the external sub units to have been removed
+                expectedStructureAfterDisconnect.Children = Array.Empty<StsOrganizationOrgUnitDTO>();
+            }
             using var response = await HttpApi.PostWithCookieAsync(connectionUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
                 SynchronizationDepth = levels
             });
             //Act
-            using var deleteResponse = await HttpApi.DeleteWithCookieAsync(connectionUrl, cookie);
+            using var deleteResponse = await HttpApi.DeleteWithCookieAsync(connectionUrl, cookie,new DisconnectFromStsOrganizationRequestDTO()
+            {
+                PurgeUnusedExternalUnits = purge
+            });
 
             //Assert
             DatabaseAccess.MapFromEntitySet<Organization, bool>(orgs =>
@@ -148,7 +162,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 Assert.Null(organization.StsOrganizationConnection.SynchronizationDepth);
 
                 //Assert that the imported stuff is till there - just converted to kitos units
-                AssertImportedTree(expectedImport, dbRoot, OrganizationUnitOrigin.Kitos);
+                AssertImportedTree(expectedStructureAfterDisconnect, dbRoot, OrganizationUnitOrigin.Kitos);
                 return true;
             });
 
@@ -482,6 +496,43 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Contains(uuidOfExpectedMoval, movedItemChildrenUuids);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_PUT_UPDATE_Consequences_With_SubscriptionChanges(bool initiallySubscribe)
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int levels = 1;
+            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels, initiallySubscribe);
+
+            //Act
+            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie, !initiallySubscribe);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            using var getResponse = await SendGetConnectionStatusAsync(targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
+            var dto = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
+            Assert.Equal(!initiallySubscribe, dto.SubscribesToUpdates);
+        }
+
+        [Fact]
+        public async Task Can_DELETE_Subscription()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr, true, true);
+
+            //Act
+            using var putResponse = await SendDeleteSubscriptionAsync(targetOrgUuid, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            var subscriptionRemoved = DatabaseAccess.MapFromEntitySet<Organization,bool>(r=>r.AsQueryable().ByUuid(targetOrgUuid).StsOrganizationConnection?.SubscribeToUpdates == false);
+            Assert.True(subscriptionRemoved);
+        }
+
         [Fact]
         public async Task Can_PUT_UPDATE_Consequences_With_Conversion_Consequences()
         {
@@ -521,6 +572,110 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Null(convertedUnit.ExternalOriginUuid);
         }
 
+        [Fact]
+        public async Task Can_GET_LOGS()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int firstRequestLevels = 2;
+            const int secondRequestLevels = 3;
+            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, firstRequestLevels);
+
+            //Addition consequences
+            using var additionConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, additionConsequencesResponse.StatusCode);
+            var additionConsequencesBody = await additionConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var additionConsequences = additionConsequencesBody.Consequences.ToList();
+
+            //Update consequences in order to log addition consequences
+            using var additionPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, additionPutResponse.StatusCode);
+
+            //Setup other consequences
+            var expectedConversionUuid = Guid.NewGuid();
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(repo =>
+            {
+                var availableUnits = repo
+                    .AsQueryable()
+                    .Where(x => x.Organization.Uuid == targetOrgUuid
+                                && x.Origin == OrganizationUnitOrigin.STS_Organisation
+                                && x.Parent != null
+                                && x.Children.Any())
+                    .ToList();
+
+                var unitToRename = availableUnits.FirstOrDefault();
+                Assert.NotNull(unitToRename);
+                availableUnits.Remove(unitToRename);
+
+                var unitToMove = availableUnits.FirstOrDefault();
+                Assert.NotNull(unitToMove);
+                availableUnits.Remove(unitToMove);
+
+                var targetUnit = availableUnits.FirstOrDefault(x => x.Id != unitToMove.ParentId);
+                Assert.NotNull(targetUnit);
+
+                //Since the unitToRename won't be moved and all of it's children are meant for deletion select a unit to convert from there
+                var unitToConvert = unitToRename.Children.FirstOrDefault();
+                Assert.NotNull(unitToConvert);
+                expectedConversionUuid = unitToConvert.Uuid;
+
+                unitToRename.Name += "_rn1"; //change name so we expect an update to restore the old names
+                unitToMove.ParentId = targetUnit.Id;
+            });
+
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            await ItContractV2Helper.PostContractAsync(globalAdminToken.Token,
+                new CreateNewContractRequestDTO
+                {
+                    Name = A<string>(),
+                    OrganizationUuid = targetOrgUuid,
+                    Responsible = new ContractResponsibleDataWriteRequestDTO { OrganizationUnitUuid = expectedConversionUuid }
+                });
+            
+            using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
+            var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var otherConsequences = otherConsequencesBody.Consequences.ToList();
+
+            //Log deletion, renaming, conversion and relocation changes
+            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+            
+            //Act
+            using var logsResponse = await SendGetLogsAsync(targetOrgUuid, 5, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
+            var deserializedLogs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
+            var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
+
+            //2 updates + create
+            Assert.Equal(3, logsList.Count);
+
+            //Addition consequences
+            var additionLogs = logsList[1];
+            Assert.NotNull(additionLogs);
+            var additionLogsConsequences = additionLogs.Consequences.ToList();
+
+            Assert.Equal(additionConsequences.Count, additionLogsConsequences.Count);
+            AssertConsequenceLogs(additionConsequences, additionLogs);
+
+            //Get second item in the list
+            var otherLogs = logsList.Last();
+            Assert.NotNull(otherLogs);
+            var otherLogsConsequences = otherLogs.Consequences.ToList();
+
+            Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
+            var consequenceCategories = otherLogsConsequences.Select(x => x.Category).ToList();
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, consequenceCategories);
+
+            AssertConsequenceLogs(otherConsequences, otherLogs);
+        }
+
         private static void AssertImportedTree(StsOrganizationOrgUnitDTO treeToImport, OrganizationUnit importedTree, OrganizationUnitOrigin expectedOrganizationUnitOrigin = OrganizationUnitOrigin.STS_Organisation, int? remainingLevelsToImport = null)
         {
             Assert.Equal(treeToImport.Name, importedTree.Name);
@@ -535,8 +690,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             }
             else
             {
-                var childrenToImport = treeToImport.Children.OrderBy(x=>x.Name).ThenBy(x=>x.Uuid.ToString()).ToList();
-                var importedUnits = importedTree.Children.OrderBy(x=>x.Name).ThenBy(x=>x.ExternalOriginUuid.GetValueOrDefault().ToString()).ToList();
+                var childrenToImport = treeToImport.Children.OrderBy(x => x.Name).ThenBy(x => x.Uuid.ToString()).ToList();
+                var importedUnits = importedTree.Children.OrderBy(x => x.Name).ThenBy(x => x.ExternalOriginUuid.GetValueOrDefault().ToString()).ToList();
                 Assert.Equal(childrenToImport.Count, importedUnits.Count);
                 for (var i = 0; i < childrenToImport.Count; i++)
                 {
@@ -563,9 +718,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return targetOrgUuid;
         }
 
-        private async Task<Guid> CreateOrgWithCvr(string cvr)
+        private async Task<Guid> CreateOrgWithCvr(string cvr, bool fakeInitialConnection = false, bool fakeInitialSubscription = false)
         {
             var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, $"StsSync_{A<Guid>():N}", cvr, OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            if (fakeInitialConnection)
+            {
+                DatabaseAccess.MutateEntitySet<Organization>(repo =>
+                {
+                    var organization = repo.AsQueryable().ByUuid(org.Uuid);
+                    organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, new ExternalOrganizationUnit(Guid.NewGuid(), "FAKE ROOT", new Dictionary<string, string>(), new List<ExternalOrganizationUnit>()), Maybe<int>.Some(1), fakeInitialSubscription);
+                });
+            }
             return org.Uuid;
         }
 
@@ -584,6 +747,24 @@ namespace Tests.Integration.Presentation.Web.Organizations
             foreach (var child in unit.Children)
             {
                 AssertOrgTree(child, seenUuids);
+            }
+        }
+
+        private static void AssertConsequenceLogs(
+            IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> consequences,
+            StsOrganizationChangeLogResponseDTO logs)
+        {
+            var consequencesList = consequences.ToList();
+            Assert.Equal(consequencesList.Count, logs.Consequences.Count());
+            foreach (var consequence in consequencesList)
+            {
+                var logConsequence = logs.Consequences.FirstOrDefault(x => x.Uuid == consequence.Uuid && x.Category == consequence.Category);
+                Assert.NotNull(logConsequence);
+
+                Assert.Equal(consequence.Uuid, logConsequence.Uuid);
+                Assert.Equal(consequence.Category, logConsequence.Category);
+                Assert.Equal(consequence.Name, logConsequence.Name);
+                Assert.Equal(consequence.Description, logConsequence.Description);
             }
         }
 
@@ -611,14 +792,15 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
-        private static async Task<HttpResponseMessage> SendPostCreateConnectionAsync(Guid targetOrgUuid, Cookie cookie, int levels)
+        private static async Task<HttpResponseMessage> SendPostCreateConnectionAsync(Guid targetOrgUuid, Cookie cookie, int levels, bool subscribe = false)
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
                     $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
             return await HttpApi.PostWithCookieAsync(postUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
-                SynchronizationDepth = levels
+                SynchronizationDepth = levels,
+                SubscribeToUpdates = subscribe
             });
         }
 
@@ -630,15 +812,30 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return await HttpApi.GetWithCookieAsync(getUrl, cookie);
         }
 
-        private static async Task<HttpResponseMessage> SendPutUpdateConsequencesAsync(Guid targetOrgUuid, int levels, Cookie cookie)
+        private static async Task<HttpResponseMessage> SendPutUpdateConsequencesAsync(Guid targetOrgUuid, int levels, Cookie cookie, bool subscribe = false)
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
                     $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
             return await HttpApi.PutWithCookieAsync(postUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
-                SynchronizationDepth = levels
+                SynchronizationDepth = levels,
+                SubscribeToUpdates = subscribe
             });
+        }
+
+        private static async Task<HttpResponseMessage> SendDeleteSubscriptionAsync(Guid targetOrgUuid, Cookie cookie)
+        {
+            var postUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/subscription");
+            return await HttpApi.DeleteWithCookieAsync(postUrl, cookie);
+		}
+		
+        private static async Task<HttpResponseMessage> SendGetLogsAsync(Guid targetOrgUuid, int numberOfChangeLogs, Cookie cookie)
+        {
+            var postUrl =
+                TestEnvironment.CreateUrl(
+                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/change-log?numberOfChangeLogs={numberOfChangeLogs}");
+            return await HttpApi.GetWithCookieAsync(postUrl, cookie);
         }
     }
 }

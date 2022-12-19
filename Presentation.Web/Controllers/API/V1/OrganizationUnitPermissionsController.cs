@@ -12,7 +12,7 @@ using Core.ApplicationServices.Organizations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/organizations/{organizationUuid}/organization-units")]
     public class OrganizationUnitPermissionsController : BaseApiController
     {

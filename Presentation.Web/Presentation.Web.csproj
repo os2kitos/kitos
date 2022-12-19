@@ -356,6 +356,8 @@
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-change-log.component.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-change-logs-root.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config-import-modal.dialog.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-consequences-log.component.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\fk-organization-import-config.component.ts" />
@@ -365,6 +367,7 @@
     <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
     <TypeScriptCompile Include="app\Configs\kendo-date-picker-options.ts" />
     <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\connection-change-log-helper.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
@@ -374,9 +377,12 @@
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-origin.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-change-category.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-organization-unit-consequence-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-update-consequences-response-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-permissions-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-origin.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-org-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-registration-dto.ts" />
@@ -391,6 +397,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-connection-change-logs.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-unit-migration.ts" />
     <TypeScriptCompile Include="app\models\users\user-deletion-strategy-type.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\feature-toggle\feature-toggle-view-model.ts" />
@@ -404,11 +411,14 @@
     <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
+    <Compile Include="Controllers\API\V1\OrganizationPermissionsController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitPermissionsController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitRegistrationController.cs" />
@@ -428,9 +438,13 @@
     <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangeOrganizationUnitRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\DisconnectFromStsOrganizationRequestDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\OrganizationPermissionsDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRegistrationUnitDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\PaymentRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationAccessStatusResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogResponseDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\StsOrganizationChangeLogOriginOption.cs" />
     <Compile Include="Models\API\V1\Organizations\StsOrganizationSynchronizationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\TransferOrganizationUnitRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\UnitAccessRightsDTO.cs" />
@@ -672,6 +686,9 @@
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-change-log.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-change-logs-root.view.html" />
+    <Content Include="app\components\local-config\import\fk-organization-import-break-connection-prompt.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-consequences-log.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config-import-modal.view.html" />
     <Content Include="app\components\local-config\import\fk-organization-import-config.view.html" />
@@ -684,6 +701,7 @@
     <Content Include="app\components\user-notification\user-notification-modal.view.html" />
     <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
+    <Content Include="app\shared\generic-prompt\generic-prompt.view.html" />
     <Content Include="app\shared\helpText\inlineHelpText.view.html" />
     <Content Include="app\shared\helpText\field-help-text.view.html" />
     <Content Include="app\shared\organization-tree\organization-tree-node.view.html" />
@@ -940,6 +958,7 @@
     <TypeScriptCompile Include="app\shared\cache\in-memory-cache.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
     <TypeScriptCompile Include="app\shared\EntityMapper.ts" />
+    <TypeScriptCompile Include="app\shared\generic-prompt\generic-prompt.dialog.ts" />
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
@@ -1339,7 +1358,6 @@
     <Content Include="app\shared\helpText\helpTextModal.view.html" />
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
-    <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
@@ -1423,7 +1441,6 @@
     <Content Include="app\components\global-admin\global-admin-global-admins.view.html" />
     <Content Include="app\components\global-admin\global-admin-local-admins.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations.view.html" />
-    <Content Include="app\shared\optionList\optionList.view.html" />
     <Content Include="app\components\global-admin\global-admin-system.view.html" />
     <Content Include="app\components\global-admin\global-admin-contract.view.html" />
     <Content Include="app\components\global-admin\global-admin-org.view.html" />

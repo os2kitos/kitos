@@ -40,10 +40,5 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             return organization;
         }
-
-        private string CreateEmail()
-        {
-            return $"{nameof(OrganizationUnitTests)}{A<string>()}@test.dk";
-        }
     }
 }

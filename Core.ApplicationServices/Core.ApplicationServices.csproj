@@ -112,6 +112,7 @@
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="Extensions\OptionalValueChangeExtensions.cs" />
+    <Compile Include="Extensions\OrganizationTreeUpdateConsequencesExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOptionsApplicationService.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\PaymentChangeParameters.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
+    <Compile Include="Model\Organizations\AuthorizedUpdateOrganizationFromFKOrganisationCommand.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
@@ -183,6 +185,8 @@
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
     <Compile Include="Organizations\Handlers\HandleOrganizationBeingDeleted.cs" />
     <Compile Include="Organizations\Handlers\RemoveOrganizationUnitRegistrationsCommandHandler.cs" />
+    <Compile Include="Organizations\Handlers\AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler.cs" />
+    <Compile Include="Organizations\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandler.cs" />
     <Compile Include="Organizations\IOrganizationUnitService.cs" />
     <Compile Include="Organizations\IStsOrganizationSynchronizationService.cs" />
     <Compile Include="Organizations\OrganizationUnitService.cs" />

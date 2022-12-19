@@ -1,17 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Context;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Serilog;
-using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -24,8 +31,11 @@ namespace Core.ApplicationServices.Organizations
         private readonly IDatabaseControl _databaseControl;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
-        private readonly IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
+        private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
+        private readonly IOperationClock _operationClock;
+        private readonly ICommandBus _commandBus;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
@@ -36,7 +46,10 @@ namespace Core.ApplicationServices.Organizations
             IDatabaseControl databaseControl,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IGenericRepository<OrganizationUnit> organizationUnitRepository)
+            Maybe<ActiveUserIdContext> activeUserIdContext,
+            IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository,
+            IOperationClock operationClock,
+            ICommandBus commandBus)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
@@ -45,8 +58,11 @@ namespace Core.ApplicationServices.Organizations
             _databaseControl = databaseControl;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
-            _organizationUnitRepository = organizationUnitRepository;
             _authorizationContext = authorizationContext;
+            _activeUserIdContext = activeUserIdContext;
+            _stsChangeLogRepository = stsChangeLogRepository;
+            _operationClock = operationClock;
+            _commandBus = commandBus;
         }
 
         public Result<StsOrganizationSynchronizationDetails, OperationError> GetSynchronizationDetails(Guid organizationId)
@@ -56,6 +72,8 @@ namespace Core.ApplicationServices.Organizations
                 {
                     var currentConnectionStatus = ValidateConnection(organization);
                     var isConnected = organization.StsOrganizationConnection?.Connected == true;
+                    var subscribesToUpdates = organization.StsOrganizationConnection?.SubscribeToUpdates == true;
+                    var dateOfLatestCheckBySubscription = organization.StsOrganizationConnection?.DateOfLatestCheckBySubscription;
                     var canCreateConnection = currentConnectionStatus.IsNone && organization.StsOrganizationConnection?.Connected != true;
                     var canUpdateConnection = currentConnectionStatus.IsNone && isConnected;
                     return new StsOrganizationSynchronizationDetails
@@ -65,7 +83,9 @@ namespace Core.ApplicationServices.Organizations
                         canCreateConnection,
                         canUpdateConnection,
                         isConnected,
-                        currentConnectionStatus.Match(error => error.Detail, () => default(CheckConnectionError?))
+                        currentConnectionStatus.Match(error => error.Detail, () => default(CheckConnectionError?)),
+                        subscribesToUpdates,
+                        dateOfLatestCheckBySubscription
                     );
                 });
         }
@@ -83,33 +103,33 @@ namespace Core.ApplicationServices.Organizations
                     .Bind(root => FilterByRequestedLevels(root, levelsToInclude));
         }
 
-        public Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude)
+        public Maybe<OperationError> Connect(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return Modify(organizationId, organization =>
             {
                 return LoadOrganizationUnits(organization)
-                    .Match
-                    (
-                        importRoot =>
-                        {
-                            var error = organization.ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude);
-                            if (error.HasValue)
-                            {
-                                _logger.Error("Failed to import org root {rootId} and subtree into organization with id {orgId}. Failed with: {errorCode}:{errorMessage}", importRoot.Uuid, organization.Id, error.Value.FailureType, error.Value.Message.GetValueOrFallback(""));
-                                return new OperationError("Failed to import sub tree", OperationFailure.UnknownError);
-                            }
-
-                            return Maybe<OperationError>.None;
-                        },
-                        error => error
-                    );
+                    .Bind(importRoot => ConnectToExternalOrganizationHierarchy(organization, importRoot, levelsToInclude, subscribeToUpdates))
+                    .Select(ToConnectionConsequences)
+                    .Select(x => x.ToLogEntries(_activeUserIdContext, _operationClock))
+                    .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
+                    .MatchFailure();
             });
         }
 
-        public Maybe<OperationError> Disconnect(Guid organizationId)
+        public Maybe<OperationError> Disconnect(Guid organizationId, bool purgeUnusedExternalOrganizationUnits)
         {
             return Modify(organizationId, organization =>
             {
+                if (purgeUnusedExternalOrganizationUnits)
+                {
+                    //Perform sync to level 1 before disconnecting and let the update functionality deal with the consequence calculations
+                    var purgeError = _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, 1, false, ToExternalUnitWithoutChildren(organization.GetRoot())));
+                    if (purgeError.HasValue)
+                    {
+                        _logger.Error("Failed to sync to level 1 prior to disconnecting from FK Org in organization {id}. Error: {code}:{message}", organizationId, purgeError.Value.FailureType, purgeError.Value.Message.GetValueOrDefault());
+                        return purgeError;
+                    }
+                }
                 var result = organization.DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin.STS_Organisation);
                 if (result.Failed)
                 {
@@ -117,12 +137,23 @@ namespace Core.ApplicationServices.Organizations
                 }
 
                 var disconnectionResult = result.Value;
+                if (disconnectionResult.RemovedChangeLogs.Any())
+                {
+                    _stsChangeLogRepository.RemoveRange(disconnectionResult.RemovedChangeLogs);
+                }
+
                 foreach (var convertedUnit in disconnectionResult.ConvertedUnits)
                 {
                     _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(convertedUnit));
                 }
                 return Maybe<OperationError>.None;
             });
+        }
+
+        private static ExternalOrganizationUnit ToExternalUnitWithoutChildren(OrganizationUnit unit)
+        {
+            return new ExternalOrganizationUnit(unit.ExternalOriginUuid.GetValueOrDefault(), unit.Name,
+                new Dictionary<string, string>(), Array.Empty<ExternalOrganizationUnit>());
         }
 
         public Result<OrganizationTreeUpdateConsequences, OperationError> GetConnectionExternalHierarchyUpdateConsequences(Guid organizationId, Maybe<int> levelsToInclude)
@@ -138,27 +169,23 @@ namespace Core.ApplicationServices.Organizations
                 );
         }
 
-        public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude)
+        public Maybe<OperationError> UpdateConnection(Guid organizationId, Maybe<int> levelsToInclude, bool subscribeToUpdates)
         {
             return Modify(organizationId, organization =>
-                LoadOrganizationUnits(organization)
-                    .Bind(importRoot => organization.UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude))
-                    .Select(consequences =>
-                    {
-                        if (consequences.DeletedExternalUnitsBeingDeleted.Any())
-                        {
-                            _organizationUnitRepository.RemoveRange(consequences.DeletedExternalUnitsBeingDeleted);
-                        }
-                        foreach (var (affectedUnit, _, _) in consequences.OrganizationUnitsBeingRenamed)
-                        {
-                            _domainEvents.Raise(new EntityUpdatedEvent<OrganizationUnit>(affectedUnit));
-                        }
-                        return consequences;
-                    })
-                    .Match(_ => Maybe<OperationError>.None, error => error)
+                _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, levelsToInclude, subscribeToUpdates, Maybe<ExternalOrganizationUnit>.None))
             );
         }
 
+        public Maybe<OperationError> UnsubscribeFromAutomaticUpdates(Guid organizationId)
+        {
+            return Modify(organizationId, organization => organization.UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin.STS_Organisation));
+        }
+
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
+        {
+            return GetOrganizationWithImportPermission(organizationUuid)
+                .Bind(organization => organization.GetExternalConnectionEntryLogs(OrganizationUnitOrigin.STS_Organisation, numberOfChangeLogs));
+        }
 
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {
@@ -220,6 +247,32 @@ namespace Core.ApplicationServices.Organizations
             transaction.Commit();
 
             return Maybe<OperationError>.None;
+        }
+
+        private static Result<ExternalOrganizationUnit, OperationError> ConnectToExternalOrganizationHierarchy(
+            Organization organization, ExternalOrganizationUnit importRoot, Maybe<int> levelsToInclude, bool subscribeToUpdates)
+        {
+            return organization
+                .ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin.STS_Organisation, importRoot, levelsToInclude, subscribeToUpdates)
+                .Match
+                (
+                    error => error,
+                    () => Result<ExternalOrganizationUnit, OperationError>.Success(importRoot)
+                );
+        }
+
+        private static OrganizationTreeUpdateConsequences ToConnectionConsequences(ExternalOrganizationUnit importRoot)
+        {
+            var unitsToImport = importRoot.Flatten();
+            var importedTreeToParent = importRoot.ToParentMap(importRoot.ToLookupByUuid());
+            var consequences = new OrganizationTreeUpdateConsequences(
+                Enumerable.Empty<(Guid, OrganizationUnit)>(),
+                Enumerable.Empty<(Guid, OrganizationUnit)>(),
+                unitsToImport.Select(unit => (unit, importedTreeToParent[unit.Uuid])).ToList(),
+                Enumerable.Empty<(OrganizationUnit affectedUnit, string oldName, string newName)>(),
+                Enumerable
+                    .Empty<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>());
+            return consequences;
         }
     }
 }

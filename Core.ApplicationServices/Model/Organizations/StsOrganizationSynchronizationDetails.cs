@@ -1,4 +1,5 @@
-﻿using Core.DomainServices.Model.StsOrganization;
+﻿using System;
+using Core.DomainServices.Model.StsOrganization;
 
 namespace Core.ApplicationServices.Model.Organizations
 {
@@ -10,8 +11,10 @@ namespace Core.ApplicationServices.Model.Organizations
         public bool CanUpdateConnection { get; }
         public bool CanDeleteConnection { get; }
         public CheckConnectionError? CheckConnectionError { get; }
+        public bool SubscribesToUpdates { get; }
+        public DateTime? DateOfLatestCheckBySubscription { get; }
 
-        public StsOrganizationSynchronizationDetails(bool connected, int? synchronizationDepth, bool canCreateConnection, bool canUpdateConnection, bool canDeleteConnection, CheckConnectionError? checkConnectionError)
+        public StsOrganizationSynchronizationDetails(bool connected, int? synchronizationDepth, bool canCreateConnection, bool canUpdateConnection, bool canDeleteConnection, CheckConnectionError? checkConnectionError, bool subscribesToUpdates, DateTime? dateOfLatestCheckBySubscription)
         {
             Connected = connected;
             SynchronizationDepth = synchronizationDepth;
@@ -19,6 +22,8 @@ namespace Core.ApplicationServices.Model.Organizations
             CanUpdateConnection = canUpdateConnection;
             CanDeleteConnection = canDeleteConnection;
             CheckConnectionError = checkConnectionError;
+            SubscribesToUpdates = subscribesToUpdates;
+            DateOfLatestCheckBySubscription = dateOfLatestCheckBySubscription;
         }
     }
 }

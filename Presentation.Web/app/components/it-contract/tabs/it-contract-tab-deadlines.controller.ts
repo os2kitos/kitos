@@ -148,37 +148,21 @@
 
             vm.datepickerOptions = Kitos.Configs.standardKendoDatePickerOptions;
 
-            vm.patchDate = (field, value) => {
-                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
-                if (value === "") {
-                    var payload = {};
+            vm.patchDate = (field, value, fieldName) => {
+                var payload = {};
+                const url = vm.autosaveUrl + "?organizationId=" + user.currentOrganizationId;
+
+                if (!value) {
                     payload[field] = null;
-                    patch(payload, vm.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
-                } else if (value == null) {
-
-                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
-
-                } else {
-                    const dateString = date.format("YYYY-MM-DD");
-                    var payload = {};
+                    patch(payload, url);
+                }
+                else if (Kitos.Helpers.DateValidationHelper.validateDateInput(value, notify, fieldName, true)) {
+                    const dateString = Kitos.Helpers.DateStringFormat.fromDanishToEnglishFormat(value);
                     payload[field] = dateString;
-                    patch(payload, vm.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
+                    patch(payload, url);
                 }
             }
-            vm.patchDateProcurement = (field, value, id, url) => {
-                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
 
-                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
-
-                } else {
-                    var dateString = date.format("YYYY-MM-DD");
-                    var payload = {};
-                    payload[field] = dateString;
-                    patch(payload, url + id + '?organizationId=' + user.currentOrganizationId);
-                }
-            }
             function patch(payload, url) {
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http({ method: 'PATCH', url: url, data: payload })

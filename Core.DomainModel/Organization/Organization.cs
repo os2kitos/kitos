@@ -10,10 +10,8 @@ using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
-using Core.DomainModel.Organization.Strategies;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
-
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -198,30 +196,24 @@ namespace Core.DomainModel.Organization
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
-            IExternalOrganizationalHierarchyUpdateStrategy strategy;
-            //Pre-validate
-            switch (origin)
-            {
-                case OrganizationUnitOrigin.STS_Organisation:
-                    if (StsOrganizationConnection?.Connected != true)
-                    {
-                        return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.Conflict);
-                    }
-                    strategy = StsOrganizationConnection.GetUpdateStrategy();
-                    break;
-                case OrganizationUnitOrigin.Kitos:
-                    return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return GetExternalConnection(origin)
+                .Bind<OrganizationTreeUpdateConsequences>(connection =>
+                {
+                    var strategy = connection.GetUpdateStrategy();
 
-            var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
-            var filteredTree = root.Copy(childLevelsToInclude);
+                    var childLevelsToInclude =
+                        levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
+                    var filteredTree = root.Copy(childLevelsToInclude);
 
-            return strategy.ComputeUpdate(filteredTree);
+                    return strategy.ComputeUpdate(filteredTree);
+                });
         }
 
-        public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        public Maybe<OperationError> ConnectToExternalOrganizationHierarchy(
+            OrganizationUnitOrigin origin,
+            ExternalOrganizationUnit root,
+            Maybe<int> levelsIncluded,
+            bool subscribeToUpdates)
         {
             if (root == null)
             {
@@ -257,7 +249,19 @@ namespace Core.DomainModel.Organization
                     () =>
                     {
                         StsOrganizationConnection ??= new StsOrganizationConnection();
-                        StsOrganizationConnection.Connected = true;
+                        StsOrganizationConnection.Connect();
+
+                        if (subscribeToUpdates != StsOrganizationConnection.SubscribeToUpdates)
+                        {
+                            var subscriptionError = subscribeToUpdates ?
+                                StsOrganizationConnection.Subscribe() :
+                                StsOrganizationConnection.Unsubscribe();
+                            if (subscriptionError.HasValue)
+                            {
+                                return subscriptionError.Value;
+                            }
+                        }
+
                         StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
                         return Maybe<OperationError>.None;
                     }
@@ -266,28 +270,54 @@ namespace Core.DomainModel.Organization
 
         public Result<DisconnectOrganizationFromOriginResult, OperationError> DisconnectOrganizationFromExternalSource(OrganizationUnitOrigin origin)
         {
-            switch (origin)
-            {
-                case OrganizationUnitOrigin.STS_Organisation:
-
-                    if (StsOrganizationConnection?.Connected != true)
-                    {
-                        return new OperationError("Not connected", OperationFailure.BadState);
-                    }
-                    return StsOrganizationConnection.Disconnect();
-                case OrganizationUnitOrigin.Kitos:
-                    return new OperationError("Kitos is not an external source and cannot be disconnected", OperationFailure.BadInput);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return GetExternalConnection(origin)
+                .Bind<DisconnectOrganizationFromOriginResult>(connection => connection.Disconnect());
         }
 
-        public Result<OrganizationTreeUpdateConsequences, OperationError> UpdateConnectionToExternalOrganizationHierarchy(OrganizationUnitOrigin origin, ExternalOrganizationUnit root, Maybe<int> levelsIncluded)
+        public Result<OrganizationTreeUpdateConsequences, OperationError> UpdateConnectionToExternalOrganizationHierarchy(
+            OrganizationUnitOrigin origin,
+            ExternalOrganizationUnit root,
+            Maybe<int> levelsIncluded,
+            bool subscribeToUpdates)
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
 
-            IExternalOrganizationalHierarchyUpdateStrategy strategy;
-            //Pre-validate
+            return GetExternalConnection(origin)
+                .Bind(connection =>
+                {
+                    var strategy = connection.GetUpdateStrategy();
+
+                    var childLevelsToInclude =
+                        levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
+                    var filteredTree = root.Copy(childLevelsToInclude);
+                    connection.UpdateSynchronizationDepth(levelsIncluded.Match(levels => (int?)levels,
+                        () => default));
+
+                    if (subscribeToUpdates == StsOrganizationConnection.SubscribeToUpdates)
+                        return strategy.PerformUpdate(filteredTree);
+
+                    var subscriptionError = subscribeToUpdates
+                        ? StsOrganizationConnection.Subscribe()
+                        : StsOrganizationConnection.Unsubscribe();
+                    return subscriptionError.Match(
+                        error => error, () => strategy.PerformUpdate(filteredTree));
+                });
+        }
+
+        public Result<ExternalConnectionAddNewLogsResult, OperationError> AddExternalImportLog(OrganizationUnitOrigin origin, ExternalConnectionAddNewLogInput changeLogToAdd)
+        {
+            return GetExternalConnection(origin)
+                .Bind(connection => connection.AddNewLog(changeLogToAdd));
+        }
+
+        public Result<IEnumerable<IExternalConnectionChangelog>, OperationError> GetExternalConnectionEntryLogs(OrganizationUnitOrigin origin, int numberOfLogs)
+        {
+            return GetExternalConnection(origin)
+                .Bind(connection => connection.GetLastNumberOfChangeLogs(numberOfLogs));
+        }
+
+        private Result<IExternalOrganizationalHierarchyConnection, OperationError> GetExternalConnection(OrganizationUnitOrigin origin)
+        {
             switch (origin)
             {
                 case OrganizationUnitOrigin.STS_Organisation:
@@ -295,19 +325,14 @@ namespace Core.DomainModel.Organization
                     {
                         return new OperationError($"Not connected to {origin:G}. Please connect before performing an update", OperationFailure.BadState);
                     }
-                    strategy = StsOrganizationConnection.GetUpdateStrategy();
-                    break;
+
+                    return StsOrganizationConnection;
                 case OrganizationUnitOrigin.Kitos:
                     return new OperationError("Kitos is not an external source", OperationFailure.BadInput);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            var childLevelsToInclude = levelsIncluded.Select(levels => levels - 1); //subtract the root level before copying
-            var filteredTree = root.Copy(childLevelsToInclude);
-            StsOrganizationConnection.SynchronizationDepth = levelsIncluded.Match(levels => (int?)levels, () => default);
-
-            return strategy.PerformUpdate(filteredTree);
         }
 
         /// <summary>
@@ -400,7 +425,7 @@ namespace Core.DomainModel.Organization
             else
             {
                 //If subtree is to be moved along with it, then the target unit cannot be a descendant of the moved unit
-                if (movedUnit.FlattenHierarchy().Contains(newParentUnit))
+                if (movedUnit.SearchSubTree(unit => unit.Uuid == newParentUnit.Uuid).HasValue)
                 {
                     return new OperationError($"newParentUnit with uuid {newParentUnit.Uuid} is a descendant of org unit with uuid {movedUnit.Uuid}", OperationFailure.BadInput);
                 }
@@ -460,6 +485,29 @@ namespace Core.DomainModel.Organization
         private static bool MatchRoot(OrganizationUnit unit)
         {
             return unit.Parent == null;
+        }
+
+        public Maybe<OperationError> UnsubscribeFromAutomaticUpdates(OrganizationUnitOrigin origin)
+        {
+            return GetExternalConnection(origin)
+                .Match
+                (
+                    connection => connection.Unsubscribe(),
+                    error => error
+                );
+        }
+
+        public IEnumerable<User> GetUsersWithRole(OrganizationRole role, bool includeApiUsers = false)
+        {
+            var query = Rights.Where(x => x.Role == role);
+            if (!includeApiUsers)
+            {
+                query = query.Where(right => right.User.HasApiAccess != true);
+            }
+            return query
+                .Select(x => x.User)
+                .ToList()
+                .AsReadOnly();
         }
     }
 }
