@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Users;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Queries;
@@ -26,5 +27,6 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null);
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
+        Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid);
     }
 }

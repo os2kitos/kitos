@@ -57,7 +57,7 @@
 
             var payments = [];
             contractIds.forEach(contractId => {
-                var payment = new Models.Api.Organization.PaymentRegistrationChangeRequestDto();
+                var payment = <Models.Api.Organization.PaymentRegistrationChangeRequestDto>{};
                 payment.itContractId = contractId;
                 payment.externalPayments = this.mapSelectedOptionsToIds(selectedExternPayments.filter(x => x.optionalObjectContext.id === contractId));
                 payment.internalPayments = this.mapSelectedOptionsToIds(selectedInternPayments.filter(x => x.optionalObjectContext.id === contractId));

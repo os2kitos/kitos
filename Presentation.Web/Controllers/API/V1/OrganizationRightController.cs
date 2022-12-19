@@ -4,8 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using Core.DomainServices;
 using System.Web.Http;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 
@@ -26,18 +29,22 @@ namespace Presentation.Web.Controllers.API.V1
             _organizationRightsService = organizationRightsService;
         }
 
-        public virtual HttpResponseMessage GetRightsWithRoleName(string roleName, bool? roleWithName)
+        public virtual HttpResponseMessage GetAllLocalAdmins(bool? allLocalAdmins)
         {
             try
             {
-                var role = (OrganizationRole)Enum.Parse(typeof(OrganizationRole), roleName, true);
-                var theRights =
-                    _rightRepository
-                        .Get(x => x.Role == role)
-                        .Where(AllowRead);
+                if (GetCrossOrganizationReadAccessLevel() < CrossOrganizationDataReadAccessLevel.All)
+                {
+                    return Forbidden();
+                }
 
-                var dtos = Map<IEnumerable<OrganizationRight>, IEnumerable<OrganizationRightDTO>>(theRights);
-                return Ok(dtos);
+                return _rightRepository
+                    .AsQueryable()
+                    .Where(x => x.Role == OrganizationRole.LocalAdmin)
+                    .AsEnumerable()
+                    .Select(Map<OrganizationRight, OrganizationRightDTO>)
+                    .ToList()
+                    .Transform(Ok);
             }
             catch (Exception e)
             {
@@ -100,5 +107,8 @@ namespace Presentation.Web.Controllers.API.V1
                 return Error(e);
             }
         }
+
+        [NonAction]
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj) => throw new NotSupportedException();
     }
 }

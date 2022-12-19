@@ -67,7 +67,7 @@
                     </a>
                 </div>
                 <div ng-if="isRegistrationDetailsExpanded" class="panel-body">
-                    <org-unit-migration organization-id="orgUnit.orgId" organization-uuid="{{::orgUnit.orgUuid}}" unit-uuid="{{::orgUnit.uuid}}" unit-name="{{::orgUnit.oldName}}" state-parameters="stateParameters"/>
+                    <org-unit-migration ng-disabled="!canEditRegistrations" organization-id="orgUnit.orgId" organization-uuid="{{::orgUnit.orgUuid}}" unit-uuid="{{::orgUnit.uuid}}" unit-name="{{::orgUnit.oldName}}" state-parameters="stateParameters" />
                 </div>
             </div>
 </form>

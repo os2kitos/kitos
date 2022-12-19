@@ -14,5 +14,7 @@ namespace Core.ApplicationServices.Authorization
         bool Visit(TriggerBrokenReferencesReportPermission permission);
         bool Visit(AdministerGlobalPermission permission);
         bool Visit(ImportHierarchyFromStsOrganizationPermission permission);
+        bool Visit(BulkAdministerOrganizationUnitRegistrations permission);
+        bool Visit(DeleteAnyUserPermission permission);
     }
 }
