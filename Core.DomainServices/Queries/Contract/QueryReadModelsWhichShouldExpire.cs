@@ -22,19 +22,13 @@ namespace Core.DomainServices.Queries.Contract
                 x =>
                     // All currently set as active in the read model
                     x.IsActive &&
+                    // Remove results where the date has no effect (active overrides all other logic)
                     x.SourceEntity.Active == false &&
-                    (
-                        // Expiration data defined
-                        x.SourceEntity.ExpirationDate != null &&
-                        // Expiration date has passed
-                        x.SourceEntity.ExpirationDate < currentTime ||
-                        // Termination data defined
-                        x.SourceEntity.Terminated != null &&
-                        // Termination date defined
-                        x.SourceEntity.Terminated < currentTime
-                    )
+                    // Expiration data defined
+                    x.SourceEntity.ExpirationDate != null &&
+                    // Expiration date has passed
+                    x.SourceEntity.ExpirationDate < currentTime || (x.SourceEntity.Terminated != null && x.SourceEntity.Terminated < currentTime)
             );
-                    //ItContractIsActiveQueryHelper.CheckIfContractIsExpired(currentTime, x.SourceEntity)
         }
     }
 }
