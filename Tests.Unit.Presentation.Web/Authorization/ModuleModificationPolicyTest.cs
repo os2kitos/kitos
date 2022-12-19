@@ -99,7 +99,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(Organization), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(OrganizationUnit), false, false, OrganizationRole.SystemModuleAdmin, false)]
-        [InlineData(typeof(OrganizationRight), false, false, OrganizationRole.SystemModuleAdmin, true)]
+        [InlineData(typeof(OrganizationRight), false, false, OrganizationRole.SystemModuleAdmin, false)]
         // CONTRACT ADMIN
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.ContractModuleAdmin, false)]
@@ -108,7 +108,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(Organization), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(OrganizationUnit), false, false, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(typeof(OrganizationRight), false, false, OrganizationRole.ContractModuleAdmin, true)]
+        [InlineData(typeof(OrganizationRight), false, false, OrganizationRole.ContractModuleAdmin, false)]
         // ORGANIZATION ADMIN
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.OrganizationModuleAdmin, false)]

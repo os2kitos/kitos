@@ -110,9 +110,7 @@ namespace Core.ApplicationServices.Authorization.Policies
             if (MatchType<OrganizationRight>(target))
             {
                 return IsLocalAdmin(organizationId) ||
-                       IsOrganizationModuleAdmin(organizationId) ||
-                       IsContractModuleAdmin(organizationId) ||
-                       IsSystemModuleAdmin(organizationId);
+                       IsOrganizationModuleAdmin(organizationId);
             }
 
             if (MatchType<OrganizationUnit>(target))
