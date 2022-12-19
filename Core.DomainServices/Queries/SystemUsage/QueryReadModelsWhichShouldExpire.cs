@@ -27,22 +27,21 @@ namespace Core.DomainServices.Queries.SystemUsage
                      // Expiration date has passed
                      x.SourceEntity.ExpirationDate < currentTime) ||
                     // All currently set as active in the read model
-                    (
-                        x.MainContractIsActive &&
-                         // Main Contract is not null
-                         x.SourceEntity.MainContract != null &&
-                         // Remove results where the date has no effect (active overrides all other logic)
-                         x.SourceEntity.MainContract.ItContract.Active == false &&
-                         (
-                             // Expiration data defined
-                             x.SourceEntity.MainContract.ItContract.ExpirationDate != null &&
-                             // Expiration date has passed
-                             x.SourceEntity.MainContract.ItContract.ExpirationDate < currentTime ||
-                             // Termination data defined
-                             x.SourceEntity.MainContract.ItContract.Terminated != null &&
-                             // Termination date defined
-                             x.SourceEntity.MainContract.ItContract.Terminated < currentTime
-                         )
+                    (x.MainContractIsActive &&
+                     // Main Contract is not null
+                     x.SourceEntity.MainContract != null &&
+                     // Remove results where the date has no effect (active overrides all other logic)
+                     x.SourceEntity.MainContract.ItContract.Active == false &&
+                     (
+                         // Expiration data defined
+                         x.SourceEntity.MainContract.ItContract.ExpirationDate != null &&
+                         // Expiration date has passed
+                         x.SourceEntity.MainContract.ItContract.ExpirationDate < currentTime ||
+                         // Termination data defined
+                         x.SourceEntity.MainContract.ItContract.Terminated != null &&
+                         // Termination date defined
+                         x.SourceEntity.MainContract.ItContract.Terminated < currentTime
+                     )
                     )
             );
         }
