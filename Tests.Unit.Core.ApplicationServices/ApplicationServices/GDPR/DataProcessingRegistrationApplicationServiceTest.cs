@@ -1693,7 +1693,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Update_MainContract_Returns_Not_Found()
+        public void Update_MainContract_Returns_Not_Found_When_Contract_With_Id_Doesnt_Exist()
         {
             Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateMainContract(id, A<int>()));
         }
@@ -1708,20 +1708,20 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 registration.MainContract = new ItContract() { Id = mainContractId };
 
                 //Act
-                return _sut.RemoveMainContract(registration.Id, mainContractId);
+                return _sut.RemoveMainContract(registration.Id);
             });
         }
 
         [Fact]
         public void Remove_MainContract_Returns_Forbidden()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveMainContract(id, A<int>()));
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(_sut.RemoveMainContract);
         }
 
         [Fact]
-        public void Remove_MainContract_Returns_Not_Found()
+        public void Remove_MainContract_Returns_Not_Found_When_Contract_With_Id_Doesnt_Exist()
         {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveMainContract(id, A<int>()));
+            Test_Command_Which_Fails_With_Dpr_NotFound(_sut.RemoveMainContract);
         }
 
         [Fact]

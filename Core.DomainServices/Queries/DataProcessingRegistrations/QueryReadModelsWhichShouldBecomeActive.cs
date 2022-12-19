@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel.GDPR.Read;
-using Core.DomainServices.Queries.Helpers;
 
 namespace Core.DomainServices.Queries.DataProcessingRegistrations
 {
@@ -20,10 +19,21 @@ namespace Core.DomainServices.Queries.DataProcessingRegistrations
             return source.Where(
                 x =>
                 (
-                    x.MainContractIsActive == false &&
+                    x.ActiveAccordingToMainContract == false &&
                     (
                         x.SourceEntity.MainContract == null ||
-                        ItContractIsActiveQueryHelper.CheckIfContractIsValid(currentTime, x.SourceEntity.MainContract)
+                        (
+                            // 1: Common scenario
+                            // Exclude those which were enforced as valid - dates have no effect
+                            x.SourceEntity.MainContract.Active == false &&
+                            // Include where concluded (start time) has passed or is not defined
+                            (x.SourceEntity.MainContract.Concluded == null || x.SourceEntity.MainContract.Concluded <= currentTime) &&
+                            // Include only if not expired or no expiration defined
+                            (x.SourceEntity.MainContract.ExpirationDate == null || currentTime <= x.SourceEntity.MainContract.ExpirationDate)
+                        ) ||
+                        // 2: Out of sync scenario
+                        // Source entity marked as active (forced) but read model state false, mark as target for update
+                        x.SourceEntity.MainContract.Active
                     )
                 )
             );

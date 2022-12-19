@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel.GDPR.Read;
-using Core.DomainServices.Queries.Helpers;
 
 namespace Core.DomainServices.Queries.DataProcessingRegistrations
 {
@@ -21,7 +20,18 @@ namespace Core.DomainServices.Queries.DataProcessingRegistrations
                 x =>
                 (
                     x.SourceEntity.MainContract != null &&
-                    ItContractIsActiveQueryHelper.CheckIfContractIsExpired(currentTime, x.SourceEntity.MainContract)
+                    // Remove results where the date has no effect (active overrides all other logic)
+                    x.SourceEntity.MainContract.Active == false &&
+                    (
+                        // Expiration data defined
+                        x.SourceEntity.MainContract.ExpirationDate != null &&
+                        // Expiration date has passed
+                        x.SourceEntity.MainContract.ExpirationDate < currentTime ||
+                        // Termination data defined
+                        x.SourceEntity.MainContract.Terminated != null &&
+                        // Termination date defined
+                        x.SourceEntity.MainContract.Terminated < currentTime
+                    )
                 )
             );
         }

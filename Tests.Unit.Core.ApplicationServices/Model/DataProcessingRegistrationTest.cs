@@ -67,52 +67,6 @@ namespace Tests.Unit.Core.Model
         }
 
         [Fact]
-        public void Can_RemoveMainContract()
-        {
-            //Arrange
-            var contractId = A<int>();
-            var dpr = CreateDprWithMainContract(contractId);
-
-            //Act
-            var error = dpr.RemoveMainContract(contractId);
-
-            //Assert
-            Assert.False(error.HasValue);
-            Assert.Null(dpr.MainContract);
-        }
-
-        [Fact]
-        public void RemoveMainContract_Returns_No_Error_When_Contract_Is_Already_Null()
-        {
-            //Arrange
-            var contractId = A<int>();
-            var dpr = new DataProcessingRegistration();
-
-            //Act
-            var error = dpr.RemoveMainContract(contractId);
-
-            //Assert
-            Assert.False(error.HasValue);
-            Assert.Null(dpr.MainContract);
-        }
-
-        [Fact]
-        public void RemoveMainContract_Returns_BadInput_When_Contract_Has_Different_Id()
-        {
-            //Arrange
-            var contractId = A<int>();
-            var dpr = CreateDprWithMainContract(A<int>());
-
-            //Act
-            var error = dpr.RemoveMainContract(contractId);
-
-            //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
-            Assert.NotNull(dpr.MainContract);
-        }
-
-        [Fact]
         public void Can_ResetMainContract()
         {
             //Arrange

@@ -1023,13 +1023,81 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
             Assert.NotNull(contract);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, contract.Id);
-            
+            if (hasMainContract)
+            {
+                ExpectUpdateMainContractReturns(createdRegistration.Id, contract.Id, createdRegistration);
+            }
+            else
+            {
+                ExpectRemoveMainContractReturns(createdRegistration.Id, createdRegistration);
+            }
+
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Create_With_GeneralData_MainContract_Returns_OperationError_When_UpdateMainContract_Fails()
+        {
+            //Arrange
+            var inputUuids = A<Guid?>();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                MainContractUuid = inputUuids.AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
+            Assert.NotNull(contract);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, contract.Id);
+            var expectedError = A<OperationError>();
+            ExpectUpdateMainContractReturns(createdRegistration.Id, contract.Id, expectedError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedError.FailureType, result.Error.FailureType);
+            Assert.Equal(expectedError, result.Error);
+        }
+
+        [Fact]
+        public void Create_With_GeneralData_MainContract_Returns_OperationError_When_RemoveMainContract_Fails()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                MainContractUuid = OptionalValueChange<Guid?>.With(null),
+            };
+            var (organizationUuid, parameters, createdRegistration, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            
+            var expectedError = A<OperationError>();
+            ExpectRemoveMainContractReturns(createdRegistration.Id, expectedError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedError.FailureType, result.Error.FailureType);
+            Assert.Equal(expectedError, result.Error);
+        }
+
+        private void ExpectUpdateMainContractReturns(int dprId, int contractId,
+            Result<DataProcessingRegistration, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.UpdateMainContract(dprId, contractId)).Returns(result);
+        }
+
+        private void ExpectRemoveMainContractReturns(int dprId,
+            Result<DataProcessingRegistration, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.RemoveMainContract(dprId)).Returns(result);
         }
 
         [Fact]
@@ -1045,7 +1113,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
             Assert.NotNull(contract);
-            var operationError = A<OperationError>();
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, Maybe<int>.None);
 
             //Act
@@ -1053,7 +1120,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result, $"Data responsible option with uuid {generalData.MainContractUuid.NewValue} could not be found", OperationFailure.BadInput, transaction);
+            AssertFailureWithKnownErrorDetails(result, $"It contract with uuid {generalData.MainContractUuid.NewValue} could not be found", OperationFailure.BadInput, transaction);
         }
 
         [Theory]

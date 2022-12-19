@@ -1,6 +1,5 @@
 ﻿using AutoFixture;
 using Core.DomainModel.ItContract;
-using System;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 
@@ -14,7 +13,7 @@ namespace Tests.Unit.Presentation.Web.Helpers
             return new DataProcessingRegistrationReadModel
             {
                 Id = Fixture.Create<int>(),
-                MainContractIsActive = isActive,
+                ActiveAccordingToMainContract = isActive,
                 SourceEntity = new DataProcessingRegistration
                 {
                     Id = Fixture.Create<int>(),

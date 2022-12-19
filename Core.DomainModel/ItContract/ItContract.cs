@@ -543,7 +543,7 @@ namespace Core.DomainModel.ItContract
 
         #endregion
 
-        public virtual ICollection<DataProcessingRegistration> AssociatedDataProcessingRegistrations { get; set; }
+        public virtual ICollection<DataProcessingRegistration> DataProcessingRegistrationsWhereContractIsMainContract { get; set; }
 
         public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
 

@@ -519,16 +519,12 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id, int contractId)
+        public Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id)
         {
-            return Modify(id, registration =>
+            return Modify<DataProcessingRegistration>(id, registration =>
             {
-                return registration.RemoveMainContract(contractId)
-                    .Match
-                    (
-                        error => error,
-                        () => Result<DataProcessingRegistration, OperationError>.Success(registration)
-                    );
+                registration.ResetMainContract();
+                return registration;
             });
         }
 

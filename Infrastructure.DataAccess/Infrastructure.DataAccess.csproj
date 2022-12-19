@@ -986,9 +986,9 @@
     <Compile Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.designer.cs">
       <DependentUpon>202212150709011_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202212151224126_DataProcessingMainContract.cs" />
-    <Compile Include="Migrations\202212151224126_DataProcessingMainContract.designer.cs">
-      <DependentUpon>202212151224126_DataProcessingMainContract.cs</DependentUpon>
+    <Compile Include="Migrations\202212191220524_DataProcessingMainContract.cs" />
+    <Compile Include="Migrations\202212191220524_DataProcessingMainContract.designer.cs">
+      <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1651,8 +1651,8 @@
     <EmbeddedResource Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.resx">
       <DependentUpon>202212150709011_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202212151224126_DataProcessingMainContract.resx">
-      <DependentUpon>202212151224126_DataProcessingMainContract.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202212191220524_DataProcessingMainContract.resx">
+      <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

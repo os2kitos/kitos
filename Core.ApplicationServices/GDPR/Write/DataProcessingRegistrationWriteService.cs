@@ -333,21 +333,18 @@ namespace Core.ApplicationServices.GDPR.Write
                 .MatchFailure();
         }
 
-        private Result<DataProcessingRegistration, OperationError> UpdateMainContract(DataProcessingRegistration dpr, Guid? contractId)
+        private Result<DataProcessingRegistration, OperationError> UpdateMainContract(DataProcessingRegistration dpr, Guid? contractUuid)
         {
-            if (!contractId.HasValue)
-            {
-                dpr.ResetMainContract();
-                return dpr;
-            }
+            if (contractUuid.HasValue)
+                return _entityIdentityResolver.ResolveDbId<ItContract>(contractUuid.Value)
+                    .Match
+                    (
+                        contractId => _applicationService.UpdateMainContract(dpr.Id, contractId),
+                        () => new OperationError($"It contract with uuid {contractUuid.Value} could not be found", OperationFailure.BadInput)
+                    );
 
-            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(contractId.Value);
+            return _applicationService.RemoveMainContract(dpr.Id);
 
-            if (dbId.IsNone)
-                return new OperationError($"Data responsible option with uuid {contractId.Value} could not be found", OperationFailure.BadInput);
-
-            return dpr.AssignMainContract(dbId.Value)
-                .Match<Result<DataProcessingRegistration, OperationError>>(error => error, () => dpr);
         }
 
         private Maybe<OperationError> UpdateDataResponsible(DataProcessingRegistration dpr, Guid? dataResponsibleUuid)

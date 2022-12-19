@@ -342,7 +342,7 @@ namespace Core.DomainModel.GDPR
         public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; }
         public int? MainContractId { get; set; }
         public virtual ItContract.ItContract MainContract { get; set; }
-        public bool IsActiveAccordingToMainContract => CheckContractValidity();
+        public bool IsActiveAccordingToMainContract => CheckContractValidity().IsNone;
 
         public void ResetMainContract()
         {
@@ -352,35 +352,44 @@ namespace Core.DomainModel.GDPR
 
         public Maybe<OperationError> AssignMainContract(int contractId)
         {
-            if (MainContract != null && contractId == MainContract.Id)
+            if (MainContract?.Id == contractId)
                 return Maybe<OperationError>.None;
 
-            var contract = AssociatedContracts.FirstOrDefault(c => c.Id == contractId);
-            if (contract == null)
+            var contract = GetAssociatedContract(contractId);
+            if (contract.IsNone)
                 return new OperationError($"Contract with id: {contractId} is not associated with this data processing registration", OperationFailure.BadState);
 
             ResetMainContract();
-            MainContract = contract;
+            MainContract = contract.Value;
 
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> RemoveMainContract(int contractId)
+        public Maybe<ItContract.ItContract> GetAssociatedContract(int id)
         {
-            if (MainContract == null)
-                return Maybe<OperationError>.None;
-
-            if(MainContract.Id != contractId)
-                return new OperationError($"Contract with id: {contractId} is not set as the main contract for this data processing registration", OperationFailure.BadInput);
-
-            ResetMainContract();
-
-            return Maybe<OperationError>.None;
+            return AssociatedContracts.FirstOrDefault(c => c.Id == id);
         }
 
-        private bool CheckContractValidity()
+        public DataProcessingRegistrationValidationResult CheckDprValidity()
         {
-            return MainContract?.IsActive != false;
+            var errors = new List<DataProcessingRegistrationValidationError>();
+
+            var hasContractValidityError = CheckContractValidity();
+            
+            if (hasContractValidityError.HasValue)
+            {
+                errors.Add(hasContractValidityError.Value);
+            }
+
+            return new DataProcessingRegistrationValidationResult(errors);
+        }
+
+        private Maybe<DataProcessingRegistrationValidationError> CheckContractValidity()
+        {
+            //Main contract is considered valid if it's null or if "IsActive" == true
+            return MainContract == null || MainContract.IsActive
+                ? Maybe<DataProcessingRegistrationValidationError>.None
+                : DataProcessingRegistrationValidationError.MainContractNotActive;
         }
 
         public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)

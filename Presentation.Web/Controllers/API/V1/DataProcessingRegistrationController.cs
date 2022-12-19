@@ -769,13 +769,10 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveMainContract(int id, [FromBody] SingleValueDTO<int> mainContractionId)
+        public HttpResponseMessage RemoveMainContract(int id)
         {
-            if (mainContractionId == null)
-                return BadRequest(nameof(mainContractionId) + " must be provided");
-
             return _dataProcessingRegistrationApplicationService
-                .RemoveMainContract(id, mainContractionId.Value)
+                .RemoveMainContract(id)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -936,8 +933,8 @@ namespace Presentation.Web.Controllers.API.V1
                     .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
                     .GetValueOrDefault(),
                 MainContractId = value.MainContractId,
-                MainContractIsActive = value.IsActiveAccordingToMainContract,
-                DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>()
+                IsActiveAccordingToMainContract = value.IsActiveAccordingToMainContract,
+                DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>
                 {
                     Value = value
                             .DataResponsible
@@ -946,7 +943,7 @@ namespace Presentation.Web.Controllers.API.V1
                             .GetValueOrDefault(),
                     Remark = value.DataResponsibleRemark
                 },
-                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>()
+                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>
                 {
                     Value = value
                             .OversightOptions

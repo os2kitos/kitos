@@ -27,6 +27,7 @@ namespace Core.BackgroundJobs.Services
         private readonly RebuildItContractOverviewReadModelsBatchJob _rebuildItContractOverviewReadModelsBatchJob;
         private readonly ScheduleItContractOverviewReadModelUpdates _scheduleItContractOverviewReadModelUpdates;
         private readonly ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState _contractOverviewReadModelsWhichChangesActiveState;
+        private readonly ScheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState _scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState;
         private readonly ScheduleFkOrgUpdatesBackgroundJob _scheduleFkOrgUpdatesBackgroundJob;
 
         public BackgroundJobLauncher(
@@ -43,7 +44,8 @@ namespace Core.BackgroundJobs.Services
             RebuildItContractOverviewReadModelsBatchJob rebuildItContractOverviewReadModelsBatchJob,
             ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates,
             ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState contractOverviewReadModelsWhichChangesActiveState,
-            ScheduleFkOrgUpdatesBackgroundJob scheduleFkOrgUpdatesBackgroundJob)
+            ScheduleFkOrgUpdatesBackgroundJob scheduleFkOrgUpdatesBackgroundJob, 
+            ScheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -59,6 +61,7 @@ namespace Core.BackgroundJobs.Services
             _scheduleItContractOverviewReadModelUpdates = scheduleItContractOverviewReadModelUpdates;
             _contractOverviewReadModelsWhichChangesActiveState = contractOverviewReadModelsWhichChangesActiveState;
             _scheduleFkOrgUpdatesBackgroundJob = scheduleFkOrgUpdatesBackgroundJob;
+            _scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState = scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState;
         }
 
         public async Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default)
@@ -89,6 +92,11 @@ namespace Core.BackgroundJobs.Services
         public async Task LaunchScheduleDataProcessingRegistrationReadModelUpdates(CancellationToken token = default)
         {
             await Launch(_scheduleDataProcessingRegistrationReadModelUpdates, token);
+        }
+
+        public async Task LaunchUpdateStaleDataProcessingRegistrationReadModels(CancellationToken token = default)
+        {
+            await Launch(_scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState, token);
         }
 
         public async Task LaunchScheduleItSystemUsageOverviewReadModelUpdates(CancellationToken token = default)

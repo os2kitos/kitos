@@ -616,6 +616,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleItContractOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<ScheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState>().ToSelf().InCommandScope(Mode);
 
             //contract
             kernel.Bind<RebuildItContractOverviewReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
