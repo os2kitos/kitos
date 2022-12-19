@@ -6,9 +6,7 @@
             bindings: {
                 pageName: "@",
                 hasWriteAccess: "=",
-                contractId: "=",
-                save: "&",
-                options: "<"
+                viewModel: "<",
             },
             controller: MainContractSectionController,
             controllerAs: "ctrl",
@@ -16,23 +14,26 @@
         };
     }
 
-    //TODO: Create a model containing data (currentId, isActive etc.) and the save method
-
+    export interface IMainContractSectionViewModel {
+        isActive: boolean;
+        options: Models.ViewModel.Generic.Select2OptionViewModel<null>[];
+        postMethod: (contractId: number) => ng.IPromise<void>;
+        deleteMethod: (contractId: number) => ng.IPromise<void>;
+        stateReloadMethod: () => ng.IPromise<void>;
+        contractId: number;
+    }
+    
     interface IMainContractSectionController extends ng.IComponentController {
         pageName: string;
         hasWriteAccess: boolean;
-        options: Models.ViewModel.Generic.Select2OptionViewModel<null>[];
-        save: (id: number) => void;
-        contractId: number;
+        viewModel: IMainContractSectionViewModel;
     }
 
     class MainContractSectionController implements IMainContractSectionController {
         pageName: string | null = null;
         hasWriteAccess: boolean | null = null;
-        options: Models.ViewModel.Generic.Select2OptionViewModel<null>[];
-        save: (id: number) => void | null = null;
-        contractId: number;
-
+        viewModel: IMainContractSectionViewModel | null = null;
+        currentContract: {id: number, text: string};
 
         $onInit() {
             if (this.pageName === null) {
@@ -43,13 +44,29 @@
                 console.error("Missing hasWriteAccess parameter for MainContractSectionController");
                 return;
             }
-            if (this.options === null) {
-                console.error("Missing options parameter for MainContractSectionController");
+            if (this.viewModel === null) {
+                console.error("Missing viewModel parameter for MainContractSectionController");
                 return;
             }
-            if (this.save === null) {
-                console.error("Missing save (method) parameter for MainContractSectionController");
+
+            this.currentContract = { id: this.viewModel.contractId, text: "" }
+        }
+
+        saveContract(selectedContract: number) {
+            if (this.currentContract.id === selectedContract){
                 return;
+            }
+
+            if (selectedContract) {
+                this.viewModel.postMethod(selectedContract)
+                    .then(() => this.viewModel.stateReloadMethod())
+                    .then(() => this.currentContract.id = selectedContract,
+                        error => console.log(error));
+            } else {
+                this.viewModel.deleteMethod(selectedContract)
+                    .then(() => this.viewModel.stateReloadMethod())
+                    .then(() => this.currentContract.id = selectedContract,
+                        error => console.log(error));
             }
         }
     }

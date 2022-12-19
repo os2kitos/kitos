@@ -17,26 +17,30 @@
             var usageId = itSystemUsage.id;
             bindContracts(itSystemUsage);
             var currentMainContract: number;
-
-            const reloadContractState = () => {
+            
+            function reloadContractState () {
                 return itSystemUsageService.getItSystemUsage(usageId)
                     .then((usage) => bindContracts(usage));
             }
 
-            $scope.saveMainContract = (id: any) => {
+            function saveMainContract (id: number) {
                 if (currentMainContract === id || _.isUndefined(id)) {
                     return;
                 }
-                if (id) {
-                    apiUseCaseFactory
-                        .createAssignmentCreation(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`))
-                        .executeAsync((_) => reloadContractState());
-                } else {
-                    apiUseCaseFactory
-                        .createAssignmentRemoval(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`))
-                        .executeAsync((_) => reloadContractState());
-                }
+
+                apiUseCaseFactory
+                    .createAssignmentCreation(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`));
             };
+
+            function deleteMainContract (id: number) {
+
+                if (currentMainContract === id || _.isUndefined(id)) {
+                    return;
+                }
+
+                apiUseCaseFactory
+                    .createAssignmentRemoval(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`));
+            }
 
             function bindContracts(usage: any) {
                 $scope.contracts = usage.contracts.map(contract => {
@@ -61,6 +65,16 @@
                 }
                 itSystemUsage.mainContractIsActive = match?.isActive;
                 $scope.mainContractIsActive = match?.isActive;
+
+                $scope.mainContractViewModel = {
+                    hasWriteAccess: $scope.hasWriteAccess,
+                    options: entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts),
+                    contractId: usage.mainContractId,
+                    isActive: itSystemUsage.mainContractIsActive,
+                    postMethod: (id: number) => saveMainContract(id),
+                    deleteMethod: (id: number) => deleteMainContract(id),
+                    stateReloadMethod: () => reloadContractState(),
+                }
             }
 
             //UI Customization
