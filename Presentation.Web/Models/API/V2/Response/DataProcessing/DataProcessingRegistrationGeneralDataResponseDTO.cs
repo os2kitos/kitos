@@ -58,7 +58,7 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// </summary>
         public bool Valid { get; set; }
         /// <summary>
-        /// Defines the master contract for this data processing registration (many contracts can point to a data processor registration but only one can be the master contract)
+        /// Defines the master contract for this data processing registration (many contracts can point to a data processing registration but only one can be the master contract)
         /// </summary>
         public IdentityNamePairResponseDTO MainContract { get; set; }
     }
