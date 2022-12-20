@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Core.Abstractions.Types;
-using Core.ApplicationServices.Authorization.Policies;
+﻿using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 

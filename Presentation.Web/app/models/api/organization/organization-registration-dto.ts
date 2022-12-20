@@ -25,23 +25,24 @@
         targetUnitUuid: string;
     }
 
-    export class PaymentRegistrationChangeRequestDto {
-        itContractId: number;
-        externalPayments: number[];
-        internalPayments: number[];
+    export interface PaymentRegistrationChangeRequestDto {
+        itContractId: number
+        externalPayments: number[]
+        internalPayments: number[]
     }
 
-    export class UnitAccessRightsDto {
-        canBeRead: boolean;
-        canBeModified: boolean;
-        canBeDeleted: boolean;
-        canNameBeModified: boolean;
-        canEanBeModified: boolean;
-        canDeviceIdBeModified: boolean;
-        canBeRearranged: boolean;
-    }
+    export interface UnitAccessRightsDto {
+        canBeRead: boolean
+        canBeModified: boolean
+        canBeDeleted: boolean
+        canNameBeModified: boolean
+        canEanBeModified: boolean
+        canDeviceIdBeModified: boolean
+        canBeRearranged: boolean
+        canEditRegistrations: boolean
+}
 
-    export class UnitAccessRightsWithUnitIdDto extends UnitAccessRightsDto {
+    export interface UnitAccessRightsWithUnitIdDto extends UnitAccessRightsDto {
         unitId: number;
     }
 }

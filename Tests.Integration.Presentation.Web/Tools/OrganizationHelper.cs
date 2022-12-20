@@ -154,7 +154,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<HttpResponseMessage> SendGetOrganizationRemovalConflictsRequestAsync(Guid organizationUuid, Cookie optionalLogin = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid:D}/deletion/conflicts");
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }

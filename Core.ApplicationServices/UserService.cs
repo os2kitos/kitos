@@ -11,6 +11,7 @@ using System.Security.Cryptography;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
@@ -310,14 +311,23 @@ namespace Core.ApplicationServices
                 .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
 
+        public Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(organization => new UserAdministrationPermissions(AllowDelete(organization.Id)));
+        }
+
+        private bool AllowDelete(int? optionalOrganizationScopeId)
+        {
+            return _authorizationContext.HasPermission(new DeleteAnyUserPermission(optionalOrganizationScopeId.FromNullableValueType()));
+        }
+
         public Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null)
         {
             var hasOrganizationIdValue = scopedToOrganizationId.HasValue;
 
-            var allowByGlobalAdminRights = _organizationalUserContext.IsGlobalAdmin();
-            var allowByLocalAdminRights = hasOrganizationIdValue && _organizationalUserContext.HasRole(scopedToOrganizationId.Value, OrganizationRole.LocalAdmin);
-
-            if (allowByGlobalAdminRights || allowByLocalAdminRights)
+            if (AllowDelete(scopedToOrganizationId))
             {
                 var user = _userRepository.AsQueryable().ByUuid(userUuid);
                 if (user == null)

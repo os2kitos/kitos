@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.Organization;
+﻿using System;
+using Core.DomainModel.Organization;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -11,8 +12,6 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class UserHelper
     {
-
-
         public static async Task<List<UserWithOrganizationDTO>> GetUsersWithRightsholderAccessAsync(Cookie optionalLogin = null)
         {
             using var response = await SendGetUsersWithRightsholderAccessAsync(optionalLogin);
@@ -64,6 +63,21 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/users/search?query={query}"), cookie);
+        }
+
+        public static async Task<UserAdministrationPermissionsDTO> GetUserAdministrationPermissionsAsync(Guid organizationUuid,Cookie optionalLogin = null)
+        {
+            using var response = await SendGetUserAdministrationPermissionsRequestAsync(organizationUuid,optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<UserAdministrationPermissionsDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetUserAdministrationPermissionsRequestAsync(Guid organizationUuid,Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid:D}/administration/users/permissions");
+            return await HttpApi.GetWithCookieAsync(url, cookie);
         }
     }
 }
