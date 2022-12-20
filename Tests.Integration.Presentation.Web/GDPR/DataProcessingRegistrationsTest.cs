@@ -989,7 +989,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
 
             var contract = await ItContractHelper.CreateContract(A<string>(), organizationId);
-            var assignDprToContractResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract.Id, registration.Id);
+            using var assignDprToContractResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract.Id, registration.Id);
             Assert.Equal(HttpStatusCode.OK, assignDprToContractResponse.StatusCode);
 
             //Act
