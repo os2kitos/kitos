@@ -16,6 +16,7 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
@@ -335,11 +336,16 @@ namespace Core.ApplicationServices.Contract.Write
                 "data processing registration",
                 contract,
                 dataProcessingRegistrationUuids.FromNullable(),
-                (dprUuid) => _dataProcessingRegistrationApplicationService.GetByUuid(dprUuid),
+                GetAssignmentInputFromKey,
                 itContract => itContract.DataProcessingRegistrations.ToList(),
-                (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).MatchFailure(),
-                (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).MatchFailure()
+                (itContract, registration) => _contractService.AssignDataProcessingRegistration(itContract.Id, registration.Id).MatchFailure(),
+                (itContract, registration) => _contractService.RemoveDataProcessingRegistration(itContract.Id, registration.Id).MatchFailure()
             );
+        }
+
+        private Result<DataProcessingRegistration, OperationError> GetAssignmentInputFromKey(Guid dprUuid)
+        {
+            return _dataProcessingRegistrationApplicationService.GetByUuid(dprUuid);
         }
 
         private Result<ItContract, OperationError> UpdatePaymentModelParameters(ItContract contract, ItContractPaymentModelModificationParameters parameters)

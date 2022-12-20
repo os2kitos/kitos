@@ -228,6 +228,8 @@
     <Compile Include="DomainServices\DPR\QueryBySubDataProcessorUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySystemUsageUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySystemUuidTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryReadModelsWhichShouldBecomeActiveTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryReadModelsWhichShouldExpireTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
     <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelRepositoryTest.cs" />
@@ -274,6 +276,7 @@
     <Compile Include="Extensions\ItSystemExtensions.cs" />
     <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
+    <Compile Include="Helpers\DataProcessingRegistrationReadModelTestData.cs" />
     <Compile Include="Helpers\ItSystemUsageOverviewReadModelTestData.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />

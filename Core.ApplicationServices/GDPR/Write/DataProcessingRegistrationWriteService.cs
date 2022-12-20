@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
@@ -12,6 +13,7 @@ using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
@@ -251,7 +253,8 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(r => r.WithOptionalUpdate(parameters.InsecureCountriesSubjectToDataTransferUuids, UpdateInsecureCountriesSubjectToDataTransfer))
                 .Bind(r => r.WithOptionalUpdate(parameters.DataProcessorUuids, UpdateDataProcessors))
                 .Bind(r => r.WithOptionalUpdate(parameters.HasSubDataProcessors, (registration, newValue) => _applicationService.SetSubDataProcessorsState(registration.Id, newValue ?? YesNoUndecidedOption.Undecided)))
-                .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessorUuids, UpdateSubDataProcessors));
+                .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessorUuids, UpdateSubDataProcessors))
+                .Bind(r => r.WithOptionalUpdate(parameters.MainContractUuid, UpdateMainContract));
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateSystemAssignments(DataProcessingRegistration dpr, IEnumerable<Guid> systemUsageUuids)
@@ -328,6 +331,21 @@ namespace Core.ApplicationServices.GDPR.Write
             return _applicationService
                 .AssignBasisForTransfer(dpr.Id, dbId.Value)
                 .MatchFailure();
+        }
+
+        private Result<DataProcessingRegistration, OperationError> UpdateMainContract(DataProcessingRegistration dpr, Guid? contractUuid)
+        {
+            if (contractUuid.HasValue)
+            {
+                return _entityIdentityResolver.ResolveDbId<ItContract>(contractUuid.Value)
+                    .Match
+                    (
+                        contractId => _applicationService.UpdateMainContract(dpr.Id, contractId),
+                        () => new OperationError($"It contract with uuid {contractUuid.Value} could not be found", OperationFailure.BadInput)
+                    );
+            }
+            return _applicationService.RemoveMainContract(dpr.Id);
+
         }
 
         private Maybe<OperationError> UpdateDataResponsible(DataProcessingRegistration dpr, Guid? dataResponsibleUuid)

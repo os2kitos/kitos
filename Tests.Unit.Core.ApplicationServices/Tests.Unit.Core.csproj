@@ -255,6 +255,7 @@
     <Compile Include="Infrastructure\NinjectDomainEventsAdapterTest.cs" />
     <Compile Include="Infrastructure\EndpointValidationServiceTest.cs" />
     <Compile Include="Infrastructure\EnumerableExtensionsTest.cs" />
+    <Compile Include="Model\DataProcessingRegistrationTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\HasRightsEntityTest.cs" />

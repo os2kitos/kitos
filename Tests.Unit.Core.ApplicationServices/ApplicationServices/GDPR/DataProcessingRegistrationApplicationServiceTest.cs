@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -1669,6 +1670,58 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Update_IsOversightCompletedRemark_Returns_Not_Found()
         {
             Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Can_Update_MainContract()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var mainContractId = A<int>();
+                registration.AssociatedContracts = new List<ItContract> {new() {Id = mainContractId}};
+
+                //Act
+                return _sut.UpdateMainContract(registration.Id, mainContractId);
+            });
+        }
+
+        [Fact]
+        public void Update_MainContract_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateMainContract(id, A<int>()));
+        }
+
+        [Fact]
+        public void Update_MainContract_Returns_Not_Found_When_Contract_With_Id_Doesnt_Exist()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateMainContract(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_Remove_MainContract()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var mainContractId = A<int>();
+                registration.MainContract = new ItContract() { Id = mainContractId };
+
+                //Act
+                return _sut.RemoveMainContract(registration.Id);
+            });
+        }
+
+        [Fact]
+        public void Remove_MainContract_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(_sut.RemoveMainContract);
+        }
+
+        [Fact]
+        public void Remove_MainContract_Returns_Not_Found_When_Contract_With_Id_Doesnt_Exist()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(_sut.RemoveMainContract);
         }
 
         [Fact]
