@@ -54,7 +54,8 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         public IEnumerable<ShallowOrganizationResponseDTO> SubDataProcessors { get; set; }
 
         /// <summary>
-        /// Determines if the entity is considered valid. Validity is determined by the MainContract Validity.
+        /// Determines if the entity is considered valid. Validity is determined by
+        /// - the MainContract Validity.
         /// </summary>
         public bool Valid { get; set; }
         /// <summary>
