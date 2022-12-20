@@ -350,10 +350,10 @@ namespace Core.DomainModel.GDPR
             MainContract = null;
         }
 
-        public Maybe<OperationError> AssignMainContract(int contractId)
+        public Result<DataProcessingRegistration, OperationError> AssignMainContract(int contractId)
         {
-            if (MainContract?.Id == contractId)
-                return Maybe<OperationError>.None;
+            if (MainContract != null && MainContract.Id == contractId)
+                return this;
 
             var contract = GetAssociatedContract(contractId);
             if (contract.IsNone)
@@ -362,7 +362,7 @@ namespace Core.DomainModel.GDPR
             ResetMainContract();
             MainContract = contract.Value;
 
-            return Maybe<OperationError>.None;
+            return this;
         }
 
         public Maybe<ItContract.ItContract> GetAssociatedContract(int id)
@@ -375,7 +375,7 @@ namespace Core.DomainModel.GDPR
             var errors = new List<DataProcessingRegistrationValidationError>();
 
             var hasContractValidityError = CheckContractValidity();
-            
+
             if (hasContractValidityError.HasValue)
             {
                 errors.Add(hasContractValidityError.Value);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -24,7 +25,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var error = dpr.AssignMainContract(contractId);
+            var error = dpr.AssignMainContract(contractId).MatchFailure();
 
             //Assert
             Assert.False(error.HasValue);
@@ -43,7 +44,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var error = dpr.AssignMainContract(contractId);
+            var error = dpr.AssignMainContract(contractId).MatchFailure();
 
             //Assert
             Assert.True(error.HasValue);
@@ -59,7 +60,7 @@ namespace Tests.Unit.Core.Model
             var dpr = CreateDprWithMainContract(contractId);
 
             //Act
-            var error = dpr.AssignMainContract(contractId);
+            var error = dpr.AssignMainContract(contractId).MatchFailure();
 
             //Assert
             Assert.False(error.HasValue);

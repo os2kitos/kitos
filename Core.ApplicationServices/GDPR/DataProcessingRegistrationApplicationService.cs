@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -477,7 +478,7 @@ namespace Core.ApplicationServices.GDPR
             return Modify<DataProcessingRegistration>(id, registration =>
             {
                 registration.SetOversightScheduledInspectionDate(oversightScheduledInspectionDate);
-                
+
                 return registration;
             });
         }
@@ -508,15 +509,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateMainContract(int id, int contractId)
         {
-            return Modify(id, registration =>
-            {
-                return registration.AssignMainContract(contractId)
-                    .Match
-                    (
-                        error => error,
-                        () => Result<DataProcessingRegistration, OperationError>.Success(registration)
-                    );
-            });
+            return Modify(id, registration => registration.AssignMainContract(contractId));
         }
 
         public Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id)
