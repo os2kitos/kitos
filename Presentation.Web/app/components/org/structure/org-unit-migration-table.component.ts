@@ -9,7 +9,8 @@
                 configuration: "<",
                 unitUuid: "@",
                 organizationUuid: "@",
-                stateParameters: "<"
+                stateParameters: "<",
+                ngDisabled: "<"
             },
             controller: OrganizationUnitMigrationTableController,
             controllerAs: "ctrl",
@@ -36,6 +37,7 @@
         unitUuid: string;
         organizationUuid: string;
         stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
+        ngDisabled: boolean;
     }
 
     class OrganizationUnitMigrationTableController implements IOrganizationUnitMigrationTableController {
@@ -44,6 +46,7 @@
         configuration: IMigrationTableColumn[] | null = null;
         unitUuid: string | null = null;
         organizationUuid: string | null = null;
+        ngDisabled: boolean = false;
         stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters | null = null;
         root: IOrganizationUnitMigrationRoot;
         columnTypes = MigrationTableColumnType;

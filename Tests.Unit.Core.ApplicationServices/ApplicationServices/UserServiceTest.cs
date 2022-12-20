@@ -258,11 +258,10 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var userId = A<int>();
             var userUuid = A<Guid>();
-            var isDeleteAllowed = true;
 
             var transaction = ExpectTransactionBeginReturns();
             var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
-            ExpectAuthorizationAllowDeleteReturns(user, isDeleteAllowed);
+            ExpectHasDeletePermissionReturns(true);
             ExpectIsGlobalReturns(true);
             _commandBusMock
                 .Setup(x => x.Execute<RemoveUserFromKitosCommand, Maybe<OperationError>>(
@@ -303,6 +302,7 @@ namespace Tests.Unit.Core.ApplicationServices
             }
 
             var transaction = ExpectTransactionBeginReturns();
+            ExpectHasDeletePermissionReturns(organizationId, true);
             ExpectAuthorizationAllowModifyReturns(organization, true);
             ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
             ExpectIsGlobalReturns(adminType == OrganizationRole.GlobalAdmin);
@@ -344,6 +344,8 @@ namespace Tests.Unit.Core.ApplicationServices
             }
 
             var transaction = ExpectTransactionBeginReturns();
+
+            ExpectHasDeletePermissionReturns(organizationId, true);
             ExpectHasRoleInSameOrganizationAsReturns(user, isInSameOrganization);
             ExpectIsGlobalReturns(adminType == OrganizationRole.GlobalAdmin);
             ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, adminType == OrganizationRole.LocalAdmin);
@@ -372,7 +374,8 @@ namespace Tests.Unit.Core.ApplicationServices
             user.OrganizationRights = new List<OrganizationRight> { new() { OrganizationId = organizationId2 } };
             var transaction = ExpectTransactionBeginReturns();
 
-            ExpectIsGlobalReturns(true);
+            ExpectHasDeletePermissionReturns(organizationId1, true);
+
 
             //Act
             var result = _sut.DeleteUser(user.Uuid, organizationId1);
@@ -393,7 +396,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
             user.Deleted = true;
             var transaction = ExpectTransactionBeginReturns();
-            ExpectIsGlobalReturns(true);
+            ExpectHasDeletePermissionReturns(organizationId, true);
 
             //Act
             var result = _sut.DeleteUser(user.Uuid, organizationId);
@@ -414,9 +417,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
             user.OrganizationRights = new List<OrganizationRight> { new() { OrganizationId = organizationId } };
 
-            ExpectHasRoleInSameOrganizationAsReturns(user, true);
-            ExpectIsGlobalReturns(false);
-            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, false);
+            ExpectHasDeletePermissionReturns(organizationId, false);
 
             //Act
             var result = _sut.DeleteUser(user.Uuid, organizationId);
@@ -425,6 +426,30 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value);
         }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_GetAdministrativePermissions(bool allowDelete)
+        {
+            //Arrange
+            var organization = new Organization()
+            {
+                Uuid = A<Guid>(),
+                Id = A<int>()
+            };
+            
+            ExpectGetOrganizationReturns(organization.Uuid,organization);
+            ExpectHasDeletePermissionReturns(organization.Id, allowDelete);
+
+            //Act
+            var result = _sut.GetAdministrativePermissions(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(allowDelete,result.Value.AllowDelete);
+        }
+
 
         private void ExpectGetOrganizationAccessReturns(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
@@ -493,6 +518,18 @@ namespace Tests.Unit.Core.ApplicationServices
         private static void AddNewOrganizationToUser(User user, int organizationId)
         {
             user.OrganizationRights.Add(new OrganizationRight() { OrganizationId = organizationId });
+        }
+
+        private void ExpectHasDeletePermissionReturns(int organizationId, bool value)
+        {
+            _authorizationContextMock.Setup(x => x.HasPermission(It.Is<DeleteAnyUserPermission>(p =>
+                p.OptionalOrganizationScopeId.Select(id => id == organizationId).GetValueOrDefault()))).Returns(value);
+        }
+
+        private void ExpectHasDeletePermissionReturns(bool value)
+        {
+            _authorizationContextMock.Setup(x => x.HasPermission(It.Is<DeleteAnyUserPermission>(p =>
+                p.OptionalOrganizationScopeId.IsNone))).Returns(value);
         }
     }
 }

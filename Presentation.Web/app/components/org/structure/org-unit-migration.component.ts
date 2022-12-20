@@ -8,7 +8,8 @@
                 organizationUuid: "@",
                 unitUuid: "@",
                 unitName: "@",
-                stateParameters: "<"
+                stateParameters: "<",
+                ngDisabled: "<"
             },
             controller: OrganizationUnitMigrationController,
             controllerAs: "ctrl",
@@ -37,6 +38,7 @@
         unitUuid: string;
         unitName: string;
         stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
+        ngDisabled: boolean;
     }
 
     class OrganizationUnitMigrationController implements IOrganizationUnitMigrationController {
@@ -45,7 +47,7 @@
         unitUuid: string | null = null;
         unitName: string | null = null;
         stateParameters: Models.ViewModel.Organization.IRegistrationMigrationStateParameters;
-
+        ngDisabled: boolean = false;
         anySelections = false;
         allSelections = false;
         targetUnitSelected = false;

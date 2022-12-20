@@ -107,6 +107,18 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return true;
             }
 
+            if (MatchType<OrganizationRight>(target))
+            {
+                return IsLocalAdmin(organizationId) ||
+                       IsOrganizationModuleAdmin(organizationId);
+            }
+
+            if (MatchType<OrganizationUnit>(target))
+            {
+                return IsLocalAdmin(organizationId) ||
+                       IsOrganizationModuleAdmin(organizationId);
+            }
+
             if (MatchType<KendoColumnConfiguration>(target))
             {
                 return IsLocalAdmin(organizationId);

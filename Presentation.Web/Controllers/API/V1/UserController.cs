@@ -13,7 +13,6 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.User;
 using Newtonsoft.Json.Linq;
