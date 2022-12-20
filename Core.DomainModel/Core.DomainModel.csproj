@@ -55,7 +55,6 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ICommandHandler.cs" />
     <Compile Include="Commands\ICommandBus.cs" />
-    <Compile Include="Commands\RemoveMainContractFromDataProcessingRegistrationCommand.cs" />
     <Compile Include="Commands\RemoveOrganizationUnitRegistrationsCommand.cs" />
     <Compile Include="Commands\RemoveUserFromKitosCommand.cs" />
     <Compile Include="Constants\ExternalConnectionConstants.cs" />
@@ -66,6 +65,7 @@
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationError.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationResult.cs" />
+    <Compile Include="GDPR\Events\DataProcessingRegistrationRemovedFromItContractEvent.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
