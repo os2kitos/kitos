@@ -20,7 +20,7 @@
         postMethod: (contractId: number) => ng.IPromise<void>;
         deleteMethod: (contractId: number) => ng.IPromise<void>;
         stateReloadMethod: () => ng.IPromise<void>;
-        contractId: number;
+        selectedContract: {id: number, text: string};
     }
     
     interface IMainContractSectionController extends ng.IComponentController {
@@ -49,7 +49,7 @@
                 return;
             }
 
-            this.currentContract = { id: this.viewModel.contractId, text: "" }
+            this.currentContract = this.viewModel.selectedContract;
         }
 
         saveContract(selectedContract: number) {

@@ -69,7 +69,7 @@
                 $scope.mainContractViewModel = {
                     hasWriteAccess: $scope.hasWriteAccess,
                     options: entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts),
-                    contractId: usage.mainContractId,
+                    selectedContract: match ? {id: match.id, text: match.name} : null,
                     isActive: itSystemUsage.mainContractIsActive,
                     postMethod: (id: number) => saveMainContract(id),
                     deleteMethod: (id: number) => deleteMainContract(id),

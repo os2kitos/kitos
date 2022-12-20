@@ -9,8 +9,8 @@
                     <select-simple data-id="contract-selector"
                                    data-placeholder="Ingen kontrakt"
                                    data-options="ctrl.viewModel.options"
-                                   data-ng-model="ctrl.viewModel.contractId"
-                                   data-function="ctrl.saveContract(ctrl.viewModel.contractId)"
+                                   data-ng-model="ctrl.currentContract"
+                                   data-function="ctrl.saveContract(ctrl.currentContract.id)"
                                    data-ng-disabled="!ctrl.hasWriteAccess">
                     </select-simple>
                 </div>
