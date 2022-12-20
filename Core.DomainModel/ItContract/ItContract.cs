@@ -35,6 +35,7 @@ namespace Core.DomainModel.ItContract
             Uuid = Guid.NewGuid();
             MarkAsDirty();
             AssociatedSystemRelations = new List<SystemRelation>();
+            DataProcessingRegistrationsWhereContractIsMainContract = new List<DataProcessingRegistration>();
         }
 
         public Guid Uuid { get; set; }
