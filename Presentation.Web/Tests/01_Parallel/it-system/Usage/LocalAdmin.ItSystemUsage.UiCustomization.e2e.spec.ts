@@ -25,11 +25,7 @@ describe("Local admin is able customize the IT-System usage UI", () => {
     function createHelper() {
         return new UiCustomizationTestHelper({
             createEntity: (systemName) =>
-                SystemCatalogHelper.createSystem(systemName)
-                    .then(() => SystemCatalogHelper.createLocalSystem(systemName))
-                    .then(() => SystemUsageHelper.openLocalSystem(systemName))
-                    .then(() => navigation.findSubMenuElement(LocalItSystemNavigationSrefs.GDPRSref).click()) //Make sure hidden fields are available
-                    .then(() => Select2Helper.selectWithNoSearch("Ja", consts.gdprRiskAssessmentSelect2Id)),
+                SystemCatalogHelper.createSystem(systemName).then(() => SystemCatalogHelper.createLocalSystem(systemName)),
             navigateToEntity: systemName => SystemUsageHelper.openLocalSystem(systemName),
             localAdminArea: "system",
             module: "ItSystemUsages"

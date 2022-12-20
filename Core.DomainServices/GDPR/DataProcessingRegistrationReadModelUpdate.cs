@@ -112,8 +112,8 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchMainContract(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.MainContractId = source.MainContractId;
-            destination.MainContractIsActive = source.IsActiveAccordingToMainContract;
+            destination.IsActive = source.CheckDprValidity().Result;
+            destination.ActiveAccordingToMainContract = source.IsActiveAccordingToMainContract;
         }
 
         private static void PatchReference(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

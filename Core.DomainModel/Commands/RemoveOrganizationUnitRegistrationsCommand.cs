@@ -1,5 +1,4 @@
-﻿using System;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.Commands
 {

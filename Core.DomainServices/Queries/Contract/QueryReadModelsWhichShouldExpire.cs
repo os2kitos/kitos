@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel.ItContract.Read;
-using Core.DomainServices.Queries.Helpers;
 
 namespace Core.DomainServices.Queries.Contract
 {
@@ -22,7 +21,13 @@ namespace Core.DomainServices.Queries.Contract
 
                 x =>
                     // All currently set as active in the read model
-                    x.IsActive && ItContractIsActiveQueryHelper.CheckIfContractIsExpired(currentTime, x.SourceEntity)
+                    x.IsActive &&
+                    // Remove results where the date has no effect (active overrides all other logic)
+                    x.SourceEntity.Active == false &&
+                    // Expiration data defined
+                    x.SourceEntity.ExpirationDate != null &&
+                    // Expiration date has passed
+                    x.SourceEntity.ExpirationDate < currentTime || (x.SourceEntity.Terminated != null && x.SourceEntity.Terminated < currentTime)
             );
         }
     }

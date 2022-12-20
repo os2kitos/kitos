@@ -35,6 +35,7 @@ namespace Core.DomainModel.ItContract
             Uuid = Guid.NewGuid();
             MarkAsDirty();
             AssociatedSystemRelations = new List<SystemRelation>();
+            DataProcessingRegistrationsWhereContractIsMainContract = new List<DataProcessingRegistration>();
         }
 
         public Guid Uuid { get; set; }
@@ -543,7 +544,7 @@ namespace Core.DomainModel.ItContract
 
         #endregion
 
-        public virtual ICollection<DataProcessingRegistration> AssociatedDataProcessingRegistrations { get; set; }
+        public virtual ICollection<DataProcessingRegistration> DataProcessingRegistrationsWhereContractIsMainContract { get; set; }
 
         public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
 

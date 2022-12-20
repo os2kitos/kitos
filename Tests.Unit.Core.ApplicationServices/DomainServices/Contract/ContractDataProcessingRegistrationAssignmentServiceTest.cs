@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using Core.Abstractions.Types;
+using Core.BackgroundJobs.Model.ReadModels;
+using Core.DomainModel.Commands;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Contract;
@@ -13,12 +15,14 @@ namespace Tests.Unit.Core.DomainServices.Contract
     public class ContractDataProcessingRegistrationAssignmentServiceTest : WithAutoFixture
     {
         private readonly Mock<IDataProcessingRegistrationRepository> _dataProcessingRegistrationRepository;
+        private readonly Mock<ICommandBus> _commandBusMock;
         private readonly ContractDataProcessingRegistrationAssignmentService _sut;
 
         public ContractDataProcessingRegistrationAssignmentServiceTest()
         {
             _dataProcessingRegistrationRepository = new Mock<IDataProcessingRegistrationRepository>();
-            _sut = new ContractDataProcessingRegistrationAssignmentService(_dataProcessingRegistrationRepository.Object);
+            _commandBusMock = new Mock<ICommandBus>();
+            _sut = new ContractDataProcessingRegistrationAssignmentService(_dataProcessingRegistrationRepository.Object, _commandBusMock.Object);
         }
 
         [Fact]
@@ -90,6 +94,10 @@ namespace Tests.Unit.Core.DomainServices.Contract
             var contract = new ItContract { OrganizationId = organizationId, DataProcessingRegistrations = { registration } };
 
             _dataProcessingRegistrationRepository.Setup(x => x.GetById(registration.Id)).Returns(registration);
+            _commandBusMock.Setup(x =>
+                x.Execute<RemoveMainContractFromDataProcessingRegistrationCommand, Maybe<OperationError>>(
+                    It.Is<RemoveMainContractFromDataProcessingRegistrationCommand>(registrationCommand =>
+                        registrationCommand.RemovedDataProcessingRegistration == registration))).Returns(Maybe<OperationError>.None);
 
             //Act
             var result = _sut.RemoveDataProcessingRegistration(contract, registration.Id);

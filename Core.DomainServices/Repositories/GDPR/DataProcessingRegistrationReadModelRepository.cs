@@ -84,7 +84,7 @@ namespace Core.DomainServices.Repositories.GDPR
                 .AsQueryable()
                 .Transform(new QueryReadModelsWhichShouldBecomeActive(now).Apply)
                 .Select(x => x.Id);
-
+            
             var idsOfReadModelsWhichMustUpdate = expiringReadModelIds.Concat(activatingReadModelIds).Distinct().ToList();
 
             return _repository.AsQueryable().ByIds(idsOfReadModelsWhichMustUpdate);

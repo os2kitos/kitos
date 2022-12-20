@@ -113,7 +113,6 @@
     <Compile Include="Queries\DPR\QueryByDataProcessorUuid.cs" />
     <Compile Include="Queries\DPR\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\DPR\QueryBySystemUuid.cs" />
-    <Compile Include="Queries\Helpers\ItContractIsActiveQueryHelper.cs" />
     <Compile Include="Queries\ItSystem\QueryByBusinessType.cs" />
     <Compile Include="Queries\ItSystem\QueryByNumberOfUsages.cs" />
     <Compile Include="Queries\ItSystem\QueryByRightsHolderIdOrOwnOrganizationIds.cs" />

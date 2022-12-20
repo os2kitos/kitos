@@ -172,8 +172,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
             Assert.Equal(itSystemDto.Uuid.ToString(), readModel.SystemUuidsAsCsv);
             Assert.Equal(oversightDate, readModel.LatestOversightDate);
-            Assert.Equal(contractDto.Id, readModel.MainContractId);
-            Assert.True(readModel.MainContractIsActive);
+            Assert.True(readModel.IsActive);
+            Assert.True(readModel.ActiveAccordingToMainContract);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");
@@ -217,8 +217,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             
             //Assert
             var readModel = Assert.Single(readModels);
-            Assert.Null(readModel.MainContractId);
-            Assert.True(readModel.MainContractIsActive);
+            Assert.True(readModel.IsActive);
+            Assert.True(readModel.ActiveAccordingToMainContract);
         }
 
         [Fact]

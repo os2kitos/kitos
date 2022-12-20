@@ -44,13 +44,14 @@
         deleteUser(id: number): ng.IPromise<any>;
         searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
         getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
+        getPermissions(organizationUuid: string): ng.IPromise<Models.Users.UserAdministrationPermissionsDTO>;
     }
 
     export class UserService implements IUserService {
         _user: Kitos.Services.IUser = null;
         _loadUserDeferred = null;
 
-        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_", "uiCustomizationStateCache","inMemoryCacheService"];
+        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_", "uiCustomizationStateCache", "inMemoryCacheService","genericApiWrapper"];
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly $q: ng.IQService,
@@ -58,7 +59,12 @@
             private readonly $uibModal: ng.ui.bootstrap.IModalService,
             private readonly _: _.LoDashStatic,
             private readonly uiCustomizationStateService: Services.UICustomization.UiCustomizationStateCache,
-            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService) {
+            private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
+            private readonly genericApiWrapper: Services.Generic.ApiWrapper) {
+        }
+
+        getPermissions(organizationUuid: string): ng.IPromise<Models.Users.UserAdministrationPermissionsDTO> {
+            return this.genericApiWrapper.getDataFromUrl<Models.Users.UserAdministrationPermissionsDTO>(`api/v1/organizations/${organizationUuid}/administration/users/permissions`);
         }
 
         saveUser = (user, orgAndDefaultUnit) => {

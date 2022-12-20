@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -24,7 +25,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var error = dpr.AssignMainContract(contractId);
+            var error = dpr.AssignMainContract(contractId).MatchFailure();
 
             //Assert
             Assert.False(error.HasValue);
@@ -43,7 +44,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var error = dpr.AssignMainContract(contractId);
+            var error = dpr.AssignMainContract(contractId).MatchFailure();
 
             //Assert
             Assert.True(error.HasValue);
@@ -59,57 +60,11 @@ namespace Tests.Unit.Core.Model
             var dpr = CreateDprWithMainContract(contractId);
 
             //Act
-            var error = dpr.AssignMainContract(contractId);
+            var error = dpr.AssignMainContract(contractId).MatchFailure();
 
             //Assert
             Assert.False(error.HasValue);
             Assert.Equal(contractId, dpr.MainContract.Id);
-        }
-
-        [Fact]
-        public void Can_RemoveMainContract()
-        {
-            //Arrange
-            var contractId = A<int>();
-            var dpr = CreateDprWithMainContract(contractId);
-
-            //Act
-            var error = dpr.RemoveMainContract(contractId);
-
-            //Assert
-            Assert.False(error.HasValue);
-            Assert.Null(dpr.MainContract);
-        }
-
-        [Fact]
-        public void RemoveMainContract_Returns_No_Error_When_Contract_Is_Already_Null()
-        {
-            //Arrange
-            var contractId = A<int>();
-            var dpr = new DataProcessingRegistration();
-
-            //Act
-            var error = dpr.RemoveMainContract(contractId);
-
-            //Assert
-            Assert.False(error.HasValue);
-            Assert.Null(dpr.MainContract);
-        }
-
-        [Fact]
-        public void RemoveMainContract_Returns_BadInput_When_Contract_Has_Different_Id()
-        {
-            //Arrange
-            var contractId = A<int>();
-            var dpr = CreateDprWithMainContract(A<int>());
-
-            //Act
-            var error = dpr.RemoveMainContract(contractId);
-
-            //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
-            Assert.NotNull(dpr.MainContract);
         }
 
         [Fact]

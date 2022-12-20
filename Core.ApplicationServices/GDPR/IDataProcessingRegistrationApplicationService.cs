@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
@@ -61,7 +62,7 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark);
         Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId);
         Result<DataProcessingRegistration, OperationError> UpdateMainContract(int id, int contractId);
-        Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id, int contractId);
+        Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id);
 
         IQueryable<DataProcessingRegistration> Query(params IDomainQuery<DataProcessingRegistration>[] conditions);
         Result<DataProcessingRegistration, OperationError> GetByUuid(Guid uuid);

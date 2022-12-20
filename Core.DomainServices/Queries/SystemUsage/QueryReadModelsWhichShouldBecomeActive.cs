@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage.Read;
-using Core.DomainServices.Queries.Helpers;
 
 namespace Core.DomainServices.Queries.SystemUsage
 {
@@ -34,7 +33,20 @@ namespace Core.DomainServices.Queries.SystemUsage
                     x.MainContractIsActive == false &&
                     // Include if Main Contract is active
                     (
-                        x.SourceEntity.MainContract == null || ItContractIsActiveQueryHelper.CheckIfContractIsValid(currentTime,  x.SourceEntity.MainContract.ItContract)
+                        //Main Contract is null which means it's valid
+                        x.SourceEntity.MainContract == null ||
+                        (
+                            // 1: Common scenario
+                            // Exclude those which were enforced as valid - dates have no effect
+                            x.SourceEntity.MainContract.ItContract.Active == false &&
+                            // Include systems where concluded (start time) has passed or is not defined
+                            (x.SourceEntity.MainContract.ItContract.Concluded == null || x.SourceEntity.MainContract.ItContract.Concluded <= currentTime) &&
+                            // Include only if not expired or no expiration defined
+                            (x.SourceEntity.MainContract.ItContract.ExpirationDate == null || currentTime <= x.SourceEntity.MainContract.ItContract.ExpirationDate) 
+                        ) ||
+                        // 2: Out of sync scenario
+                        // Source entity marked as active (forced) but read model state false, mark as target for update
+                        x.SourceEntity.MainContract.ItContract.Active == true
                     )
 
 
