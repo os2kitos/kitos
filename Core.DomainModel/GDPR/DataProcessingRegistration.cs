@@ -352,7 +352,7 @@ namespace Core.DomainModel.GDPR
 
         public Result<DataProcessingRegistration, OperationError> AssignMainContract(int contractId)
         {
-            if (MainContract != null && MainContract.Id == contractId)
+            if (MainContract?.Id == contractId)
                 return this;
 
             var contract = GetAssociatedContract(contractId);
