@@ -336,13 +336,14 @@ namespace Core.ApplicationServices.GDPR.Write
         private Result<DataProcessingRegistration, OperationError> UpdateMainContract(DataProcessingRegistration dpr, Guid? contractUuid)
         {
             if (contractUuid.HasValue)
+            {
                 return _entityIdentityResolver.ResolveDbId<ItContract>(contractUuid.Value)
                     .Match
                     (
                         contractId => _applicationService.UpdateMainContract(dpr.Id, contractId),
                         () => new OperationError($"It contract with uuid {contractUuid.Value} could not be found", OperationFailure.BadInput)
                     );
-
+            }
             return _applicationService.RemoveMainContract(dpr.Id);
 
         }
