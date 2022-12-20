@@ -1,15 +1,16 @@
 ﻿using Core.DomainModel.Events;
-using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.GDPR.Events
 {
-    public class DataProcessingRegistrationRemovedFromItContractEvent : EntityLifeCycleEvent<DataProcessingRegistration>
+    public class DataProcessingRegistrationRemovedFromItContractEvent : IDomainEvent
     {
-        public DataProcessingRegistrationRemovedFromItContractEvent(DataProcessingRegistration entity, ItContract.ItContract itContract) : base(LifeCycleEventType.Deleting, entity)
+        public DataProcessingRegistrationRemovedFromItContractEvent(DataProcessingRegistration dataProcessingRegistration, ItContract.ItContract itContract)
         {
+            DataProcessingRegistration = dataProcessingRegistration;
             ItContract = itContract;
         }
 
-        public ItContract.ItContract ItContract { get; set; }
+        public DataProcessingRegistration DataProcessingRegistration { get; }
+        public ItContract.ItContract ItContract { get; }
     }
 }

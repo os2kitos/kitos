@@ -98,7 +98,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
             _dataProcessingRegistrationRepository.Setup(x => x.GetById(registration.Id)).Returns(registration);
             _domainEvents.Setup(x =>
                 x.Raise(It.Is<DataProcessingRegistrationRemovedFromItContractEvent>(dprEvent =>
-                    dprEvent.ItContract.Id == contract.Id && dprEvent.Entity.Id == registration.Id)));
+                    dprEvent.ItContract.Id == contract.Id && dprEvent.DataProcessingRegistration.Id == registration.Id)));
 
             //Act
             var result = _sut.RemoveDataProcessingRegistration(contract, registration.Id);
@@ -110,7 +110,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
         }
 
         [Fact]
-        public void Cannot_RemoveDataProcessingRegistration_If_Registraion_Is_Not_Found()
+        public void Cannot_RemoveDataProcessingRegistration_If_Registration_Is_Not_Found()
         {
             //Arrange
             var organizationId = A<int>();

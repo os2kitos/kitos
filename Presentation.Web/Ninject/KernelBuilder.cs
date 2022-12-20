@@ -340,6 +340,9 @@ namespace Presentation.Web.Ninject
             //DPR overview updates
             RegisterDomainEvents<BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
 
+            //DPR Contract dependencies
+            RegisterDomainEvents<ResetDprMainContractWhenDprRemovedFromContractEventHandler>(kernel);
+
             //Relations
             RegisterDomainEvents<ContractDeletedSystemRelationsHandler>(kernel);
             RegisterDomainEvents<RelationSpecificInterfaceEventsHandler>(kernel);
