@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -520,6 +519,20 @@ namespace Core.ApplicationServices.GDPR
             return Modify<DataProcessingRegistration>(id, registration =>
             {
                 registration.OversightCompletedRemark = remark;
+                return registration;
+            });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateMainContract(int id, int contractId)
+        {
+            return Modify(id, registration => registration.AssignMainContract(contractId));
+        }
+
+        public Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.ResetMainContract();
                 return registration;
             });
         }

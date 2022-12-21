@@ -115,7 +115,11 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
                 SubDataProcessorUuids = rule.MustUpdate(x => x.General.SubDataProcessorUuids)
                     ? dto.SubDataProcessorUuids.FromNullable().AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
+                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
+
+                MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
+                    ? dto.MainContractUuid.AsChangedValue()
+                    : OptionalValueChange<Guid?>.None
             };
         }
 

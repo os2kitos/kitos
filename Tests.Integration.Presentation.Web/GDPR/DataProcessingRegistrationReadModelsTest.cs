@@ -141,6 +141,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var assignDataProcessingResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contractDto.Id, registration.Id);
             Assert.Equal(HttpStatusCode.OK, assignDataProcessingResponse.StatusCode);
 
+            await DataProcessingRegistrationHelper.SendUpdateMainContractRequestAsync(registration.Id, contractDto.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -170,6 +172,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
             Assert.Equal(itSystemDto.Uuid.ToString(), readModel.SystemUuidsAsCsv);
             Assert.Equal(oversightDate, readModel.LatestOversightDate);
+            Assert.True(readModel.IsActive);
+            Assert.True(readModel.ActiveAccordingToMainContract);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");
@@ -189,6 +193,32 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             readModels = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
             Assert.Empty(readModels);
+        }
+
+        [Fact]
+        public async Task ReadModels_MainContract_Is_Updated_When_MainContract_Is_Deleted()
+        {
+            //Arrange
+            var dprName = A<string>();
+            var contractName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organizationId, dprName);
+
+            var contract = await ItContractHelper.CreateContract(contractName, organizationId);
+            using var assignDprResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract.Id, dpr.Id).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var updateMainContractResponse = await DataProcessingRegistrationHelper.SendUpdateMainContractRequestAsync(dpr.Id, contract.Id).WithExpectedResponseCode(HttpStatusCode.OK);
+            
+            await WaitForReadModelQueueDepletion();
+            await ItContractHelper.SendDeleteContractRequestAsync(contract.Id).DisposeAsync();
+            await WaitForReadModelQueueDepletion();
+
+            //Act
+            var readModels = await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, dprName, 1, 0);
+            
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Assert.True(readModel.IsActive);
+            Assert.True(readModel.ActiveAccordingToMainContract);
         }
 
         [Fact]

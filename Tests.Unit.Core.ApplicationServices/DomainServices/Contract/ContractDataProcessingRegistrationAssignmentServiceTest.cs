@@ -1,6 +1,10 @@
 ﻿using System.Linq;
 using Core.Abstractions.Types;
+using Core.BackgroundJobs.Model.ReadModels;
+using Core.DomainModel.Commands;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Repositories.GDPR;
@@ -13,12 +17,14 @@ namespace Tests.Unit.Core.DomainServices.Contract
     public class ContractDataProcessingRegistrationAssignmentServiceTest : WithAutoFixture
     {
         private readonly Mock<IDataProcessingRegistrationRepository> _dataProcessingRegistrationRepository;
+        private readonly Mock<IDomainEvents> _domainEvents;
         private readonly ContractDataProcessingRegistrationAssignmentService _sut;
 
         public ContractDataProcessingRegistrationAssignmentServiceTest()
         {
             _dataProcessingRegistrationRepository = new Mock<IDataProcessingRegistrationRepository>();
-            _sut = new ContractDataProcessingRegistrationAssignmentService(_dataProcessingRegistrationRepository.Object);
+            _domainEvents = new Mock<IDomainEvents>();
+            _sut = new ContractDataProcessingRegistrationAssignmentService(_dataProcessingRegistrationRepository.Object, _domainEvents.Object);
         }
 
         [Fact]
@@ -87,9 +93,12 @@ namespace Tests.Unit.Core.DomainServices.Contract
             //Arrange
             var organizationId = A<int>();
             var registration = new DataProcessingRegistration { OrganizationId = organizationId, Id = A<int>() };
-            var contract = new ItContract { OrganizationId = organizationId, DataProcessingRegistrations = { registration } };
+            var contract = new ItContract { Id=A<int>(), OrganizationId = organizationId, DataProcessingRegistrations = { registration } };
 
             _dataProcessingRegistrationRepository.Setup(x => x.GetById(registration.Id)).Returns(registration);
+            _domainEvents.Setup(x =>
+                x.Raise(It.Is<DataProcessingRegistrationRemovedFromItContractEvent>(dprEvent =>
+                    dprEvent.ItContract.Id == contract.Id && dprEvent.DataProcessingRegistration.Id == registration.Id)));
 
             //Act
             var result = _sut.RemoveDataProcessingRegistration(contract, registration.Id);
@@ -101,7 +110,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
         }
 
         [Fact]
-        public void Cannot_RemoveDataProcessingRegistration_If_Registraion_Is_Not_Found()
+        public void Cannot_RemoveDataProcessingRegistration_If_Registration_Is_Not_Found()
         {
             //Arrange
             var organizationId = A<int>();

@@ -750,6 +750,35 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/main-contract/update")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchMainContract(int id, [FromBody] SingleValueDTO<int> mainContractionId)
+        {
+            if (mainContractionId == null)
+                return BadRequest(nameof(mainContractionId) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateMainContract(id, mainContractionId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/main-contract/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveMainContract(int id)
+        {
+            return _dataProcessingRegistrationApplicationService
+                .RemoveMainContract(id)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(x => x.MapToUserWithEmailDTO());
@@ -906,7 +935,9 @@ namespace Presentation.Web.Controllers.API.V1
                     .FromNullable()
                     .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
                     .GetValueOrDefault(),
-                DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>()
+                MainContractId = value.MainContractId,
+                IsActiveAccordingToMainContract = value.IsActiveAccordingToMainContract,
+                DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>
                 {
                     Value = value
                             .DataResponsible
@@ -915,7 +946,7 @@ namespace Presentation.Web.Controllers.API.V1
                             .GetValueOrDefault(),
                     Remark = value.DataResponsibleRemark
                 },
-                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>()
+                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>
                 {
                     Value = value
                             .OversightOptions

@@ -68,5 +68,12 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         ///     - No duplicates
         /// </summary>
         public IEnumerable<Guid> SubDataProcessorUuids { get; set; }
+
+        /// <summary>
+        /// Defines the master contract for this Data Processing Registration (many contracts can point to a DPR but only one can be the master contract)
+        /// Constraint: The contract provided MUST point to this Data Processing Registration for it to be selected as "main contract".
+        /// </summary>
+        [NonEmptyGuid]
+        public Guid? MainContractUuid { get; set; }
     }
 }

@@ -49,7 +49,7 @@ namespace Presentation.Web.Models.API.V1.GDPR
         public DateTime? OversightScheduledInspectionDate { get; set; }
         public string LastChangedByName { get; set; }
         public DateTime LastChangedAt { get; set; }
-
-
+        public bool IsActiveAccordingToMainContract { get; set; }
+        public int? MainContractId { get; set; }
     }
 }

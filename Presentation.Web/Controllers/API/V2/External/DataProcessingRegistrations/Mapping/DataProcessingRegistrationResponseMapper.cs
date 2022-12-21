@@ -90,7 +90,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 InsecureCountriesSubjectToDataTransfer = dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
                 DataProcessors = dataProcessingRegistration.DataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList(),
                 HasSubDataProcessors = MapYesNoUndecided(dataProcessingRegistration.HasSubDataProcessors),
-                SubDataProcessors = dataProcessingRegistration.SubDataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList()
+                SubDataProcessors = dataProcessingRegistration.SubDataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList(),
+                MainContract = dataProcessingRegistration.MainContract?.MapIdentityNamePairDTO(),
+                Valid = dataProcessingRegistration.IsActiveAccordingToMainContract
             };
         }
 
