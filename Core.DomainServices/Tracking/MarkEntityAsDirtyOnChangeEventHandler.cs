@@ -4,6 +4,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainServices.Tracking
 {
@@ -12,8 +13,9 @@ namespace Core.DomainServices.Tracking
         IDomainEventHandler<EntityUpdatedEvent<ItSystemUsage>>,
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
         IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
-        IDomainEventHandler<EntityUpdatedEvent<ItInterface>>
-    {
+        IDomainEventHandler<EntityUpdatedEvent<ItInterface>>,
+        IDomainEventHandler<EntityUpdatedEvent<OrganizationUnit>>
+        {
         public void Handle(EntityUpdatedEvent<ItSystem> domainEvent)
         {
             MarkAsDirty(domainEvent.Entity);
@@ -43,5 +45,10 @@ namespace Core.DomainServices.Tracking
         {
             target.MarkAsDirty();
         }
-    }
+
+        public void Handle(EntityUpdatedEvent<OrganizationUnit> domainEvent)
+        {
+            MarkAsDirty(domainEvent.Entity);
+        }
+        }
 }

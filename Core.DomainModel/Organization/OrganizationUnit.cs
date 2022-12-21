@@ -12,7 +12,7 @@ namespace Core.DomainModel.Organization
     /// <summary>
     /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
     /// </summary>
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IOrganizationModule, IOwnedByOrganization, IHasUuid, IHasName
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IOrganizationModule, IOwnedByOrganization, IHasUuid, IHasName, IHasDirtyMarking
     {
         public const int MaxNameLength = 100;
         public OrganizationUnit()
@@ -243,6 +243,11 @@ namespace Core.DomainModel.Organization
         public void ResetParent()
         {
             Parent = null;
+        }
+
+        public void MarkAsDirty()
+        {
+            LastChanged = DateTime.UtcNow;
         }
     }
 }
