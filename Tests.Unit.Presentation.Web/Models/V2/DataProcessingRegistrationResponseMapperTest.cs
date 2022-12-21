@@ -117,7 +117,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentities(dpr.InsecureCountriesSubjectToDataTransfer, general.InsecureCountriesSubjectToDataTransfer);
             AssertOrganizations(dpr.DataProcessors, general.DataProcessors);
             AssertYesNoUndecided(dpr.HasSubDataProcessors, general.HasSubDataProcessors);
-            AssertOrganizations(dpr.SubDataProcessors, general.SubDataProcessors);
+            AssertOrganizations(dpr.AssignedSubDataProcessors.Select(x => x.Organization), general.SubDataProcessors);
             AssertIdentity(dpr.MainContract, general.MainContract);
             Assert.Equal(dpr.IsActiveAccordingToMainContract, general.Valid);
         }
@@ -265,6 +265,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return new Organization { Name = A<string>(), Cvr = A<string>(), Uuid = A<Guid>() };
         }
 
+        private SubDataProcessor CreateSubDataProcessor(DataProcessingRegistration dataProcessingRegistration)
+        {
+            return new SubDataProcessor() { Organization = CreateOrganization(), DataProcessingRegistration = dataProcessingRegistration };
+        }
+
         #endregion
 
         #region Assigns
@@ -338,8 +343,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 : null;
             dpr.DataProcessors = new List<Organization> { CreateOrganization(), CreateOrganization() };
             dpr.HasSubDataProcessors = A<YesNoUndecidedOption>();
-            dpr.SubDataProcessors = new List<Organization> { CreateOrganization(), CreateOrganization() };
-            dpr.MainContract = new ItContract() { Uuid = A<Guid>(), Name = A<string>()};
+            dpr.AssignedSubDataProcessors = new List<SubDataProcessor> { CreateSubDataProcessor(dpr), CreateSubDataProcessor(dpr) };
+            dpr.MainContract = new ItContract() { Uuid = A<Guid>(), Name = A<string>() };
         }
 
         private void AssignRoles(DataProcessingRegistration dpr)

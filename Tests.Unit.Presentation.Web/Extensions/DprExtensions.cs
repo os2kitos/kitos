@@ -16,8 +16,8 @@ namespace Tests.Unit.Presentation.Web.Extensions
         public static DataProcessingRegistration WithSubDataProcessor(this DataProcessingRegistration dpr, Organization subDataProcessor)
         {
             dpr.HasSubDataProcessors = YesNoUndecidedOption.Yes;
-            dpr.AssignSubDataProcessor(subDataProcessor);
-            subDataProcessor.SubDataProcessorForDataProcessingRegistrations.Add(dpr);
+            var dataProcessor = dpr.AssignSubDataProcessor(subDataProcessor);
+            subDataProcessor.SubDataProcessorRegistrations.Add(dataProcessor.Value);
             return dpr;
         }
     }

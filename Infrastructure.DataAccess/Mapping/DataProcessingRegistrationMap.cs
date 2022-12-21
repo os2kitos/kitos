@@ -48,9 +48,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(x => x.DataProcessorForDataProcessingRegistrations);
 
             //Sub Data processors
-            HasMany(x => x.SubDataProcessors)
-                .WithMany(x => x.SubDataProcessorForDataProcessingRegistrations);
-            //TODO: Kill it
+            HasMany(x => x.AssignedSubDataProcessors)
+                .WithRequired(x => x.DataProcessingRegistration)
+                .HasForeignKey(x => x.DataProcessingRegistrationId)
+                .WillCascadeOnDelete(true);
 
             HasMany(x => x.AssignedSubDataProcessors)
                 .WithRequired(x => x.DataProcessingRegistration)

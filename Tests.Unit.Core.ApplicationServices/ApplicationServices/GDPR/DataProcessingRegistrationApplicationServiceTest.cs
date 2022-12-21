@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -77,7 +78,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _userContextMock.Object,
-                _dprOversightDaterepositoryMock.Object);
+                _dprOversightDaterepositoryMock.Object,
+                null);
         }
 
         [Fact]
@@ -824,33 +826,33 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var id = A<int>();
             var registration = new DataProcessingRegistration();
             var organizationId = A<int>();
-            var organization = new Organization();
+            var sdp = new SubDataProcessor();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             _dpAssignmentService.Setup(x => x.AssignSubDataProcessor(registration, organizationId))
-                .Returns(Result<Organization, OperationError>.Success(organization));
+                .Returns(Result<SubDataProcessor, OperationError>.Success(sdp));
 
             var transaction = ExpectTransaction();
 
             //Act
-            var result = _sut.AssignSubDataProcessor(id, organizationId);
+            var result = _sut.AssignSubDataProcessor(id, organizationId, Maybe<BasisForTransferParameters>.None);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(organization, result.Value);
+            Assert.Same(sdp, result.Value);
             transaction.Verify(x => x.Commit());
         }
 
         [Fact]
         public void Cannot_AssignSubDataProcessorIf_Dpr_Is_Not_Found()
         {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSubDataProcessor(id, A<int>()));
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSubDataProcessor(id, A<int>(),Maybe<BasisForTransferParameters>.None));
         }
 
         [Fact]
         public void Cannot_AssignSubDataProcessor_If_Write_Access_Is_Denied()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>()));
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>(),Maybe<BasisForTransferParameters>.None));
         }
 
         [Fact]
@@ -860,11 +862,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var id = A<int>();
             var registration = new DataProcessingRegistration();
             var organizationId = A<int>();
-            var organization = new Organization();
+            var sdp = new SubDataProcessor();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             _dpAssignmentService.Setup(x => x.RemoveSubDataProcessor(registration, organizationId))
-                .Returns(Result<Organization, OperationError>.Success(organization));
+                .Returns(Result<SubDataProcessor, OperationError>.Success(sdp));
 
             var transaction = ExpectTransaction();
 
@@ -873,7 +875,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(organization, result.Value);
+            Assert.Same(sdp, result.Value);
             transaction.Verify(x => x.Commit());
         }
 
@@ -969,7 +971,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var id = A<int>();
-            var registration = new DataProcessingRegistration(){SubDataProcessors = {new Organization()}};
+            var registration = new DataProcessingRegistration(){AssignedSubDataProcessors = {new SubDataProcessor(){ Organization = new Organization()} }};
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
 
@@ -981,7 +983,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(registration.HasSubDataProcessors, clearingSetting);
-            Assert.Empty(registration.SubDataProcessors);
+            Assert.Empty(registration.AssignedSubDataProcessors);
             transaction.Verify(x => x.Commit());
         }
 

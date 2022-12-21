@@ -20,7 +20,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         public DataProcessingRegistrationDataProcessorAssignmentServiceTest()
         {
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
-            _sut = new DataProcessingRegistrationDataProcessorAssignmentService(_organizationRepositoryMock.Object);
+            _sut = new DataProcessingRegistrationDataProcessorAssignmentService(_organizationRepositoryMock.Object, null, null);
         }
 
         [Fact]
@@ -153,12 +153,12 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         public void GetApplicableSubDataProcessors_Returns_Organizations_Not_Already_Assigned()
         {
             //Arrange
-            var existingProcessor = new Organization { Id = A<int>() };
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
             var validCandidate1 = new Organization { Id = A<int>() };
             var validCandidate2 = new Organization { Id = A<int>() };
-            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor } };
+            var dataProcessingRegistration = new DataProcessingRegistration() { AssignedSubDataProcessors = { existingProcessor } };
 
-            ExpectGetAllOrganizationsReturn(validCandidate1, validCandidate2, existingProcessor);
+            ExpectGetAllOrganizationsReturn(validCandidate1, validCandidate2, existingProcessor.Organization);
 
             //Act
             var applicableSubDataProcessors = _sut.GetApplicableSubDataProcessors(dataProcessingRegistration).ToList();
@@ -172,9 +172,9 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         public void Can_AssignSubDataProcessor()
         {
             //Arrange
-            var existingProcessor = new Organization { Id = A<int>() };
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
             var validCandidate = new Organization { Id = A<int>() };
-            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.Yes };
+            var dataProcessingRegistration = new DataProcessingRegistration() { AssignedSubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.Yes };
 
             ExpectGetOrganizationByIdReturns(validCandidate.Id, validCandidate);
 
@@ -184,16 +184,16 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Same(validCandidate, result.Value);
-            Assert.True(dataProcessingRegistration.SubDataProcessors.Contains(validCandidate));
+            Assert.True(dataProcessingRegistration.GetSubDataProcessor(validCandidate).HasValue);
         }
 
         [Fact]
         public void Cannot_AssignSubDataProcessor_If_Not_Ussing_Sub_Data_Processors()
         {
             //Arrange
-            var existingProcessor = new Organization { Id = A<int>() };
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
             var validCandidate = new Organization { Id = A<int>() };
-            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.No };
+            var dataProcessingRegistration = new DataProcessingRegistration() { AssignedSubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.No };
 
             ExpectGetOrganizationByIdReturns(validCandidate.Id, validCandidate);
 
@@ -209,9 +209,9 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         public void Cannot_AssignSubDataProcessor_If_Not_Applicable()
         {
             //Arrange
-            var existingProcessor = new Organization { Id = A<int>() };
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
             var dpId = A<int>();
-            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor } };
+            var dataProcessingRegistration = new DataProcessingRegistration() { AssignedSubDataProcessors = { existingProcessor } };
 
             ExpectGetOrganizationByIdReturns(dpId, Maybe<Organization>.None);
 
@@ -227,10 +227,10 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         public void Cannot_AssignSubDataProcessor_If_Already_Assigned()
         {
             //Arrange
-            var existingProcessor = new Organization { Id = A<int>() };
-            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.Yes };
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
+            var dataProcessingRegistration = new DataProcessingRegistration() { AssignedSubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.Yes };
 
-            ExpectGetOrganizationByIdReturns(existingProcessor.Id, existingProcessor);
+            ExpectGetOrganizationByIdReturns(existingProcessor.Id, existingProcessor.Organization);
 
             //Act
             var result = _sut.AssignSubDataProcessor(dataProcessingRegistration, existingProcessor.Id);
@@ -244,10 +244,10 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         public void Can_RemoveSubDataProcessor()
         {
             //Arrange
-            var existingProcessor = new Organization { Id = A<int>() };
-            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor } };
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
+            var dataProcessingRegistration = new DataProcessingRegistration() { AssignedSubDataProcessors = { existingProcessor } };
 
-            ExpectGetOrganizationByIdReturns(existingProcessor.Id, existingProcessor);
+            ExpectGetOrganizationByIdReturns(existingProcessor.Id, existingProcessor.Organization);
 
             //Act
             var result = _sut.RemoveSubDataProcessor(dataProcessingRegistration, existingProcessor.Id);
@@ -255,16 +255,16 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Same(existingProcessor, result.Value);
-            Assert.False(dataProcessingRegistration.SubDataProcessors.Contains(existingProcessor));
+            Assert.False(dataProcessingRegistration.AssignedSubDataProcessors.Contains(existingProcessor));
         }
 
         [Fact]
         public void Cannot_RemoveSubDataProcessor_If_Not_Applicable()
         {
             //Arrange
-            var existingProcessor = new Organization { Id = A<int>() };
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
             var dpId = A<int>();
-            var dataProcessingRegistration = new DataProcessingRegistration { SubDataProcessors = { existingProcessor } };
+            var dataProcessingRegistration = new DataProcessingRegistration { AssignedSubDataProcessors = { existingProcessor } };
 
             ExpectGetOrganizationByIdReturns(dpId, Maybe<Organization>.None);
 
@@ -302,6 +302,11 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         private void ExpectGetOrganizationByIdReturns(int id, Maybe<Organization> validCandidate)
         {
             _organizationRepositoryMock.Setup(x => x.GetById(id)).Returns(validCandidate);
+        }
+
+        private SubDataProcessor CreateSubDataProcessor(Organization organization)
+        {
+            return new SubDataProcessor() { Organization = organization };
         }
     }
 }

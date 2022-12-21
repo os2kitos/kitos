@@ -43,7 +43,7 @@ namespace Core.ApplicationServices.GDPR.Write
             ILogger logger,
             IDomainEvents domainEvents,
             ITransactionManager transactionManager,
-            IDatabaseControl databaseControl, 
+            IDatabaseControl databaseControl,
             IAssignmentUpdateService assignmentUpdateService)
         {
             _applicationService = applicationService;
@@ -271,6 +271,7 @@ namespace Core.ApplicationServices.GDPR.Write
             ).Match<Result<DataProcessingRegistration, OperationError>>(error => error, () => dpr);
         }
 
+        //TODO: Update support in v2 as well.
         private Maybe<OperationError> UpdateSubDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)
         {
             return _assignmentUpdateService.UpdateUniqueMultiAssignment
@@ -279,8 +280,8 @@ namespace Core.ApplicationServices.GDPR.Write
                 dpr,
                 organizationUuids,
                 subDataProcessorUuid => _entityIdentityResolver.ResolveDbId<Organization>(subDataProcessorUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {subDataProcessorUuid}", OperationFailure.BadInput)),
-                registration => registration.SubDataProcessors.ToList(),
-                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId,Maybe<BasisForTransferParameters>.None).MatchFailure(), //TODO: Update support in v2 as well.
+                registration => registration.AssignedSubDataProcessors.Select(x => x.Organization).ToList(),
+                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId, Maybe<BasisForTransferParameters>.None).MatchFailure(),
                 (registration, subDataProcessor) => _applicationService.RemoveSubDataProcessor(registration.Id, subDataProcessor.Id).MatchFailure()
                 );
         }

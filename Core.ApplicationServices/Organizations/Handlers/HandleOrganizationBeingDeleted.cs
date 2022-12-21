@@ -169,7 +169,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             var subDataProcessorContext = conflicts.DprInOtherOrganizationsWhereOrgIsSubDataProcessor.ToList();
             subDataProcessorContext.ForEach(x =>
                 _dataProcessingRegistrationService.RemoveSubDataProcessor(x.Id, organization.Id).ThrowOnFailure());
-            organization.SubDataProcessorForDataProcessingRegistrations.Clear();
+            organization.SubDataProcessorRegistrations.Clear();
 
             var dataProcessorContext = conflicts.DprInOtherOrganizationsWhereOrgIsDataProcessor.ToList();
             dataProcessorContext.ForEach(x =>

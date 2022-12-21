@@ -355,9 +355,26 @@ namespace Presentation.Web.Controllers.API.V1
             return _dataProcessingRegistrationApplicationService
                 .AssignSubDataProcessor(id, organizationId.Value, Maybe<BasisForTransferParameters>.None)
                 .Match(_ => Ok(), FromOperationError);
+            //TODO: Test the New parameters
         }
 
-        //TODO: Test the New parameters
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/update")] //TODO: New endpoint
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignSubDataProcessor(id, organizationId.Value, Maybe<BasisForTransferParameters>.None)
+                .Match(_ => Ok(), FromOperationError);
+            //TODO: Test the New parameters
+        }
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/remove")]
@@ -807,8 +824,8 @@ namespace Presentation.Web.Controllers.API.V1
             return value
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences)
-                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x=>x.LastChangedByUser))
-                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x=>x.ObjectOwner))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x => x.LastChangedByUser))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x => x.ObjectOwner))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference.ObjectOwner)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference.LastChangedByUser)
@@ -817,7 +834,8 @@ namespace Presentation.Web.Controllers.API.V1
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
-                .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.AssignedSubDataProcessors)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.AssignedSubDataProcessors.Select(x => x.Organization))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.BasisForTransfer)
                 .AsEnumerable()
@@ -869,12 +887,12 @@ namespace Presentation.Web.Controllers.API.V1
             var enabledOversightOptions = GetIdsOfAvailableOversightOptions(assignableDataProcessingRegistrationOptions);
             int organizationId = value.OrganizationId;
             return ToDTO(
-                value, 
-                GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)), 
-                enabledCountryOptions, 
-                enabledBasisForTransferOptions, 
-                enabledDataResponsibleOptions, 
-                enabledRoles, 
+                value,
+                GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)),
+                enabledCountryOptions,
+                enabledBasisForTransferOptions,
+                enabledDataResponsibleOptions,
+                enabledRoles,
                 enabledOversightOptions);
         }
 
@@ -914,7 +932,8 @@ namespace Presentation.Web.Controllers.API.V1
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
                 SubDataProcessors = value
-                    .SubDataProcessors
+                    .AssignedSubDataProcessors
+                    .Select(x => x.Organization)
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
                 HasSubDataProcessors = value.HasSubDataProcessors,
@@ -923,7 +942,7 @@ namespace Presentation.Web.Controllers.API.V1
                     Value = value.IsAgreementConcluded,
                     OptionalDateValue = value.AgreementConcludedAt,
                     Remark = value.AgreementConcludedRemark
-                    
+
                 },
                 TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries,
                 InsecureThirdCountries = value
@@ -965,8 +984,8 @@ namespace Presentation.Web.Controllers.API.V1
                     .ToArray(),
                 OversightDates = value
                     .OversightDates
-                    .Select(oversightDate => new DataProcessingRegistrationOversightDateDTO 
-                    { 
+                    .Select(oversightDate => new DataProcessingRegistrationOversightDateDTO
+                    {
                         Id = oversightDate.Id,
                         OversightDate = oversightDate.OversightDate,
                         OversightRemark = oversightDate.OversightRemark

@@ -283,8 +283,9 @@ namespace Core.ApplicationServices.Organizations
                         .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
                     var dprInOtherOrganizationsWhereOrgIsSubDataProcessor = organizationWhichCanBeDeleted
-                        .SubDataProcessorForDataProcessingRegistrations
+                        .SubDataProcessorRegistrations
                         .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
+                        .Select(x => x.DataProcessingRegistration)
                         .ToList();
                     var contractsInOtherOrganizationsWhereOrgIsSupplier = organizationWhichCanBeDeleted
                         .Supplier
@@ -298,7 +299,7 @@ namespace Core.ApplicationServices.Organizations
                         .ArchiveSupplierForItSystems
                         .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
-                    
+
                     return new OrganizationRemovalConflicts(
                         systemsWithUsagesOutsideTheOrganization,
                         interfacesExposedOnSystemsOutsideTheOrganization,
@@ -354,7 +355,7 @@ namespace Core.ApplicationServices.Organizations
         public Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId)
         {
             var user = _userRepository.GetByKey(userId);
-            if(user == null)
+            if (user == null)
                 return Result<IEnumerable<Organization>, OperationError>.Failure(new OperationError($"User with id: {userId} was not found", OperationFailure.NotFound));
 
             var userOrganizationsIds = user.GetOrganizationIds();

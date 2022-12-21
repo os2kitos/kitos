@@ -40,6 +40,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly ITransactionManager _transactionManager;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IGenericRepository<DataProcessingRegistrationOversightDate> _dataProcessingRegistrationOversightDateRepository;
+        private readonly IGenericRepository<SubDataProcessor> _sdpRepository;
 
 
         public DataProcessingRegistrationApplicationService(
@@ -57,7 +58,8 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
             IOrganizationalUserContext userContext,
-            IGenericRepository<DataProcessingRegistrationOversightDate> dataProcessingRegistrationOversightDateRepository)
+            IGenericRepository<DataProcessingRegistrationOversightDate> dataProcessingRegistrationOversightDateRepository,
+            IGenericRepository<SubDataProcessor> sdpRepository)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -74,6 +76,7 @@ namespace Core.ApplicationServices.GDPR
             _transactionManager = transactionManager;
             _userContext = userContext;
             _dataProcessingRegistrationOversightDateRepository = dataProcessingRegistrationOversightDateRepository;
+            _sdpRepository = sdpRepository;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -296,12 +299,12 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<Organization, OperationError> UpdateSubDataProcessor(int id, int organizationId, BasisForTransferParameters basisForTransfer)
+        public Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, BasisForTransferParameters basisForTransfer)
         {
-            throw new NotImplementedException();
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.UpdateSubDataProcessor(registration, organizationId, basisForTransfer.BasisForTransferOptionId, basisForTransfer.InsecureCountryParameters.Transfer, basisForTransfer.InsecureCountryParameters.InsecureCountryOptionId));
         }
 
-        public Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<BasisForTransferParameters> basisForTransfer)
+        public Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<BasisForTransferParameters> basisForTransfer)
         {
             return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService
                 .AssignSubDataProcessor(registration, organizationId)
@@ -309,7 +312,7 @@ namespace Core.ApplicationServices.GDPR
                 (
                     dpr =>
                     {
-                        return basisForTransfer.Match //TODO: We should return the created sub data processor in the domain, and then we can just bind to the domain method directly in stead of doing anything
+                        return basisForTransfer.Match
                         (
                             parameters => UpdateSubDataProcessor(id, organizationId, parameters),
                             () => dpr
@@ -318,9 +321,17 @@ namespace Core.ApplicationServices.GDPR
             );
         }
 
-        public Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId)
+        public Result<SubDataProcessor, OperationError> RemoveSubDataProcessor(int id, int organizationId)
         {
-            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveSubDataProcessor(registration, organizationId));
+            return Modify(id, registration =>
+            {
+                var result = _dataProcessingRegistrationDataProcessorAssignmentService.RemoveSubDataProcessor(registration, organizationId);
+                if (result.Ok)
+                {
+                    _sdpRepository.Delete(result.Value);
+                }
+                return result;
+            });
         }
 
 
