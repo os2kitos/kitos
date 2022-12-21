@@ -39,7 +39,6 @@
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
-            //TODO: Add the SQL to upgrade
             DropTable("dbo.DataProcessingRegistrationOrganization1");
         }
         

@@ -142,7 +142,11 @@ namespace Core.DomainModel.GDPR
 
             return sdp;
         }
-        public Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(Organization.Organization organization, Maybe<DataProcessingBasisForTransferOption> basisForTransfer, YesNoUndecidedOption? transferToInsecureThirdCountry, Maybe<DataProcessingCountryOption> insecureCountry)
+        public Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(
+            Organization.Organization organization,
+            Maybe<DataProcessingBasisForTransferOption> basisForTransfer,
+            YesNoUndecidedOption? transferToInsecureThirdCountry,
+            Maybe<DataProcessingCountryOption> insecureCountry)
         {
             if (HasSubDataProcessors != YesNoUndecidedOption.Yes)
                 return new OperationError("To Add new sub data processors, enable sub data processors", OperationFailure.BadInput);
@@ -153,6 +157,7 @@ namespace Core.DomainModel.GDPR
 
             var dataProcessor = result.Value;
             dataProcessor.UpdateBasisForTransfer(basisForTransfer);
+
             return dataProcessor
                 .UpdateTransferToInsecureThirdCountries(transferToInsecureThirdCountry, insecureCountry)
                 .Match<Result<SubDataProcessor, OperationError>>(error => error, () => dataProcessor);

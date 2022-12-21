@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202212210922387_Changed_Dpr_SubDataProcessors"; }
+            get { return "202212211020229_Changed_Dpr_SubDataProcessors"; }
         }
         
         string IMigrationMetadata.Source

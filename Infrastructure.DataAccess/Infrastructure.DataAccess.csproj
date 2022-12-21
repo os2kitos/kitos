@@ -991,9 +991,9 @@
     <Compile Include="Migrations\202212191220524_DataProcessingMainContract.designer.cs">
       <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202212210922387_Changed_Dpr_SubDataProcessors.cs" />
-    <Compile Include="Migrations\202212210922387_Changed_Dpr_SubDataProcessors.designer.cs">
-      <DependentUpon>202212210922387_Changed_Dpr_SubDataProcessors.cs</DependentUpon>
+    <Compile Include="Migrations\202212211020229_Changed_Dpr_SubDataProcessors.cs" />
+    <Compile Include="Migrations\202212211020229_Changed_Dpr_SubDataProcessors.designer.cs">
+      <DependentUpon>202212211020229_Changed_Dpr_SubDataProcessors.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1659,8 +1659,8 @@
     <EmbeddedResource Include="Migrations\202212191220524_DataProcessingMainContract.resx">
       <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202212210922387_Changed_Dpr_SubDataProcessors.resx">
-      <DependentUpon>202212210922387_Changed_Dpr_SubDataProcessors.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202212211020229_Changed_Dpr_SubDataProcessors.resx">
+      <DependentUpon>202212211020229_Changed_Dpr_SubDataProcessors.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

@@ -16,7 +16,7 @@ namespace Core.DomainModel.GDPR
         public YesNoUndecidedOption? TransferToInsecureCountry { get; set; }
         public int? InsecureCountryId { get; set; }
         public virtual DataProcessingCountryOption InsecureCountry { get; set; }
-        public int? DataProcessingRegistrationId { get; set; }
+        public int DataProcessingRegistrationId { get; set; }
         public virtual DataProcessingRegistration DataProcessingRegistration { get; set; }
 
         public void UpdateBasisForTransfer(Maybe<DataProcessingBasisForTransferOption> basisForTransfer)
