@@ -183,7 +183,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(validCandidate, result.Value);
+            Assert.Same(validCandidate, result.Value.Organization);
             Assert.True(dataProcessingRegistration.GetSubDataProcessor(validCandidate).HasValue);
         }
 

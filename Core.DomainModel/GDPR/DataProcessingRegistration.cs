@@ -134,7 +134,7 @@ namespace Core.DomainModel.GDPR
 
             var sdp = new SubDataProcessor
             {
-                Organization = Organization,
+                Organization = dataProcessor,
                 DataProcessingRegistration = this
             };
 

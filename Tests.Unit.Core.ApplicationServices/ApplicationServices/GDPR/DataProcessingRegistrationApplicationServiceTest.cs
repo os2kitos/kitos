@@ -45,6 +45,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationOversightDateAssignmentService> _oversightDateAssignmentServiceMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IGenericRepository<DataProcessingRegistrationOversightDate>> _dprOversightDaterepositoryMock;
+        private readonly Mock<IGenericRepository<SubDataProcessor>> _sdpRepositoryMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -63,6 +64,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _oversightDateAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightDateAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _dprOversightDaterepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationOversightDate>>();
+            _sdpRepositoryMock = new Mock<IGenericRepository<SubDataProcessor>>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -79,7 +81,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _transactionManagerMock.Object,
                 _userContextMock.Object,
                 _dprOversightDaterepositoryMock.Object,
-                null);
+                _sdpRepositoryMock.Object);
         }
 
         [Fact]
@@ -801,8 +803,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowReadReturns(registration, true);
-            var org1 = new Organization {Id = org1Id, Name = $"{nameQuery}{1}", Cvr = testCvr};
-            var org2 = new Organization {Id = org2Id, Name = $"{nameQuery}{2}", Cvr = nameQuery};
+            var org1 = new Organization { Id = org1Id, Name = $"{nameQuery}{1}", Cvr = testCvr };
+            var org2 = new Organization { Id = org2Id, Name = $"{nameQuery}{2}", Cvr = nameQuery };
             var organizations = new[] { org1, org2 };
             _dpAssignmentService.Setup(x => x.GetApplicableDataProcessors(registration)).Returns(organizations.AsQueryable());
 
@@ -846,13 +848,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_AssignSubDataProcessorIf_Dpr_Is_Not_Found()
         {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSubDataProcessor(id, A<int>(),Maybe<BasisForTransferParameters>.None));
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSubDataProcessor(id, A<int>(), Maybe<BasisForTransferParameters>.None));
         }
 
         [Fact]
         public void Cannot_AssignSubDataProcessor_If_Write_Access_Is_Denied()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>(),Maybe<BasisForTransferParameters>.None));
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>(), Maybe<BasisForTransferParameters>.None));
         }
 
         [Fact]
@@ -877,6 +879,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(result.Ok);
             Assert.Same(sdp, result.Value);
             transaction.Verify(x => x.Commit());
+            _sdpRepositoryMock.Verify(x => x.Delete(sdp), Times.Once());
         }
 
         [Fact]
@@ -971,7 +974,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var id = A<int>();
-            var registration = new DataProcessingRegistration(){AssignedSubDataProcessors = {new SubDataProcessor(){ Organization = new Organization()} }};
+            var registration = new DataProcessingRegistration() { AssignedSubDataProcessors = { new SubDataProcessor() { Organization = new Organization() } } };
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
 
@@ -1103,7 +1106,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var id = A<int>();
-            var registration = new DataProcessingRegistration {AgreementConcludedAt = A<DateTime>()};
+            var registration = new DataProcessingRegistration { AgreementConcludedAt = A<DateTime>() };
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
@@ -1221,7 +1224,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var id = A<int>();
-            var registration = new DataProcessingRegistration(){InsecureCountriesSubjectToDataTransfer = {new DataProcessingCountryOption()}};
+            var registration = new DataProcessingRegistration() { InsecureCountriesSubjectToDataTransfer = { new DataProcessingCountryOption() } };
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
 
@@ -1526,7 +1529,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             {
                 //Arrange
                 var oversightCompleted = A<YesNoUndecidedOption>();
-                
+
                 //Act
                 return _sut.UpdateIsOversightCompleted(registration.Id, oversightCompleted);
             });
@@ -1681,7 +1684,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             {
                 //Arrange
                 var mainContractId = A<int>();
-                registration.AssociatedContracts = new List<ItContract> {new() {Id = mainContractId}};
+                registration.AssociatedContracts = new List<ItContract> { new() { Id = mainContractId } };
 
                 //Act
                 return _sut.UpdateMainContract(registration.Id, mainContractId);
@@ -1799,7 +1802,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void GetByUuid_Returns_DPR()
         {
             //Arrange
-            var registration = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>()};
+            var registration = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
             _repositoryMock.Setup(x => x.AsQueryable()).Returns(CreateListOfDPRFromDpr(registration).AsQueryable());
             ExpectAllowReadReturns(registration, true);
 
