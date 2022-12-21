@@ -301,6 +301,11 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, BasisForTransferParameters basisForTransfer)
         {
+            if (basisForTransfer == null)
+            {
+                throw new ArgumentNullException(nameof(basisForTransfer));
+            }
+
             return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.UpdateSubDataProcessor(registration, organizationId, basisForTransfer.BasisForTransferOptionId, basisForTransfer.InsecureCountryParameters.Transfer, basisForTransfer.InsecureCountryParameters.InsecureCountryOptionId));
         }
 
