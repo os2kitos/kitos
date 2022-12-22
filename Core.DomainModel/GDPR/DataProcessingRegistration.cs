@@ -89,9 +89,7 @@ namespace Core.DomainModel.GDPR
         public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; }
 
         public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
-
-        public virtual ICollection<SubDataProcessor> AssignedSubDataProcessors { get; set; } //TODO:switch to this one!
-
+        public virtual ICollection<SubDataProcessor> AssignedSubDataProcessors { get; set; }
         public virtual DataProcessingDataResponsibleOption DataResponsible { get; set; }
         public int? DataResponsible_Id { get; set; }
 
