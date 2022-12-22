@@ -294,7 +294,12 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.SetHasSubDataProcessors(state);
+                var result = registration.SetHasSubDataProcessors(state);
+                var removedSubDataProcessors = result.RemovedSubDataProcessors.ToList();
+                if (removedSubDataProcessors.Any())
+                {
+                    _sdpRepository.RemoveRange(removedSubDataProcessors);
+                }
                 return registration;
             });
         }

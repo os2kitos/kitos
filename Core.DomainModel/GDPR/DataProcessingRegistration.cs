@@ -60,13 +60,17 @@ namespace Core.DomainModel.GDPR
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
-        public void SetHasSubDataProcessors(YesNoUndecidedOption hasSubDataProcessors)
+        public ChangeHasSubDataProcessorsResult SetHasSubDataProcessors(YesNoUndecidedOption hasSubDataProcessors)
         {
+            var removedSubDataProcessors = new List<SubDataProcessor>();
             HasSubDataProcessors = hasSubDataProcessors;
             if (hasSubDataProcessors != YesNoUndecidedOption.Yes)
             {
+                removedSubDataProcessors.AddRange(AssignedSubDataProcessors);
                 AssignedSubDataProcessors.Clear();
             }
+
+            return new ChangeHasSubDataProcessorsResult(removedSubDataProcessors);
         }
 
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
