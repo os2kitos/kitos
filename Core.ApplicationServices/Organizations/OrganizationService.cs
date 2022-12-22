@@ -284,8 +284,8 @@ namespace Core.ApplicationServices.Organizations
                         .ToList();
                     var dprInOtherOrganizationsWhereOrgIsSubDataProcessor = organizationWhichCanBeDeleted
                         .SubDataProcessorRegistrations
-                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .Select(x => x.DataProcessingRegistration)
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
                     var contractsInOtherOrganizationsWhereOrgIsSupplier = organizationWhichCanBeDeleted
                         .Supplier

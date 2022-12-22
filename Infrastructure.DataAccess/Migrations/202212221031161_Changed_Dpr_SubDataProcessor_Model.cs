@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Changed_Dpr_SubDataProcessors : DbMigration
+    public partial class Changed_Dpr_SubDataProcessor_Model : DbMigration
     {
         public override void Up()
         {
@@ -26,12 +26,12 @@
                         LastChangedByUserId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.DataProcessingRegistrations", t => t.DataProcessingRegistrationId, cascadeDelete: true)
                 .ForeignKey("dbo.DataProcessingCountryOptions", t => t.InsecureCountryId)
                 .ForeignKey("dbo.User", t => t.LastChangedByUserId)
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
                 .ForeignKey("dbo.DataProcessingBasisForTransferOptions", t => t.SubDataProcessorBasisForTransferId)
-                .ForeignKey("dbo.DataProcessingRegistrations", t => t.DataProcessingRegistrationId, cascadeDelete: true)
                 .Index(t => t.OrganizationId)
                 .Index(t => t.SubDataProcessorBasisForTransferId)
                 .Index(t => t.InsecureCountryId)
@@ -53,12 +53,12 @@
                     })
                 .PrimaryKey(t => new { t.DataProcessingRegistration_Id, t.Organization_Id });
             
-            DropForeignKey("dbo.SubDataProcessors", "DataProcessingRegistrationId", "dbo.DataProcessingRegistrations");
             DropForeignKey("dbo.SubDataProcessors", "SubDataProcessorBasisForTransferId", "dbo.DataProcessingBasisForTransferOptions");
             DropForeignKey("dbo.SubDataProcessors", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.SubDataProcessors", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.SubDataProcessors", "LastChangedByUserId", "dbo.User");
             DropForeignKey("dbo.SubDataProcessors", "InsecureCountryId", "dbo.DataProcessingCountryOptions");
+            DropForeignKey("dbo.SubDataProcessors", "DataProcessingRegistrationId", "dbo.DataProcessingRegistrations");
             DropIndex("dbo.SubDataProcessors", new[] { "LastChangedByUserId" });
             DropIndex("dbo.SubDataProcessors", new[] { "ObjectOwnerId" });
             DropIndex("dbo.SubDataProcessors", new[] { "DataProcessingRegistrationId" });

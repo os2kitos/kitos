@@ -333,7 +333,7 @@ namespace Core.ApplicationServices.GDPR
                 var result = _dataProcessingRegistrationDataProcessorAssignmentService.RemoveSubDataProcessor(registration, organizationId);
                 if (result.Ok)
                 {
-                    _sdpRepository.DeleteWithReferencePreload(result.Value);
+                    _sdpRepository.Delete(result.Value);
                 }
                 return result;
             });

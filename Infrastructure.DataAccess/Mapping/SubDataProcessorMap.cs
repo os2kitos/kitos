@@ -6,9 +6,14 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public SubDataProcessorMap()
         {
+            HasRequired(x => x.DataProcessingRegistration)
+                .WithMany(x => x.AssignedSubDataProcessors)
+                .HasForeignKey(x => x.DataProcessingRegistrationId)
+                .WillCascadeOnDelete(true);
+
             HasRequired(x => x.Organization)
                 .WithMany(x => x.SubDataProcessorRegistrations)
-                .HasForeignKey(x=>x.OrganizationId)
+                .HasForeignKey(x => x.OrganizationId)
                 .WillCascadeOnDelete(false);
 
             HasOptional(x => x.SubDataProcessorBasisForTransfer)

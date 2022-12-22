@@ -47,17 +47,6 @@ namespace Infrastructure.DataAccess.Mapping
             HasMany(x => x.DataProcessors)
                 .WithMany(x => x.DataProcessorForDataProcessingRegistrations);
 
-            //Sub Data processors
-            HasMany(x => x.AssignedSubDataProcessors)
-                .WithRequired(x => x.DataProcessingRegistration)
-                .HasForeignKey(x => x.DataProcessingRegistrationId)
-                .WillCascadeOnDelete(true);
-
-            HasMany(x => x.AssignedSubDataProcessors)
-                .WithRequired(x => x.DataProcessingRegistration)
-                .HasForeignKey(x => x.DataProcessingRegistrationId)
-                .WillCascadeOnDelete(true);
-
             //Transfer to insecure countries
             HasMany(x => x.InsecureCountriesSubjectToDataTransfer)
                 .WithMany(x => x.References);
