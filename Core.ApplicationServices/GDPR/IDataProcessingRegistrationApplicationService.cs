@@ -37,8 +37,8 @@ namespace Core.ApplicationServices.GDPR
         Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId);
         Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state);
-        Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<BasisForTransferParameters> basisForTransfer);
-        Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, BasisForTransferParameters basisForTransfer);
+        Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<SubDataProcessorDetailsParameters> details);
+        Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, SubDataProcessorDetailsParameters details);
         Result<SubDataProcessor, OperationError> RemoveSubDataProcessor(int id, int organizationId);
         Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded);
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedRemark(int id, string remark);

@@ -837,7 +837,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var transaction = ExpectTransaction();
 
             //Act
-            var result = _sut.AssignSubDataProcessor(id, organizationId, Maybe<BasisForTransferParameters>.None);
+            var result = _sut.AssignSubDataProcessor(id, organizationId, Maybe<SubDataProcessorDetailsParameters>.None);
 
             //Assert
             Assert.True(result.Ok);
@@ -848,13 +848,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_AssignSubDataProcessorIf_Dpr_Is_Not_Found()
         {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSubDataProcessor(id, A<int>(), Maybe<BasisForTransferParameters>.None));
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSubDataProcessor(id, A<int>(), Maybe<SubDataProcessorDetailsParameters>.None));
         }
 
         [Fact]
         public void Cannot_AssignSubDataProcessor_If_Write_Access_Is_Denied()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>(), Maybe<BasisForTransferParameters>.None));
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>(), Maybe<SubDataProcessorDetailsParameters>.None));
         }
 
         [Fact]

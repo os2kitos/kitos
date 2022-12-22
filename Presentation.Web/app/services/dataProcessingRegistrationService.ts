@@ -17,7 +17,7 @@
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize: number): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         removeSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateSubDataProcessorsState(dataProcessingRegistrationId: number, state: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
-        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<void>;
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize: number): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, value: Models.Api.Shared.YesNoIrrelevantOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
@@ -166,8 +166,19 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/remove"), dataProcessorId);
         }
 
-        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/assign"), dataProcessorId);
+        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<void> {
+            const payload = {
+                organizationId: dataProcessorId
+            };
+            return this
+                .$http
+                .patch<API.Models.IApiWrapper<any>>(
+                    this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/assign"),
+                    payload)
+                .then(
+                    result => { },
+                    error => this.apiWrapper.handleServerError(error)
+                );
         }
 
         updateTransferToInsecureThirdCountry(dataProcessingRegistrationId: number, value: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult> {

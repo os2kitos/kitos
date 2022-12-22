@@ -281,7 +281,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 organizationUuids,
                 subDataProcessorUuid => _entityIdentityResolver.ResolveDbId<Organization>(subDataProcessorUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {subDataProcessorUuid}", OperationFailure.BadInput)),
                 registration => registration.AssignedSubDataProcessors.Select(x => x.Organization).ToList(),
-                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId, Maybe<BasisForTransferParameters>.None).MatchFailure(),
+                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId, Maybe<SubDataProcessorDetailsParameters>.None).MatchFailure(),
                 (registration, subDataProcessor) => _applicationService.RemoveSubDataProcessor(registration.Id, subDataProcessor.Id).MatchFailure()
                 );
         }

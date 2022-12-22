@@ -210,7 +210,10 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> SendAssignSubDataProcessorRequestAsync(int registrationId, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/sub-data-processors/assign"), cookie, new SingleValueDTO<int> { Value = organizationId });
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/sub-data-processors/assign"), cookie, new AssignSubDataProcessorRequestDTO()
+            {
+                OrganizationId = organizationId
+            });
         }
 
         public static async Task<HttpResponseMessage> SendRemoveSubDataProcessorRequestAsync(int registrationId, int organizationId, Cookie optionalLogin = null)

@@ -347,34 +347,38 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] AssignSubDataProcessorRequestDTO request)
         {
-            if (organizationId == null)
+            if (request == null)
                 return BadRequest("organizationId must be provided");
+            
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var details = ParseSubDataProcessorDetails(request);
             return _dataProcessingRegistrationApplicationService
-                .AssignSubDataProcessor(id, organizationId.Value, Maybe<BasisForTransferParameters>.None)
+                .AssignSubDataProcessor(id, request.OrganizationId, details)
                 .Match(_ => Ok(), FromOperationError);
             //TODO: Test the New parameters
         }
 
-        [HttpPatch]
-        [Route("{id}/sub-data-processors/update")] //TODO: New endpoint
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
-        {
-            if (organizationId == null)
-                return BadRequest("organizationId must be provided");
+        //[HttpPatch]
+        //[Route("{id}/sub-data-processors/update")] //TODO: New endpoint
+        //[SwaggerResponse(HttpStatusCode.OK)]
+        //[SwaggerResponse(HttpStatusCode.Forbidden)]
+        //[SwaggerResponse(HttpStatusCode.BadRequest)]
+        //[SwaggerResponse(HttpStatusCode.NotFound)]
+        //[SwaggerResponse(HttpStatusCode.Conflict)]
+        //public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        //{
+        //    if (organizationId == null)
+        //        return BadRequest("organizationId must be provided");
 
-            return _dataProcessingRegistrationApplicationService
-                .AssignSubDataProcessor(id, organizationId.Value, Maybe<BasisForTransferParameters>.None)
-                .Match(_ => Ok(), FromOperationError);
-            //TODO: Test the New parameters
-        }
+        //    return _dataProcessingRegistrationApplicationService
+        //        .AssignSubDataProcessor(id, organizationId.Value, Maybe<BasisForTransferParameters>.None)
+        //        .Match(_ => Ok(), FromOperationError);
+        //    //TODO: Test the New parameters
+        //}
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/remove")]
@@ -1044,6 +1048,19 @@ namespace Presentation.Web.Controllers.API.V1
                 OversightDate = oversightDate.OversightDate,
                 OversightRemark = oversightDate.OversightRemark
             };
+        }
+
+        private static Maybe<SubDataProcessorDetailsParameters> ParseSubDataProcessorDetails(AssignSubDataProcessorRequestDTO request)
+        {
+            return request
+                .Details
+                .FromNullable()
+                .Select(ToSubDataProcessorDetailsParameters);
+        }
+
+        private static SubDataProcessorDetailsParameters ToSubDataProcessorDetailsParameters(SubDataProcessorDetailsDTO details)
+        {
+            return new SubDataProcessorDetailsParameters(details.BasisForTransferOptionId, new TransferToInsecureCountryParameters(details.TransferToInsecureThirdCountries, details.InsecureCountryOptionId));
         }
     }
 }

@@ -304,17 +304,17 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, BasisForTransferParameters basisForTransfer)
+        public Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, SubDataProcessorDetailsParameters details)
         {
-            if (basisForTransfer == null)
+            if (details == null)
             {
-                throw new ArgumentNullException(nameof(basisForTransfer));
+                throw new ArgumentNullException(nameof(details));
             }
 
-            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.UpdateSubDataProcessor(registration, organizationId, basisForTransfer.BasisForTransferOptionId, basisForTransfer.InsecureCountryParameters.Transfer, basisForTransfer.InsecureCountryParameters.InsecureCountryOptionId));
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.UpdateSubDataProcessor(registration, organizationId, details.BasisForTransferOptionId, details.InsecureCountryParameters.Transfer, details.InsecureCountryParameters.InsecureCountryOptionId));
         }
 
-        public Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<BasisForTransferParameters> basisForTransfer)
+        public Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<SubDataProcessorDetailsParameters> details)
         {
             return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService
                 .AssignSubDataProcessor(registration, organizationId)
@@ -322,7 +322,7 @@ namespace Core.ApplicationServices.GDPR
                 (
                     dpr =>
                     {
-                        return basisForTransfer.Match
+                        return details.Match
                         (
                             parameters => UpdateSubDataProcessor(id, organizationId, parameters),
                             () => dpr

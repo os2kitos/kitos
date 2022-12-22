@@ -7,5 +7,10 @@ namespace Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write
         public YesNoUndecidedOption? Transfer { get; }
         public int? InsecureCountryOptionId { get; }
 
+        public TransferToInsecureCountryParameters(YesNoUndecidedOption? transfer, int? insecureCountryOptionId)
+        {
+            Transfer = transfer;
+            InsecureCountryOptionId = insecureCountryOptionId;
+        }
     }
 }
