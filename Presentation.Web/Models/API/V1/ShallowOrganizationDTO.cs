@@ -4,6 +4,12 @@
     {
         public ShallowOrganizationDTO(int id, string name) : base(id, name)
         {
+
+        }
+
+        public ShallowOrganizationDTO()
+        {
+
         }
 
         public string CvrNumber { get; set; }

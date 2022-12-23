@@ -944,8 +944,7 @@ namespace Presentation.Web.Controllers.API.V1
                     .ToArray(),
                 SubDataProcessors = value
                     .AssignedSubDataProcessors
-                    .Select(x => x.Organization)
-                    .Select(x => x.MapToShallowOrganizationDTO())
+                    .Select(sdp => MapSubDataProcessorResponseDto(enabledCountryOptions, enabledBasisForTransferOptions, sdp))
                     .ToArray(),
                 HasSubDataProcessors = value.HasSubDataProcessors,
                 AgreementConcluded = new ValueWithOptionalDateAndRemark<YesNoIrrelevantOption?>
@@ -958,12 +957,12 @@ namespace Presentation.Web.Controllers.API.V1
                 TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries,
                 InsecureThirdCountries = value
                     .InsecureCountriesSubjectToDataTransfer
-                    .Select(x => new NamedEntityWithExpirationStatusDTO(x.Id, x.Name, enabledCountryOptions.Contains(x.Id) == false))
+                    .Select(x => MapSelectedOptionWithExpirationStatus(enabledCountryOptions, x))
                     .ToArray(),
                 BasisForTransfer = value
                     .BasisForTransfer
                     .FromNullable()
-                    .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
+                    .Select(basisForTransfer => MapSelectedOptionWithExpirationStatus(enabledBasisForTransferOptions, basisForTransfer))
                     .GetValueOrDefault(),
                 MainContractId = value.MainContractId,
                 IsActiveAccordingToMainContract = value.IsActiveAccordingToMainContract,
@@ -980,7 +979,7 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     Value = value
                             .OversightOptions
-                            .Select(oversightOption => new NamedEntityWithExpirationStatusDTO(oversightOption.Id, oversightOption.Name, enabledOversightOptions.Contains(oversightOption.Id) == false))
+                            .Select(oversightOption => MapSelectedOptionWithExpirationStatus(enabledOversightOptions, oversightOption))
                             .ToArray(),
                     Remark = value.OversightOptionRemark
                 },
@@ -1006,6 +1005,16 @@ namespace Presentation.Web.Controllers.API.V1
                 LastChangedAt = value.LastChanged,
                 LastChangedByName = value.LastChangedByUser?.GetFullName()
             };
+        }
+
+        private static SubDataProcessorResponseDTO MapSubDataProcessorResponseDto(ISet<int> enabledCountryOptions, ISet<int> enabledBasisForTransferOptions, SubDataProcessor x)
+        {
+            return new SubDataProcessorResponseDTO(x.Organization.Id, x.Organization.Name, x.Organization.Cvr, x.SubDataProcessorBasisForTransfer.FromNullable().Select(b => MapSelectedOptionWithExpirationStatus(enabledBasisForTransferOptions, b)).GetValueOrDefault(), x.TransferToInsecureCountry, x.InsecureCountry.FromNullable().Select(c => MapSelectedOptionWithExpirationStatus(enabledCountryOptions, c)).GetValueOrDefault());
+        }
+
+        private static NamedEntityWithExpirationStatusDTO MapSelectedOptionWithExpirationStatus<T>(ISet<int> enabledIds, T option) where T : IHasId, IHasName, IOptionReference<DataProcessingRegistration>
+        {
+            return new NamedEntityWithExpirationStatusDTO(option.Id, option.Name, enabledIds.Contains(option.Id) == false);
         }
 
         private static ReferenceDTO ToDTO(int? masterReferenceId, ExternalReference reference)

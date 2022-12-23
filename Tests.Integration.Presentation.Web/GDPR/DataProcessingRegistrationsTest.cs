@@ -441,7 +441,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert
             Assert.Contains(processors, x => x.Id == organization.Id);
         }
-        
+
 
         [Fact]
         public async Task Can_Get_Available_DataProcessors_By_Cvr()
@@ -536,6 +536,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Contains(processors, x => x.Id == organization.Id);
         }
 
+        //TODO: also test with the details!!
         [Fact]
         public async Task Can_Assign_SubDataProcessors()
         {
@@ -558,6 +559,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(organization.Id, processor.Id);
             Assert.Equal(organization.Name, processor.Name);
             Assert.Equal(organization.Cvr, processor.CvrNumber);
+            //TODO: Assert details as well
         }
 
         [Fact]
