@@ -4,9 +4,10 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices.GDPR;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
-
 using Moq;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -16,11 +17,15 @@ namespace Tests.Unit.Core.DomainServices.GDPR
     {
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly DataProcessingRegistrationDataProcessorAssignmentService _sut;
+        private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>> _countryOptionsServiceMock;
+        private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>> _basisForTransferOptionsServiceMock;
 
         public DataProcessingRegistrationDataProcessorAssignmentServiceTest()
         {
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
-            _sut = new DataProcessingRegistrationDataProcessorAssignmentService(_organizationRepositoryMock.Object, null, null);
+            _countryOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>>();
+            _basisForTransferOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>();
+            _sut = new DataProcessingRegistrationDataProcessorAssignmentService(_organizationRepositoryMock.Object, _countryOptionsServiceMock.Object, _basisForTransferOptionsServiceMock.Object);
         }
 
         [Fact]
@@ -187,8 +192,6 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             Assert.True(dataProcessingRegistration.GetSubDataProcessor(validCandidate).HasValue);
         }
 
-        //TODO: Extend with an update test
-
         [Fact]
         public void Cannot_AssignSubDataProcessor_If_Not_Using_Sub_Data_Processors()
         {
@@ -240,6 +243,122 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, true, false)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_UpdateSubDataProcessor(bool withBasisForTransfer, bool withTransferToInsecureThirdCountries, bool withInsecureThirdCountry)
+        {
+            //Arrange
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Organization = new Organization { Id = A<int>() },
+                AssignedSubDataProcessors = { existingProcessor },
+                HasSubDataProcessors = YesNoUndecidedOption.Yes
+            };
+            var basisForTransferOptionId = withBasisForTransfer ? A<int>() : (int?)null;
+            var transferToInsecureThirdCountries = withTransferToInsecureThirdCountries
+                ? YesNoUndecidedOption.Yes
+                : EnumRange.AllExcept(YesNoUndecidedOption.Yes).RandomItem();
+            var insecureThirdCountryOptionId = withInsecureThirdCountry ? A<int>() : (int?)null;
+            var basisForTransferOption = new DataProcessingBasisForTransferOption();
+            var countryOption = new DataProcessingCountryOption();
+
+            ExpectGetOrganizationByIdReturns(existingProcessor.Organization.Id, existingProcessor.Organization);
+
+            if (basisForTransferOptionId.HasValue)
+                SetupResolveBasisForTransfer(dataProcessingRegistration, basisForTransferOptionId.Value, basisForTransferOption);
+
+            if (insecureThirdCountryOptionId.HasValue)
+                SetupResolveCountry(dataProcessingRegistration, insecureThirdCountryOptionId.Value, countryOption);
+
+            //Act
+            var result = _sut.UpdateSubDataProcessor(
+                dataProcessingRegistration,
+                existingProcessor.Organization.Id,
+                basisForTransferOptionId,
+                transferToInsecureThirdCountries,
+                insecureThirdCountryOptionId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(existingProcessor, result.Value);
+            Assert.Equal(withBasisForTransfer ? basisForTransferOption : null, existingProcessor.SubDataProcessorBasisForTransfer);
+            Assert.Equal(transferToInsecureThirdCountries, existingProcessor.TransferToInsecureCountry);
+            Assert.Equal(withInsecureThirdCountry ? countryOption : null, existingProcessor.InsecureCountry);
+        }
+
+        [Fact]
+        public void Cannot_UpdateSubDataProcessor_With_InsecureCountry_If_TransferToInsecureCountry_Has_Not_Been_Selected()
+        {
+            //Arrange
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Organization = new Organization { Id = A<int>() },
+                AssignedSubDataProcessors = { existingProcessor },
+                HasSubDataProcessors = YesNoUndecidedOption.Yes
+            };
+            var noTransfer = EnumRange.AllExcept(YesNoUndecidedOption.Yes).RandomItem();
+            var insecureThirdCountryOptionId = A<int>();
+            var countryOption = new DataProcessingCountryOption();
+
+            ExpectGetOrganizationByIdReturns(existingProcessor.Organization.Id, existingProcessor.Organization);
+            SetupResolveCountry(dataProcessingRegistration, insecureThirdCountryOptionId, countryOption);
+
+            //Act
+            var result = _sut.UpdateSubDataProcessor(
+                dataProcessingRegistration,
+                existingProcessor.Organization.Id,
+                null,
+                noTransfer,
+                insecureThirdCountryOptionId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void Can_UpdateSubDataProcessor_If_Option_Resolution_Fails(bool cannotResolveBasisForTransfer, bool cannotResolveCountry)
+        {
+            //Arrange
+            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Organization = new Organization { Id = A<int>() },
+                AssignedSubDataProcessors = { existingProcessor },
+                HasSubDataProcessors = YesNoUndecidedOption.Yes
+            };
+            var basisForTransferOptionId = A<int>();
+            var transferToInsecureThirdCountries = YesNoUndecidedOption.Yes;
+            var insecureThirdCountryOptionId = A<int>();
+            var basisForTransferOption = new DataProcessingBasisForTransferOption();
+            var countryOption = new DataProcessingCountryOption();
+            ExpectGetOrganizationByIdReturns(existingProcessor.Organization.Id, existingProcessor.Organization);
+            SetupResolveBasisForTransfer(dataProcessingRegistration, basisForTransferOptionId, cannotResolveBasisForTransfer ? Maybe<DataProcessingBasisForTransferOption>.None : basisForTransferOption);
+            SetupResolveCountry(dataProcessingRegistration, insecureThirdCountryOptionId, cannotResolveCountry ? Maybe<DataProcessingCountryOption>.None : countryOption);
+
+            //Act
+            var result = _sut.UpdateSubDataProcessor(
+                dataProcessingRegistration,
+                existingProcessor.Organization.Id,
+                basisForTransferOptionId,
+                transferToInsecureThirdCountries,
+                insecureThirdCountryOptionId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
         [Fact]
@@ -309,6 +428,21 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         private SubDataProcessor CreateSubDataProcessor(Organization organization)
         {
             return new SubDataProcessor() { Organization = organization };
+        }
+
+        private void SetupResolveCountry(DataProcessingRegistration dataProcessingRegistration, int insecureThirdCountryOptionId, Maybe<DataProcessingCountryOption> result)
+        {
+            _countryOptionsServiceMock
+                .Setup(x => x.GetAvailableOption(dataProcessingRegistration.Organization.Id,
+                    insecureThirdCountryOptionId))
+                .Returns(result);
+        }
+
+        private void SetupResolveBasisForTransfer(DataProcessingRegistration dataProcessingRegistration, int basisForTransferOptionId, Maybe<DataProcessingBasisForTransferOption> result)
+        {
+            _basisForTransferOptionsServiceMock
+                .Setup(x => x.GetAvailableOption(dataProcessingRegistration.Organization.Id,
+                    basisForTransferOptionId)).Returns(result);
         }
     }
 }

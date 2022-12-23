@@ -71,16 +71,17 @@ namespace Core.DomainServices.GDPR
                         return new OperationError($"Sub data processor with id {organizationId} not assigned to dpr with id {registration.Id}", OperationFailure.NotFound);
                     }
                     var subDataProcessor = subDataProcessorResult.Value;
+                    var registrationOrganizationId = registration.Organization.Id;
 
                     //Get the insecureCountry
-                    var countryResult = ResolveOption(organizationId, insecureCountryOptionId, subDataProcessor.InsecureCountry.FromNullable(), _countryOptionsService);
+                    var countryResult = ResolveOption(registrationOrganizationId, insecureCountryOptionId, subDataProcessor.InsecureCountry.FromNullable(), _countryOptionsService);
                     if (countryResult.Failed)
                     {
                         return countryResult.Error;
                     }
 
                     //Get the basis for transfer
-                    var basisForTransferResult = ResolveOption(organizationId, basisForTransferOptionId, subDataProcessor.SubDataProcessorBasisForTransfer.FromNullable(), _basisForTransferOptionsService);
+                    var basisForTransferResult = ResolveOption(registrationOrganizationId, basisForTransferOptionId, subDataProcessor.SubDataProcessorBasisForTransfer.FromNullable(), _basisForTransferOptionsService);
                     if (basisForTransferResult.Failed)
                     {
                         return basisForTransferResult.Error;
