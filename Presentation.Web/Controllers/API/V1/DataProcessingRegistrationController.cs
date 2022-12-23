@@ -1009,7 +1009,20 @@ namespace Presentation.Web.Controllers.API.V1
 
         private static SubDataProcessorResponseDTO MapSubDataProcessorResponseDto(ISet<int> enabledCountryOptions, ISet<int> enabledBasisForTransferOptions, SubDataProcessor x)
         {
-            return new SubDataProcessorResponseDTO(x.Organization.Id, x.Organization.Name, x.Organization.Cvr, x.SubDataProcessorBasisForTransfer.FromNullable().Select(b => MapSelectedOptionWithExpirationStatus(enabledBasisForTransferOptions, b)).GetValueOrDefault(), x.TransferToInsecureCountry, x.InsecureCountry.FromNullable().Select(c => MapSelectedOptionWithExpirationStatus(enabledCountryOptions, c)).GetValueOrDefault());
+            return new SubDataProcessorResponseDTO(
+                x.Organization.Id,
+                x.Organization.Name,
+                x.Organization.Cvr,
+                x.SubDataProcessorBasisForTransfer
+                    .FromNullable()
+                    .Select(b => MapSelectedOptionWithExpirationStatus(enabledBasisForTransferOptions, b))
+                    .GetValueOrDefault(),
+                x.TransferToInsecureCountry,
+                x.InsecureCountry
+                    .FromNullable()
+                    .Select(c => MapSelectedOptionWithExpirationStatus(enabledCountryOptions, c))
+                    .GetValueOrDefault()
+            );
         }
 
         private static NamedEntityWithExpirationStatusDTO MapSelectedOptionWithExpirationStatus<T>(ISet<int> enabledIds, T option) where T : IHasId, IHasName, IOptionReference<DataProcessingRegistration>

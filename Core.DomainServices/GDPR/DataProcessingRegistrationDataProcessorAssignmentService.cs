@@ -73,14 +73,14 @@ namespace Core.DomainServices.GDPR
                     var subDataProcessor = subDataProcessorResult.Value;
 
                     //Get the insecureCountry
-                    var countryResult = ResolveOption(organizationId, insecureCountryOptionId, subDataProcessor, subDataProcessor.InsecureCountry.FromNullable(), _countryOptionsService);
+                    var countryResult = ResolveOption(organizationId, insecureCountryOptionId, subDataProcessor.InsecureCountry.FromNullable(), _countryOptionsService);
                     if (countryResult.Failed)
                     {
                         return countryResult.Error;
                     }
 
                     //Get the basis for transfer
-                    var basisForTransferResult = ResolveOption(organizationId, insecureCountryOptionId, subDataProcessor, subDataProcessor.SubDataProcessorBasisForTransfer.FromNullable(), _basisForTransferOptionsService);
+                    var basisForTransferResult = ResolveOption(organizationId, basisForTransferOptionId, subDataProcessor.SubDataProcessorBasisForTransfer.FromNullable(), _basisForTransferOptionsService);
                     if (basisForTransferResult.Failed)
                     {
                         return basisForTransferResult.Error;
@@ -90,19 +90,18 @@ namespace Core.DomainServices.GDPR
             });
         }
 
-        private static Result<Maybe<TOption>, OperationError> ResolveOption<TOption>(int organizationId, int? optionId, SubDataProcessor subDataProcessor, Maybe<TOption> existingOption, IOptionsService<DataProcessingRegistration, TOption> optionsService)
+        private static Result<Maybe<TOption>, OperationError> ResolveOption<TOption>(int organizationId, int? optionId, Maybe<TOption> existingOption, IOptionsService<DataProcessingRegistration, TOption> optionsService)
             where TOption : OptionEntity<DataProcessingRegistration>
         {
             if (!optionId.HasValue)
                 return Maybe<TOption>.None;
 
-            var option = Maybe<TOption>.None;
-            var existingAssignment = existingOption;
+            Maybe<TOption> option;
             var newOptionId = optionId.Value;
-            if (existingAssignment.Select(o => o.Id == newOptionId).GetValueOrFallback(false))
+            if (existingOption.Select(o => o.Id == newOptionId).GetValueOrFallback(false))
             {
                 //If already assigned we don't check for availability of the option
-                option = existingAssignment;
+                option = existingOption;
             }
             else
             {

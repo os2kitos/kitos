@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Organization;
 using ExpectedObjects;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.GDPR;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -556,10 +557,66 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             var processor = Assert.Single(dto.SubDataProcessors);
-            Assert.Equal(organization.Id, processor.Id);
-            Assert.Equal(organization.Name, processor.Name);
-            Assert.Equal(organization.Cvr, processor.CvrNumber);
-            //TODO: Assert details as well
+            AssertSubDataProcessor(organization, processor, null, null, null);
+        }
+
+        [Fact]
+        public async Task Can_Assign_SubDataProcessors_With_Details()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, A<string>(), "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
+            var basisForTransferOptions = (await DataProcessingRegistrationHelper.GetBasisForTransferOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
+            var basisForTransferOption = basisForTransferOptions[Math.Abs(A<int>()) % basisForTransferOptions.Count];
+            var countryOptions = (await DataProcessingRegistrationHelper.GetCountryOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
+            var countryOption = countryOptions[Math.Abs(A<int>()) % countryOptions.Count];
+
+            //Act
+            const YesNoUndecidedOption sdpTransferToInsecureCountries = YesNoUndecidedOption.Yes;
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, organization.Id, details: new SubDataProcessorDetailsDTO()
+            {
+                BasisForTransferOptionId = basisForTransferOption.Id,
+                TransferToInsecureThirdCountries = sdpTransferToInsecureCountries,
+                InsecureCountryOptionId = countryOption.Id
+            });
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            var processor = Assert.Single(dto.SubDataProcessors);
+            AssertSubDataProcessor(organization, processor, sdpTransferToInsecureCountries, countryOption, basisForTransferOption);
+        }
+
+        [Fact]
+        public async Task Can_Update_SubDataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, A<string>(), "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
+            var basisForTransferOptions = (await DataProcessingRegistrationHelper.GetBasisForTransferOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
+            var basisForTransferOption = basisForTransferOptions[Math.Abs(A<int>()) % basisForTransferOptions.Count];
+            var countryOptions = (await DataProcessingRegistrationHelper.GetCountryOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
+            var countryOption = countryOptions[Math.Abs(A<int>()) % countryOptions.Count];
+            var sdpTransferToInsecureCountries = YesNoUndecidedOption.Yes;
+            var updateDetails = new SubDataProcessorDetailsDTO
+            {
+                BasisForTransferOptionId = basisForTransferOption.Id,
+                TransferToInsecureThirdCountries = sdpTransferToInsecureCountries,
+                InsecureCountryOptionId = countryOption.Id
+            };
+            using var _ = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, organization.Id);
+            using var updateResponse = await DataProcessingRegistrationHelper.SendUpdateSubDataProcessorRequestAsync(registration.Id, organization.Id, updateDetails);
+
+            //Act
+
+            //Assert
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            var processor = Assert.Single(dto.SubDataProcessors);
+            AssertSubDataProcessor(organization, processor, sdpTransferToInsecureCountries, countryOption, basisForTransferOption);
         }
 
         [Fact]
@@ -1010,6 +1067,16 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Null(dto.MainContractId);
+        }
+
+        private static void AssertSubDataProcessor(OrganizationDTO organization, SubDataProcessorResponseDTO processor, YesNoUndecidedOption? sdpTransferToInsecureCountries, OptionDTO countryOption, OptionDTO basisForTransferOption)
+        {
+            Assert.Equal(organization.Id, processor.Id);
+            Assert.Equal(organization.Name, processor.Name);
+            Assert.Equal(organization.Cvr, processor.CvrNumber);
+            Assert.Equal(sdpTransferToInsecureCountries, processor.TransferToInsecureThirdCountries);
+            Assert.Equal(countryOption?.Id, processor.InsecureCountry?.Id);
+            Assert.Equal(basisForTransferOption?.Id, processor.BasisForTransfer?.Id);
         }
     }
 }
