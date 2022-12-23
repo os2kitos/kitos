@@ -434,6 +434,8 @@
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
+    <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
+    <Compile Include="Models\API\V1\GDPR\UpdateSubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\AssignSubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\SubDataProcessorDetailsDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />

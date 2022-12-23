@@ -2,10 +2,11 @@
 
 namespace Presentation.Web.Models.API.V1.GDPR
 {
-    public class AssignSubDataProcessorRequestDTO : ISubDataProcessorRequestDTO
+    public class UpdateSubDataProcessorRequestDTO : ISubDataProcessorRequestDTO
     {
         [Required]
         public int OrganizationId { get; set; }
+        [Required]
         public SubDataProcessorDetailsDTO Details { get; set; }
     }
 }

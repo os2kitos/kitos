@@ -351,7 +351,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             if (request == null)
                 return BadRequest("organizationId must be provided");
-            
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -359,26 +359,33 @@ namespace Presentation.Web.Controllers.API.V1
             return _dataProcessingRegistrationApplicationService
                 .AssignSubDataProcessor(id, request.OrganizationId, details)
                 .Match(_ => Ok(), FromOperationError);
-            //TODO: Test the New parameters
         }
 
-        //[HttpPatch]
-        //[Route("{id}/sub-data-processors/update")] //TODO: New endpoint
-        //[SwaggerResponse(HttpStatusCode.OK)]
-        //[SwaggerResponse(HttpStatusCode.Forbidden)]
-        //[SwaggerResponse(HttpStatusCode.BadRequest)]
-        //[SwaggerResponse(HttpStatusCode.NotFound)]
-        //[SwaggerResponse(HttpStatusCode.Conflict)]
-        //public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
-        //{
-        //    if (organizationId == null)
-        //        return BadRequest("organizationId must be provided");
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/update")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] UpdateSubDataProcessorRequestDTO request)
+        {
+            if (request == null)
+                return BadRequest("organizationId must be provided");
 
-        //    return _dataProcessingRegistrationApplicationService
-        //        .AssignSubDataProcessor(id, organizationId.Value, Maybe<BasisForTransferParameters>.None)
-        //        .Match(_ => Ok(), FromOperationError);
-        //    //TODO: Test the New parameters
-        //}
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var details = ParseSubDataProcessorDetails(request);
+
+            //Details are required for updates
+            if (details.IsNone)
+                return BadRequest($"Missing section: {nameof(request.Details)}");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateSubDataProcessor(id, request.OrganizationId, details.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/remove")]
@@ -1050,7 +1057,7 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
 
-        private static Maybe<SubDataProcessorDetailsParameters> ParseSubDataProcessorDetails(AssignSubDataProcessorRequestDTO request)
+        private static Maybe<SubDataProcessorDetailsParameters> ParseSubDataProcessorDetails(ISubDataProcessorRequestDTO request)
         {
             return request
                 .Details
