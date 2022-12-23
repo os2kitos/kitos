@@ -10,7 +10,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Model.GDPR;
-using Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write;
+using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;

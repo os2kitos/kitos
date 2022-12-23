@@ -1,6 +1,6 @@
 ﻿using Core.DomainModel.Shared;
 
-namespace Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write
+namespace Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor
 {
     public class TransferToInsecureCountryParameters
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Model.GDPR.SubDataProcessor.Write;
+using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;

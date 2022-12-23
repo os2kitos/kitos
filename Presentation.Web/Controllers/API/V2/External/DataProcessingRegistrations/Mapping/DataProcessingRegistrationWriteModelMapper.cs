@@ -113,14 +113,19 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                     ? (dto.HasSubDataProcessors?.ToYesNoUndecidedOption()).AsChangedValue()
                     : OptionalValueChange<YesNoUndecidedOption?>.None,
 
-                SubDataProcessorUuids = rule.MustUpdate(x => x.General.SubDataProcessorUuids)
-                    ? dto.SubDataProcessorUuids.FromNullable().AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
+                SubDataProcessors = rule.MustUpdate(x => x.General.SubDataProcessorUuids)
+                    ? dto.SubDataProcessorUuids.FromNullable().Select<IEnumerable<SubDataProcessorParameter>>(uuids => uuids.Select(ToSubDataProcessorParameter).ToList()).AsChangedValue()
+                    : OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>>.None,
 
                 MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
                     ? dto.MainContractUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None
             };
+        }
+
+        private static SubDataProcessorParameter ToSubDataProcessorParameter(Guid uuid)
+        {
+            return new SubDataProcessorParameter { OrganizationUuid = uuid };
         }
 
         private UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
