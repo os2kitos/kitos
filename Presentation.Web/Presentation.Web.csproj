@@ -442,6 +442,7 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserAdministrationPermissionsDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />

@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
@@ -90,9 +91,20 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 InsecureCountriesSubjectToDataTransfer = dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
                 DataProcessors = dataProcessingRegistration.DataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList(),
                 HasSubDataProcessors = MapYesNoUndecided(dataProcessingRegistration.HasSubDataProcessors),
-                SubDataProcessors = dataProcessingRegistration.AssignedSubDataProcessors?.Select(x=>x.Organization).Select(x => x.MapShallowOrganizationResponseDTO()).ToList(),
+                SubDataProcessors = dataProcessingRegistration.AssignedSubDataProcessors?.Select(ToSubDataProcessorDTO).ToList(),
                 MainContract = dataProcessingRegistration.MainContract?.MapIdentityNamePairDTO(),
                 Valid = dataProcessingRegistration.IsActiveAccordingToMainContract
+            };
+        }
+
+        private static DataProcessorRegistrationSubDataProcessorResponseDTO ToSubDataProcessorDTO(SubDataProcessor organization)
+        {
+            return new DataProcessorRegistrationSubDataProcessorResponseDTO()
+            {
+                DataProcessorOrganization = organization.Organization.MapShallowOrganizationResponseDTO(),
+                BasisForTransfer = organization.SubDataProcessorBasisForTransfer?.MapIdentityNamePairDTO(),
+                TransferToInsecureThirdCountry = organization.TransferToInsecureCountry?.ToYesNoUndecidedChoice(),
+                InsecureThirdCountrySubjectToDataProcessing = organization.InsecureCountry?.MapIdentityNamePairDTO()
             };
         }
 
