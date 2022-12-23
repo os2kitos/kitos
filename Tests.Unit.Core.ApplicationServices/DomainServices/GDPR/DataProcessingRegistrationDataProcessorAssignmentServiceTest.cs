@@ -187,8 +187,10 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             Assert.True(dataProcessingRegistration.GetSubDataProcessor(validCandidate).HasValue);
         }
 
+        //TODO: Extend with an update test
+
         [Fact]
-        public void Cannot_AssignSubDataProcessor_If_Not_Ussing_Sub_Data_Processors()
+        public void Cannot_AssignSubDataProcessor_If_Not_Using_Sub_Data_Processors()
         {
             //Arrange
             var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });

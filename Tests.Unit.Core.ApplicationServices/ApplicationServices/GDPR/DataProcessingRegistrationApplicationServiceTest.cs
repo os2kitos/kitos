@@ -821,8 +821,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(organizationWithWrongCvr == null);
         }
 
-        [Fact]
-        public void Can_AssignSubDataProcessor()
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(true, true)]
+        public void Can_AssignSubDataProcessor(bool withBasisForOption, bool withInsecureCountry)
         {
             //Arrange
             var id = A<int>();
@@ -835,13 +839,28 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 .Returns(Result<SubDataProcessor, OperationError>.Success(sdp));
 
             var transaction = ExpectTransaction();
+            var details = Maybe<SubDataProcessorDetailsParameters>.None;
+            var expectUpdate = withBasisForOption || withInsecureCountry;
+            if (expectUpdate)
+            {
+                details = new SubDataProcessorDetailsParameters(withBasisForOption ? A<int>() : null,
+                    withInsecureCountry
+                        ? new TransferToInsecureCountryParameters(A<YesNoUndecidedOption>(), A<int>())
+                        : new TransferToInsecureCountryParameters(null, null));
+            }
+            if (expectUpdate)
+            {
+                _dpAssignmentService.Setup(x => x.UpdateSubDataProcessor(registration, organizationId, details.Value.BasisForTransferOptionId, details.Value.InsecureCountryParameters.Transfer, details.Value.InsecureCountryParameters.InsecureCountryOptionId))
+                    .Returns(Result<SubDataProcessor, OperationError>.Success(sdp));
+            }
 
             //Act
-            var result = _sut.AssignSubDataProcessor(id, organizationId, Maybe<SubDataProcessorDetailsParameters>.None);
+            var result = _sut.AssignSubDataProcessor(id, organizationId, details);
 
             //Assert
             Assert.True(result.Ok);
             Assert.Same(sdp, result.Value);
+
             transaction.Verify(x => x.Commit());
         }
 
@@ -855,6 +874,52 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Cannot_AssignSubDataProcessor_If_Write_Access_Is_Denied()
         {
             Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>(), Maybe<SubDataProcessorDetailsParameters>.None));
+        }
+
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(true, true)]
+        public void Can_UpdateSubDataProcessor(bool withBasisForOption, bool withInsecureCountry)
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var organizationId = A<int>();
+            var sdp = new SubDataProcessor();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+            var details = new SubDataProcessorDetailsParameters(withBasisForOption ? A<int>() : null,
+                withInsecureCountry
+                    ? new TransferToInsecureCountryParameters(A<YesNoUndecidedOption>(), A<int>())
+                    : new TransferToInsecureCountryParameters(null, null));
+
+            _dpAssignmentService.Setup(x => x.UpdateSubDataProcessor(registration, organizationId, details.BasisForTransferOptionId, details.InsecureCountryParameters.Transfer, details.InsecureCountryParameters.InsecureCountryOptionId))
+                .Returns(Result<SubDataProcessor, OperationError>.Success(sdp));
+
+            //Act
+            var result = _sut.UpdateSubDataProcessor(id, organizationId, details);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(sdp, result.Value);
+
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_UpdateSubDataProcessorIf_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateSubDataProcessor(id, A<int>(), A<SubDataProcessorDetailsParameters>()));
+        }
+
+        [Fact]
+        public void Cannot_UpdateSubDataProcessor_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateSubDataProcessor(id, A<int>(), A<SubDataProcessorDetailsParameters>()));
         }
 
         [Fact]
