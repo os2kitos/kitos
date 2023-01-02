@@ -537,7 +537,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Contains(processors, x => x.Id == organization.Id);
         }
 
-        //TODO: also test with the details!!
         [Fact]
         public async Task Can_Assign_SubDataProcessors()
         {
