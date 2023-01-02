@@ -6,6 +6,7 @@
             bindings: {
                 pageName: "@",
                 hasWriteAccess: "=",
+                isVisible: "=",
                 viewModel: "<",
             },
             controller: MainContractSectionController,
@@ -16,24 +17,31 @@
 
     export interface IMainContractSectionViewModel {
         isActive: boolean;
+        selectedContractId: number;
         options: Models.ViewModel.Generic.Select2OptionViewModel<null>[];
         postMethod: (contractId: number) => ng.IPromise<void>;
-        deleteMethod: (contractId: number) => ng.IPromise<void>;
+        deleteMethod: () => ng.IPromise<void>;
         stateReloadMethod: () => ng.IPromise<void>;
-        selectedContract: {id: number, text: string};
     }
     
     interface IMainContractSectionController extends ng.IComponentController {
         pageName: string;
         hasWriteAccess: boolean;
+        isVisible: boolean;
         viewModel: IMainContractSectionViewModel;
     }
 
     class MainContractSectionController implements IMainContractSectionController {
         pageName: string | null = null;
         hasWriteAccess: boolean | null = null;
+        isVisible: boolean | null = null;
         viewModel: IMainContractSectionViewModel | null = null;
-        currentContract: {id: number, text: string};
+        contractModel: {id: number, text: string};
+        currentContractId: number = null;
+        select2Model: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityDTO>;
+
+        static $inject: string[] = ["select2LoadingService", "organizationApiService", "notify"];
+        constructor(private readonly select2LoadingService: Services.ISelect2LoadingService) {}
 
         $onInit() {
             if (this.pageName === null) {
@@ -44,30 +52,49 @@
                 console.error("Missing hasWriteAccess parameter for MainContractSectionController");
                 return;
             }
+            if (this.isVisible === null) {
+                console.error("Missing isVisible parameter for MainContractSectionController");
+                return;
+            }
             if (this.viewModel === null) {
                 console.error("Missing viewModel parameter for MainContractSectionController");
                 return;
             }
 
-            this.currentContract = this.viewModel.selectedContract;
+            //TODO: is it possible to use "find"? Right now compiler shows an error
+            const selectedContract = this.viewModel.options.filter(x => x.id === this.viewModel.selectedContractId);
+            if (selectedContract.length === 1) {
+                this.contractModel = selectedContract[0];
+                this.updateCurrentContractId(this.viewModel.selectedContractId);
+            }
+
+            this.select2Model = {
+                selectedElement: this.contractModel,
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => this.viewModel.options, true),
+                elementSelected: (contract) => this.saveContract(contract?.id)
+            };
         }
 
-        saveContract(selectedContract: number) {
-            if (this.currentContract.id === selectedContract){
+        saveContract(selectedContractId: number = null) {
+            if (this.currentContractId === selectedContractId){
                 return;
             }
 
-            if (selectedContract) {
-                this.viewModel.postMethod(selectedContract)
+            if (selectedContractId) {
+                this.viewModel.postMethod(selectedContractId)
                     .then(() => this.viewModel.stateReloadMethod())
-                    .then(() => this.currentContract.id = selectedContract,
+                    .then(() => this.updateCurrentContractId(selectedContractId),
                         error => console.log(error));
             } else {
-                this.viewModel.deleteMethod(selectedContract)
+                this.viewModel.deleteMethod()
                     .then(() => this.viewModel.stateReloadMethod())
-                    .then(() => this.currentContract.id = selectedContract,
+                    .then(() => this.updateCurrentContractId(selectedContractId),
                         error => console.log(error));
             }
+        }
+
+        private updateCurrentContractId(id: number) {
+            this.currentContractId = id;
         }
     }
     angular.module("app")

@@ -753,13 +753,13 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchMainContract(int id, [FromBody] SingleValueDTO<int> mainContractionId)
+        public HttpResponseMessage PatchMainContract(int id, [FromBody] SingleValueDTO<int> mainContractId)
         {
-            if (mainContractionId == null)
-                return BadRequest(nameof(mainContractionId) + " must be provided");
+            if (mainContractId == null)
+                return BadRequest(nameof(mainContractId) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateMainContract(id, mainContractionId.Value)
+                .UpdateMainContract(id, mainContractId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 

@@ -25,5 +25,19 @@
                     };
             });
         }
+
+        static createActiveRange(): Utility.KendoGrid.IKendoParameter[] {
+            const texts = Helpers.RenderFieldsHelper.getTexts();
+            return [
+                {
+                    textValue: texts.active,
+                    remoteValue: true
+                } as Utility.KendoGrid.IKendoParameter,
+                {
+                    textValue: texts.notActive,
+                    remoteValue: false
+                } as Utility.KendoGrid.IKendoParameter
+            ];
+        }
     }
 }

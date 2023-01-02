@@ -13,33 +13,32 @@
     }]);
 
     app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "apiUseCaseFactory", "contractUiState", "itSystemUsageService",
-        ($scope, $http, itSystemUsage, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory, contractUiState: Kitos.Models.UICustomization.ICustomizedModuleUI, itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
+        ($scope, $http, itSystemUsage,
+            entityMapper: Kitos.Services.LocalOptions.IEntityMapper,
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
+            apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory,
+            contractUiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
+            itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
             var usageId = itSystemUsage.id;
             bindContracts(itSystemUsage);
-            var currentMainContract: number;
             
             function reloadContractState () {
                 return itSystemUsageService.getItSystemUsage(usageId)
                     .then((usage) => bindContracts(usage));
             }
 
-            function saveMainContract (id: number) {
-                if (currentMainContract === id || _.isUndefined(id)) {
-                    return;
-                }
+            function saveMainContract(id: number): ng.IPromise<any> {
 
-                apiUseCaseFactory
-                    .createAssignmentCreation(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`));
+                return apiUseCaseFactory
+                    .createAssignmentCreation(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`))
+                    .executeAsync();
             };
 
-            function deleteMainContract (id: number) {
+            function deleteMainContract (): ng.IPromise<any> {
 
-                if (currentMainContract === id || _.isUndefined(id)) {
-                    return;
-                }
-
-                apiUseCaseFactory
-                    .createAssignmentRemoval(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`));
+                return apiUseCaseFactory
+                    .createAssignmentRemoval(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`))
+                    .executeAsync();
             }
 
             function bindContracts(usage: any) {
@@ -58,7 +57,7 @@
                 $scope.contractsToSelect = entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts);
 
                 $scope.mainContractId = usage.mainContractId;
-                currentMainContract = usage.mainContractId;
+                 
                 let match;
                 if (usage.mainContractId !== null) {
                     match = usage.contracts && usage.contracts.find(x => { return x.id === usage.mainContractId });
@@ -67,14 +66,13 @@
                 $scope.mainContractIsActive = match?.isActive;
 
                 $scope.mainContractViewModel = {
-                    hasWriteAccess: $scope.hasWriteAccess,
                     options: entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts),
-                    selectedContract: match ? {id: match.id, text: match.name} : null,
+                    selectedContractId: match ? match.id : null,
                     isActive: itSystemUsage.mainContractIsActive,
                     postMethod: (id: number) => saveMainContract(id),
-                    deleteMethod: (id: number) => deleteMainContract(id),
+                    deleteMethod: () => deleteMainContract(),
                     stateReloadMethod: () => reloadContractState(),
-                }
+                } as Kitos.Shared.Components.IMainContractSectionViewModel;
             }
 
             //UI Customization

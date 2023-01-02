@@ -70,20 +70,6 @@
                 return orderBy;
             };
 
-            const texts = Kitos.Helpers.RenderFieldsHelper.getTexts();
-            const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] => {
-                return [
-                    {
-                        textValue: texts.active,
-                        remoteValue: true
-                    },
-                    {
-                        textValue: texts.notActive,
-                        remoteValue: false
-                    }];
-            }
-
-
             var self = this;
             var showInactiveSystems = ItSystem.Settings.OverviewState.getShowInactiveSystems($window, user.id, pageName);
 
@@ -294,7 +280,7 @@
                     .withTitle("Status (Datofelter)")
                     .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(createActiveRange(), false)
+                    .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(), false)
                     .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToValidityPeriod))
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.usagePeriod)))
@@ -305,7 +291,7 @@
                         .withTitle("Status (Livscyklus)")
                         .withId("isActiveAccordingToLifeCycle")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(createActiveRange(), false)
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(), false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToLifeCycle))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.lifeCycleStatus)))
@@ -317,7 +303,7 @@
                         .withStandardWidth(190)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(createActiveRange(), false)
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(), false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.MainContractIsActive))
                         .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))

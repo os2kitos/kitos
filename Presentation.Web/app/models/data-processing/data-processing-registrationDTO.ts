@@ -26,6 +26,8 @@
         associatedContracts: Models.Generic.NamedEntity.NamedEntityDTO[];
         oversightDates: IDataProcessingRegistrationOversightDateDTO[];
         oversightScheduledInspectionDate: string;
+        mainContractId: number;
+        isActiveAccordingToMainContract: boolean;
     }
 
     export interface IDataProcessingRegistrationOversightDateDTO {
