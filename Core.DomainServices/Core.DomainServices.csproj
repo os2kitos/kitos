@@ -74,6 +74,7 @@
     <Compile Include="GDPR\DataProcessingRegistrationOversightDateAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOversightOptionsAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelUpdate.cs" />
+    <Compile Include="GDPR\ResetDprMainContractWhenDprRemovedFromContractEventHandler.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationBasisForTransferAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationDataProcessorAssignmentService.cs" />

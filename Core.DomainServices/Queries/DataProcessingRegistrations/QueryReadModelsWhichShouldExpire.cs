@@ -19,6 +19,8 @@ namespace Core.DomainServices.Queries.DataProcessingRegistrations
             return source.Where(
                 x =>
                 (
+                    //All currently set as active in the read model
+                    x.ActiveAccordingToMainContract &&
                     x.SourceEntity.MainContract != null &&
                     // Remove results where the date has no effect (active overrides all other logic)
                     x.SourceEntity.MainContract.Active == false &&

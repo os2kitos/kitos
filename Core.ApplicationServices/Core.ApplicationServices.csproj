@@ -119,7 +119,6 @@
     <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOptionsApplicationService.cs" />
-    <Compile Include="GDPR\Handlers\RemoveMainContractFromDataProcessingRegistraitonCommandHandler.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationOptionsApplicationService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />

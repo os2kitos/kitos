@@ -1021,7 +1021,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
             var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
-            Assert.NotNull(contract);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, contract.Id);
             if (hasMainContract)
             {
@@ -1051,8 +1050,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
-            Assert.NotNull(contract);
+            var contract = createdRegistration.AssociatedContracts.First();
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, contract.Id);
             var expectedError = A<OperationError>();
             ExpectUpdateMainContractReturns(createdRegistration.Id, contract.Id, expectedError);
@@ -1088,18 +1086,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(expectedError, result.Error);
         }
 
-        private void ExpectUpdateMainContractReturns(int dprId, int contractId,
-            Result<DataProcessingRegistration, OperationError> result)
-        {
-            _dprServiceMock.Setup(x => x.UpdateMainContract(dprId, contractId)).Returns(result);
-        }
-
-        private void ExpectRemoveMainContractReturns(int dprId,
-            Result<DataProcessingRegistration, OperationError> result)
-        {
-            _dprServiceMock.Setup(x => x.RemoveMainContract(dprId)).Returns(result);
-        }
-
         [Fact]
         public void Cannot_Create_With_GeneralData_MainContract_If_MainContract_Id_Cannot_Be_Resolved()
         {
@@ -1109,10 +1095,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             {
                 MainContractUuid = inputUuids.AsChangedValue()
             };
-            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            var contract = createdRegistration.AssociatedContracts.FirstOrDefault();
-            Assert.NotNull(contract);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(generalData.MainContractUuid.NewValue, Maybe<int>.None);
 
             //Act
@@ -2176,9 +2160,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
-            var trasactionMock = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin()).Returns(trasactionMock.Object);
-            return trasactionMock;
+            var transactionMock = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transactionMock.Object);
+            return transactionMock;
         }
 
         private void ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<T>(Guid? uuid, Maybe<int> dbId) where T : class, IHasUuid, IHasId
@@ -2200,6 +2184,18 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                     It.IsAny<Func<DataProcessingRegistration, TAssignmentInput, Maybe<OperationError>>>(),
                     It.IsAny<Func<DataProcessingRegistration, TAssignmentState, Maybe<OperationError>>>()))
                 .Returns(result);
+        }
+
+        private void ExpectUpdateMainContractReturns(int dprId, int contractId,
+            Result<DataProcessingRegistration, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.UpdateMainContract(dprId, contractId)).Returns(result);
+        }
+
+        private void ExpectRemoveMainContractReturns(int dprId,
+            Result<DataProcessingRegistration, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.RemoveMainContract(dprId)).Returns(result);
         }
     }
 }

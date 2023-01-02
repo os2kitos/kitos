@@ -141,7 +141,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var assignDataProcessingResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contractDto.Id, registration.Id);
             Assert.Equal(HttpStatusCode.OK, assignDataProcessingResponse.StatusCode);
 
-            await DataProcessingRegistrationHelper.SendUpdateMainContractRequestAsync(registration.Id, contractDto.Id);
+            await DataProcessingRegistrationHelper.SendUpdateMainContractRequestAsync(registration.Id, contractDto.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
