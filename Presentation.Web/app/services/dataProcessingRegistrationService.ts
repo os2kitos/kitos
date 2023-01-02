@@ -71,7 +71,7 @@
         //Use for contracts that take an input defined as SingleValueDTO
         private simplePatch(url: string, value: any): angular.IPromise<IDataProcessingRegistrationPatchResult> {
 
-            const payload = this.createPayload(value);
+            const payload = this.createSingleValueDTOPayload(value);
 
             return this
                 .$http
@@ -88,7 +88,7 @@
                 );
         }
 
-        private createPayload(value: any) {
+        private createSingleValueDTOPayload(value: any) {
             return {
                 Value: value
             };
@@ -326,7 +326,7 @@
         }
 
         updateMainContract(dataProcessingRegistrationId: number, mainContractId: number): angular.IPromise<void> {
-            const payload = this.createPayload(mainContractId);
+            const payload = this.createSingleValueDTOPayload(mainContractId);
             return this.apiWrapper.patch(
                 this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "main-contract/update"), payload);
         }
