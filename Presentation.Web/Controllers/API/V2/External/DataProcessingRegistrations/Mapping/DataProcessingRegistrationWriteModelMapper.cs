@@ -113,8 +113,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                     ? (dto.HasSubDataProcessors?.ToYesNoUndecidedOption()).AsChangedValue()
                     : OptionalValueChange<YesNoUndecidedOption?>.None,
 
-                SubDataProcessors = rule.MustUpdate(x => x.General.SubDataProcessorUuids)
-                    ? dto.SubDataProcessorUuids.FromNullable().Select<IEnumerable<SubDataProcessorParameter>>(uuids => uuids.Select(ToSubDataProcessorParameter).ToList()).AsChangedValue()
+                SubDataProcessors = rule.MustUpdate(x => x.General.SubDataProcessors)
+                    ? dto.SubDataProcessors.FromNullable().Select<IEnumerable<SubDataProcessorParameter>>(sdps => sdps.Select(ToSubDataProcessorParameter).ToList()).AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>>.None,
 
                 MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
@@ -123,9 +123,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        private static SubDataProcessorParameter ToSubDataProcessorParameter(Guid uuid)
+        private static SubDataProcessorParameter ToSubDataProcessorParameter(DataProcessorRegistrationSubDataProcessorWriteRequestDTO sdp)
         {
-            return new SubDataProcessorParameter { OrganizationUuid = uuid };
+            return new SubDataProcessorParameter(
+                sdp.DataProcessorOrganizationUuid,
+                sdp.BasisForTransferUuid,
+                sdp.TransferToInsecureThirdCountry?.ToYesNoUndecidedOption(),
+                sdp.InsecureThirdCountrySubjectToDataProcessingUuid);
         }
 
         private UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto, bool enforceFallbackIfNotProvided)

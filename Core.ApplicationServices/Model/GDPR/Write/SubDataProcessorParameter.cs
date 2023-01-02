@@ -5,9 +5,21 @@ namespace Core.ApplicationServices.Model.GDPR.Write
 {
     public class SubDataProcessorParameter
     {
-        public Guid OrganizationUuid { get; set; }
-        public Guid? BasisForTransferOptionUuid { get; set; }
-        public YesNoUndecidedOption? TransferToInsecureThirdCountry { get; set; }
-        public Guid? InsecureCountrySubjectToDataTransferUuid { get; set; }
+        public Guid OrganizationUuid { get; }
+        public Guid? BasisForTransferOptionUuid { get; }
+        public YesNoUndecidedOption? TransferToInsecureThirdCountry { get; }
+        public Guid? InsecureCountrySubjectToDataTransferUuid { get; }
+
+        public SubDataProcessorParameter(
+            Guid organizationUuid, 
+            Guid? basisForTransferOptionUuid, 
+            YesNoUndecidedOption? transferToInsecureThirdCountry, 
+            Guid? insecureCountrySubjectToDataTransferUuid)
+        {
+            OrganizationUuid = organizationUuid;
+            BasisForTransferOptionUuid = basisForTransferOptionUuid;
+            TransferToInsecureThirdCountry = transferToInsecureThirdCountry;
+            InsecureCountrySubjectToDataTransferUuid = insecureCountrySubjectToDataTransferUuid;
+        }
     }
 }

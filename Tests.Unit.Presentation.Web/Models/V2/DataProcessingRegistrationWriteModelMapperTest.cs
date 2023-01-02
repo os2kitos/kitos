@@ -80,7 +80,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = A<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
-            input.SubDataProcessorUuids = null;
+            input.SubDataProcessors = null;
 
             //Act
             var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { General = input });
@@ -611,7 +611,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.InsecureCountriesSubjectToDataTransferUuids));
             if (noDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataProcessorUuids));
             if (noHasSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.HasSubDataProcessors));
-            if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
+            if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessors));
             if (noMainContract) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.MainContractUuid));
 
             _currentHttpRequestMock

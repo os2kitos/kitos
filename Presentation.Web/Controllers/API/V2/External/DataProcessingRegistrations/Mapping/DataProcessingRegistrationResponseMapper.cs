@@ -2,7 +2,6 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;

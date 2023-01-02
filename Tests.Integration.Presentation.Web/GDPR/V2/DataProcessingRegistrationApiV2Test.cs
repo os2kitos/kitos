@@ -496,7 +496,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
             {
                 HasSubDataProcessors = hasSubDataProcessors,
-                SubDataProcessorUuids = new[] { organization.Uuid }
+                SubDataProcessors = Many<DataProcessorRegistrationSubDataProcessorWriteRequestDTO>()
             };
 
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -585,9 +585,9 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act
             using var response1 = await DataProcessingRegistrationV2Helper
-                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = contract1.Uuid})
+                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = contract1.Uuid })
                 .WithExpectedResponseCode(HttpStatusCode.OK);
-            
+
             //Assert
             var updatedDpr = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, registration.Uuid);
             Assert.Equal(contract1.Uuid, updatedDpr.General.MainContract.Uuid);
@@ -596,11 +596,11 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - set to another contract
             using var response2 = await DataProcessingRegistrationV2Helper
-                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = contract2.Uuid})
+                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = contract2.Uuid })
                 .WithExpectedResponseCode(HttpStatusCode.OK);
 
-            using var patchedContract2= await ItContractV2Helper
-                .SendPatchContractGeneralDataAsync(token, contract2.Uuid, new ContractGeneralDataWriteRequestDTO() { Validity = new ContractValidityWriteRequestDTO(){ ValidTo = DateTime.Now.AddMonths(-A<int>())}})
+            using var patchedContract2 = await ItContractV2Helper
+                .SendPatchContractGeneralDataAsync(token, contract2.Uuid, new ContractGeneralDataWriteRequestDTO() { Validity = new ContractValidityWriteRequestDTO() { ValidTo = DateTime.Now.AddMonths(-A<int>()) } })
                 .WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
@@ -611,7 +611,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - set contract to null
             using var response3 = await DataProcessingRegistrationV2Helper
-                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO {MainContractUuid = null})
+                .SendPatchGeneralDataAsync(token, registration.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO { MainContractUuid = null })
                 .WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
@@ -1267,7 +1267,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(input.HasSubDataProcessors, actual.General.HasSubDataProcessors);
 
             //TODO - update once write model changes as well
-            AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors.Select(x=>x.DataProcessorOrganization));
+            AssertMultiAssignment(input.SubDataProcessors.Select(x=>x.DataProcessorOrganizationUuid), actual.General.SubDataProcessors.Select(x => x.DataProcessorOrganization));
         }
 
         private static void AssertSingleRight(RoleOptionResponseDTO expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
@@ -1396,7 +1396,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                     ? YesNoUndecidedChoice.Yes
                     : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 DataProcessorUuids = dataProcessorUuids,
-                SubDataProcessorUuids = subDataProcessorUuids
+                //SubDataProcessorUuids = subDataProcessorUuids //TODO
             };
             return (dataResponsible, basisForTransfer, inputDTO);
         }
