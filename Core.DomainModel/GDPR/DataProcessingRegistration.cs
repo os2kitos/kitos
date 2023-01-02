@@ -151,11 +151,11 @@ namespace Core.DomainModel.GDPR
             Maybe<DataProcessingCountryOption> insecureCountry)
         {
             if (HasSubDataProcessors != YesNoUndecidedOption.Yes)
-                return new OperationError("To Add new sub data processors, enable sub data processors", OperationFailure.BadInput);
+                return new OperationError("To Manage sub data processors, enable sub data processors", OperationFailure.BadInput);
 
             var result = GetSubDataProcessor(organization);
             if (result.IsNone)
-                return new OperationError("Sub Data processor already assigned", OperationFailure.Conflict);
+                return new OperationError("Sub Data processor not found", OperationFailure.NotFound);
 
             var dataProcessor = result.Value;
             dataProcessor.UpdateBasisForTransfer(basisForTransfer);

@@ -28,7 +28,7 @@ namespace Core.DomainModel.GDPR
         {
             if (insecureCountry.HasValue && transferToInsecureThirdCountry != YesNoUndecidedOption.Yes)
             {
-                return new OperationError($"{nameof(insecureCountry)} be provided if {nameof(transferToInsecureThirdCountry)} does not equal {nameof(YesNoUndecidedOption.Yes)}", OperationFailure.BadInput);
+                return new OperationError($"{nameof(insecureCountry)} must be provided if {nameof(transferToInsecureThirdCountry)} does not equal {nameof(YesNoUndecidedOption.Yes)}", OperationFailure.BadInput);
             }
 
             TransferToInsecureCountry = transferToInsecureThirdCountry;
