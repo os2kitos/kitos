@@ -1265,9 +1265,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, actual.General.InsecureCountriesSubjectToDataTransfer);
             AssertMultiAssignment(input.DataProcessorUuids, actual.General.DataProcessors);
             Assert.Equal(input.HasSubDataProcessors, actual.General.HasSubDataProcessors);
-
-            //TODO - update once write model changes as well
-            AssertMultiAssignment(input.SubDataProcessors.Select(x=>x.DataProcessorOrganizationUuid), actual.General.SubDataProcessors.Select(x => x.DataProcessorOrganization));
+            AssertSubDataProcessorAssignment(input.SubDataProcessors, actual.General.SubDataProcessors);
         }
 
         private static void AssertSingleRight(RoleOptionResponseDTO expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
@@ -1306,12 +1304,30 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(expected?.Name, actual?.Name);
         }
 
-        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        private static void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
         {
             var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
             var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
             Assert.Equal(expectedUuids.Count, actualUuids.Count);
             Assert.Equal(expectedUuids, actualUuids);
+        }
+
+        private void AssertSubDataProcessorAssignment(
+            IEnumerable<DataProcessorRegistrationSubDataProcessorWriteRequestDTO> expected, 
+            IEnumerable<DataProcessorRegistrationSubDataProcessorResponseDTO> actual)
+        {
+            var expectedSdps = expected.ToDictionary(x=>x.DataProcessorOrganizationUuid);
+            var actualSdps = actual.ToDictionary(x=>x.DataProcessorOrganization.Uuid);
+
+            Assert.Equal(expectedSdps.Count,actualSdps.Count);
+            foreach (var expectedSdp in expectedSdps.Values)
+            {
+                Assert.Contains(expectedSdp.DataProcessorOrganizationUuid, actualSdps.Keys);
+                var actualSdp = actualSdps[expectedSdp.DataProcessorOrganizationUuid];
+                Assert.Equal(expectedSdp.BasisForTransferUuid,actualSdp.BasisForTransfer?.Uuid);
+                Assert.Equal(expectedSdp.InsecureThirdCountrySubjectToDataProcessingUuid,actualSdp.InsecureThirdCountrySubjectToDataProcessing?.Uuid);
+                Assert.Equal(expectedSdp.TransferToInsecureThirdCountry,actualSdp.TransferToInsecureThirdCountry);
+            }
         }
 
         #endregion
@@ -1360,6 +1376,10 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
            bool withInsecureCountries,
            OrganizationDTO organization)
         {
+            var sdpBasisForTransfer = (await OptionV2ApiHelper.GetOptionsAsync(
+                    OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)
+                )
+                .RandomItem();
             var dataProcessor1 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
             var dataProcessor2 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
             var subDataProcessor1 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
@@ -1396,7 +1416,12 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                     ? YesNoUndecidedChoice.Yes
                     : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 DataProcessorUuids = dataProcessorUuids,
-                //SubDataProcessorUuids = subDataProcessorUuids //TODO
+                SubDataProcessors = subDataProcessorUuids?.Select(organizationUuid=>new DataProcessorRegistrationSubDataProcessorWriteRequestDTO()
+                {
+                    DataProcessorOrganizationUuid = organizationUuid,
+                    TransferToInsecureThirdCountry = EnumRange.All<YesNoUndecidedChoice>().RandomItem(),
+                    BasisForTransferUuid = sdpBasisForTransfer.Uuid
+                })
             };
             return (dataResponsible, basisForTransfer, inputDTO);
         }
