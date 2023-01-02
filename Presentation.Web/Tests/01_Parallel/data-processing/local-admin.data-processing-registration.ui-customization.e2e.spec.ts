@@ -42,7 +42,8 @@ describe("Local admin is able customize the DataProcessingRegistration UI", () =
 
         const helper = createHelper();
         return helper.setupUserAndOrg()
-            .then(() => helper.testFieldCustomization("DataProcessingRegistrations.oversight.scheduledInspectionDate", "data-processing.edit-registration.oversight", "scheduledInspection"));
+            .then(() => helper.testFieldCustomization("DataProcessingRegistrations.oversight.scheduledInspectionDate", "data-processing.edit-registration.oversight", "scheduledInspection"))
+            .then(() => helper.testFieldCustomization("DataProcessingRegistrations.itContracts.mainContract", "data-processing.edit-registration.contracts", "selectMainContractSection"));
     });
 });
 
