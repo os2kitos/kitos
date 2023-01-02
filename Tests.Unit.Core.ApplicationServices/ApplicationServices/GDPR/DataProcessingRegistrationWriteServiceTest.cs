@@ -22,7 +22,6 @@ using Core.DomainModel.References;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Serilog;
 using Tests.Toolkit.Extensions;
@@ -962,51 +961,155 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             AssertFailureWithKnownError(result, operationError, transaction);
         }
 
-        //TODO: Fix it
-        //[Theory]
-        //[InlineData(true)]
-        //[InlineData(false)]
-        //public void Can_Create_With_GeneralData_SubDataProcessor(bool hasSubDataProcessors)
-        //{
-        //    //Arrange
-        //    var inputUuids = hasSubDataProcessors ? Many<Guid>().ToList() : new List<Guid>();
-        //    var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
-        //    {
-        //        SubDataProcessors = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
-        //    };
-        //    var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_SubDataProcessor(bool hasSubDataProcessors)
+        {
+            //Arrange
+            var sdpInputs = hasSubDataProcessors ? Many<SubDataProcessorParameter>().ToList() : new List<SubDataProcessorParameter>();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            sdpInputs.ForEach(sdp =>
+            {
+                //All ids return correct data
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(sdp.OrganizationUuid, A<int>());
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, A<int>());
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), Maybe<OperationError>.None);
 
-        //    ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
 
-        //    //Act
-        //    var result = _sut.Create(organizationUuid, parameters);
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
 
-        //    //Assert
-        //    Assert.True(result.Ok);
-        //    AssertTransactionCommitted(transaction);
-        //}
+        [Fact]
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_UpdateMultiAssignment_Fails()
+        {
+            //Arrange
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
 
-        //[Fact]
-        //public void Cannot_Create_With_GeneralData_SubDataProcessor_If_UpdateMultiAssignment_Fails()
-        //{
-        //    //Arrange
-        //    var inputUuids = Many<Guid>().ToList();
-        //    var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
-        //    {
-        //        SubDataProcessors = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
-        //    };
-        //    var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-        //    var operationError = A<OperationError>(); 
-        //    ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, operationError);
+            var operationError = A<OperationError>();
+            sdpInputs.ForEach(sdp =>
+            {
+                //All ids return correct data
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(sdp.OrganizationUuid, A<int>());
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, A<int>());
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
 
-        //    //Act
-        //    var result = _sut.Create(organizationUuid, parameters);
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
 
-        //    //Assert
-        //    Assert.True(result.Failed);
-        //    AssertFailureWithKnownError(result, operationError, transaction);
-        //}
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_BasisForTransferIdLookup_Fails()
+        {
+            //Arrange
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            sdpInputs.Take(1).ToList().ForEach(sdp =>
+            {
+                //All ids return correct data
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, Maybe<int>.None);
+                operationError = new OperationError($"Provided id for basis for transfer {sdp.BasisForTransferOptionUuid.Value} does not point to a valid entity", OperationFailure.BadInput);
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_InsecureCountry_Fails()
+        {
+            //Arrange
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            sdpInputs.Take(1).ToList().ForEach(sdp =>
+            {
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue)
+                {
+                    ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, Maybe<int>.None);
+                    operationError = new OperationError($"Provided id for country {sdp.InsecureCountrySubjectToDataTransferUuid.Value} does not point to a valid entity", OperationFailure.BadInput);
+                }
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_Organization_Fails()
+        {
+            //Arrange
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            sdpInputs.Take(1).ToList().ForEach(sdp =>
+            {
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, A<int>());
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(sdp.OrganizationUuid, Maybe<int>.None);
+                operationError = new OperationError($"Provided org id {sdp.OrganizationUuid} does not point to a valid entity", OperationFailure.BadInput);
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
 
         [Theory]
         [InlineData(true)]
@@ -2129,14 +2232,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Setup(x => x.GetByUuid(dprUuid)).Returns(result);
         }
 
-        private void AssertFailureWithKnownError(Result<DataProcessingRegistration, OperationError> result, OperationError operationError, Mock<IDatabaseTransaction> transaction)
+        private static void AssertFailureWithKnownError(Result<DataProcessingRegistration, OperationError> result, OperationError operationError, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Equal(operationError, result.Error);
             AssertTransactionNotCommitted(transaction);
         }
 
-        private void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
+        public void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Contains(errorMessageContent, result.Error.Message.GetValueOrEmptyString());
@@ -2179,12 +2282,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 .Setup(x => x.UpdateUniqueMultiAssignment(
                     It.IsAny<string>(),
                     registration,
-                    assignmentUuids,
+                    It.Is<Maybe<IEnumerable<Guid>>>(uuids =>
+                        uuids.HasValue == assignmentUuids.HasValue &&
+                        (uuids.IsNone || uuids.Value.SequenceEqual(assignmentUuids.Value))),
                     It.IsAny<Func<Guid, Result<TAssignmentInput, OperationError>>>(),
                     It.IsAny<Func<DataProcessingRegistration, IEnumerable<TAssignmentState>>>(),
                     It.IsAny<Func<DataProcessingRegistration, TAssignmentInput, Maybe<OperationError>>>(),
                     It.IsAny<Func<DataProcessingRegistration, TAssignmentState, Maybe<OperationError>>>(),
-                    null))
+                    It.IsAny<Func<DataProcessingRegistration, TAssignmentState, Maybe<OperationError>>>()))
                 .Returns(result);
         }
 
