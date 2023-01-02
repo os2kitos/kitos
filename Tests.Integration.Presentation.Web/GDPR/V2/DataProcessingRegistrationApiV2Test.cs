@@ -1316,7 +1316,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             IEnumerable<DataProcessorRegistrationSubDataProcessorWriteRequestDTO> expected, 
             IEnumerable<DataProcessorRegistrationSubDataProcessorResponseDTO> actual)
         {
-            var expectedSdps = expected.ToDictionary(x=>x.DataProcessorOrganizationUuid);
+            var expectedSdps = expected?.ToDictionary(x=>x.DataProcessorOrganizationUuid) ?? new Dictionary<Guid, DataProcessorRegistrationSubDataProcessorWriteRequestDTO>();
             var actualSdps = actual.ToDictionary(x=>x.DataProcessorOrganization.Uuid);
 
             Assert.Equal(expectedSdps.Count,actualSdps.Count);
