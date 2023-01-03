@@ -413,6 +413,7 @@
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-contract-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\helpers\KendoToolbarCustomizationHelper.ts" />
     <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
+    <Compile Include="Controllers\API\V1\DataProcessingRegistrationValidationController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
@@ -434,6 +435,7 @@
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
+    <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserAdministrationPermissionsDTO.cs" />

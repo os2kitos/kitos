@@ -41,6 +41,7 @@
         updateOversightScheduledInspectionDate(dataProcessingRegistrationId: number, date: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateMainContract(dataProcessingRegistrationId: number, contractId: number): angular.IPromise<void>;
         removeMainContract(dataProcessingRegistrationId: number): angular.IPromise<void>;
+        getValidationDetails(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationValidationDTO>;
 
         assignOversightDate(dataProcessingRegistrationId: number, dateTime: string, remark: string): angular.IPromise<IOversightDateResult>;
         updateOversightDate(dataProcessingRegistrationId: number, oversightDateId: number, dateTime: string, remark: string): angular.IPromise<IOversightDateResult>;
@@ -334,6 +335,12 @@
         removeMainContract(dataProcessingRegistrationId: number): angular.IPromise<void> {
             return this.apiWrapper.patch(
                 this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "main-contract/remove"));
+        }
+
+        getValidationDetails(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationValidationDTO> {
+            return this.$http.get<API.Models.IApiWrapper<Models.DataProcessing.IDataProcessingRegistrationValidationDTO>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "validation-details"))
+                .then(response => response.data.response,
+                    error => this.apiWrapper.handleServerError(error));
         }
 
         assignOversightDate(dataProcessingRegistrationId: number, dateTime: string, remark: string) {

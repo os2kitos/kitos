@@ -4,7 +4,7 @@
     function setupComponent(): ng.IComponentOptions {
         return {
             bindings: {
-                pageName: "@",
+                mainText: "@",
                 hasWriteAccess: "=",
                 isVisible: "=",
                 viewModel: "<",
@@ -25,14 +25,14 @@
     }
     
     interface IMainContractSectionController extends ng.IComponentController {
-        pageName: string;
+        mainText: string;
         hasWriteAccess: boolean;
         isVisible: boolean;
         viewModel: IMainContractSectionViewModel;
     }
 
     class MainContractSectionController implements IMainContractSectionController {
-        pageName: string | null = null;
+        mainText: string | null = null;
         hasWriteAccess: boolean | null = null;
         isVisible: boolean | null = null;
         viewModel: IMainContractSectionViewModel | null = null;
@@ -44,8 +44,8 @@
         constructor(private readonly select2LoadingService: Services.ISelect2LoadingService) {}
 
         $onInit() {
-            if (this.pageName === null) {
-                console.error("Missing pageName parameter for MainContractSectionController");
+            if (this.mainText === null) {
+                console.error("Missing mainText parameter for MainContractSectionController");
                 return;
             }
             if (this.hasWriteAccess === null) {

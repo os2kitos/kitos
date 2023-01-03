@@ -3,7 +3,7 @@
         
             <div class="form-group row">
                 <label class="col-xs-4 control-label">
-                    Hvilken kontrakt skal afgøre om {{ctrl.pageName}} er aktivt:
+                    {{ctrl.mainText}}
                 </label>
                 <div class="col-xs-3">
                     <single-select-select2 data-placeholder="Ingen kontrakt"
@@ -12,12 +12,12 @@
                                                            ng-disabled="!ctrl.hasWriteAccess" />
                 </div>
                 <div class="col-xs-4" data-ng-show="ctrl.currentContractId !== null">
-                    Kontrakt har nu status som:
+                    Kontrakten har status som:
                     <strong class="text-success" ng-show="ctrl.viewModel.isActive">
-                        Aktivt
+                        Aktiv
                     </strong>
                     <strong class="text-danger" ng-hide="ctrl.viewModel.isActive">
-                        Inaktivt
+                        Inaktiv
                     </strong>
                 </div>
             </div>

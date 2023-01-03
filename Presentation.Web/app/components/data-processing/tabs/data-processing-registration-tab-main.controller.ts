@@ -34,6 +34,7 @@
             this.bindBasisForTransfer();
             this.bindDataResponsible();
             this.bindDataResponsibleRemark();
+            this.reloadValidationStatus();
         }
 
 
@@ -70,6 +71,14 @@
         dataResponsible: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
 
         dataResponsibleRemark: Models.ViewModel.Generic.IEditTextViewModel;
+
+        validationStatus: Models.DataProcessing.IDataProcessingRegistrationValidationDTO;
+
+        reloadValidationStatus() {
+            this.dataProcessingRegistrationService.getValidationDetails(this.dataProcessingRegistration.id).then((newStatus: Models.DataProcessing.IDataProcessingRegistrationValidationDTO) => {
+                this.validationStatus = newStatus;
+            });
+        }
 
         private bindDataResponsible() {
             const optionMap = this.dataProcessingRegistrationOptions.dataResponsibleOptions.reduce((acc, next, _) => {
@@ -491,7 +500,6 @@
                 this.dataProcessingRegistration.agreementConcluded.optionalDateValue,
                 (newDate) => this.changeAgreementConcludedAt(newDate));
         }
-
     }
 
     angular
