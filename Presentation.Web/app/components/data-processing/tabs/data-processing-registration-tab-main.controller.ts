@@ -10,7 +10,8 @@
             "select2LoadingService",
             "notify",
             "dataProcessingRegistrationOptions",
-            "bindingService"
+            "bindingService",
+            "$uibModal"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -22,7 +23,8 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly notify,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
-            private readonly bindingService: Kitos.Services.Generic.IBindingService) {
+            private readonly bindingService: Kitos.Services.Generic.IBindingService,
+            private readonly $modal) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
@@ -70,6 +72,68 @@
         dataResponsible: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
 
         dataResponsibleRemark: Models.ViewModel.Generic.IEditTextViewModel;
+
+        private modalOpen = false;
+
+        createSubDataProcessor() {
+            if (this.modalOpen === false) {
+                this.modalOpen = true;
+                this.$modal.open({
+                    windowClass: "modal fade in",
+                    templateUrl: "app/components/data-processing/tabs/data-processing-registration-sub-data-processor-modal.view.html",
+                    controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService: Services.ISelect2LoadingService) => {
+                        this.modalOpen = true;
+                        /*$scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], false, "nameContent");
+                        $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name, itSystemUsage.itSystem.disabled);
+                        $scope.RelationModalViewModel.configureAsNewRelationDialog();
+
+                        $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
+                        $scope.InterfaceOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.interface.options);
+                        $scope.FrequencyOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.frequency.options);
+
+                        const exposedSystemChanged = () => {
+                            if ($scope.RelationModalViewModel.toSystem != null) {
+                                systemRelationService
+                                    .getAvailableRelationOptions(usageId, $scope.RelationModalViewModel.toSystem.id)
+                                    .then((relationOptions: Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO) => {
+                                        const updatedView = $scope.RelationModalViewModel;
+                                        updatedView.updateAvailableOptions(relationOptions);
+                                        $scope.RelationModalViewModel = updatedView;
+                                    });
+                            }
+                        };
+
+                        $scope.ExposedSystemSelectedTrigger = exposedSystemChanged;*/
+
+                        $scope.subDprVm = 
+
+                        $scope.save = () => {
+                            const newRelation = new Kitos.Models.Api.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
+                            this.dataProcessingRegistrationService.assignSubDataProcessor().createSystemRelation(newRelation)
+                                .then(
+                                    () => {
+                                        notify.addSuccessMessage("Relation tilføjet");
+                                        modalOpen = false;
+                                        $scope.$close(true);
+                                        reload();
+                                    },
+                                    error => {
+                                        notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relationen.");
+                                    });
+
+                        };
+
+                        $scope.dismiss = () => {
+                            this.modalOpen = false;
+                            $scope.$close(true);
+                        };
+
+                        this.modalOpen = false;
+                    }],
+                    controllerAs: "ctrl",
+                });
+            }
+        }
 
         private bindDataResponsible() {
             const optionMap = this.dataProcessingRegistrationOptions.dataResponsibleOptions.reduce((acc, next, _) => {

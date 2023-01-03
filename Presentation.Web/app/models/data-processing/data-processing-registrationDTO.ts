@@ -61,4 +61,20 @@
         oversightOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         roles: IDataProcessingRoleDTO[],
     }
+    
+    export interface IAssignSubDataProcessorRequestDTO {
+        organizationId: number,
+        details?: ISubDataProcessorDetailsDTO,
+    }
+
+    export interface IUpdateSubDataProcessorRequestDTO {
+        organizationId: number,
+        details: ISubDataProcessorDetailsDTO,
+    }
+
+    export interface ISubDataProcessorDetailsDTO {
+        basisForTransferOptionId: number,
+        transferToInsecureThirdCountries: Models.Api.Shared.YesNoUndecidedOption,
+        insecureCountryOptionId: number,
+    }
 }

@@ -691,6 +691,7 @@
     <Content Include="app\components\data-processing\data-processing-registration-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
