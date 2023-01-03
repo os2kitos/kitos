@@ -991,9 +991,9 @@
     <Compile Include="Migrations\202212191220524_DataProcessingMainContract.designer.cs">
       <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202212221031161_Changed_Dpr_SubDataProcessor_Model.cs" />
-    <Compile Include="Migrations\202212221031161_Changed_Dpr_SubDataProcessor_Model.designer.cs">
-      <DependentUpon>202212221031161_Changed_Dpr_SubDataProcessor_Model.cs</DependentUpon>
+    <Compile Include="Migrations\202301030910462_change_dpr_sub_data_processors.cs" />
+    <Compile Include="Migrations\202301030910462_change_dpr_sub_data_processors.designer.cs">
+      <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1009,6 +1009,10 @@
     <Compile Include="TypeMapping.cs" />
     <Compile Include="UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Migrations\202301030910462_change_dpr_sub_data_processors.resx">
+      <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\SQLScripts\Dpr_Migrate_SubDataProcessors.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -1658,9 +1662,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202212191220524_DataProcessingMainContract.resx">
       <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202212221031161_Changed_Dpr_SubDataProcessor_Model.resx">
-      <DependentUpon>202212221031161_Changed_Dpr_SubDataProcessor_Model.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

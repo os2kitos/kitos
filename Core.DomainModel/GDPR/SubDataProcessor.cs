@@ -3,12 +3,8 @@ using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.GDPR
 {
-    public class SubDataProcessor : Entity, IOwnedByOrganization
+    public class SubDataProcessor : IOwnedByOrganization
     {
-        public SubDataProcessor()
-        {
-        }
-
         public int OrganizationId { get; set; }
         public virtual Organization.Organization Organization { get; set; }
         public int? SubDataProcessorBasisForTransferId { get; set; }

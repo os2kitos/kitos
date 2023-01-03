@@ -1,11 +1,13 @@
 ﻿using Core.DomainModel.GDPR;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class SubDataProcessorMap : EntityMap<SubDataProcessor>
+    public class SubDataProcessorMap : EntityTypeConfiguration<SubDataProcessor>
     {
         public SubDataProcessorMap()
         {
+            HasKey(x => new { x.OrganizationId, x.DataProcessingRegistrationId });
             HasRequired(x => x.DataProcessingRegistration)
                 .WithMany(x => x.AssignedSubDataProcessors)
                 .HasForeignKey(x => x.DataProcessingRegistrationId)
