@@ -229,7 +229,7 @@
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
-                () => this.dataProcessingRegistration.dataProcessors,
+                () => this.dataProcessingRegistration.dataProcessors.sort((a, b) => a.name.localeCompare(b.name, "da-DK")),
                 element => this.removeDataProcessor(element.id),
                 newElement => this.addDataProcessor(newElement),
                 this.hasWriteAccess,
@@ -245,7 +245,7 @@
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.subDataProcessors = config,
-                () => this.dataProcessingRegistration.subDataProcessors,
+                () => this.dataProcessingRegistration.subDataProcessors.sort((a, b) => a.name.localeCompare(b.name,"da-DK")),
                 element => this.removeSubDataProcessor(element.id),
                 newElement => this.addSubDataProcessor(newElement),
                 this.hasWriteAccess,
