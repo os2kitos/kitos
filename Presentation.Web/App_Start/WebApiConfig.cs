@@ -390,10 +390,12 @@ namespace Presentation.Web
 
             //Generic global options
             BindEntitySet<DataProcessingRegistrationRole, DataProcessingRegistrationRolesController>(builder);
-            BindEntitySet<DataProcessingBasisForTransferOption, DataProcessingBasisForTransferOptionsController>(builder);
+            var basisForTransferConfig = BindEntitySet<DataProcessingBasisForTransferOption, DataProcessingBasisForTransferOptionsController>(builder);
+            basisForTransferConfig.EntityType.Ignore(x => x.SubDataProcessors);
             BindEntitySet<DataProcessingOversightOption, DataProcessingOversightOptionsController>(builder);
             BindEntitySet<DataProcessingDataResponsibleOption, DataProcessingDataResponsibleOptionsController>(builder);
-            BindEntitySet<DataProcessingCountryOption, DataProcessingCountryOptionsController>(builder);
+            var countryConfig = BindEntitySet<DataProcessingCountryOption, DataProcessingCountryOptionsController>(builder);
+            countryConfig.EntityType.Ignore(x => x.SubDataProcessors);
 
             //Generic local options
             BindEntitySet<LocalDataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOptionsController>(builder);
