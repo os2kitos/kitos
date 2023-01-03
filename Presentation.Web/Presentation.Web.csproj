@@ -400,6 +400,7 @@
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\data-processing-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\users\user-administration-permissions-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\GDPR\sub-data-processor-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\selected-value-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-connection-change-logs.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-unit-migration.ts" />

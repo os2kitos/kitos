@@ -76,6 +76,7 @@
         private modalOpen = false;
 
         createSubDataProcessor() {
+            const self = this;
             if (this.modalOpen === false) {
                 this.modalOpen = true;
                 this.$modal.open({
@@ -83,35 +84,29 @@
                     templateUrl: "app/components/data-processing/tabs/data-processing-registration-sub-data-processor-modal.view.html",
                     controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService: Services.ISelect2LoadingService) => {
                         this.modalOpen = true;
-                        /*$scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], false, "nameContent");
-                        $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name, itSystemUsage.itSystem.disabled);
-                        $scope.RelationModalViewModel.configureAsNewRelationDialog();
 
-                        $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
-                        $scope.InterfaceOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.interface.options);
-                        $scope.FrequencyOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.frequency.options);
+                        $scope.subDataProcessorsConfig = self.bindSingleSelectSubDataProcessors();
+                        $scope.subDataProcessorTransferToThirdCountriesConfig = self.bindSubDataProcessorTransferToThirdCountriesOptions();
+                        $scope.subDataProcessorBasisForTransferConfig = self.bindSubDataProcessorBasisForTransfer();
+                        $scope.subDataProcessorInsecureThirdCountriesConfig = self.bindSubDataProcessorInsecureThirdCountriesOptions();
+                        /*var vm = new Models.ViewModel.GDPR.SubDataProcessorViewModel(
+                            self.dataProcessingRegistration, *//*this.subDataProcessors,*//*
+                            transferToThirdCountries,
+                            basisForTransfer,
+                            insecureThirdCountries);
+                        $scope.subDprVm = new Models.ViewModel.GDPR.SubDataProcessorViewModel(
+                            self.dataProcessingRegistration, *//*this.subDataProcessors,*//*
+                            transferToThirdCountries,
+                            basisForTransfer,
+                            insecureThirdCountries);
+                        vm.configureAsCreate();
+                        $scope.subDprVm.configureAsCreate();*/
 
-                        const exposedSystemChanged = () => {
-                            if ($scope.RelationModalViewModel.toSystem != null) {
-                                systemRelationService
-                                    .getAvailableRelationOptions(usageId, $scope.RelationModalViewModel.toSystem.id)
-                                    .then((relationOptions: Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO) => {
-                                        const updatedView = $scope.RelationModalViewModel;
-                                        updatedView.updateAvailableOptions(relationOptions);
-                                        $scope.RelationModalViewModel = updatedView;
-                                    });
-                            }
-                        };
-
-                        $scope.ExposedSystemSelectedTrigger = exposedSystemChanged;*/
-
-                        $scope.subDprVm = 
-
-                        $scope.save = () => {
+                        /*$scope.save = () => {
                             const newRelation = new Kitos.Models.Api.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
                             this.dataProcessingRegistrationService.assignSubDataProcessor().createSystemRelation(newRelation)
                                 .then(
-                                    () => {
+                                    () => {1
                                         notify.addSuccessMessage("Relation tilføjet");
                                         modalOpen = false;
                                         $scope.$close(true);
@@ -121,7 +116,7 @@
                                         notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relationen.");
                                     });
 
-                        };
+                        };*/
 
                         $scope.dismiss = () => {
                             this.modalOpen = false;
@@ -135,19 +130,102 @@
             }
         }
 
-        private bindDataResponsible() {
-            const optionMap = this.dataProcessingRegistrationOptions.dataResponsibleOptions.reduce((acc, next, _) => {
-                acc[next.id] = {
-                    text: next.name,
-                    id: next.id,
-                    optionalObjectContext: {
-                        id: next.id,
-                        name: next.name,
-                        description: next.description
+        private bindSubDataProcessorTransferToThirdCountriesOptions(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption> {
+            const thirdCountriesOptions = new Models.ViewModel.Shared.YesNoUndecidedOptions();
+
+            let selectedOption = null;
+            if (subDprId) {
+                const selectedSubDataProcessor = _.find(this.dataProcessingRegistration.subDataProcessors, {id: subDprId}) as Models.DataProcessing.IDataProcessorDTO;
+                selectedOption = thirdCountriesOptions.getById(selectedSubDataProcessor.transferToInsecureThirdCountries);
+            }
+            return {
+                selectedElement: selectedOption,
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => thirdCountriesOptions.options, false),
+                elementSelected: (newElement) => {
+                    if (!!newElement) {
+                        this.changeTransferToInsecureThirdCountries(newElement.optionalObjectContext);
                     }
-                };
-                return acc;
-            }, {});
+                }
+            };
+        }
+
+        private bindSubDataProcessorBasisForTransfer(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
+            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
+
+            let existingChoice = null;
+            if (subDprId) {
+                const selectedSubDataProcessor = _.find(this.dataProcessingRegistration.subDataProcessors, { id: subDprId }) as Models.DataProcessing.IDataProcessorDTO;
+                //If selected state is expired, add it for presentation reasons
+                existingChoice = selectedSubDataProcessor.basisForTransfer;
+                if (existingChoice && !optionMap[existingChoice.id]) {
+                    optionMap[existingChoice.id] = {
+                        text: `${existingChoice.name} (udgået)`,
+                        id: existingChoice.id,
+                        disabled: true,
+                        optionalObjectContext: existingChoice
+                    }
+                }
+            }
+
+            const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
+
+            return {
+                selectedElement: existingChoice && optionMap[existingChoice.id],
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
+                elementSelected: (newElement) => this.updateBasisForTransfer(newElement)
+            };
+        }
+
+        private bindSubDataProcessorInsecureThirdCountriesOptions(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
+            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistration.insecureThirdCountries);
+
+            let selectedOption = null;
+            if (subDprId) {
+                const selectedSubDataProcessor = _.find(this.dataProcessingRegistration.subDataProcessors, { id: subDprId }) as Models.DataProcessing.IDataProcessorDTO;
+                selectedOption = _.find(optionMap, selectedSubDataProcessor.transferToInsecureThirdCountries);
+            }
+
+            const options = this.dataProcessingRegistration.insecureThirdCountries.map(option => optionMap[option.id]);
+
+            return {
+                selectedElement: selectedOption,
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, false),
+                elementSelected: (newElement) => {
+                    if (!!newElement) {
+                        //this.changeTransferToInsecureThirdCountries(newElement.optionalObjectContext);
+                    }
+                }
+            };
+        }
+
+        private bindSingleSelectSubDataProcessors(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
+            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistration.insecureThirdCountries);
+
+            let selectedOption = null;
+            if (subDprId) {
+                selectedOption = _.find(this.dataProcessingRegistration.subDataProcessors, { id: subDprId }) as Models.DataProcessing.IDataProcessorDTO;
+            }
+            
+            const pageSize = 100;
+            
+            return {
+                selectedElement: selectedOption,
+                select2Config: this.select2LoadingService.loadSelect2WithDataSource(
+                    (query) => this
+                    .dataProcessingRegistrationService
+                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
+                    .then(results => this.mapDataProcessingSearchResults(results)),
+                    true),
+                elementSelected: (newElement) => {
+                    if (!!newElement) {
+                        //this.changeTransferToInsecureThirdCountries(newElement.optionalObjectContext);
+                    }
+                }
+            };
+        }
+
+        private bindDataResponsible() {
+            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.dataResponsibleOptions);
 
             //If selected state is expired, add it for presentation reasons
             const existingChoice = this.dataProcessingRegistration.dataResponsible.value;
@@ -182,18 +260,7 @@
         }
 
         private bindBasisForTransfer() {
-            const optionMap = this.dataProcessingRegistrationOptions.basisForTransferOptions.reduce((acc, next, _) => {
-                acc[next.id] = {
-                    text: next.name,
-                    id: next.id,
-                    optionalObjectContext: {
-                        id: next.id,
-                        name: next.name,
-                        expired: false //We only allow selection of non-expired and this object is based on the available objects
-                    }
-                };
-                return acc;
-            }, {});
+            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
 
             //If selected state is expired, add it for presentation reasons
             const existingChoice = this.dataProcessingRegistration.basisForTransfer;
@@ -311,7 +378,7 @@
                 config => this.subDataProcessors = config,
                 () => this.dataProcessingRegistration.subDataProcessors.sort((a, b) => a.name.localeCompare(b.name, "da-DK")),
                 element => this.removeSubDataProcessor(element.id),
-                newElement => this.addSubDataProcessor(newElement),
+                newElement => {} /*this.addSubDataProcessor(newElement)*/,
                 this.hasWriteAccess,
                 this.hasWriteAccess,
                 (query) => this
@@ -362,7 +429,7 @@
                 });
         }
 
-        private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
+        /*private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
                 const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
                 this.apiUseCaseFactory
@@ -376,7 +443,7 @@
                         return success;
                     });
             }
-        }
+        }*/
 
         private removeInsecureThirdCountry(id: number) {
             this.apiUseCaseFactory
@@ -556,6 +623,21 @@
                 (newDate) => this.changeAgreementConcludedAt(newDate));
         }
 
+        private mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(dtos: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[]): Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[] {
+            return dtos.reduce((acc, next, _) => {
+                acc[next.id] = {
+                    id: next.id,
+                    text: next.name,
+                    optionalObjectContext: {
+                        id: next.id,
+                        name: next.name,
+                        expired: false, //We only allow selection of non-expired and this object is based on the available objects
+                        description: next.description
+                    }
+                } ;
+                return acc;
+            }, {}) as Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[];
+        }
     }
 
     angular

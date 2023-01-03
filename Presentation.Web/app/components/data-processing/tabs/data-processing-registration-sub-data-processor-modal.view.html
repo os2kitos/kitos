@@ -7,11 +7,35 @@
 
 <form name="createForm">
     <div class="modal-body relation">
+        <div class="row">
+            <div class="col-md-3">
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-danger pull-left" data-element-type="relationDeleteButton" ng-if="vm.isEditDialog" ng-click="remove()">Slet</button>
-            <button type="button" class="btn btn-warning" ng-click="dismiss()">Annuller</button>
-            <!--<button type="button" class="btn btn-primary" ng-click="save()" data-element-type="relationSaveButton" ng-disabled="!RelationModalViewModel.toSystem">Gem</button>-->
+            </div>
+            <!--Exposing System-->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="sub-data-processor_select-new">Underdatabehandler *</label>
+                    <single-select-select2 data-placeholder="Vælg Underdatabehandler"
+                                           id="sub-data-processor_select-new"
+                                           ng-model="subDprVm.subDataProcessorsConfig" />
+                </div>
+                <div class="form-group">
+                    <label for="basisForTransferConfig">Overførselsgrundlag</label>
+                    <single-select-select2 id="basisForTransferConfig" ng-model="subDataProcessorBasisForTransferConfig" />
+                </div>
+                <div class="form-group">
+                    <label for="transferToInsecureThirdCountries">Overførsel til usikkert 3. land</label>
+                    <single-select-select2 id="transferToInsecureThirdCountries" ng-model="subDataProcessorTransferToThirdCountriesConfig" />
+                </div>
+                <div class="form-group">
+                    <label for="insecureThirdCountryConfig">Land der overføres til</label>
+                    <single-select-select2 id="insecureThirdCountryConfig" ng-model="subDataProcessorInsecureThirdCountriesConfig" />
+                </div>
+            </div>
+            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" ng-click="dismiss()">Annuller</button>
+                    <!--<button type="button" class="btn btn-primary" ng-click="save()" data-element-type="relationSaveButton" ng-disabled="!RelationModalViewModel.toSystem">Gem</button>-->
         </div>
     </div>
 </form>

@@ -46,6 +46,9 @@
 
     export interface IDataProcessorDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         cvrNumber: string,
+        basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO;
+        transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption
+        insecureCountry: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO;
     }
 
     export interface IDataProcessingRoleDTO extends Models.Generic.Roles.BusinessRoleDTO{ }
