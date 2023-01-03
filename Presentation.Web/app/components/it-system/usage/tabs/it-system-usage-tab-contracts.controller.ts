@@ -27,17 +27,17 @@
                     .then((usage) => bindContracts(usage));
             }
 
-            function saveMainContract(id: number): ng.IPromise<any> {
+            function saveMainContract(id: number): ng.IPromise<void> {
 
                 return apiUseCaseFactory
-                    .createAssignmentCreation(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`))
+                    .createAssignmentCreation<void>(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`))
                     .executeAsync();
             };
 
-            function deleteMainContract (): ng.IPromise<any> {
+            function deleteMainContract (): ng.IPromise<void> {
 
                 return apiUseCaseFactory
-                    .createAssignmentRemoval(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`))
+                    .createAssignmentRemoval<void>(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`))
                     .executeAsync();
             }
 
