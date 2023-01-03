@@ -167,7 +167,7 @@
 
             this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
                 config => this.insecureThirdCountries = config,
-                () => this.dataProcessingRegistration.insecureThirdCountries,
+                () => this.dataProcessingRegistration.insecureThirdCountries.sort((a, b) => a.name.localeCompare(b.name, "da-DK")),
                 element => this.removeInsecureThirdCountry(element.id),
                 newElement => this.addInsecureThirdCountry(newElement),
                 this.hasWriteAccess,
@@ -245,7 +245,7 @@
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.subDataProcessors = config,
-                () => this.dataProcessingRegistration.subDataProcessors.sort((a, b) => a.name.localeCompare(b.name,"da-DK")),
+                () => this.dataProcessingRegistration.subDataProcessors.sort((a, b) => a.name.localeCompare(b.name, "da-DK")),
                 element => this.removeSubDataProcessor(element.id),
                 newElement => this.addSubDataProcessor(newElement),
                 this.hasWriteAccess,
