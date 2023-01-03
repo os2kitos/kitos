@@ -1421,7 +1421,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                     DataProcessorOrganizationUuid = organizationUuid,
                     TransferToInsecureThirdCountry = EnumRange.All<YesNoUndecidedChoice>().RandomItem(),
                     BasisForTransferUuid = sdpBasisForTransfer.Uuid
-                })
+                }).ToList()
             };
             return (dataResponsible, basisForTransfer, inputDTO);
         }
