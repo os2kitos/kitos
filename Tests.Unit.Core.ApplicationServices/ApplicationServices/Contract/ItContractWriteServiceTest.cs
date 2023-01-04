@@ -1231,7 +1231,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            AssertFailureWithKnownErrorDetails(result,$"Failed to add external payment:Organization unit with uuid:{invalidOrgUnit.Uuid} is not part of the contract's organization",OperationFailure.BadInput,transaction);
+            AssertFailureWithKnownErrorDetails(result, $"Failed to add external payment:Organization unit with uuid:{invalidOrgUnit.Uuid} is not part of the contract's organization", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1267,8 +1267,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Configure(f => f.Register<bool>(() => false));
 
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(
-                parentUuid: A<Guid>(),  
-                responsible: A<ItContractResponsibleDataModificationParameters>(), 
+                parentUuid: A<Guid>(),
+                responsible: A<ItContractResponsibleDataModificationParameters>(),
                 supplier: A<ItContractSupplierModificationParameters>(),
                 systemUsageUuids: Many<Guid>().ToList(),
                 dataProcessingRegistrationUuids: Many<Guid>().ToList(),
@@ -1312,7 +1312,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Data processing registration setup
             ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, parameters.DataProcessingRegistrationUuids, Maybe<OperationError>.None);
-            
+
             //External references setup
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
             parameters.ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>();
@@ -1320,7 +1320,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Roles setup
             ExpectBatchUpdateRoleAssignmentsReturn(createdContract, parameters.Roles.Value.ToList(), Maybe<OperationError>.None);
-            
+
             //Payment model setup
             var paymentModel = CreatePaymentModel(true);
             parameters.PaymentModel = paymentModel;
@@ -1396,7 +1396,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.Equal(parameters.Supplier.Value.Signed.NewValue, contract.HasSupplierSigned);
             Assert.Equal(parameters.Supplier.Value.SignedAt.NewValue?.Date, contract.SupplierSignedDate);
             Assert.Equal(parameters.Supplier.Value.SignedBy.NewValue, contract.SupplierContractSigner);
-            
+
             AssertPaymentModel(paymentModel, contract, true);
 
             //Agreement period
@@ -1520,7 +1520,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                     It.IsAny<Func<Guid, Result<TAssignmentInput, OperationError>>>(),
                     It.IsAny<Func<ItContract, IEnumerable<TAssignmentState>>>(),
                     It.IsAny<Func<ItContract, TAssignmentInput, Maybe<OperationError>>>(),
-                    It.IsAny<Func<ItContract, TAssignmentState, Maybe<OperationError>>>()))
+                    It.IsAny<Func<ItContract, TAssignmentState, Maybe<OperationError>>>(),
+                    null))
                 .Returns(result);
         }
 
@@ -1606,7 +1607,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var enforceValid = A<bool>();
             var validFrom = withValidFrom ? A<DateTime>().Date : (DateTime?)null;
             var validTo = withValidTo ? (validFrom ?? A<DateTime>()).AddDays(Math.Abs(A<int>() % 100)).Date : (DateTime?)null;
-            var criticalityTypeUuid = withCriticalityType? A<Guid>() : (Guid?)null;
+            var criticalityTypeUuid = withCriticalityType ? A<Guid>() : (Guid?)null;
             var agreementElementUuids = withAgreementElements ? Many<Guid>().ToList() : new List<Guid>();
             var parameters = new ItContractGeneralDataModificationParameters
             {

@@ -22,7 +22,6 @@ using Core.DomainModel.References;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Serilog;
 using Tests.Toolkit.Extensions;
@@ -54,7 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _sut = new DataProcessingRegistrationWriteService(
                 _dprServiceMock.Object,
                 _identityResolverMock.Object,
-                _referenceServiceMock.Object, 
+                _referenceServiceMock.Object,
                 Mock.Of<ILogger>(),
                 _domainEventsMock.Object,
                 _transactionManagerMock.Object,
@@ -968,15 +967,21 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Can_Create_With_GeneralData_SubDataProcessor(bool hasSubDataProcessors)
         {
             //Arrange
-            var inputUuids = hasSubDataProcessors ? Many<Guid>().ToList() : new List<Guid>();
+            var sdpInputs = hasSubDataProcessors ? Many<SubDataProcessorParameter>().ToList() : new List<SubDataProcessorParameter>();
             var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
-                SubDataProcessorUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            sdpInputs.ForEach(sdp =>
+            {
+                //All ids return correct data
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(sdp.OrganizationUuid, A<int>());
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, A<int>());
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), Maybe<OperationError>.None);
 
-            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
-            
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
@@ -989,15 +994,114 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Cannot_Create_With_GeneralData_SubDataProcessor_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
-            var inputUuids = Many<Guid>().ToList();
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
             var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
-                SubDataProcessorUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
             };
+
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            var operationError = A<OperationError>(); 
-            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, operationError);
+            var operationError = A<OperationError>();
+            sdpInputs.ForEach(sdp =>
+            {
+                //All ids return correct data
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(sdp.OrganizationUuid, A<int>());
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, A<int>());
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_BasisForTransferIdLookup_Fails()
+        {
+            //Arrange
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            sdpInputs.Take(1).ToList().ForEach(sdp =>
+            {
+                //All ids return correct data
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, Maybe<int>.None);
+                operationError = new OperationError($"Provided id for basis for transfer {sdp.BasisForTransferOptionUuid.Value} does not point to a valid entity", OperationFailure.BadInput);
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_InsecureCountry_Fails()
+        {
+            //Arrange
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            sdpInputs.Take(1).ToList().ForEach(sdp =>
+            {
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue)
+                {
+                    ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, Maybe<int>.None);
+                    operationError = new OperationError($"Provided id for country {sdp.InsecureCountrySubjectToDataTransferUuid.Value} does not point to a valid entity", OperationFailure.BadInput);
+                }
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_Organization_Fails()
+        {
+            //Arrange
+            var sdpInputs = Many<SubDataProcessorParameter>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessors = sdpInputs.AsEnumerable().FromNullable().AsChangedValue()
+            };
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            sdpInputs.Take(1).ToList().ForEach(sdp =>
+            {
+                if (sdp.BasisForTransferOptionUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingBasisForTransferOption>(sdp.BasisForTransferOptionUuid.Value, A<int>());
+                if (sdp.InsecureCountrySubjectToDataTransferUuid.HasValue) ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(sdp.InsecureCountrySubjectToDataTransferUuid.Value, A<int>());
+                ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(sdp.OrganizationUuid, Maybe<int>.None);
+                operationError = new OperationError($"Provided org id {sdp.OrganizationUuid} does not point to a valid entity", OperationFailure.BadInput);
+            });
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, sdpInputs.Select(x => x.OrganizationUuid).FromNullable(), operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -1073,7 +1177,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 MainContractUuid = OptionalValueChange<Guid?>.With(null),
             };
             var (organizationUuid, parameters, createdRegistration, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
-            
+
             var expectedError = A<OperationError>();
             ExpectRemoveMainContractReturns(createdRegistration.Id, expectedError);
 
@@ -1664,7 +1768,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 dates
                     .ToDictionary(
                         x => x,
-                        x => new DataProcessingRegistrationOversightDate { Id = A<int>(), OversightDate = x.CompletedAt, OversightRemark = x.Remark});
+                        x => new DataProcessingRegistrationOversightDate { Id = A<int>(), OversightDate = x.CompletedAt, OversightRemark = x.Remark });
 
             foreach (var oversightDate in dates)
             {
@@ -1683,7 +1787,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             {
                 _dprServiceMock.Verify(x => x.AssignOversightDate(createdRegistration.Id, oversightDate.CompletedAt, oversightDate.Remark), Times.Once);
             }
-            
+
             _dprServiceMock.Verify(x => x.RemoveOversightDate(createdRegistration.Id, It.IsAny<int>()), Times.Never);
         }
 
@@ -1793,10 +1897,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(result.Ok);
             Assert.Same(createdRegistration, result.Value);
             AssertTransactionCommitted(transaction);
-            
+
             _dprServiceMock.Verify(x => x.RemoveOversightDate(createdRegistration.Id, It.IsAny<int>()), Times.Never);
             _dprServiceMock.Verify(x => x.AssignOversightDate(createdRegistration.Id, It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
-        
+
         }
 
         [Fact]
@@ -1808,7 +1912,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var userId = A<int>();
             var userUuid = A<Guid>();
 
-            var rolePairs = new List<UserRolePair>() {CreateUserRolePair(roleUuid, userUuid)};
+            var rolePairs = new List<UserRolePair>() { CreateUserRolePair(roleUuid, userUuid) };
             var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
             var right = CreateRight(createdRegistration, roleUuid, roleId, userUuid, userId);
@@ -1831,7 +1935,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Can_Create_With_No_Roles()
         {
             //Arrange
-            var roles = new UpdatedDataProcessingRegistrationRoles(){UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue() };
+            var roles = new UpdatedDataProcessingRegistrationRoles() { UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue() };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
 
             //Act
@@ -1857,7 +1961,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
 
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
-            
+
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userUuid, userId);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(roleUuid, Maybe<int>.None);
 
@@ -1963,7 +2067,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRoleAssignmentReturns(createdRegistration, newRight.RoleId, newRight.UserId, newRight);
 
             var rightToRemove = CreateRight(createdRegistration, A<Guid>(), A<int>(), A<Guid>(), A<int>());
-            
+
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(rightToRemove.User.Uuid, rightToRemove.UserId);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(rightToRemove.Role.Uuid, rightToRemove.RoleId);
 
@@ -2004,7 +2108,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Arrange
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
-            
+
             ExpectBatchUpdateExternalReferencesReturns(createdRegistration, externalReferences, Maybe<OperationError>.None);
 
             //Act
@@ -2079,7 +2183,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             {
                 Id = A<int>(),
                 Uuid = A<Guid>(),
-                AssociatedContracts = new List<ItContract> { new(){ Id = A<int>()}}
+                AssociatedContracts = new List<ItContract> { new() { Id = A<int>() } }
             };
             var transaction = ExpectTransaction();
             var orgDbId = A<int>();
@@ -2128,14 +2232,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Setup(x => x.GetByUuid(dprUuid)).Returns(result);
         }
 
-        private void AssertFailureWithKnownError(Result<DataProcessingRegistration, OperationError> result, OperationError operationError, Mock<IDatabaseTransaction> transaction)
+        private static void AssertFailureWithKnownError(Result<DataProcessingRegistration, OperationError> result, OperationError operationError, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Equal(operationError, result.Error);
             AssertTransactionNotCommitted(transaction);
         }
 
-        private void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
+        public void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Contains(errorMessageContent, result.Error.Message.GetValueOrEmptyString());
@@ -2178,10 +2282,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 .Setup(x => x.UpdateUniqueMultiAssignment(
                     It.IsAny<string>(),
                     registration,
-                    assignmentUuids,
+                    It.Is<Maybe<IEnumerable<Guid>>>(uuids =>
+                        uuids.HasValue == assignmentUuids.HasValue &&
+                        (uuids.IsNone || uuids.Value.SequenceEqual(assignmentUuids.Value))),
                     It.IsAny<Func<Guid, Result<TAssignmentInput, OperationError>>>(),
                     It.IsAny<Func<DataProcessingRegistration, IEnumerable<TAssignmentState>>>(),
                     It.IsAny<Func<DataProcessingRegistration, TAssignmentInput, Maybe<OperationError>>>(),
+                    It.IsAny<Func<DataProcessingRegistration, TAssignmentState, Maybe<OperationError>>>(),
                     It.IsAny<Func<DataProcessingRegistration, TAssignmentState, Maybe<OperationError>>>()))
                 .Returns(result);
         }

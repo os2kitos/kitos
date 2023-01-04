@@ -18,18 +18,24 @@ namespace Tests.Unit.Presentation.Web.DomainServices.DPR
             var correctId = A<Guid>();
             var incorrectId = A<Guid>();
             var matched = new DataProcessingRegistration() { 
-                SubDataProcessors = new List<Organization>() { 
-                    new Organization
+                AssignedSubDataProcessors = new List<SubDataProcessor>() { 
+                    new()
                     {
-                        Uuid = correctId
+                        Organization = new Organization
+                        {
+                            Uuid = correctId
+                        }
                     }
                 } 
             };
             var excluded1 = new DataProcessingRegistration() {
-                SubDataProcessors = new List<Organization>() {
-                    new Organization
+                AssignedSubDataProcessors = new List<SubDataProcessor>() {
+                    new()
                     {
-                        Uuid = incorrectId
+                        Organization = new Organization
+                        {
+                            Uuid = incorrectId
+                        }
                     }
                 }
             };

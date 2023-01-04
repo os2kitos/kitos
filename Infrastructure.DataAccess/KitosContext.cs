@@ -160,8 +160,9 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractOverviewRoleAssignmentReadModel> ItContractOverviewRoleAssignmentReadModels { get; set; }
         public DbSet<ItContractOverviewReadModelSystemRelation> ItContractOverviewReadModelSystemRelations { get; set; }
         public DbSet<StsOrganizationConnection> StsOrganizationConnections { get; set; }
-        public DbSet<StsOrganizationChangeLog> StsOrganizationChangeLogs{ get; set; }
-        public DbSet<StsOrganizationConsequenceLog> StsOrganizationConsequenceLogs{ get; set; }
+        public DbSet<StsOrganizationChangeLog> StsOrganizationChangeLogs { get; set; }
+        public DbSet<StsOrganizationConsequenceLog> StsOrganizationConsequenceLogs { get; set; }
+        public DbSet<SubDataProcessor> SubDataProcessors { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -262,6 +263,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new StsOrganizationConnectionMap());
             modelBuilder.Configurations.Add(new StsOrganizationChangeLogMap());
             modelBuilder.Configurations.Add(new StsOrganizationConsequenceLogMap());
+            modelBuilder.Configurations.Add(new SubDataProcessorMap());
         }
     }
 }

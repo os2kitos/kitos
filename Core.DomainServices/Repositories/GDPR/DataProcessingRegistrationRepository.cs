@@ -90,7 +90,7 @@ namespace Core.DomainServices.Repositories.GDPR
                 .AsQueryable()
                 .Where(x =>
                     x.DataProcessors.Any(organization => organization.Id == organizationId) ||
-                    x.SubDataProcessors.Any(organization => organization.Id == organizationId
+                    x.AssignedSubDataProcessors.Any(sdp => sdp.Organization.Id == organizationId
                     )
                 );
         }
@@ -139,6 +139,6 @@ namespace Core.DomainServices.Repositories.GDPR
             }
         }
 
-        
+
     }
 }

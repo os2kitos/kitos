@@ -21,7 +21,7 @@ namespace Tests.Unit.Core.Model
             };
             var dpr = new DataProcessingRegistration()
             {
-                AssociatedContracts = new List<ItContract>{ contract }
+                AssociatedContracts = new List<ItContract> { contract }
             };
 
             //Act
@@ -80,7 +80,7 @@ namespace Tests.Unit.Core.Model
             Assert.Null(dpr.MainContract);
         }
 
-        private DataProcessingRegistration CreateDprWithMainContract(int contractId)
+        private static DataProcessingRegistration CreateDprWithMainContract(int contractId)
         {
             return new DataProcessingRegistration
             {

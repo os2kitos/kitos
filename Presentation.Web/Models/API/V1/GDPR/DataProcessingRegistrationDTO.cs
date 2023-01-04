@@ -26,7 +26,7 @@ namespace Presentation.Web.Models.API.V1.GDPR
 
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
         
-        public ShallowOrganizationDTO[] SubDataProcessors { get; set; }
+        public SubDataProcessorResponseDTO[] SubDataProcessors { get; set; }
 
         public ValueWithOptionalDateAndRemark<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
 
