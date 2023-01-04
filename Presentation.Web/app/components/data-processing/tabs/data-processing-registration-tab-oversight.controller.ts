@@ -382,11 +382,12 @@
         }
 
         private changeScheduledInspectionDate(scheduledInspection: string) {
-            if (Helpers.DateValidationHelper.validateDateInput(scheduledInspection, this.notify, "Kommende planlagt tilsyn", true)) {
+            const scheduledInspectionDateFieldTitle = "Kommende planlagt tilsyn";
+            if (Helpers.DateValidationHelper.validateDateInput(scheduledInspection, this.notify, scheduledInspectionDateFieldTitle, true)) {
                 const formattedDate = Helpers.DateStringFormat.fromDanishToEnglishFormat(scheduledInspection);
 
                 return this.apiUseCaseFactory
-                    .createUpdate("Dato for indgåelse af databehandleraftale", () => this.dataProcessingRegistrationService.updateOversightScheduledInspectionDate(this.dataProcessingRegistration.id, formattedDate))
+                    .createUpdate(scheduledInspectionDateFieldTitle, () => this.dataProcessingRegistrationService.updateOversightScheduledInspectionDate(this.dataProcessingRegistration.id, formattedDate))
                     .executeAsync(success => {
                         this.dataProcessingRegistration.oversightScheduledInspectionDate = scheduledInspection;
                         this.bindScheduledInspectionDate();
