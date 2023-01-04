@@ -74,7 +74,7 @@
             if (this.currentContractId === selectedContractId) {
                 return;
             }
-            return this.apiUseCaseFactory.createUpdate("Valgt kontrakt", () => {
+            return this.apiUseCaseFactory.createUpdate("\"Valgt kontrakt\"", () => {
                 if (selectedContractId) {
                     return this.viewModel.selectContract(selectedContractId)
                         .then(() => this.reInitialize(selectedContractId), error => console.log(error));
