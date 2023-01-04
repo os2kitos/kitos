@@ -19,7 +19,7 @@ namespace Core.ApplicationServices.Model.GDPR.Write
         public OptionalValueChange<Maybe<IEnumerable<Guid>>> InsecureCountriesSubjectToDataTransferUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
         public OptionalValueChange<Maybe<IEnumerable<Guid>>> DataProcessorUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
         public OptionalValueChange<YesNoUndecidedOption?> HasSubDataProcessors { get; set; } = OptionalValueChange<YesNoUndecidedOption?>.None;
-        public OptionalValueChange<Maybe<IEnumerable<Guid>>> SubDataProcessorUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>> SubDataProcessors { get; set; } = OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>>.None;
         public OptionalValueChange<Guid?> MainContractUuid { get; set; } = OptionalValueChange<Guid?>.None;
     }
 }

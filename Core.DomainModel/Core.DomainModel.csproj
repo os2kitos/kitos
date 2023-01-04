@@ -63,6 +63,8 @@
     <Compile Include="Extensions\ExternalOrganizationUnitExtensions.cs" />
     <Compile Include="Extensions\HierarchyExtensions.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
+    <Compile Include="GDPR\ChangeHasSubDataProcessorsResult.cs" />
+    <Compile Include="GDPR\SubDataProcessor.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationError.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationResult.cs" />
     <Compile Include="GDPR\Events\DataProcessingRegistrationRemovedFromItContractEvent.cs" />

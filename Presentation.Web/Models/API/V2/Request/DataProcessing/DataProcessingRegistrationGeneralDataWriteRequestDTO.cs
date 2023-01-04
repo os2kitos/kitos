@@ -62,12 +62,12 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         /// </summary>
         public YesNoUndecidedChoice? HasSubDataProcessors { get; set; }
         /// <summary>
-        /// UUID's of the organization entities selected as sub data processors
+        /// Sub data processors
         /// Constraints:
         ///     - HasSubDataProcesors equals 'yes'
-        ///     - No duplicates
+        ///     - No duplicates allowed
         /// </summary>
-        public IEnumerable<Guid> SubDataProcessorUuids { get; set; }
+        public IEnumerable<DataProcessorRegistrationSubDataProcessorWriteRequestDTO> SubDataProcessors { get; set; }
 
         /// <summary>
         /// Defines the master contract for this Data Processing Registration (many contracts can point to a DPR but only one can be the master contract)

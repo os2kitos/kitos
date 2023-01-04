@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
+using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.References;
@@ -43,7 +43,7 @@ namespace Core.ApplicationServices.GDPR.Write
             ILogger logger,
             IDomainEvents domainEvents,
             ITransactionManager transactionManager,
-            IDatabaseControl databaseControl, 
+            IDatabaseControl databaseControl,
             IAssignmentUpdateService assignmentUpdateService)
         {
             _applicationService = applicationService;
@@ -253,7 +253,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(r => r.WithOptionalUpdate(parameters.InsecureCountriesSubjectToDataTransferUuids, UpdateInsecureCountriesSubjectToDataTransfer))
                 .Bind(r => r.WithOptionalUpdate(parameters.DataProcessorUuids, UpdateDataProcessors))
                 .Bind(r => r.WithOptionalUpdate(parameters.HasSubDataProcessors, (registration, newValue) => _applicationService.SetSubDataProcessorsState(registration.Id, newValue ?? YesNoUndecidedOption.Undecided)))
-                .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessorUuids, UpdateSubDataProcessors))
+                .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessors, UpdateSubDataProcessors))
                 .Bind(r => r.WithOptionalUpdate(parameters.MainContractUuid, UpdateMainContract));
         }
 
@@ -271,18 +271,75 @@ namespace Core.ApplicationServices.GDPR.Write
             ).Match<Result<DataProcessingRegistration, OperationError>>(error => error, () => dpr);
         }
 
-        private Maybe<OperationError> UpdateSubDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)
+        private Maybe<OperationError> UpdateSubDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<SubDataProcessorParameter>> subDataProcessors)
         {
+            var basisForTransferLookups = new Dictionary<Guid, int>();
+            var countryIdLookups = new Dictionary<Guid, int>();
+            var orgIdLookup = new Dictionary<int, Guid>();
+
+            foreach (var subDataProcessorParameter in subDataProcessors.GetValueOrFallback(new List<SubDataProcessorParameter>()))
+            {
+                var basisForTransferOptionUuid = subDataProcessorParameter.BasisForTransferOptionUuid;
+                if (basisForTransferOptionUuid.HasValue)
+                {
+                    var optionUuid = basisForTransferOptionUuid.Value;
+                    if (!basisForTransferLookups.ContainsKey(optionUuid))
+                    {
+                        var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingBasisForTransferOption>(optionUuid);
+                        if (dbId.IsNone)
+                            return new OperationError($"Provided id for basis for transfer {optionUuid} does not point to a valid entity", OperationFailure.BadInput);
+                        basisForTransferLookups.Add(optionUuid, dbId.Value);
+                    }
+                }
+
+                var insecureCountryParam = subDataProcessorParameter.InsecureCountrySubjectToDataTransferUuid;
+                if (insecureCountryParam.HasValue)
+                {
+                    var optionUuid = insecureCountryParam.Value;
+                    if (!countryIdLookups.ContainsKey(optionUuid))
+                    {
+                        var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingCountryOption>(optionUuid);
+                        if (dbId.IsNone)
+                            return new OperationError($"Provided id for country {optionUuid} does not point to a valid entity", OperationFailure.BadInput);
+                        countryIdLookups.Add(optionUuid, dbId.Value);
+                    }
+                }
+
+                var organizationUuid = subDataProcessorParameter.OrganizationUuid;
+                if (!orgIdLookup.ContainsValue(organizationUuid))
+                {
+                    var orgId = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
+                    if (orgId.IsNone)
+                        return new OperationError($"Provided org id {organizationUuid} does not point to a valid entity", OperationFailure.BadInput);
+                    orgIdLookup.Add(orgId.Value, organizationUuid);
+                }
+            }
+
+            var detailsLookup = subDataProcessors
+                .Select(x => x.ToDictionary(sdp => sdp.OrganizationUuid, sdp => ToSubDataProcessorDetailsParameters(sdp, basisForTransferLookups, countryIdLookups)))
+                .GetValueOrFallback(new Dictionary<Guid, SubDataProcessorDetailsParameters>());
+
             return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
                 "sub data processor",
                 dpr,
-                organizationUuids,
+                subDataProcessors.Select<IEnumerable<Guid>>(x => x.Select(sdp => sdp.OrganizationUuid).ToList()),
                 subDataProcessorUuid => _entityIdentityResolver.ResolveDbId<Organization>(subDataProcessorUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {subDataProcessorUuid}", OperationFailure.BadInput)),
-                registration => registration.SubDataProcessors.ToList(),
-                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId).MatchFailure(),
-                (registration, subDataProcessor) => _applicationService.RemoveSubDataProcessor(registration.Id, subDataProcessor.Id).MatchFailure()
+                registration => registration.AssignedSubDataProcessors.Select(x => x.Organization).ToList(),
+                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId, detailsLookup[orgIdLookup[subDataProcessorId]]).MatchFailure(),
+                (registration, subDataProcessor) => _applicationService.RemoveSubDataProcessor(registration.Id, subDataProcessor.Id).MatchFailure(),
+                update: (registration, subDataProcessor) => _applicationService.UpdateSubDataProcessor(registration.Id, subDataProcessor.Id, detailsLookup[subDataProcessor.Uuid]).MatchFailure()
                 );
+        }
+
+        private static SubDataProcessorDetailsParameters ToSubDataProcessorDetailsParameters(SubDataProcessorParameter sdp, IReadOnlyDictionary<Guid, int> basisForTransferLookups, Dictionary<Guid, int> countryIdLookups)
+        {
+            return new SubDataProcessorDetailsParameters(sdp.BasisForTransferOptionUuid?.Transform(id => basisForTransferLookups[id]), ToInsecureCountryParameters(sdp, countryIdLookups));
+        }
+
+        private static TransferToInsecureCountryParameters ToInsecureCountryParameters(SubDataProcessorParameter sdp, IReadOnlyDictionary<Guid, int> countryIdLookups)
+        {
+            return new TransferToInsecureCountryParameters(sdp.TransferToInsecureThirdCountry, sdp.InsecureCountrySubjectToDataTransferUuid?.Transform(id => countryIdLookups[id]));
         }
 
         private Maybe<OperationError> UpdateDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)

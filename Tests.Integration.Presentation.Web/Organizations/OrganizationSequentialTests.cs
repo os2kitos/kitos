@@ -175,7 +175,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var archiveSupplierConflicts = Assert.Single(conflicts.SystemsWhereOrgIsArchiveSupplier);
             AssertNamedEntityWithOrganizationalRelationship(usageInAnotherOrg3.Id, systemInAnotherOrg3.Name, anotherOrg1.Id, anotherOrg1.Name, archiveSupplierConflicts);
 
-
             // ACT - DELETE The organization
             await OrganizationHelper.SendDeleteOrganizationRequestAsync(organization.Uuid, true).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 

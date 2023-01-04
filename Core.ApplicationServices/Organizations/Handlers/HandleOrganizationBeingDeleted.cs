@@ -18,7 +18,6 @@ using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainServices;
 using Core.DomainServices.Context;
 
 namespace Core.ApplicationServices.Organizations.Handlers
@@ -169,7 +168,6 @@ namespace Core.ApplicationServices.Organizations.Handlers
             var subDataProcessorContext = conflicts.DprInOtherOrganizationsWhereOrgIsSubDataProcessor.ToList();
             subDataProcessorContext.ForEach(x =>
                 _dataProcessingRegistrationService.RemoveSubDataProcessor(x.Id, organization.Id).ThrowOnFailure());
-            organization.SubDataProcessorForDataProcessingRegistrations.Clear();
 
             var dataProcessorContext = conflicts.DprInOtherOrganizationsWhereOrgIsDataProcessor.ToList();
             dataProcessorContext.ForEach(x =>

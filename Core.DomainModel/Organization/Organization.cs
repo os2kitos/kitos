@@ -46,7 +46,7 @@ namespace Core.DomainModel.Organization
             IsDefaultOrganization = null;
             ItInterfaces = new List<ItInterface>();
             DataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
-            SubDataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
+            SubDataProcessorRegistrations = new List<SubDataProcessor>();
             BelongingSystems = new List<ItSystem.ItSystem>();
             UIModuleCustomizations = new List<UIModuleCustomization>();
             ArchiveSupplierForItSystems = new List<ItSystemUsage.ItSystemUsage>();
@@ -117,7 +117,7 @@ namespace Core.DomainModel.Organization
 
         public virtual ContactPerson ContactPerson { get; set; }
         public virtual ICollection<DataProcessingRegistration> DataProcessorForDataProcessingRegistrations { get; set; }
-        public virtual ICollection<DataProcessingRegistration> SubDataProcessorForDataProcessingRegistrations { get; set; }
+        public virtual ICollection<SubDataProcessor> SubDataProcessorRegistrations { get; set; }
         public virtual ICollection<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEventsWhereOrganizationIsRightsHolder { get; set; }

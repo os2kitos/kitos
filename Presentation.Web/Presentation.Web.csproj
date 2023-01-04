@@ -434,9 +434,16 @@
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
+    <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
+    <Compile Include="Models\API\V1\GDPR\SubDataProcessorResponseDTO.cs" />
+    <Compile Include="Models\API\V1\GDPR\UpdateSubDataProcessorRequestDTO.cs" />
+    <Compile Include="Models\API\V1\GDPR\AssignSubDataProcessorRequestDTO.cs" />
+    <Compile Include="Models\API\V1\GDPR\SubDataProcessorDetailsDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserAdministrationPermissionsDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessorRegistrationSubDataProcessorWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />

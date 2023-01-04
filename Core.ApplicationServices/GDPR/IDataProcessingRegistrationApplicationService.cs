@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
@@ -37,8 +37,9 @@ namespace Core.ApplicationServices.GDPR
         Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId);
         Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state);
-        Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId);
-        Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId);
+        Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<SubDataProcessorDetailsParameters> details);
+        Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, SubDataProcessorDetailsParameters details);
+        Result<SubDataProcessor, OperationError> RemoveSubDataProcessor(int id, int organizationId);
         Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded);
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedRemark(int id, string remark);
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate);

@@ -51,7 +51,7 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// <summary>
         /// UUID's of the organization entities selected as sub data processors
         /// </summary>
-        public IEnumerable<ShallowOrganizationResponseDTO> SubDataProcessors { get; set; }
+        public IEnumerable<DataProcessorRegistrationSubDataProcessorResponseDTO> SubDataProcessors { get; set; }
 
         /// <summary>
         /// Determines if the entity is considered valid. Validity is determined by

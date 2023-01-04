@@ -9,10 +9,12 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -117,9 +119,26 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentities(dpr.InsecureCountriesSubjectToDataTransfer, general.InsecureCountriesSubjectToDataTransfer);
             AssertOrganizations(dpr.DataProcessors, general.DataProcessors);
             AssertYesNoUndecided(dpr.HasSubDataProcessors, general.HasSubDataProcessors);
-            AssertOrganizations(dpr.SubDataProcessors, general.SubDataProcessors);
+            AssertSubDataProcessors(dpr.AssignedSubDataProcessors, general.SubDataProcessors);
             AssertIdentity(dpr.MainContract, general.MainContract);
             Assert.Equal(dpr.IsActiveAccordingToMainContract, general.Valid);
+        }
+
+        private void AssertSubDataProcessors(IEnumerable<SubDataProcessor> assignedSubDataProcessors, IEnumerable<DataProcessorRegistrationSubDataProcessorResponseDTO> mappedSubDataProcessors)
+        {
+            var expectedSubDataProcessors = assignedSubDataProcessors.ToDictionary(x => x.Organization.Uuid);
+            var actualSubDataProcessors = mappedSubDataProcessors.ToDictionary(x => x.DataProcessorOrganization.Uuid);
+
+            Assert.Equal(expectedSubDataProcessors.Count, actualSubDataProcessors.Count);
+            foreach (var expectedSubDataProcessor in expectedSubDataProcessors)
+            {
+                Assert.True(actualSubDataProcessors.TryGetValue(expectedSubDataProcessor.Key, out _));
+                var actualSubDataProcessor = actualSubDataProcessors[expectedSubDataProcessor.Key];
+                AssertOrganization(expectedSubDataProcessor.Value.Organization, actualSubDataProcessor.DataProcessorOrganization);
+                AssertOptionalIdentity(expectedSubDataProcessor.Value.SubDataProcessorBasisForTransfer, actualSubDataProcessor.BasisForTransfer);
+                AssertYesNoUndecided(expectedSubDataProcessor.Value.TransferToInsecureCountry, actualSubDataProcessor.TransferToInsecureThirdCountry);
+                AssertOptionalIdentity(expectedSubDataProcessor.Value.InsecureCountry, actualSubDataProcessor.InsecureThirdCountrySubjectToDataProcessing);
+            }
         }
 
         [Theory]
@@ -138,7 +157,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
             else
             {
-                AssignSystemUsages(dpr, new ItSystemUsage[0]);
+                AssignSystemUsages(dpr, Array.Empty<ItSystemUsage>());
             }
 
             //Act
@@ -265,6 +284,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return new Organization { Name = A<string>(), Cvr = A<string>(), Uuid = A<Guid>() };
         }
 
+        private SubDataProcessor CreateSubDataProcessor(DataProcessingRegistration dataProcessingRegistration, bool withBasisForTransfer, bool withTransferToInsecureThirdCountry, bool withCountry)
+        {
+            return new SubDataProcessor
+            {
+                Organization = CreateOrganization(),
+                DataProcessingRegistration = dataProcessingRegistration,
+                SubDataProcessorBasisForTransfer = withBasisForTransfer ? new DataProcessingBasisForTransferOption { Uuid = A<Guid>(), Name = A<string>() } : null,
+                TransferToInsecureCountry = withTransferToInsecureThirdCountry ? YesNoUndecidedOption.Yes : EnumRange.AllExcept(YesNoUndecidedOption.Yes).RandomItem(),
+                InsecureCountry = withCountry ? new DataProcessingCountryOption { Name = A<string>(), Uuid = A<Guid>() } : null
+            };
+        }
+
         #endregion
 
         #region Assigns
@@ -305,7 +336,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             };
         }
 
-        private void AssignSystemUsages(DataProcessingRegistration dpr, ItSystemUsage[] usages)
+        private static void AssignSystemUsages(DataProcessingRegistration dpr, ItSystemUsage[] usages)
         {
             dpr.SystemUsages = usages;
         }
@@ -338,8 +369,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 : null;
             dpr.DataProcessors = new List<Organization> { CreateOrganization(), CreateOrganization() };
             dpr.HasSubDataProcessors = A<YesNoUndecidedOption>();
-            dpr.SubDataProcessors = new List<Organization> { CreateOrganization(), CreateOrganization() };
-            dpr.MainContract = new ItContract() { Uuid = A<Guid>(), Name = A<string>()};
+            dpr.AssignedSubDataProcessors = new List<SubDataProcessor>
+            {
+                CreateSubDataProcessor(dpr,false,false,false),
+                CreateSubDataProcessor(dpr,true,false,false),
+                CreateSubDataProcessor(dpr,false,true,false),
+                CreateSubDataProcessor(dpr,false,true,true),
+                CreateSubDataProcessor(dpr,true,true,true),
+                CreateSubDataProcessor(dpr,true,true,false)
+            };
+            dpr.MainContract = new ItContract() { Uuid = A<Guid>(), Name = A<string>() };
         }
 
         private void AssignRoles(DataProcessingRegistration dpr)

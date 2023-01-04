@@ -15,7 +15,7 @@ namespace Core.DomainServices.Queries.DPR
 
         public IQueryable<DataProcessingRegistration> Apply(IQueryable<DataProcessingRegistration> source)
         {
-            return source.Where(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors.Any(subDataProcessor => subDataProcessor.Uuid == _subDataProcessorId));
+            return source.Where(dataProcessingRegistration => dataProcessingRegistration.AssignedSubDataProcessors.Any(subDataProcessor => subDataProcessor.Organization.Uuid == _subDataProcessorId));
         }
     }
 }
