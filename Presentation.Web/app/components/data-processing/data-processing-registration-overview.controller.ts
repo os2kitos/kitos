@@ -159,7 +159,7 @@
                         .withStandardWidth(190)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(), false)
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(false), false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToMainContract))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(blueprint.children.itContracts.children.mainContract)))

@@ -26,15 +26,16 @@
             });
         }
 
-        static createActiveRange(): Utility.KendoGrid.IKendoParameter[] {
+        static createActiveRange(isSystemStatus: boolean): Utility.KendoGrid.IKendoParameter[] {
             const texts = Helpers.RenderFieldsHelper.getTexts();
+            const statusTexts = isSystemStatus ? texts.status.systems : texts.status.other;
             return [
                 {
-                    textValue: texts.active,
+                    textValue: statusTexts.active,
                     remoteValue: true
                 } as Utility.KendoGrid.IKendoParameter,
                 {
-                    textValue: texts.notActive,
+                    textValue: statusTexts.notActive,
                     remoteValue: false
                 } as Utility.KendoGrid.IKendoParameter
             ];

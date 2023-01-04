@@ -71,8 +71,8 @@
         </table>
     </div>
     
-    <main-contract-section data-main-text="Hvilken kontrakt skal afgøre om IT systemet er aktivt:" 
-                           data-has-write-access="hasWriteAccess" 
-                           data-is-visible="showMainContract"
-                           data-view-model="mainContractViewModel"/>
+    <main-contract-selection ng-if="showMainContract" 
+                             data-main-text="Hvilken kontrakt skal afgøre om IT Systemet er aktivt:" 
+                             data-has-write-access="hasWriteAccess"
+                             data-view-model="mainContractViewModel"/>
 </div>

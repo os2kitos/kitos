@@ -1,5 +1,16 @@
 ﻿module Kitos.Helpers {
 
+    export interface ActiveStatusTexts {
+        active: string
+        notActive: string
+    }
+
+    export interface StatusTexts {
+        status: {
+            systems: ActiveStatusTexts,
+            other: ActiveStatusTexts
+        }
+    }
     export class RenderFieldsHelper {
 
         private static readonly noValueFallback = "";
@@ -73,16 +84,28 @@
         }
 
         static renderActiveNotActive(value: boolean) {
-            return value ? RenderFieldsHelper.texts.active : RenderFieldsHelper.texts.notActive;
+            return value ? RenderFieldsHelper.texts.status.other.active : RenderFieldsHelper.texts.status.other.notActive;
         }
 
-        static getTexts(): { active: string, notActive: string } {
+        static renderActiveNotActiveSystem(value: boolean) {
+            return value ? RenderFieldsHelper.texts.status.systems.active : RenderFieldsHelper.texts.status.systems.notActive;
+        }
+
+        static getTexts(): StatusTexts {
             return RenderFieldsHelper.texts;
         }
 
         private static readonly texts = {
-            active: "Aktivt",
-            notActive: "Ikke aktivt"
+            status: {
+                systems: {
+                    active: "Aktivt",
+                    notActive: "Ikke aktivt"
+                },
+                other: {
+                    active: "Aktiv",
+                    notActive: "Ikke aktiv"
+                }
+            }
         }
     }
 }

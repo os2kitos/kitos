@@ -22,8 +22,8 @@
         </table>
     </div>
     
-    <main-contract-section data-main-text="Hvilken kontrakt skal afgøre om Databehandling er aktiv:"
-                           data-has-write-access="vm.hasWriteAccess"
-                           data-is-visible="vm.isMainContractVisible"
-                           data-view-model="vm.mainContractViewModel" />
+    <main-contract-selection ng-if="vm.isMainContractVisible" 
+                             data-main-text="Hvilken kontrakt skal afgøre om databehandlingen er aktiv:"
+                             data-has-write-access="vm.hasWriteAccess"
+                             data-view-model="vm.mainContractViewModel" />
 </div>

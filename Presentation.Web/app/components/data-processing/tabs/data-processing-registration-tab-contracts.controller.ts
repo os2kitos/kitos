@@ -10,7 +10,7 @@
             "hasWriteAccess"
         ];
 
-        mainContractViewModel: Shared.Components.IMainContractSectionViewModel;
+        mainContractViewModel: Shared.Components.IMainContractSelectionViewModel;
         isMainContractVisible: boolean;
 
         headerName = this.dataProcessingRegistration.name;
@@ -23,16 +23,18 @@
             private readonly entityMapper: Services.LocalOptions.IEntityMapper,
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             private readonly uiState: Models.UICustomization.ICustomizedModuleUI,
-            public readonly hasWriteAccess: boolean) {
+            public readonly hasWriteAccess: boolean
+        ) {
         }
 
         $onInit() {
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.DataProcessingUiCustomizationBluePrint;
             this.isMainContractVisible = this.uiState.isBluePrintNodeAvailable(blueprint.children.itContracts.children.mainContract);
-
-            this.bindMainContract();
+            if (this.isMainContractVisible) {
+                this.bindMainContract();
+            }
         }
-        
+
         private bindMainContract() {
 
             const mainContractId = this.dataProcessingRegistration.mainContractId;
@@ -45,9 +47,9 @@
                 options: mappedContracts,
                 selectedContractId: mainContractId,
                 isActive: mainContractIsActive,
-                postMethod: (id: number) => this.saveMainContract(id),
-                deleteMethod: () => this.deleteMainContract(),
-                stateReloadMethod: () => this.reloadContractState()
+                selectContract: (id: number) => this.saveMainContract(id),
+                deselectContract: () => this.deleteMainContract(),
+                reloadSelectedContractState: () => this.reloadContractState()
             }
         }
 
@@ -55,7 +57,7 @@
             return this.dataProcessingRegistrationService.updateMainContract(this.dprId, id);
         }
 
-        private deleteMainContract(): ng.IPromise<void>{
+        private deleteMainContract(): ng.IPromise<void> {
             return this.dataProcessingRegistrationService.removeMainContract(this.dprId);
         }
 

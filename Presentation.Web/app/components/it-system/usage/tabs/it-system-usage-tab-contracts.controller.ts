@@ -12,11 +12,10 @@
         });
     }]);
 
-    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "apiUseCaseFactory", "contractUiState", "itSystemUsageService",
+    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "contractUiState", "itSystemUsageService",
         ($scope, $http, itSystemUsage,
             entityMapper: Kitos.Services.LocalOptions.IEntityMapper,
             uiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
-            apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory,
             contractUiState: Kitos.Models.UICustomization.ICustomizedModuleUI,
             itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
             var usageId = itSystemUsage.id;
@@ -28,17 +27,11 @@
             }
 
             function saveMainContract(id: number): ng.IPromise<void> {
-
-                return apiUseCaseFactory
-                    .createAssignmentCreation<void>(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`))
-                    .executeAsync();
+                return $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`)
             };
 
             function deleteMainContract (): ng.IPromise<void> {
-
-                return apiUseCaseFactory
-                    .createAssignmentRemoval<void>(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`))
-                    .executeAsync();
+                return $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`);
             }
 
             function bindContracts(usage: any) {
@@ -69,10 +62,10 @@
                     options: entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts),
                     selectedContractId: match ? match.id : null,
                     isActive: itSystemUsage.mainContractIsActive,
-                    postMethod: (id: number) => saveMainContract(id),
-                    deleteMethod: () => deleteMainContract(),
-                    stateReloadMethod: () => reloadContractState(),
-                } as Kitos.Shared.Components.IMainContractSectionViewModel;
+                    selectContract: (id: number) => saveMainContract(id),
+                    deselectContract: () => deleteMainContract(),
+                    reloadSelectedContractState: () => reloadContractState(),
+                } as Kitos.Shared.Components.IMainContractSelectionViewModel;
             }
 
             //UI Customization

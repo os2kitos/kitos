@@ -338,9 +338,7 @@
         }
 
         updateMainContract(dataProcessingRegistrationId: number, mainContractId: number): angular.IPromise<void> {
-            const payload = this.createSingleValueDTOPayload(mainContractId);
-            return this.apiWrapper.patch(
-                this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "main-contract/update"), payload);
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "main-contract/update"), mainContractId).then(() => { });
         }
 
         removeMainContract(dataProcessingRegistrationId: number): angular.IPromise<void> {

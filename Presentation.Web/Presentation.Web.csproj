@@ -979,8 +979,8 @@
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
-    <TypeScriptCompile Include="app\shared\main-contract\main-contract-section.component.ts" />
-    <Content Include="app\shared\main-contract\main-contract-section.view.html" />
+    <TypeScriptCompile Include="app\shared\main-contract\main-contract-selection.component.ts" />
+    <Content Include="app\shared\main-contract\main-contract-selection.view.html" />
     <TypeScriptCompile Include="app\shared\organization-tree\organization-tree.component.ts" />
     <TypeScriptCompile Include="app\shared\progress-spinner\progress-spinner.component.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
