@@ -11,7 +11,7 @@
             "notify",
             "dataProcessingRegistrationOptions",
             "bindingService",
-            "$uibModal"
+            "$state"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -23,8 +23,8 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly notify,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
-            private readonly bindingService: Kitos.Services.Generic.IBindingService,
-            private readonly $modal) {
+            private readonly bindingService: Services.Generic.IBindingService,
+            private readonly $state: ng.ui.IStateService) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
@@ -76,156 +76,11 @@
         private modalOpen = false;
 
         createSubDataProcessor() {
-            const self = this;
-            if (this.modalOpen === false) {
-                this.modalOpen = true;
-                this.$modal.open({
-                    windowClass: "modal fade in",
-                    templateUrl: "app/components/data-processing/tabs/data-processing-registration-sub-data-processor-modal.view.html",
-                    controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService: Services.ISelect2LoadingService) => {
-                        this.modalOpen = true;
-
-                        $scope.subDataProcessorsConfig = self.bindSingleSelectSubDataProcessors();
-                        $scope.subDataProcessorTransferToThirdCountriesConfig = self.bindSubDataProcessorTransferToThirdCountriesOptions();
-                        $scope.subDataProcessorBasisForTransferConfig = self.bindSubDataProcessorBasisForTransfer();
-                        $scope.subDataProcessorInsecureThirdCountriesConfig = self.bindSubDataProcessorInsecureThirdCountriesOptions();
-                        /*var vm = new Models.ViewModel.GDPR.SubDataProcessorViewModel(
-                            self.dataProcessingRegistration, *//*this.subDataProcessors,*//*
-                            transferToThirdCountries,
-                            basisForTransfer,
-                            insecureThirdCountries);
-                        $scope.subDprVm = new Models.ViewModel.GDPR.SubDataProcessorViewModel(
-                            self.dataProcessingRegistration, *//*this.subDataProcessors,*//*
-                            transferToThirdCountries,
-                            basisForTransfer,
-                            insecureThirdCountries);
-                        vm.configureAsCreate();
-                        $scope.subDprVm.configureAsCreate();*/
-
-                        /*$scope.save = () => {
-                            const newRelation = new Kitos.Models.Api.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
-                            this.dataProcessingRegistrationService.assignSubDataProcessor().createSystemRelation(newRelation)
-                                .then(
-                                    () => {1
-                                        notify.addSuccessMessage("Relation tilføjet");
-                                        modalOpen = false;
-                                        $scope.$close(true);
-                                        reload();
-                                    },
-                                    error => {
-                                        notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relationen.");
-                                    });
-
-                        };*/
-
-                        $scope.dismiss = () => {
-                            this.modalOpen = false;
-                            $scope.$close(true);
-                        };
-
-                        this.modalOpen = false;
-                    }],
-                    controllerAs: "ctrl",
-                });
-            }
-        }
-
-        private bindSubDataProcessorTransferToThirdCountriesOptions(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption> {
-            const thirdCountriesOptions = new Models.ViewModel.Shared.YesNoUndecidedOptions();
-
-            let selectedOption = null;
-            if (subDprId) {
-                const selectedSubDataProcessor = _.find(this.dataProcessingRegistration.subDataProcessors, {id: subDprId}) as Models.DataProcessing.IDataProcessorDTO;
-                selectedOption = thirdCountriesOptions.getById(selectedSubDataProcessor.transferToInsecureThirdCountries);
-            }
-            return {
-                selectedElement: selectedOption,
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => thirdCountriesOptions.options, false),
-                elementSelected: (newElement) => {
-                    if (!!newElement) {
-                        this.changeTransferToInsecureThirdCountries(newElement.optionalObjectContext);
-                    }
-                }
-            };
-        }
-
-        private bindSubDataProcessorBasisForTransfer(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
-            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
-
-            let existingChoice = null;
-            if (subDprId) {
-                const selectedSubDataProcessor = _.find(this.dataProcessingRegistration.subDataProcessors, { id: subDprId }) as Models.DataProcessing.IDataProcessorDTO;
-                //If selected state is expired, add it for presentation reasons
-                existingChoice = selectedSubDataProcessor.basisForTransfer;
-                if (existingChoice && !optionMap[existingChoice.id]) {
-                    optionMap[existingChoice.id] = {
-                        text: `${existingChoice.name} (udgået)`,
-                        id: existingChoice.id,
-                        disabled: true,
-                        optionalObjectContext: existingChoice
-                    }
-                }
-            }
-
-            const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
-
-            return {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
-                elementSelected: (newElement) => this.updateBasisForTransfer(newElement)
-            };
-        }
-
-        private bindSubDataProcessorInsecureThirdCountriesOptions(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
-            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistration.insecureThirdCountries);
-
-            let selectedOption = null;
-            if (subDprId) {
-                const selectedSubDataProcessor = _.find(this.dataProcessingRegistration.subDataProcessors, { id: subDprId }) as Models.DataProcessing.IDataProcessorDTO;
-                selectedOption = _.find(optionMap, selectedSubDataProcessor.transferToInsecureThirdCountries);
-            }
-
-            const options = this.dataProcessingRegistration.insecureThirdCountries.map(option => optionMap[option.id]);
-
-            return {
-                selectedElement: selectedOption,
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, false),
-                elementSelected: (newElement) => {
-                    if (!!newElement) {
-                        //this.changeTransferToInsecureThirdCountries(newElement.optionalObjectContext);
-                    }
-                }
-            };
-        }
-
-        private bindSingleSelectSubDataProcessors(subDprId: number = null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
-            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistration.insecureThirdCountries);
-
-            let selectedOption = null;
-            if (subDprId) {
-                selectedOption = _.find(this.dataProcessingRegistration.subDataProcessors, { id: subDprId }) as Models.DataProcessing.IDataProcessorDTO;
-            }
-            
-            const pageSize = 100;
-            
-            return {
-                selectedElement: selectedOption,
-                select2Config: this.select2LoadingService.loadSelect2WithDataSource(
-                    (query) => this
-                    .dataProcessingRegistrationService
-                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
-                    .then(results => this.mapDataProcessingSearchResults(results)),
-                    true),
-                elementSelected: (newElement) => {
-                    if (!!newElement) {
-                        //this.changeTransferToInsecureThirdCountries(newElement.optionalObjectContext);
-                    }
-                }
-            };
+            this.$state.go("data-processing.edit-registration.main.sub-data-processor", { subDataProcessorId: 2 });
         }
 
         private bindDataResponsible() {
-            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.dataResponsibleOptions);
+            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.dataResponsibleOptions);
 
             //If selected state is expired, add it for presentation reasons
             const existingChoice = this.dataProcessingRegistration.dataResponsible.value;
@@ -260,7 +115,7 @@
         }
 
         private bindBasisForTransfer() {
-            const optionMap = this.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
+            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
 
             //If selected state is expired, add it for presentation reasons
             const existingChoice = this.dataProcessingRegistration.basisForTransfer;
@@ -344,18 +199,7 @@
             };
             this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
-
-        private mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
-            return dataProcessors.map(
-                dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
-                    id: dataProcessor.id,
-                    text: dataProcessor.name,
-                    optionalObjectContext: dataProcessor,
-                    cvrNumber: dataProcessor.cvrNumber
-                }
-            );
-        }
-
+        
         private bindDataProcessors() {
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
@@ -366,7 +210,7 @@
                 this.hasWriteAccess,
                 this.hasWriteAccess,
                 (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
-                    .then(results => this.mapDataProcessingSearchResults(results)),
+                    .then(results => Helpers.Select2MappingHelper.mapDataProcessingSearchResults(results)),
                 null,
                 Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext
             );
@@ -384,7 +228,7 @@
                 (query) => this
                     .dataProcessingRegistrationService
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
-                    .then(results => this.mapDataProcessingSearchResults(results)),
+                    .then(results => Helpers.Select2MappingHelper.mapDataProcessingSearchResults(results)),
                 null,
                 Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext
             );
@@ -621,22 +465,6 @@
             this.agreementConcludedAt = new Models.ViewModel.Generic.DateSelectionViewModel(
                 this.dataProcessingRegistration.agreementConcluded.optionalDateValue,
                 (newDate) => this.changeAgreementConcludedAt(newDate));
-        }
-
-        private mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(dtos: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[]): Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[] {
-            return dtos.reduce((acc, next, _) => {
-                acc[next.id] = {
-                    id: next.id,
-                    text: next.name,
-                    optionalObjectContext: {
-                        id: next.id,
-                        name: next.name,
-                        expired: false, //We only allow selection of non-expired and this object is based on the available objects
-                        description: next.description
-                    }
-                } ;
-                return acc;
-            }, {}) as Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[];
         }
     }
 
