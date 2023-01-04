@@ -36,7 +36,7 @@
         hasWriteAccess: boolean | null = null;
         isVisible: boolean | null = null;
         viewModel: IMainContractSectionViewModel | null = null;
-        contractModel: {id: number, text: string};
+        contractModel: Models.ViewModel.Generic.Select2OptionViewModel<null>;
         currentContractId: number = null;
         select2Model: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityDTO>;
 
@@ -61,10 +61,9 @@
                 return;
             }
 
-            //TODO: is it possible to use "find"? Right now compiler shows an error
-            const selectedContract = this.viewModel.options.filter(x => x.id === this.viewModel.selectedContractId);
-            if (selectedContract.length === 1) {
-                this.contractModel = selectedContract[0];
+            const selectedContract = _.find(this.viewModel.options, { id: this.viewModel.selectedContractId }) as Models.ViewModel.Generic.Select2OptionViewModel<null>;
+            if (selectedContract !== null) {
+                this.contractModel = selectedContract;
                 this.updateCurrentContractId(this.viewModel.selectedContractId);
             }
 

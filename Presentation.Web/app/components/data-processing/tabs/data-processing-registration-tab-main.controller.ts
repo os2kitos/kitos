@@ -36,7 +36,7 @@
             this.bindDataResponsibleRemark();
             this.reloadValidationStatus();
         }
-
+        
 
         headerName = this.dataProcessingRegistration.name;
 
