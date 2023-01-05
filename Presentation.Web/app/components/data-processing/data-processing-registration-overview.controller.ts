@@ -153,6 +153,18 @@
                     } as Utility.KendoGrid.IKendoToolbarEntry)
                     .withColumn(builder =>
                         builder
+                        .withDataSourceName("ActiveAccordingToMainContract")
+                        .withTitle("Status (Markeret kontrakt)")
+                        .withId("mainContract")
+                        .withStandardWidth(190)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(false), false)
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToMainContract))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(blueprint.children.itContracts.children.mainContract)))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("Name")
                             .withTitle("Databehandling")
                             .withId("dpaName")

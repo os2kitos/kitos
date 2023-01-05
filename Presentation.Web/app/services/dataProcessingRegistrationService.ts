@@ -39,6 +39,9 @@
         updateOversightCompleted(dataProcessingRegistrationId: number, isOversightCompleted: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightCompletedRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightScheduledInspectionDate(dataProcessingRegistrationId: number, date: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateMainContract(dataProcessingRegistrationId: number, contractId: number): angular.IPromise<void>;
+        removeMainContract(dataProcessingRegistrationId: number): angular.IPromise<void>;
+        getValidationDetails(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationValidationDTO>;
 
         assignOversightDate(dataProcessingRegistrationId: number, dateTime: string, remark: string): angular.IPromise<IOversightDateResult>;
         updateOversightDate(dataProcessingRegistrationId: number, oversightDateId: number, dateTime: string, remark: string): angular.IPromise<IOversightDateResult>;
@@ -69,9 +72,7 @@
         //Use for contracts that take an input defined as SingleValueDTO
         private simplePatch(url: string, value: any): angular.IPromise<IDataProcessingRegistrationPatchResult> {
 
-            const payload = {
-                Value: value
-            };
+            const payload = this.createSingleValueDTOPayload(value);
 
             return this
                 .$http
@@ -86,6 +87,12 @@
                     },
                     error => this.apiWrapper.handleServerError(error)
                 );
+        }
+
+        private createSingleValueDTOPayload(value: any) {
+            return {
+                Value: value
+            };
         }
 
         rename(dataProcessingRegistrationId: number, name: string): angular.IPromise<IDataProcessingRegistrationPatchResult> {
@@ -328,6 +335,21 @@
 
         updateOversightScheduledInspectionDate(dataProcessingRegistrationId: number, date: string) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-scheduled-inspection-date"), date);
+        }
+
+        updateMainContract(dataProcessingRegistrationId: number, mainContractId: number): angular.IPromise<void> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "main-contract/update"), mainContractId).then(() => { });
+        }
+
+        removeMainContract(dataProcessingRegistrationId: number): angular.IPromise<void> {
+            return this.apiWrapper.patch(
+                this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "main-contract/remove"));
+        }
+
+        getValidationDetails(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationValidationDTO> {
+            return this.$http.get<API.Models.IApiWrapper<Models.DataProcessing.IDataProcessingRegistrationValidationDTO>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "validation-details"))
+                .then(response => response.data.response,
+                    error => this.apiWrapper.handleServerError(error));
         }
 
         assignOversightDate(dataProcessingRegistrationId: number, dateTime: string, remark: string) {

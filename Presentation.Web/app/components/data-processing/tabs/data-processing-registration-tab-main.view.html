@@ -167,42 +167,60 @@
                     <!-- Sub Data processors -->
                     <table id="subDpTable" class="table table-striped table-bordered">
                         <thead>
-                        <tr>
-                            <th class="element-selection-list_header--padding">
-                                <p class="small">Navn</p>
-                            </th>
-                            <th class="element-selection-list_header--padding noRightBorder">
-                                <p class="small">CVR</p>
-                            </th>
-                            <th class="element-selection-list_header--padding noLeftBorder"></th>
-                        </tr>
+                            <tr>
+                                <th class="element-selection-list_header--padding">
+                                    <p class="small">Navn</p>
+                                </th>
+                                <th class="element-selection-list_header--padding noRightBorder">
+                                    <p class="small">CVR</p>
+                                </th>
+                                <th class="element-selection-list_header--padding noLeftBorder"></th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="dataProcessor in vm.subDataProcessors.selectedElements" data-element-type="data-processing_sub-data-processors">
-                            <td>{{::dataProcessor.name }}</td>
-                            <td class="noRightBorder">{{::dataProcessor.cvrNumber }}</td>
-                            <td class="text-right noLeftBorder" style="width: 20px;">
-                                <button type="button"
-                                        class="btn btn-danger btn-xs"
-                                        data-confirmed-click="vm.subDataProcessors.removeItemRequested({{::dataProcessor}})"
-                                        data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                        ng-if="vm.subDataProcessors.allowRemoval">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
+                            <tr ng-repeat="dataProcessor in vm.subDataProcessors.selectedElements" data-element-type="data-processing_sub-data-processors">
+                                <td>{{::dataProcessor.name }}</td>
+                                <td class="noRightBorder">{{::dataProcessor.cvrNumber }}</td>
+                                <td class="text-right noLeftBorder" style="width: 20px;">
+                                    <button type="button"
+                                            class="btn btn-danger btn-xs"
+                                            data-confirmed-click="vm.subDataProcessors.removeItemRequested({{::dataProcessor}})"
+                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                            ng-if="vm.subDataProcessors.allowRemoval">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
                         </tbody>
                         <tfoot ng-if="vm.subDataProcessors.allowAddition" class="element-selection-list_footer--padding">
-                        <tr>
-                            <td colspan="3" style="padding: 0">
-                                <single-select-select2 data-placeholder="Vælg Underdatabehandler"
-                                                       id="sub-data-processor_select-new"
-                                                       ng-model="vm.subDataProcessors.newItemSelectionConfig"
-                                                       ng-disabled="!vm.subDataProcessors.allowAddition" />
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="3" style="padding: 0">
+                                    <single-select-select2 data-placeholder="Vælg Underdatabehandler"
+                                                           id="sub-data-processor_select-new"
+                                                           ng-model="vm.subDataProcessors.newItemSelectionConfig"
+                                                           ng-disabled="!vm.subDataProcessors.allowAddition" />
+                                </td>
+                            </tr>
                         </tfoot>
                     </table>
+                </div>
+                <label class="control-label small">Status</label>
+                <!-- Show the simple version of the status if there are no details to explain-->
+                <div class="form-group object-status-active-summary" ng-if="vm.validationStatus && vm.validationStatus.valid">
+                    <span>Databehandlingen er <strong>aktiv</strong></span>
+                </div>
+                <!-- Show the detailed summary if any errors are involved at all-->
+                <div class="form-group object-status-active-summary" ng-if="vm.validationStatus && !vm.validationStatus.valid">
+                    <a id="expand_collapse_contract_status" class="task-fold control-label" data-ng-click="isValidationDetailsExpanded = !isValidationDetailsExpanded">
+                        <span>Databehandlingen er <strong>ikke aktiv</strong></span>
+                        <i class="faded-gray fa pull-right" data-ng-class="{'fa-minus-square-o': isValidationDetailsExpanded, 'fa-plus-square-o': !isValidationDetailsExpanded}"></i>
+                    </a>
+                    <p ng-if="isValidationDetailsExpanded" style="margin-top: 5px;">
+                        Følgende gør databehandlingen inaktiv:
+                    </p>
+                    <ul ng-if="isValidationDetailsExpanded" ng-repeat="error in vm.validationStatus.errors">
+                        <li ng-if="error === 0">Den markerede kontrakt</li>
+                    </ul>
                 </div>
                 <div class="form-group">
                     <div class="form-group">

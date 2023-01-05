@@ -26,6 +26,8 @@
         associatedContracts: Models.Generic.NamedEntity.NamedEntityDTO[];
         oversightDates: IDataProcessingRegistrationOversightDateDTO[];
         oversightScheduledInspectionDate: string;
+        mainContractId: number;
+        isActiveAccordingToMainContract: boolean;
     }
 
     export interface IDataProcessingRegistrationOversightDateDTO {
@@ -60,5 +62,14 @@
         basisForTransferOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         oversightOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         roles: IDataProcessingRoleDTO[],
+    }
+
+    export interface IDataProcessingRegistrationValidationDTO {
+        valid: boolean,
+        errors: DataProcessingRegistrationValidationError[],
+    }
+
+    export enum DataProcessingRegistrationValidationError {
+        MainContractNotActive = 0
     }
 }
