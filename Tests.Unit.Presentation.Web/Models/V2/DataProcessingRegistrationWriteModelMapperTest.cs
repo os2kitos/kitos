@@ -27,13 +27,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public DataProcessingRegistrationWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties( Enumerable.Empty<string>().AsParameterMatch())).Returns(GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
-        
+
         [Fact]
         public void MapGeneral_Returns_UpdatedDataProcessingRegistrationGeneralDataParameters()
         {
@@ -249,7 +249,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noInsecureCountries,
             bool noDataProcessors,
             bool noHasSubDataProcessors,
-            bool noSubDataProcessors, 
+            bool noSubDataProcessors,
             bool noMainContract)
         {
             //Arrange
@@ -527,14 +527,37 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.AgreementConcludedAt, AssertPropertyContainsDataChange(output.AgreementConcludedAt));
             Assert.Equal(input.BasisForTransferUuid, AssertPropertyContainsDataChange(output.BasisForTransferUuid));
             Assert.Equal(input.TransferToInsecureThirdCountries?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.TransferToInsecureThirdCountries));
-            AssertNullableCollection(input, input.InsecureCountriesSubjectToDataTransferUuids, output.InsecureCountriesSubjectToDataTransferUuids);
-            AssertNullableCollection(input, input.DataProcessorUuids, output.DataProcessorUuids);
+            AssertNullableCollection(input.InsecureCountriesSubjectToDataTransferUuids, output.InsecureCountriesSubjectToDataTransferUuids);
+            AssertNullableCollection(input.DataProcessorUuids, output.DataProcessorUuids);
             Assert.Equal(input.HasSubDataProcessors?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.HasSubDataProcessors));
-            //AssertNullableCollection(input, input.SubDataProcessorUuids, output.SubDataProcessors); //TODO: Fix it
+            AssertNullableSubDataProcessorCollection(input.SubDataProcessors, output.SubDataProcessors);
             Assert.Equal(input.MainContractUuid, AssertPropertyContainsDataChange(output.MainContractUuid));
         }
 
-        private static void AssertNullableCollection(DataProcessingRegistrationGeneralDataWriteRequestDTO input, IEnumerable<Guid> fromCollection, OptionalValueChange<Maybe<IEnumerable<Guid>>> actualCollection)
+        private static void AssertNullableSubDataProcessorCollection(IEnumerable<DataProcessorRegistrationSubDataProcessorWriteRequestDTO> inputSubDataProcessors, OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>> outputSubDataProcessors)
+        {
+            if (inputSubDataProcessors == null)
+                AssertPropertyContainsResetDataChange(outputSubDataProcessors);
+            else
+            {
+                var mappedChanges = AssertPropertyContainsDataChange(outputSubDataProcessors).ToList();
+                var inputSdps = inputSubDataProcessors.ToList();
+                Assert.Equal(inputSdps.Count, mappedChanges.Count);
+                var inputByOrgUuid = inputSdps.ToDictionary(x => x.DataProcessorOrganizationUuid);
+                var outputByUuid = mappedChanges.ToDictionary(x => x.OrganizationUuid);
+                Assert.Equivalent(inputByOrgUuid.Keys.OrderBy(x => x), outputByUuid.Keys.OrderBy(x => x));
+                foreach (var inputSdp in inputByOrgUuid)
+                {
+                    var expected = inputSdp.Value;
+                    var actual = outputByUuid[inputSdp.Key];
+                    Assert.Equal(expected.TransferToInsecureThirdCountry?.ToYesNoUndecidedOption(), actual.TransferToInsecureThirdCountry);
+                    Assert.Equal(expected.BasisForTransferUuid, actual.BasisForTransferOptionUuid);
+                    Assert.Equal(expected.InsecureThirdCountrySubjectToDataProcessingUuid, actual.InsecureCountrySubjectToDataTransferUuid);
+                }
+            }
+        }
+
+        private static void AssertNullableCollection(IEnumerable<Guid> fromCollection, OptionalValueChange<Maybe<IEnumerable<Guid>>> actualCollection)
         {
             if (fromCollection == null)
                 AssertPropertyContainsResetDataChange(actualCollection);

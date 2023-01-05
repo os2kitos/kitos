@@ -15,7 +15,7 @@ namespace Core.DomainServices.Tracking
         IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
         IDomainEventHandler<EntityUpdatedEvent<ItInterface>>,
         IDomainEventHandler<EntityUpdatedEvent<OrganizationUnit>>
-        {
+    {
         public void Handle(EntityUpdatedEvent<ItSystem> domainEvent)
         {
             MarkAsDirty(domainEvent.Entity);
@@ -50,5 +50,5 @@ namespace Core.DomainServices.Tracking
         {
             MarkAsDirty(domainEvent.Entity);
         }
-        }
+    }
 }

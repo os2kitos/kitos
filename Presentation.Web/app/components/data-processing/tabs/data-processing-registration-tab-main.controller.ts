@@ -36,8 +36,9 @@
             this.bindBasisForTransfer();
             this.bindDataResponsible();
             this.bindDataResponsibleRemark();
+            this.reloadValidationStatus();
         }
-
+        
 
         headerName = this.dataProcessingRegistration.name;
 
@@ -73,6 +74,15 @@
 
         dataResponsibleRemark: Models.ViewModel.Generic.IEditTextViewModel;
 
+        validationStatus: Models.DataProcessing.IDataProcessingRegistrationValidationDTO;
+
+        reloadValidationStatus() {
+            this.dataProcessingRegistrationService.getValidationDetails(this.dataProcessingRegistration.id).then((newStatus: Models.DataProcessing.IDataProcessingRegistrationValidationDTO) => {
+                this.validationStatus = newStatus;
+            });
+        }
+
+        
         yesNoUndecidedOptionsViewModel = Models.ViewModel.Shared.YesNoUndecidedOptions;
 
         createSubDataProcessor() {
@@ -86,7 +96,7 @@
         private openModal(subDataProcessorId: number = null) {
             this.$state.go("data-processing.edit-registration.main.sub-data-processor", { subDataProcessorId: subDataProcessorId });
         }
-        
+
         private bindDataResponsible() {
             const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.dataResponsibleOptions);
 

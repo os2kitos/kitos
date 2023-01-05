@@ -416,6 +416,7 @@
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-contract-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\helpers\KendoToolbarCustomizationHelper.ts" />
     <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
+    <Compile Include="Controllers\API\V1\DataProcessingRegistrationValidationController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
@@ -437,6 +438,7 @@
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
+    <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\SubDataProcessorResponseDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\UpdateSubDataProcessorRequestDTO.cs" />
@@ -981,6 +983,8 @@
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
+    <TypeScriptCompile Include="app\shared\main-contract\main-contract-selection.component.ts" />
+    <Content Include="app\shared\main-contract\main-contract-selection.view.html" />
     <TypeScriptCompile Include="app\shared\organization-tree\organization-tree.component.ts" />
     <TypeScriptCompile Include="app\shared\progress-spinner\progress-spinner.component.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />

@@ -9,7 +9,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/itsystemusage")]
     public class ItSystemUsageValidationController : BaseApiController
     {

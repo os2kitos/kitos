@@ -608,9 +608,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 InsecureCountryOptionId = countryOption.Id
             };
             using var _ = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, organization.Id);
-            using var updateResponse = await DataProcessingRegistrationHelper.SendUpdateSubDataProcessorRequestAsync(registration.Id, organization.Id, updateDetails);
 
             //Act
+            using var updateResponse = await DataProcessingRegistrationHelper.SendUpdateSubDataProcessorRequestAsync(registration.Id, organization.Id, updateDetails);
 
             //Assert
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);

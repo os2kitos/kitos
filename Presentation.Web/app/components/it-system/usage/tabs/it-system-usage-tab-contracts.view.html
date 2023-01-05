@@ -70,34 +70,9 @@
             </tbody>
         </table>
     </div>
-
-    <div id="selectMainContractSection" class="object-section-container" ng-if="showMainContractSelection && showContractIsActive">
-        <div class="panel panel-default">
-            <form class="form-horizontal">
-                <div class="form-group row">
-                    <label class="col-xs-4 control-label">
-                        Hvilken kontrakt skal afgøre om IT systemet er aktivt:
-                    </label>
-                    <div class="col-xs-3">
-                        <select-simple data-id="contract-selector"
-                                       data-placeholder="Ingen kontrakt"
-                                       data-options="contractsToSelect"
-                                       data-ng-model="mainContractId"
-                                       data-function="saveMainContract"
-                                       data-ng-disabled="!hasWriteAccess">
-                        </select-simple>
-                    </div>
-                    <div class="col-xs-4" data-ng-show="mainContractId !== null">
-                        IT systemet har nu status som:
-                        <strong class="text-success" ng-show="mainContractIsActive">
-                            Aktivt
-                        </strong>
-                        <strong class="text-danger" ng-hide="mainContractIsActive">
-                            Inaktivt
-                        </strong>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    
+    <main-contract-selection ng-if="showMainContract" 
+                             data-main-text="Hvilken kontrakt skal afgøre om IT Systemet er aktivt:" 
+                             data-has-write-access="hasWriteAccess"
+                             data-view-model="mainContractViewModel"/>
 </div>
