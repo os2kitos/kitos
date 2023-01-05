@@ -73,12 +73,20 @@
 
         dataResponsibleRemark: Models.ViewModel.Generic.IEditTextViewModel;
 
-        private modalOpen = false;
+        yesNoUndecidedOptionsViewModel = Models.ViewModel.Shared.YesNoUndecidedOptions;
 
         createSubDataProcessor() {
-            this.$state.go("data-processing.edit-registration.main.sub-data-processor", { subDataProcessorId: 2 });
+            this.openModal();
         }
 
+        updateSubDataProcessor(id: number) {
+            this.openModal(id);
+        }
+
+        private openModal(subDataProcessorId: number = null) {
+            this.$state.go("data-processing.edit-registration.main.sub-data-processor", { subDataProcessorId: subDataProcessorId });
+        }
+        
         private bindDataResponsible() {
             const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.dataResponsibleOptions);
 
@@ -217,21 +225,10 @@
         }
 
         private bindSubDataProcessors() {
-            const pageSize = 100;
-            this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
-                config => this.subDataProcessors = config,
-                () => this.dataProcessingRegistration.subDataProcessors.sort((a, b) => a.name.localeCompare(b.name, "da-DK")),
-                element => this.removeSubDataProcessor(element.id),
-                newElement => {} /*this.addSubDataProcessor(newElement)*/,
-                this.hasWriteAccess,
-                this.hasWriteAccess,
-                (query) => this
-                    .dataProcessingRegistrationService
-                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
-                    .then(results => Helpers.Select2MappingHelper.mapDataProcessingSearchResults(results)),
-                null,
-                Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext
-            );
+            this.dataProcessingRegistrationService.get(this.dataProcessingRegistration.id)
+                .then(reloadedSubDp => {
+                    this.dataProcessingRegistration.subDataProcessors = reloadedSubDp.subDataProcessors
+                });
         }
 
         changeName(name) {
@@ -319,7 +316,7 @@
             }
         }
 
-        private removeSubDataProcessor(id: number) {
+        removeSubDataProcessor(id: number) {
             this.apiUseCaseFactory
                 .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistrationId, id))
                 .executeAsync(success => {

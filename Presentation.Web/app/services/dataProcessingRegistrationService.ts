@@ -17,8 +17,8 @@
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize: number): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         removeSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateSubDataProcessorsState(dataProcessingRegistrationId: number, state: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
-        assignSubDataProcessor(dataProcessingRegistrationId: number, assignSubDprDto: Models.DataProcessing.IAssignSubDataProcessorRequestDTO): angular.IPromise<void>;
-        updateSubDataProcessor(dataProcessingRegistrationId: number, updateSubDprDto: Models.DataProcessing.IUpdateSubDataProcessorRequestDTO): angular.IPromise<void>;
+        assignSubDataProcessor(dataProcessingRegistrationId: number, assignSubDprDto: Models.DataProcessing.ISubDataProcessorRequestDTO): angular.IPromise<void>;
+        updateSubDataProcessor(dataProcessingRegistrationId: number, updateSubDprDto: Models.DataProcessing.ISubDataProcessorRequestDTO): angular.IPromise<void>;
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize: number): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, value: Models.Api.Shared.YesNoIrrelevantOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
@@ -167,7 +167,7 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/remove"), dataProcessorId);
         }
 
-        assignSubDataProcessor(dataProcessingRegistrationId: number, assignSubDprDto: Models.DataProcessing.IAssignSubDataProcessorRequestDTO): angular.IPromise<void> {
+        assignSubDataProcessor(dataProcessingRegistrationId: number, assignSubDprDto: Models.DataProcessing.ISubDataProcessorRequestDTO): angular.IPromise<void> {
             
             return this
                 .$http
@@ -180,7 +180,7 @@
                 );
         }
 
-        updateSubDataProcessor(dataProcessingRegistrationId: number, updateSubDprDto: Models.DataProcessing.IUpdateSubDataProcessorRequestDTO): angular.IPromise<void> {
+        updateSubDataProcessor(dataProcessingRegistrationId: number, updateSubDprDto: Models.DataProcessing.ISubDataProcessorRequestDTO): angular.IPromise<void> {
             
             return this
                 .$http

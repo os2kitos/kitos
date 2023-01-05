@@ -1,7 +1,6 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
-        <h3 class="modal-title pull-left">test</h3>
-        <!--{{RelationModalViewModel.headerText}}-->
+        <h3 class="modal-title pull-left">{{ctrl.title}}</h3>
     </div>
 </div>
 
@@ -18,6 +17,9 @@
                     <single-select-select2 data-placeholder="Vælg Underdatabehandler"
                                            id="sub-data-processor_select-new"
                                            ng-model="ctrl.subDataProcessorsConfig" />
+                    <div ng-if="ctrl.viewModel.cvrNumber">
+                        <i>CVR: {{ctrl.viewModel.cvrNumber}}</i>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="basisForTransferConfig">Overførselsgrundlag</label>
@@ -27,15 +29,15 @@
                     <label for="transferToInsecureThirdCountries">Overførsel til usikkert 3. land</label>
                     <single-select-select2 id="transferToInsecureThirdCountries" ng-model="ctrl.subDataProcessorTransferToThirdCountriesConfig" />
                 </div>
-                <div class="form-group" ng-if="ctrl.viewModel.transferToInsecureThirdCountryId !== yesNoUndecidedValues.Yes">
+                <div class="form-group" ng-if="ctrl.viewModel.transferToInsecureThirdCountryId === ctrl.yesValue">
                     <label for="insecureThirdCountryConfig">Land der overføres til</label>
                     <single-select-select2 id="insecureThirdCountryConfig" ng-model="ctrl.subDataProcessorInsecureThirdCountriesConfig" />
                 </div>
             </div>
             </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" ng-click="ctrl.dismiss()">Annuller</button>
-                    <button type="button" class="btn btn-primary" ng-click="ctrl.save()" data-element-type="relationSaveButton" ng-disabled="!RelationModalViewModel.toSystem">Gem</button>
+                    <button type="button" class="btn btn-warning" ng-click="ctrl.cancel()">Annuller</button>
+                    <button type="button" class="btn btn-primary" ng-click="ctrl.save()" data-element-type="relationSaveButton" ng-disabled="ctrl.isInvalid()">Gem</button>
         </div>
     </div>
 </form>
