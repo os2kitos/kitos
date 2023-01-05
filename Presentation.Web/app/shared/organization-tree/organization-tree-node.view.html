@@ -6,7 +6,8 @@
     </a>
     {{::node.name}}
 </div>
-<ol ng-if="ctrl.options.availableLevels === null || ctrl.options.availableLevels >= (node.level + 1)" ui-tree-nodes="" data-ng-model="node.nodes" ng-class="{hidden: collapsed}">
-    <li collapsed="true" data-ng-repeat="node in node.nodes" ui-tree-node ng-include="'app/shared/organization-tree/organization-tree-node.view.html'">
+<ol ng-if="ctrl.options.availableLevels === null || ctrl.options.availableLevels >= (node.level + 1)" ui-tree-nodes="" data-ng-model="node.nodes">
+    <!--Only render if expanded-->
+    <li ng-if="!collapsed" collapsed="true" data-ng-repeat="node in node.nodes" ui-tree-node ng-include="'app/shared/organization-tree/organization-tree-node.view.html'">
     </li>
 </ol>
