@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using AutoMapper;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -10,6 +12,7 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Advice = Core.DomainModel.Advice.Advice;
@@ -190,7 +193,7 @@ namespace Presentation.Web
             CreateMap<Organization, OrganizationSimpleDTO>();
 
             CreateMap<OrganizationUnit, OrgUnitDTO>()
-                  .ForMember(dest => dest.Children, opt => opt.MapFrom(unit => unit.Children.OrderBy(child => child.Name).ToList()))
+                  .ForMember(dest => dest.Children, opt => opt.MapFrom(unit => unit.Children.OrderBy(child => child.Name, KitosConstants.DanishStringComparer).ToList()))
                   .ReverseMap()
                   .ForMember(dest => dest.Children, opt => opt.Ignore())
                   .IgnoreDestinationEntityFields();
