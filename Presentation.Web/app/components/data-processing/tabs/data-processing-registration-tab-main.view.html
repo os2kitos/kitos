@@ -143,7 +143,7 @@
                             <tbody>
                                 <tr ng-repeat="country in vm.insecureThirdCountries.selectedElements" data-element-type="data-processing_insecure_third_countries">
                                     <td>{{::country.name }}<span ng-if="country.expired"> (udgået)</span></td>
-                                    <td class="text-right noLeftBorder" style="width: 20px;">
+                                    <td class="text-right noLeftBorder width-20px">
                                         <button type="button"
                                                 class="btn btn-danger btn-xs"
                                                 data-confirmed-click="vm.insecureThirdCountries.removeItemRequested({{::country}})"
@@ -190,7 +190,7 @@
                     <tr ng-repeat="dataProcessor in vm.dataProcessors.selectedElements" data-element-type="data-processing_data-processors">
                         <td>{{::dataProcessor.name }}</td>
                         <td class="noRightBorder">{{::dataProcessor.cvrNumber }}</td>
-                        <td class="text-right noLeftBorder" style="width: 20px;">
+                        <td class="text-right noLeftBorder width-20px">
                             <button type="button"
                                     class="btn btn-danger btn-xs"
                                     data-confirmed-click="vm.dataProcessors.removeItemRequested({{::dataProcessor}})"
@@ -253,8 +253,7 @@
                             <td class="noRightBorder">{{::dataProcessor.basisForTransfer.name }}</td>
                             <td class="noRightBorder">{{::vm.yesNoUndecidedOptionsViewModel.getText(dataProcessor.transferToInsecureThirdCountries) }}</td>
                             <td class="noRightBorder">{{::dataProcessor.insecureCountry.name }}</td>
-                            <!--TODO: Move style to kitos.less-->
-                            <td class="text-right noLeftBorder noRightBorder" style="width: 20px;">
+                            <td class="text-right noLeftBorder noRightBorder width-20px">
                                 <button type="button"
                                         class="btn btn-info btn-xs"
                                         ng-click="vm.updateSubDataProcessor(dataProcessor.id)"
@@ -262,7 +261,7 @@
                                     <i class="glyphicon glyphicon-pencil"></i>
                                 </button>
                             </td>
-                            <td class="text-right noLeftBorder" style="width: 20px;">
+                            <td class="text-right noLeftBorder width-20px">
                                 <button type="button"
                                         id="delete-sub-data-processor"
                                         class="btn btn-danger btn-xs"
