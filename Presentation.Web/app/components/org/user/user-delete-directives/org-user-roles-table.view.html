@@ -1,8 +1,8 @@
-﻿<table class="table table-hover" ng-if="model.rights.length > 0">
+﻿<table class="table table-hover" ng-if="ctrl.model.rights.length > 0">
     <thead>
     <tr>
         <th class="col-xs-1">
-            <input type="checkbox" ng-model="model.selected" ng-checked="model.selected" ng-change="callbacks.selectOrDeselectGroup(model.rights)" />
+            <input type="checkbox" ng-model="ctrl.model.selected" ng-checked="ctrl.model.selected" ng-change="callbacks.selectOrDeselectGroup(ctrl.model.rights)" />
         </th>
         <th class="col-xs-3">{{ ::roleTypeName }}</th>
         <th class="col-xs-3">Rolle</th>
@@ -11,7 +11,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="right in model.rights | orderBy: 'right.roleName'">
+    <tr ng-repeat="right in ctrl.model.rights | orderBy: 'right.roleName'">
         <td><input data-disabled-on-busy type="checkbox" ng-model="right.selected" ng-change="callbacks.selectionChanged()" /></td>
         <td>{{right.right.businessObjectName}}</td>
         <td>{{right.right.roleName}}</td>
