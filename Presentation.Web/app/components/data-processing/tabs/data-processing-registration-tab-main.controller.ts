@@ -97,18 +97,12 @@
         }
 
         private bindDataResponsible() {
-            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.dataResponsibleOptions);
-
-            //If selected state is expired, add it for presentation reasons
-            const existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(this.dataProcessingRegistration.dataResponsible.value, optionMap, true);
-
-            const options = this.dataProcessingRegistrationOptions.dataResponsibleOptions.map(option => optionMap[option.id]);
-
-            this.dataResponsible = {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
-                elementSelected: (newElement) => this.updateDataResponsible(newElement)
-            };
+            this.dataResponsible =
+                Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(
+                    this.dataProcessingRegistration.dataResponsible.value,
+                    this.dataProcessingRegistrationOptions.dataResponsibleOptions,
+                    (newElement) => this.updateDataResponsible(newElement),
+                    this.select2LoadingService);
         }
 
         private bindDataResponsibleRemark() {
@@ -124,18 +118,12 @@
         }
 
         private bindBasisForTransfer() {
-            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
-
-            //If selected state is expired, add it for presentation reasons
-            const existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(this.dataProcessingRegistration.basisForTransfer, optionMap, true);
-
-            const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
-
-            this.basisForTransfer = {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
-                elementSelected: (newElement) => this.updateBasisForTransfer(newElement)
-            };
+            this.basisForTransfer = Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(
+                this.dataProcessingRegistration.basisForTransfer,
+                this.dataProcessingRegistrationOptions.basisForTransferOptions,
+                (newElement) => this.updateBasisForTransfer(newElement),
+                this.select2LoadingService,
+                true);
         }
 
         private bindTransferToInsecureThirdCountries() {

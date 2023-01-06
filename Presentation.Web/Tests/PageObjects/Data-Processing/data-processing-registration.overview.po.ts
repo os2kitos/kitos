@@ -100,6 +100,7 @@ class DataProcessingRegistrationOverviewPageObject implements PageObject {
     getRemoveSystemButton(systemName: string) {
         return element(by.xpath(`//*/a[text()="${systemName}"]/../..//button`));
     }
+
     isCreateDpaAvailable(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.getCreateDpaDialog());
     }

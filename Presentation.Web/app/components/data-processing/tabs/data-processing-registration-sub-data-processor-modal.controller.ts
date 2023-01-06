@@ -63,18 +63,6 @@
             this.subDataProcessorInsecureThirdCountriesConfig = this.bindInsecureThirdCountries(subDataProcessor);
         }
 
-        private close() {
-            this.$uibModalInstance.close();
-        }
-
-        private popState(reload = false) {
-            const popped = this.$state.go("^");
-            if (reload) {
-                return popped.then(() => this.$state.reload());
-            }
-            return popped;
-        }
-
         save(): void {
             if (this.isBusy)
                 return;
@@ -112,24 +100,23 @@
             return !this.viewModel.subDataProcessorId;
         }
 
-        private bindBasisForTransfer(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
-            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
+        private close() {
+            this.$uibModalInstance.close();
+        }
 
-            let existingChoice = null;
-            if (subDataProcessor) {
-                //If selected state is expired, add it for presentation reasons
-                existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(subDataProcessor.basisForTransfer, optionMap);
+        private popState(reload = false) {
+            const popped = this.$state.go("^");
+            if (reload) {
+                return popped.then(() => this.$state.reload());
             }
+            return popped;
+        }
 
-            const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
-
-            return {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
-                elementSelected: (newElement) => {
-                    this.viewModel.updateBasisForTransfer(newElement);
-                }
-            };
+        private bindBasisForTransfer(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
+            return Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(subDataProcessor?.basisForTransfer,
+                this.dataProcessingRegistrationOptions.basisForTransferOptions,
+                (newElement) => this.viewModel.updateBasisForTransfer(newElement),
+                this.select2LoadingService);
         }
 
         private bindTransferToThirdCountriesOptions(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption> {
@@ -155,7 +142,12 @@
         }
 
         private bindInsecureThirdCountries(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
-            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.thirdCountryOptions);
+            return Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(subDataProcessor?.insecureCountry,
+                this.dataProcessingRegistrationOptions.thirdCountryOptions,
+                (newElement) => this.viewModel.updateInsecureThirdCountry(newElement),
+                this.select2LoadingService);
+        }
+            /*const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.thirdCountryOptions);
 
             let existingChoice = null;
             if (subDataProcessor) {
@@ -171,8 +163,7 @@
                 elementSelected: (newElement) => {
                     this.viewModel.updateInsecureThirdCountry(newElement);
                 }
-            };
-        }
+            };*/
 
         private bindSubDataProcessor(): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO> {
 

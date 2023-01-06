@@ -13,7 +13,6 @@
         expired: boolean;
         description: string;
     }
-
     export interface NamedEntityWithUserFullNameDTO extends NamedEntityDTO {
         userFullName: string;
     }

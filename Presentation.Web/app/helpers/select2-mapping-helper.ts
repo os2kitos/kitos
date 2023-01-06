@@ -40,5 +40,31 @@
                 }
             );
         }
+
+        static createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(element: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO,
+            baseOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
+            updateMethod: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) => void,
+            select2LoadingService: Services.ISelect2LoadingService,
+            hasDisabledValue: boolean = null):
+            Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
+
+            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(baseOptions);
+
+            let existingChoice = null;
+            if (element) {
+                //If selected state is expired, add it for presentation reasons
+                existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(element, optionMap, hasDisabledValue);
+            }
+
+            const options = baseOptions.map(option => optionMap[option.id]);
+
+            return {
+                selectedElement: existingChoice && optionMap[existingChoice.id],
+                select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
+                elementSelected: (newElement) => {
+                    updateMethod(newElement);
+                }
+            };
+        }
     }
 }
