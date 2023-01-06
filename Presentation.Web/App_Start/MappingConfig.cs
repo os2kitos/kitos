@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using AutoMapper;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -168,6 +170,8 @@ namespace Presentation.Web
 
     public class MappingProfile : Profile
     {
+        private static readonly StringComparer DanishStringComparer = StringComparer.Create(new CultureInfo("da-DK"), true);
+
         public MappingProfile()
         {
             CreateMap<Text, TextDTO>()
@@ -190,7 +194,7 @@ namespace Presentation.Web
             CreateMap<Organization, OrganizationSimpleDTO>();
 
             CreateMap<OrganizationUnit, OrgUnitDTO>()
-                  .ForMember(dest => dest.Children, opt => opt.MapFrom(unit => unit.Children.OrderBy(child => child.Name).ToList()))
+                  .ForMember(dest => dest.Children, opt => opt.MapFrom(unit => unit.Children.OrderBy(child => child.Name,DanishStringComparer).ToList()))
                   .ReverseMap()
                   .ForMember(dest => dest.Children, opt => opt.Ignore())
                   .IgnoreDestinationEntityFields();
