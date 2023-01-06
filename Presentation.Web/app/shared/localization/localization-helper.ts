@@ -1,3 +1,3 @@
 ﻿module Kitos.Shared.Localization {
-    export const danishLocale = Kitos.Shared.Localization.danishLocale;
+    export const danishLocale = "da-DK";
 }

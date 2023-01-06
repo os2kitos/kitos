@@ -364,7 +364,7 @@
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-unit-migration-table.component.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-unit-migration.component.ts" />
-    <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.component.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-delete-components\org-user-roles-table.component.ts" />
     <TypeScriptCompile Include="app\Configs\kendo-date-picker-options.ts" />
     <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
     <TypeScriptCompile Include="app\helpers\connection-change-log-helper.ts" />
@@ -714,7 +714,7 @@
     <Content Include="app\components\local-config\ui-customization\local-ui-customization.view.html" />
     <Content Include="app\components\org\structure\org-unit-migration.view.html" />
     <Content Include="app\components\org\structure\org-unit-migration-table.view.html" />
-    <Content Include="app\components\org\user\user-delete-directives\org-user-roles-table.view.html" />
+    <Content Include="app\components\org\user\user-delete-components\org-user-roles-table.view.html" />
     <Content Include="app\components\user-notification\user-notification-modal.view.html" />
     <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
