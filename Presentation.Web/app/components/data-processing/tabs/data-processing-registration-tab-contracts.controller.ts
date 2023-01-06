@@ -40,7 +40,9 @@
             const mainContractId = this.dataProcessingRegistration.mainContractId;
             const mainContractIsActive = this.dataProcessingRegistration.isActiveAccordingToMainContract;
 
-            const contracts = this.dataProcessingRegistration.associatedContracts.sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale);
+            const contracts = this.dataProcessingRegistration
+                .associatedContracts
+                .sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale));
             const mappedContracts = this.entityMapper.mapApiResponseToSelect2ViewModel(contracts);
 
             this.mainContractViewModel = {
