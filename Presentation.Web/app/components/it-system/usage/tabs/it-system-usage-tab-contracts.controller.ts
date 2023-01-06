@@ -20,8 +20,8 @@
             itSystemUsageService: Kitos.Services.ItSystemUsage.IItSystemUsageService) => {
             var usageId = itSystemUsage.id;
             bindContracts(itSystemUsage);
-            
-            function reloadContractState () {
+
+            function reloadContractState() {
                 return itSystemUsageService.getItSystemUsage(usageId)
                     .then((usage) => bindContracts(usage));
             }
@@ -30,27 +30,30 @@
                 return $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`)
             };
 
-            function deleteMainContract (): ng.IPromise<void> {
+            function deleteMainContract(): ng.IPromise<void> {
                 return $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`);
             }
 
             function bindContracts(usage: any) {
-                $scope.contracts = usage.contracts.map(contract => {
-                    return {
-                        id: contract.id,
-                        name: contract.name,
-                        contractTypeName: contract.contractTypeName,
-                        supplierName: contract.supplierName,
-                        hasOperationElement: contract.hasOperationElement,
-                        concluded: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.concluded),
-                        expirationDate: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.expirationDate),
-                        terminated: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.terminated)
-                    }
-                });
+                $scope.contracts = usage
+                    .contracts
+                    .sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale))
+                    .map(contract => {
+                        return {
+                            id: contract.id,
+                            name: contract.name,
+                            contractTypeName: contract.contractTypeName,
+                            supplierName: contract.supplierName,
+                            hasOperationElement: contract.hasOperationElement,
+                            concluded: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.concluded),
+                            expirationDate: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.expirationDate),
+                            terminated: Kitos.Helpers.RenderFieldsHelper.renderDate(contract.terminated)
+                        }
+                    });
                 $scope.contractsToSelect = entityMapper.mapApiResponseToSelect2ViewModel(usage.contracts);
 
                 $scope.mainContractId = usage.mainContractId;
-                 
+
                 let match;
                 if (usage.mainContractId !== null) {
                     match = usage.contracts && usage.contracts.find(x => { return x.id === usage.mainContractId });
