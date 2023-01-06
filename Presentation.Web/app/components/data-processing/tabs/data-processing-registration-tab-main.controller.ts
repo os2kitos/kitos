@@ -81,7 +81,6 @@
                 this.validationStatus = newStatus;
             });
         }
-
         
         yesNoUndecidedOptionsViewModel = Models.ViewModel.Shared.YesNoUndecidedOptions;
 
@@ -101,15 +100,7 @@
             const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.dataResponsibleOptions);
 
             //If selected state is expired, add it for presentation reasons
-            const existingChoice = this.dataProcessingRegistration.dataResponsible.value;
-            if (existingChoice && !optionMap[existingChoice.id]) {
-                optionMap[existingChoice.id] = {
-                    text: `${existingChoice.name} (udgået)`,
-                    id: existingChoice.id,
-                    disabled: true,
-                    optionalObjectContext: existingChoice
-                }
-            }
+            const existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(this.dataProcessingRegistration.dataResponsible.value, optionMap, true);
 
             const options = this.dataProcessingRegistrationOptions.dataResponsibleOptions.map(option => optionMap[option.id]);
 
@@ -136,15 +127,7 @@
             const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
 
             //If selected state is expired, add it for presentation reasons
-            const existingChoice = this.dataProcessingRegistration.basisForTransfer;
-            if (existingChoice && !optionMap[existingChoice.id]) {
-                optionMap[existingChoice.id] = {
-                    text: `${existingChoice.name} (udgået)`,
-                    id: existingChoice.id,
-                    disabled: true,
-                    optionalObjectContext: existingChoice
-                }
-            }
+            const existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(this.dataProcessingRegistration.basisForTransfer, optionMap, true);
 
             const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
 
@@ -279,22 +262,6 @@
                     return success;
                 });
         }
-
-        /*private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
-            if (!!newElement && !!newElement.optionalObjectContext) {
-                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
-                this.apiUseCaseFactory
-                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignSubDataProcessor(this.dataProcessingRegistrationId, newDp.id))
-                    .executeAsync(success => {
-                        //Update the source collection
-                        this.dataProcessingRegistration.subDataProcessors.push(newDp);
-
-                        //Trigger UI update
-                        this.bindSubDataProcessors();
-                        return success;
-                    });
-            }
-        }*/
 
         private removeInsecureThirdCountry(id: number) {
             this.apiUseCaseFactory

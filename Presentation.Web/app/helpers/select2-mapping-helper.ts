@@ -16,6 +16,18 @@
                 return acc;
             }, {}) as Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[];
         }
+        static mapNamedEntityToSelect2ViewModel(existingChoice: Models.Generic.NamedEntity.NamedEntityDTO, map: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityDTO>[], disabledValue: boolean = null): Models.Generic.NamedEntity.NamedEntityDTO {
+            if (existingChoice && !map[existingChoice.id]) {
+                map[existingChoice.id] = {
+                    text: `${existingChoice.name} (udgået)`,
+                    id: existingChoice.id,
+                    disabled: disabledValue,
+                    optionalObjectContext: existingChoice
+                }
+            }
+
+            return existingChoice;
+        }
 
         static mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
             return dataProcessors.map(

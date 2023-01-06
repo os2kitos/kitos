@@ -104,25 +104,13 @@
             return !this.viewModel.subDataProcessorId;
         }
 
-        private updateMapForExistingChoice<T extends Models.Generic.NamedEntity.NamedEntityDTO>(existingChoice: T, map: Models.ViewModel.Generic.Select2OptionViewModel<T>[]): T {
-            if (existingChoice && !map[existingChoice.id]) {
-                map[existingChoice.id] = {
-                    text: existingChoice.name,
-                    id: existingChoice.id,
-                    optionalObjectContext: existingChoice
-                }
-            }
-
-            return existingChoice;
-        }
-
         private bindBasisForTransfer(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
             const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.basisForTransferOptions);
 
             let existingChoice = null;
             if (subDataProcessor) {
                 //If selected state is expired, add it for presentation reasons
-                existingChoice = this.updateMapForExistingChoice(subDataProcessor.basisForTransfer, optionMap);
+                existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(subDataProcessor.basisForTransfer, optionMap);
             }
 
             const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
@@ -163,7 +151,7 @@
             let existingChoice = null;
             if (subDataProcessor) {
                 //If selected state is expired, add it for presentation reasons
-                existingChoice = this.updateMapForExistingChoice(subDataProcessor.insecureCountry, optionMap);
+                existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(subDataProcessor.insecureCountry, optionMap);
             }
 
             const options = this.dataProcessingRegistrationOptions.thirdCountryOptions.map(option => optionMap[option.id]);
