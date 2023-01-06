@@ -148,8 +148,10 @@ class DataProcessingRegistrationHelper {
 
     public static assignSubDataProcessor(name: string) {
         console.log("Assigning sub data processor with name: " + name);
-        return Select2Helper.searchFor(name, "s2id_sub-data-processor_select-new_config")
-            .then(() => Select2Helper.waitForDataAndSelect());
+        return this.pageObject.getAddSubDataProcessorButton().click()
+            .then(() => Select2Helper.searchFor(name, "s2id_sub-data-processor_select-new_config"))
+            .then(() => Select2Helper.waitForDataAndSelect())
+            .then(() => this.pageObject.getSaveSubDataProcessorButton().click());
     }
 
     public static enableSubDataProcessors() {

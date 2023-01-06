@@ -264,6 +264,7 @@
                             </td>
                             <td class="text-right noLeftBorder" style="width: 20px;">
                                 <button type="button"
+                                        id="delete-sub-data-processor"
                                         class="btn btn-danger btn-xs"
                                         data-confirmed-click="vm.removeSubDataProcessor({{::dataProcessor.id}})"
                                         data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
@@ -275,7 +276,8 @@
                     </tbody>
                 </table>
                 <div class="text-align-right" ng-if="vm.hasWriteAccess">
-                    <button type="button"
+                    <button id="create-sub-data-processor-btn"
+                            type="button"
                             class="btn btn-success btn-sm"
                             ng-click="vm.createSubDataProcessor()">
                         Opret underdatabehandler

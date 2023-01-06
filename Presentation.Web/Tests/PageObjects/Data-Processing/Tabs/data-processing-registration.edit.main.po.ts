@@ -53,7 +53,7 @@ class DataProcessingRegistrationEditMainPageObject {
     }
 
     getRemoveSubDataProcessorButton(dpName: string) {
-        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//button`));
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}/td[last()]/button`));
     }
 
     private getThirdCountryRowExpression(dpName: string) {
