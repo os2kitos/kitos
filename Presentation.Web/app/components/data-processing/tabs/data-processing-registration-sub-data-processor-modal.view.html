@@ -13,12 +13,18 @@
             <!--Exposing System-->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="sub-data-processor_select-new">Underdatabehandler *</label>
-                    <single-select-select2 data-placeholder="Vælg Underdatabehandler"
-                                           id="sub-data-processor_select-new"
-                                           ng-model="ctrl.subDataProcessorsConfig" />
+                    <div ng-if="!ctrl.isEdit">
+                        <label for="sub-data-processor_select-new">{{::ctrl.subDataProcessorFieldName}} *</label>
+                        <single-select-select2 data-placeholder="Vælg Underdatabehandler"
+                                               id="sub-data-processor_select-new"
+                                               ng-model="ctrl.subDataProcessorsConfig"/>
+                    </div>
+                    <div ng-if="ctrl.isEdit">
+                        <label for="sub-data-processor_select-new">{{::ctrl.subDataProcessorFieldName}}</label>
+                        <label type="text" disabled="disabled" class="form-control input-sm">{{::ctrl.subDataProcessorName}}</label>
+                    </div>
                     <div ng-if="ctrl.viewModel.cvrNumber">
-                        <i>CVR: {{ctrl.viewModel.cvrNumber}}</i>
+                        <i>CVR: {{::ctrl.viewModel.cvrNumber}}</i>
                     </div>
                 </div>
                 <div class="form-group">

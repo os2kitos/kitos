@@ -17,10 +17,14 @@
         subDataProcessorBasisForTransferConfig: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
         subDataProcessorInsecureThirdCountriesConfig: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
 
-        readonly yesValue = Models.Api.Shared.YesNoUndecidedOption.Yes;
         title: string;
+        subDataProcessorFieldName: string;
+        isEdit: boolean;
+        subDataProcessorName: string;
 
         viewModel: Models.ViewModel.GDPR.SubDataProcessorViewModel;
+
+        readonly yesValue = Models.Api.Shared.YesNoUndecidedOption.Yes;
 
         private subDataProcessorId: number | null;
         private isBusy = false;
@@ -40,7 +44,11 @@
             this.subDataProcessorId = this.$stateParams.subDataProcessorId;
             const subDataProcessor = this.getSubDataProcessor();
 
+            this.isEdit = !!subDataProcessor;
+            this.subDataProcessorName = this.isEdit ? subDataProcessor.name : "";
+
             const titleSuffix = "underdatabehandler";
+            this.subDataProcessorFieldName = "Underdatabehandler";
             this.title = subDataProcessor ? `Rediger ${titleSuffix}` : `Opret ${titleSuffix}`;
 
             this.viewModel = new Models.ViewModel.GDPR.SubDataProcessorViewModel(this.subDataProcessorId,
@@ -49,7 +57,7 @@
                 subDataProcessor?.transferToInsecureThirdCountries,
                 subDataProcessor?.insecureCountry?.id);
 
-            this.subDataProcessorsConfig = this.bindSubDataProcessor(subDataProcessor);
+            this.subDataProcessorsConfig = this.bindSubDataProcessor();
             this.subDataProcessorBasisForTransferConfig = this.bindBasisForTransfer(subDataProcessor);
             this.subDataProcessorTransferToThirdCountriesConfig = this.bindTransferToThirdCountriesOptions(subDataProcessor);
             this.subDataProcessorInsecureThirdCountriesConfig = this.bindInsecureThirdCountries(subDataProcessor);
@@ -119,7 +127,7 @@
                 selectedElement: existingChoice && optionMap[existingChoice.id],
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
                 elementSelected: (newElement) => {
-                    this.viewModel.basisForTransferId = newElement?.id;
+                    this.viewModel.updateBasisForTransfer(newElement);
                 }
             };
         }
@@ -136,9 +144,10 @@
                 selectedElement: selectedOption,
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => thirdCountriesOptions.options, false),
                 elementSelected: (newElement) => {
-                    this.viewModel.transferToInsecureThirdCountryId = newElement?.id;
+
+                    this.viewModel.updateTransferToInsecureThirdCountry(newElement);
+
                     if (this.viewModel.transferToInsecureThirdCountryId !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
-                        this.viewModel.insecureCountryId = null;
                         this.subDataProcessorInsecureThirdCountriesConfig.selectedElement = null;
                     }
                 }
@@ -160,28 +169,16 @@
                 selectedElement: existingChoice && optionMap[existingChoice.id],
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, false),
                 elementSelected: (newElement) => {
-                    if (this.viewModel.transferToInsecureThirdCountryId !== Models.Api.Shared.YesNoUndecidedOption.Yes)
-                        return;
-
-                    this.viewModel.insecureCountryId = newElement?.id;
+                    this.viewModel.updateInsecureThirdCountry(newElement);
                 }
             };
         }
 
-        private bindSubDataProcessor(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO> {
-
-            let selectedOption: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO> | null = null;
-            if (subDataProcessor) {
-                selectedOption = {
-                    id: subDataProcessor.id,
-                    text: subDataProcessor.name,
-                    optionalObjectContext: subDataProcessor
-                } as Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>;
-            }
+        private bindSubDataProcessor(): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO> {
 
             const pageSize = 100;
             return {
-                selectedElement: selectedOption,
+                selectedElement: null,
                 select2Config: this.select2LoadingService.loadSelect2WithDataSource(
                     (query) => this
                         .dataProcessingRegistrationService
@@ -189,14 +186,13 @@
                         .then(results => Helpers.Select2MappingHelper.mapDataProcessingSearchResults(results)),
                     true),
                 elementSelected: (newElement) => {
-                    this.viewModel.subDataProcessorId = newElement?.id;
-                    this.viewModel.cvrNumber = newElement?.optionalObjectContext.cvrNumber;
+                    this.viewModel.updateSubDataProcessor(newElement);
                 }
             };
         }
 
-        private getSubDataProcessor(): Models.DataProcessing.IDataProcessorDTO {
-            return _.find(this.dataProcessingRegistration.subDataProcessors, { id: this.subDataProcessorId }) as Models.DataProcessing.IDataProcessorDTO;
+        private getSubDataProcessor(): Models.DataProcessing.IDataProcessorDTO | null {
+            return _.find(this.dataProcessingRegistration.subDataProcessors, { id: this.subDataProcessorId });
         }
     }
 

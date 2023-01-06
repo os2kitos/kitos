@@ -100,16 +100,6 @@ class DataProcessingRegistrationOverviewPageObject implements PageObject {
     getRemoveSystemButton(systemName: string) {
         return element(by.xpath(`//*/a[text()="${systemName}"]/../..//button`));
     }
-
-    getAddSubDataProcessorButton() {
-        return element(by.id("create-sub-data-processor-btn"));
-    }
-
-    getSaveSubDataProcessorButton() {
-        console.log("Getting the save SubDataProcessor button");
-        return element(by.id("save-sub-data-processor-btn"));
-    }
-
     isCreateDpaAvailable(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.getCreateDpaDialog());
     }
