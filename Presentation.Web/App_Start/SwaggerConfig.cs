@@ -2,15 +2,15 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 using System.Web.Http;
 using Presentation.Web;
 using Presentation.Web.Helpers;
 using Presentation.Web.Swagger;
 using Swashbuckle.Application;
 using Swashbuckle.OData;
-using WebActivatorEx;
 
-[assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
+[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
 namespace Presentation.Web
 {
@@ -21,6 +21,24 @@ namespace Presentation.Web
             public const int V1 = 1;
             public const int V2 = 2;
         }
+
+        /// <summary>
+        /// Produce RFC3986 compliant ids for model descriptions
+        /// </summary>
+        /// <param name="modelType"></param>
+        /// <returns></returns>
+        private static string BuildSchemaId(Type modelType)
+        {
+            if (!modelType.IsConstructedGenericType) return modelType.Name;
+
+            var prefix = modelType.GetGenericArguments()
+                .Select(BuildSchemaId)
+                .Aggregate((previous, current) => previous + current);
+
+            return (prefix + modelType.Name.Split('`').First())
+                .Replace("[]", "_array_"); //Remove array annotations which produce invalid document ids
+        }
+
         public static void Register()
         {
             GlobalConfiguration.Configuration.EnableSwagger(c =>
@@ -60,13 +78,14 @@ namespace Presentation.Web
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
                     c.DocumentFilter<RemoveInternalApiOperationsFilter>();
                     c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
+                    c.OperationFilter<CreateOperationIdOperationFilter>();
                     c.OperationFilter<FixNamingOfComplexQueryParametersFilter>();
                     c.OperationFilter<FixContentParameterTypesOnSwaggerSpec>();
                     c.GroupActionsBy(apiDesc =>
                         {
                             var controllerName = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
                             if (apiDesc.RelativePath.IsExternalApiPath())
-                                return "API V2 - " + (controllerName.EndsWith("V2",StringComparison.OrdinalIgnoreCase) ? controllerName.Substring(0,controllerName.Length-2) : controllerName);
+                                return "API V2 - " + (controllerName.EndsWith("V2", StringComparison.OrdinalIgnoreCase) ? controllerName.Substring(0, controllerName.Length - 2) : controllerName);
                             if (apiDesc.RelativePath.Contains("api"))
                                 return "API - V1 - " + controllerName;
                             return "API - V1 (ODATA) - " + controllerName;
@@ -75,6 +94,9 @@ namespace Presentation.Web
                     c.IncludeXmlComments(commentsFile);
 
                     c.DescribeAllEnumsAsStrings();
+
+                    //Fix invalid names (generics etc)
+                    c.SchemaId(BuildSchemaId);
 
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
