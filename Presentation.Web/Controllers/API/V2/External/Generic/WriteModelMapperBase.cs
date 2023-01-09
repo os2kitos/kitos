@@ -158,11 +158,22 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return isPartOfScopedReset;
         }
 
-        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
+        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapCreateReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
         {
             return references.Select(x => new UpdatedExternalReferenceProperties
             {
-                Uuid =  x.Uuid,
+                Title = x.Title,
+                DocumentId = x.DocumentId,
+                Url = x.Url,
+                MasterReference = x.MasterReference
+            }).ToList();
+        }
+
+        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapUpdateReferences(IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> references)
+        {
+            return references.Select(x => new UpdatedExternalReferenceProperties
+            {
+                Uuid = x.Uuid,
                 Title = x.Title,
                 DocumentId = x.DocumentId,
                 Url = x.Url,

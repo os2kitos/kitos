@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Core.DomainModel.GDPR;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Request.DataProcessing
 {
-    public class UpdateDataProcessingRegistrationRequestDTO : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal
+    public class UpdateDataProcessingRegistrationRequestDTO : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal, IHasExternalReference<UpdateExternalReferenceDataWriteRequestDTO>
     {
         /// <summary>
         /// Name of the registration
@@ -14,5 +16,9 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         /// </summary>
         [MaxLength(DataProcessingRegistrationConstraints.MaxNameLength)]
         public string Name { get; set; }
+        /// <summary>
+        /// External reference definitions
+        /// </summary>
+        public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
     }
 }

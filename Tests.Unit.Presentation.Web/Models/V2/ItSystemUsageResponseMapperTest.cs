@@ -14,6 +14,7 @@ using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -474,7 +475,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             };
         }
 
-        private static void AssertExternalReferences(ItSystemUsage itSystemUsage, List<ExternalReferenceDataDTO> dtoExternalReferences)
+        private static void AssertExternalReferences(ItSystemUsage itSystemUsage, List<ExternalReferenceDataResponseDTO> dtoExternalReferences)
         {
             var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
             AssertExternalReference(itSystemUsage.Reference, actualMaster);
@@ -488,8 +489,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataDTO actualMaster)
+        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataResponseDTO actualMaster)
         {
+            Assert.Equal(reference.Uuid, actualMaster.Uuid);
             Assert.Equal(reference.Title, actualMaster.Title);
             Assert.Equal(reference.URL, actualMaster.Url);
             Assert.Equal(reference.ExternalReferenceId, actualMaster.DocumentId);

@@ -12,6 +12,7 @@ using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.M
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
@@ -495,7 +496,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_ExternalReferences()
         {
             //Arrange
-            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+            var references = Many<UpdateExternalReferenceDataWriteRequestDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
             var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { ExternalReferences = references });
@@ -504,7 +505,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertReferences(references, AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
         }
 
-        private static void AssertReferences(IReadOnlyList<ExternalReferenceDataDTO> references, IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences)
+        private static void AssertReferences<T>(IReadOnlyList<T> references, IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences) where T: BaseExternalReferenceDTO
         {
             Assert.Equal(mappedReferences.Count, mappedReferences.Count);
             for (var i = 0; i < mappedReferences.Count; i++)
@@ -515,6 +516,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(expected.Title, actual.Title);
                 Assert.Equal(expected.DocumentId, actual.DocumentId);
                 Assert.Equal(expected.MasterReference, actual.MasterReference);
+
+                if (expected is UpdateExternalReferenceDataWriteRequestDTO expectedUpdateReference)
+                {
+                    Assert.Equal(expectedUpdateReference.Uuid, actual.Uuid);
+                }
             }
         }
 
@@ -650,7 +656,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
             if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
             if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
-            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
+            if (noReferences) properties.Remove(nameof(UpdateDataProcessingRegistrationRequestDTO.ExternalReferences));
+
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(properties);
         }
 

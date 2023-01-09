@@ -14,6 +14,7 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
@@ -914,7 +915,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var inputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var inputs = Many<ExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
 
             var request = new CreateNewContractRequestDTO
             {
@@ -945,7 +946,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             };
             var newContract = await ItContractV2Helper.PostContractAsync(token, request);
 
-            var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var inputs1 = Many<UpdateExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
 
             //Act
             using var response1 = await ItContractV2Helper.SendPatchExternalReferences(token, newContract.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
@@ -955,7 +956,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertExternalReferenceResults(inputs1, dto);
 
             //Act - reset
-            var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
+            var inputs2 = Enumerable.Empty<UpdateExternalReferenceDataWriteRequestDTO>().ToList();
             using var response2 = await ItContractV2Helper.SendPatchExternalReferences(token, newContract.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
@@ -1589,7 +1590,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequest) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var externalReferences = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var externalReferences = Many<ExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
             var systemUsageUuids = await CreateSystemUsageUuids(token, organization);
             var roles = await CreateRoles(organization);
             var dataProcessingRegistrationUuids = await CreateDataProcessingRegistrationUuids(token, organization);
@@ -1654,7 +1655,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (contractType1, contractTemplateType1, agreementElements1, criticalityType1, generalDataWriteRequest1) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest1 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest1 = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var externalReferences1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var externalReferences1 = Many<UpdateExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
             var systemUsageUuids1 = await CreateSystemUsageUuids(token, organization);
             var roles1 = await CreateRoles(organization);
             var dataProcessingRegistrationUuids1 = await CreateDataProcessingRegistrationUuids(token, organization);
@@ -1708,7 +1709,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (contractType2, contractTemplateType2, agreementElements2, criticalityType2, generalDataWriteRequest2) = await CreateGeneralDataRequestDTO(organization, true, true, true, true);
             var contractResponsibleDataWriteRequest2 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var supplierRequest2 = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var externalReferences2 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var externalReferences2 = Many<UpdateExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
             var systemUsageUuids2 = await CreateSystemUsageUuids(token, organization);
             var roles2 = await CreateRoles(organization);
             var dataProcessingRegistrationUuids2 = await CreateDataProcessingRegistrationUuids(token, organization);
@@ -2127,7 +2128,16 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
         }
-        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
+        private IEnumerable<ExternalReferenceDataWriteRequestDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
+        }
+        private IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> WithRandomMaster(IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> references)
         {
             var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
             orderedRandomly.First().MasterReference = true;
@@ -2137,7 +2147,15 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return orderedRandomly;
         }
 
-        private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItContractResponseDTO actual)
+        private static void AssertExternalReferenceResults(List<UpdateExternalReferenceDataWriteRequestDTO> expected, ItContractResponseDTO actual)
+        {
+            Assert.Equal(expected.Count, actual.ExternalReferences.Count());
+            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+        }
+
+
+        private static void AssertExternalReferenceResults(List<ExternalReferenceDataWriteRequestDTO> expected, ItContractResponseDTO actual)
         {
             Assert.Equal(expected.Count, actual.ExternalReferences.Count());
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()

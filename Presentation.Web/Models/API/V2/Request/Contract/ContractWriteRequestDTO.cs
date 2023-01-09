@@ -47,6 +47,5 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// </summary>
         public IEnumerable<RoleAssignmentRequestDTO> Roles { get; set; }
 
-        public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
     }
 }

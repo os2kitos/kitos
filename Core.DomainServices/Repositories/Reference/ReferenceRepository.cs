@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
@@ -85,6 +86,16 @@ namespace Core.DomainServices.Repositories.Reference
             }
 
             ResolveRepositoryOperations(root.GetRootType()).Save();
+        }
+
+        public void UpdateRange(IEnumerable<ExternalReference> entitiesToUpdate)
+        {
+            foreach (var reference in entitiesToUpdate)
+            {
+                _referenceRepository.Update(reference);
+            }
+
+            _referenceRepository.Save();
         }
 
         private ReferenceRootRepositoryOperations ResolveRepositoryOperations(ReferenceRootType rootType)

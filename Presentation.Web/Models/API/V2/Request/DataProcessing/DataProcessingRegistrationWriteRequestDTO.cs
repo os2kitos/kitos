@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Shared;
-using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Request.DataProcessing
 {
@@ -24,9 +22,5 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         ///     - Role options must be available in the organization of the data processing registration
         /// </summary>
         public IEnumerable<RoleAssignmentRequestDTO> Roles { get; set; }
-        /// <summary>
-        /// External reference definitions
-        /// </summary>
-        public IEnumerable<ExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
     }
 }

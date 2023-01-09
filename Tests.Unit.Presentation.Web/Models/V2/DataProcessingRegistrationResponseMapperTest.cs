@@ -12,6 +12,7 @@ using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.M
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
@@ -512,7 +513,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 AssertIdentity(optionalExpectedIdentity, actualIdentity);
         }
 
-        private static void AssertExternalReferences(DataProcessingRegistration dpr, List<ExternalReferenceDataDTO> dtoExternalReferences)
+        private static void AssertExternalReferences(DataProcessingRegistration dpr, IReadOnlyCollection<ExternalReferenceDataResponseDTO> dtoExternalReferences)
         {
             var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
             AssertExternalReference(dpr.Reference, actualMaster);
@@ -526,8 +527,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataDTO actualMaster)
+        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataResponseDTO actualMaster)
         {
+            Assert.Equal(reference.Uuid, actualMaster.Uuid);
             Assert.Equal(reference.Title, actualMaster.Title);
             Assert.Equal(reference.URL, actualMaster.Url);
             Assert.Equal(reference.ExternalReferenceId, actualMaster.DocumentId);
