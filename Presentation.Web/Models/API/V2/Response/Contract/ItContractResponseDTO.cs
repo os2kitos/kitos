@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
 {
@@ -58,6 +58,6 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Role assignments
         /// </summary>
         public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
-        public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
+        public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
     }
 }

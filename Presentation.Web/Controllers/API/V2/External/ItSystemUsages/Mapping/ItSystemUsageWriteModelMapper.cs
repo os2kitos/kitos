@@ -15,6 +15,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -55,7 +56,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             var orgUsageInput = WithResetDataIfPropertyIsDefined(request.OrganizationUsage, nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage), enforceFallbackOnUndefinedProperties);
             var kleInput = WithResetDataIfPropertyIsDefined(request.LocalKleDeviations, nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations), enforceFallbackOnUndefinedProperties);
             var roles = WithResetDataIfPropertyIsDefined(request.Roles, nameof(UpdateItSystemUsageRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>(), enforceFallbackOnUndefinedProperties);
-            var externalReferenceDataDtos = WithResetDataIfPropertyIsDefined(request.ExternalReferences, nameof(UpdateItSystemUsageRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>(), enforceFallbackOnUndefinedProperties);
+            var externalReferenceDataDtos = WithResetDataIfPropertyIsDefined(request.ExternalReferences, nameof(UpdateItSystemUsageRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataWriteRequestDTO>(), enforceFallbackOnUndefinedProperties);
             var gdpr = WithResetDataIfPropertyIsDefined(request.GDPR, nameof(UpdateItSystemUsageRequestDTO.GDPR), enforceFallbackOnUndefinedProperties);
             var archiving = WithResetDataIfPropertyIsDefined(request.Archiving, nameof(UpdateItSystemUsageRequestDTO.Archiving), enforceFallbackOnUndefinedProperties);
 
@@ -246,7 +247,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
         {
             return BaseMapReferences(references);
         }

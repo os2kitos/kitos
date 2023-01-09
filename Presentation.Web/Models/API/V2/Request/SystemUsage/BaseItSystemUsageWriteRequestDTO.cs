@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Request.Shared;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
@@ -33,6 +33,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// Constraint:
         ///     - If the list is not empty one (and only one) must be marked as the master reference.
         /// </summary>
-        public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
+        public IEnumerable<ExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
     }
 }

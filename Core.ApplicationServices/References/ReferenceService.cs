@@ -182,40 +182,55 @@ namespace Core.ApplicationServices.References
                 .GetRootEntity(rootId, rootType)
                 .Match(root =>
                 {
-                    //Clear existing state
-                    root.ClearMasterReference();
-                    var deleteResult = DeleteExternalReferences(root);
-                    if (deleteResult.Failed)
-                        return new OperationError("Failed to delete old references", deleteResult.Error);
+                    var referenceList = externalReferences.ToList();
+                    var masterReferencesCount = referenceList.Count(x => x.MasterReference);
 
-                    var newReferences = externalReferences.ToList();
-                    if (newReferences.Any())
+                    switch (masterReferencesCount)
                     {
-                        var masterReferencesCount = newReferences.Count(x => x.MasterReference);
-
-                        switch (masterReferencesCount)
-                        {
-                            case < 1:
-                                return new OperationError("A master reference must be defined", OperationFailure.BadInput);
-                            case > 1:
-                                return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
-                        }
-
-                        foreach (var referenceProperties in newReferences)
-                        {
-                            var result = AddReference(rootId, rootType, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
-
-                            if (result.Failed)
-                                return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
-
-                            if (referenceProperties.MasterReference)
-                            {
-                                var masterReferenceResult = root.SetMasterReference(result.Value);
-                                if (masterReferenceResult.Failed)
-                                    return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
-                            }
-                        }
+                        case < 1:
+                            return new OperationError("A master reference must be defined", OperationFailure.BadInput);
+                        case > 1:
+                            return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
                     }
+
+                    var referencesToDelete = root.ExternalReferences.Where(externalReference => !referenceList.Any(referenceProperties => referenceProperties.Uuid == externalReference.Uuid));
+                    DeleteExternalReferenceRange(referencesToDelete);
+
+                    var referencesToUpdate = new List<ExternalReference>();
+                    foreach (var externalReferenceProperties in referenceList)
+                    {
+                        ExternalReference externalReference;
+                        if (externalReferenceProperties.Uuid.HasValue)
+                        {
+                            var uuid = externalReferenceProperties.Uuid.Value;
+                            var existingReferenceResult = _referenceRepository.GetByUuid(uuid);
+                            if(existingReferenceResult.IsNone)
+                                return new OperationError($"External reference with uuid: {uuid} was not found", OperationFailure.NotFound);
+
+                            externalReference = existingReferenceResult.Value;
+                            MapExternalReference(externalReferenceProperties, externalReference);
+                            referencesToUpdate.Add(externalReference);
+                        }
+                        else
+                        {
+                            var addReferenceResult = AddReference(rootId, rootType, externalReferenceProperties.Title, externalReferenceProperties.DocumentId, externalReferenceProperties.Url);
+
+                            if (addReferenceResult.Failed)
+                                return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(externalReferenceProperties)}. Error:{addReferenceResult.Error.Message.GetValueOrEmptyString()}", addReferenceResult.Error.FailureType);
+
+                            externalReference = addReferenceResult.Value;
+                        }
+
+                        if (!externalReferenceProperties.MasterReference) 
+                            continue;
+
+                        var masterReferenceResult = root.SetMasterReference(externalReference);
+                        if (masterReferenceResult.Failed)
+                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
+                    }
+
+                    _referenceRepository.UpdateRange(referencesToUpdate);
+
                     return Maybe<OperationError>.None;
 
                 }, () => new OperationError(OperationFailure.NotFound));
@@ -224,6 +239,33 @@ namespace Core.ApplicationServices.References
                 transaction.Commit();
 
             return error;
+        }
+
+        private void MapExternalReference(UpdatedExternalReferenceProperties updatedProperties,
+            ExternalReference externalReference)
+        {
+            externalReference.Title = updatedProperties.Title;
+            
+        }
+
+        private IEnumerable<ExternalReference> DeleteExternalReferenceRange(IEnumerable<ExternalReference> references)
+        {
+            using var transaction = _transactionManager.Begin();
+            var externalReferenceList = references.ToList();
+
+            if (externalReferenceList.Count == 0)
+            {
+                return externalReferenceList;
+            }
+
+            foreach (var reference in externalReferenceList)
+            {
+                _domainEvents.Raise(new EntityBeingDeletedEvent<ExternalReference>(reference));
+                _referenceRepository.Delete(reference);
+            }
+
+            transaction.Commit();
+            return externalReferenceList;
         }
 
         private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferences(IEntityWithExternalReferences root)
@@ -239,22 +281,11 @@ namespace Core.ApplicationServices.References
             }
 
             using var transaction = _transactionManager.Begin();
-            var systemExternalReferences = root.ExternalReferences.ToList();
-
-            if (systemExternalReferences.Count == 0)
-            {
-                return systemExternalReferences;
-            }
-
-            foreach (var reference in systemExternalReferences)
-            {
-                _domainEvents.Raise(new EntityBeingDeletedEvent<ExternalReference>(reference));
-                _referenceRepository.Delete(reference);
-            }
-
+            var removedReferences = DeleteExternalReferenceRange(root.ExternalReferences.ToList());
             RaiseRootUpdated(root);
             transaction.Commit();
-            return systemExternalReferences;
+
+            return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(removedReferences);
         }
     }
 }

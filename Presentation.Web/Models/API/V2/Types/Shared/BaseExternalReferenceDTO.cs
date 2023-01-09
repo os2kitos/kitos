@@ -2,10 +2,7 @@
 
 namespace Presentation.Web.Models.API.V2.Types.Shared
 {
-    /// <summary>
-    /// User defined external references attached to a KITOS entity
-    /// </summary>
-    public class ExternalReferenceDataDTO
+    public abstract class BaseExternalReferenceDTO
     {
         /// <summary>
         /// Reference title as shown in KITOS UI

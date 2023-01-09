@@ -9,7 +9,7 @@ using Core.ApplicationServices.Model.Shared.Write;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Request.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
@@ -158,10 +158,11 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return isPartOfScopedReset;
         }
 
-        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
         {
             return references.Select(x => new UpdatedExternalReferenceProperties
             {
+                Uuid =  x.Uuid,
                 Title = x.Title,
                 DocumentId = x.DocumentId,
                 Url = x.Url,

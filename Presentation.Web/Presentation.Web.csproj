@@ -445,7 +445,11 @@
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserAdministrationPermissionsDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessorRegistrationSubDataProcessorWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Shared\ExternalReferenceDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Shared\UpdateExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Shared\ExternalReferenceDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\BaseExternalReferenceDTO.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />
@@ -615,7 +619,6 @@
     <Compile Include="Models\API\V2\Response\SystemUsage\OrganizationUsageResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasEntityCreator.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasLastModified.cs" />
-    <Compile Include="Models\API\V2\Types\Shared\ExternalReferenceDataDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Roles\RoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\BaseItSystemUsageWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\CreateItSystemUsageRequestDTO.cs" />

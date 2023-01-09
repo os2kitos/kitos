@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
@@ -31,6 +32,6 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// <summary>
         /// External reference definitions
         /// </summary>
-        public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
+        public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
     }
 }

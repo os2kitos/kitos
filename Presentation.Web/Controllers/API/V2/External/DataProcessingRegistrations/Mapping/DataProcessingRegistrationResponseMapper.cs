@@ -7,6 +7,7 @@ using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
@@ -112,15 +113,16 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return isAgreementConcluded?.ToYesNoIrrelevantChoice();
         }
 
-        private static IEnumerable<ExternalReferenceDataDTO> MapExternalReferences(DataProcessingRegistration dataProcessingRegistration)
+        private static IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(DataProcessingRegistration dataProcessingRegistration)
         {
             return dataProcessingRegistration.ExternalReferences.Select(reference => MapExternalReferenceDTO(dataProcessingRegistration, reference)).ToList();
         }
 
-        private static ExternalReferenceDataDTO MapExternalReferenceDTO(DataProcessingRegistration dataProcessingRegistration, ExternalReference reference)
+        private static ExternalReferenceDataResponseDTO MapExternalReferenceDTO(DataProcessingRegistration dataProcessingRegistration, ExternalReference reference)
         {
             return new()
             {
+                Uuid = reference.Uuid,
                 DocumentId = reference.ExternalReferenceId,
                 Title = reference.Title,
                 Url = reference.URL,

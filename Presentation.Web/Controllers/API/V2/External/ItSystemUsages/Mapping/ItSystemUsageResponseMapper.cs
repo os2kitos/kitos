@@ -10,6 +10,7 @@ using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -131,7 +132,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return systemUsage.UsageRelations.Select(MapSystemRelationDTO).ToList();
         }
 
-        private static IEnumerable<ExternalReferenceDataDTO> MapExternalReferences(ItSystemUsage systemUsage)
+        private static IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(ItSystemUsage systemUsage)
         {
             return systemUsage.ExternalReferences.Select(reference => MapExternalReferenceDTO(systemUsage, reference)).ToList();
         }
@@ -241,10 +242,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private static ExternalReferenceDataDTO MapExternalReferenceDTO(ItSystemUsage systemUsage, ExternalReference reference)
+        private static ExternalReferenceDataResponseDTO MapExternalReferenceDTO(ItSystemUsage systemUsage, ExternalReference reference)
         {
             return new()
             {
+                Uuid = reference.Uuid,
                 DocumentId = reference.ExternalReferenceId,
                 Title = reference.Title,
                 Url = reference.URL,

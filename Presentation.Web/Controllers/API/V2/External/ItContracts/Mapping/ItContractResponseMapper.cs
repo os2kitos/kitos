@@ -8,8 +8,8 @@ using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Contract;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -102,9 +102,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return contract.Rights?.Select(ToRoleResponseDTO).ToList() ?? new List<RoleAssignmentResponseDTO>();
         }
 
-        private static List<ExternalReferenceDataDTO> MapExternalReferences(ItContract contract)
+        private static List<ExternalReferenceDataResponseDTO> MapExternalReferences(ItContract contract)
         {
-            return contract.ExternalReferences?.Select(x => MapExternalReferenceDTO(contract, x)).ToList() ?? new List<ExternalReferenceDataDTO>();
+            return contract.ExternalReferences?.Select(x => MapExternalReferenceDTO(contract, x)).ToList() ?? new List<ExternalReferenceDataResponseDTO>();
         }
 
         private static ContractPaymentModelDataResponseDTO MapPaymentModel(ItContract contract)
@@ -186,10 +186,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private static ExternalReferenceDataDTO MapExternalReferenceDTO(ItContract contract, ExternalReference reference)
+        private static ExternalReferenceDataResponseDTO MapExternalReferenceDTO(ItContract contract, ExternalReference reference)
         {
             return new()
             {
+                Uuid = reference.Uuid,
                 DocumentId = reference.ExternalReferenceId,
                 Title = reference.Title,
                 Url = reference.URL,

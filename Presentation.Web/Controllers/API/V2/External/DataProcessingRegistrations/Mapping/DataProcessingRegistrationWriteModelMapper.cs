@@ -13,6 +13,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
@@ -49,7 +50,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids, x => x.SystemUsageUuids, () => new List<Guid>());
             dto.Oversight = WithResetDataIfSectionIsNotDefined(dto.Oversight, x => x.Oversight);
             dto.Roles = WithResetDataIfSectionIsNotDefinedWithFallback(dto.Roles, x => x.Roles, Array.Empty<RoleAssignmentRequestDTO>);
-            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences, x => x.ExternalReferences, Array.Empty<ExternalReferenceDataDTO>);
+            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences, x => x.ExternalReferences, Array.Empty<ExternalReferenceDataWriteRequestDTO>);
 
             return new DataProcessingRegistrationModificationParameters
             {
@@ -62,7 +63,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
         {
             return BaseMapReferences(references);
         }

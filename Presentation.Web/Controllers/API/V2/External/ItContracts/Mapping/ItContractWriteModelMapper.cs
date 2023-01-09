@@ -312,7 +312,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> dtos)
         {
-            return BaseMapReferences(dtos);
+            return BaseMapCreateReferences(dtos);
         }
 
         private static Maybe<(byte quarter, int year)> MapProcurementPlan(ProcurementPlanDTO plan)
