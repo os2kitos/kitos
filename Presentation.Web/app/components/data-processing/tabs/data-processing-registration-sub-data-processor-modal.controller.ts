@@ -116,7 +116,9 @@
             return Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(subDataProcessor?.basisForTransfer,
                 this.dataProcessingRegistrationOptions.basisForTransferOptions,
                 (newElement) => this.viewModel.updateBasisForTransfer(newElement),
-                this.select2LoadingService);
+                this.select2LoadingService,
+                null,
+                false); //We only allow selection of non-expired and this object is based on the available objects
         }
 
         private bindTransferToThirdCountriesOptions(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption> {
@@ -147,24 +149,7 @@
                 (newElement) => this.viewModel.updateInsecureThirdCountry(newElement),
                 this.select2LoadingService);
         }
-            /*const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(this.dataProcessingRegistrationOptions.thirdCountryOptions);
-
-            let existingChoice = null;
-            if (subDataProcessor) {
-                //If selected state is expired, add it for presentation reasons
-                existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(subDataProcessor.insecureCountry, optionMap);
-            }
-
-            const options = this.dataProcessingRegistrationOptions.thirdCountryOptions.map(option => optionMap[option.id]);
-
-            return {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, false),
-                elementSelected: (newElement) => {
-                    this.viewModel.updateInsecureThirdCountry(newElement);
-                }
-            };*/
-
+            
         private bindSubDataProcessor(): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO> {
 
             const pageSize = 100;

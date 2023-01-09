@@ -92,6 +92,29 @@
             this.openModal(id);
         }
 
+        changeName(name) {
+            this.apiUseCaseFactory
+                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistrationId, name))
+                .executeAsync(nameChangeResponse => {
+                    this.headerName = name;
+                    return nameChangeResponse;
+                });
+        }
+
+        removeSubDataProcessor(id: number) {
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistrationId, id))
+                .executeAsync(success => {
+
+                    //Update the source collection
+                    this.dataProcessingRegistration.subDataProcessors = this.dataProcessingRegistration.subDataProcessors.filter(x => x.id !== id);
+
+                    //Propagate changes to UI binding
+                    this.bindSubDataProcessors();
+                    return success;
+                });
+        }
+
         private openModal(subDataProcessorId: number = null) {
             this.$state.go("data-processing.edit-registration.main.sub-data-processor", { subDataProcessorId: subDataProcessorId });
         }
@@ -123,7 +146,8 @@
                 this.dataProcessingRegistrationOptions.basisForTransferOptions,
                 (newElement) => this.updateBasisForTransfer(newElement),
                 this.select2LoadingService,
-                true);
+                true,
+                false); //We only allow selection of non-expired and this object is based on the available objects
         }
 
         private bindTransferToInsecureThirdCountries() {
@@ -212,15 +236,6 @@
                 });
         }
 
-        changeName(name) {
-            this.apiUseCaseFactory
-                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistrationId, name))
-                .executeAsync(nameChangeResponse => {
-                    this.headerName = name;
-                    return nameChangeResponse;
-                });
-        }
-
         private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
                 const newDp = newElement.optionalObjectContext;
@@ -279,20 +294,6 @@
                         return success;
                     });
             }
-        }
-
-        removeSubDataProcessor(id: number) {
-            this.apiUseCaseFactory
-                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistrationId, id))
-                .executeAsync(success => {
-
-                    //Update the source collection
-                    this.dataProcessingRegistration.subDataProcessors = this.dataProcessingRegistration.subDataProcessors.filter(x => x.id !== id);
-
-                    //Propagate changes to UI binding
-                    this.bindSubDataProcessors();
-                    return success;
-                });
         }
 
         private updateBasisForTransfer(newValue?: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) {
