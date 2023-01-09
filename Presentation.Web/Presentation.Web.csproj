@@ -1613,7 +1613,6 @@
     <Content Include="Content\less\kitos.less" />
     <Content Include="Content\less\variables.less" />
     <Content Include="Content\notify\notify.less" />
-    <Content Include="Content\kendo.default.min.css" />
     <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
     <Content Include="Metadata.ashx" />
     <None Include="packages.config" />
