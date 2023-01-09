@@ -1,5 +1,29 @@
 ﻿module Kitos.DataProcessing.Registration.Edit.SubDataProcessor {
     "use strict";
+    
+    export interface ISubDataProcessorDialogFactory {
+        open(subDataProcessorId: number | null, dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO, dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions): ng.ui.bootstrap.IModalInstanceService
+    }
+
+    export class SubDataProcessorDialogFactory implements ISubDataProcessorDialogFactory {
+        static $inject = ["$uibModal"];
+        constructor(private readonly $uibModal: ng.ui.bootstrap.IModalService) { }
+
+        open(subDataProcessorId: number | null, dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO, dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions): ng.ui.bootstrap.IModalInstanceService {
+            return this.$uibModal.open({
+                templateUrl: "app/components/data-processing/tabs/data-processing-registration-sub-data-processor-modal.view.html",
+                windowClass: "modal fade in",
+                controller: SubDataProcessorModalController,
+                controllerAs: "ctrl",
+                resolve: {
+                    "subDataProcessorId": [() => subDataProcessorId],
+                    "dataProcessingRegistration": [() => dataProcessingRegistration],
+                    "dataProcessingRegistrationOptions": [() => dataProcessingRegistrationOptions]
+                },
+                backdrop: "static", //Make sure accidental click outside the modal does not close the modal
+            });
+        }
+    }
 
     export class SubDataProcessorModalController {
         static $inject: Array<string> = [
@@ -26,22 +50,19 @@
 
         readonly yesValue = Models.Api.Shared.YesNoUndecidedOption.Yes;
 
-        private subDataProcessorId: number | null;
         private isBusy = false;
 
         constructor(
-            private readonly $state,
-            private readonly $uibModalInstance,
+            private readonly subDataProcessorId: number | null,
             private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
+            private readonly $uibModalInstance,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
-            private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
-            private readonly $stateParams) {
+            private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService) {
         }
 
         $onInit() {
             
-            this.subDataProcessorId = this.$stateParams.subDataProcessorId;
             const subDataProcessor = this.getSubDataProcessor();
 
             this.isEdit = !!subDataProcessor;
@@ -105,11 +126,11 @@
         }
 
         private popState(reload = false) {
-            const popped = this.$state.go("^");
+           /* const popped = this.$state.go("^");
             if (reload) {
                 return popped.then(() => this.$state.reload());
             }
-            return popped;
+            return popped;*/
         }
 
         private bindBasisForTransfer(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
@@ -174,7 +195,7 @@
         }
     }
 
-    angular
+    /*angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
             $stateProvider.state("data-processing.edit-registration.main.sub-data-processor", {
@@ -201,14 +222,10 @@
                             },
                             controller: SubDataProcessorModalController,
                             controllerAs: "ctrl",
-                        }).result.then(() => {
-
-                        },
-                        () => {
-                            $state.go("^");
                         });
                     }
                 ]
             });
-        }]);
+        }]);*/
+    app.service("subDataProcessorDialogFactory", SubDataProcessorDialogFactory);
 }
