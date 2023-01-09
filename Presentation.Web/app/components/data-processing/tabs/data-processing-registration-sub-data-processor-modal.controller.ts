@@ -147,7 +147,9 @@
             return Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(subDataProcessor?.insecureCountry,
                 this.dataProcessingRegistrationOptions.thirdCountryOptions,
                 (newElement) => this.viewModel.updateInsecureThirdCountry(newElement),
-                this.select2LoadingService);
+                this.select2LoadingService,
+                null,
+                false);
         }
             
         private bindSubDataProcessor(): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO> {

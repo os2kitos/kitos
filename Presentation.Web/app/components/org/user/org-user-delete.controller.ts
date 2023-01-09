@@ -1,16 +1,8 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface IAssignedRightViewModel extends Models.ViewModel.Organization.IHasSelection {
-        right: Models.Users.IAssignedRightDTO;
-    }
-
     interface IAssignedAdminRoleViewModel extends Models.ViewModel.Organization.IHasSelection {
         role: Models.OrganizationRole;
-    }
-
-    interface IRootAssignedRightsWithGroupSelectionViewModel extends Models.ViewModel.Organization.IHasSelection {
-        rights: IAssignedRightViewModel[];
     }
 
     interface IRootAssignedAdminRolesWithGroupSelectionViewModel extends Models.ViewModel.Organization.IHasSelection {

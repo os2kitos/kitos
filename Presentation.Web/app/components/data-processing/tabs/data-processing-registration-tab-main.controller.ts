@@ -151,6 +151,7 @@
         }
 
         private bindTransferToInsecureThirdCountries() {
+
             const options = new Models.ViewModel.Shared.YesNoUndecidedOptions();
             this.transferToInsecureThirdCountries = {
 
@@ -166,7 +167,7 @@
 
             this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
                 config => this.insecureThirdCountries = config,
-                () => this.dataProcessingRegistration.insecureThirdCountries.sort((a, b) => a.name.localeCompare(b.name, "da-DK")),
+                () => this.dataProcessingRegistration.insecureThirdCountries.sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale)),
                 element => this.removeInsecureThirdCountry(element.id),
                 newElement => this.addInsecureThirdCountry(newElement),
                 this.hasWriteAccess,
@@ -217,7 +218,7 @@
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
-                () => this.dataProcessingRegistration.dataProcessors.sort((a, b) => a.name.localeCompare(b.name, "da-DK")),
+                () => this.dataProcessingRegistration.dataProcessors.sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale)),
                 element => this.removeDataProcessor(element.id),
                 newElement => this.addDataProcessor(newElement),
                 this.hasWriteAccess,

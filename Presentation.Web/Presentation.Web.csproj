@@ -365,7 +365,7 @@
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-unit-migration-table.component.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-unit-migration.component.ts" />
-    <TypeScriptCompile Include="app\components\org\user\user-delete-directives\org-user-roles-table.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-delete-components\org-user-roles-table.component.ts" />
     <TypeScriptCompile Include="app\Configs\kendo-date-picker-options.ts" />
     <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
     <TypeScriptCompile Include="app\helpers\connection-change-log-helper.ts" />
@@ -718,7 +718,7 @@
     <Content Include="app\components\local-config\ui-customization\local-ui-customization.view.html" />
     <Content Include="app\components\org\structure\org-unit-migration.view.html" />
     <Content Include="app\components\org\structure\org-unit-migration-table.view.html" />
-    <Content Include="app\components\org\user\user-delete-directives\org-user-roles-table.view.html" />
+    <Content Include="app\components\org\user\user-delete-components\org-user-roles-table.view.html" />
     <Content Include="app\components\user-notification\user-notification-modal.view.html" />
     <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
@@ -983,6 +983,7 @@
     <TypeScriptCompile Include="app\shared\helpText\inlineHelpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\field-help-text.directive.ts" />
     <TypeScriptCompile Include="app\shared\helpText\help-text-modal-helper.ts" />
+    <TypeScriptCompile Include="app\shared\localization\localization-helper.ts" />
     <TypeScriptCompile Include="app\shared\main-contract\main-contract-selection.component.ts" />
     <Content Include="app\shared\main-contract\main-contract-selection.view.html" />
     <TypeScriptCompile Include="app\shared\organization-tree\organization-tree.component.ts" />
@@ -1616,7 +1617,6 @@
     <Content Include="Content\less\kitos.less" />
     <Content Include="Content\less\variables.less" />
     <Content Include="Content\notify\notify.less" />
-    <Content Include="Content\kendo.default.min.css" />
     <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
     <Content Include="Metadata.ashx" />
     <None Include="packages.config" />
