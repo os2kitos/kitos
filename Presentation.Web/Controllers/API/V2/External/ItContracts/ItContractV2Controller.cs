@@ -111,19 +111,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="uuid">Specific IT-Contract UUID</param>
         /// <returns>Specific data related to the IT-Contract</returns>
         [HttpGet]
-        [Route("{uuid}")]
+        [Route("{contractUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItContract([NonEmptyGuid] Guid uuid)
+        public IHttpActionResult GetItContract([NonEmptyGuid] Guid contractUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itContractService
-                .GetContract(uuid)
+                .GetContract(contractUuid)
                 .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
         }
