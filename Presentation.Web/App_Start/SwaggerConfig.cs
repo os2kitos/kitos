@@ -51,6 +51,15 @@ namespace Presentation.Web
                         .Description("The KITOS TOKEN")
                         .In("header");
 
+
+                    var swaggerIssueDescription =
+                        "<b>KENDTE FEJL OG BEGRÆNSNINGER PÅ DENNE HJÆLPESIDE SAMT WORKAROUND</b><br/>" +
+                        "Felter der består af lister af enum værdier vises ikke rigtigt i denne UI. Konkret vises de mulige valg ikke, men i stedet vises 'Array[string]'. For et retvisende billede af dokumentationen anbefales derfor følgende workaround:<br/><br/>" +
+                        "- JSON downloades via 'docs linket i toppen'<br/>" +
+                        "- Indholdet indsættes i anden editor f.eks. <a href='https://editor.swagger.io' target='_blank'>Swagger.io</a><br/><br/>" +
+                        "<b>BEMÆRK</b>: Funktionen 'Try it out' virker p.t. ikke i den eksterne editor." +
+                        "";
+
                     c.MultipleApiVersions((description, version) => version == ApiVersions.V1.ToString() || version == ApiVersions.V2.ToString(), builder =>
                       {
                           //NOTE: Add new versions to the top so that users are always presented with the latest version by default (first one added)
@@ -59,12 +68,13 @@ namespace Presentation.Web
                                   "<b><i>OBS: Dokumentation for V1 findes ved at skifte version på dokumentet til 1 øverst på siden</i></b><br/><br/>" +
                                   "KITOS API V2 understøtter både læse- og skriveoperationer for de væsentlige registreringsobjekter i KITOS. <br/><br/>" +
                                   "Se mere om designet og konventionerne i API'et her: <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/2059599873/API+Design+V2'>API V2</a>.<br/><br/>" +
-                                  "Generelt er anvendelsen af KITOS API(er) beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/>"
+                                  "Generelt er anvendelsen af KITOS API(er) beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/><br/>" +
+                                  swaggerIssueDescription
                               );
                           builder.Version("1", "OS2Kitos API - V1")
                               .Description(
                                   "<b><i>OBS: Dokumentation for V2 findes ved at skifte version på dokumentet til 2 øverst på siden</i></b><br/><br/>" +
-                                  "<b>BEMÆRK: ADGANG TIL API V1 <ul>LUKKES</ul>. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/><br/>" +
+                                  "<b>BEMÆRK: ADGANG TIL API V1 LUKKES. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/><br/>" +
                               "Denne dokumentation udstiller Kitos API'et til brug for applikationsudvikling.<br/><br/>" +
                               "Den første udgave af API'et (V1) blev udviklet til understøttelse af projektets brugerflade og vil med tiden blive erstattet " +
                               "af et selvstændigt API (V2) udviklet til brug for integration med udefrakommende systemer. " +
@@ -75,7 +85,8 @@ namespace Presentation.Web
                               "ObjectOwnerId, LastChanged og LastChangedByUserId bliver som udgangspunkt sat af systemet automatisk.<br/>" +
                               "Der er udelukkende adgang til læseoperationer i V1. Ved behov for adgang til funktionalitet, der ændrer i data, kontakt da venligst KITOS sekretariatet.<br/><br/>" +
                               "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/><br/>" +
-                                "<b>BEMÆRK: ADGANG TIL API V1 <ul>LUKKES</ul>. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/>"
+                                "<b>BEMÆRK: ADGANG TIL API V1 LUKKES. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/><br/>" +
+                                  swaggerIssueDescription
                               );
                       });
 
@@ -103,7 +114,7 @@ namespace Presentation.Web
                     c.SchemaId(BuildSchemaId);
 
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-                    
+
                     //Do not enable the build-in caching in the odata provider. It caches error responses which we dont want so we wrap it in a custom caching provider which bails out on errors
                     c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)));
                 })
