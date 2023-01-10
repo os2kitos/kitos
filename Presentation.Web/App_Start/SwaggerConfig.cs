@@ -46,6 +46,10 @@ namespace Presentation.Web
                     var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
                     var commentsFileName = Assembly.GetExecutingAssembly().GetName().Name + ".XML";
                     var commentsFile = Path.Combine(baseDirectory, "bin", commentsFileName);
+                    c.ApiKey("KITOS TOKEN")
+                        .Name("Authorization")
+                        .Description("The KITOS TOKEN")
+                        .In("header");
 
                     c.MultipleApiVersions((description, version) => version == ApiVersions.V1.ToString() || version == ApiVersions.V2.ToString(), builder =>
                       {
@@ -99,7 +103,7 @@ namespace Presentation.Web
                     c.SchemaId(BuildSchemaId);
 
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-
+                    
                     //Do not enable the build-in caching in the odata provider. It caches error responses which we dont want so we wrap it in a custom caching provider which bails out on errors
                     c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)));
                 })
