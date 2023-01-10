@@ -88,11 +88,11 @@
         yesNoUndecidedOptionsViewModel = Models.ViewModel.Shared.YesNoUndecidedOptions;
 
         createSubDataProcessor() {
-            this.openModal();
+            this.openSubDataProcessorModal();
         }
 
         updateSubDataProcessor(id: number) {
-            this.openModal(id);
+            this.openSubDataProcessorModal(id);
         }
 
         changeName(name) {
@@ -118,13 +118,15 @@
                 });
         }
 
-        private openModal(subDataProcessorId: number = null) {
+        private openSubDataProcessorModal(subDataProcessorId: number = null) {
             this.subDataProcessorDialogFactory.open(subDataProcessorId,
                 this.dataProcessingRegistration,
                 this.dataProcessingRegistrationOptions)
-                .closed.then(() => {
+                .result.then((isSubProcessorChanged: boolean) => {
                     //Reload state from backend if the dialog was closed 
-                    this.loadState();
+                    if (isSubProcessorChanged) {
+                        this.bindSubDataProcessors();
+                    }
                 });
         }
 

@@ -350,7 +350,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] AssignSubDataProcessorRequestDTO request)
         {
             if (request == null)
-                return BadRequest("AssignSubDataProcessorRequestDTO must be provided");
+                return BadRequest("Request body must be provided");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -371,7 +371,7 @@ namespace Presentation.Web.Controllers.API.V1
         public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] UpdateSubDataProcessorRequestDTO request)
         {
             if (request == null)
-                return BadRequest("UpdateSubDataProcessorRequestDTO must be provided");
+                return BadRequest("Request body must be provided");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

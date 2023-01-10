@@ -44,6 +44,7 @@
         subDataProcessorFieldName: string;
         isEdit: boolean;
         subDataProcessorName: string;
+        helpTextKey: string;
 
         viewModel: Models.ViewModel.GDPR.SubDataProcessorViewModel;
 
@@ -61,15 +62,17 @@
         }
 
         $onInit() {
-            
+
+            this.isEdit = this.subDataProcessorId != null;
             const subDataProcessor = this.getSubDataProcessor();
 
-            this.isEdit = !!subDataProcessor;
             this.subDataProcessorName = this.isEdit ? subDataProcessor.name : "";
+            this.helpTextKey = this.isEdit ? "edit" : "create";
 
             const titleSuffix = "underdatabehandler";
-            this.subDataProcessorFieldName = "Underdatabehandler";
-            this.title = subDataProcessor ? `Rediger ${titleSuffix}` : `Opret ${titleSuffix}`;
+            const subDataFieldNamePrefix = "Underdatabehandler";
+            this.subDataProcessorFieldName = this.isEdit ? `${subDataFieldNamePrefix} *` : subDataFieldNamePrefix;
+            this.title = this.isEdit ? `Rediger ${titleSuffix}` : `Opret ${titleSuffix}`;
 
             this.viewModel = new Models.ViewModel.GDPR.SubDataProcessorViewModel(this.subDataProcessorId,
                 subDataProcessor?.cvrNumber,
@@ -84,43 +87,38 @@
         }
 
         save(): void {
-            if (this.isBusy)
+            if (this.isBusy || this.isInvalid())
                 return;
             this.isBusy = true;
 
             const payload = this.viewModel.prepareRequestPayload();
-            if (this.subDataProcessorId) {
+            if (this.isEdit) {
                 this.dataProcessingRegistrationService
                     .updateSubDataProcessor(this.dataProcessingRegistration.id, payload)
                     .then(() => {
                             this.isBusy = false;
-                            this.cancel(true);
+                            this.close(true);
                         },
                         () => this.isBusy = false);
-
-                return;
+            } else {
+                this.dataProcessingRegistrationService
+                    .assignSubDataProcessor(this.dataProcessingRegistration.id, payload)
+                    .then(() => {
+                        this.isBusy = false;
+                        this.close(true);
+                    }, () => this.isBusy = false);
             }
-
-            this.dataProcessingRegistrationService.assignSubDataProcessor(this.dataProcessingRegistration.id, payload)
-                .then(() => {
-                    this.isBusy = false;
-                    this.cancel(true);
-                }, () => this.isBusy = false);
         }
 
-        cancel(reload = false): void {
+        close(isSubProcessorChanged = false): void {
             if (this.isBusy)
                 return;
 
-            this.close();
+            this.$uibModalInstance.close(isSubProcessorChanged);
         }
 
         isInvalid(): boolean {
             return !this.viewModel.subDataProcessorId;
-        }
-
-        private close() {
-            this.$uibModalInstance.close();
         }
 
         private bindBasisForTransfer(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
@@ -173,7 +171,8 @@
                         .dataProcessingRegistrationService
                         .getApplicableSubDataProcessors(this.dataProcessingRegistration.id, query, pageSize)
                         .then(results => Helpers.Select2MappingHelper.mapDataProcessingSearchResults(results)),
-                    true),
+                    true,
+                    Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext),
                 elementSelected: (newElement) => {
                     this.viewModel.updateSubDataProcessor(newElement);
                 }
@@ -181,6 +180,9 @@
         }
 
         private getSubDataProcessor(): Models.DataProcessing.IDataProcessorDTO | null {
+            if (!this.isEdit)
+                return null;
+
             return _.find(this.dataProcessingRegistration.subDataProcessors, { id: this.subDataProcessorId });
         }
     }

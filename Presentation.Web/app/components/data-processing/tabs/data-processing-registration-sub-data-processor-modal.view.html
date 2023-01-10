@@ -1,11 +1,12 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
         <h3 class="modal-title pull-left">{{::ctrl.title}}</h3>
+        <help-text class="pull-right" data-key="dpr-sub-data-processor-modal.{{::ctrl.helpTextKey}}" data-default-title="{{::ctrl.title}}"></help-text>
     </div>
 </div>
 
-<form name="createForm">
-    <div class="modal-body relation">
+<div class="modal-body">
+    <form name="createForm">
         <div class="row">
             <div class="col-md-3">
 
@@ -14,18 +15,18 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <div ng-if="!ctrl.isEdit">
-                        <label for="sub-data-processor_select-new">{{::ctrl.subDataProcessorFieldName}} *</label>
+                        <label for="sub-data-processor_select-new">{{::ctrl.subDataProcessorFieldName}}</label>
                         <single-select-select2 data-placeholder="Vælg Underdatabehandler"
                                                id="sub-data-processor_select-new"
-                                               ng-model="ctrl.subDataProcessorsConfig"/>
+                                               ng-model="ctrl.subDataProcessorsConfig" />
                     </div>
                     <div ng-if="ctrl.isEdit">
-                        <label for="sub-data-processor_select-new">{{::ctrl.subDataProcessorFieldName}}</label>
-                        <label type="text" disabled="disabled" class="form-control input-sm">{{::ctrl.subDataProcessorName}}</label>
+                        <label for="sub-data-processor_select-edit">{{::ctrl.subDataProcessorFieldName}}</label>
+                        <label type="text" disabled="disabled" id="sub-data-processor_select-edit" class="form-control input-sm">{{::ctrl.subDataProcessorName}}</label>
                     </div>
-                    <div ng-if="ctrl.viewModel.cvrNumber">
-                        <i>CVR: {{::ctrl.viewModel.cvrNumber}}</i>
-                    </div>
+                    <span ng-if="ctrl.viewModel.cvrNumber" class="help-block small">
+                        CVR: {{::ctrl.viewModel.cvrNumber}}
+                    </span>
                 </div>
                 <div class="form-group">
                     <label for="basisForTransferConfig">Overførselsgrundlag</label>
@@ -40,10 +41,11 @@
                     <single-select-select2 id="insecureThirdCountryConfig" ng-model="ctrl.subDataProcessorInsecureThirdCountriesConfig" />
                 </div>
             </div>
-            </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" ng-click="ctrl.cancel()">Annuller</button>
-                    <button id="save-sub-data-processor-btn" type="button" class="btn btn-primary" ng-click="ctrl.save()" ng-disabled="ctrl.isInvalid()">Gem</button>
         </div>
-    </div>
-</form>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-warning" ng-click="ctrl.close()">Annuller</button>
+    <button id="save-sub-data-processor-btn" type="button" class="btn btn-primary" ng-click="ctrl.save()" ng-disabled="ctrl.isInvalid()">Gem</button>
+</div>
