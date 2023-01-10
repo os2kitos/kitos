@@ -2,6 +2,10 @@
     export class Select2MappingHelper {
         static mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(dtos: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         allowExpiredObjects: boolean = true): Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>[] {
+
+            if (!dtos) {
+                throw "Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap: dtos cannot be undefined/null ";
+            }
             return dtos.reduce((acc, next, _) => {
                 acc[next.id] = {
                     id: next.id,
@@ -49,14 +53,18 @@
             allowExpiredObjects: boolean = true):
             Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
 
-            const optionMap = Helpers.Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(baseOptions, allowExpiredObjects);
+            if (!baseOptions) {
+                throw "Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel: baseOptions cannot be undefined/null ";
+            }
+
+            const optionMap = Select2MappingHelper.mapNamedEntityWithDescriptionAndExpirationStatusDtoArrayToOptionMap(baseOptions ?? [], allowExpiredObjects);
 
             let existingChoice = null;
             if (element) {
                 //If selected state is expired, add it for presentation reasons
-                existingChoice = Helpers.Select2MappingHelper.mapNamedEntityToSelect2ViewModel(element, optionMap, hasDisabledValue);
+                existingChoice = Select2MappingHelper.mapNamedEntityToSelect2ViewModel(element, optionMap, hasDisabledValue);
             }
-
+            
             const options = baseOptions.map(option => optionMap[option.id]);
 
             return {

@@ -11,7 +11,6 @@
             "notify",
             "dataProcessingRegistrationOptions",
             "bindingService",
-            "$state",
             "subDataProcessorDialogFactory"
         ];
 
@@ -25,12 +24,15 @@
             private readonly notify,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
             private readonly bindingService: Services.Generic.IBindingService,
-            private readonly $state: ng.ui.IStateService,
             private readonly subDataProcessorDialogFactory: Edit.SubDataProcessor.ISubDataProcessorDialogFactory) {
+            this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
+            this.loadState();
+        }
+
+        private loadState() {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
-            this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindIsAgreementConcluded();
             this.bindAgreementConcludedRemark();
             this.bindAgreementConcludedAt();
@@ -40,7 +42,6 @@
             this.bindDataResponsibleRemark();
             this.reloadValidationStatus();
         }
-        
 
         headerName = this.dataProcessingRegistration.name;
 
@@ -120,9 +121,11 @@
         private openModal(subDataProcessorId: number = null) {
             this.subDataProcessorDialogFactory.open(subDataProcessorId,
                 this.dataProcessingRegistration,
-                this.dataProcessingRegistrationOptions);
-
-            //this.$state.go("data-processing.edit-registration.main.sub-data-processor", { subDataProcessorId: subDataProcessorId });
+                this.dataProcessingRegistrationOptions)
+                .closed.then(() => {
+                    //Reload state from backend if the dialog was closed 
+                    this.loadState();
+                });
         }
 
         private bindDataResponsible() {

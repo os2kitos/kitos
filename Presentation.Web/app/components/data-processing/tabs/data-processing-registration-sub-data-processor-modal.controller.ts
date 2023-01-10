@@ -27,13 +27,12 @@
 
     export class SubDataProcessorModalController {
         static $inject: Array<string> = [
-            "$state",
-            "$uibModalInstance",
+            "subDataProcessorId",
             "dataProcessingRegistration",
             "dataProcessingRegistrationOptions",
+            "$uibModalInstance",
             "select2LoadingService",
             "dataProcessingRegistrationService",
-            "$stateParams"
         ];
         
         subDataProcessorsConfig: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO>;
@@ -114,7 +113,6 @@
                 return;
 
             this.close();
-            this.popState(reload);
         }
 
         isInvalid(): boolean {
@@ -125,21 +123,13 @@
             this.$uibModalInstance.close();
         }
 
-        private popState(reload = false) {
-           /* const popped = this.$state.go("^");
-            if (reload) {
-                return popped.then(() => this.$state.reload());
-            }
-            return popped;*/
-        }
-
         private bindBasisForTransfer(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
             return Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(subDataProcessor?.basisForTransfer,
                 this.dataProcessingRegistrationOptions.basisForTransferOptions,
                 (newElement) => this.viewModel.updateBasisForTransfer(newElement),
                 this.select2LoadingService,
                 null,
-                false); //We only allow selection of non-expired and this object is based on the available objects
+                false);
         }
 
         private bindTransferToThirdCountriesOptions(subDataProcessor: Models.DataProcessing.IDataProcessorDTO | null): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption> {
@@ -195,37 +185,5 @@
         }
     }
 
-    /*angular
-        .module("app")
-        .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("data-processing.edit-registration.main.sub-data-processor", {
-                url: "/sub-data-processor-modal",
-                params: {
-                    subDataProcessorId: null
-                },
-                onEnter: [
-                    "$state", "$uibModal",
-                    ($state, $uibModal) => {
-                        $uibModal.open({
-                            templateUrl: "app/components/data-processing/tabs/data-processing-registration-sub-data-processor-modal.view.html",
-                            windowClass: "modal fade in",
-                            resolve: {
-                                dataProcessingRegistration: [
-                                    "dataProcessingRegistrationService", "$stateParams", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, $stateParams) => dataProcessingRegistrationService.get($stateParams.id)
-                                ],
-                                dataProcessingRegistrationOptions: [
-                                    "dataProcessingRegistrationService", "userService", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
-                                        userService: Services.IUserService) => {
-                                        return userService.getUser().then(user => dataProcessingRegistrationService.getApplicableDataProcessingRegistrationOptions(user.currentOrganizationId));
-                                    }
-                                ]
-                            },
-                            controller: SubDataProcessorModalController,
-                            controllerAs: "ctrl",
-                        });
-                    }
-                ]
-            });
-        }]);*/
     app.service("subDataProcessorDialogFactory", SubDataProcessorDialogFactory);
 }
