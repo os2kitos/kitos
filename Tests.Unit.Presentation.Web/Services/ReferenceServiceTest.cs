@@ -432,70 +432,119 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Can_BatchUpdateExternalReferences_With_No_Uuid()
+        public void Can_CreateExternalReferences()
         {
             //Arrange
             var rootType = A<ReferenceRootType>();
             var rootId = A<int>();
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().Select(x =>
+            var externalReferencePropertiesList = Many<UpdatedExternalReferenceProperties>().Select(x =>
             {
                 x.Uuid = null;
                 return x;
             }).ToList();
-            var expectedMaster = externalReferences.RandomItem();
+            var expectedMaster = externalReferencePropertiesList.RandomItem();
             expectedMaster.MasterReference = true;
 
+            var entity = root.Object.FromNullable();
             var masterReference = CreateExternalReference(expectedMaster);
             ExpectMasterReference(root, masterReference);
-            ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
+            ExpectRootDeleteAndAdd(root, externalReferencePropertiesList, new List<ExternalReference>());
             ExpectAllowModifyReturns(root.Object, true);
             ExpectTransactionToBeSet();
-            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+            ExpectGetRootEntityReturns(rootId, rootType, entity);
 
             //Act
-            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferencePropertiesList);
 
             //Assert
             Assert.True(result.IsNone);
             _dbTransaction.Verify(x => x.Commit());
+            foreach (var externalReference in externalReferencePropertiesList)
+            {
+                root.Verify(x => x.AddExternalReference
+                (
+                    It.Is<ExternalReference>
+                    (
+                        reference => reference.Title == externalReference.Title 
+                        && reference.ExternalReferenceId == externalReference.DocumentId 
+                        && reference.URL == externalReference.Url)
+                    ), 
+                    Times.Once
+                );
+            }
+        }
+
+        private UpdatedExternalReferenceProperties MapExternalReferenceToProperties(ExternalReference externalReference)
+        {
+            return new UpdatedExternalReferenceProperties()
+            {
+                Uuid = externalReference.Uuid,
+                Title = externalReference.Title,
+                DocumentId = externalReference.ExternalReferenceId,
+                MasterReference = false,
+                Url = externalReference.URL
+            };
         }
 
         [Fact]
-        public void Can_BatchUpdateExternalReferences_With_Existing_References()
+        public void Can_UpdateExternalReferences()
         {
             //Arrange
             var rootType = A<ReferenceRootType>();
             var rootId = A<int>();
             var root = new Mock<IEntityWithExternalReferences>();
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().Select(x =>
+            var externalReferences = new List<ExternalReference>
             {
-                x.MasterReference = false;
-                return x;
-            }).ToList();
-            var expectedMaster = externalReferences.RandomItem();
+                new()
+                {
+                    Uuid = Guid.NewGuid()
+                }
+            };
+
+            root.Object.ExternalReferences = externalReferences;
+
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferencePropertiesList = new List<UpdatedExternalReferenceProperties>()
+                {
+                    new()
+                    {
+                        Uuid = externalReferences.First().Uuid,
+                        DocumentId = A<string>(),
+                        Title = A<string>(), 
+                        Url = A<string>()
+                    }
+                };
+            var expectedMaster = externalReferencePropertiesList.RandomItem();
             expectedMaster.MasterReference = true;
 
             var masterReference = CreateExternalReference(expectedMaster);
             ExpectMasterReference(root, masterReference);
-            ExpectRootDeleteAndAdd(root, externalReferences, externalReferences.Select(CreateExternalReference).ToList());
             ExpectAllowModifyReturns(root.Object, true);
             ExpectTransactionToBeSet();
             ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
-            foreach (var externalReference in externalReferences)
-            {
-                var uuid = externalReference.Uuid.Value;
-                ExpectGetByUuid(uuid, new ExternalReference{Uuid = uuid });
-            }
+            ExpectGetByUuidForExternalReferences(externalReferences);
 
             //Act
-            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferencePropertiesList);
 
             //Assert
             Assert.True(result.IsNone);
             _dbTransaction.Verify(x => x.Commit());
+            foreach (var externalReference in externalReferencePropertiesList)
+            {
+                root.Verify(x => x.AddExternalReference
+                    (
+                        It.Is<ExternalReference>
+                        (
+                            reference => reference.Title == externalReference.Title
+                                         && reference.ExternalReferenceId == externalReference.DocumentId
+                                         && reference.URL == externalReference.Url)
+                    ),
+                    Times.Once
+                );
+            }
         }
 
         [Fact]
@@ -691,6 +740,14 @@ namespace Tests.Unit.Presentation.Web.Services
                     er.ExternalReferenceId == externalReferenceId &&
                     er.URL == url)))
                 .Returns(result);
+        }
+
+        private void ExpectGetByUuidForExternalReferences(IEnumerable<ExternalReference> references)
+        {
+            foreach (var externalReference in references)
+            {
+                ExpectGetByUuid(externalReference.Uuid, externalReference);
+            }
         }
 
         private void ExpectGetByUuid(Guid uuid, Maybe<ExternalReference> value)
