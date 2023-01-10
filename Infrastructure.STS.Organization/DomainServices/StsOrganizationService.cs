@@ -106,9 +106,80 @@ namespace Infrastructure.STS.Organization.DomainServices
             return uuid;
         }
 
+        public Result<Guid, OperationError> ResolveOrganizationHierarchyRootUuid(Core.DomainModel.Organization.Organization organization)
+        {
+            if (organization == null)
+            {
+                throw new ArgumentNullException(nameof(organization));
+            }
+
+            var organizationUuidResult = ResolveStsOrganizationUuid(organization);
+            if (organizationUuidResult.Failed)
+            {
+                var error = organizationUuidResult.Error;
+                _logger.Error("Failed to resilve uuid while looking up hierarchy root for org {ordId}. Failed with error: {code}:{message}", organization.Id, error.Detail, error.Message.GetValueOrFallback(""));
+                return error;
+            }
+
+            var uuid = organizationUuidResult.Value;
+            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
+            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
+
+            var readRequest = CreateGetOrganizationByUuidRequest(organization, uuid);
+            var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
+
+            var response = GetReadResponse(channel, readRequest);
+            var statusResult = response.LaesResponse1.LaesOutput.StandardRetur;
+            var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
+            if (stsError.HasValue)
+            {
+                _logger.Error("Failed to read organization ({id}) by uuid {uuid}. Failed with {stsError} {code} and {message}", organization.Id, uuid, stsError.Value, statusResult.StatusKode, statusResult.FejlbeskedTekst);
+                return new OperationError("Failed to resolve organization by uuid", OperationFailure.UnknownError);
+            }
+
+            var orgResult = response.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering.FirstOrDefault();
+            if (orgResult == null)
+            {
+                _logger.Error("Success reading organization ({id}) by uuid {uuid}. But no data was returned", organization.Id, uuid);
+                return new OperationError("FK Organisation did not return the organization by uuid", OperationFailure.UnknownError);
+            }
+
+            var rootId = orgResult.RelationListe.Overordnet?.ReferenceID?.Item;
+            if (rootId == null || !Guid.TryParse(rootId, out var rootIdAsUuid))
+            {
+                _logger.Error("Failed to read main root from organization ({id}) by uuid {uuid}. Root unit id was provided as {rootid}", organization.Id, uuid, rootId);
+                return new OperationError("FK Organisation root was not valid", OperationFailure.UnknownError);
+            }
+
+            return rootIdAsUuid;
+        }
+
+        private static laesRequest CreateGetOrganizationByUuidRequest(Core.DomainModel.Organization.Organization organization, Guid uuid)
+        {
+            return new laesRequest()
+            {
+                LaesRequest1 = new LaesRequestType()
+                {
+                    AuthorityContext = new AuthorityContextType()
+                    {
+                        MunicipalityCVR = organization.Cvr
+                    },
+                    LaesInput = new LaesInputType()
+                    {
+                        UUIDIdentifikator = uuid.ToString("D")
+                    }
+                }
+            };
+        }
+
         private static soegResponse GetSearchResponse(OrganisationPortType channel, soegRequest searchRequest)
         {
             return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(searchRequest)).Execute();
+        }
+
+        private static laesResponse GetReadResponse(OrganisationPortType channel, laesRequest readRequest)
+        {
+            return new RetriedIntegrationRequest<laesResponse>(() => channel.laes(readRequest)).Execute();
         }
 
         private Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveExternalUuid(Core.DomainModel.Organization.Organization organization)
