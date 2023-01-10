@@ -50,6 +50,7 @@ namespace Core.DomainModel.Organization
             BelongingSystems = new List<ItSystem.ItSystem>();
             UIModuleCustomizations = new List<UIModuleCustomization>();
             ArchiveSupplierForItSystems = new List<ItSystemUsage.ItSystemUsage>();
+            StsOrganizationIdentities = new List<StsOrganizationIdentity>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
