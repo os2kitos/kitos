@@ -64,7 +64,7 @@
         $onInit() {
 
             this.isEdit = this.subDataProcessorId != null;
-            const subDataProcessor = this.getSubDataProcessor();
+            const subDataProcessor = this.isEdit ? _.find(this.dataProcessingRegistration.subDataProcessors, { id: this.subDataProcessorId }) : null;
 
             this.subDataProcessorName = this.isEdit ? subDataProcessor.name : "";
             this.helpTextKey = this.isEdit ? "edit" : "create";
@@ -177,13 +177,6 @@
                     this.viewModel.updateSubDataProcessor(newElement);
                 }
             };
-        }
-
-        private getSubDataProcessor(): Models.DataProcessing.IDataProcessorDTO | null {
-            if (!this.isEdit)
-                return null;
-
-            return _.find(this.dataProcessingRegistration.subDataProcessors, { id: this.subDataProcessorId });
         }
     }
 
