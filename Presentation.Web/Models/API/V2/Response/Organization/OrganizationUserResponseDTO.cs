@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
-using Presentation.Web.Models.API.V2.Types;
 using Presentation.Web.Models.API.V2.Types.Organization;
 
 namespace Presentation.Web.Models.API.V2.Response.Organization
@@ -10,6 +10,7 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// <summary>
         /// User's first name
         /// </summary>
+        [Required]
         public string FirstName { get; set; }
         /// <summary>
         /// User's last name(s)
@@ -18,6 +19,7 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// <summary>
         /// User's email
         /// </summary>
+        [Required]
         public string Email { get; set; }
         /// <summary>
         /// User's phone number
@@ -26,10 +28,12 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// <summary>
         /// Determines if the user credentials can be used to request a KITOS API token
         /// </summary>
+        [Required]
         public bool ApiAccess { get; set; }
         /// <summary>
         /// Roles assigned to the user within the context of the organization
         /// </summary>
+        [Required]
         public IEnumerable<OrganizationUserRole> Roles { get; set; }
     }
 }

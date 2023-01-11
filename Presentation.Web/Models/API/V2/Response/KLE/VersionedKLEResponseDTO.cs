@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.API.V2.Response.KLE
 {
@@ -11,10 +12,12 @@ namespace Presentation.Web.Models.API.V2.Response.KLE
         /// <summary>
         /// Defines the version of KLE (from api.kle-online.dk) which the content in 'payload' is based on.
         /// </summary>
+        [Required]
         public DateTime ReferenceVersion { get; set; }
         /// <summary>
         /// Requested payload
         /// </summary>
+        [Required]
         public T Payload { get; set; }
 
     }
