@@ -25,6 +25,7 @@ namespace Presentation.Web.Models.API.V2.Types.Shared
         /// Determines if this is the master reference for the KITOS entity
         /// Constraint: Only one external reference can be marked as the master reference
         /// </summary>
+        [Required]
         public bool MasterReference { get; set; }
     }
 }
