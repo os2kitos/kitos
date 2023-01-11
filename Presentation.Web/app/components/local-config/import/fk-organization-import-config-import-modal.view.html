@@ -14,7 +14,7 @@
                     <label for="sync-levels-input" class="control-label small">Niveauer <field-help-text data-key="local-config-fk-org-import-modal.sync-levels" /></label>
                 </div>
                 <div class="col-xs-4">
-                    <input ng-disabled="vm.busy || vm.loadingHierarchy || vm.updating || vm.consequencesAwaitingApproval" id="sync-levels-input" class="form-control input-sm" type="number" ng-model="vm.fkOrgHierarchy.availableLevels" step="1" min="1" pattern="^[0-9]*$" name="synchronizationDepth" />
+                    <input ng-disabled="vm.busy || vm.loadingPreviewFailed || vm.loadingHierarchy || vm.updating || vm.consequencesAwaitingApproval" id="sync-levels-input" class="form-control input-sm" type="number" ng-model="vm.fkOrgHierarchy.availableLevels" step="1" min="1" pattern="^[0-9]*$" name="synchronizationDepth" />
                 </div>
                 <div class="col-xs-12" ng-switch="!!(importSettings.synchronizationDepth.$error.number || importSettings.synchronizationDepth.$error.pattern || importSettings.synchronizationDepth.$error.min)">
                     <span ng-switch-when="false" ng-if="!vm.fkOrgHierarchy.availableLevels" class="help-block small">
@@ -44,7 +44,7 @@
                                id="subscribe-to-changes-input"
                                data-element-type="dataLevelTypeNoneCheckbox"
                                ng-model="vm.subscribesToUpdates"
-                               ng-disabled="vm.busy || vm.loadingHierarchy || vm.updating || vm.consequencesAwaitingApproval">
+                               ng-disabled="vm.busy || vm.loadingPreviewFailed || vm.loadingHierarchy || vm.updating || vm.consequencesAwaitingApproval">
                         Importér automatisk (dagligt) ændringer fra FK Organisation
                     </label>
                 </div>
@@ -67,6 +67,7 @@
                     <div class="panel-body" ng-show="!vm.isHierarchyCollapsed || vm.loadingHierarchy">
                         <organization-tree ng-if="!vm.loadingHierarchy" data-options="vm.fkOrgHierarchy" />
                         <span ng-if="vm.loadingHierarchy" class="pull-left"><progress-spinner data-show-text="true" data-custom-text="Indlæser forhåndsvisning (kan tage tid)..." /></span>
+                        <span ng-if="vm.loadingPreviewFailed" class="pull-left">Indlæsning af forhåndsvisning fejlede. Luk venligst dialogen og prøv igen.</span>
                     </div>
                 </div>
             </div>
@@ -95,7 +96,7 @@
 </div>
 <div class="modal-footer" ng-if="!vm.consequencesAwaitingApproval">
     <span class="pull-left" ng-if="vm.busy"><progress-spinner data-show-text="true" data-custom-text="Synkroniserer (kan tage tid)..." /></span>
-    <button type="submit" ng-disabled="vm.loadingHierarchy || vm.busy || (!!(importSettings.synchronizationDepth.$error.number || importSettings.synchronizationDepth.$error.pattern || importSettings.synchronizationDepth.$error.min))" id="btnAssign" class="btn btn-primary" data-ng-click="vm.performImport()"><span ng-if="vm.flow === 'create'">Gennemfør synkronisering</span><span ng-if="vm.flow === 'update'">Opdatér</span></button>
+    <button type="submit" ng-disabled="vm.loadingPreviewFailed || vm.loadingHierarchy || vm.busy || (!!(importSettings.synchronizationDepth.$error.number || importSettings.synchronizationDepth.$error.pattern || importSettings.synchronizationDepth.$error.min))" id="btnAssign" class="btn btn-primary" data-ng-click="vm.performImport()"><span ng-if="vm.flow === 'create'">Gennemfør synkronisering</span><span ng-if="vm.flow === 'update'">Opdatér</span></button>
     <button type="submit" ng-disabled="vm.busy" class="btn btn-danger" data-ng-click="vm.cancel()" data-disabled-on-busy>Annuller</button>
 </div>
 <div class="modal-footer" ng-if="vm.consequencesAwaitingApproval">
