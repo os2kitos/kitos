@@ -274,7 +274,7 @@ namespace Core.ApplicationServices.Contract.Write
         private Maybe<OperationError> UpdateExternalReferences(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             return _referenceService
-                .BatchUpdateExternalReferences(
+                .UpdateExternalReferences(
                     ReferenceRootType.Contract,
                     contract.Id,
                     externalReferences.ToList())

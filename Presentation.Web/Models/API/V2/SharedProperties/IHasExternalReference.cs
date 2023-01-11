@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Request.Shared;
 
 namespace Presentation.Web.Models.API.V2.SharedProperties
 {
-    public interface IHasExternalReference<T> where T : BaseExternalReferenceDTO
+    public interface IHasExternalReference<T> where T : ExternalReferenceDataWriteRequestDTO
     {
         IEnumerable<T> ExternalReferences{ get; set; }
     }

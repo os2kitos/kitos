@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private DataProcessingRegistrationModificationParameters Map<TDto, TExternalReferenceDto>(TDto dto, bool enforceFallbackIfNotProvided) 
             where TDto: DataProcessingRegistrationWriteRequestDTO, IHasNameExternal, IHasExternalReference<TExternalReferenceDto>
-            where TExternalReferenceDto: BaseExternalReferenceDTO
+            where TExternalReferenceDto: ExternalReferenceDataWriteRequestDTO
         {
             TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection) where TSection : new() => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, enforceFallbackIfNotProvided);
             TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection, Func<TSection> fallbackFactory) => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, fallbackFactory, enforceFallbackIfNotProvided);

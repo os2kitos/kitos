@@ -17,10 +17,8 @@ using System.Linq.Expressions;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.Shared;
-using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
-using Core.ApplicationServices.Model.GDPR.Write;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -66,7 +64,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private ItContractModificationParameters Map<TDto, TExternalReferenceDto>(TDto dto, bool enforceFallbackIfNotProvided)
             where TDto : ContractWriteRequestDTO, IHasNameExternal, IHasExternalReference<TExternalReferenceDto>
-            where TExternalReferenceDto : BaseExternalReferenceDTO
+            where TExternalReferenceDto : ExternalReferenceDataWriteRequestDTO
         {
             var rule = CreateChangeRule<TDto>(enforceFallbackIfNotProvided);
             TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue,

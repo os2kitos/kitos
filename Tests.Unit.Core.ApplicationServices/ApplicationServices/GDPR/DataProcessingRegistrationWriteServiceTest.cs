@@ -2140,7 +2140,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
             _referenceServiceMock
-                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.DataProcessingRegistration, dpr.Id, externalReferences))
+                .Setup(x => x.UpdateExternalReferences(ReferenceRootType.DataProcessingRegistration, dpr.Id, externalReferences))
                 .Returns(value);
         }
 

@@ -312,7 +312,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             //Clear existing state
-            var updateResult = _referenceService.BatchUpdateExternalReferences(
+            var updateResult = _referenceService.UpdateExternalReferences(
                 ReferenceRootType.SystemUsage,
                 systemUsage.Id,
                 externalReferences);

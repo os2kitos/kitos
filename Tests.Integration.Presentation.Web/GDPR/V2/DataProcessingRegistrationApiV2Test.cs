@@ -29,6 +29,7 @@ using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2
 {
@@ -1012,14 +1013,14 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             };
             var newRegistration = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
 
-            var inputs1 = Many<UpdateExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+            var inputs1 = CreateUpdateExternalReferences();
 
             //Act
             using var response1 = await DataProcessingRegistrationV2Helper.SendPatchExternalReferences(token, newRegistration.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
-            AssertExternalReferenceResults(inputs1, dto);
+            AssertExternalReferenceResults(inputs1, dto, true);
 
             //Act - reset
             var inputs2 = Enumerable.Empty<UpdateExternalReferenceDataWriteRequestDTO>().ToList();
@@ -1104,7 +1105,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var rolesRequest1 = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role1.Uuid, UserUuid = user1.Uuid } };
 
-            var referencesRequest1 = Many<UpdateExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+            var referencesRequest1 = CreateUpdateExternalReferences();
 
             var modifyRequest1 = new UpdateDataProcessingRegistrationRequestDTO()
             {
@@ -1126,7 +1127,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertMultiAssignment(systemUsagesRequest1, dto1.SystemUsages);
             AssertOversight(oversightRequest1, dto1.Oversight);
             AssertSingleRight(role1, user1, dto1.Roles);
-            AssertExternalReferenceResults(referencesRequest1, dto1);
+            AssertExternalReferenceResults(referencesRequest1, dto1, true);
 
             //Act - Put on filled
             var (dataResponsible2, basisForTransfer2, generalRequest2) = await CreateGeneralDataInput(true, true, true, true, true, organization);
@@ -1146,7 +1147,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var rolesRequest2 = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role2.Uuid, UserUuid = user2.Uuid } };
 
-            var referencesRequest2 = Many<UpdateExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+            var referencesRequest2 = CreateNewExternalReferenceDataWithOldUuid(dto1.ExternalReferences);
 
             var modifyRequest2 = new UpdateDataProcessingRegistrationRequestDTO()
             {
@@ -1213,10 +1214,20 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
         }
 
-        private static void AssertExternalReferenceResults(List<UpdateExternalReferenceDataWriteRequestDTO> expected, DataProcessingRegistrationResponseDTO actual)
+        private static void AssertExternalReferenceResults(List<UpdateExternalReferenceDataWriteRequestDTO> expected, DataProcessingRegistrationResponseDTO actual, bool ignoreUuid = false)
         {
+            Assert.Equal(expected.Count, actual.ExternalReferences.Count());
+
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
-                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).Select(x =>
+                    new UpdateExternalReferenceDataWriteRequestDTO
+                    {
+                        Uuid = ignoreUuid ? null : x.Uuid,
+                        DocumentId = x.DocumentId,
+                        MasterReference = x.MasterReference,
+                        Title = x.Title,
+                        Url = x.Url
+                    }).ToList());
         }
 
         private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
@@ -1354,6 +1365,30 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 OversightScheduledInspectionDate = A<DateTime>(),
                 OversightDates = oversightDates.ToList()
             };
+        }
+
+        private List<UpdateExternalReferenceDataWriteRequestDTO> CreateUpdateExternalReferences()
+        {
+            return Many<UpdateExternalReferenceDataWriteRequestDTO>()
+                .Transform(WithRandomMaster)
+                .Select(x =>
+                {
+                    x.Uuid = null;
+                    return x;
+                }).ToList();
+        }
+
+        private List<UpdateExternalReferenceDataWriteRequestDTO> CreateNewExternalReferenceDataWithOldUuid(IEnumerable<ExternalReferenceDataResponseDTO> createExternalReferences)
+        {
+            return createExternalReferences.Select(externalReference => new UpdateExternalReferenceDataWriteRequestDTO
+                {
+                    Uuid = externalReference.Uuid,
+                    Title = A<string>(),
+                    DocumentId = A<string>(),
+                    Url = A<string>(),
+                    MasterReference = externalReference.MasterReference
+                })
+                .ToList();
         }
 
         private IEnumerable<ExternalReferenceDataWriteRequestDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
