@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.API.V2.Response.SystemUsage
@@ -40,6 +40,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         public int? FrequencyInMonths { get; set; }
 
         public bool? DocumentBearing { get; set; }
+        [Required]
         public IEnumerable<JournalPeriodDTO> JournalPeriods { get; set; }
 
     }

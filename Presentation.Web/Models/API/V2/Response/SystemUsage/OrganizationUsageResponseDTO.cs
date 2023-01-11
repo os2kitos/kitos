@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Response.SystemUsage
@@ -8,6 +9,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// A collection of organization units which have taken this system into use
         /// </summary>
+        [Required]
         public IEnumerable<IdentityNamePairResponseDTO> UsingOrganizationUnits { get; set; }
         /// <summary>
         /// Out of all of the using organization units, this one is responsible for the system within the organization.
