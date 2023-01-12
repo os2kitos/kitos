@@ -19,6 +19,7 @@ using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -677,14 +678,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var request = CreatePostRequest(organization.Uuid, system.Uuid);
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
 
-            var inputs1 = Many<UpdateExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+            var inputs1 = CreateUpdateExternalReferenceDataWriteRequestDTOs().ToList();
 
             //Act
             using var response1 = await ItSystemUsageV2Helper.SendPatchExternalReferences(token, newUsage.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertExternalReferenceResults(inputs1, dto);
+            AssertExternalReferenceResults(inputs1, dto, true);
 
             //Act - reset
             var inputs2 = Enumerable.Empty<UpdateExternalReferenceDataWriteRequestDTO>().ToList();
@@ -1072,12 +1073,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert - PUT on empty system usage
             AssertGeneralData(updateRequest1.General, updatedUsage1.General);
 
-            await AssertOrganizationalUsage(token, updatedUsage1.Uuid, new OrgUnitDTO[] { orgUnit1 }, orgUnit1);
+            await AssertOrganizationalUsage(token, updatedUsage1.Uuid, new[] { orgUnit1 }, orgUnit1);
 
             AssertKLEDeviation(true, addedTaskRefs1, updatedUsage1.LocalKLEDeviations.AddedKLE);
             AssertKLEDeviation(true, removedTaskRefs1, updatedUsage1.LocalKLEDeviations.RemovedKLE);
 
-            AssertExternalReferenceResults(updateRequest1.ExternalReferences.ToList(), updatedUsage1);
+            AssertExternalReferenceResults(updateRequest1.ExternalReferences.ToList(), updatedUsage1, true);
 
             AssertRoles(updateRequest1.Roles, updatedUsage1.Roles);
 
@@ -1086,7 +1087,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertArchivingParametersSet(updateRequest1.Archiving, updatedUsage1.Archiving);
 
             //Act - PUT on filled system usage
-            var (generalData2, orgUnit2, organizationUsageData2, addedTaskRefs2, removedTaskRefs2, kleDeviations2, externalReferences2, roles2, gdpr2, archiving2) = await CreateUpdateFullDataRequestDTO(organization, system);
+            var (generalData2, orgUnit2, organizationUsageData2, addedTaskRefs2, removedTaskRefs2, kleDeviations2,
+                externalReferences2, roles2, gdpr2, archiving2) = await CreateUpdateFullDataRequestDTO(organization, system, updatedUsage1.ExternalReferences);
             var updateRequest2 = CreatePutRequest(
                     generalSection: generalData2,
                     organizationalUsageSection: organizationUsageData2,
@@ -1716,7 +1718,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<UpdateExternalReferenceDataWriteRequestDTO>,
             IEnumerable<RoleAssignmentRequestDTO>,
             GDPRWriteRequestDTO,
-            ArchivingWriteRequestDTO)> CreateUpdateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
+            ArchivingWriteRequestDTO)> CreateUpdateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system, IEnumerable<ExternalReferenceDataResponseDTO> existingExternalReferences = null)
         {
             var fullData = await CreateFullDataRequestDTO(organization, system);
 
@@ -1727,7 +1729,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 fullData.addedTaskRefs,
                 fullData.removedTaskRefs,
                 fullData.kleDeviations,
-                MapExternalReferenceDtosToUpdateDtos(fullData.externalReferences),
+                existingExternalReferences != null ? CreateNewExternalReferenceDataWithOldUuid(existingExternalReferences) : MapExternalReferenceDtosToUpdateDtos(fullData.externalReferences),
                 fullData.roles,
                 fullData.gdpr,
                 fullData.archiving);
@@ -1763,7 +1765,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             }
             var kleDeviations = CreateLocalKLEDeviationsRequestDTO(addedTaskRefs, removedTaskRefs);
 
-            var externalReferences = CreateExternalReferenceDataDTOs();
+            var externalReferences = CreateExternalReferenceDataDTOs<ExternalReferenceDataWriteRequestDTO>();
 
             var userToGainRole = await CreateUser(organization);
             var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First());
@@ -1828,10 +1830,34 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
         }
 
-        private IEnumerable<ExternalReferenceDataWriteRequestDTO> CreateExternalReferenceDataDTOs()
+        private IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> CreateNewExternalReferenceDataWithOldUuid(IEnumerable<ExternalReferenceDataResponseDTO> createExternalReferences)
+        {
+            return createExternalReferences.Select(externalReference => new UpdateExternalReferenceDataWriteRequestDTO
+                {
+                    Uuid = externalReference.Uuid,
+                    Title = A<string>(),
+                    DocumentId = A<string>(),
+                    Url = A<string>(),
+                    MasterReference = externalReference.MasterReference
+                })
+                .ToList();
+        }
+
+        private IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> CreateUpdateExternalReferenceDataWriteRequestDTOs()
+        {
+            return CreateExternalReferenceDataDTOs<UpdateExternalReferenceDataWriteRequestDTO>()
+                .Select(
+                    x =>
+                    {
+                        x.Uuid = null;
+                        return x;
+                    });
+        }
+
+        private IEnumerable<T> CreateExternalReferenceDataDTOs<T>() where T: ExternalReferenceDataWriteRequestDTO
         {
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            return Many<ExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+            return Many<T>().Transform(WithRandomMaster).ToList();
         }
         
         private LocalKLEDeviationsRequestDTO CreateLocalKLEDeviationsRequestDTO(Guid[] addedUuids, Guid[] removedUuids)
@@ -2030,7 +2056,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
         }
 
-        private IEnumerable<ExternalReferenceDataWriteRequestDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
+        private IEnumerable<T> WithRandomMaster<T>(IEnumerable<T> references) where T: ExternalReferenceDataWriteRequestDTO
         {
             var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
             orderedRandomly.First().MasterReference = true;
@@ -2050,10 +2076,35 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return orderedRandomly;
         }
 
-        private static void AssertExternalReferenceResults<T>(IEnumerable<T> expected, ItSystemUsageResponseDTO actual) where T: BaseExternalReferenceDTO
+        private static void AssertExternalReferenceResults(IReadOnlyCollection<UpdateExternalReferenceDataWriteRequestDTO> expected, ItSystemUsageResponseDTO actual, bool ignoreUuid = false)
         {
+            Assert.Equal(expected.Count, actual.ExternalReferences.Count());
+
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
-                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).Select(x =>
+                    new UpdateExternalReferenceDataWriteRequestDTO
+                    {
+                        Uuid = ignoreUuid ? null : x.Uuid,
+                        DocumentId = x.DocumentId,
+                        MasterReference = x.MasterReference,
+                        Title = x.Title,
+                        Url = x.Url
+                    }).ToList());
+        }
+
+        private static void AssertExternalReferenceResults(IReadOnlyCollection<ExternalReferenceDataWriteRequestDTO> expected, ItSystemUsageResponseDTO actual) 
+        {
+            Assert.Equal(expected.Count, actual.ExternalReferences.Count());
+
+            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).Select(x =>
+                    new ExternalReferenceDataWriteRequestDTO
+                    {
+                        DocumentId = x.DocumentId,
+                        MasterReference = x.MasterReference,
+                        Title = x.Title,
+                        Url = x.Url
+                    }).ToList());
         }
 
         private static void AssertKLEDeviation(bool withDeviation, IEnumerable<Guid> expectedDeviation, IEnumerable<IdentityNamePairResponseDTO> actualDeviation)
