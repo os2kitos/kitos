@@ -1,5 +1,5 @@
 ﻿param(
-    [Parameter(Mandatory=$true)][string]$targetEnvironment ,
+    [Parameter(Mandatory=$true)][string]$targetEnvironment
     )
 #-------------------------------------------------------------
 # Stop on first error
