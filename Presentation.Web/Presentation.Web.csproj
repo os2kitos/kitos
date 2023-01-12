@@ -354,6 +354,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-list.component.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
@@ -378,6 +379,7 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\local-admin-rights-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\personal-data-option.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-dto.ts" />
@@ -702,6 +704,7 @@
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\global-admin\global-admin-local-admins-list.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-organization-modal-delete.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />

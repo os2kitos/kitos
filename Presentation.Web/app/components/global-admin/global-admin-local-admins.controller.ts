@@ -20,7 +20,7 @@
 
     app.controller("globalAdmin.localAdminsCtrl", [
         "$rootScope", "$scope", "$http", "$state", "notify", "adminRights", "user", "userService","select2LoadingService",
-        ($rootScope, $scope, $http, $state, notify, adminRights, user: Kitos.Services.IUser, userService: Kitos.Services.IUserService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
+        ($rootScope, $scope, $http, $state, notify, adminRights: Kitos.Models.Api.Organization.ILocalAdminRightsDto[], user: Kitos.Services.IUser, userService: Kitos.Services.IUserService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
             $rootScope.page.title = "Lokal administratorer";
             $scope.adminRights = adminRights;
 
@@ -74,7 +74,7 @@
                 newLocalAdmin();
             });
 
-            $scope.deleteLocalAdmin = right => {
+            $scope.deleteLocalAdmin = (right: Kitos.Models.Api.Organization.ILocalAdminRightsDto) => {
                 var oId = right.organizationId;
                 var rId = right.role;
                 var uId = right.userId;
