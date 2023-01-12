@@ -100,11 +100,42 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
                 .Where(x => x.Item2.RelationListe.Overordnet != null) // exclude the root
                 .GroupBy(unit => new Guid(unit.Item2.RelationListe.Overordnet.ReferenceID.Item))
                 .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
+
             var roots = totalResults.Where(x => x.Item2.RelationListe.Overordnet == null).ToList();
-            if (roots.Count != 1)
+            if (roots.Count > 1)
             {
-                _logger.Error("Failed validating units for org with sts uuid: {stsuuid}. Expected one root but found: {roots}", organizationStsUuid, string.Join(",", roots.Select(x => x.Item1.ToString("D")).ToList()));
-                return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.OrgTreeHasMultipleRoots);
+                //More than one root detected
+                var rootIdResult = _organizationService.ResolveOrganizationHierarchyRootUuid(organization);
+                if (rootIdResult.Failed)
+                {
+                    var error = rootIdResult.Error;
+                    _logger.Error("Failed to resolve root id for org {id}. Failed with {errorCode}:{error}", organization.Id, error.FailureType, error.Message.GetValueOrFallback(""));
+                    return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedToLookupRootUnit, "Failed to determine root unit");
+                }
+
+                var currentRootId = rootIdResult.Value;
+                var currentRootResult = roots.Where(root => root.Item1 == currentRootId).ToList();
+                if (currentRootResult.Count != 1)
+                {
+                    _logger.Error("Failed to resolve root for org {id}. Root id was supposed to be {rootId} but that was not found in the collection of root units", organization.Id, currentRootId);
+                    return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedToLookupRootUnit, "Failed to find root unit from known root unit id");
+                }
+
+                var rootsToRemove = roots.Except(currentRootResult).ToList();
+                roots = currentRootResult; //remove the other roots
+
+                //Purge the secondary org trees from the known structure
+                var idsOfUnitsToPurge = new Queue<Guid>(rootsToRemove.Select(x => x.Item1));
+                while (idsOfUnitsToPurge.Count != 0)
+                {
+                    var current = idsOfUnitsToPurge.Dequeue();
+                    if (unitsByParent.TryGetValue(current, out var children))
+                    {
+                        children.ToList().ForEach(child => idsOfUnitsToPurge.Enqueue(child.Item1));
+                        unitsByParent.Remove(current);
+                    }
+                    unitsByUuid.Remove(current);
+                }
             }
 
             // Process the tree info from sts org in order to generate the import tree

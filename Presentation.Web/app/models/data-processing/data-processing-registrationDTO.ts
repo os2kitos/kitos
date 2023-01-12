@@ -48,6 +48,9 @@
 
     export interface IDataProcessorDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         cvrNumber: string,
+        basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
+        transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
+        insecureCountry: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
     }
 
     export interface IDataProcessingRoleDTO extends Models.Generic.Roles.BusinessRoleDTO{ }
@@ -71,5 +74,16 @@
 
     export enum DataProcessingRegistrationValidationError {
         MainContractNotActive = 0
+    }
+    
+    export interface ISubDataProcessorRequestDTO {
+        organizationId: number,
+        details: ISubDataProcessorDetailsDTO,
+    }
+
+    export interface ISubDataProcessorDetailsDTO {
+        basisForTransferOptionId: number,
+        transferToInsecureThirdCountries: Models.Api.Shared.YesNoUndecidedOption,
+        insecureCountryOptionId: number,
     }
 }

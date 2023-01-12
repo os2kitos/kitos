@@ -5,6 +5,6 @@
         FailedResolvingUuid,
         FailedSearchingForOrgUnits,
         FailedLoadingOrgUnits,
-        OrgTreeHasMultipleRoots
+        FailedToLookupRootUnit
     }
 }
