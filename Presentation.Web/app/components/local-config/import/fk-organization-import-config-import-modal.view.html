@@ -67,7 +67,7 @@
                     <div class="panel-body" ng-show="!vm.isHierarchyCollapsed || vm.loadingHierarchy">
                         <organization-tree ng-if="!vm.loadingHierarchy" data-options="vm.fkOrgHierarchy" />
                         <span ng-if="vm.loadingHierarchy" class="pull-left"><progress-spinner data-show-text="true" data-custom-text="Indlæser forhåndsvisning (kan tage tid)..." /></span>
-                        <span ng-if="vm.loadingPreviewFailed" class="pull-left">Indlæsning af forhåndsvisning fejlede. Luk venligst dialogen og prøv igen.</span>
+                        <span ng-if="vm.loadingPreviewFailed" class="input-validation-error pull-left" role="alert">Indlæsning af forhåndsvisning fejlede. Luk venligst dialogen og prøv igen.</span>
                     </div>
                 </div>
             </div>
