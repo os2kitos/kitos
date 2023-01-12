@@ -34,6 +34,7 @@
         isConsequencesCollapsed: boolean = false;
         isHierarchyCollapsed: boolean = false;
         busy: boolean = false;
+        loadingPreviewFailed: boolean = false;
         updating: boolean = false;
         loadingHierarchy: boolean | null;
         subscribesToUpdates: boolean = false;
@@ -66,6 +67,8 @@
                 }, error => {
                     console.error(error);
                     this.notify.addErrorMessage("Fejl i indlæsning af hierarkiet fra FK Organisation. Genindlæs siden og prøv igen.");
+                    this.loadingHierarchy = false;
+                    this.loadingPreviewFailed = true;
                 });
         }
 

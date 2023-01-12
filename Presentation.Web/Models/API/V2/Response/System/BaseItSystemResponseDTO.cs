@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.SharedProperties;
@@ -11,6 +12,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// UUID for IT-System
         /// </summary>
+        [Required]
         public Guid Uuid { get; set; }
 
         /// <summary>
@@ -21,6 +23,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// Name of IT-System
         /// </summary>
+        [Required]
         public string Name { get; set; }
 
         /// <summary>
@@ -41,11 +44,13 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// List of KLE number representations as name and UUID pairs
         /// </summary>
+        [Required]
         public IEnumerable<IdentityNamePairResponseDTO> KLE { get; set; }
 
         /// <summary>
         /// Active status
         /// </summary>
+        [Required]
         public bool Deactivated { get; set; }
 
         /// <summary>
@@ -66,16 +71,19 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// Date of creation (on some legacy systems , this information is not available. If so, it will be null)
         /// </summary>
+        [Required]
         public DateTime? Created { get; set; }
 
         /// <summary>
         /// Responsible for creation.
         /// </summary>
+        [Required]
         public IdentityNamePairResponseDTO CreatedBy { get; set; }
 
         /// <summary>
         /// Archive duty recommendation from "Rigsarkivet"
         /// </summary>
+        [Required]
         public RecommendedArchiveDutyResponseDTO RecommendedArchiveDuty { get; set; }
     }
 }

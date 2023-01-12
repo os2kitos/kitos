@@ -1,4 +1,5 @@
-﻿using Presentation.Web.Models.API.V2.Types.Shared;
+﻿using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.System
 {
@@ -18,6 +19,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// Archive duty recommendation identifier
         /// </summary>
+        [Required]
         public RecommendedArchiveDutyChoice Id { get; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Response.SystemUsage
@@ -11,10 +12,12 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// Inherited KLE which have been removed locally
         /// </summary>
+        [Required]
         public IEnumerable<IdentityNamePairResponseDTO> RemovedKLE { get; set; }
         /// <summary>
         /// KLE which has been added locally
         /// </summary>
+        [Required]
         public IEnumerable<IdentityNamePairResponseDTO> AddedKLE { get; set; }
     }
 }
