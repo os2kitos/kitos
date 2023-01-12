@@ -1,5 +1,4 @@
-﻿using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+﻿using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
@@ -10,7 +9,6 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Optionally assigned purchase type
         /// </summary>
-        [NonEmptyGuid]
         public IdentityNamePairResponseDTO PurchaseType { get; set; }
         /// <summary>
         /// Optionally assigned procurement strategy

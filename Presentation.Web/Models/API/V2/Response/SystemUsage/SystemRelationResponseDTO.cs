@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
@@ -9,10 +10,12 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// UUID of the system relation registration
         /// </summary>
+        [Required]
         public Guid Uuid { get; set; }
         /// <summary>
         /// Identifies the system usage the relation points to
         /// </summary>
+        [Required]
         public IdentityNamePairResponseDTO ToSystemUsage { get; set; }
         /// <summary>
         /// The relation uses the interface

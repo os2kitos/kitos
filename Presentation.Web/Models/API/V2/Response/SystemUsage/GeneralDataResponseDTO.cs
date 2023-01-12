@@ -1,4 +1,5 @@
-﻿using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+﻿using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.API.V2.Response.SystemUsage
@@ -32,6 +33,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// Specifies the validity of this system usage
         /// </summary>
+        [Required]
         public ItSystemUsageValidityResponseDTO Validity { get; set; }
         /// <summary>
         /// Defines the master contract for this system (many contracts can point to a system usage but only one can be the master contract)
