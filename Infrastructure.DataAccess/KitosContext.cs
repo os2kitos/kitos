@@ -264,6 +264,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new StsOrganizationChangeLogMap());
             modelBuilder.Configurations.Add(new StsOrganizationConsequenceLogMap());
             modelBuilder.Configurations.Add(new SubDataProcessorMap());
+            modelBuilder.Configurations.Add(new ExternalReferenceMap());
         }
     }
 }

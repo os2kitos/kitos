@@ -3,7 +3,6 @@ using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure.Design;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,7 +10,6 @@ using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
-using Infrastructure.DataAccess.Migrations;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -2174,7 +2172,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return orderedRandomly;
         }
 
-        private static void AssertExternalReferenceResults(List<UpdateExternalReferenceDataWriteRequestDTO> expected, ItContractResponseDTO actual, bool ignoreUuid = false)
+        private static void AssertExternalReferenceResults(IReadOnlyCollection<UpdateExternalReferenceDataWriteRequestDTO> expected, ItContractResponseDTO actual, bool ignoreUuid = false)
         {
             Assert.Equal(expected.Count, actual.ExternalReferences.Count());
             
@@ -2190,7 +2188,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                     }).ToList());
         }
 
-        private static void AssertExternalReferenceResults(List<ExternalReferenceDataWriteRequestDTO> expected, ItContractResponseDTO actual)
+        private static void AssertExternalReferenceResults(IReadOnlyCollection<ExternalReferenceDataWriteRequestDTO> expected, ItContractResponseDTO actual)
         {
             Assert.Equal(expected.Count, actual.ExternalReferences.Count());
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()

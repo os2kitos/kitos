@@ -2,6 +2,9 @@
 
 namespace Presentation.Web.Models.API.V2.Types.Shared
 {
+    /// <summary>
+    /// User defined external references attached to a KITOS entity
+    /// </summary>
     public abstract class BaseExternalReferenceDTO
     {
         /// <summary>

@@ -58,6 +58,9 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Role assignments
         /// </summary>
         public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
+        /// <summary>
+        /// External reference definitions
+        /// </summary>
         public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
     }
 }

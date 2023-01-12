@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.Uuid)
                 .IsRequired()
-                .HasIndexAnnotation("UX_ExternalReference_Uuid", 0);
+                .HasUniqueIndexAnnotation("UX_ExternalReference_Uuid", 0);
         }
     }
 }

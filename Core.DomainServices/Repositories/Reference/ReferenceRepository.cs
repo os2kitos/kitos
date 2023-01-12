@@ -90,6 +90,8 @@ namespace Core.DomainServices.Repositories.Reference
 
         public void UpdateRange(IEnumerable<ExternalReference> entitiesToUpdate)
         {
+            if(entitiesToUpdate.Count() == 0)
+                return;
             foreach (var reference in entitiesToUpdate)
             {
                 _referenceRepository.Update(reference);

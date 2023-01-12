@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202301111053117_added_uuid_to_external_reference"; }
+            get { return "202301120832587_added_uuid_to_external_reference"; }
         }
         
         string IMigrationMetadata.Source

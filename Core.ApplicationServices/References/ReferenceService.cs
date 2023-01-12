@@ -184,7 +184,7 @@ namespace Core.ApplicationServices.References
                 {
                     var referenceList = externalReferences.ToList();
 
-                    var referencesToDelete = root.ExternalReferences.Where(externalReference => !referenceList.Any(referenceProperties => referenceProperties.Uuid == externalReference.Uuid));
+                    var referencesToDelete = root.ExternalReferences.Where(externalReference => !referenceList.Any(referenceToUpdate => referenceToUpdate.Uuid == externalReference.Uuid));
                     var deleteResult = DeleteExternalReferences(root, referencesToDelete);
                     if(deleteResult.Failed)
                         return new OperationError("Failed to delete old references", deleteResult.Error);

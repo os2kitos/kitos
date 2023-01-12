@@ -4,7 +4,9 @@ namespace Presentation.Web.Models.API.V2.Request.Shared
 {
     public class UpdateExternalReferenceDataWriteRequestDTO : ExternalReferenceDataWriteRequestDTO
     {
-        //TODO: add summary
+        /// <summary>
+        /// The UUID of the External Reference
+        /// </summary>
         public Guid? Uuid { get; set; }
     }
 }

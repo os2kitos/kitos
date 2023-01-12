@@ -995,9 +995,9 @@
     <Compile Include="Migrations\202301030910462_change_dpr_sub_data_processors.designer.cs">
       <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202301111053117_added_uuid_to_external_reference.cs" />
-    <Compile Include="Migrations\202301111053117_added_uuid_to_external_reference.designer.cs">
-      <DependentUpon>202301111053117_added_uuid_to_external_reference.cs</DependentUpon>
+    <Compile Include="Migrations\202301120832587_added_uuid_to_external_reference.cs" />
+    <Compile Include="Migrations\202301120832587_added_uuid_to_external_reference.designer.cs">
+      <DependentUpon>202301120832587_added_uuid_to_external_reference.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1016,8 +1016,8 @@
     <EmbeddedResource Include="Migrations\202301030910462_change_dpr_sub_data_processors.resx">
       <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202301111053117_added_uuid_to_external_reference.resx">
-      <DependentUpon>202301111053117_added_uuid_to_external_reference.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202301120832587_added_uuid_to_external_reference.resx">
+      <DependentUpon>202301120832587_added_uuid_to_external_reference.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Dpr_Migrate_SubDataProcessors.sql" />
   </ItemGroup>
