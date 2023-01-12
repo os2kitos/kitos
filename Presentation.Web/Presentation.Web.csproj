@@ -353,6 +353,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
@@ -369,6 +370,7 @@
     <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
     <TypeScriptCompile Include="app\helpers\connection-change-log-helper.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\select2-mapping-helper.ts" />
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
     <TypeScriptCompile Include="app\helpers\organization-registration-helper.ts" />
@@ -400,6 +402,7 @@
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\data-processing-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\users\user-administration-permissions-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\GDPR\sub-data-processor-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\selected-value-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-connection-change-logs.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Organization\organization-unit-migration.ts" />
@@ -693,6 +696,7 @@
     <Content Include="app\components\data-processing\data-processing-registration-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
