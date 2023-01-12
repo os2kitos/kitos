@@ -146,10 +146,25 @@ class DataProcessingRegistrationHelper {
             .then(() => browser.waitForAngular());
     }
 
-    public static assignSubDataProcessor(name: string) {
+    public static assignSubDataProcessor(name: string, basisForTransfer: string, dropdownYes: string, thirdCountryName: string) {
+        
         console.log("Assigning sub data processor with name: " + name);
-        return Select2Helper.searchFor(name, "s2id_sub-data-processor_select-new_config")
-            .then(() => Select2Helper.waitForDataAndSelect());
+        return this.editMainPo.getAddSubDataProcessorButton().click()
+            .then(() => Select2Helper.searchFor(name, "s2id_sub-data-processor_select-new_config"))
+            .then(() => Select2Helper.waitForDataAndSelect())
+            .then(() => Select2Helper.selectWithNoSearch(basisForTransfer, "s2id_basisForTransferConfig_config"))
+            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, "s2id_transferToInsecureThirdCountries_config"))
+            .then(() => Select2Helper.selectWithNoSearch(thirdCountryName, "s2id_insecureThirdCountryConfig_config"))
+            .then(() => this.editMainPo.getSaveSubDataProcessorButton().click());
+    }
+
+    public static updateSubDataProcessor(name: string, basisForTransfer: string, dropdownNo: string) {
+        
+        console.log("Assigning sub data processor with name: " + name);
+        return this.editMainPo.getEditSubDataProcessorButton(name).click()
+            .then(() => Select2Helper.selectWithNoSearch(basisForTransfer, "s2id_basisForTransferConfig_config"))
+            .then(() => Select2Helper.selectWithNoSearch(dropdownNo, "s2id_transferToInsecureThirdCountries_config"))
+            .then(() => this.editMainPo.getSaveSubDataProcessorButton().click());
     }
 
     public static enableSubDataProcessors() {
