@@ -12,10 +12,10 @@
     }
 
     export interface ILocalAdminRow {
-        organization: string
-        name: string
+        organization: string,
+        name: string,
         email: string,
-        objectContext: Models.Api.Organization.ILocalAdminRightsDto
+        objectContext: Models.Api.Organization.ILocalAdminRightsDto,
     }
 
     interface IGlobalAdminLocalAdminListController extends ng.IComponentController, Utility.KendoGrid.IGridViewAccess<ILocalAdminRow> {
@@ -45,6 +45,10 @@
         }
 
         private loadGrid() {
+            var users = this.localAdmins;
+            this.$scope.localAdminListVm = {
+                removeRight: (dataItem: ILocalAdminRow) => this.deleteLocalAdmin(dataItem.objectContext),
+            };
 
             this.userService.getUser().then(user => {
                 this.kendoGridLauncherFactory
@@ -54,7 +58,7 @@
                     .withFlexibleWidth()
                     .withArrayDataSource(this.localAdmins.map(row => {
                         return <ILocalAdminRow>{
-                            name: row.fullName,
+                            name: row.user.fullName,
                             organization: row.organizationName,
                             email: row.userEmail,
                             objectContext: row
@@ -71,28 +75,53 @@
                         .withDataSourceName("organization")
                         .withTitle("Organisationsenhed")
                         .withSourceValueEchoRendering()
-                        .withFilteringOperation(Kitos.Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                     )
                     .withColumn(builder => builder
                         .withId("name")
                         .withDataSourceName("name")
                         .withTitle("Navn")
                         .withSourceValueEchoRendering()
-                        .withFilteringOperation(Kitos.Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                     )
                     .withColumn(builder => builder
                         .withId("email")
                         .withDataSourceName("email")
                         .withTitle("Email")
                         .withSourceValueEchoRendering()
-                        .withFilteringOperation(Kitos.Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                    )
+                    .withColumn(builder => builder
+                        .withId("deleteButton")
+                        .withDataSourceName("deleteButton")
+                        .withTitle("Slet")
+                        .withRendering((source: ILocalAdminRow) => ` <button type='button' data-element-type='deleteLocalAdminRight' data-confirm-click="Er du sikker på at du vil slette?" class='btn btn-link' title='Slet reference' data-confirmed-click='localAdminListVm.removeRight(${source})'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>`)
                     )
                     .resetAnySavedSettings()
                     .launch();
             });
         }
+
+        private deleteLocalAdmin = (right: Models.Api.Organization.ILocalAdminRightsDto) => {
+            var oId = right.organizationId;
+            var rId = right.role;
+            var uId = right.userId;
+            //var msg = notify.addInfoMessage("Arbejder ...", false);
+            /*$http.delete("api/OrganizationRight/" + oId + "?rId=" + rId + "&uId=" + uId + "&organizationId=" + user.currentOrganizationId)
+                .then(function onSuccess(result) {
+                    msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
+                    if (uId == user.id) {
+                        // Reload user
+                        userService.reAuthorize();
+                    }
+                    reload();
+                }, function onError(result) {
+
+                    msg.toErrorMessage("Kunne ikke fjerne " + right.userName + " som lokal administrator");
+                });*/
+        }
     }
 
     angular.module("app")
-        .component("globalAdminLocalAdminList", setupComponent());
+        .component("globalAdminLocalAdminsList", setupComponent());
 }

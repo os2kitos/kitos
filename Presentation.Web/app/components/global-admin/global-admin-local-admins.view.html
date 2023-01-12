@@ -5,18 +5,33 @@
         <i class="glyphicon glyphicon-user"></i>
         Lokale administratorer
     </div>
-    <global-admin-local-admins-list data-local-admins="adminRights"/>
-    <table class="full-width table">
+    <div class="panel-body">
+        <global-admin-local-admins-list data-local-admins="adminRights" />
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-xs-3">
+                <input type="hidden" id="selectOrg" class="form-control input-sm"
+                       data-placeholder="Vælg organisation"
+                       data-ui-select2="organizationSelectOptions"
+                       data-ng-model="newOrg">
+            </div>
+            <div class="col-xs-9">
+                <input id="selectUser" data-select-user="foo" data-user-model="newUser"/>
+            </div>
+        </div>
+    </div>
+    <!--<table class="full-width table">
         <thead>
             <tr>
                 <th>Organisation</th>
                 <th>Navn</th>
                 <th>Email</th>
-                <th><!-- CONTROL --></th>
+                <th>--><!-- CONTROL --><!--</th>
             </tr>
-        </thead>
+        </thead>-->
         <!-- for each right -->
-        <tbody data-ng-repeat="right in adminRights">
+        <!--<tbody data-ng-repeat="right in adminRights">
             <tr>
                 <td>{{ right.organizationName }}</td>
                 <td>{{ right.user.fullName }}</td>
@@ -31,21 +46,17 @@
                     </div>
                 </td>
             </tr>
-        </tbody>
+        </tbody>-->
 
         <!-- add-new-right row -->
-        <tbody>
+        <!--<tbody>
             <tr>
                 <td>
-                    <input type="hidden" id="selectOrg" class="form-control input-sm"
-                           data-placeholder="Vælg organisation"
-                           data-ui-select2="organizationSelectOptions"
-                           data-ng-model="newOrg">
+                    
                 </td>
                 <td colspan="3" class="form-group">
-                    <input id="selectUser" data-select-user="foo" data-user-model="newUser" />
                 </td>
             </tr>
         </tbody>
-    </table>
+    </table>-->
 </div>
