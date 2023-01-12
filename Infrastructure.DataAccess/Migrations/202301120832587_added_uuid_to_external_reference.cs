@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.DataAccess.Migrations
+﻿using Infrastructure.DataAccess.Tools;
+
+namespace Infrastructure.DataAccess.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
@@ -11,6 +13,7 @@
             DropIndex("dbo.ExternalReferences", new[] { "ObjectOwnerId" });
             DropIndex("dbo.ExternalReferences", new[] { "LastChangedByUserId" });
             AddColumn("dbo.ExternalReferences", "Uuid", c => c.Guid(nullable: false));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Patch_Uuid_ExternalReference.sql"));
             AlterColumn("dbo.ExternalReferences", "ObjectOwnerId", c => c.Int(nullable: false));
             AlterColumn("dbo.ExternalReferences", "LastChangedByUserId", c => c.Int(nullable: false));
             CreateIndex("dbo.ExternalReferences", "Uuid", unique: true, name: "UX_ExternalReference_Uuid");
