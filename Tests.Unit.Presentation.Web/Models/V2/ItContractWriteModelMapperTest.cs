@@ -1403,7 +1403,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        private static void AssertExternalReferences<T>(IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences, IReadOnlyList<T> references) where T : BaseExternalReferenceDTO
+        private static void AssertExternalReferences<T>(IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences, IReadOnlyList<T> references) where T : ExternalReferenceDataWriteRequestDTO
         {
             Assert.Equal(mappedReferences.Count, mappedReferences.Count);
             for (var i = 0; i < mappedReferences.Count; i++)

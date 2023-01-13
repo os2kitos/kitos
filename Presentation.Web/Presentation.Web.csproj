@@ -422,6 +422,8 @@
     <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\UserAdministrationPermissionsController.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\ExternalReferenceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\IExternalReferenceResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\GDPRPersonalDataMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
@@ -453,7 +455,6 @@
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ExternalReferenceDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasExternalReference.cs" />
-    <Compile Include="Models\API\V2\Types\Shared\BaseExternalReferenceDTO.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />

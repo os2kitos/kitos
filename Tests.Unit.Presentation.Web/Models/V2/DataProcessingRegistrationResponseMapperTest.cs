@@ -8,7 +8,9 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Moq;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -24,10 +26,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class DataProcessingRegistrationResponseMapperTest : WithAutoFixture
     {
         private readonly DataProcessingRegistrationResponseMapper _sut;
+        private readonly Mock<IExternalReferenceResponseMapper> _externalReferenceResponseMapperMock;
 
         public DataProcessingRegistrationResponseMapperTest()
         {
-            _sut = new DataProcessingRegistrationResponseMapper();
+            _externalReferenceResponseMapperMock = new Mock<IExternalReferenceResponseMapper>();
+            _sut = new DataProcessingRegistrationResponseMapper(_externalReferenceResponseMapperMock.Object);
         }
 
         [Fact]
@@ -245,10 +249,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssignExternalReferences(dpr);
 
             //Act
-            var dto = _sut.MapDataProcessingRegistrationDTO(dpr);
+            _sut.MapDataProcessingRegistrationDTO(dpr);
 
             //Assert
-            AssertExternalReferences(dpr, dto.ExternalReferences.ToList());
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferenceDtoList(dpr.ExternalReferences, dpr.Reference), Times.Once);
         }
 
         #region Creates
@@ -396,6 +400,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             dpr.ExternalReferences = Many<string>().Select((title, i) => new ExternalReference
             {
+                Uuid = A<Guid>(),
                 Title = title,
                 URL = A<string>(),
                 ExternalReferenceId = A<string>(),
@@ -511,28 +516,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Null(actualIdentity);
             else
                 AssertIdentity(optionalExpectedIdentity, actualIdentity);
-        }
-
-        private static void AssertExternalReferences(DataProcessingRegistration dpr, IReadOnlyCollection<ExternalReferenceDataResponseDTO> dtoExternalReferences)
-        {
-            var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
-            AssertExternalReference(dpr.Reference, actualMaster);
-            Assert.Equal(dpr.ExternalReferences.Count, dtoExternalReferences.Count);
-
-            foreach (var comparison in dpr.ExternalReferences.OrderBy(x => x.Title)
-                .Zip(dtoExternalReferences.OrderBy(x => x.Title), (expected, actual) => new { expected, actual })
-                .ToList())
-            {
-                AssertExternalReference(comparison.expected, comparison.actual);
-            }
-        }
-
-        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataResponseDTO actualMaster)
-        {
-            Assert.Equal(reference.Uuid, actualMaster.Uuid);
-            Assert.Equal(reference.Title, actualMaster.Title);
-            Assert.Equal(reference.URL, actualMaster.Url);
-            Assert.Equal(reference.ExternalReferenceId, actualMaster.DocumentId);
         }
 
         private static void AssertUser(User user, IdentityNamePairResponseDTO dtoValue)

@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Shared;
@@ -22,15 +23,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
         private readonly IGenericRepository<RegisterType> _registerTypesRepository;
+        private readonly IExternalReferenceResponseMapper _externalReferenceResponseMapper;
 
         public ItSystemUsageResponseMapper(
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository,
-            IGenericRepository<RegisterType> registerTypesRepository)
+            IGenericRepository<RegisterType> registerTypesRepository,
+            IExternalReferenceResponseMapper externalReferenceResponseMapper)
         {
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
             _registerTypesRepository = registerTypesRepository;
+            _externalReferenceResponseMapper = externalReferenceResponseMapper;
         }
 
         public ItSystemUsageResponseDTO MapSystemUsageDTO(ItSystemUsage systemUsage)
@@ -47,7 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Roles = MapRoles(systemUsage),
                 LocalKLEDeviations = MapKle(systemUsage),
                 OrganizationUsage = MapOrganizationUsage(systemUsage),
-                ExternalReferences = MapExternalReferences(systemUsage),
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferenceDtoList(systemUsage.ExternalReferences, systemUsage.Reference),
                 OutgoingSystemRelations = MapOutgoingSystemRelations(systemUsage),
                 Archiving = MapArchiving(systemUsage),
                 GDPR = MapGDPR(systemUsage)
@@ -130,11 +134,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         private IEnumerable<SystemRelationResponseDTO> MapOutgoingSystemRelations(ItSystemUsage systemUsage)
         {
             return systemUsage.UsageRelations.Select(MapSystemRelationDTO).ToList();
-        }
-
-        private static IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(ItSystemUsage systemUsage)
-        {
-            return systemUsage.ExternalReferences.Select(reference => MapExternalReferenceDTO(systemUsage, reference)).ToList();
         }
 
         private static OrganizationUsageResponseDTO MapOrganizationUsage(ItSystemUsage systemUsage)
@@ -239,18 +238,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO(),
                 RelationInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO(),
                 ToSystemUsage = systemRelation.ToSystemUsage?.MapIdentityNamePairDTO()
-            };
-        }
-
-        private static ExternalReferenceDataResponseDTO MapExternalReferenceDTO(ItSystemUsage systemUsage, ExternalReference reference)
-        {
-            return new()
-            {
-                Uuid = reference.Uuid,
-                DocumentId = reference.ExternalReferenceId,
-                Title = reference.Title,
-                Url = reference.URL,
-                MasterReference = systemUsage.Reference?.Id.Equals(reference.Id) == true
             };
         }
 

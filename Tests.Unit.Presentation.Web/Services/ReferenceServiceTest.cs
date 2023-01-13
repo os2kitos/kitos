@@ -432,7 +432,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Can_CreateExternalReferences()
+        public void Can_UpdateExternalReferences_Create_ExternalReferences()
         {
             //Arrange
             var rootType = A<ReferenceRootType>();
@@ -473,7 +473,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Can_UpdateExternalReferences()
+        public void Can_UpdateExternalReferences_Update_ExternalReferences()
         {
             //Arrange
             var rootType = A<ReferenceRootType>();
@@ -519,10 +519,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             _referenceRepository.Verify
             (
-                repository => repository.UpdateRange
-                (
-                    It.Is<IEnumerable<ExternalReference>>(references => references.Select(x => x.Uuid).Contains(externalReference.Uuid))
-                ),
+                repository => repository.SaveRootEntity(It.Is<IEntityWithExternalReferences>(x => x.Id == rootEntity.Id)),
                 Times.Once
             );
         }
@@ -610,13 +607,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var rootType = A<ReferenceRootType>();
             var rootId = A<int>();
-            var externalReferenceList = new List<ExternalReference>
-            {
-                new()
-                {
-                    Uuid = Guid.NewGuid()
-                }
-            };
+            var externalReferenceList = CreateExternalReferences();
 
             var root = new Mock<IEntityWithExternalReferences>();
             var externalReferencePropertiesList = Many<UpdatedExternalReferenceProperties>().ToList();
@@ -689,7 +680,35 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Contains("Failed to add reference with data:", result.Value.Message.GetValueOrEmptyString());
         }
 
-        private void ExpectMasterReference(Mock<IEntityWithExternalReferences> root, ExternalReference masterReference)
+        [Fact]
+        public void Cannot_UpdateExternalReferences_If_Reference_With_Uuid_Was_Not_Found_Returns_BadInput()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var externalReferenceList = CreateExternalReferences().ToList();
+            var root = new Mock<IEntityWithExternalReferences>();
+            root.SetupGet(x => x.ExternalReferences).Returns(externalReferenceList);
+            var rootEntity = root.Object;
+
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferencePropertiesList = CreateExternalReferenceProperties(true).ToList();
+
+            ExpectRootDeleteAndAdd(root, externalReferencePropertiesList, externalReferenceList);
+            ExpectAllowModifyReturns(rootEntity, true);
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, rootEntity.FromNullable());
+            ExpectGetByUuidForExternalReferences(externalReferenceList);
+
+            //Act
+            var result = _sut.UpdateExternalReferences(rootType, rootId, externalReferencePropertiesList);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
+        }
+
+        private static void ExpectMasterReference(Mock<IEntityWithExternalReferences> root, ExternalReference masterReference)
         {
             root.Setup(x => x.SetMasterReference(It.Is<ExternalReference>(er =>
                     er.Title == masterReference.Title &&
@@ -815,5 +834,17 @@ namespace Tests.Unit.Presentation.Web.Services
                 return x;
             });
         }
+
+        private IEnumerable<ExternalReference> CreateExternalReferences()
+        {
+            return new List<ExternalReference>
+            {
+                new()
+                {
+                    Uuid = Guid.NewGuid()
+                }
+            };
+        }
+
     }
 }

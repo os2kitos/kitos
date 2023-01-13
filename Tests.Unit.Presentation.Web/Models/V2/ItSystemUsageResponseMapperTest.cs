@@ -11,6 +11,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
 using Moq;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -29,16 +30,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private readonly Mock<IItSystemUsageAttachedOptionRepository> _attachedOptionsRepositoryMock;
         private readonly Mock<ISensitivePersonalDataTypeRepository> _sensitivePersonalDataTypeRepositoryMock;
         private readonly Mock<IGenericRepository<RegisterType>> _registerTypeRepositoryMock;
+        private readonly Mock<IExternalReferenceResponseMapper> _externalReferenceResponseMapperMock;
 
         public ItSystemUsageResponseMapperTest()
         {
             _attachedOptionsRepositoryMock = new Mock<IItSystemUsageAttachedOptionRepository>();
             _sensitivePersonalDataTypeRepositoryMock = new Mock<ISensitivePersonalDataTypeRepository>();
             _registerTypeRepositoryMock = new Mock<IGenericRepository<RegisterType>>();
+            _externalReferenceResponseMapperMock = new Mock<IExternalReferenceResponseMapper>();
             _sut = new ItSystemUsageResponseMapper(
                 _attachedOptionsRepositoryMock.Object,
                 _sensitivePersonalDataTypeRepositoryMock.Object,
-                _registerTypeRepositoryMock.Object
+                _registerTypeRepositoryMock.Object,
+                _externalReferenceResponseMapperMock.Object
                 );
         }
 
@@ -176,10 +180,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssignExternalReferences(itSystemUsage);
 
             //Act
-            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+            _sut.MapSystemUsageDTO(itSystemUsage);
 
             //Assert
-            AssertExternalReferences(itSystemUsage, dto.ExternalReferences.ToList());
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferenceDtoList(itSystemUsage.ExternalReferences, itSystemUsage.Reference), Times.Once);
         }
 
         [Fact]
@@ -473,28 +477,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 ToSystemUsage = new ItSystemUsage() { Uuid = A<Guid>(), ItSystem = new ItSystem() { Name = A<string>() } },
                 Description = A<string>()
             };
-        }
-
-        private static void AssertExternalReferences(ItSystemUsage itSystemUsage, List<ExternalReferenceDataResponseDTO> dtoExternalReferences)
-        {
-            var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
-            AssertExternalReference(itSystemUsage.Reference, actualMaster);
-            Assert.Equal(itSystemUsage.ExternalReferences.Count, dtoExternalReferences.Count);
-
-            foreach (var comparison in itSystemUsage.ExternalReferences.OrderBy(x => x.Title)
-                .Zip(dtoExternalReferences.OrderBy(x => x.Title), (expected, actual) => new { expected, actual })
-                .ToList())
-            {
-                AssertExternalReference(comparison.expected, comparison.actual);
-            }
-        }
-
-        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataResponseDTO actualMaster)
-        {
-            Assert.Equal(reference.Uuid, actualMaster.Uuid);
-            Assert.Equal(reference.Title, actualMaster.Title);
-            Assert.Equal(reference.URL, actualMaster.Url);
-            Assert.Equal(reference.ExternalReferenceId, actualMaster.DocumentId);
         }
 
         private void AssignExternalReferences(ItSystemUsage itSystemUsage)

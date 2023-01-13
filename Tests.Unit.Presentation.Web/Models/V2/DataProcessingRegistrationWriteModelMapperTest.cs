@@ -505,7 +505,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertReferences(references, AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
         }
 
-        private static void AssertReferences<T>(IReadOnlyList<T> references, IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences) where T: BaseExternalReferenceDTO
+        private static void AssertReferences<T>(IReadOnlyList<T> references, IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences) where T: ExternalReferenceDataWriteRequestDTO
         {
             Assert.Equal(mappedReferences.Count, mappedReferences.Count);
             for (var i = 0; i < mappedReferences.Count; i++)

@@ -26,6 +26,12 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         [Required(AllowEmptyStrings = false)]
         [MaxLength(ItContractConstraints.MaxNameLength)]
         public string Name { get; set; }
+        /// <summary>
+        /// User defined external references.
+        /// The external reference marked as "master reference" will be shown in overviews and on the system front page in KITOS
+        /// Constraint:
+        ///     - If the list is not empty one (and only one) must be marked as the master reference.
+        /// </summary>
         public IEnumerable<ExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
     }
 }

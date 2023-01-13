@@ -23,7 +23,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         ///     - If the list is not empty one (and only one) must be marked as the master reference.
         ///     - If the reference has a uuid it will update an existing reference (with the same uuid), uuid must exist
         ///     - If the reference has no uuid, a new External Reference will be created
-        ///     - References with uuids not included in the update call will be deleted
+        ///     - Existing references will be replaced by the input data in this field unless specifically identified using the uuid on items in the update
         /// </summary>
         public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
     }

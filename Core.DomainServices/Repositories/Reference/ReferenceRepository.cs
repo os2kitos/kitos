@@ -88,18 +88,6 @@ namespace Core.DomainServices.Repositories.Reference
             ResolveRepositoryOperations(root.GetRootType()).Save();
         }
 
-        public void UpdateRange(IEnumerable<ExternalReference> entitiesToUpdate)
-        {
-            if(entitiesToUpdate.Count() == 0)
-                return;
-            foreach (var reference in entitiesToUpdate)
-            {
-                _referenceRepository.Update(reference);
-            }
-
-            _referenceRepository.Save();
-        }
-
         private ReferenceRootRepositoryOperations ResolveRepositoryOperations(ReferenceRootType rootType)
         {
             return rootType switch

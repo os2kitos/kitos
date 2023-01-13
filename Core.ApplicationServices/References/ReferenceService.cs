@@ -184,7 +184,10 @@ namespace Core.ApplicationServices.References
                 {
                     var referenceList = externalReferences.ToList();
 
-                    var referencesToDelete = root.ExternalReferences.Where(externalReference => !referenceList.Any(referenceToUpdate => referenceToUpdate.Uuid == externalReference.Uuid));
+                    //External references with uuids not included in the update are going to be deleted
+                    var uuidsToUpdateHashSet = referenceList.Where(referenceToUpdate => referenceToUpdate.Uuid.HasValue).Select(referenceToUpdate => referenceToUpdate.Uuid).ToHashSet();
+                    var referencesToDelete = root.ExternalReferences.Where(externalReference => !uuidsToUpdateHashSet.Contains(externalReference.Uuid));
+
                     var deleteResult = DeleteExternalReferences(root, referencesToDelete);
                     if(deleteResult.Failed)
                         return new OperationError("Failed to delete old references", deleteResult.Error);
@@ -201,21 +204,22 @@ namespace Core.ApplicationServices.References
                                 return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
                         }
                         
-                        var referencesToUpdate = new List<ExternalReference>();
                         foreach (var externalReferenceProperties in referenceList)
                         {
                             ExternalReference externalReference;
+                            //If external reference has Uuid, an existing reference is going to be updated
+                            //If the uuid doesn't match an existing reference an Error is returned
                             if (externalReferenceProperties.Uuid.HasValue)
                             {
                                 var uuid = externalReferenceProperties.Uuid.Value;
                                 var existingReferenceResult = _referenceRepository.GetByUuid(uuid);
                                 if(existingReferenceResult.IsNone)
-                                    return new OperationError($"External reference with uuid: {uuid} was not found", OperationFailure.NotFound);
+                                    return new OperationError($"External reference with uuid: {uuid} was not found in the {rootType} with id: {root.Id}", OperationFailure.BadInput);
 
                                 externalReference = existingReferenceResult.Value;
                                 MapExternalReference(externalReferenceProperties, externalReference);
-                                referencesToUpdate.Add(externalReference);
                             }
+                            //If uuid is null a new reference is going to be created
                             else
                             {
                                 var addReferenceResult = AddReference(rootId, rootType, externalReferenceProperties.Title, externalReferenceProperties.DocumentId, externalReferenceProperties.Url);
@@ -234,7 +238,7 @@ namespace Core.ApplicationServices.References
                                 return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
                         }
 
-                        _referenceRepository.UpdateRange(referencesToUpdate);
+                        _referenceRepository.SaveRootEntity(root);
                     }
 
                     return Maybe<OperationError>.None;
@@ -247,7 +251,7 @@ namespace Core.ApplicationServices.References
             return error;
         }
 
-        private void MapExternalReference(UpdatedExternalReferenceProperties updatedProperties,
+        private static void MapExternalReference(UpdatedExternalReferenceProperties updatedProperties,
             ExternalReference externalReference)
         {
             externalReference.Title = updatedProperties.Title;

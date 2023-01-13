@@ -8,14 +8,15 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Moq;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Types.Contract;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -24,10 +25,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class ItContractResponseMapperTest : WithAutoFixture
     {
         private readonly ItContractResponseMapper _sut;
+        private readonly Mock<IExternalReferenceResponseMapper> _externalReferenceResponseMapperMock;
 
         public ItContractResponseMapperTest()
         {
-            _sut = new ItContractResponseMapper();
+            _externalReferenceResponseMapperMock = new Mock<IExternalReferenceResponseMapper>();
+            _sut = new ItContractResponseMapper(_externalReferenceResponseMapperMock.Object);
         }
 
         [Fact]
@@ -446,10 +449,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssignExternalReferences(contract);
 
             //Act
-            var dto = _sut.MapContractDTO(contract);
+            _sut.MapContractDTO(contract);
 
             //Assert
-            AssertExternalReferences(contract, dto.ExternalReferences.ToList());
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferenceDtoList(contract.ExternalReferences, contract.Reference), Times.Once);
         }
 
         #region Creaters
@@ -692,29 +695,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         #endregion
 
         #region Asserters
-
-        private static void AssertExternalReferences(ItContract contract, List<ExternalReferenceDataResponseDTO> dtoExternalReferences)
-        {
-            var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
-            AssertExternalReference(contract.Reference, actualMaster);
-            Assert.Equal(contract.ExternalReferences.Count, dtoExternalReferences.Count);
-
-            foreach (var comparison in contract.ExternalReferences.OrderBy(x => x.Title)
-                .Zip(dtoExternalReferences.OrderBy(x => x.Title), (expected, actual) => new { expected, actual })
-                .ToList())
-            {
-                AssertExternalReference(comparison.expected, comparison.actual);
-            }
-        }
-
-        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataResponseDTO actualMaster)
-        {
-            Assert.Equal(reference.Uuid, actualMaster.Uuid);
-            Assert.Equal(reference.Title, actualMaster.Title);
-            Assert.Equal(reference.URL, actualMaster.Url);
-            Assert.Equal(reference.ExternalReferenceId, actualMaster.DocumentId);
-        }
-
+        
         private void AssertPayments(ICollection<EconomyStream> expecteds, List<PaymentResponseDTO> actuals)
         {
             Assert.Equal(expecteds.Count, actuals.Count);

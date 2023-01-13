@@ -120,6 +120,7 @@ using System.Linq;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Ninject
 {
@@ -307,6 +308,9 @@ namespace Presentation.Web.Ninject
 
             //Interfaces
             kernel.Bind<IItInterfaceWriteModelMapper>().To<ItInterfaceWriteModelMapper>().InCommandScope(Mode);
+
+            //External references
+            kernel.Bind<IExternalReferenceResponseMapper>().To<ExternalReferenceResponseMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
