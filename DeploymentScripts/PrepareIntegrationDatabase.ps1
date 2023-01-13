@@ -1,4 +1,7 @@
-﻿#-------------------------------------------------------------
+﻿param(
+    [Parameter(Mandatory=$true)][string]$targetEnvironment
+    )
+#-------------------------------------------------------------
 # Stop on first error
 #-------------------------------------------------------------
 $ErrorActionPreference = "Stop"
@@ -9,7 +12,22 @@ $ErrorActionPreference = "Stop"
 .$PSScriptRoot\DeploymentSetup.ps1
 .$PSScriptRoot\DbMigrations.ps1
 
-Setup-Environment -environmentName "integration"
+switch( $targetEnvironment ) 
+    {
+        "integration" 
+        {
+            #All good
+            break;
+        }
+        "dev" 
+        {
+            #All good
+            break;
+        }
+        default { Throw "Error: Unsupported environment provided: $targetEnvironment" }
+    }
+
+Setup-Environment -environmentName $targetEnvironment
 
 .$PSScriptRoot\PrepareCleanDeveloperDatabase.ps1 `
                 -testToolsExePath "$Env:TestToolsPath" `
