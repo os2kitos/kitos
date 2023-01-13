@@ -1,6 +1,6 @@
 ﻿module Kitos.DataProcessing.Registration.Edit.SubDataProcessor {
     "use strict";
-    
+
     export interface ISubDataProcessorDialogFactory {
         open(subDataProcessorId: number | null, dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO, dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions): ng.ui.bootstrap.IModalInstanceService
     }
@@ -34,7 +34,7 @@
             "select2LoadingService",
             "dataProcessingRegistrationService",
         ];
-        
+
         subDataProcessorsConfig: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO>;
         subDataProcessorTransferToThirdCountriesConfig: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
         subDataProcessorBasisForTransferConfig: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
@@ -96,9 +96,9 @@
                 this.dataProcessingRegistrationService
                     .updateSubDataProcessor(this.dataProcessingRegistration.id, payload)
                     .then(() => {
-                            this.isBusy = false;
-                            this.close(true);
-                        },
+                        this.isBusy = false;
+                        this.close(true);
+                    },
                         () => this.isBusy = false);
             } else {
                 this.dataProcessingRegistrationService
@@ -158,9 +158,10 @@
                 (newElement) => this.viewModel.updateInsecureThirdCountry(newElement),
                 this.select2LoadingService,
                 null,
-                false);
+                false,
+                true);
         }
-            
+
         private bindSubDataProcessor(): Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.DataProcessing.IDataProcessorDTO> {
 
             const pageSize = 100;

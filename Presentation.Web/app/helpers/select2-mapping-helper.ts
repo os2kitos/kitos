@@ -50,7 +50,8 @@
             updateMethod: (newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) => void,
             select2LoadingService: Services.ISelect2LoadingService,
             hasDisabledValue: boolean = null,
-            allowExpiredObjects: boolean = true):
+            allowExpiredObjects: boolean = true,
+            enableSearch : boolean = false):
             Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO> {
 
             if (!baseOptions) {
@@ -66,10 +67,10 @@
             }
             
             const options = baseOptions.map(option => optionMap[option.id]);
-
+            const select2Config = enableSearch ? select2LoadingService.select2LocalData(() => options, true) : select2LoadingService.select2LocalDataNoSearch(() => options, true);
             return {
                 selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: select2LoadingService.select2LocalDataNoSearch(() => options, true),
+                select2Config: select2Config,
                 elementSelected: (newElement) => {
                     updateMethod(newElement);
                 }
