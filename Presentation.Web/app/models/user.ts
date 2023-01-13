@@ -2,6 +2,7 @@
     export interface IUser extends IEntity {
         Name?: string;
         LastName?: string;
+        FullName?: string;
         PhoneNumber?: string;
         Email?: string;
         IsGlobalAdmin?: boolean;

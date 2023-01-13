@@ -959,6 +959,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\it-contract\it-contract-service.ts" />
+    <TypeScriptCompile Include="app\services\Organization\organization-right-service.ts" />
     <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
     <TypeScriptCompile Include="app\services\Organization\organization-unit-service.ts" />
     <TypeScriptCompile Include="app\services\sts-organization-sync-service.ts" />

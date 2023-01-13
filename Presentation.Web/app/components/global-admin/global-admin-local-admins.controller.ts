@@ -23,6 +23,8 @@
         ($rootScope, $scope, $http, $state, notify, adminRights: Kitos.Models.Api.Organization.ILocalAdminRightsDto[], user: Kitos.Services.IUser, userService: Kitos.Services.IUserService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
             $rootScope.page.title = "Lokal administratorer";
             $scope.adminRights = adminRights;
+            $scope.userId = user.id;
+            $scope.currentOrganizationId = user.currentOrganizationId;
 
             function newLocalAdmin() {
                 // select2 changes the value twice, first with invalid values
