@@ -4,9 +4,8 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainServices;
-
 using Presentation.Web.Models.Application.FeatureToggle;
-using Presentation.Web.Properties;
+using Presentation.Web.Models.Application.RuntimeEnv;
 
 namespace Presentation.Web.Controllers.Web
 {
@@ -15,6 +14,7 @@ namespace Presentation.Web.Controllers.Web
     {
         private readonly IAuthenticationContext _userContext;
         private readonly IUserRepository _userRepository;
+        private readonly bool _isProd;
         private const string SsoErrorKey = "SSO_ERROR";
         private const string FeatureToggleKey = "FEATURE_TOGGLE";
         private const string SsoAuthenticationCompletedKey = "SSO_PREFERRED_START";
@@ -23,11 +23,12 @@ namespace Presentation.Web.Controllers.Web
         {
             _userContext = userContext;
             _userRepository = userRepository;
+            _isProd = KitosEnvironmentConfiguration.FromConfiguration().Environment == KitosEnvironment.Production;
         }
 
         public ActionResult Index()
         {
-            ViewBag.StylingScheme = Settings.Default.Environment?.ToLowerInvariant().Contains("prod") == true ? "PROD" : "TEST";
+            ViewBag.StylingScheme = _isProd ? "PROD" : "TEST";
             AppendSsoError();
             AppendFeatureToggles();
             AppendSsoLoginInformation();

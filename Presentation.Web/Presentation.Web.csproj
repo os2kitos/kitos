@@ -773,6 +773,7 @@
     <Compile Include="Models\API\V1\BusinessRoleDTO.cs" />
     <Compile Include="Models\API\V1\CreateItSystemDTO.cs" />
     <Compile Include="Models\API\V1\CreateItsystemUsageDTO.cs" />
+    <Compile Include="Models\Application\Cors\CorsConfiguration.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Application\Csv\CsvResponseBuilder.cs" />
@@ -830,6 +831,8 @@
     <Compile Include="Models\API\V1\UserWithEmailDTO.cs" />
     <Compile Include="Models\API\V1\ValueWithOptionalDateAndRemark.cs" />
     <Compile Include="Models\API\V1\ValueWithOptionalRemarkDTO.cs" />
+    <Compile Include="Models\Application\RuntimeEnv\KitosEnvironment.cs" />
+    <Compile Include="Models\Application\RuntimeEnv\KitosEnvironmentConfiguration.cs" />
     <Compile Include="Ninject\HangfireNinjectResolutionScope.cs" />
     <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
     <Compile Include="Ninject\KernelBuilder.cs" />
