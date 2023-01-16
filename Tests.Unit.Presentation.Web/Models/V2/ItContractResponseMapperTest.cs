@@ -448,13 +448,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssignBasicProperties(contract);
             AssignExternalReferences(contract);
 
+            var mappedReferences = Many<ExternalReferenceDataResponseDTO>();
+            _externalReferenceResponseMapperMock
+                .Setup(x => x.MapExternalReferences(contract.ExternalReferences, contract.Reference))
+                .Returns(mappedReferences);
+
             //Act
-            _sut.MapContractDTO(contract);
+            var dto = _sut.MapContractDTO(contract);
 
             //Assert
+            Assert.Equivalent(mappedReferences, dto.ExternalReferences);
             _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(contract.ExternalReferences, contract.Reference), Times.Once);
         }
-
+        
         #region Creaters
 
         private DataProcessingRegistration CreateDPR()
@@ -515,7 +521,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private EconomyStream CreateEconomyStream()
         {
-            return new ()
+            return new()
             {
                 AccountingEntry = A<string>(),
                 Acquisition = A<int>(),
@@ -585,7 +591,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.DurationYears = A<int>();
             contract.DurationMonths = A<int>() % 11;
             contract.DurationOngoing = A<bool>();
-            contract.OptionExtend = withOptionalCrossReferences 
+            contract.OptionExtend = withOptionalCrossReferences
                 ? new OptionExtendType() { Uuid = A<Guid>(), Name = A<string>() }
                 : null;
             contract.ExtendMultiplier = A<int>();
@@ -613,7 +619,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private void AssignSystemUsages(ItContract contract, ItSystemUsage[] usages)
         {
-            contract.AssociatedSystemUsages = usages.Select(usage => new ItContractItSystemUsage() {ItContract = contract, ItSystemUsage = usage} ).ToList();
+            contract.AssociatedSystemUsages = usages.Select(usage => new ItContractItSystemUsage() { ItContract = contract, ItSystemUsage = usage }).ToList();
         }
 
         private void AssignResponsiblePropertiesSection(ItContract contract, bool withOptionalCrossReferences)
@@ -631,7 +637,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.SupplierContractSigner = A<string>();
             contract.HasSupplierSigned = A<bool>();
             contract.SupplierSignedDate = A<DateTime>();
-            contract.Supplier = withOptionalCrossReferences 
+            contract.Supplier = withOptionalCrossReferences
                 ? CreateOrganization()
                 : null;
         }
@@ -644,14 +650,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.PurchaseForm = withOptionalCrossReferences
                 ? new PurchaseFormType() { Uuid = A<Guid>(), Name = A<string>() }
                 : null;
-            contract.ProcurementPlanQuarter = withOptionalCrossReferences 
-                ? A<int>() % 2 
+            contract.ProcurementPlanQuarter = withOptionalCrossReferences
+                ? A<int>() % 2
                 : null;
-            contract.ProcurementPlanYear = withOptionalCrossReferences 
-                ? A<int>() 
+            contract.ProcurementPlanYear = withOptionalCrossReferences
+                ? A<int>()
                 : null;
-            contract.ProcurementInitiated = withOptionalCrossReferences 
-                ? A<YesNoUndecidedOption>() 
+            contract.ProcurementInitiated = withOptionalCrossReferences
+                ? A<YesNoUndecidedOption>()
                 : null;
         }
 
@@ -676,7 +682,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 }
                 : null;
             contract.Criticality = withOptionalCrossReferences
-                ? new CriticalityType {Uuid = A<Guid>(), Name = A<string>()}
+                ? new CriticalityType { Uuid = A<Guid>(), Name = A<string>() }
                 : null;
             contract.Active = A<bool>();
             contract.Concluded = A<DateTime>();
@@ -695,7 +701,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         #endregion
 
         #region Asserters
-        
+
         private void AssertPayments(ICollection<EconomyStream> expecteds, List<PaymentResponseDTO> actuals)
         {
             Assert.Equal(expecteds.Count, actuals.Count);

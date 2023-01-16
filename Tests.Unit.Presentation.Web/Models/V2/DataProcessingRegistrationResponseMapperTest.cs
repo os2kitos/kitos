@@ -14,6 +14,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
@@ -246,12 +247,17 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var dpr = new DataProcessingRegistration();
             AssignBasicProperties(dpr);
             AssignExternalReferences(dpr);
+            var mappedReferences = Many<ExternalReferenceDataResponseDTO>();
+            _externalReferenceResponseMapperMock
+                .Setup(x => x.MapExternalReferences(dpr.ExternalReferences, dpr.Reference))
+                .Returns(mappedReferences);
 
             //Act
-            _sut.MapDataProcessingRegistrationDTO(dpr);
+            var dto = _sut.MapDataProcessingRegistrationDTO(dpr);
 
             //Assert
             _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(dpr.ExternalReferences, dpr.Reference), Times.Once);
+            Assert.Equivalent(mappedReferences, dto.ExternalReferences);
         }
 
         #region Creates

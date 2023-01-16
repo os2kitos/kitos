@@ -179,11 +179,17 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssignBasicProperties(itSystemUsage);
             AssignExternalReferences(itSystemUsage);
 
+            var mappedReferences = Many<ExternalReferenceDataResponseDTO>();
+            _externalReferenceResponseMapperMock
+                .Setup(x => x.MapExternalReferences(itSystemUsage.ExternalReferences, itSystemUsage.Reference))
+                .Returns(mappedReferences);
+
             //Act
-            _sut.MapSystemUsageDTO(itSystemUsage);
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
 
             //Assert
             _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(itSystemUsage.ExternalReferences, itSystemUsage.Reference), Times.Once);
+            Assert.Equivalent(mappedReferences, dto.ExternalReferences);
         }
 
         [Fact]
