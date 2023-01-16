@@ -183,7 +183,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _sut.MapSystemUsageDTO(itSystemUsage);
 
             //Assert
-            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferenceDtoList(itSystemUsage.ExternalReferences, itSystemUsage.Reference), Times.Once);
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(itSystemUsage.ExternalReferences, itSystemUsage.Reference), Times.Once);
         }
 
         [Fact]

@@ -452,7 +452,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _sut.MapContractDTO(contract);
 
             //Assert
-            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferenceDtoList(contract.ExternalReferences, contract.Reference), Times.Once);
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(contract.ExternalReferences, contract.Reference), Times.Once);
         }
 
         #region Creaters

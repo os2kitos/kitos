@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Roles = MapRoles(systemUsage),
                 LocalKLEDeviations = MapKle(systemUsage),
                 OrganizationUsage = MapOrganizationUsage(systemUsage),
-                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferenceDtoList(systemUsage.ExternalReferences, systemUsage.Reference),
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(systemUsage.ExternalReferences, systemUsage.Reference),
                 OutgoingSystemRelations = MapOutgoingSystemRelations(systemUsage),
                 Archiving = MapArchiving(systemUsage),
                 GDPR = MapGDPR(systemUsage)

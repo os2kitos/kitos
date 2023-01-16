@@ -252,7 +252,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _sut.MapDataProcessingRegistrationDTO(dpr);
 
             //Assert
-            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferenceDtoList(dpr.ExternalReferences, dpr.Reference), Times.Once);
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(dpr.ExternalReferences, dpr.Reference), Times.Once);
         }
 
         #region Creates

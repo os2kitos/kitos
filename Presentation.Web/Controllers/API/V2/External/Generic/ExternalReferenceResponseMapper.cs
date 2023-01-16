@@ -7,10 +7,10 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public class ExternalReferenceResponseMapper: IExternalReferenceResponseMapper
     {
-        public IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferenceDtoList(IEnumerable<ExternalReference> externalReferences,
+        public IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(IEnumerable<ExternalReference> externalReferences,
             ExternalReference masterReference)
         {
-            return externalReferences.Select(x => MapExternalReferenceDto(x, masterReference)).ToList();
+            return externalReferences.Select(externalReference => MapExternalReferenceDto(externalReference, masterReference)).ToList();
         }
 
         private static ExternalReferenceDataResponseDTO MapExternalReferenceDto(ExternalReference externalReference, ExternalReference masterReference)

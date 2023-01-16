@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 SystemUsages = MapSystemUsages(dataProcessingRegistration),
                 Oversight = MapOversight(dataProcessingRegistration),
                 Roles = MapRoles(dataProcessingRegistration),
-                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferenceDtoList(dataProcessingRegistration.ExternalReferences, dataProcessingRegistration.Reference)
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(dataProcessingRegistration.ExternalReferences, dataProcessingRegistration.Reference)
             };
         }
 

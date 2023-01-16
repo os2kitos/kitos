@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Termination = MapTermination(contract),
                 Payments = MapPayments(contract),
                 Roles = MapRoles(contract),
-                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferenceDtoList(contract.ExternalReferences, contract.Reference)
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(contract.ExternalReferences, contract.Reference)
             };
         }
 
