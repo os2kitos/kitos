@@ -13,7 +13,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return externalReferences.Select(x => MapExternalReferenceDto(x, masterReference)).ToList();
         }
 
-        private ExternalReferenceDataResponseDTO MapExternalReferenceDto(ExternalReference externalReference, ExternalReference masterReference)
+        private static ExternalReferenceDataResponseDTO MapExternalReferenceDto(ExternalReference externalReference, ExternalReference masterReference)
         {
             return new ExternalReferenceDataResponseDTO
             {

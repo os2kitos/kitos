@@ -185,11 +185,18 @@ namespace Core.ApplicationServices.References
                     var referenceList = externalReferences.ToList();
 
                     //External references with uuids not included in the update are going to be deleted
-                    var uuidsToUpdateHashSet = referenceList.Where(referenceToUpdate => referenceToUpdate.Uuid.HasValue).Select(referenceToUpdate => referenceToUpdate.Uuid).ToHashSet();
-                    var referencesToDelete = root.ExternalReferences.Where(externalReference => !uuidsToUpdateHashSet.Contains(externalReference.Uuid));
+                    var uuidsToUpdateHashSet = referenceList
+                        .Where(referenceToUpdate => referenceToUpdate.Uuid.HasValue)
+                        .Select(referenceToUpdate => referenceToUpdate.Uuid)
+                        .ToHashSet();
 
+                    var referencesToDelete = root
+                        .ExternalReferences
+                        .Where(externalReference => !uuidsToUpdateHashSet.Contains(externalReference.Uuid));
+
+                    //Delete all references not explicitly referenced by the input parameters
                     var deleteResult = DeleteExternalReferences(root, referencesToDelete);
-                    if(deleteResult.Failed)
+                    if (deleteResult.Failed)
                         return new OperationError("Failed to delete old references", deleteResult.Error);
 
                     if (referenceList.Any())
@@ -203,17 +210,17 @@ namespace Core.ApplicationServices.References
                             case > 1:
                                 return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
                         }
-                        
+
                         foreach (var externalReferenceProperties in referenceList)
                         {
                             ExternalReference externalReference;
-                            //If external reference has Uuid, an existing reference is going to be updated
-                            //If the uuid doesn't match an existing reference an Error is returned
+                            //Replace references, which are identified by the update using uuids
+                            //If no existing reference is found by uuid, it is considered an input error
                             if (externalReferenceProperties.Uuid.HasValue)
                             {
                                 var uuid = externalReferenceProperties.Uuid.Value;
                                 var existingReferenceResult = _referenceRepository.GetByUuid(uuid);
-                                if(existingReferenceResult.IsNone)
+                                if (existingReferenceResult.IsNone)
                                     return new OperationError($"External reference with uuid: {uuid} was not found in the {rootType} with id: {root.Id}", OperationFailure.BadInput);
 
                                 externalReference = existingReferenceResult.Value;
@@ -230,7 +237,7 @@ namespace Core.ApplicationServices.References
                                 externalReference = addReferenceResult.Value;
                             }
 
-                            if (!externalReferenceProperties.MasterReference) 
+                            if (!externalReferenceProperties.MasterReference)
                                 continue;
 
                             var masterReferenceResult = root.SetMasterReference(externalReference);
@@ -247,6 +254,8 @@ namespace Core.ApplicationServices.References
 
             if (error.IsNone)
                 transaction.Commit();
+            else
+                transaction.Rollback();
 
             return error;
         }
@@ -258,7 +267,7 @@ namespace Core.ApplicationServices.References
             externalReference.ExternalReferenceId = updatedProperties.DocumentId;
             externalReference.URL = updatedProperties.Url;
         }
-        
+
         private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferencesByRoot(IEntityWithExternalReferences root)
         {
             if (root == null)

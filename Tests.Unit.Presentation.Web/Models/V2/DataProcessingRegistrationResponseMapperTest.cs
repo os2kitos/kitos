@@ -413,7 +413,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         #region Asserts
 
-        private void AssertOversightDates(ICollection<DataProcessingRegistrationOversightDate> expectedOversightDates, IEnumerable<OversightDateDTO> actualOversightDates)
+        private static void AssertOversightDates(ICollection<DataProcessingRegistrationOversightDate> expectedOversightDates, IEnumerable<OversightDateDTO> actualOversightDates)
         {
             var orderedExpected = expectedOversightDates.OrderBy(x => x.OversightDate).ToList();
             var orderedActual = actualOversightDates.OrderBy(x => x.CompletedAt).ToList();
@@ -440,7 +440,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        private void AssertSystemUsage(ItSystemUsage expected, IdentityNamePairResponseDTO actual)
+        private static void AssertSystemUsage(ItSystemUsage expected, IdentityNamePairResponseDTO actual)
         {
             Assert.Equal(expected.Uuid, actual.Uuid);
             Assert.Equal(expected.ItSystem.Name, actual.Name);
