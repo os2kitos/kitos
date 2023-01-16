@@ -432,7 +432,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Can_UpdateExternalReferences_Create_ExternalReferences()
+        public void UpdateExternalReferences_Creates_ExternalReferences()
         {
             //Arrange
             var rootType = A<ReferenceRootType>();
@@ -473,7 +473,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Can_UpdateExternalReferences_Update_ExternalReferences()
+        public void UpdateExternalReferences_Updates_Existing_ExternalReferences()
         {
             //Arrange
             var rootType = A<ReferenceRootType>();
@@ -491,16 +491,17 @@ namespace Tests.Unit.Presentation.Web.Services
             var rootEntity = root.Object;
 
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var updatedReference = new UpdatedExternalReferenceProperties()
+            {
+                Uuid = externalReference.Uuid,
+                DocumentId = A<string>(),
+                Title = A<string>(),
+                Url = A<string>(),
+                MasterReference = true
+            };
             var externalReferencePropertiesList = new List<UpdatedExternalReferenceProperties>()
             {
-                new()
-                {
-                    Uuid = externalReferenceList.First().Uuid,
-                    DocumentId = A<string>(),
-                    Title = A<string>(), 
-                    Url = A<string>(),
-                    MasterReference = true
-                }
+                updatedReference
             };
 
             ExpectRootDeleteAndAdd(root, externalReferencePropertiesList, externalReferenceList);
@@ -516,7 +517,10 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.IsNone);
             _dbTransaction.Verify(x => x.Commit());
-
+            Assert.Equal(updatedReference.DocumentId, externalReference.ExternalReferenceId);
+            Assert.Equal(updatedReference.Title, externalReference.Title);
+            Assert.Equal(updatedReference.Url, externalReference.URL);
+            root.Verify(x => x.SetMasterReference(externalReference));
             _referenceRepository.Verify
             (
                 repository => repository.SaveRootEntity(It.Is<IEntityWithExternalReferences>(x => x.Id == rootEntity.Id)),
