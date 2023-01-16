@@ -1457,7 +1457,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private void ExpectBatchUpdateExternalReferencesReturns(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
             _referenceServiceMock
-                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.Contract, contract.Id, externalReferences))
+                .Setup(x => x.UpdateExternalReferences(ReferenceRootType.Contract, contract.Id, externalReferences))
                 .Returns(value);
         }
 

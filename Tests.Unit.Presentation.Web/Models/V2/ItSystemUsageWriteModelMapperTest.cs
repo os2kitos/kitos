@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
@@ -62,7 +63,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_ExternalReferences()
         {
             //Arrange
-            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+            var references = Many<UpdateExternalReferenceDataWriteRequestDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
             var mappedReferences = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
@@ -73,6 +74,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 var expected = references[i];
                 var actual = mappedReferences[i];
+                Assert.Equal(expected.Uuid, actual.Uuid);
                 Assert.Equal(expected.Url, actual.Url);
                 Assert.Equal(expected.Title, actual.Title);
                 Assert.Equal(expected.DocumentId, actual.DocumentId);
@@ -496,7 +498,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Roles = rolesNull ? null : Many<RoleAssignmentRequestDTO>(),
                 LocalKleDeviations = kleNull ? null : A<LocalKLEDeviationsRequestDTO>(),
                 OrganizationUsage = orgUsageNull ? null : A<OrganizationUsageWriteRequestDTO>(),
-                ExternalReferences = referencesNull ? null : Many<ExternalReferenceDataDTO>(),
+                ExternalReferences = referencesNull ? null : Many<ExternalReferenceDataWriteRequestDTO>(),
                 Archiving = archivingNull ? null : A<ArchivingWriteRequestDTO>(),
                 GDPR = gdprNull ? null : A<GDPRWriteRequestDTO>(),
             };
@@ -532,7 +534,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Roles = rolesNull ? null : Many<RoleAssignmentRequestDTO>(),
                 LocalKleDeviations = kleNull ? null : A<LocalKLEDeviationsRequestDTO>(),
                 OrganizationUsage = orgUsageNull ? null : A<OrganizationUsageWriteRequestDTO>(),
-                ExternalReferences = referencesNull ? null : Many<ExternalReferenceDataDTO>(),
+                ExternalReferences = referencesNull ? null : Many<UpdateExternalReferenceDataWriteRequestDTO>(),
                 Archiving = archivingNull ? null : A<ArchivingWriteRequestDTO>(),
                 GDPR = gdprNull ? null : A<GDPRWriteRequestDTO>(),
             };

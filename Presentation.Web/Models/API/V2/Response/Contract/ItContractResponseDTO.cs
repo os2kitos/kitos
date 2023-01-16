@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
 {
@@ -76,7 +76,10 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// </summary>
         [Required]
         public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
+        /// <summary>
+        /// External reference definitions
+        /// </summary>
         [Required]
-        public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
+        public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
     }
 }
