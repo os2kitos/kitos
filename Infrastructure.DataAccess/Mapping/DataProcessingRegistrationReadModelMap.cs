@@ -81,6 +81,15 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.LastChangedAt)
                 .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedAt", 0);
+
+            Property(x => x.OversightScheduledInspectionDate)
+                .HasIndexAnnotation("IX_DPR_OversightScheduledInspectionDate");
+
+            Property(x => x.IsActive)
+                .HasIndexAnnotation("IX_DPR_IsActive");
+
+            Property(x => x.ActiveAccordingToMainContract)
+                .HasIndexAnnotation("IX_DPR_MainContractIsActive");
         }
     }
 }

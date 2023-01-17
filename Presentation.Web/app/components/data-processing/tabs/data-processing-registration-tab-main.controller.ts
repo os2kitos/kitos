@@ -10,7 +10,8 @@
             "select2LoadingService",
             "notify",
             "dataProcessingRegistrationOptions",
-            "bindingService"
+            "bindingService",
+            "subDataProcessorDialogFactory"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -22,11 +23,16 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly notify,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
-            private readonly bindingService: Kitos.Services.Generic.IBindingService) {
+            private readonly bindingService: Services.Generic.IBindingService,
+            private readonly subDataProcessorDialogFactory: Edit.SubDataProcessor.ISubDataProcessorDialogFactory) {
+            this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
+            this.loadState();
+        }
+
+        private loadState() {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
-            this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindIsAgreementConcluded();
             this.bindAgreementConcludedRemark();
             this.bindAgreementConcludedAt();
@@ -34,8 +40,8 @@
             this.bindBasisForTransfer();
             this.bindDataResponsible();
             this.bindDataResponsibleRemark();
+            this.reloadValidationStatus();
         }
-
 
         headerName = this.dataProcessingRegistration.name;
 
@@ -71,38 +77,66 @@
 
         dataResponsibleRemark: Models.ViewModel.Generic.IEditTextViewModel;
 
-        private bindDataResponsible() {
-            const optionMap = this.dataProcessingRegistrationOptions.dataResponsibleOptions.reduce((acc, next, _) => {
-                acc[next.id] = {
-                    text: next.name,
-                    id: next.id,
-                    optionalObjectContext: {
-                        id: next.id,
-                        name: next.name,
-                        description: next.description
+        validationStatus: Models.DataProcessing.IDataProcessingRegistrationValidationDTO;
+
+        reloadValidationStatus() {
+            this.dataProcessingRegistrationService.getValidationDetails(this.dataProcessingRegistration.id).then((newStatus: Models.DataProcessing.IDataProcessingRegistrationValidationDTO) => {
+                this.validationStatus = newStatus;
+            });
+        }
+        
+        yesNoUndecidedOptionsViewModel = Models.ViewModel.Shared.YesNoUndecidedOptions;
+
+        createSubDataProcessor() {
+            this.openSubDataProcessorModal();
+        }
+
+        updateSubDataProcessor(id: number) {
+            this.openSubDataProcessorModal(id);
+        }
+
+        changeName(name) {
+            this.apiUseCaseFactory
+                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistrationId, name))
+                .executeAsync(nameChangeResponse => {
+                    this.headerName = name;
+                    return nameChangeResponse;
+                });
+        }
+
+        removeSubDataProcessor(id: number) {
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistrationId, id))
+                .executeAsync(success => {
+
+                    //Update the source collection
+                    this.dataProcessingRegistration.subDataProcessors = this.dataProcessingRegistration.subDataProcessors.filter(x => x.id !== id);
+
+                    //Propagate changes to UI binding
+                    this.bindSubDataProcessors();
+                    return success;
+                });
+        }
+
+        private openSubDataProcessorModal(subDataProcessorId: number = null) {
+            this.subDataProcessorDialogFactory.open(subDataProcessorId,
+                this.dataProcessingRegistration,
+                this.dataProcessingRegistrationOptions)
+                .result.then((isSubProcessorChanged: boolean) => {
+                    //Reload state from backend if the dialog was closed 
+                    if (isSubProcessorChanged) {
+                        this.bindSubDataProcessors();
                     }
-                };
-                return acc;
-            }, {});
+                });
+        }
 
-            //If selected state is expired, add it for presentation reasons
-            const existingChoice = this.dataProcessingRegistration.dataResponsible.value;
-            if (existingChoice && !optionMap[existingChoice.id]) {
-                optionMap[existingChoice.id] = {
-                    text: `${existingChoice.name} (udgået)`,
-                    id: existingChoice.id,
-                    disabled: true,
-                    optionalObjectContext: existingChoice
-                }
-            }
-
-            const options = this.dataProcessingRegistrationOptions.dataResponsibleOptions.map(option => optionMap[option.id]);
-
-            this.dataResponsible = {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
-                elementSelected: (newElement) => this.updateDataResponsible(newElement)
-            };
+        private bindDataResponsible() {
+            this.dataResponsible =
+                Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(
+                    this.dataProcessingRegistration.dataResponsible.value,
+                    this.dataProcessingRegistrationOptions.dataResponsibleOptions,
+                    (newElement) => this.updateDataResponsible(newElement),
+                    this.select2LoadingService);
         }
 
         private bindDataResponsibleRemark() {
@@ -118,40 +152,17 @@
         }
 
         private bindBasisForTransfer() {
-            const optionMap = this.dataProcessingRegistrationOptions.basisForTransferOptions.reduce((acc, next, _) => {
-                acc[next.id] = {
-                    text: next.name,
-                    id: next.id,
-                    optionalObjectContext: {
-                        id: next.id,
-                        name: next.name,
-                        expired: false //We only allow selection of non-expired and this object is based on the available objects
-                    }
-                };
-                return acc;
-            }, {});
-
-            //If selected state is expired, add it for presentation reasons
-            const existingChoice = this.dataProcessingRegistration.basisForTransfer;
-            if (existingChoice && !optionMap[existingChoice.id]) {
-                optionMap[existingChoice.id] = {
-                    text: `${existingChoice.name} (udgået)`,
-                    id: existingChoice.id,
-                    disabled: true,
-                    optionalObjectContext: existingChoice
-                }
-            }
-
-            const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
-
-            this.basisForTransfer = {
-                selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
-                elementSelected: (newElement) => this.updateBasisForTransfer(newElement)
-            };
+            this.basisForTransfer = Helpers.Select2MappingHelper.createNewNamedEntityWithDescriptionAndExpirationStatusDtoViewModel(
+                this.dataProcessingRegistration.basisForTransfer,
+                this.dataProcessingRegistrationOptions.basisForTransferOptions,
+                (newElement) => this.updateBasisForTransfer(newElement),
+                this.select2LoadingService,
+                true,
+                false); //We only allow selection of non-expired and this object is based on the available objects
         }
 
         private bindTransferToInsecureThirdCountries() {
+
             const options = new Models.ViewModel.Shared.YesNoUndecidedOptions();
             this.transferToInsecureThirdCountries = {
 
@@ -167,7 +178,7 @@
 
             this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
                 config => this.insecureThirdCountries = config,
-                () => this.dataProcessingRegistration.insecureThirdCountries,
+                () => this.dataProcessingRegistration.insecureThirdCountries.sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale)),
                 element => this.removeInsecureThirdCountry(element.id),
                 newElement => this.addInsecureThirdCountry(newElement),
                 this.hasWriteAccess,
@@ -213,58 +224,27 @@
             };
             this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
-
-        private mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
-            return dataProcessors.map(
-                dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
-                    id: dataProcessor.id,
-                    text: dataProcessor.name,
-                    optionalObjectContext: dataProcessor,
-                    cvrNumber: dataProcessor.cvrNumber
-                }
-            );
-        }
-
+        
         private bindDataProcessors() {
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
-                () => this.dataProcessingRegistration.dataProcessors,
+                () => this.dataProcessingRegistration.dataProcessors.sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale)),
                 element => this.removeDataProcessor(element.id),
                 newElement => this.addDataProcessor(newElement),
                 this.hasWriteAccess,
                 this.hasWriteAccess,
                 (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
-                    .then(results => this.mapDataProcessingSearchResults(results)),
+                    .then(results => Helpers.Select2MappingHelper.mapDataProcessingSearchResults(results)),
                 null,
                 Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext
             );
         }
 
         private bindSubDataProcessors() {
-            const pageSize = 100;
-            this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
-                config => this.subDataProcessors = config,
-                () => this.dataProcessingRegistration.subDataProcessors,
-                element => this.removeSubDataProcessor(element.id),
-                newElement => this.addSubDataProcessor(newElement),
-                this.hasWriteAccess,
-                this.hasWriteAccess,
-                (query) => this
-                    .dataProcessingRegistrationService
-                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
-                    .then(results => this.mapDataProcessingSearchResults(results)),
-                null,
-                Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext
-            );
-        }
-
-        changeName(name) {
-            this.apiUseCaseFactory
-                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistrationId, name))
-                .executeAsync(nameChangeResponse => {
-                    this.headerName = name;
-                    return nameChangeResponse;
+            this.dataProcessingRegistrationService.get(this.dataProcessingRegistration.id)
+                .then(reloadedSubDp => {
+                    this.dataProcessingRegistration.subDataProcessors = reloadedSubDp.subDataProcessors
                 });
         }
 
@@ -298,22 +278,6 @@
                 });
         }
 
-        private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
-            if (!!newElement && !!newElement.optionalObjectContext) {
-                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
-                this.apiUseCaseFactory
-                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignSubDataProcessor(this.dataProcessingRegistrationId, newDp.id))
-                    .executeAsync(success => {
-                        //Update the source collection
-                        this.dataProcessingRegistration.subDataProcessors.push(newDp);
-
-                        //Trigger UI update
-                        this.bindSubDataProcessors();
-                        return success;
-                    });
-            }
-        }
-
         private removeInsecureThirdCountry(id: number) {
             this.apiUseCaseFactory
                 .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeInsecureThirdCountry(this.dataProcessingRegistrationId, id))
@@ -342,20 +306,6 @@
                         return success;
                     });
             }
-        }
-
-        private removeSubDataProcessor(id: number) {
-            this.apiUseCaseFactory
-                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistrationId, id))
-                .executeAsync(success => {
-
-                    //Update the source collection
-                    this.dataProcessingRegistration.subDataProcessors = this.dataProcessingRegistration.subDataProcessors.filter(x => x.id !== id);
-
-                    //Propagate changes to UI binding
-                    this.bindSubDataProcessors();
-                    return success;
-                });
         }
 
         private updateBasisForTransfer(newValue?: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) {
@@ -491,7 +441,6 @@
                 this.dataProcessingRegistration.agreementConcluded.optionalDateValue,
                 (newDate) => this.changeAgreementConcludedAt(newDate));
         }
-
     }
 
     angular

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -39,10 +40,12 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// <summary>
         /// Which insecure third countries are subject to data transfer as part of the data processing
         /// </summary>
+        [Required]
         public IEnumerable<IdentityNamePairResponseDTO> InsecureCountriesSubjectToDataTransfer { get; set; }
         /// <summary>
         /// UUID's of the organization entities selected as data processors
         /// </summary>
+        [Required]
         public IEnumerable<ShallowOrganizationResponseDTO> DataProcessors { get; set; }
         /// <summary>
         /// Determines if the data processing involves sub data processors
@@ -51,6 +54,18 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// <summary>
         /// UUID's of the organization entities selected as sub data processors
         /// </summary>
-        public IEnumerable<ShallowOrganizationResponseDTO> SubDataProcessors { get; set; }
+        [Required]
+        public IEnumerable<DataProcessorRegistrationSubDataProcessorResponseDTO> SubDataProcessors { get; set; }
+
+        /// <summary>
+        /// Determines if the entity is considered valid. Validity is determined by
+        /// - the MainContract Validity.
+        /// </summary>
+        [Required]
+        public bool Valid { get; set; }
+        /// <summary>
+        /// Defines the master contract for this data processing registration (many contracts can point to a data processing registration but only one can be the master contract)
+        /// </summary>
+        public IdentityNamePairResponseDTO MainContract { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel.ItSystem.DataTypes;
 
 namespace Core.DomainModel.ItSystemUsage.GDPR
@@ -16,7 +17,12 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public bool LinkToDirectory { get; set; }
         public IEnumerable<string> SensitiveDataTypes { get; set; }
         public DataOptions? RiskAssessment { get; set; }
+        public DateTime? RiskAssessmentDate { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         public RiskLevel? PreRiskAssessment { get; set; }
+        public bool PersonalDataCpr { get; set; }
+        public bool PersonalDataSocialProblems { get; set; }
+        public bool PersonalDataSocialOtherPrivateMatters { get; set; }
         public DataOptions? DPIA { get; set; }
         public HostedAt? HostedAt { get; set; }
     }

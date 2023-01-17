@@ -67,6 +67,8 @@
         ActiveArchivePeriodEndDate: Date | null;
         RiskSupervisionDocumentationName: string | null;
         RiskSupervisionDocumentationUrl: string | null;
+        RiskAssessmentDate: Date | null;
+        PlannedRiskAssessmentDate: Date | null;
         LinkToDirectoryName: string | null;
         LinkToDirectoryUrl: string | null;
         DataProcessingRegistrationsConcludedAsCsv: string | null;

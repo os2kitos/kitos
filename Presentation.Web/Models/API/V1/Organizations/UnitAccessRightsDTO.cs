@@ -6,7 +6,7 @@
         {
         }
 
-        public UnitAccessRightsDTO(bool canBeRead, bool canBeModified, bool canNameBeModified, bool canEanBeModified, bool canDeviceIdBeModified, bool canBeRearranged, bool canBeDeleted)
+        public UnitAccessRightsDTO(bool canBeRead, bool canBeModified, bool canNameBeModified, bool canEanBeModified, bool canDeviceIdBeModified, bool canBeRearranged, bool canBeDeleted, bool canEditRegistrations)
         {
             CanBeRead = canBeRead;
             CanBeModified = canBeModified;
@@ -15,10 +15,11 @@
             CanDeviceIdBeModified = canDeviceIdBeModified;
             CanBeRearranged = canBeRearranged;
             CanBeDeleted = canBeDeleted;
+            CanEditRegistrations = canEditRegistrations;
         }
 
         protected UnitAccessRightsDTO(UnitAccessRightsDTO other)
-        : this(other.CanBeRead, other.CanBeModified, other.CanNameBeModified, other.CanEanBeModified, other.CanDeviceIdBeModified, other.CanBeRearranged, other.CanBeDeleted)
+        : this(other.CanBeRead, other.CanBeModified, other.CanNameBeModified, other.CanEanBeModified, other.CanDeviceIdBeModified, other.CanBeRearranged, other.CanBeDeleted, other.CanEditRegistrations)
         {
 
         }
@@ -30,5 +31,6 @@
         public bool CanDeviceIdBeModified { get; set; }
         public bool CanBeRearranged { get; set; }
         public bool CanBeDeleted { get; set; }
+        public bool CanEditRegistrations { get; set; }
     }
 }

@@ -62,6 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
         private readonly Mock<IItsystemUsageRelationsService> _systemUsageRelationServiceMock;
+        private readonly Mock<IGenericRepository<ItSystemUsagePersonalData>> _personalDataOptionsRepository;
 
         public ItSystemUsageWriteServiceTest()
         {
@@ -84,6 +85,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
             _systemUsageRelationServiceMock = new Mock<IItsystemUsageRelationsService>();
+            _personalDataOptionsRepository = new Mock<IGenericRepository<ItSystemUsagePersonalData>>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object,
@@ -95,7 +97,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _archiveTypeOptionsServiceMock.Object, _archiveLocationOptionsServiceMock.Object,
                 _archiveTestLocationOptionsServiceMock.Object,
                 _systemUsageRelationServiceMock.Object,
-                _identityResolverMock.Object);
+                _identityResolverMock.Object,
+                _personalDataOptionsRepository.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -1378,6 +1381,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var riskAssessmentDate = A<DateTime?>();
             var riskAssessmentDoc = A<NamedLink>();
             var riskAssessmentNotes = A<string>();
+            var plannedRiskAssessmentDate = A<DateTime?>();
             var riskAssessmentResult = A<RiskLevel?>();
             var dpiaConducted = A<DataOptions?>();
             var dpiaDate = A<DateTime?>();
@@ -1404,6 +1408,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 RiskAssessmentConductedDate = riskAssessmentDate.AsChangedValue(),
                 RiskAssessmentDocumentation = riskAssessmentDoc.FromNullable().AsChangedValue(),
                 RiskAssessmentNotes = riskAssessmentNotes.AsChangedValue(),
+                PlannedRiskAssessmentDate = plannedRiskAssessmentDate.AsChangedValue(),
                 RiskAssessmentResult = riskAssessmentResult.AsChangedValue(),
                 DPIAConducted = dpiaConducted.AsChangedValue(),
                 DPIADate = dpiaDate.AsChangedValue(),
@@ -1808,7 +1813,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
             var systemRelationParameters = new SystemRelationParameters(A<Guid>(), A<Guid>(), null, null, A<string>(), A<string>());
             var toSystemUsageId = A<int>();
-            var operationError = A<OperationError>();
             ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItInterface>(systemRelationParameters.UsingInterfaceUuid, Maybe<int>.None);
@@ -2147,6 +2151,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(gdpr.RiskAssessmentConducted.NewValue, actual.riskAssessment);
             Assert.Equal(gdpr.RiskAssessmentConductedDate.NewValue, actual.riskAssesmentDate);
             Assert.Equal(gdpr.RiskAssessmentNotes.NewValue, actual.noteRisks);
+            Assert.Equal(gdpr.PlannedRiskAssessmentDate.NewValue, actual.PlannedRiskAssessmentDate);
             Assert.Equal(gdpr.RiskAssessmentResult.NewValue, actual.preriskAssessment);
             Assert.Equal(gdpr.DPIAConducted.NewValue, actual.DPIA);
             Assert.Equal(gdpr.DPIADate.NewValue, actual.DPIADateFor);
@@ -2216,6 +2221,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     RiskAssessmentConductedDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
                     RiskAssessmentNotes = A<string>().AsChangedValue(),
+                    PlannedRiskAssessmentDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentResult = A<RiskLevel?>().AsChangedValue(),
                     DPIAConducted = A<DataOptions?>().AsChangedValue(),
                     DPIADate = A<DateTime?>().AsChangedValue(),
@@ -2264,6 +2270,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     RiskAssessmentConductedDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
                     RiskAssessmentNotes = "".AsChangedValue(),
+                    PlannedRiskAssessmentDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentResult = new ChangedValue<RiskLevel?>(null),
                     DPIAConducted = new ChangedValue<DataOptions?>(null),
                     DPIADate = new ChangedValue<DateTime?>(null),
@@ -2405,24 +2412,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _archiveTypeOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, archiveTypeUuid)).Returns(result);
         }
 
-        private void ExpectAddExternalReferenceReturns(ItSystemUsage itSystemUsage, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
-        {
-            _referenceServiceMock
-                .Setup(x => x.AddReference(itSystemUsage.Id, ReferenceRootType.SystemUsage, externalReference.Title, externalReference.DocumentId, externalReference.Url))
-                .Returns(value);
-        }
-
-        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
-        {
-            return new ExternalReference
-            {
-                Id = A<int>(),
-                Title = externalReference.Title,
-                ExternalReferenceId = externalReference.DocumentId,
-                URL = externalReference.Url
-            };
-        }
-
         private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)
         {
             var input = new SystemUsageUpdateParameters
@@ -2481,16 +2470,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 }.FromNullable()
             };
         }
-
-        private static UserRolePair CreateUserRolePair(Guid roleUuid, Guid userUuid)
-        {
-            return new UserRolePair()
-            {
-                RoleUuid = roleUuid,
-                UserUuid = userUuid
-            };
-        }
-
+        
         private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithData(IEnumerable<UserRolePair> userRolePairs)
         {
             return new SystemUsageUpdateParameters()
@@ -2502,25 +2482,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     .FromNullable()
             };
         }
-
-        private ItSystemRight CreateRight(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
-        {
-            return new ItSystemRight()
-            {
-                Object = itSystemUsage,
-                Role = new ItSystemRole()
-                {
-                    Id = A<int>(),
-                    Uuid = roleUuid
-                },
-                User = new User()
-                {
-                    Id = A<int>(),
-                    Uuid = userUuid
-                }
-            };
-        }
-
+        
         private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables(bool assignUuidToOrganization = false)
         {
             var systemUuid = A<Guid>();
@@ -2622,9 +2584,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
-            var trasactionMock = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin()).Returns(trasactionMock.Object);
-            return trasactionMock;
+            var transactionMock = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transactionMock.Object);
+            return transactionMock;
         }
 
         private static bool MatchExpectedAssignments(IEnumerable<(Guid roleUuid, Guid user)> actual, List<UserRolePair> expected)

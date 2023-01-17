@@ -70,20 +70,6 @@
                 return orderBy;
             };
 
-            const texts = Kitos.Helpers.RenderFieldsHelper.getTexts();
-            const createActiveRange = (): Utility.KendoGrid.IKendoParameter[] => {
-                return [
-                    {
-                        textValue: texts.active,
-                        remoteValue: true
-                    },
-                    {
-                        textValue: texts.notActive,
-                        remoteValue: false
-                    }];
-            }
-
-
             var self = this;
             var showInactiveSystems = ItSystem.Settings.OverviewState.getShowInactiveSystems($window, user.id, pageName);
 
@@ -267,7 +253,7 @@
             if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)) {
                 launcher = launcher.withToolbarEntry({
                     id: "gdprExportAnchor",
-                    title: "Exportér GPDR data til Excel",
+                    title: "Exportér GDPR data til Excel",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Link,
@@ -294,8 +280,8 @@
                     .withTitle("Status (Datofelter)")
                     .withId("isActive")
                     .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                    .withFixedValueRange(createActiveRange(), false)
-                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToValidityPeriod))
+                    .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(true), false)
+                    .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActiveSystem(dataItem.ActiveAccordingToValidityPeriod))
                     .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                     .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.usagePeriod)))
                 .withColumn(builder =>
@@ -305,8 +291,8 @@
                         .withTitle("Status (Livscyklus)")
                         .withId("isActiveAccordingToLifeCycle")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(createActiveRange(), false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.ActiveAccordingToLifeCycle))
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(true), false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActiveSystem(dataItem.ActiveAccordingToLifeCycle))
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.lifeCycleStatus)))
                 .withColumn(builder =>
@@ -317,9 +303,9 @@
                         .withStandardWidth(190)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange(createActiveRange(), false)
+                        .withFixedValueRange(Helpers.KendoOverviewHelper.createActiveRange(true), false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActive(dataItem.MainContractIsActive))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderActiveNotActiveSystem(dataItem.MainContractIsActive))
                         .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
                 .withColumn(builder =>
                     builder
@@ -653,8 +639,7 @@
                             }
                         ]
                             , false)
-                        .withRendering(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
-                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderBoolean(dataItem.IsHoldingDocument))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
@@ -666,7 +651,6 @@
                         .withStandardWidth(170)
                         .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
@@ -812,7 +796,27 @@
                         .withId("note")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering());
+                        .withSourceValueEchoRendering())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("RiskAssessmentDate")
+                        .withTitle("Dato for seneste risikovurdering")
+                        .withId("LatestRiskAssessmentDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(220)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.RiskAssessmentDate))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("PlannedRiskAssessmentDate")
+                        .withTitle("Dato for planlagt risikovurdering")
+                        .withId("PlannedRiskAssessmentDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withStandardWidth(220)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.PlannedRiskAssessmentDate))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr.children.plannedRiskAssessmentDate)));
 
             //Launch kendo grid
             launcher.launch();

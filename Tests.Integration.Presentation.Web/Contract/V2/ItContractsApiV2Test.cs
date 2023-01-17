@@ -247,7 +247,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var orgUnit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var orgUnit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
             var contract1 = await CreateContractAsync(organization.Id);
             var contract2 = await CreateContractAsync(organization.Id);
             using var responsibleOrgUnitAssignmentResponse = await ItContractHelper.SendAssignResponsibleOrgUnitAsync(contract1.Id, orgUnit.Id, organization.Id);

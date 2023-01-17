@@ -28,6 +28,18 @@ class ItSystemUsageGDPR {
         return element(this.cssHelper.byDataElementType(this.consts.dataLevelTypeLegalCheckbox));
     }
 
+    static getPersonalCprCheckBox() {
+        return element(by.id(this.consts.personalCprCheckbox));
+    }
+
+    static getPersonalOtherPrivateCheckBox() {
+        return element(by.id(this.consts.personalOtherPrivateCheckbox));
+    }
+
+    static getPersonalSocialProblemsCheckBox() {
+        return element(by.id(this.consts.personalSocialProblemsCheckbox));
+    }
+
     static getPrecautionsEncryptionCheckbox() {
         return element(this.cssHelper.byDataElementType(this.consts.precautionsEncryptionCheckbox));
     }
@@ -118,6 +130,10 @@ class ItSystemUsageGDPR {
 
     static getRiskAssesmentDateField() {
         return element(by.id(this.consts.gdprRiskAssesmentDateId));
+    }
+
+    static getPlannedRiskAssessmentDateField() {
+        return element(by.id(this.consts.gdprPlannedRiskAssesmentDateId));
     }
 
     static getDPIADateField() {

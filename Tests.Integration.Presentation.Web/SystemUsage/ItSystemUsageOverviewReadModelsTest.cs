@@ -73,6 +73,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsageExpirationDate = DateTime.UtcNow.AddDays(A<int>());
             var archiveDuty = A<ArchiveDutyTypes>();
             var riskAssessment = A<DataOptions>();
+            var riskAssessmentDate = A<DateTime>();
             var linkToDirectoryUrl = A<string>();
             var linkToDirectoryUrlName = A<string>();
             var riskSupervisionDocumentationUrl = A<string>();
@@ -122,6 +123,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 Concluded = concluded,
                 ArchiveDuty = archiveDuty,
                 RiskAssessment = riskAssessment,
+                RiskAssessmentDate = riskAssessmentDate,
                 linkToDirectoryUrl = linkToDirectoryUrl,
                 linkToDirectoryUrlName = linkToDirectoryUrlName,
                 riskSupervisionDocumentationUrl = riskSupervisionDocumentationUrl,
@@ -234,11 +236,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             {
                 Assert.Equal(riskSupervisionDocumentationUrlName, readModel.RiskSupervisionDocumentationName);
                 Assert.Equal(riskSupervisionDocumentationUrl, readModel.RiskSupervisionDocumentationUrl);
+                Assert.Equal(riskAssessmentDate, readModel.RiskAssessmentDate);
             }
             else
             {
                 Assert.Null(readModel.RiskSupervisionDocumentationName);
                 Assert.Null(readModel.RiskSupervisionDocumentationUrl);
+                Assert.Null(readModel.RiskAssessmentDate);
             }
 
             // Sensitive Data Level
@@ -389,8 +393,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
-            var organizationUnit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName1);
-            var organizationUnit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName2);
+            var organizationUnit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationId, orgUnitName1);
+            var organizationUnit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationId, orgUnitName2);
 
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId).DisposeAsync();
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId).DisposeAsync();

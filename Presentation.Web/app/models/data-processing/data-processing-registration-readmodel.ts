@@ -29,5 +29,7 @@
         LastChangedAt: string;
         LastChangedByName: string;
         SystemUuidsAsCsv: string;
+        OversightScheduledInspectionDate: string;
+        ActiveAccordingToMainContract: boolean;
     }
 }

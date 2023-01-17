@@ -2,7 +2,9 @@
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.GDPR;
@@ -13,10 +15,13 @@ namespace Core.DomainServices.Contract
     public class ContractDataProcessingRegistrationAssignmentService : IContractDataProcessingRegistrationAssignmentService
     {
         private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
+        private readonly IDomainEvents _domainEvents;
 
-        public ContractDataProcessingRegistrationAssignmentService(IDataProcessingRegistrationRepository dataProcessingRegistrationRepository)
+        public ContractDataProcessingRegistrationAssignmentService(IDataProcessingRegistrationRepository dataProcessingRegistrationRepository, 
+            IDomainEvents domainEvents)
         {
             _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
+            _domainEvents = domainEvents;
         }
         public IQueryable<DataProcessingRegistration> GetApplicableDataProcessingRegistrations(ItContract contract)
         {
@@ -56,7 +61,20 @@ namespace Core.DomainServices.Contract
                 .GetById(dataProcessingRegistrationId)
                 .Match
                 (
-                    contract.RemoveDataProcessingRegistration,
+                    dpr =>
+                    {
+
+                        return contract.RemoveDataProcessingRegistration(dpr)
+                            .Match
+                            (
+                                removedDpr =>
+                                {
+                                    _domainEvents.Raise(new DataProcessingRegistrationRemovedFromItContractEvent(dpr, contract));
+                                    return Result<DataProcessingRegistration, OperationError>.Success(removedDpr);
+                                },
+                                error => error
+                                );
+                    },
                     () => new OperationError("Data processing registration ID is not valid", OperationFailure.BadInput)
                 );
         }

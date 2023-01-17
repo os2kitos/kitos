@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Presentation.Web.Infrastructure.Attributes;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
@@ -13,21 +13,21 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Optionally assigned contract type
         /// </summary>
-        [NonEmptyGuid]
         public IdentityNamePairResponseDTO ContractType { get; set; }
         /// <summary>
         /// Optionally assigned contract template
         /// </summary>
-        [NonEmptyGuid]
         public IdentityNamePairResponseDTO ContractTemplate { get; set; }
         /// <summary>
         /// Optionally assigned agreement elements
         /// </summary>
+        [Required]
         public IEnumerable<IdentityNamePairResponseDTO> AgreementElements { get; set; }
         public string Notes { get; set; }
         /// <summary>
         /// Validity of the it-contract
         /// </summary>
+        [Required]
         public ContractValidityResponseDTO Validity { get; set; }
         /// <summary>
         /// Optionally assigned criticality

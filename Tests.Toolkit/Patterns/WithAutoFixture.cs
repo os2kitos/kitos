@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoFixture;
 
 namespace Tests.Toolkit.Patterns
@@ -35,7 +36,7 @@ namespace Tests.Toolkit.Patterns
 
         protected IEnumerable<T> Many<T>(int? howMany = null)
         {
-            return howMany.HasValue ? _fixture.CreateMany<T>(howMany.Value) : _fixture.CreateMany<T>();
+            return (howMany.HasValue ? _fixture.CreateMany<T>(howMany.Value) : _fixture.CreateMany<T>()).ToList();
         }
     }
 }

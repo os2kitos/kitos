@@ -42,6 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 OversightIntervalRemark = dataProcessingRegistration.OversightIntervalRemark,
                 IsOversightCompleted = MapYesNoUndecided(dataProcessingRegistration.IsOversightCompleted),
                 OversightCompletedRemark = dataProcessingRegistration.OversightCompletedRemark,
+                OversightScheduledInspectionDate = dataProcessingRegistration.OversightScheduledInspectionDate,
                 OversightDates = MapOversightDates(dataProcessingRegistration.OversightDates).ToList()
             };
         }
@@ -75,7 +76,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return dataProcessingRegistration.SystemUsages.Select(x => x.MapIdentityNamePairDTO()).ToList();
         }
 
-        private DataProcessingRegistrationGeneralDataResponseDTO MapGeneral(DataProcessingRegistration dataProcessingRegistration)
+        private static DataProcessingRegistrationGeneralDataResponseDTO MapGeneral(DataProcessingRegistration dataProcessingRegistration)
         {
             return new DataProcessingRegistrationGeneralDataResponseDTO
             {
@@ -89,7 +90,20 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 InsecureCountriesSubjectToDataTransfer = dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
                 DataProcessors = dataProcessingRegistration.DataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList(),
                 HasSubDataProcessors = MapYesNoUndecided(dataProcessingRegistration.HasSubDataProcessors),
-                SubDataProcessors = dataProcessingRegistration.SubDataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList()
+                SubDataProcessors = dataProcessingRegistration.AssignedSubDataProcessors?.Select(ToSubDataProcessorDTO).ToList(),
+                MainContract = dataProcessingRegistration.MainContract?.MapIdentityNamePairDTO(),
+                Valid = dataProcessingRegistration.IsActiveAccordingToMainContract
+            };
+        }
+
+        private static DataProcessorRegistrationSubDataProcessorResponseDTO ToSubDataProcessorDTO(SubDataProcessor organization)
+        {
+            return new DataProcessorRegistrationSubDataProcessorResponseDTO()
+            {
+                DataProcessorOrganization = organization.Organization.MapShallowOrganizationResponseDTO(),
+                BasisForTransfer = organization.SubDataProcessorBasisForTransfer?.MapIdentityNamePairDTO(),
+                TransferToInsecureThirdCountry = organization.TransferToInsecureCountry?.ToYesNoUndecidedChoice(),
+                InsecureThirdCountrySubjectToDataProcessing = organization.InsecureCountry?.MapIdentityNamePairDTO()
             };
         }
 

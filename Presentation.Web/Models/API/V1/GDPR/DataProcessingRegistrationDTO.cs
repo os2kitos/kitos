@@ -26,7 +26,7 @@ namespace Presentation.Web.Models.API.V1.GDPR
 
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
         
-        public ShallowOrganizationDTO[] SubDataProcessors { get; set; }
+        public SubDataProcessorResponseDTO[] SubDataProcessors { get; set; }
 
         public ValueWithOptionalDateAndRemark<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
 
@@ -46,9 +46,10 @@ namespace Presentation.Web.Models.API.V1.GDPR
         public DataProcessingRegistrationOversightDateDTO[] OversightDates { get; set; }
 
         public NamedEntityDTO[] AssociatedContracts { get; set; }
+        public DateTime? OversightScheduledInspectionDate { get; set; }
         public string LastChangedByName { get; set; }
         public DateTime LastChangedAt { get; set; }
-
-
+        public bool IsActiveAccordingToMainContract { get; set; }
+        public int? MainContractId { get; set; }
     }
 }

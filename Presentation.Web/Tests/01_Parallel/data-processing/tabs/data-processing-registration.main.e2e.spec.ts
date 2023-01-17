@@ -34,7 +34,11 @@ describe("Data processing registration main detail tests", () => {
         return `Remark: ${new Date().getTime()} ${uniqueValue}`;
     }
 
-    var dropdownYes = "Ja";
+    const dropdownYes = "Ja";
+    const dropdownNo = "Nej";
+    const thirdCountryName = "Danmark";
+    const basisForTransfer = "Andet";
+    const otherBasisForTransfer = "Intet";
 
     var today = GetDateHelper.getTodayAsString();
     
@@ -53,8 +57,6 @@ describe("Data processing registration main detail tests", () => {
         () => {
             var name = createName(10);
             var renameValue = createName(30);
-            const thirdCountryName = "Danmark";
-            const basisForTransfer = "Andet";
             const dataResponsibleOptionName = "Fællesdataansvar";
             var dataResponsibleRemark = createRemark("dataResponsible");
             var agreementConcludedRemark = createRemark("agreementConcluded");
@@ -83,8 +85,10 @@ describe("Data processing registration main detail tests", () => {
                 //Changing sub data processors
                 .then(() => dpaHelper.enableSubDataProcessors())
                 .then(() => dpaHelper.verifyHasSubDataProcessorsToBeEnabled())
-                .then(() => dpaHelper.assignSubDataProcessor(dataProcessorName))
-                .then(() => verifySubDataProcessorContent([dataProcessorName], []))
+                .then(() => dpaHelper.assignSubDataProcessor(dataProcessorName, basisForTransfer, dropdownYes, thirdCountryName))
+                .then(() => verifySubDataProcessorContent([dataProcessorName, basisForTransfer, dropdownYes, thirdCountryName], []))
+                .then(() => dpaHelper.updateSubDataProcessor(dataProcessorName, otherBasisForTransfer, dropdownNo))
+                .then(() => verifySubDataProcessorContent([dataProcessorName, otherBasisForTransfer, dropdownNo], [basisForTransfer, dropdownYes, thirdCountryName]))
                 .then(() => dpaHelper.removeSubDataProcessor(dataProcessorName))
                 .then(() => verifySubDataProcessorContent([], [dataProcessorName]))
                 //Changing transfer to insecure third countries
@@ -125,11 +129,11 @@ describe("Data processing registration main detail tests", () => {
                 //assigning and verifying sub-data processor with a special character
                 .then(() => dpaHelper.enableSubDataProcessors())
                 .then(() => dpaHelper.verifyHasSubDataProcessorsToBeEnabled())
-                .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterName))
+                .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterName, basisForTransfer, dropdownYes, thirdCountryName))
                 .then(() => verifySubDataProcessorContent([organizationWithSpecialCharacterName], []))
                 .then(() => dpaHelper.removeSubDataProcessor(organizationWithSpecialCharacterName))
                 .then(() => verifySubDataProcessorContent([], [organizationWithSpecialCharacterName]))
-                .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterCvr))
+                .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterCvr, basisForTransfer, dropdownYes, thirdCountryName))
                 .then(() => verifySubDataProcessorContent([organizationWithSpecialCharacterCvr], []));
         });
 
@@ -146,11 +150,11 @@ describe("Data processing registration main detail tests", () => {
 
     function verifySubDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
         presentNames.forEach(name => {
-            console.log(`Expecting sub data processor to be present:${name}`);
+            console.log(`Expecting value to be present in the sub data processor table:${name}`);
             expect(pageObject.getSubDataProcessorRow(name).isPresent()).toBeTruthy();
         });
         unpresentNames.forEach(name => {
-            console.log(`Expecting sub data processor NOT to be present:${name}`);
+            console.log(`Expecting value NOT to be present in the sub data processor table:${name}`);
             expect(pageObject.getSubDataProcessorRow(name).isPresent()).toBeFalsy();
         });
     }

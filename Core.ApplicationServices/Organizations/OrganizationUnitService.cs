@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.UI.WebControls;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.SystemUsage;
@@ -107,7 +107,6 @@ namespace Core.ApplicationServices.Organizations
             }
             else
             {
-                _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(deleteResult.Value));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }
@@ -116,7 +115,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationUnitRegistrationChangeParameters parameters)
         {
-            return Modify(organizationUuid, unitUuid, (_, unit) =>
+            return ModifyRegistrations(organizationUuid, unitUuid, (_, unit) =>
             {
                 return _organizationRightsService.RemoveUnitRightsByIds(organizationUuid, unitUuid, parameters.OrganizationUnitRights)
                     .Match
@@ -149,7 +148,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid)
         {
-            return Modify(organizationUuid, unitUuid, (_, unit) =>
+            return ModifyRegistrations(organizationUuid, unitUuid, (_, unit) =>
             {
                 return GetRegistrations(organizationUuid, unitUuid)
                     .Bind<OrganizationUnit>
@@ -170,7 +169,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> TransferRegistrations(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, OrganizationUnitRegistrationChangeParameters parameters)
         {
-            return Modify(organizationUuid, unitUuid, (organization, unit) =>
+            return ModifyRegistrations(organizationUuid, unitUuid, (organization, unit) =>
             {
                 var targetUnitResult = organization.GetOrganizationUnit(targetUnitUuid);
                 if (targetUnitResult.IsNone)
@@ -259,6 +258,15 @@ namespace Core.ApplicationServices.Organizations
             return mutationResult;
         }
 
+        private Result<TSuccess, OperationError> ModifyRegistrations<TSuccess>(Guid organizationId, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)
+        {
+            return Modify(organizationId, unitUuid,
+                (org, orgUnit) => _authorizationContext.HasPermission(new BulkAdministerOrganizationUnitRegistrations(org.Id))
+                    ? mutation(org, orgUnit)
+                    : new OperationError("User is not authorized for bulk permission administration", OperationFailure.Forbidden)
+                );
+        }
+
         private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
         {
             return _organizationService.GetOrganization(uuid, OrganizationDataReadAccessLevel.All)
@@ -298,7 +306,7 @@ namespace Core.ApplicationServices.Organizations
                 canBeDeleted = false;
             }
 
-            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canInfoAdditionalfieldsBeModified, canBeRearranged, canBeDeleted);
+            return new UnitAccessRights(canBeRead: true, canBeModified, canBeRenamed, canInfoAdditionalfieldsBeModified, canBeRearranged, canBeDeleted, _authorizationContext.HasPermission(new BulkAdministerOrganizationUnitRegistrations(organization.Id)));
         }
 
         private Maybe<OperationError> RemovePaymentResponsibleUnits(IEnumerable<PaymentChangeParameters> payments)
@@ -435,6 +443,7 @@ namespace Core.ApplicationServices.Organizations
                 return deleteRegistrationsError.Value;
             }
 
+            _domainEvents.Raise(new EntityBeingDeletedEvent<OrganizationUnit>(organizationUnit));
             var error = organization.DeleteOrganizationUnit(organizationUnit);
             if (error.HasValue)
             {

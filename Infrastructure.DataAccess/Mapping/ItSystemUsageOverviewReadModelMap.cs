@@ -128,9 +128,16 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ExpirationDate)
                 .IsOptional()
                 .HasIndexAnnotation("IX_ExpirationDate");
+
             Property(x => x.SystemActive)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_SystemActive", 0);
 
+            Property(x => x.RiskAssessmentDate)
+                .IsOptional()
+               .HasIndexAnnotation("IX_RiskAssessmentDate", 0);
+
+            Property(x => x.PlannedRiskAssessmentDate)
+                .HasIndexAnnotation("IX_PlannedRiskAssessmentDate");
 
             Property(x => x.LastChangedAt)
                 .HasIndexAnnotation("IX_LastChangedAt");

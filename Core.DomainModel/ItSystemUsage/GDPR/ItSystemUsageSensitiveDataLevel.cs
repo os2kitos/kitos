@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Core.DomainModel.ItSystemUsage.GDPR
+﻿namespace Core.DomainModel.ItSystemUsage.GDPR
 {
     public class ItSystemUsageSensitiveDataLevel
     {

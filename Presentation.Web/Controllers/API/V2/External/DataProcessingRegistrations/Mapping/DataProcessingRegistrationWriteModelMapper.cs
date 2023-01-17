@@ -113,10 +113,23 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                     ? (dto.HasSubDataProcessors?.ToYesNoUndecidedOption()).AsChangedValue()
                     : OptionalValueChange<YesNoUndecidedOption?>.None,
 
-                SubDataProcessorUuids = rule.MustUpdate(x => x.General.SubDataProcessorUuids)
-                    ? dto.SubDataProcessorUuids.FromNullable().AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
+                SubDataProcessors = rule.MustUpdate(x => x.General.SubDataProcessors)
+                    ? dto.SubDataProcessors.FromNullable().Select<IEnumerable<SubDataProcessorParameter>>(sdps => sdps.Select(ToSubDataProcessorParameter).ToList()).AsChangedValue()
+                    : OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>>.None,
+
+                MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
+                    ? dto.MainContractUuid.AsChangedValue()
+                    : OptionalValueChange<Guid?>.None
             };
+        }
+
+        private static SubDataProcessorParameter ToSubDataProcessorParameter(DataProcessorRegistrationSubDataProcessorWriteRequestDTO sdp)
+        {
+            return new SubDataProcessorParameter(
+                sdp.DataProcessorOrganizationUuid,
+                sdp.BasisForTransferUuid,
+                sdp.TransferToInsecureThirdCountry?.ToYesNoUndecidedOption(),
+                sdp.InsecureThirdCountrySubjectToDataProcessingUuid);
         }
 
         private UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
@@ -148,6 +161,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 OversightCompletedRemark = rule.MustUpdate(x => x.Oversight.OversightCompletedRemark)
                     ? dto.OversightCompletedRemark.AsChangedValue()
                     : OptionalValueChange<string>.None,
+
+                OversightScheduledInspectionDate = rule.MustUpdate(x => x.Oversight.OversightScheduledInspectionDate)
+                    ? dto.OversightScheduledInspectionDate.AsChangedValue()
+                    : OptionalValueChange<DateTime?>.None,
 
                 OversightDates = rule.MustUpdate(x => x.Oversight.OversightDates)
                     ? dto.OversightDates

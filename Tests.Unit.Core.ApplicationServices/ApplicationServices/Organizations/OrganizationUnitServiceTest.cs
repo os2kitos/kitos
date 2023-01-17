@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
@@ -153,7 +154,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Fact]
-        public void DeleteSelectedOrganizationRegistrations_Returns_NotFound_When_Unit_NotFound()
+        public void DeleteRegistrations_Returns_NotFound_When_Unit_NotFound()
         {
             //Arrange
             var orgUuid = A<Guid>();
@@ -177,7 +178,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Fact]
-        public void DeleteSelectedOrganizationRegistrations_Returns_Forbidden()
+        public void DeleteRegistrations_Returns_Forbidden()
         {
             //Arrange
             var orgUuid = A<Guid>();
@@ -215,10 +216,12 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             var org = new Organization
             {
-                Uuid = orgUuid
+                Uuid = orgUuid,
+                Id = A<int>()
             };
 
             ExpectGetOrganizationReturns(orgUuid, org);
+            ExpectAllowAdministerRegistrations(org.Id, true);
             ExpectAllowModifyReturns(org, true);
 
             //If unit is valid check if target unit returns NotFound
@@ -240,9 +243,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void TransferSelectedOrganizationRegistrations_Returns_Forbidden(bool isUnitValid, bool isTargetUnitValid)
+        [InlineData(false, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        public void TransferSelectedOrganizationRegistrations_Returns_Forbidden(bool isUnitValid, bool isTargetUnitValid, bool hasAdministerPermission)
         {
             //Arrange
             var orgUuid = A<Guid>();
@@ -256,11 +260,12 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 OrgUnits = new List<OrganizationUnit>
                 {
                     unit, targetUnit
-                }
+                },
+                Id = A<int>()
             };
 
             ExpectGetOrganizationReturns(orgUuid, org);
-
+            ExpectAllowAdministerRegistrations(org.Id, hasAdministerPermission);
             ExpectAllowModifyReturns(unit, isUnitValid);
             ExpectAllowModifyReturns(targetUnit, isTargetUnitValid);
 
@@ -326,7 +331,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             ExpectAllowDeleteReturns(unit2, true);
             ExpectAllowModifyReturns(unit3, true);
             ExpectAllowDeleteReturns(unit3, true);
-            
+
             //Act
             var result = _sut.GetAccessRightsByOrganization(orgUuid);
 
@@ -392,7 +397,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var unitUuid = A<Guid>();
             var orgUuid = A<Guid>();
 
-            var organization = new Organization() {Uuid = orgUuid};
+            var organization = new Organization() { Uuid = orgUuid };
 
             ExpectGetOrganizationReturns(orgUuid, organization);
 
@@ -417,7 +422,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Parent = new OrganizationUnit(),
                 Origin = OrganizationUnitOrigin.Kitos
             };
-            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            var organization = new Organization() { Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> { unit } };
             unit.Organization = organization;
 
             ExpectGetOrganizationReturns(orgUuid, organization);
@@ -452,7 +457,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Uuid = unitUuid,
                 Origin = OrganizationUnitOrigin.Kitos
             };
-            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            var organization = new Organization() { Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> { unit } };
             unit.Organization = organization;
 
             ExpectGetOrganizationReturns(orgUuid, organization);
@@ -486,7 +491,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Uuid = unitUuid,
                 Origin = OrganizationUnitOrigin.STS_Organisation
             };
-            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            var organization = new Organization() { Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> { unit } };
             unit.Organization = organization;
 
             ExpectGetOrganizationReturns(orgUuid, organization);
@@ -520,7 +525,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Uuid = unitUuid,
                 Origin = OrganizationUnitOrigin.Kitos
             };
-            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            var organization = new Organization() { Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> { unit } };
             unit.Organization = organization;
 
             ExpectGetOrganizationReturns(orgUuid, organization);
@@ -555,7 +560,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Parent = new OrganizationUnit(),
                 Origin = OrganizationUnitOrigin.Kitos
             };
-            var organization = new Organization() {Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> {unit}};
+            var organization = new Organization() { Uuid = orgUuid, OrgUnits = new List<OrganizationUnit> { unit } };
             unit.Organization = organization;
 
             ExpectGetOrganizationReturns(orgUuid, organization);
@@ -610,6 +615,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.True(deleteError.IsNone);
             _databaseControl.Verify(x => x.SaveChanges(), Times.Once());
             transaction.Verify(x => x.Commit(), Times.Once());
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<OrganizationUnit>>(ev => ev.Entity == toRemove)));
         }
 
         [Fact]
@@ -699,6 +705,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private void ExpectAllowModifyReturns(IEntity unit, bool result)
         {
             _authorizationContextMock.Setup(x => x.AllowModify(unit)).Returns(result);
+        }
+
+        private void ExpectAllowAdministerRegistrations(int orgId, bool result)
+        {
+            _authorizationContextMock.Setup(x => x.HasPermission(It.Is<BulkAdministerOrganizationUnitRegistrations>(r => r.OrganizationId == orgId))).Returns(result);
         }
 
         private static OrganizationUnitRegistrationChangeParameters CreateEmptyChangeParameters()

@@ -17,7 +17,6 @@ namespace Core.DomainModel.GDPR
     public class DataProcessingRegistration :
         HasRightsEntity<DataProcessingRegistration, DataProcessingRegistrationRight, DataProcessingRegistrationRole>,
         IHasName,
-        IOwnedByOrganization,
         IDataProcessingModule,
         IEntityWithExternalReferences,
         IEntityWithAdvices,
@@ -30,12 +29,12 @@ namespace Core.DomainModel.GDPR
             ExternalReferences = new List<ExternalReference>();
             SystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             DataProcessors = new List<Organization.Organization>();
-            SubDataProcessors = new List<Organization.Organization>();
             InsecureCountriesSubjectToDataTransfer = new List<DataProcessingCountryOption>();
             OversightOptions = new List<DataProcessingOversightOption>();
             AssociatedContracts = new List<ItContract.ItContract>();
             OversightDates = new List<DataProcessingRegistrationOversightDate>();
             UserNotifications = new List<UserNotification>();
+            AssignedSubDataProcessors = new List<SubDataProcessor>();
             Uuid = Guid.NewGuid();
             MarkAsDirty();
         }
@@ -61,13 +60,17 @@ namespace Core.DomainModel.GDPR
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
-        public void SetHasSubDataProcessors(YesNoUndecidedOption hasSubDataProcessors)
+        public ChangeHasSubDataProcessorsResult SetHasSubDataProcessors(YesNoUndecidedOption hasSubDataProcessors)
         {
+            var removedSubDataProcessors = new List<SubDataProcessor>();
             HasSubDataProcessors = hasSubDataProcessors;
             if (hasSubDataProcessors != YesNoUndecidedOption.Yes)
             {
-                SubDataProcessors.Clear();
+                removedSubDataProcessors.AddRange(AssignedSubDataProcessors);
+                AssignedSubDataProcessors.Clear();
             }
+
+            return new ChangeHasSubDataProcessorsResult(removedSubDataProcessors);
         }
 
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
@@ -90,9 +93,7 @@ namespace Core.DomainModel.GDPR
         public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; }
 
         public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
-
-        public virtual ICollection<Organization.Organization> SubDataProcessors { get; set; }
-
+        public virtual ICollection<SubDataProcessor> AssignedSubDataProcessors { get; set; }
         public virtual DataProcessingDataResponsibleOption DataResponsible { get; set; }
         public int? DataResponsible_Id { get; set; }
 
@@ -122,31 +123,59 @@ namespace Core.DomainModel.GDPR
 
             return dataProcessor;
         }
-
-        public Result<Organization.Organization, OperationError> AssignSubDataProcessor(Organization.Organization dataProcessor)
+        public Result<SubDataProcessor, OperationError> AssignSubDataProcessor(Organization.Organization dataProcessor)
         {
             if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
 
             if (HasSubDataProcessors != YesNoUndecidedOption.Yes)
                 return new OperationError("To Add new sub data processors, enable sub data processors", OperationFailure.BadInput);
 
-            if (HasSubDataProcessor(dataProcessor))
+            var subDataProcessor = GetSubDataProcessor(dataProcessor);
+            if (subDataProcessor.HasValue)
                 return new OperationError("Sub Data processor already assigned", OperationFailure.Conflict);
 
-            SubDataProcessors.Add(dataProcessor);
+            var sdp = new SubDataProcessor
+            {
+                Organization = dataProcessor,
+                DataProcessingRegistration = this
+            };
 
-            return dataProcessor;
+            AssignedSubDataProcessors.Add(sdp);
+
+            return sdp;
+        }
+        public Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(
+            Organization.Organization organization,
+            Maybe<DataProcessingBasisForTransferOption> basisForTransfer,
+            YesNoUndecidedOption? transferToInsecureThirdCountry,
+            Maybe<DataProcessingCountryOption> insecureCountry)
+        {
+            if (HasSubDataProcessors != YesNoUndecidedOption.Yes)
+                return new OperationError("To Manage sub data processors, enable sub data processors", OperationFailure.BadInput);
+
+            var result = GetSubDataProcessor(organization);
+            if (result.IsNone)
+                return new OperationError("Sub Data processor not found", OperationFailure.NotFound);
+
+            var dataProcessor = result.Value;
+            dataProcessor.UpdateBasisForTransfer(basisForTransfer);
+
+            return dataProcessor
+                .UpdateTransferToInsecureThirdCountries(transferToInsecureThirdCountry, insecureCountry)
+                .Match<Result<SubDataProcessor, OperationError>>(error => error, () => dataProcessor);
         }
 
-        public Result<Organization.Organization, OperationError> RemoveSubDataProcessor(Organization.Organization dataProcessor)
+        public Result<SubDataProcessor, OperationError> RemoveSubDataProcessor(Organization.Organization dataProcessor)
         {
             if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
-            if (!HasSubDataProcessor(dataProcessor))
+            var subDataProcessor = GetSubDataProcessor(dataProcessor);
+            if (subDataProcessor.IsNone)
                 return new OperationError("Sub Data processor not assigned", OperationFailure.BadInput);
 
-            SubDataProcessors.Remove(dataProcessor);
+            var assignedSdp = subDataProcessor.Value;
+            AssignedSubDataProcessors.Remove(assignedSdp);
 
-            return dataProcessor;
+            return assignedSdp;
         }
 
         public Result<DataProcessingCountryOption, OperationError> AssignInsecureCountrySubjectToDataTransfer(DataProcessingCountryOption country)
@@ -203,9 +232,9 @@ namespace Core.DomainModel.GDPR
             return InsecureCountriesSubjectToDataTransfer.Any(c => c.Id == country.Id);
         }
 
-        private bool HasSubDataProcessor(Organization.Organization dataProcessor)
+        public Maybe<SubDataProcessor> GetSubDataProcessor(Organization.Organization organization)
         {
-            return SubDataProcessors.Any(x => x.Id == dataProcessor.Id);
+            return AssignedSubDataProcessors.FirstOrDefault(sdp => sdp.Organization.Id == organization.Id);
         }
 
         private bool HasDataProcessor(Organization.Organization dataProcessor)
@@ -318,7 +347,15 @@ namespace Core.DomainModel.GDPR
 
         public string OversightCompletedRemark { get; set; }
 
+        public DateTime? OversightScheduledInspectionDate { get; set; }
+
+        public void SetOversightScheduledInspectionDate(DateTime? oversightScheduledInspectionDate)
+        {
+            OversightScheduledInspectionDate = oversightScheduledInspectionDate;
+        }
+
         public virtual ICollection<DataProcessingRegistrationOversightDate> OversightDates { get; set; }
+
 
         public Maybe<IEnumerable<DataProcessingRegistrationOversightDate>> SetOversightCompleted(YesNoUndecidedOption completed)
         {
@@ -333,6 +370,57 @@ namespace Core.DomainModel.GDPR
         }
 
         public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; }
+        public int? MainContractId { get; set; }
+        public virtual ItContract.ItContract MainContract { get; set; }
+        public bool IsActiveAccordingToMainContract => CheckContractValidity().IsNone;
+
+        public void ResetMainContract()
+        {
+            MainContract?.Track();
+            MainContract = null;
+        }
+
+        public Result<DataProcessingRegistration, OperationError> AssignMainContract(int contractId)
+        {
+            if (MainContract?.Id == contractId)
+                return this;
+
+            var contract = GetAssociatedContract(contractId);
+            if (contract.IsNone)
+                return new OperationError($"Contract with id: {contractId} is not associated with this data processing registration", OperationFailure.BadState);
+
+            ResetMainContract();
+            MainContract = contract.Value;
+
+            return this;
+        }
+
+        public Maybe<ItContract.ItContract> GetAssociatedContract(int id)
+        {
+            return AssociatedContracts.FirstOrDefault(c => c.Id == id);
+        }
+
+        public DataProcessingRegistrationValidationResult CheckDprValidity()
+        {
+            var errors = new List<DataProcessingRegistrationValidationError>();
+
+            var hasContractValidityError = CheckContractValidity();
+
+            if (hasContractValidityError.HasValue)
+            {
+                errors.Add(hasContractValidityError.Value);
+            }
+
+            return new DataProcessingRegistrationValidationResult(errors);
+        }
+
+        private Maybe<DataProcessingRegistrationValidationError> CheckContractValidity()
+        {
+            //Main contract is considered valid if it's null or if "IsActive" == true
+            return MainContract == null || MainContract.IsActive
+                ? Maybe<DataProcessingRegistrationValidationError>.None
+                : DataProcessingRegistrationValidationError.MainContractNotActive;
+        }
 
         public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)
         {

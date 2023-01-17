@@ -10,6 +10,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Model.GDPR;
+using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
@@ -346,13 +347,43 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] AssignSubDataProcessorRequestDTO request)
         {
-            if (organizationId == null)
-                return BadRequest("organizationId must be provided");
+            if (request == null)
+                return BadRequest("Request body must be provided");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var details = ParseSubDataProcessorDetails(request);
+            return _dataProcessingRegistrationApplicationService
+                .AssignSubDataProcessor(id, request.OrganizationId, details)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/update")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] UpdateSubDataProcessorRequestDTO request)
+        {
+            if (request == null)
+                return BadRequest("Request body must be provided");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var details = ParseSubDataProcessorDetails(request);
+
+            //Details are required for updates
+            if (details.IsNone)
+                return BadRequest($"Missing section: {nameof(request.Details)}");
 
             return _dataProcessingRegistrationApplicationService
-                .AssignSubDataProcessor(id, organizationId.Value)
+                .UpdateSubDataProcessor(id, request.OrganizationId, details.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -659,7 +690,25 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateIsOversightCompleted(id, completed.Value)
-                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-scheduled-inspection-date")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightScheduledInspectionDate(int id, [FromBody] SingleValueDTO<DateTime?> scheduledInspectionDate)
+        {
+            if (scheduledInspectionDate == null)
+                return BadRequest(nameof(scheduledInspectionDate) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightScheduledInspectionDate(id, scheduledInspectionDate.Value)
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -675,7 +724,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .AssignOversightDate(id, createOversightDateDTO.OversightDate, createOversightDateDTO.OversightRemark)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -691,7 +741,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .ModifyOversightDate(id, oversightDateDTO.Id, oversightDateDTO.OversightDate, oversightDateDTO.OversightRemark)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -707,7 +758,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveOversightDate(id, oversightDateId.Value)
-                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -723,6 +775,35 @@ namespace Presentation.Web.Controllers.API.V1
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightCompletedRemark(id, oversightCompletedRemark.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/main-contract/update")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchMainContract(int id, [FromBody] SingleValueDTO<int> mainContractId)
+        {
+            if (mainContractId == null)
+                return BadRequest(nameof(mainContractId) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateMainContract(id, mainContractId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/main-contract/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveMainContract(int id)
+        {
+            return _dataProcessingRegistrationApplicationService
+                .RemoveMainContract(id)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -754,8 +835,8 @@ namespace Presentation.Web.Controllers.API.V1
             return value
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences)
-                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x=>x.LastChangedByUser))
-                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x=>x.ObjectOwner))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x => x.LastChangedByUser))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x => x.ObjectOwner))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference.ObjectOwner)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference.LastChangedByUser)
@@ -764,7 +845,8 @@ namespace Presentation.Web.Controllers.API.V1
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
-                .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.AssignedSubDataProcessors)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.AssignedSubDataProcessors.Select(x => x.Organization))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.BasisForTransfer)
                 .AsEnumerable()
@@ -816,12 +898,12 @@ namespace Presentation.Web.Controllers.API.V1
             var enabledOversightOptions = GetIdsOfAvailableOversightOptions(assignableDataProcessingRegistrationOptions);
             int organizationId = value.OrganizationId;
             return ToDTO(
-                value, 
-                GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)), 
-                enabledCountryOptions, 
-                enabledBasisForTransferOptions, 
-                enabledDataResponsibleOptions, 
-                enabledRoles, 
+                value,
+                GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)),
+                enabledCountryOptions,
+                enabledBasisForTransferOptions,
+                enabledDataResponsibleOptions,
+                enabledRoles,
                 enabledOversightOptions);
         }
 
@@ -861,8 +943,8 @@ namespace Presentation.Web.Controllers.API.V1
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
                 SubDataProcessors = value
-                    .SubDataProcessors
-                    .Select(x => x.MapToShallowOrganizationDTO())
+                    .AssignedSubDataProcessors
+                    .Select(sdp => MapSubDataProcessorResponseDto(enabledCountryOptions, enabledBasisForTransferOptions, sdp))
                     .ToArray(),
                 HasSubDataProcessors = value.HasSubDataProcessors,
                 AgreementConcluded = new ValueWithOptionalDateAndRemark<YesNoIrrelevantOption?>
@@ -870,19 +952,21 @@ namespace Presentation.Web.Controllers.API.V1
                     Value = value.IsAgreementConcluded,
                     OptionalDateValue = value.AgreementConcludedAt,
                     Remark = value.AgreementConcludedRemark
-                    
+
                 },
                 TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries,
                 InsecureThirdCountries = value
                     .InsecureCountriesSubjectToDataTransfer
-                    .Select(x => new NamedEntityWithExpirationStatusDTO(x.Id, x.Name, enabledCountryOptions.Contains(x.Id) == false))
+                    .Select(x => MapSelectedOptionWithExpirationStatus(enabledCountryOptions, x))
                     .ToArray(),
                 BasisForTransfer = value
                     .BasisForTransfer
                     .FromNullable()
-                    .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
+                    .Select(basisForTransfer => MapSelectedOptionWithExpirationStatus(enabledBasisForTransferOptions, basisForTransfer))
                     .GetValueOrDefault(),
-                DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>()
+                MainContractId = value.MainContractId,
+                IsActiveAccordingToMainContract = value.IsActiveAccordingToMainContract,
+                DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>
                 {
                     Value = value
                             .DataResponsible
@@ -891,11 +975,11 @@ namespace Presentation.Web.Controllers.API.V1
                             .GetValueOrDefault(),
                     Remark = value.DataResponsibleRemark
                 },
-                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>()
+                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>
                 {
                     Value = value
                             .OversightOptions
-                            .Select(oversightOption => new NamedEntityWithExpirationStatusDTO(oversightOption.Id, oversightOption.Name, enabledOversightOptions.Contains(oversightOption.Id) == false))
+                            .Select(oversightOption => MapSelectedOptionWithExpirationStatus(enabledOversightOptions, oversightOption))
                             .ToArray(),
                     Remark = value.OversightOptionRemark
                 },
@@ -910,16 +994,40 @@ namespace Presentation.Web.Controllers.API.V1
                     .ToArray(),
                 OversightDates = value
                     .OversightDates
-                    .Select(oversightDate => new DataProcessingRegistrationOversightDateDTO 
-                    { 
+                    .Select(oversightDate => new DataProcessingRegistrationOversightDateDTO
+                    {
                         Id = oversightDate.Id,
                         OversightDate = oversightDate.OversightDate,
                         OversightRemark = oversightDate.OversightRemark
                     })
                     .ToArray(),
+                OversightScheduledInspectionDate = value.OversightScheduledInspectionDate,
                 LastChangedAt = value.LastChanged,
                 LastChangedByName = value.LastChangedByUser?.GetFullName()
             };
+        }
+
+        private static SubDataProcessorResponseDTO MapSubDataProcessorResponseDto(ISet<int> enabledCountryOptions, ISet<int> enabledBasisForTransferOptions, SubDataProcessor x)
+        {
+            return new SubDataProcessorResponseDTO(
+                x.Organization.Id,
+                x.Organization.Name,
+                x.Organization.Cvr,
+                x.SubDataProcessorBasisForTransfer
+                    .FromNullable()
+                    .Select(b => MapSelectedOptionWithExpirationStatus(enabledBasisForTransferOptions, b))
+                    .GetValueOrDefault(),
+                x.TransferToInsecureCountry,
+                x.InsecureCountry
+                    .FromNullable()
+                    .Select(c => MapSelectedOptionWithExpirationStatus(enabledCountryOptions, c))
+                    .GetValueOrDefault()
+            );
+        }
+
+        private static NamedEntityWithExpirationStatusDTO MapSelectedOptionWithExpirationStatus<T>(ISet<int> enabledIds, T option) where T : IHasId, IHasName, IOptionReference<DataProcessingRegistration>
+        {
+            return new NamedEntityWithExpirationStatusDTO(option.Id, option.Name, enabledIds.Contains(option.Id) == false);
         }
 
         private static ReferenceDTO ToDTO(int? masterReferenceId, ExternalReference reference)
@@ -969,6 +1077,19 @@ namespace Presentation.Web.Controllers.API.V1
                 OversightDate = oversightDate.OversightDate,
                 OversightRemark = oversightDate.OversightRemark
             };
+        }
+
+        private static Maybe<SubDataProcessorDetailsParameters> ParseSubDataProcessorDetails(ISubDataProcessorRequestDTO request)
+        {
+            return request
+                .Details
+                .FromNullable()
+                .Select(ToSubDataProcessorDetailsParameters);
+        }
+
+        private static SubDataProcessorDetailsParameters ToSubDataProcessorDetailsParameters(SubDataProcessorDetailsDTO details)
+        {
+            return new SubDataProcessorDetailsParameters(details.BasisForTransferOptionId, new TransferToInsecureCountryParameters(details.TransferToInsecureThirdCountries, details.InsecureCountryOptionId));
         }
     }
 }

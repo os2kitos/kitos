@@ -38,7 +38,21 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$uibModal", "$state", "notify", "rootNodeOfOrganization", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory", "select2LoadingService", "inMemoryCacheService", "organizationUnitService","currentOrganization",
+        "$scope",
+        "$http",
+        "$uibModal",
+        "$state",
+        "notify",
+        "rootNodeOfOrganization",
+        "localOrgUnitRoles",
+        "orgUnitRoles",
+        "user",
+        "hasWriteAccess",
+        "authorizationServiceFactory",
+        "inMemoryCacheService",
+        "organizationUnitService",
+        "currentOrganization",
+        "$q",
         function ($scope,
             $http: ng.IHttpService,
             $modal,
@@ -50,10 +64,16 @@
             user,
             hasWriteAccess,
             authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory,
-            select2LoadingService: Kitos.Services.ISelect2LoadingService,
             inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
             organizationUnitService: Kitos.Services.Organization.IOrganizationUnitService,
-            currentOrganization) {
+            currentOrganization,
+            $q: ng.IQService) {
+
+            function setBusyState(state: boolean) {
+                $scope.isBusy = state;
+            }
+
+            setBusyState(true);
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -76,12 +96,12 @@
             });
             $scope.showDifferenceBetweenOrgUnitOrigin =
                 // User is an admin with edit rights to the hierarchy
-                (user.isGlobalAdmin || user.isLocalAdmin) &&
+                (user.isGlobalAdmin || user.isLocalAdmin || user.isOrgAdmin) &&
                 // Hierarchy root has been synced from a different source than KITOS
                 rootNodeOfOrganization.origin !== Kitos.Models.Api.Organization.OrganizationUnitOrigin.Kitos;
 
 
-            function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit) {
+            function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit): ng.IPromise<unknown> {
                 orgUnit.parent = parentOrgunit;
 
                 //restore previously saved settings
@@ -96,23 +116,16 @@
 
                 if (!inheritWriteAccess) {
 
-                    authorizationServiceFactory
+                    return authorizationServiceFactory
                         .createOrganizationUnitAuthorization()
                         .getAuthorizationForItem(orgUnit.id)
                         .then(response => {
                             orgUnit.hasWriteAccess = response.canEdit;
-
-                            _.each(orgUnit.children,
-                                u => {
-                                    flattenAndSave(u, response.canEdit, orgUnit);
-                                });
+                            return $q.all(orgUnit.children.map(u => flattenAndSave(u, response.canEdit, orgUnit)));
                         });
                 } else {
                     orgUnit.hasWriteAccess = true;
-
-                    _.each(orgUnit.children, function (u) {
-                        return flattenAndSave(u, true, orgUnit);
-                    });
+                    return $q.all(orgUnit.children.map(u => flattenAndSave(u, true, orgUnit)));
                 }
             }
 
@@ -121,20 +134,14 @@
 
                 if (!unit || unit.id !== user.currentOrganizationUnitId) return;
 
-                open(unit);
                 $scope.chooseOrgUnit(unit);
-
-                function open(u) {
-                    u.isOpen = true;
-                    if (u.parent) open(u.parent);
-                }
             }
 
-            function loadUnits() {
+            function loadUnits(): ng.IPromise<unknown> {
                 var rootNode = rootNodeOfOrganization;
-                $scope.nodes = [rootNode];
-
-                flattenAndSave(rootNode, false, null);
+                return flattenAndSave(rootNode, false, null).then(() => {
+                    $scope.nodes = [rootNode];
+                });
             }
 
             $scope.showChildren = false;
@@ -223,7 +230,7 @@
                 var uId = $scope.selectedUser.id;
 
                 if (!oId || !rId || !uId) return;
-                
+
                 var data = {
                     "roleId": rId,
                     "userId": uId
@@ -432,6 +439,7 @@
                             $modalScope.canEanBeModified = false;
                             $modalScope.canDeviceIdBeModified = false;
                             $modalScope.canDelete = false;
+                            $modalScope.canEditRegistrations = false;
 
                             organizationUnitService.getUnitAccessRights(currentOrganization.uuid, unit.uuid)
                                 .then(res => {
@@ -440,6 +448,7 @@
                                     $modalScope.canEanBeModified = res.canEanBeModified;
                                     $modalScope.canDeviceIdBeModified = res.canDeviceIdBeModified;
                                     $modalScope.canChangeParent = res.canBeRearranged;
+                                    $modalScope.canEditRegistrations = res.canEditRegistrations;
                                     $modalScope.areRightsLoaded = true;
                                 });
 
@@ -717,13 +726,12 @@
             });
 
             $scope.isReordering = false;
-            $scope.loadingAccessRights = false;
 
             $scope.toggleDrag = function () {
                 $scope.isReordering = !$scope.isReordering;
 
                 if ($scope.isReordering) {
-                    $scope.loadingAccessRights = true;
+                    setBusyState(true);
                     organizationUnitService.getUnitAccessRightsForOrganization(currentOrganization.uuid)
                         .then(response => {
                             const rightsMap = response.reduce((rights, next) => {
@@ -731,12 +739,12 @@
                                 return rights;
                             }, {})
                             applyAccessRights(rootNodeOfOrganization, rightsMap);
-                            $scope.loadingAccessRights = false;
+                            setBusyState(false);
                         }, error => {
                             notify.addErrorMessage("Kunne ikke indlæse rettighederne for organisationsenheden");
                             console.log(error);
-                            $scope.loadingAccessRights = false;
                             $scope.isReordering = false;
+                            setBusyState(false);
                         });
                 }
             };
@@ -791,8 +799,7 @@
                 return role.Name;
             }
 
-            // activate
-            loadUnits();
+            loadUnits().then(() => setBusyState(false));
         }
     ]);
 })(angular, app);

@@ -25,6 +25,9 @@
         oversightCompleted: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YesNoUndecidedOption>;
         associatedContracts: Models.Generic.NamedEntity.NamedEntityDTO[];
         oversightDates: IDataProcessingRegistrationOversightDateDTO[];
+        oversightScheduledInspectionDate: string;
+        mainContractId: number;
+        isActiveAccordingToMainContract: boolean;
     }
 
     export interface IDataProcessingRegistrationOversightDateDTO {
@@ -45,6 +48,9 @@
 
     export interface IDataProcessorDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         cvrNumber: string,
+        basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
+        transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
+        insecureCountry: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
     }
 
     export interface IDataProcessingRoleDTO extends Models.Generic.Roles.BusinessRoleDTO{ }
@@ -59,5 +65,25 @@
         basisForTransferOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         oversightOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         roles: IDataProcessingRoleDTO[],
+    }
+
+    export interface IDataProcessingRegistrationValidationDTO {
+        valid: boolean,
+        errors: DataProcessingRegistrationValidationError[],
+    }
+
+    export enum DataProcessingRegistrationValidationError {
+        MainContractNotActive = 0
+    }
+    
+    export interface ISubDataProcessorRequestDTO {
+        organizationId: number,
+        details: ISubDataProcessorDetailsDTO,
+    }
+
+    export interface ISubDataProcessorDetailsDTO {
+        basisForTransferOptionId: number,
+        transferToInsecureThirdCountries: Models.Api.Shared.YesNoUndecidedOption,
+        insecureCountryOptionId: number,
     }
 }

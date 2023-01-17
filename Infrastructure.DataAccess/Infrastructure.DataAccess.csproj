@@ -92,6 +92,7 @@
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewTaskRefReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsagePersonalDataOptionsMap.cs" />
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Mapping\DataRowMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
+    <Compile Include="Mapping\SubDataProcessorMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
@@ -969,6 +971,30 @@
     <Compile Include="Migrations\202212010827066_AddLatestSubscriptionCheckDateToSts.designer.cs">
       <DependentUpon>202212010827066_AddLatestSubscriptionCheckDateToSts.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202212071214089_AddedRiskAssessmentDateToReadModel.cs" />
+    <Compile Include="Migrations\202212071214089_AddedRiskAssessmentDateToReadModel.designer.cs">
+      <DependentUpon>202212071214089_AddedRiskAssessmentDateToReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202212080835262_OversightScheduledInspectionDateField.cs" />
+    <Compile Include="Migrations\202212080835262_OversightScheduledInspectionDateField.designer.cs">
+      <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.cs" />
+    <Compile Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.designer.cs">
+      <DependentUpon>202212121346223_Added_PlannedRiskAssessmentDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.cs" />
+    <Compile Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.designer.cs">
+      <DependentUpon>202212150709011_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202212191220524_DataProcessingMainContract.cs" />
+    <Compile Include="Migrations\202212191220524_DataProcessingMainContract.designer.cs">
+      <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202301030910462_change_dpr_sub_data_processors.cs" />
+    <Compile Include="Migrations\202301030910462_change_dpr_sub_data_processors.designer.cs">
+      <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -983,6 +1009,10 @@
     <Compile Include="TypeMapping.cs" />
     <Compile Include="UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Migrations\202301030910462_change_dpr_sub_data_processors.resx">
+      <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\SQLScripts\Dpr_Migrate_SubDataProcessors.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -1617,6 +1647,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202212010827066_AddLatestSubscriptionCheckDateToSts.resx">
       <DependentUpon>202212010827066_AddLatestSubscriptionCheckDateToSts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212071214089_AddedRiskAssessmentDateToReadModel.resx">
+      <DependentUpon>202212071214089_AddedRiskAssessmentDateToReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212080835262_OversightScheduledInspectionDateField.resx">
+      <DependentUpon>202212080835262_OversightScheduledInspectionDateField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212121346223_Added_PlannedRiskAssessmentDate.resx">
+      <DependentUpon>202212121346223_Added_PlannedRiskAssessmentDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212150709011_AddedPersonalDataToItSystemUsage.resx">
+      <DependentUpon>202212150709011_AddedPersonalDataToItSystemUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202212191220524_DataProcessingMainContract.resx">
+      <DependentUpon>202212191220524_DataProcessingMainContract.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

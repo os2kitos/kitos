@@ -51,6 +51,7 @@ namespace Core.DomainModel.ItSystemUsage
             Uuid = Guid.NewGuid();
             MarkAsDirty();
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
+            PersonalDataOptions = new List<ItSystemUsagePersonalData>();
         }
 
         public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
@@ -250,6 +251,7 @@ namespace Core.DomainModel.ItSystemUsage
         public string LinkToDirectoryUrlName { get; set; }
 
 
+        public virtual ICollection<ItSystemUsagePersonalData> PersonalDataOptions { get; set; }
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
         public DataOptions? precautions { get; set; }
@@ -280,6 +282,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DataOptions? riskAssessment { get; set; }
         public DateTime? riskAssesmentDate { get; set; }
         public RiskLevel? preriskAssessment { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string noteRisks { get; set; }
@@ -446,18 +449,24 @@ namespace Core.DomainModel.ItSystemUsage
             return newDataLevel;
         }
 
-        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(
+        public Result<RemoveSensitiveDataLevelResultModel, OperationError> RemoveSensitiveDataLevel(
             SensitiveDataLevel sensitiveDataLevel)
         {
             if (!SensitiveDataLevelExists(sensitiveDataLevel))
             {
                 return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
             }
-
+            
             var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);
+
+            var removedPersonalData = new List<ItSystemUsagePersonalData>();
+            if (dataLevelToRemove.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA)
+            {
+                removedPersonalData.AddRange(ResetPersonalData());
+            }
             SensitiveDataLevels.Remove(dataLevelToRemove);
 
-            return dataLevelToRemove;
+            return new RemoveSensitiveDataLevelResultModel(dataLevelToRemove, removedPersonalData);
         }
 
         private bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
@@ -876,7 +885,7 @@ namespace Core.DomainModel.ItSystemUsage
             return newPeriod;
         }
 
-        public Maybe<OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
+        public Result<IEnumerable<ItSystemUsagePersonalData>, OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
         {
             if (sensitiveDataLevels == null)
                 throw new ArgumentNullException(nameof(sensitiveDataLevels));
@@ -894,7 +903,13 @@ namespace Core.DomainModel.ItSystemUsage
 
             levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
 
-            return Maybe<OperationError>.None;
+            var removedPersonalData = new List<ItSystemUsagePersonalData>();
+            if (!SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA))
+            {
+                removedPersonalData.AddRange(ResetPersonalData());
+            }
+
+            return removedPersonalData;
         }
 
         public Maybe<OperationError> UpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
@@ -972,6 +987,52 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             return new ItSystemUsageValidationResult(errors);
+        }
+
+        public Result<ItSystemUsagePersonalData, OperationError> AddPersonalData(GDPRPersonalDataOption option)
+        {
+            if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
+            {
+                return new OperationError($"You cannot add {nameof(PersonalDataOptions)} before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
+            }
+
+            if (GetPersonalData(option).HasValue)
+            {
+                return new OperationError($"An option with value: '{option}' already exists", OperationFailure.Conflict);
+            }
+
+            var personalDataOption = new ItSystemUsagePersonalData() {ItSystemUsage = this, PersonalData = option};
+            PersonalDataOptions.Add(personalDataOption);
+            return personalDataOption;
+        }
+
+        public Result<ItSystemUsagePersonalData, OperationError> RemovePersonalData(GDPRPersonalDataOption option)
+        {
+            if (SensitiveDataLevelExists(SensitiveDataLevel.PERSONALDATA) == false)
+            {
+                return new OperationError($"You cannot remove {nameof(PersonalDataOptions)} before adding {nameof(SensitiveDataLevel)}.{nameof(SensitiveDataLevel.PERSONALDATA)}", OperationFailure.BadState);
+            }
+
+            var personalDataOptionResult = GetPersonalData(option);
+            if (personalDataOptionResult.IsNone)
+                return new OperationError($"PersonalData: \"{option}\" wasn't found", OperationFailure.NotFound);
+
+            var personalDataOption = personalDataOptionResult.Value;
+            PersonalDataOptions.Remove(personalDataOption);
+            return personalDataOption;
+        }
+
+        private IEnumerable<ItSystemUsagePersonalData> ResetPersonalData()
+        {
+            var dataBeforeRemoval = PersonalDataOptions.ToList();
+            PersonalDataOptions.Clear();
+
+            return dataBeforeRemoval;
+        }
+
+        public Maybe<ItSystemUsagePersonalData> GetPersonalData(GDPRPersonalDataOption option)
+        {
+            return PersonalDataOptions.FirstOrDefault(x => x.PersonalData == option).FromNullable();
         }
 
         private Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)

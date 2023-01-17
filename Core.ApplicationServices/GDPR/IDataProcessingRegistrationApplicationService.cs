@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
@@ -36,8 +37,9 @@ namespace Core.ApplicationServices.GDPR
         Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId);
         Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state);
-        Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId);
-        Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId);
+        Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<SubDataProcessorDetailsParameters> details);
+        Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, SubDataProcessorDetailsParameters details);
+        Result<SubDataProcessor, OperationError> RemoveSubDataProcessor(int id, int organizationId);
         Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded);
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedRemark(int id, string remark);
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate);
@@ -55,10 +57,13 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingOversightOption, OperationError> RemoveOversightOption(int id, int oversightOptionId);
         Result<DataProcessingRegistration, OperationError> UpdateOversightOptionRemark(int id, string remark);
         Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption completed);
+        Result<DataProcessingRegistration, OperationError> UpdateOversightScheduledInspectionDate(int id, DateTime? oversightScheduledInspectionDate);
         Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark);
         Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string oversightRemark);
         Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark);
         Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId);
+        Result<DataProcessingRegistration, OperationError> UpdateMainContract(int id, int contractId);
+        Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id);
 
         IQueryable<DataProcessingRegistration> Query(params IDomainQuery<DataProcessingRegistration>[] conditions);
         Result<DataProcessingRegistration, OperationError> GetByUuid(Guid uuid);

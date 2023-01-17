@@ -68,6 +68,8 @@
                     return Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
                 case Models.UICustomization.CustomizableKitosModule.ItContract:
                     return Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
+                case Models.UICustomization.CustomizableKitosModule.DataProcessingRegistrations:
+                    return Models.UICustomization.Configs.BluePrints.DataProcessingUiCustomizationBluePrint;
                 default:
                     throw `Unknown module blueprint:${module}`;
             }

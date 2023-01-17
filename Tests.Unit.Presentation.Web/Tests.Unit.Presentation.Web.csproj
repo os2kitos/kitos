@@ -94,7 +94,7 @@
       <HintPath>..\packages\Moq.4.18.2\lib\net462\Moq.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.3.6.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.3.6\lib\net45\Ninject.dll</HintPath>
@@ -228,6 +228,8 @@
     <Compile Include="DomainServices\DPR\QueryBySubDataProcessorUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySystemUsageUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySystemUuidTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryReadModelsWhichShouldBecomeActiveTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryReadModelsWhichShouldExpireTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
     <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelRepositoryTest.cs" />
@@ -274,6 +276,7 @@
     <Compile Include="Extensions\ItSystemExtensions.cs" />
     <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
+    <Compile Include="Helpers\DataProcessingRegistrationReadModelTestData.cs" />
     <Compile Include="Helpers\ItSystemUsageOverviewReadModelTestData.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />

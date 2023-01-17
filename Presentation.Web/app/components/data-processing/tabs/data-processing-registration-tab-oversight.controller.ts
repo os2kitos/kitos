@@ -10,11 +10,11 @@
             "select2LoadingService",
             "dataProcessingRegistrationOptions",
             "bindingService",
-            "$uibModal"
+            "$uibModal",
+            "notify",
+            "uiState"
         ];
 
-        private readonly dataProcessingRegistrationId: number;
-        private readonly modal;
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
@@ -23,7 +23,12 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
             private readonly bindingService: Kitos.Services.Generic.IBindingService,
-            private readonly $modal) {
+            $modal,
+            private readonly notify,
+            uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) {
+
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.DataProcessingUiCustomizationBluePrint;
+            this.showScheduledInspectionDate = uiState.isBluePrintNodeAvailable(blueprint.children.oversight.children.scheduledInspectionDate);
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindOversightInterval();
@@ -32,11 +37,15 @@
             this.bindOversigthOptionsRemark();
             this.bindOversightCompleted();
             this.bindOversightCompletedRemark();
+            this.bindScheduledInspectionDate();
 
             this.bindOversightDates();
             this.modal = $modal;
         }
 
+        private readonly dataProcessingRegistrationId: number;
+        private readonly modal;
+        showScheduledInspectionDate: boolean;
         headerName = this.dataProcessingRegistration.name;
         oversightInterval: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
         oversightIntervalRemark: Models.ViewModel.Generic.IEditTextViewModel;
@@ -47,6 +56,7 @@
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
         shouldShowLatestOversightCompletedDate: boolean;
         oversightDates: Models.ViewModel.GDPR.IOversightDateViewModel[];
+        scheduledInspectionDate: Models.ViewModel.Generic.IDateSelectionViewModel;
 
         private yesIsOversightCompletedValue = new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x => x.id === Models.Api.Shared.YesNoUndecidedOption.Yes)[0];
 
@@ -363,6 +373,28 @@
                     this.bindOversightDates();
                     return success;
                 });
+        }
+        
+        private bindScheduledInspectionDate() {
+            this.scheduledInspectionDate = new Models.ViewModel.Generic.DateSelectionViewModel(
+                this.dataProcessingRegistration.oversightScheduledInspectionDate,
+                (newDate) => this.changeScheduledInspectionDate(newDate));
+        }
+
+        private changeScheduledInspectionDate(scheduledInspection: string) {
+            const scheduledInspectionDateFieldTitle = "Kommende planlagt tilsyn";
+            if (Helpers.DateValidationHelper.validateDateInput(scheduledInspection, this.notify, scheduledInspectionDateFieldTitle, true)) {
+                const formattedDate = Helpers.DateStringFormat.fromDanishToEnglishFormat(scheduledInspection);
+
+                return this.apiUseCaseFactory
+                    .createUpdate(scheduledInspectionDateFieldTitle, () => this.dataProcessingRegistrationService.updateOversightScheduledInspectionDate(this.dataProcessingRegistration.id, formattedDate))
+                    .executeAsync(success => {
+                        this.dataProcessingRegistration.oversightScheduledInspectionDate = scheduledInspection;
+                        this.bindScheduledInspectionDate();
+                        return success;
+                    });
+            }
+            return null;
         }
     }
 

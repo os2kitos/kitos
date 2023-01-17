@@ -1,5 +1,4 @@
 ﻿using System.Data.Entity.ModelConfiguration;
-using System.Security.Cryptography.X509Certificates;
 using Core.DomainModel.GDPR;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -47,10 +46,6 @@ namespace Infrastructure.DataAccess.Mapping
             //Data processors
             HasMany(x => x.DataProcessors)
                 .WithMany(x => x.DataProcessorForDataProcessingRegistrations);
-
-            //Sub Data processors
-            HasMany(x => x.SubDataProcessors)
-                .WithMany(x => x.SubDataProcessorForDataProcessingRegistrations);
 
             //Transfer to insecure countries
             HasMany(x => x.InsecureCountriesSubjectToDataTransfer)

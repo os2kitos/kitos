@@ -47,7 +47,7 @@
       <HintPath>..\packages\Microsoft.Owin.4.2.2\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -74,6 +74,7 @@
     <Compile Include="Authentication\IAuthenticationContext.cs" />
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
     <Compile Include="Authentication\IApplicationAuthenticationState.cs" />
+    <Compile Include="Authorization\DeleteAnyUserPermission.cs" />
     <Compile Include="Authorization\OrganizationalUserContextCacheKeyFactory.cs" />
     <Compile Include="Authorization\AuthorizationContextFactory.cs" />
     <Compile Include="Authorization\CachingUserContextFactory.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
     <Compile Include="Authorization\Permissions\AdministerGlobalPermission.cs" />
+    <Compile Include="Authorization\Permissions\BulkAdministerOrganizationUnitRegistrations.cs" />
     <Compile Include="Authorization\Permissions\GlobalPermission.cs" />
     <Compile Include="Authorization\Permissions\ImportHierarchyFromStsOrganizationPermission.cs" />
     <Compile Include="Authorization\Permissions\TriggerBrokenReferencesReportPermission.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="Contract\Write\IItContractWriteService.cs" />
     <Compile Include="Contract\Write\ItContractWriteService.cs" />
     <Compile Include="Extensions\ChangedValueExtensions.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Extensions\HangfireApiExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
@@ -139,6 +142,9 @@
     <Compile Include="Model\Contracts\Write\ItContractProcurementModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractTerminationParameters.cs" />
+    <Compile Include="Model\GDPR\Write\SubDataProcessorParameter.cs" />
+    <Compile Include="Model\GDPR\Write\SubDataProcessor\SubDataProcessorDetailsParameters.cs" />
+    <Compile Include="Model\GDPR\Write\SubDataProcessor\TransferToInsecureCountryParameters.cs" />
     <Compile Include="Model\GDPR\Write\DataProcessingRegistrationModificationParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationGeneralDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
@@ -171,6 +177,7 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
+    <Compile Include="Model\Users\UserAdministrationPermissions.cs" />
     <Compile Include="Model\Users\UserRightsAssignments.cs" />
     <Compile Include="Model\Users\UserRightsChangeParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />

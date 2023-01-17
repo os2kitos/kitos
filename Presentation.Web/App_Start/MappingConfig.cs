@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using AutoMapper;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -10,6 +12,7 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Advice = Core.DomainModel.Advice.Advice;
@@ -190,7 +193,7 @@ namespace Presentation.Web
             CreateMap<Organization, OrganizationSimpleDTO>();
 
             CreateMap<OrganizationUnit, OrgUnitDTO>()
-                  .ForMember(dest => dest.Children, opt => opt.MapFrom(unit => unit.Children.OrderBy(child => child.Name).ToList()))
+                  .ForMember(dest => dest.Children, opt => opt.MapFrom(unit => unit.Children.OrderBy(child => child.Name, KitosConstants.DanishStringComparer).ToList()))
                   .ReverseMap()
                   .ForMember(dest => dest.Children, opt => opt.Ignore())
                   .IgnoreDestinationEntityFields();
@@ -253,6 +256,7 @@ namespace Presentation.Web
                 .ForMember(dest => dest.MainContractId, opt => opt.MapFrom(src => src.MainContract.ItContractId))
                 .ForMember(dest => dest.MainContractIsActive, opt => opt.MapFrom(src => src.MainContract.ItContract.IsActive))
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
+                .ForMember(dest => dest.PersonalData, opt => opt.MapFrom(src => src.PersonalDataOptions.Select(x => x.PersonalData)))
                 .ReverseMap()
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                 .ForMember(dest => dest.Contracts, opt => opt.Ignore())

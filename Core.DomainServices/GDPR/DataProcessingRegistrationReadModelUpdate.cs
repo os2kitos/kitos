@@ -43,11 +43,10 @@ namespace Core.DomainServices.GDPR
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
             PatchDataResponsible(source, destination);
+            PatchOversight(source, destination);
             PatchBasisForTransfer(source, destination);
-            PatchOversightOptions(source, destination);
-            PatchIsOversightCompleted(source, destination);
             PatchContracts(source, destination);
-            PatchLatestOversightDate(source, destination);
+            PatchActiveState(source, destination);
             PatchLastUpdateBy(source, destination);
         }
 
@@ -58,6 +57,15 @@ namespace Core.DomainServices.GDPR
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
         }
+
+        private void PatchOversight(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.OversightScheduledInspectionDate = source.OversightScheduledInspectionDate;
+            PatchLatestOversightDate(source, destination);
+            PatchIsOversightCompleted(source, destination);
+            PatchOversightOptions(source, destination);
+        }
+
         private void PatchOversightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.OversightOptionNamesAsCsv = string.Join(", ",
@@ -82,7 +90,7 @@ namespace Core.DomainServices.GDPR
         private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.DataProcessorNamesAsCsv = string.Join(", ", source.DataProcessors.Select(x => x.Name));
-            destination.SubDataProcessorNamesAsCsv = string.Join(", ", source.SubDataProcessors.Select(x => x.Name));
+            destination.SubDataProcessorNamesAsCsv = string.Join(", ", source.AssignedSubDataProcessors.Select(x=>x.Organization).Select(x => x.Name));
         }
 
         private static void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -100,6 +108,12 @@ namespace Core.DomainServices.GDPR
         private static void PatchContracts(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.ContractNamesAsCsv = string.Join(", ", source.AssociatedContracts.Select(x => (x.Name)));
+        }
+
+        private static void PatchActiveState(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.IsActive = source.CheckDprValidity().Result;
+            destination.ActiveAccordingToMainContract = source.IsActiveAccordingToMainContract;
         }
 
         private static void PatchReference(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

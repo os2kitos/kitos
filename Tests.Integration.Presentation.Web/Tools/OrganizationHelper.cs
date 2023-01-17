@@ -122,7 +122,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<OrgUnitDTO> CreateOrganizationUnitRequestAsync(int organizationId, string orgUnitName, int? parentId = null, Cookie optionalLogin = null)
+        public static async Task<OrgUnitDTO> CreateOrganizationUnitAsync(int organizationId, string orgUnitName, int? parentId = null, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/organizationUnit/");
@@ -154,7 +154,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<HttpResponseMessage> SendGetOrganizationRemovalConflictsRequestAsync(Guid organizationUuid, Cookie optionalLogin = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid:D}/deletion/conflicts");
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }

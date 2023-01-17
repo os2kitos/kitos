@@ -22,6 +22,11 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// </summary>
         public IEnumerable<Guid> SensitivePersonDataUuids { get; set; }
         /// <summary>
+        /// Constraint: Can only be added if DataSensitivityLevelChoice.PersonData is present in DataSensitivityLevels field
+        /// </summary>
+        public IEnumerable<GDPRPersonalDataChoice> SpecificPersonalData { get; set; }
+
+        /// <summary>
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         public IEnumerable<Guid> RegisteredDataCategoryUuids { get; set; }
@@ -34,6 +39,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         public YesNoDontKnowChoice? RiskAssessmentConducted { get; set; }
         public DateTime? RiskAssessmentConductedDate { get; set; }
         public RiskLevelChoice? RiskAssessmentResult { get; set; }
+        public DateTime? PlannedRiskAssessmentDate { get; set; }
         /// <summary>
         /// Constraints:
         /// - Name: 150 characters

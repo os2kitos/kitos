@@ -33,6 +33,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly IReferenceService _referenceService;
         private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
+        private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataRepository;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
@@ -44,7 +45,8 @@ namespace Core.ApplicationServices.SystemUsage
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
-            IGenericRepository<ArchivePeriod> archivePeriodRepository)
+            IGenericRepository<ArchivePeriod> archivePeriodRepository, 
+            IGenericRepository<ItSystemUsagePersonalData> personalDataRepository)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -56,6 +58,7 @@ namespace Core.ApplicationServices.SystemUsage
             _userContext = userContext;
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _archivePeriodRepository = archivePeriodRepository;
+            _personalDataRepository = personalDataRepository;
         }
 
         public IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions)
@@ -137,9 +140,8 @@ namespace Core.ApplicationServices.SystemUsage
 
         private static bool AllowUsageInTargetOrganization(ItSystemUsage newSystemUsage, ItSystem itSystem)
         {
-            return
-                    newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
-                    itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
+            return newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
+                   itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
         }
 
         public Result<ItSystemUsage, OperationError> Delete(int id)
@@ -241,12 +243,18 @@ namespace Core.ApplicationServices.SystemUsage
                 .RemoveSensitiveDataLevel(sensitiveDataLevel)
                 .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
                 (
-                    onSuccess: removedSensitivityLevel =>
+                    onSuccess: removeSensitivityLevelResult =>
                     {
+                        var removedSensitivityLevel = removeSensitivityLevelResult.RemovedRiskLevel;
+                        var removedPersonalDataOptions = removeSensitivityLevelResult.RemovedPersonalDataOptions;
+
                         _sensitiveDataLevelRepository.DeleteWithReferencePreload(removedSensitivityLevel);
-                        _sensitiveDataLevelRepository.Save();
-                        _usageRepository.Save();
+                        _personalDataRepository.RemoveRange(removedPersonalDataOptions);
+
                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
+
+                        _usageRepository.Save();
+
                         return removedSensitivityLevel;
                     },
                     onFailure: error =>
@@ -330,6 +338,36 @@ namespace Core.ApplicationServices.SystemUsage
                     (
                         error => error,
                         () => Result<ItSystemUsage, OperationError>.Success(system)
+                    );
+            }).MatchFailure();
+        }
+
+        public Maybe<OperationError> AddPersonalDataOption(int id, GDPRPersonalDataOption option)
+        {
+            return Modify(id, system =>
+            {
+                return system.AddPersonalData(option)
+                    .Match
+                    (
+                        _ => Result<ItSystemUsage, OperationError>.Success(system),
+                        error => error
+                    );
+            }).MatchFailure();
+        }
+
+        public Maybe<OperationError> RemovePersonalDataOption(int id, GDPRPersonalDataOption option)
+        {
+            return Modify(id, system =>
+            {
+                return system.RemovePersonalData(option)
+                    .Match
+                    (
+                        personalData =>
+                        {
+                            _personalDataRepository.Delete(personalData);
+                            return Result<ItSystemUsage, OperationError>.Success(system);
+                        },
+                        error => error
                     );
             }).MatchFailure();
         }

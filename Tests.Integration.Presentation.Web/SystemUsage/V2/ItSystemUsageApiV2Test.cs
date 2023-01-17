@@ -488,9 +488,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
-            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
-            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
-            var unit3 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), unit1.Id);
+            var unit3 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), unit1.Id);
 
             var units = new[] { unit1, unit2, unit3 }.OrderBy(x => A<int>()).Take(2).ToList();
             var responsible = units.First();
@@ -511,9 +511,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
-            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
-            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
-            var unit3 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), unit1.Id);
+            var unit3 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), unit1.Id);
 
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
@@ -1706,12 +1706,21 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return (targetInterface.Uuid, targetInterface.Name);
         }
 
-        private async Task<(GeneralDataWriteRequestDTO, OrgUnitDTO, OrganizationUsageWriteRequestDTO, Guid[], Guid[], LocalKLEDeviationsRequestDTO, IEnumerable<ExternalReferenceDataDTO>, IEnumerable<RoleAssignmentRequestDTO>, GDPRWriteRequestDTO, ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
+        private async Task<(GeneralDataWriteRequestDTO, 
+            OrgUnitDTO, 
+            OrganizationUsageWriteRequestDTO, 
+            Guid[], 
+            Guid[],
+            LocalKLEDeviationsRequestDTO, 
+            IEnumerable<ExternalReferenceDataDTO>, 
+            IEnumerable<RoleAssignmentRequestDTO>,
+            GDPRWriteRequestDTO,
+            ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
         {
             var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
             var generalData = CreateGeneralDataWriteRequestDTO(dataClassification.Uuid);
 
-            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
             var organizationUsageData = CreateOrganizationUsageWriteRequestDTO(new Guid[] { unit1.Uuid }, unit1.Uuid);
 
             var addedTaskRefs = Many<Guid>(2).ToArray();
@@ -1860,10 +1869,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     organization.Uuid, 10, 0);
 
             var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
-            gdprInput.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
+            var sensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList();
+            if(sensitivityLevels.Contains(DataSensitivityLevelChoice.PersonData) == false)
+                sensitivityLevels.Add(DataSensitivityLevelChoice.PersonData);
+
+            gdprInput.DataSensitivityLevels = sensitivityLevels; //Must be unique
+            gdprInput.SpecificPersonalData = Many<GDPRPersonalDataChoice>().Distinct().ToList();
             gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
             gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
+            gdprInput.PlannedRiskAssessmentDate = A<DateTime>();
             return gdprInput;
         }
 
@@ -1887,12 +1902,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(gdprInput.RiskAssessmentResult, gdprResponse.RiskAssessmentResult);
             (gdprInput.RiskAssessmentDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.RiskAssessmentDocumentation);
             Assert.Equal(gdprInput.RiskAssessmentNotes, gdprResponse.RiskAssessmentNotes);
+            Assert.Equal(gdprInput.PlannedRiskAssessmentDate, gdprResponse.PlannedRiskAssessmentDate);
             Assert.Equal(gdprInput.DPIAConducted, gdprResponse.DPIAConducted);
             Assert.Equal(gdprInput.DPIADate, gdprResponse.DPIADate);
             (gdprInput.DPIADocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.DPIADocumentation);
             Assert.Equal(gdprInput.RetentionPeriodDefined, gdprResponse.RetentionPeriodDefined);
             Assert.Equal(gdprInput.NextDataRetentionEvaluationDate, gdprResponse.NextDataRetentionEvaluationDate);
             Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
+            Assert.Equal(gdprInput.SpecificPersonalData ?? new List<GDPRPersonalDataChoice>().OrderBy(x => x), gdprResponse.SpecificPersonalData.OrderBy(x => x));
         }
 
         private static ItSystemUsageValidityWriteRequestDTO CreateValidityInput(DateTime baseDate, LifeCycleStatusChoice lifeCycleStatus)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Core.ApplicationServices.Extensions;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Models.Application.Csv;
@@ -32,6 +33,9 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
                     .WithColumn(GDPRExportReportColumns.SystemName, x => x.SystemName)
                     .WithColumn(GDPRExportReportColumns.NoData, x => MapBoolean(x.NoData))
                     .WithColumn(GDPRExportReportColumns.PersonalData, x => MapBoolean(x.PersonalData))
+                    .WithColumn(GDPRExportReportColumns.PersonalDataCpr, x => MapBoolean(x.PersonalDataCpr))
+                    .WithColumn(GDPRExportReportColumns.PersonalDataSocialProblems, x => MapBoolean(x.PersonalDataSocialProblems))
+                    .WithColumn(GDPRExportReportColumns.PersonalDataSocialOtherPrivateMatters, x => MapBoolean(x.PersonalDataSocialOtherPrivateMatters))
                     .WithColumn(GDPRExportReportColumns.SensitiveData, x => MapBoolean(x.SensitiveData))
                     .WithColumn(GDPRExportReportColumns.LegalData, x => MapBoolean(x.LegalData))
                     .WithColumn(GDPRExportReportColumns.ChosenSensitiveData, x => MapSensitiveDataTypes(x.SensitiveDataTypes))
@@ -39,6 +43,8 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
                     .WithColumn(GDPRExportReportColumns.DataProcessorContract, x => MapBoolean(x.DataProcessingAgreementConcluded))
                     .WithColumn(GDPRExportReportColumns.LinkToDirectory, x => MapBoolean(x.LinkToDirectory))
                     .WithColumn(GDPRExportReportColumns.RiskAssessment, x => MapDataOption(x.RiskAssessment))
+                    .WithColumn(GDPRExportReportColumns.RiskAssessmentDate, x => MapDateTime(x.RiskAssessmentDate))
+                    .WithColumn(GDPRExportReportColumns.PlannedRiskAssessmentDate, x => MapDateTime(x.PlannedRiskAssessmentDate))
                     .WithColumn(GDPRExportReportColumns.PreRiskAssessment, x => MapRiskLevel(x.PreRiskAssessment))
                     .WithColumn(GDPRExportReportColumns.DPIA, x => MapDataOption(x.DPIA))
                     .WithColumn(GDPRExportReportColumns.HostedAt, x => MapHostedAt(x.HostedAt));
@@ -57,6 +63,11 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsage.GDPR
         private static string MapBoolean(bool input)
         {
             return input ? Yes : No;
+        }
+
+        private static string MapDateTime(DateTime? input)
+        {
+            return input == null ? "" : $"'{input.GetValueOrDefault().ConvertToDanishFormatDateString()}'";
         }
 
         private static string MapSensitiveDataTypes(IEnumerable<string> input)
