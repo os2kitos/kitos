@@ -5,6 +5,7 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Models.API.V2.Internal.Response;
+using Presentation.Web.Controllers.API.V2.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Messages
 {
@@ -28,33 +29,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         public IHttpActionResult Get()
         {
             var texts = _textsRepository.AsQueryable().Take(5).ToList();
-            var dto = texts.Aggregate(new PublicMessagesResponseDTO(), (dto, text) => MapText(text, dto));
+            var dto = texts.ToTDO();
             return Ok(dto);
-        }
-
-        private static PublicMessagesResponseDTO MapText(Text text, PublicMessagesResponseDTO dto)
-        {
-            var textValue = text.Value ?? "";
-            switch (text.Id)
-            {
-                case 1:
-                    dto.About = textValue;
-                    break;
-                case 2:
-                    dto.Misc = textValue;
-                    break;
-                case 3:
-                    dto.Guides = textValue;
-                    break;
-                case 4:
-                    dto.StatusMessages = textValue;
-                    break;
-                case 5:
-                    dto.ContactInfo = textValue;
-                    break;
-            }
-
-            return dto;
         }
     }
 }

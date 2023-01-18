@@ -443,6 +443,7 @@
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\InternalApiV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Messages\PublicMessagesV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Mapping\PublicMessagesResponseMapper.cs" />
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\SubDataProcessorResponseDTO.cs" />
