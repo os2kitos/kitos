@@ -2,10 +2,10 @@
 
 namespace Presentation.Web.Models.API.V2.Internal.Response
 {
-    public class PublicTextsResponseDTO
+    public class PublicMessagesResponseDTO
     {
         [Required(AllowEmptyStrings = true)]
-        public string Introduction { get; set; }
+        public string About { get; set; }
         [Required(AllowEmptyStrings = true)]
         public string Guides { get; set; }
         [Required(AllowEmptyStrings = true)]

@@ -476,7 +476,7 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     context.Texts.AddOrUpdate(new Text()
                     {
-                        Value = @"Forside - blok 3",
+                        Value = @"Guides",
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });

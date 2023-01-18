@@ -24,39 +24,37 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         [HttpGet]
         [Route]
         [AllowAnonymous]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicTextsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
         public IHttpActionResult Get()
         {
             var texts = _textsRepository.AsQueryable().Take(5).ToList();
-            var dto = new PublicTextsResponseDTO();
-            for (var i = 0; i < texts.Count; i++)
-            {
-                MapText(texts[i], i, dto);
-            }
+            var dto = texts.Aggregate(new PublicMessagesResponseDTO(), (dto, text) => MapText(text, dto));
             return Ok(dto);
         }
 
-        private static void MapText(Text text, int index, PublicTextsResponseDTO dto)
+        private static PublicMessagesResponseDTO MapText(Text text, PublicMessagesResponseDTO dto)
         {
             var textValue = text.Value ?? "";
-            switch (index)
+            switch (text.Id)
             {
-                case 0:
-                    dto.Introduction = textValue;
-                    break;
                 case 1:
-                    dto.Misc = textValue;
+                    dto.About = textValue;
                     break;
                 case 2:
-                    dto.Guides = textValue;
+                    dto.Misc = textValue;
                     break;
                 case 3:
-                    dto.StatusMessages = textValue;
+                    dto.Guides = textValue;
                     break;
                 case 4:
+                    dto.StatusMessages = textValue;
+                    break;
+                case 5:
                     dto.ContactInfo = textValue;
                     break;
             }
+
+            return dto;
         }
     }
 }
