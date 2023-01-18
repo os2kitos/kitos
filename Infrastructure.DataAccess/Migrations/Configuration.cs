@@ -461,7 +461,7 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     context.Texts.AddOrUpdate(new Text()
                     {
-                        Value = @"Forside - blok 1",
+                        Value = @"Introduktion til kitos",
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });
@@ -469,7 +469,7 @@ namespace Infrastructure.DataAccess.Migrations
 
                 if (!context.Texts.Any(x => x.Id == 2))
                 {
-                    context.Texts.AddOrUpdate(new Text() { Value = "Forside - blok 2", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+                    context.Texts.AddOrUpdate(new Text() { Value = "Misc text, links osv", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
                 }
 
                 if (!context.Texts.Any(x => x.Id == 3))
@@ -484,14 +484,14 @@ namespace Infrastructure.DataAccess.Migrations
 
                 if (!context.Texts.Any(x => x.Id == 4))
                 {
-                    context.Texts.AddOrUpdate(new Text() { Value = "Forside - blok 4", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+                    context.Texts.AddOrUpdate(new Text() { Value = "Statusbeskeder", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
                 }
 
                 if (!context.Texts.Any(x => x.Id == 5))
                 {
                     context.Texts.AddOrUpdate(new Text()
                     {
-                        Value = @"Forside - blok 5",
+                        Value = @"Kontaktinformationer",
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });

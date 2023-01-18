@@ -6,14 +6,13 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [AllowAnonymous]
-    [PublicApi]
+    [InternalApi]
     public class TextController : GenericApiController<Text, TextDTO>
     {
         private readonly IGenericRepository<Text> _repository;
