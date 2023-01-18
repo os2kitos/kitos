@@ -6,7 +6,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V2.External
 {
-    [PublicApi(true)]
+    [PublicApi]
     [Authorize]
     public class ExternalBaseController: ApiController
     {
