@@ -38,5 +38,23 @@ namespace Presentation.Web.Controllers.API.V1
                 return LogError(e);
             }
         }
+
+        [NonAction]
+        public override HttpResponseMessage Delete(int id, int organizationId)
+        {
+            throw new NotSupportedException();
+        }
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, TextDTO dto)
+        {
+            throw new NotSupportedException();
+        }
+
+        [NonAction]
+        public override HttpResponseMessage GetSingle(int id)
+        {
+            throw new NotSupportedException();
+        }
     }
 }
