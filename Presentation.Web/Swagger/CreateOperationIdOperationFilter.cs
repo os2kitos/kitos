@@ -20,6 +20,8 @@ namespace Presentation.Web.Swagger
         private static string DescribeParameters(IEnumerable<HttpParameterBinding> actionBindingParameterBindings)
         {
             var parameterDescriptions = actionBindingParameterBindings
+                .OrderBy(x => x.Descriptor.ParameterType.FullName)
+                .ThenBy(x => x.Descriptor.ParameterName)
                 .Select(DescribeParameter)
                 .ToList();
 
