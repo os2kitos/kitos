@@ -100,8 +100,8 @@ namespace Presentation.Web
                     {
                         //Only remove internal api descriptions on the real environments allowing us to use the internal api docs locally and while deployed to dev (for swagger based code gen in frontend)
                         c.DocumentFilter<RemoveInternalApiOperationsFilter>();
+                        c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     }
-                    c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     c.OperationFilter<CreateOperationIdOperationFilter>();
                     c.OperationFilter<FixNamingOfComplexQueryParametersFilter>();
                     c.OperationFilter<FixContentParameterTypesOnSwaggerSpec>();
