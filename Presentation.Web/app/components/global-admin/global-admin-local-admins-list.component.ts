@@ -117,6 +117,7 @@
                         .withId("deleteButton")
                         .withDataSourceName("deleteButton")
                         .withTitle(" ")
+                        .withStandardWidth(70)
                         .withoutSorting()
                         .withoutMenu()
                         .withUiOnlyColumn()
