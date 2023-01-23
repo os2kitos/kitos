@@ -510,5 +510,30 @@ namespace Core.DomainModel.Organization
                 .ToList()
                 .AsReadOnly();
         }
+
+        /// <summary>
+        /// Replaces the current root organization unit with a new one and relocates the current root hierarchy below the new root
+        /// </summary>
+        /// <param name="newRoot"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public Maybe<OperationError> ReplaceRoot(OrganizationUnit newRoot)
+        {
+            if (newRoot == null)
+            {
+                throw new ArgumentNullException(nameof(newRoot));
+            }
+            var currentParent = newRoot.Parent;
+
+            var currentOrgRoot = GetRoot();
+
+            if (currentParent != null && currentParent != currentOrgRoot)
+            {
+                //If already a member of the org, relocate to the root before switching over
+                //TODO: Move away from current root "withou children"
+                var relocationResult = RelocateOrganizationUnit(newRoot,currentOrgRoot,currentOrgRoot,true);
+            }
+
+            throw new NotImplementedException();
+        }
     }
 }

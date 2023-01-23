@@ -120,12 +120,20 @@ namespace Core.DomainModel.Organization.Strategies
                 }
             }
 
+            var rootChange = Maybe<OrganizationRootChange>.None;
+            var currentRoot = _organization.GetRoot();
+            if (root.Uuid != currentRoot.ExternalOriginUuid.GetValueOrDefault())
+            {
+                rootChange = new OrganizationRootChange(currentRoot, root);
+            }
+
             return new OrganizationTreeUpdateConsequences(
                 removedExternalUnitsWhichMustBeConverted,
                 removedExternalUnitsWhichMustBeRemoved,
                 additions,
                 renamedUnits.Select(x => (x.current, x.current.Name, x.imported.Name)).ToList(),
-                parentChanges);
+                parentChanges,
+                rootChange);
         }
 
         public Result<OrganizationTreeUpdateConsequences, OperationError> PerformUpdate(ExternalOrganizationUnit root)
@@ -157,9 +165,21 @@ namespace Core.DomainModel.Organization.Strategies
                 unitToNativeUnit.organizationUnit.ConvertToNativeKitosUnit();
             }
 
+            //If hierarchy changed 
+            if (consequences.RootChange.HasValue)
+            {
+                var organizationRootChange = consequences.RootChange.Value;
+                var newRoot = organizationRootChange.NewRoot.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,_organization,false);
+                _organization.ReplaceRoot(newRoot);
+                //TODO: Update the map
+                //TODO: Relocate the updated root here! -> ONLY if the root was not part of the "move operations"
+            }
+
             //Addition of new units
+            //TODO: Do not add the new root since it has no
             foreach (var (unitToAdd, parent) in OrderByParentToLeaf(root, consequences.AddedExternalOrganizationUnits))
             {
+                //TODO: Expects the root to be here!!! so
                 if (currentTreeByUuid.TryGetValue(parent.Uuid, out var parentUnit))
                 {
                     var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
