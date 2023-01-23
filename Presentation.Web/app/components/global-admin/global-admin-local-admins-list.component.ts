@@ -91,7 +91,7 @@
                     .withScope(this.$scope)
                     .withoutPersonalFilterOptions()
                     .withoutGridResetControls()
-                    .withDefaultPageSize(10)
+                    .withDefaultPageSize(50)
                     .withColumn(builder => builder
                         .withId("organization")
                         .withDataSourceName("organization")
@@ -117,9 +117,14 @@
                         .withId("deleteButton")
                         .withDataSourceName("deleteButton")
                         .withTitle(" ")
-                        .withRendering((source: ILocalAdminRow) => `<button type='button' data-element-type='deleteLocalAdminRight' 
+                        .withoutSorting()
+                        .withoutMenu()
+                        .withUiOnlyColumn()
+                        .withRendering(
+                            (source: ILocalAdminRow) =>
+                            `<button type='button' data-element-type='deleteLocalAdminRight' 
                             data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click='deleteRightMethod(${source.id})' 
-                            class='k-button k-button-icontext' title='Slet reference'><i class='fa fa-trash-o' aria-hidden='true'></i> Slet</button>`)
+                            class='k-button k-button-icontext' title='Slet reference'>Slet</button>`)
                     )
                     .resetAnySavedSettings()
                     .launch();
@@ -136,7 +141,7 @@
             var organizationId = right.organizationId;
             var roleId = right.role;
             var userId = right.userId;
-            //var msg = notify.addInfoMessage("Arbejder ...", false);
+
             this.organizationRightService.removeRight(rightRow.currentOrgId, organizationId, roleId, userId)
                 .then(() => {
                     if (userId === rightRow.currentUserId) {
@@ -144,6 +149,7 @@
                     }
 
                     this.rowData.splice(rightId, 1);
+                    this.mainGrid.dataSource.read();
                 });
         }
     }

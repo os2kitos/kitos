@@ -6,10 +6,7 @@
         Lokale administratorer
     </div>
     <div class="panel-body">
-        <global-admin-local-admins-list data-local-admins="adminRights" data-current-organization-id="currentOrganizationId" data-user-id="userId"/>
-    </div>
-    <div class="panel-footer">
-        <div class="row">
+        <div class="row form-group">
             <div class="col-xs-3">
                 <input type="hidden" id="selectOrg" class="form-control input-sm"
                        data-placeholder="Vælg organisation"
@@ -20,43 +17,6 @@
                 <input id="selectUser" data-select-user="foo" data-user-model="newUser"/>
             </div>
         </div>
+        <global-admin-local-admins-list data-local-admins="adminRights" data-current-organization-id="currentOrganizationId" data-user-id="userId"/>
     </div>
-    <!--<table class="full-width table">
-        <thead>
-            <tr>
-                <th>Organisation</th>
-                <th>Navn</th>
-                <th>Email</th>
-                <th>--><!-- CONTROL --><!--</th>
-            </tr>
-        </thead>-->
-        <!-- for each right -->
-        <!--<tbody data-ng-repeat="right in adminRights">
-            <tr>
-                <td>{{ right.organizationName }}</td>
-                <td>{{ right.user.fullName }}</td>
-                <td>{{ right.userEmail }}</td>
-                <td class="text-right">
-                    <div>
-                        <a class="btn btn-link btn-sm text-danger"
-                            data-confirmed-click="deleteLocalAdmin(right)"
-                            data-confirm-click="Er du sikker på at du vil slette?">
-                            <i class="glyphicon glyphicon-trash pull-right"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-        </tbody>-->
-
-        <!-- add-new-right row -->
-        <!--<tbody>
-            <tr>
-                <td>
-                    
-                </td>
-                <td colspan="3" class="form-group">
-                </td>
-            </tr>
-        </tbody>
-    </table>-->
 </div>
