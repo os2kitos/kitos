@@ -145,8 +145,7 @@
                         width: 230,
                         persistId: "foreignCvr",
                         hidden: false,
-                        template: (dataItem) => dataItem.ForeignCvr ?? "",
-                        excelTemplate: (dataItem) => dataItem.ForeignCvr ?? "",
+                        excelTemplate: (dataItem) => dataItem.ForeignCvr,
                         filterable: {
                             cell: {
                                 template: customFilter,
