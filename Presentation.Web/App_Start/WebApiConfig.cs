@@ -28,12 +28,13 @@ using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
 using Core.DomainModel.Shared;
+using Presentation.Web.Models.Application.Cors;
 
 namespace Presentation.Web
 {
     public static class WebApiConfig
     {
-        const string ControllerSuffix = "Controller";
+        private const string ControllerSuffix = "Controller";
 
         public static void Register(HttpConfiguration config)
         {
@@ -62,6 +63,14 @@ namespace Presentation.Web
             config.Filters.Add(new ValidateActionParametersAttribute());
             config.Filters.Add(new DenyRightsHoldersAccessAttribute()); //By default block all actions for users with rights holders access in one or more organizations
             config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
+
+            //Optionally enable CORS
+            var corsConfig = CorsConfiguration.FromConfiguration();
+            var globalCors = corsConfig.GlobalCorsSettings;
+            if (globalCors.HasValue)
+            {
+                config.EnableCors(globalCors.Value);
+            }
         }
 
         public static IEdmModel GetModel()

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
@@ -14,6 +14,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 {
     public class DataProcessingRegistrationResponseMapper : IDataProcessingRegistrationResponseMapper
     {
+        private readonly IExternalReferenceResponseMapper _externalReferenceResponseMapper;
+
+        public DataProcessingRegistrationResponseMapper(IExternalReferenceResponseMapper externalReferenceResponseMapper)
+        {
+            _externalReferenceResponseMapper = externalReferenceResponseMapper;
+        }
+
         public DataProcessingRegistrationResponseDTO MapDataProcessingRegistrationDTO(DataProcessingRegistration dataProcessingRegistration)
         {
             return new DataProcessingRegistrationResponseDTO
@@ -28,7 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 SystemUsages = MapSystemUsages(dataProcessingRegistration),
                 Oversight = MapOversight(dataProcessingRegistration),
                 Roles = MapRoles(dataProcessingRegistration),
-                ExternalReferences = MapExternalReferences(dataProcessingRegistration)
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(dataProcessingRegistration.ExternalReferences, dataProcessingRegistration.Reference)
             };
         }
 
@@ -112,22 +119,6 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return isAgreementConcluded?.ToYesNoIrrelevantChoice();
         }
 
-        private static IEnumerable<ExternalReferenceDataDTO> MapExternalReferences(DataProcessingRegistration dataProcessingRegistration)
-        {
-            return dataProcessingRegistration.ExternalReferences.Select(reference => MapExternalReferenceDTO(dataProcessingRegistration, reference)).ToList();
-        }
-
-        private static ExternalReferenceDataDTO MapExternalReferenceDTO(DataProcessingRegistration dataProcessingRegistration, ExternalReference reference)
-        {
-            return new()
-            {
-                DocumentId = reference.ExternalReferenceId,
-                Title = reference.Title,
-                Url = reference.URL,
-                MasterReference = dataProcessingRegistration.Reference?.Id.Equals(reference.Id) == true
-            };
-        }
-
         private static IEnumerable<RoleAssignmentResponseDTO> MapRoles(DataProcessingRegistration dataProcessingRegistration)
         {
             return dataProcessingRegistration.Rights.Select(ToRoleResponseDTO).ToList();
@@ -135,7 +126,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private static RoleAssignmentResponseDTO ToRoleResponseDTO(DataProcessingRegistrationRight right)
         {
-            return new()
+            return new RoleAssignmentResponseDTO
             {
                 Role = right.Role.MapIdentityNamePairDTO(),
                 User = right.User.MapIdentityNamePairDTO()

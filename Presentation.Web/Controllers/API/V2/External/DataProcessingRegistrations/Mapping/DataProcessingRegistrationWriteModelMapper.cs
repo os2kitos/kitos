@@ -13,8 +13,8 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
-using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping
 {
@@ -27,29 +27,49 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         public DataProcessingRegistrationModificationParameters FromPOST(CreateDataProcessingRegistrationRequestDTO dto)
         {
-            return Map(dto, false);
+            return MapCreate(dto, false);
         }
 
         public DataProcessingRegistrationModificationParameters FromPUT(UpdateDataProcessingRegistrationRequestDTO dto)
         {
-            return Map(dto, true);
+            return MapUpdate(dto, true);
         }
 
         public DataProcessingRegistrationModificationParameters FromPATCH(UpdateDataProcessingRegistrationRequestDTO dto)
         {
-            return Map(dto, false);
+            return MapUpdate(dto, false);
         }
 
-        private DataProcessingRegistrationModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal
+        private DataProcessingRegistrationModificationParameters MapCreate(
+            CreateDataProcessingRegistrationRequestDTO dto, bool enforceFallbackIfNotProvided)
         {
-            TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue, Expression<Func<DataProcessingRegistrationWriteRequestDTO, TSection>> propertySelection) where TSection : new() => WithResetDataIfPropertyIsDefined<DataProcessingRegistrationWriteRequestDTO, TSection>(deserializedValue, propertySelection, enforceFallbackIfNotProvided);
-            TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue, Expression<Func<DataProcessingRegistrationWriteRequestDTO, TSection>> propertySelection, Func<TSection> fallbackFactory) => WithResetDataIfPropertyIsDefined<DataProcessingRegistrationWriteRequestDTO, TSection>(deserializedValue, propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
+            var parameters = Map<CreateDataProcessingRegistrationRequestDTO, ExternalReferenceDataWriteRequestDTO>(dto, enforceFallbackIfNotProvided);
+            parameters.ExternalReferences = MapCreateReferences(dto);
+
+            return parameters;
+        }
+
+        private DataProcessingRegistrationModificationParameters MapUpdate(
+            UpdateDataProcessingRegistrationRequestDTO dto, bool enforceFallbackIfNotProvided)
+        {
+            var parameters = Map<UpdateDataProcessingRegistrationRequestDTO, UpdateExternalReferenceDataWriteRequestDTO>(dto, enforceFallbackIfNotProvided);
+            parameters.ExternalReferences = MapUpdateReferences(dto);
+
+            return parameters;
+        }
+
+        private DataProcessingRegistrationModificationParameters Map<TDto, TExternalReferenceDto>(TDto dto, bool enforceFallbackIfNotProvided) 
+            where TDto: DataProcessingRegistrationWriteRequestDTO, IHasNameExternal, IHasExternalReference<TExternalReferenceDto>
+            where TExternalReferenceDto: ExternalReferenceDataWriteRequestDTO
+        {
+            TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection) where TSection : new() => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, enforceFallbackIfNotProvided);
+            TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection, Func<TSection> fallbackFactory) => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
 
             dto.General = WithResetDataIfSectionIsNotDefined(dto.General, x => x.General);
             dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids, x => x.SystemUsageUuids, () => new List<Guid>());
             dto.Oversight = WithResetDataIfSectionIsNotDefined(dto.Oversight, x => x.Oversight);
             dto.Roles = WithResetDataIfSectionIsNotDefinedWithFallback(dto.Roles, x => x.Roles, Array.Empty<RoleAssignmentRequestDTO>);
-            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences, x => x.ExternalReferences, Array.Empty<ExternalReferenceDataDTO>);
+            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences, x => x.ExternalReferences, Array.Empty<TExternalReferenceDto>);
 
             return new DataProcessingRegistrationModificationParameters
             {
@@ -57,14 +77,18 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 General = dto.General.FromNullable().Select(generalData => MapGeneral(generalData, enforceFallbackIfNotProvided)),
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Oversight = dto.Oversight.FromNullable().Select(oversight => MapOversight(oversight, enforceFallbackIfNotProvided)),
-                Roles = dto.Roles.FromNullable().Select(MapRoles),
-                ExternalReferences = dto.ExternalReferences.FromNullable().Select(MapReferences)
+                Roles = dto.Roles.FromNullable().Select(MapRoles)
             };
         }
-
-        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        
+        private Maybe<IEnumerable<UpdatedExternalReferenceProperties>> MapCreateReferences(CreateDataProcessingRegistrationRequestDTO dto)
         {
-            return BaseMapReferences(references);
+            return dto.ExternalReferences.FromNullable().Select(BaseMapCreateReferences);
+        }
+
+        private Maybe<IEnumerable<UpdatedExternalReferenceProperties>> MapUpdateReferences(UpdateDataProcessingRegistrationRequestDTO dto)
+        {
+            return dto.ExternalReferences.FromNullable().Select(BaseMapUpdateReferences);
         }
 
         private UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)

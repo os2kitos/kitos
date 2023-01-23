@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
@@ -114,7 +115,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.SystemUsageUuids), dto));
         }
 
-        public static async Task<HttpResponseMessage> SendPatchExternalReferences(string token, Guid contractUuid, List<ExternalReferenceDataDTO> request)
+        public static async Task<HttpResponseMessage> SendPatchExternalReferences(string token, Guid contractUuid, List<UpdateExternalReferenceDataWriteRequestDTO> request)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.ExternalReferences), request));
         }

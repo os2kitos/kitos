@@ -424,6 +424,9 @@
     <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\UserAdministrationPermissionsController.cs" />
+    <Compile Include="Controllers\API\V2\Common\ApiV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\ExternalReferenceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\IExternalReferenceResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\GDPRPersonalDataMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
@@ -440,6 +443,9 @@
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\Internal\InternalApiV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\PublicMessagesV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Mapping\PublicMessagesResponseMapper.cs" />
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\SubDataProcessorResponseDTO.cs" />
@@ -449,8 +455,13 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserAdministrationPermissionsDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\PublicMessagesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessorRegistrationSubDataProcessorWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Shared\ExternalReferenceDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Shared\UpdateExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Shared\ExternalReferenceDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\SharedProperties\IHasExternalReference.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />
@@ -620,7 +631,6 @@
     <Compile Include="Models\API\V2\Response\SystemUsage\OrganizationUsageResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasEntityCreator.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasLastModified.cs" />
-    <Compile Include="Models\API\V2\Types\Shared\ExternalReferenceDataDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Roles\RoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\BaseItSystemUsageWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\CreateItSystemUsageRequestDTO.cs" />
@@ -771,6 +781,7 @@
     <Compile Include="Models\API\V1\BusinessRoleDTO.cs" />
     <Compile Include="Models\API\V1\CreateItSystemDTO.cs" />
     <Compile Include="Models\API\V1\CreateItsystemUsageDTO.cs" />
+    <Compile Include="Models\Application\Cors\CorsConfiguration.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Application\Csv\CsvResponseBuilder.cs" />
@@ -828,6 +839,8 @@
     <Compile Include="Models\API\V1\UserWithEmailDTO.cs" />
     <Compile Include="Models\API\V1\ValueWithOptionalDateAndRemark.cs" />
     <Compile Include="Models\API\V1\ValueWithOptionalRemarkDTO.cs" />
+    <Compile Include="Models\Application\RuntimeEnv\KitosEnvironment.cs" />
+    <Compile Include="Models\Application\RuntimeEnv\KitosEnvironmentConfiguration.cs" />
     <Compile Include="Ninject\HangfireNinjectResolutionScope.cs" />
     <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
     <Compile Include="Ninject\KernelBuilder.cs" />

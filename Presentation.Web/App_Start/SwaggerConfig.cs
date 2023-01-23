@@ -4,8 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.Http;
+using Ninject.Infrastructure.Language;
 using Presentation.Web;
 using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.Application.RuntimeEnv;
 using Presentation.Web.Swagger;
 using Swashbuckle.Application;
 using Swashbuckle.OData;
@@ -91,19 +94,35 @@ namespace Presentation.Web
                       });
 
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
-                    c.DocumentFilter<RemoveInternalApiOperationsFilter>();
-                    c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
+
+                    var environment = KitosEnvironmentConfiguration.FromConfiguration().Environment;
+                    if (environment != KitosEnvironment.Dev)
+                    {
+                        //Only remove internal api descriptions on the real environments allowing us to use the internal api docs locally and while deployed to dev (for swagger based code gen in frontend)
+                        c.DocumentFilter<RemoveInternalApiOperationsFilter>();
+                        c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
+                    }
                     c.OperationFilter<CreateOperationIdOperationFilter>();
                     c.OperationFilter<FixNamingOfComplexQueryParametersFilter>();
                     c.OperationFilter<FixContentParameterTypesOnSwaggerSpec>();
                     c.GroupActionsBy(apiDesc =>
                         {
                             var controllerName = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                            var suffix = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerType.HasAttribute(typeof(InternalApiAttribute)) ? "[INTERNAL]" : string.Empty;
+                            string prefix;
                             if (apiDesc.RelativePath.IsExternalApiPath())
-                                return "API V2 - " + (controllerName.EndsWith("V2", StringComparison.OrdinalIgnoreCase) ? controllerName.Substring(0, controllerName.Length - 2) : controllerName);
-                            if (apiDesc.RelativePath.Contains("api"))
-                                return "API - V1 - " + controllerName;
-                            return "API - V1 (ODATA) - " + controllerName;
+                            {
+                                prefix = "API V2 - " + (controllerName.EndsWith("V2", StringComparison.OrdinalIgnoreCase) ? controllerName.Substring(0, controllerName.Length - 2) : controllerName);
+                            }
+                            else if (apiDesc.RelativePath.Contains("api"))
+                            {
+                                prefix = "API - V1 - " + controllerName;
+                            }
+                            else
+                            {
+                                prefix = "API - V1 (ODATA) - " + controllerName;
+                            }
+                            return $"{prefix.TrimEnd()} {suffix.Trim()}";
                         }
                     );
                     c.IncludeXmlComments(commentsFile);

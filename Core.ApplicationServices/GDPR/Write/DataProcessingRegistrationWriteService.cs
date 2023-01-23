@@ -129,7 +129,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> PerformReferencesUpdate(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
-            var updateResult = _referenceService.BatchUpdateExternalReferences(
+            var updateResult = _referenceService.UpdateExternalReferences(
                 ReferenceRootType.DataProcessingRegistration,
                 dpr.Id,
                 externalReferences.ToList());

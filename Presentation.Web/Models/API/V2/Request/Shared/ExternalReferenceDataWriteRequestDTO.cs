@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.Web.Models.API.V2.Types.Shared
+namespace Presentation.Web.Models.API.V2.Request.Shared
 {
     /// <summary>
     /// User defined external references attached to a KITOS entity
     /// </summary>
-    public class ExternalReferenceDataDTO
+    public class ExternalReferenceDataWriteRequestDTO
     {
         /// <summary>
         /// Reference title as shown in KITOS UI

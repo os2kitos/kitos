@@ -783,7 +783,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private void ExpectBatchUpdateExternalReferencesReturns(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
             _referenceServiceMock
-                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.SystemUsage, systemUsage.Id, externalReferences))
+                .Setup(x => x.UpdateExternalReferences(ReferenceRootType.SystemUsage, systemUsage.Id, externalReferences))
                 .Returns(value);
         }
 

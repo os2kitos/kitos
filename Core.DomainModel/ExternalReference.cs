@@ -7,12 +7,15 @@ using Core.DomainModel.Qa.References;
 
 namespace Core.DomainModel
 {
-    public class ExternalReference : Entity, ISystemModule, IContractModule, IDataProcessingModule
+    public class ExternalReference : Entity, ISystemModule, IContractModule, IDataProcessingModule, IHasUuid
     {
         public ExternalReference()
         {
             BrokenLinkReports = new List<BrokenLinkInExternalReference>();
+            Uuid = Guid.NewGuid();
         }
+
+        public Guid Uuid { get; set; }
 
         public int? Itcontract_Id { get; set; }
         public virtual ItContract.ItContract ItContract { get; set; }

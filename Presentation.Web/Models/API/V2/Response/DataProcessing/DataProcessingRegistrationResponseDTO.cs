@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
@@ -43,6 +44,6 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// External reference definitions
         /// </summary>
         [Required]
-        public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
+        public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
     }
 }

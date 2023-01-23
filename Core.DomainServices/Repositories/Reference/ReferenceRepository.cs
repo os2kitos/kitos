@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
@@ -7,6 +8,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
+using Core.DomainServices.Extensions;
 
 
 namespace Core.DomainServices.Repositories.Reference
@@ -51,6 +53,11 @@ namespace Core.DomainServices.Repositories.Reference
         public Maybe<ExternalReference> Get(int referenceId)
         {
             return _referenceRepository.GetByKey(referenceId);
+        }
+
+        public Maybe<ExternalReference> GetByUuid(Guid uuid)
+        {
+            return _referenceRepository.AsQueryable().ByUuid(uuid);
         }
 
         public Maybe<IEntityWithExternalReferences> GetRootEntity(int id, ReferenceRootType rootType)

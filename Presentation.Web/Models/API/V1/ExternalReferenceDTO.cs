@@ -5,6 +5,7 @@ namespace Presentation.Web.Models.API.V1
     public class ExternalReferenceDTO
     {
         public int Id { get; set; }
+        public Guid Uuid { get; set; }
         public string Title { get; set; }
         public string ExternalReferenceId { get; set; }
         public string URL { get; set; }

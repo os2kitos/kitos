@@ -9,15 +9,15 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -30,29 +30,49 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractModificationParameters FromPOST(CreateNewContractRequestDTO dto)
         {
-            return Map(dto, false);
+            return MapCreate(dto, false);
         }
 
         public ItContractModificationParameters FromPATCH(UpdateContractRequestDTO dto)
         {
-            return Map(dto, false);
+            return MapUpdate(dto, false);
         }
 
         public ItContractModificationParameters FromPUT(UpdateContractRequestDTO dto)
         {
-            return Map(dto, true);
+            return MapUpdate(dto, true);
         }
 
-        private ItContractModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : ContractWriteRequestDTO, IHasNameExternal
+        private ItContractModificationParameters MapCreate(
+            CreateNewContractRequestDTO dto, bool enforceFallbackIfNotProvided)
         {
-            var rule = CreateChangeRule<T>(enforceFallbackIfNotProvided);
+            var parameters = Map<CreateNewContractRequestDTO, ExternalReferenceDataWriteRequestDTO>(dto, enforceFallbackIfNotProvided);
+            parameters.ExternalReferences = MapCreateReferences(dto);
+
+            return parameters;
+        }
+
+        private ItContractModificationParameters MapUpdate(
+            UpdateContractRequestDTO dto, bool enforceFallbackIfNotProvided)
+        {
+            var parameters = Map<UpdateContractRequestDTO, UpdateExternalReferenceDataWriteRequestDTO>(dto, enforceFallbackIfNotProvided);
+            parameters.ExternalReferences = MapUpdateReferences(dto);
+
+            return parameters;
+        }
+
+        private ItContractModificationParameters Map<TDto, TExternalReferenceDto>(TDto dto, bool enforceFallbackIfNotProvided)
+            where TDto : ContractWriteRequestDTO, IHasNameExternal, IHasExternalReference<TExternalReferenceDto>
+            where TExternalReferenceDto : ExternalReferenceDataWriteRequestDTO
+        {
+            var rule = CreateChangeRule<TDto>(enforceFallbackIfNotProvided);
             TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue,
-                Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection) where TSection : new() =>
+                Expression<Func<TDto, TSection>> propertySelection) where TSection : new() =>
                 WithResetDataIfPropertyIsDefined(deserializedValue,
                     propertySelection, enforceFallbackIfNotProvided);
 
             TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue,
-                Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection,
+                Expression<Func<TDto, TSection>> propertySelection,
                 Func<TSection> fallbackFactory) =>
                 WithResetDataIfPropertyIsDefined(deserializedValue,
                     propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
@@ -61,8 +81,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             dto.Responsible = WithResetDataIfSectionIsNotDefined(dto.Responsible, x => x.Responsible);
             dto.Procurement = WithResetDataIfSectionIsNotDefined(dto.Procurement, x => x.Procurement);
             dto.Supplier = WithResetDataIfSectionIsNotDefined(dto.Supplier, x => x.Supplier);
-            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences,
-                x => x.ExternalReferences, Array.Empty<ExternalReferenceDataDTO>);
+            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences, x => x.ExternalReferences, Array.Empty<TExternalReferenceDto>);
             dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids,
                 x => x.SystemUsageUuids, () => new List<Guid>());
             dto.Roles = WithResetDataIfSectionIsNotDefinedWithFallback(dto.Roles, x => x.Roles,
@@ -85,7 +104,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Responsible = dto.Responsible.FromNullable().Select(responsible => MapResponsible(responsible, rule)),
                 Supplier = dto.Supplier.FromNullable().Select(supplier => MapSupplier(supplier, rule)),
-                ExternalReferences = dto.ExternalReferences.FromNullable().Select(MapReferences),
                 Roles = dto.Roles.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dto.DataProcessingRegistrationUuids.FromNullable(),
                 PaymentModel = dto.PaymentModel.FromNullable().Select(payment => MapPaymentModel(payment, rule)),
@@ -310,9 +328,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> dtos)
+        private Maybe<IEnumerable<UpdatedExternalReferenceProperties>> MapCreateReferences(CreateNewContractRequestDTO dto)
         {
-            return BaseMapReferences(dtos);
+            return dto.ExternalReferences.FromNullable().Select(BaseMapCreateReferences);
+        }
+
+        private Maybe<IEnumerable<UpdatedExternalReferenceProperties>> MapUpdateReferences(UpdateContractRequestDTO dto)
+        {
+            return dto.ExternalReferences.FromNullable().Select(BaseMapUpdateReferences);
         }
 
         private static Maybe<(byte quarter, int year)> MapProcurementPlan(ProcurementPlanDTO plan)

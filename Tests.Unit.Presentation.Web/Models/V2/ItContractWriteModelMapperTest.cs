@@ -16,6 +16,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
 using Xunit;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Models.API.V2.Request.Shared;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
@@ -989,7 +990,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_ExternalReferences_FromPUT()
         {
             //Arrange
-            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+            var references = Many<UpdateExternalReferenceDataWriteRequestDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
             var mappedReferences = _sut.FromPUT(new UpdateContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
@@ -1002,7 +1003,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_ExternalReferences_FromPATCH()
         {
             //Arrange
-            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+            var references = Many<UpdateExternalReferenceDataWriteRequestDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
             var mappedReferences = _sut.FromPATCH(new UpdateContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
@@ -1015,7 +1016,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_ExternalReferences_FromPOST()
         {
             //Arrange
-            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+            var references = Many<ExternalReferenceDataWriteRequestDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
             var mappedReferences = _sut.FromPOST(new CreateNewContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
@@ -1402,7 +1403,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        private static void AssertExternalReferences(List<UpdatedExternalReferenceProperties> mappedReferences, List<ExternalReferenceDataDTO> references)
+        private static void AssertExternalReferences<T>(IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences, IReadOnlyList<T> references) where T : ExternalReferenceDataWriteRequestDTO
         {
             Assert.Equal(mappedReferences.Count, mappedReferences.Count);
             for (var i = 0; i < mappedReferences.Count; i++)
@@ -1413,6 +1414,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(expected.Title, actual.Title);
                 Assert.Equal(expected.DocumentId, actual.DocumentId);
                 Assert.Equal(expected.MasterReference, actual.MasterReference);
+
+                if (expected is UpdateExternalReferenceDataWriteRequestDTO expectedUpdateReference)
+                {
+                    Assert.Equal(expectedUpdateReference.Uuid, actual.Uuid);
+                }
             }
         }
 
