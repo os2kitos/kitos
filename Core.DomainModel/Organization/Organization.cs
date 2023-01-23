@@ -522,18 +522,44 @@ namespace Core.DomainModel.Organization
             {
                 throw new ArgumentNullException(nameof(newRoot));
             }
-            var currentParent = newRoot.Parent;
 
-            var currentOrgRoot = GetRoot();
-
-            if (currentParent != null && currentParent != currentOrgRoot)
+            if (newRoot.Organization != null && newRoot.Organization != this)
             {
-                //If already a member of the org, relocate to the root before switching over
-                //TODO: Move away from current root "withou children"
-                var relocationResult = RelocateOrganizationUnit(newRoot,currentOrgRoot,currentOrgRoot,true);
+                return new OperationError("newRoot resides from a different organization", OperationFailure.BadInput);
             }
 
-            throw new NotImplementedException();
+            var currentOrgRoot = GetRoot();
+            if (currentOrgRoot == newRoot)
+            {
+                return new OperationError("newRoot eq current root", OperationFailure.BadInput);
+            }
+
+            newRoot.Organization = this;
+
+            var currentParent = newRoot.Parent;
+
+
+            if (currentParent != null)
+            {
+                var removeChildError = currentParent.RemoveChild(newRoot);
+                if (removeChildError.HasValue)
+                {
+                    return removeChildError.Value;
+                }
+            }
+
+            //Move current root as child of the new root
+            var addChildError = newRoot.AddChild(currentOrgRoot);
+            if (addChildError.HasValue)
+            {
+                return addChildError.Value;
+            }
+
+            //Move owned tasks (if any)
+            var ownedTasks = currentOrgRoot.OwnedTasks.ToList();
+            currentOrgRoot.OwnedTasks.Clear();
+            ownedTasks.ForEach(newRoot.OwnedTasks.Add);
+            return Maybe<OperationError>.None;
         }
     }
 }

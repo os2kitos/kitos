@@ -170,13 +170,18 @@ namespace Core.DomainModel.Organization.Strategies
             {
                 var organizationRootChange = consequences.RootChange.Value;
                 var newRoot = organizationRootChange.NewRoot.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,_organization,false);
-                _organization.ReplaceRoot(newRoot);
+                var rootReplacementError = _organization.ReplaceRoot(newRoot);
+                if (rootReplacementError.HasValue)
+                {
+                    return rootReplacementError.Value;
+                }
                 //TODO: Update the map
                 //TODO: Relocate the updated root here! -> ONLY if the root was not part of the "move operations"
+                //TODO: Do not add the new root since it has no
+                //TODO: Remove the new root from the additions - if it is there
             }
 
             //Addition of new units
-            //TODO: Do not add the new root since it has no
             foreach (var (unitToAdd, parent) in OrderByParentToLeaf(root, consequences.AddedExternalOrganizationUnits))
             {
                 //TODO: Expects the root to be here!!! so
@@ -199,6 +204,7 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Relocation of existing units
+            //TODO:If relocated is the root switch automaticaly target the new root
             var processingQueue = new Queue<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>(consequences.OrganizationUnitsBeingMoved);
             while (processingQueue.Any())
             {
