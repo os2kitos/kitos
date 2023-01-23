@@ -254,10 +254,10 @@
                     </thead>
                     <tbody>
                         <tr ng-repeat="dataProcessor in vm.dataProcessingRegistration.subDataProcessors" data-element-type="data-processing_sub-data-processors">
-                            <td>{{::dataProcessor.name }}</td>
-                            <td class="noRightBorder">{{::dataProcessor.cvrNumber }}</td>
+                            <td style="min-width: 300px">{{::dataProcessor.name }}</td>
+                            <td class="noRightBorder" style="width: 50px">{{::dataProcessor.cvrNumber }}</td>
                             <td class="noRightBorder">{{::dataProcessor.basisForTransfer.name }}</td>
-                            <td class="noRightBorder">{{::vm.yesNoUndecidedOptionsViewModel.getText(dataProcessor.transferToInsecureThirdCountries) }}</td>
+                            <td class="noRightBorder" style="width: 180px">{{::vm.yesNoUndecidedOptionsViewModel.getText(dataProcessor.transferToInsecureThirdCountries) }}</td>
                             <td class="noRightBorder">{{::dataProcessor.insecureCountry.name }}</td>
                             <td class="text-right noLeftBorder noRightBorder" style="width: 20px;">
                                 <button type="button"
