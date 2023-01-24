@@ -4,8 +4,7 @@
         return {
             bindings: {
                 localAdmins: "<",
-                currentOrganizationId: "=",
-                userId: "=",
+                callbacks: "<"
             },
             controller: GlobalAdminLocalAdminListController,
             controllerAs: "ctrl",
@@ -13,39 +12,28 @@
         };
     }
 
-    export interface ILocalAdminRow {
-        id: number,
-        organization: string,
-        name: string,
-        email: string,
-        currentOrgId: number,
-        currentUserId: number,
-        objectContext: Models.Api.Organization.ILocalAdminRightsDto,
+    export interface IGlobalAdminLocalAdminCallbacks {
+        removeRight(rightId: number): ng.IPromise<void>;
     }
 
     interface IGlobalAdminLocalAdminListController extends ng.IComponentController, Utility.KendoGrid.IGridViewAccess<ILocalAdminRow> {
-        localAdmins: Array<Models.Api.Organization.ILocalAdminRightsDto>;
-        currentOrganizationId: number;
-        userId: number;
+        localAdmins: Array<ILocalAdminRow>;
+        callbacks: IGlobalAdminLocalAdminCallbacks;
     }
 
     class GlobalAdminLocalAdminListController implements IGlobalAdminLocalAdminListController
     {
-        localAdmins: Array<Models.Api.Organization.ILocalAdminRightsDto> | null = null;
-        currentOrganizationId: number | null = null;
-        userId: number | null = null;
+        localAdmins: Array<ILocalAdminRow> | null = null;
+        callbacks: IGlobalAdminLocalAdminCallbacks | null = null;
 
         mainGrid: IKendoGrid<ILocalAdminRow>;
         mainGridOptions: IKendoGridOptions<ILocalAdminRow>;
 
-        private rowData: Array<ILocalAdminRow>;
-
-        static $inject: string[] = ["kendoGridLauncherFactory", "$scope", "userService", "organizationRightService"];
+        static $inject: string[] = ["kendoGridLauncherFactory", "$scope", "userService"];
         constructor(
             private readonly kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             private readonly $scope,
-            private readonly userService: Kitos.Services.IUserService,
-            private readonly organizationRightService: Services.Organization.IOrganizationRightService) {
+            private readonly userService: Kitos.Services.IUserService) {
         }
 
 
@@ -53,29 +41,14 @@
             if (this.localAdmins === null) {
                 throw "Missing parameter 'localAdmins'";
             }
-            if(this.currentOrganizationId === null){
-                throw "Missing parameter 'currentOrganizationId'";
-            }
-            if (this.userId === null){
-                throw "Missing parameter 'userId'";
+            if (this.callbacks === null) {
+                throw "Missing parameter 'callbacks'";
             }
 
             this.loadGrid();
         }
 
         private loadGrid() {
-
-            this.rowData = this.localAdmins.map((row, index) => {
-                return <ILocalAdminRow>{
-                    id: index,
-                    name: row.user.fullName,
-                    organization: row.organizationName,
-                    email: row.userEmail,
-                    currentOrgId: this.currentOrganizationId,
-                    currentUserId: this.userId,
-                    objectContext: row
-                };
-            });
             
             this.$scope.deleteRightMethod = this.deleteLocalAdmin;
 
@@ -85,9 +58,9 @@
                     .withUser(user)
                     .withGridBinding(this)
                     .withFlexibleWidth()
-                    .withArrayDataSource(this.rowData)
-                    .withEntityTypeName("FK Organisation - Konsekvenser ved opdatering")
-                    .withStorageKey("fkOrgConsequences")
+                    .withArrayDataSource(this.localAdmins)
+                    .withEntityTypeName("Lokale administratorer")
+                    .withStorageKey("globalAdminLocalAdmins")
                     .withScope(this.$scope)
                     .withoutPersonalFilterOptions()
                     .withoutGridResetControls()
@@ -95,7 +68,7 @@
                     .withColumn(builder => builder
                         .withId("organization")
                         .withDataSourceName("organization")
-                        .withTitle("Organisationsenhed")
+                        .withTitle("Organisation")
                         .withSourceValueEchoRendering()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                     )
@@ -117,10 +90,10 @@
                         .withId("deleteButton")
                         .withDataSourceName("deleteButton")
                         .withTitle(" ")
-                        .withStandardWidth(70)
+                        .withStandardWidth(30)
                         .withoutSorting()
                         .withoutMenu()
-                        .withUiOnlyColumn()
+                        .asUiOnlyColumn()
                         .withRendering(
                             (source: ILocalAdminRow) =>
                             `<button type='button' data-element-type='deleteLocalAdminRight' 
@@ -133,25 +106,9 @@
         }
 
         private deleteLocalAdmin = (rightId: number) => {
-            var rightRow = _.find(this.rowData, { id: rightId });
-            if (!rightRow)
-                return;
-
-            var right = rightRow.objectContext;
-
-            var organizationId = right.organizationId;
-            var roleId = right.role;
-            var userId = right.userId;
-
-            this.organizationRightService.removeRight(rightRow.currentOrgId, organizationId, roleId, userId)
-                .then(() => {
-                    if (userId === rightRow.currentUserId) {
-                        this.userService.reAuthorize();
-                    }
-
-                    this.rowData.splice(rightId, 1);
-                    this.mainGrid.dataSource.read();
-                });
+            this.callbacks.removeRight(rightId).then(_ => {
+                this.mainGrid.dataSource.read();
+            });
         }
     }
 

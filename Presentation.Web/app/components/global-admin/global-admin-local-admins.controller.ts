@@ -7,9 +7,9 @@
                 controller: "globalAdmin.localAdminsCtrl",
                 authRoles: ["GlobalAdmin"],
                 resolve: {
-                    adminRights: [
+                    /*adminRights: [
                         "$http", $http => $http.get("api/OrganizationRight/?allLocalAdmins").then(result => result.data.response)
-                    ],
+                    ],*/
                     user: [
                         "userService", userService => userService.getUser()
                     ]
@@ -19,14 +19,14 @@
     ]);
 
     app.controller("globalAdmin.localAdminsCtrl", [
-        "$rootScope", "$scope", "$http", "$state", "notify", "adminRights", "user", "userService","select2LoadingService",
-        ($rootScope, $scope, $http, $state, notify, adminRights: Kitos.Models.Api.Organization.ILocalAdminRightsDto[], user: Kitos.Services.IUser, userService: Kitos.Services.IUserService, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
+        "$rootScope", "$scope", /*"$http", "$state", "notify", "adminRights",*/ "user", "userService","select2LoadingService",
+        ($rootScope, $scope, /*$http, $state, notify, adminRights: Kitos.Models.Api.Organization.ILocalAdminRightsDto[],*/ user: Kitos.Services.IUser/*, userService: Kitos.Services.IUserService, select2LoadingService: Kitos.Services.ISelect2LoadingService*/) => {
             $rootScope.page.title = "Lokal administratorer";
-            $scope.adminRights = adminRights;
+            //$scope.adminRights = adminRights;
             $scope.userId = user.id;
             $scope.currentOrganizationId = user.currentOrganizationId;
 
-            function newLocalAdmin() {
+            /*function newLocalAdmin() {
                 // select2 changes the value twice, first with invalid values
                 // so ignore invalid values
                 if (typeof $scope.newUser !== "object") return;
@@ -95,13 +95,13 @@
                     });
             };
 
-            $scope.organizationSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100", "orgId=" + user.currentOrganizationId], (item, items) => {
+            $scope.organizationSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100", "orgId=" + this.currentOrganizationId], (item, items) => {
                 items.push({
                     id: item.id,
                     text: item.name ? item.name : 'Unavngiven',
                     cvr: item.cvrNumber
                 });
-            }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
+            }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);*/
         }
     ]);
 })(angular, app);

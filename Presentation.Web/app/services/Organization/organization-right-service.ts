@@ -1,6 +1,7 @@
 ﻿module Kitos.Services.Organization {
     export interface IOrganizationRightService {
         removeRight(currentOrgId: number, roleOrgId: number, roleId: number, userId: number): ng.IPromise<boolean>;
+        getAll(): ng.IPromise<Array<Models.Api.Organization.ILocalAdminRightsDto>>;
     }
 
     export class OrganizationRightService implements IOrganizationRightService{
@@ -12,14 +13,22 @@
             this.apiWrapper = new Services.Generic.ApiWrapper($http);
         }
 
-        private getBaseUrl(currentOrgId: number, roleOrgId: number, roleId: number, userId: number): string {
-            return `api/OrganizationRight/${roleOrgId}?rId=${roleId}&uId=${userId}&organizationId=${currentOrgId}`;
+        private getBaseUrl(): string {
+            return `api/OrganizationRight`;
+        }
+
+        private getBaseUrlWithIds(currentOrgId: number, roleOrgId: number, roleId: number, userId: number): string {
+            return `${this.getBaseUrl()}/${roleOrgId}?rId=${roleId}&uId=${userId}&organizationId=${currentOrgId}`;
         }
 
         removeRight(currentOrgId: number, roleOrgId: number, roleId: number, userId: number): ng.IPromise<boolean> {
             return this.apiUseCaseFactory.createDeletion("Lokale administratorer",
-                    () => this.apiWrapper.delete(this.getBaseUrl(currentOrgId, roleOrgId, roleId, userId)))
+                () => this.apiWrapper.delete(this.getBaseUrlWithIds(currentOrgId, roleOrgId, roleId, userId)))
                 .executeAsync();
+        }
+
+        getAll(): ng.IPromise<Array<Models.Api.Organization.ILocalAdminRightsDto>> {
+            return this.apiWrapper.getDataFromUrl(this.getBaseUrl());
         }
     }
     app.service("organizationRightService", OrganizationRightService);

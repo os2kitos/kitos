@@ -67,7 +67,6 @@ module Kitos.Utility.KendoGrid {
         withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withoutMenu(): IKendoGridColumnBuilder<TDataSource>;
-        withUiOnlyColumn(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
@@ -76,6 +75,7 @@ module Kitos.Utility.KendoGrid {
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
         withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource>;
         withInclusionCriterion(Predicate): IKendoGridColumnBuilder<TDataSource>;
+        asUiOnlyColumn(): IKendoGridColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
@@ -225,7 +225,7 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
-        withUiOnlyColumn(): IKendoGridColumnBuilder<TDataSource> {
+        asUiOnlyColumn(): IKendoGridColumnBuilder<TDataSource> {
             this.isUiOnly = true;
             return this;
         }
