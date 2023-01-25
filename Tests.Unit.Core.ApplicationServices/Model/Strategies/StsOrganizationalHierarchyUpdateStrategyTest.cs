@@ -168,6 +168,21 @@ namespace Tests.Unit.Core.Model.Strategies
             AssertRootSwapWithinCurrentHierarchy(consequences, expectedOldRootUuid, expectedNewRootUuid, expectedMovedUnitsToNewRoot);
         }
 
+        [Fact]
+        public void ComputeUpdate_Detects_Root_Replacement_With_New_Unit()
+        {
+            //TODO
+        }
+
+        [Fact]
+        public void ComputeUpdate_Detects_Entire_Hierarchy_Replacement()
+        {
+            //TODO
+        }
+
+        //TODO: Also test the actual updates
+        //TODO: Integration test should just test a simple scenario to ensure that db changes work as expected and tesk refs are transferred
+
         [Fact, Description("Verifies if we detect if an existing unit has been moved one of the new units")]
         public void ComputeUpdate_Detects_Units_Moved_To_Newly_Added_Parent()
         {
@@ -511,7 +526,7 @@ namespace Tests.Unit.Core.Model.Strategies
             var organizationRootChange = consequences.RootChange.Value;
             Assert.Equal(expectedOldRootUuid, organizationRootChange.CurrentRoot.ExternalOriginUuid);
             Assert.Equal(expectedNewRootUuid, organizationRootChange.NewRoot.Uuid);
-            Assert.Equivalent(expectedMovedUnitsToNewRoot.Select(x=>x.ExternalOriginUuid),consequences.OrganizationUnitsBeingMoved.Select(x=>x.movedUnit.ExternalOriginUuid));
+            Assert.Equivalent(expectedMovedUnitsToNewRoot.Select(x => x.ExternalOriginUuid), consequences.OrganizationUnitsBeingMoved.Select(x => x.movedUnit.ExternalOriginUuid));
             foreach (var (movedUnit, oldParent, newParent) in consequences.OrganizationUnitsBeingMoved)
             {
                 if (movedUnit.ExternalOriginUuid == expectedOldRootUuid)
