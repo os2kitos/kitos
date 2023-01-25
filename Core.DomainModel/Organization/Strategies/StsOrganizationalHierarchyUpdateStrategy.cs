@@ -120,6 +120,7 @@ namespace Core.DomainModel.Organization.Strategies
                 }
             }
 
+            //Detect root change
             var rootChange = Maybe<OrganizationRootChange>.None;
             var currentRoot = _organization.GetRoot();
             if (root.Uuid != currentRoot.ExternalOriginUuid.GetValueOrDefault())

@@ -96,12 +96,28 @@ namespace Core.ApplicationServices.Extensions
                 .Select(moved =>
                 {
                     var (movedUnit, oldParent, newParent) = moved;
+
+                    string description;
+                    if (newParent == null)
+                    {
+                        description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til at være organisationsroden";
+                    }
+                    else if (oldParent == null)
+                    {
+                        description = $"'{movedUnit.Name}' flyttes til fremover at være underenhed for {newParent.Name}";
+                    }
+                    else
+                    {
+                        description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}";
+                    }
+
+
                     return new StsOrganizationConsequenceLog
                     {
                         Name = movedUnit.Name,
                         Type = ConnectionUpdateOrganizationUnitChangeType.Moved,
                         ExternalUnitUuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
-                        Description = oldParent == null ? $"'{movedUnit.Name}' flyttes til fremover at være underenhed for {newParent.Name}": $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
+                        Description = description
                     };
                 })
                 .ToList();

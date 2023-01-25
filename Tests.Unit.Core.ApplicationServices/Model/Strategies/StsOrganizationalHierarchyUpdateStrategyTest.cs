@@ -7,6 +7,7 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.Strategies;
+using Microsoft.AspNet.OData.Formatter.Deserialization;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -152,6 +153,19 @@ namespace Tests.Unit.Core.Model.Strategies
 
             //Assert
             AssertUnitsToMoveToExistingParentsWereDetected(consequences, randomLeafWhichMustBeMovedToRoot, newRoot);
+        }
+
+        [Fact]
+        public void ComputeUpdate_Detects_Root_Swap_Within_CurrentHierarchy()
+        {
+            //Arrange
+            var (expectedOldRootUuid, expectedNewRootUuid, externalTree, expectedMovedUnitsToNewRoot) = CreateTreeWithRootSwappedUsingCurrentTree();
+
+            //Act
+            var consequences = _sut.ComputeUpdate(externalTree);
+
+            //Assert
+            AssertRootSwapWithinCurrentHierarchy(consequences, expectedOldRootUuid, expectedNewRootUuid, expectedMovedUnitsToNewRoot);
         }
 
         [Fact, Description("Verifies if we detect if an existing unit has been moved one of the new units")]
@@ -485,6 +499,35 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(expectedNewParent.ExternalOriginUuid.GetValueOrDefault(), newParent.Uuid);
         }
 
+        private static void AssertRootSwapWithinCurrentHierarchy(OrganizationTreeUpdateConsequences consequences,
+            Guid expectedNewRootUuid,
+            Guid expectedOldRootUuid,
+            IEnumerable<OrganizationUnit> expectedMovedUnitsToNewRoot)
+        {
+            Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
+            Assert.Empty(consequences.DeletedExternalUnitsBeingDeleted);
+            Assert.Empty(consequences.AddedExternalOrganizationUnits);
+            Assert.True(consequences.RootChange.HasValue);
+            var organizationRootChange = consequences.RootChange.Value;
+            Assert.Equal(expectedOldRootUuid, organizationRootChange.CurrentRoot.ExternalOriginUuid);
+            Assert.Equal(expectedNewRootUuid, organizationRootChange.NewRoot.Uuid);
+            Assert.Equivalent(expectedMovedUnitsToNewRoot.Select(x=>x.ExternalOriginUuid),consequences.OrganizationUnitsBeingMoved.Select(x=>x.movedUnit.ExternalOriginUuid));
+            foreach (var (movedUnit, oldParent, newParent) in consequences.OrganizationUnitsBeingMoved)
+            {
+                if (movedUnit.ExternalOriginUuid == expectedOldRootUuid)
+                {
+                    Assert.Null(oldParent);
+                }
+                else
+                {
+                    //TODO: Maybe test this manually to see what happens
+                    //TODO: Either test setup is wrong or the results are.. emulate it and see the results
+                    Assert.Equal(expectedOldRootUuid, oldParent.ExternalOriginUuid.GetValueOrDefault());
+                    Assert.Equal(expectedNewRootUuid, newParent.Uuid);
+                }
+            }
+        }
+
         private static void AssertUnitsToMoveToNewlyAddedParentWereDetected(OrganizationTreeUpdateConsequences consequences, OrganizationUnit root, OrganizationUnit exptectedNewItem, OrganizationUnit expectedMovedUnit)
         {
             Assert.Empty(consequences.DeletedExternalUnitsBeingConvertedToNativeUnits);
@@ -638,6 +681,40 @@ namespace Tests.Unit.Core.Model.Strategies
             });
 
             return (root, externalTree, randomLeafWhichMustBeMovedToRoot);
+        }
+
+        private (Guid expectedOldRoot, Guid expectedNewRoot, ExternalOrganizationUnit externalTree, IEnumerable<OrganizationUnit> expectedMovedUnitsToNewRoot) CreateTreeWithRootSwappedUsingCurrentTree()
+        {
+            PrepareConnectedOrganization();
+            var root = _organization.GetRoot();
+            var randomLeafWhichMustReplaceRoot = root
+                .FlattenHierarchy()
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .Where(x => x.IsLeaf())
+                .RandomItem();
+
+            //Create external tree based on current
+            var externalTree = ConvertToExternalTree(root);
+
+            //Swap uuid of root and leaf to simulate an external swap
+            var currentRootUuid = root.ExternalOriginUuid;
+            var currentLeafUuid = randomLeafWhichMustReplaceRoot.ExternalOriginUuid;
+
+            root.ExternalOriginUuid = currentLeafUuid;
+            randomLeafWhichMustReplaceRoot.ExternalOriginUuid = currentRootUuid;
+
+            var expectedMovedToNewRoot = root
+                .Children
+                .Except(randomLeafWhichMustReplaceRoot.WrapAsEnumerable())
+                .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
+                .ToList();
+
+            return (
+                randomLeafWhichMustReplaceRoot.ExternalOriginUuid.GetValueOrDefault(),
+                root.ExternalOriginUuid.GetValueOrDefault(),
+                externalTree,
+                expectedMovedToNewRoot
+            );
         }
 
         private (OrganizationUnit root, ExternalOrganizationUnit externalTree, OrganizationUnit randomLeafMovedToNewlyImportedItem, OrganizationUnit newItem) CreateTreeWithUnitsMovedToNewlyAddedUnit()
