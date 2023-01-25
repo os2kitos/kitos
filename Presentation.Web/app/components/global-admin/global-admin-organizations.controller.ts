@@ -140,13 +140,12 @@
                         }
                     },
                     {
-                        field: "AccessModifier",
-                        title: "Synlighed",
+                        field: "ForeignCvr",
+                        title: "Udenlandsk virksomhed",
                         width: 230,
-                        persistId: "synlighed", 
+                        persistId: "foreignCvr",
                         hidden: false,
-                        template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
-                        excelTemplate: (dataItem) => dataItem.AccessModifier.toString(),
+                        excelTemplate: (dataItem) => dataItem.ForeignCvr,
                         filterable: {
                             cell: {
                                 template: customFilter,
