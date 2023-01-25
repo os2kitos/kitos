@@ -372,11 +372,16 @@ namespace Core.DomainModel.Organization
             var addedError = actualParent.AddChild(newUnit);
             if (addedError.IsNone)
             {
-                newUnit.Organization = this;
-                OrgUnits.Add(newUnit);
+                IncludeOrganizationUnit(newUnit);
             }
 
             return addedError;
+        }
+
+        private void IncludeOrganizationUnit(OrganizationUnit newUnit)
+        {
+            newUnit.Organization = this;
+            OrgUnits.Add(newUnit);
         }
 
         public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit, bool includeSubtree)
@@ -534,10 +539,13 @@ namespace Core.DomainModel.Organization
                 return new OperationError("newRoot eq current root", OperationFailure.BadInput);
             }
 
-            newRoot.Organization = this;
+            if (GetOrganizationUnit(newRoot.Uuid).IsNone)
+            {
+                //Associate if not already added
+                IncludeOrganizationUnit(newRoot);
+            }
 
             var currentParent = newRoot.Parent;
-
 
             if (currentParent != null)
             {
@@ -558,7 +566,11 @@ namespace Core.DomainModel.Organization
             //Move owned tasks (if any)
             var ownedTasks = currentOrgRoot.OwnedTasks.ToList();
             currentOrgRoot.OwnedTasks.Clear();
-            ownedTasks.ForEach(newRoot.OwnedTasks.Add);
+            ownedTasks.ForEach(taskRef =>
+            {
+                newRoot.OwnedTasks.Add(taskRef);
+                taskRef.OwnedByOrganizationUnit = newRoot;
+            });
             return Maybe<OperationError>.None;
         }
     }

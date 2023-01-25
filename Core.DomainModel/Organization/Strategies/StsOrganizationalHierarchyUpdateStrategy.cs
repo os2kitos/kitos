@@ -162,12 +162,6 @@ namespace Core.DomainModel.Organization.Strategies
                 }
             }
 
-            //Conversion to native units
-            foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
-            {
-                unitToNativeUnit.organizationUnit.ConvertToNativeKitosUnit();
-            }
-
             //If hierarchy changed 
             if (consequences.RootChange.HasValue)
             {
@@ -247,6 +241,12 @@ namespace Core.DomainModel.Organization.Strategies
                         return relocationError.Value;
                     }
                 }
+            }
+
+            //Conversion to native units
+            foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
+            {
+                unitToNativeUnit.organizationUnit.ConvertToNativeKitosUnit();
             }
 
             //Deletion of units

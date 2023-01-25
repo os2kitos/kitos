@@ -4,7 +4,6 @@ using Core.DomainServices.Context;
 using Core.DomainServices.Time;
 using System.Collections.Generic;
 using System.Linq;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.Extensions
 {
@@ -49,16 +48,16 @@ namespace Core.ApplicationServices.Extensions
 
         private static IEnumerable<StsOrganizationConsequenceLog> MapRootChange(OrganizationTreeUpdateConsequences consequences)
         {
-            var logEntry = consequences.RootChange.Select(rootChange => new StsOrganizationConsequenceLog
+            var rootChangeEntry = consequences.RootChange.Select(rootChange => new StsOrganizationConsequenceLog
             {
                 Name = rootChange.CurrentRoot.Name,
                 Type = ConnectionUpdateOrganizationUnitChangeType.RootChanged,
                 ExternalUnitUuid = rootChange.CurrentRoot.ExternalOriginUuid.GetValueOrDefault(),
                 Description = $"Organisationsroden {rootChange.CurrentRoot.Name} ændres til {rootChange.NewRoot.Name}"
             });
-            if (logEntry.HasValue)
+            if (rootChangeEntry.HasValue)
             {
-                yield return logEntry.Value;
+                yield return rootChangeEntry.Value;
             }
         }
 

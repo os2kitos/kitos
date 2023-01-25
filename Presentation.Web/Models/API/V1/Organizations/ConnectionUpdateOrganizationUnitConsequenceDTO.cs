@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
@@ -6,7 +7,7 @@ namespace Presentation.Web.Models.API.V1.Organizations
     {
         public Guid Uuid { get; set; }
         public string Name { get; set; }
-        public ConnectionUpdateOrganizationUnitChangeCategory Category { get; set; }
+        public ConnectionUpdateOrganizationUnitChangeType Category { get; set; }
         public string Description { get; set; }
     }
 }

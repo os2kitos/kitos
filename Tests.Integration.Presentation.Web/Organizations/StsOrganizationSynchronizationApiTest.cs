@@ -204,7 +204,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Added, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, c.Category));
         }
 
         [Fact]
@@ -224,7 +224,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Deleted, c.Category));
         }
 
         [Fact]
@@ -260,7 +260,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Renamed, c.Category));
             Assert.Equal(consequences.Consequences.Select(x => x.Uuid).OrderBy(x => x), uuidsOfRenamedUnits.OrderBy(x => x));
         }
 
@@ -296,7 +296,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Moved, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Moved, c.Category));
         }
 
         [Fact]
@@ -338,7 +338,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            var conversion = Assert.Single(consequences.Consequences.Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeCategory.Converted));
+            var conversion = Assert.Single(consequences.Consequences.Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeType.Converted));
             Assert.Equal(expectedConvertedUnit, conversion.Uuid);
         }
 
@@ -355,7 +355,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             using var consequencesBeforePutResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, consequencesBeforePutResponse.StatusCode);
             var consequencesBeforePut = await consequencesBeforePutResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
-            var expectedAdded = consequencesBeforePut.Consequences.ToList().Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeCategory.Added).Select(x => x.Uuid).ToHashSet();
+            var expectedAdded = consequencesBeforePut.Consequences.ToList().Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeType.Added).Select(x => x.Uuid).ToHashSet();
             Assert.NotEmpty(expectedAdded);
 
             //Act
@@ -690,10 +690,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
             var consequenceCategories = otherLogsConsequences.Select(x => x.Category).ToList();
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, consequenceCategories);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, consequenceCategories);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, consequenceCategories);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Deleted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Renamed, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Converted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Moved, consequenceCategories);
 
             AssertConsequenceLogs(otherConsequences, otherLogs);
         }
