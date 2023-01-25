@@ -144,6 +144,9 @@ namespace Core.DomainModel.Organization.Strategies
                 .Where(unit => unit.Origin == OrganizationUnitOrigin.STS_Organisation)
                 .ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
 
+            var organizationUnitsBeingMoved = consequences.OrganizationUnitsBeingMoved.ToList();
+            var addedExternalOrganizationUnits = consequences.AddedExternalOrganizationUnits.ToList();
+
             //Renaming
             foreach (var (affectedUnit, _, newName) in consequences.OrganizationUnitsBeingRenamed)
             {
@@ -169,22 +172,34 @@ namespace Core.DomainModel.Organization.Strategies
             if (consequences.RootChange.HasValue)
             {
                 var organizationRootChange = consequences.RootChange.Value;
-                var newRoot = organizationRootChange.NewRoot.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,_organization,false);
+                var oldRoot = _organization.GetRoot();
+                var newRoot = organizationRootChange.NewRoot.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
                 var rootReplacementError = _organization.ReplaceRoot(newRoot);
                 if (rootReplacementError.HasValue)
                 {
                     return rootReplacementError.Value;
                 }
-                //TODO: Update the map
-                //TODO: Relocate the updated root here! -> ONLY if the root was not part of the "move operations"
-                //TODO: Do not add the new root since it has no
-                //TODO: Remove the new root from the additions - if it is there
+
+                currentTreeByUuid[newRoot.ExternalOriginUuid.GetValueOrDefault()] = newRoot;
+
+                //Remove from regular additions since it has already been processed
+                addedExternalOrganizationUnits = addedExternalOrganizationUnits
+                    .Where(addedUnit => addedUnit.unitToAdd.Uuid != newRoot.ExternalOriginUuid.GetValueOrDefault())
+                    .ToList();
+
+                //Patch parent if replaced root is preserved and is to be moved downwards (e.g. as a descendent to the new root)
+                organizationUnitsBeingMoved = organizationUnitsBeingMoved
+                    .Select(movedUnitInfo => movedUnitInfo.movedUnit == oldRoot
+                        ? (movedUnitInfo.movedUnit, newRoot, movedUnitInfo.newParent) //Update the "oldparent" which was previously null to now point to the new root
+                        : movedUnitInfo
+                    )
+                    .ToList();
             }
 
             //Addition of new units
-            foreach (var (unitToAdd, parent) in OrderByParentToLeaf(root, consequences.AddedExternalOrganizationUnits))
+            foreach (var (unitToAdd, parent) in OrderByParentToLeaf(root, addedExternalOrganizationUnits))
             {
-                //TODO: Expects the root to be here!!! so
+
                 if (currentTreeByUuid.TryGetValue(parent.Uuid, out var parentUnit))
                 {
                     var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
@@ -204,8 +219,7 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Relocation of existing units
-            //TODO:If relocated is the root switch automaticaly target the new root
-            var processingQueue = new Queue<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>(consequences.OrganizationUnitsBeingMoved);
+            var processingQueue = new Queue<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>(organizationUnitsBeingMoved);
             while (processingQueue.Any())
             {
                 var (movedUnit, oldParent, newParent) = processingQueue.Dequeue();

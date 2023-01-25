@@ -102,7 +102,7 @@ namespace Core.ApplicationServices.Extensions
                         Name = movedUnit.Name,
                         Type = ConnectionUpdateOrganizationUnitChangeType.Moved,
                         ExternalUnitUuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
-                        Description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
+                        Description = oldParent == null ? $"'{movedUnit.Name}' flyttes til fremover at være underenhed for {newParent.Name}": $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
                     };
                 })
                 .ToList();
