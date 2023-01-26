@@ -88,7 +88,6 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public DateTime LastChangedAt { get; set; } //Notice - not using LastChanged since we don't want update-by-naming-convention to hit this field
         public DateTime? Concluded { get; set; }
         public DateTime? ExpirationDate { get; set; }
-        public Guid? MainContractUuid { get; set; }
         public int? MainContractId { get; set; }
         public int? MainContractSupplierId { get; set; }
         public string MainContractSupplierName { get; set; }

@@ -12,7 +12,6 @@
             AddColumn("dbo.ItSystemUsageOverviewReadModels", "ParentItSystemUuid", c => c.Guid());
             AddColumn("dbo.ItSystemUsageOverviewReadModels", "ResponsibleOrganizationUnitUuid", c => c.Guid());
             AddColumn("dbo.ItSystemUsageOverviewReadModels", "ItSystemBusinessTypeUuid", c => c.Guid());
-            AddColumn("dbo.ItSystemUsageOverviewReadModels", "MainContractUuid", c => c.Guid());
             AddColumn("dbo.ItSystemUsageOverviewDataProcessingRegistrationReadModels", "DataProcessingRegistrationUuid", c => c.Guid(nullable: false));
             AddColumn("dbo.ItSystemUsageOverviewInterfaceReadModels", "InterfaceUuid", c => c.Guid(nullable: false));
             AddColumn("dbo.ItSystemUsageOverviewUsedBySystemUsageReadModels", "ItSystemUsageUuid", c => c.Guid(nullable: false));
@@ -37,7 +36,6 @@
             DropColumn("dbo.ItSystemUsageOverviewUsedBySystemUsageReadModels", "ItSystemUsageUuid");
             DropColumn("dbo.ItSystemUsageOverviewInterfaceReadModels", "InterfaceUuid");
             DropColumn("dbo.ItSystemUsageOverviewDataProcessingRegistrationReadModels", "DataProcessingRegistrationUuid");
-            DropColumn("dbo.ItSystemUsageOverviewReadModels", "MainContractUuid");
             DropColumn("dbo.ItSystemUsageOverviewReadModels", "ItSystemBusinessTypeUuid");
             DropColumn("dbo.ItSystemUsageOverviewReadModels", "ResponsibleOrganizationUnitUuid");
             DropColumn("dbo.ItSystemUsageOverviewReadModels", "ParentItSystemUuid");
