@@ -433,6 +433,7 @@ namespace Core.DomainServices.Contract
         {
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
+            destination.SourceEntityUuid = source.Uuid;
         }
     }
 }

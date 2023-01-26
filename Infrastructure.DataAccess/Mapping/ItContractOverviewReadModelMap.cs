@@ -23,6 +23,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(x => x.SourceEntityId)
                 .WillCascadeOnDelete(true);
 
+            Property(x => x.SourceEntityUuid).IsRequired();
+
             Property(x => x.Name)
                 .HasMaxLength(ItContractConstraints.MaxNameLength)
                 .HasIndexAnnotation("IX_Contract_Name");
