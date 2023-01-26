@@ -168,19 +168,31 @@ namespace Core.DomainModel.Organization.Strategies
             {
                 var organizationRootChange = consequences.RootChange.Value;
                 var oldRoot = _organization.GetRoot();
-                var newRoot = organizationRootChange.NewRoot.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
+
+                if (currentTreeByUuid.TryGetValue(organizationRootChange.NewRoot.Uuid, out var newRoot))
+                {
+                    //Remove the new root from potential "relocation descriptions" (already moved as part of replacement)
+                    organizationUnitsBeingMoved = organizationUnitsBeingMoved
+                        .Where(x => x.movedUnit != newRoot)
+                        .ToList();
+                }
+                else
+                {
+                    //Create from scratch if entirely new root
+                    newRoot = organizationRootChange.NewRoot.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
+                    currentTreeByUuid[newRoot.ExternalOriginUuid.GetValueOrDefault()] = newRoot;
+
+                    //Remove from regular additions since it has already been processed
+                    addedExternalOrganizationUnits = addedExternalOrganizationUnits
+                        .Where(addedUnit => addedUnit.unitToAdd.Uuid != newRoot.ExternalOriginUuid.GetValueOrDefault())
+                        .ToList();
+                }
+                
                 var rootReplacementError = _organization.ReplaceRoot(newRoot);
                 if (rootReplacementError.HasValue)
                 {
                     return rootReplacementError.Value;
                 }
-
-                currentTreeByUuid[newRoot.ExternalOriginUuid.GetValueOrDefault()] = newRoot;
-
-                //Remove from regular additions since it has already been processed
-                addedExternalOrganizationUnits = addedExternalOrganizationUnits
-                    .Where(addedUnit => addedUnit.unitToAdd.Uuid != newRoot.ExternalOriginUuid.GetValueOrDefault())
-                    .ToList();
 
                 //Patch parent if replaced root is preserved and is to be moved downwards (e.g. as a descendent to the new root)
                 organizationUnitsBeingMoved = organizationUnitsBeingMoved

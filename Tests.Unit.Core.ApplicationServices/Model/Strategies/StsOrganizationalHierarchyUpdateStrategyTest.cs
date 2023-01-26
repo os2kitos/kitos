@@ -7,12 +7,10 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.Strategies;
-using Microsoft.AspNet.OData.Formatter.Deserialization;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Tests.Unit.Core.Model.Strategies
 {

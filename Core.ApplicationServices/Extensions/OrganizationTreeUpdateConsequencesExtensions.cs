@@ -53,7 +53,7 @@ namespace Core.ApplicationServices.Extensions
                 Name = rootChange.CurrentRoot.Name,
                 Type = ConnectionUpdateOrganizationUnitChangeType.RootChanged,
                 ExternalUnitUuid = rootChange.CurrentRoot.ExternalOriginUuid.GetValueOrDefault(),
-                Description = $"Organisationsroden {rootChange.CurrentRoot.Name} ændres til {rootChange.NewRoot.Name}"
+                Description = $"Organisationsroden ændres fra '{rootChange.CurrentRoot.Name}' til '{rootChange.NewRoot.Name}'"
             });
             if (rootChangeEntry.HasValue)
             {
