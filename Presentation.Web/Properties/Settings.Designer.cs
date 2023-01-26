@@ -112,14 +112,5 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["SsoServiceProviderId"]));
             }
         }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:4200")]
-        public string CorsOrigins {
-            get {
-                return ((string)(this["CorsOrigins"]));
-            }
-        }
     }
 }

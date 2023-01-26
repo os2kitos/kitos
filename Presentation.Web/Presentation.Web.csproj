@@ -778,7 +778,6 @@
     <Compile Include="Models\API\V1\BusinessRoleDTO.cs" />
     <Compile Include="Models\API\V1\CreateItSystemDTO.cs" />
     <Compile Include="Models\API\V1\CreateItsystemUsageDTO.cs" />
-    <Compile Include="Models\Application\Cors\CorsConfiguration.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Application\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Application\Csv\CsvResponseBuilder.cs" />
