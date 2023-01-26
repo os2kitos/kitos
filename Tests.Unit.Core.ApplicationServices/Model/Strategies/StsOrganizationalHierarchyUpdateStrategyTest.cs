@@ -41,17 +41,17 @@ namespace Tests.Unit.Core.Model.Strategies
 
             var organizationUnit = predefinedRoot ?? CreateOrganizationUnit
             (
-                OrganizationUnitOrigin.STS_Organisation, new[]
+                OrganizationUnitOrigin.STS_Organisation, "ROOT", new[]
                 {
-                    CreateOrganizationUnit(OrganizationUnitOrigin.Kitos),
-                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,new []
+                    CreateOrganizationUnit(OrganizationUnitOrigin.Kitos,"C_1"),
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,"C_2",new []
                     {
-                        CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
+                        CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,"C_2_1")
                     }),
-                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, new[]
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, "C_3",new[]
                     {
-                        CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation),
-                        CreateOrganizationUnit(OrganizationUnitOrigin.Kitos)
+                        CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,"C_3_1"),
+                        CreateOrganizationUnit(OrganizationUnitOrigin.Kitos,"C_3_2")
 
                     })
                 });
@@ -62,12 +62,13 @@ namespace Tests.Unit.Core.Model.Strategies
             }
         }
 
-        private OrganizationUnit CreateOrganizationUnit(OrganizationUnitOrigin origin, IEnumerable<OrganizationUnit> children = null)
+        private OrganizationUnit CreateOrganizationUnit(OrganizationUnitOrigin origin, string prefix = null, IEnumerable<OrganizationUnit> children = null)
         {
+            prefix ??= "<no_prefix>";
             var unit = new OrganizationUnit
             {
                 Id = GetNewOrgUnitId(),
-                Name = A<string>(),
+                Name = $"{prefix}_{A<string>()}",
                 Origin = origin,
                 ExternalOriginUuid = origin == OrganizationUnitOrigin.STS_Organisation ? A<Guid>() : null,
                 Organization = _organization
@@ -163,7 +164,7 @@ namespace Tests.Unit.Core.Model.Strategies
             var consequences = _sut.ComputeUpdate(externalTree);
 
             //Assert
-            AssertRootSwapWithinCurrentHierarchy(consequences, expectedOldRootUuid, expectedNewRootUuid, expectedMovedUnitsToNewRoot);
+            AssertRootSwapWithinCurrentHierarchy(consequences, expectedNewRootUuid, expectedOldRootUuid, expectedMovedUnitsToNewRoot);
         }
 
         [Fact]
@@ -338,16 +339,16 @@ namespace Tests.Unit.Core.Model.Strategies
         public void PerformUpdate_Updates_Units_Moved_To_Newly_Added_Parent_And_Sub_Tree_Is_Moved_Along()
         {
             //Arrange
-            var root = CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,
+            var root = CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, null,
                 new[]
                 {
-                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,
+                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,null,
                         new []
                         {
-                            CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,
+                            CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,null,
                                 new []
                                 {
-                                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,new[]
+                                    CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation,null,new[]
                                     {
                                         CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
                                     })
@@ -531,6 +532,11 @@ namespace Tests.Unit.Core.Model.Strategies
                 {
                     Assert.Null(oldParent);
                 }
+                else if (movedUnit.ExternalOriginUuid == expectedNewRootUuid)
+                {
+                    Assert.Equal(movedUnit.Parent, oldParent);
+                    Assert.Null(newParent);
+                }
                 else
                 {
                     //TODO: Maybe test this manually to see what happens
@@ -626,7 +632,7 @@ namespace Tests.Unit.Core.Model.Strategies
                 .RandomItem();
 
             var expectedSubTree = CreateOrganizationUnit(
-                OrganizationUnitOrigin.STS_Organisation,
+                OrganizationUnitOrigin.STS_Organisation, null,
                 new[]
                 {
                     CreateOrganizationUnit(OrganizationUnitOrigin.STS_Organisation)
@@ -700,7 +706,7 @@ namespace Tests.Unit.Core.Model.Strategies
         {
             PrepareConnectedOrganization();
             var root = _organization.GetRoot();
-            var randomLeafWhichMustReplaceRoot = root
+            var randomLefActingAsOldRoot = root
                 .FlattenHierarchy()
                 .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
                 .Where(x => x.IsLeaf())
@@ -709,21 +715,24 @@ namespace Tests.Unit.Core.Model.Strategies
             //Create external tree based on current
             var externalTree = ConvertToExternalTree(root);
 
-            //Swap uuid of root and leaf to simulate an external swap
-            var currentRootUuid = root.ExternalOriginUuid;
-            var currentLeafUuid = randomLeafWhichMustReplaceRoot.ExternalOriginUuid;
+            //Swap root and leaf
+            var rootChildren = root.Children.ToList();
+            var newRootParent = randomLefActingAsOldRoot.Parent;
+            newRootParent.RemoveChild(randomLefActingAsOldRoot);
+            root.Children.Clear();
+            foreach (var organizationUnit in rootChildren)
+            {
+                randomLefActingAsOldRoot.AddChild(organizationUnit);
+            }
+            newRootParent.AddChild(root);
 
-            root.ExternalOriginUuid = currentLeafUuid;
-            randomLeafWhichMustReplaceRoot.ExternalOriginUuid = currentRootUuid;
-
-            var expectedMovedToNewRoot = root
-                .Children
-                .Except(randomLeafWhichMustReplaceRoot.WrapAsEnumerable())
+            var expectedMovedToNewRoot = rootChildren
+                .Except(randomLefActingAsOldRoot.WrapAsEnumerable())
                 .Where(x => x.Origin == OrganizationUnitOrigin.STS_Organisation)
                 .ToList();
 
             return (
-                randomLeafWhichMustReplaceRoot.ExternalOriginUuid.GetValueOrDefault(),
+                randomLefActingAsOldRoot.ExternalOriginUuid.GetValueOrDefault(),
                 root.ExternalOriginUuid.GetValueOrDefault(),
                 externalTree,
                 expectedMovedToNewRoot
@@ -741,7 +750,7 @@ namespace Tests.Unit.Core.Model.Strategies
                 .RandomItem();
 
             var newItem = CreateOrganizationUnit(
-                OrganizationUnitOrigin.STS_Organisation,
+                OrganizationUnitOrigin.STS_Organisation, "NEW_CHILD",
                 new[]
                 {
                     //NOTE: Make a copy to not modify the existing object (children in the list will get the parent in scope and this affects detection)
