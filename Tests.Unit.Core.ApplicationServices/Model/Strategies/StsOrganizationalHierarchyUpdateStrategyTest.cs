@@ -193,9 +193,6 @@ namespace Tests.Unit.Core.Model.Strategies
             AssertHierarchyReplacement(consequences, expectedNewRootUuid, expectedOldRootUuid, expectedDeletedUnits, expectedAddedUuids);
         }
 
-        //TODO: Also test the actual updates
-        //TODO: Integration test should just test a simple scenario to ensure that db changes work as expected and tesk refs are transferred
-
         [Fact, Description("Verifies if we detect if an existing unit has been moved one of the new units")]
         public void ComputeUpdate_Detects_Units_Moved_To_Newly_Added_Parent()
         {
@@ -382,6 +379,45 @@ namespace Tests.Unit.Core.Model.Strategies
 
 
             PrepareConnectedOrganization(root);
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            Assert.True(consequences.Ok);
+            AssertHierarchies(externalTree, ConvertToExternalTree(_organization.GetRoot()));
+        }
+
+        [Fact]
+        public void PerformUpdate_With_Root_Swap_Within_CurrentHierarchy()
+        {
+            var (_, _, externalTree, _) = CreateTreeWithRootSwappedUsingCurrentTree();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            Assert.True(consequences.Ok);
+            AssertHierarchies(externalTree, ConvertToExternalTree(_organization.GetRoot()));
+        }
+
+        [Fact]
+        public void PerformUpdate_With_Root_Replacement_With_New_Unit()
+        {
+            var (_, _, externalTree, _) = CreateTreeWithReplacementWithNewUnit();
+
+            //Act
+            var consequences = _sut.PerformUpdate(externalTree);
+
+            //Assert
+            Assert.True(consequences.Ok);
+            AssertHierarchies(externalTree, ConvertToExternalTree(_organization.GetRoot()));
+        }
+
+        [Fact]
+        public void PerformUpdate_With_Entire_Hierarchy_Replacement()
+        {
+            var (_, _, externalTree, _, _) = CreateTreeWithHierarchyReplacement();
 
             //Act
             var consequences = _sut.PerformUpdate(externalTree);
@@ -753,9 +789,9 @@ namespace Tests.Unit.Core.Model.Strategies
             return (root, externalTree, randomLeafWhichMustBeMovedToRoot);
         }
 
-        private (Guid expectedOldRoot, Guid expectedNewRoot, ExternalOrganizationUnit externalTree, IEnumerable<OrganizationUnit> expectedMovedUnitsToNewRoot) CreateTreeWithRootSwappedUsingCurrentTree()
+        private (Guid expectedOldRoot, Guid expectedNewRoot, ExternalOrganizationUnit externalTree, IEnumerable<OrganizationUnit> expectedMovedUnitsToNewRoot) CreateTreeWithRootSwappedUsingCurrentTree(bool enforceCleanHierarchy = false)
         {
-            PrepareConnectedOrganization();
+            PrepareConnectedOrganization(enforceCompleteSync: enforceCleanHierarchy);
             var root = _organization.GetRoot();
             var randomLefActingAsOldRoot = root
                 .FlattenHierarchy()
