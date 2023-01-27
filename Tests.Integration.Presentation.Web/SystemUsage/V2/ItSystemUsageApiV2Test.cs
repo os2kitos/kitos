@@ -286,6 +286,33 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertExpectedUsageShallow(system2UsageOrg1, dtos);
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_Specific_ItSystemUsage_Permissions(OrganizationRole userRole, bool expectRead, bool expectModify, bool expectDelete)
+        {
+            //Arrange
+            var (token, user, organization1, system) = await CreatePrerequisitesAsync();
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, userRole, organization2.Id).DisposeAsync();
+
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organization1.Id);
+            var systemUsageOrg2 = await ItSystemHelper.TakeIntoUseAsync(system.Id, organization2.Id);
+
+            //Act
+            var permissionsResponseDto = await ItSystemUsageV2Helper.GetPermissionsAsync(token, systemUsageOrg2.Uuid);
+
+            //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
+            var expected = new ResourcePermissionsResponseDTO()
+            {
+                Read = expectRead,
+                Modify = expectModify,
+                Delete = expectDelete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
         [Fact]
         public async Task Can_Get_Specific_ItSystemUsage()
         {
@@ -841,7 +868,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             gdprResponse = dto.GDPR;
             AssertGDPR(gdprVersion3, gdprResponse);
         }
-        
+
         [Fact]
         public async Task Can_PATCH_Validity()
         {
@@ -873,7 +900,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await ItSystemUsageV2Helper.SendPatchValidity(token, usageDto.Uuid, validityVersion2)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
-            
+
             //Assert version 2
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, usageDto.Uuid);
             generalResponse = dto.General.Validity;
@@ -1736,13 +1763,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return mappedFullData;
         }
 
-        private async Task<(GeneralDataWriteRequestDTO generalData, 
-            OrgUnitDTO unit1, 
-            OrganizationUsageWriteRequestDTO organizationUsageData, 
-            Guid[] addedTaskRefs, 
+        private async Task<(GeneralDataWriteRequestDTO generalData,
+            OrgUnitDTO unit1,
+            OrganizationUsageWriteRequestDTO organizationUsageData,
+            Guid[] addedTaskRefs,
             Guid[] removedTaskRefs,
-            LocalKLEDeviationsRequestDTO kleDeviations, 
-            IEnumerable<ExternalReferenceDataWriteRequestDTO> externalReferences, 
+            LocalKLEDeviationsRequestDTO kleDeviations,
+            IEnumerable<ExternalReferenceDataWriteRequestDTO> externalReferences,
             IEnumerable<RoleAssignmentRequestDTO> roles,
             GDPRWriteRequestDTO gdpr,
             ArchivingWriteRequestDTO archiving)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
@@ -1833,13 +1860,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> CreateNewExternalReferenceDataWithOldUuid(IEnumerable<ExternalReferenceDataResponseDTO> createExternalReferences)
         {
             return createExternalReferences.Select(externalReference => new UpdateExternalReferenceDataWriteRequestDTO
-                {
-                    Uuid = externalReference.Uuid,
-                    Title = A<string>(),
-                    DocumentId = A<string>(),
-                    Url = A<string>(),
-                    MasterReference = externalReference.MasterReference
-                })
+            {
+                Uuid = externalReference.Uuid,
+                Title = A<string>(),
+                DocumentId = A<string>(),
+                Url = A<string>(),
+                MasterReference = externalReference.MasterReference
+            })
                 .ToList();
         }
 
@@ -1854,12 +1881,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     });
         }
 
-        private IEnumerable<T> CreateExternalReferenceDataDTOs<T>() where T: ExternalReferenceDataWriteRequestDTO
+        private IEnumerable<T> CreateExternalReferenceDataDTOs<T>() where T : ExternalReferenceDataWriteRequestDTO
         {
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             return Many<T>().Transform(WithRandomMaster).ToList();
         }
-        
+
         private LocalKLEDeviationsRequestDTO CreateLocalKLEDeviationsRequestDTO(Guid[] addedUuids, Guid[] removedUuids)
         {
             return new LocalKLEDeviationsRequestDTO
@@ -1923,7 +1950,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
             var sensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList();
-            if(sensitivityLevels.Contains(DataSensitivityLevelChoice.PersonData) == false)
+            if (sensitivityLevels.Contains(DataSensitivityLevelChoice.PersonData) == false)
                 sensitivityLevels.Add(DataSensitivityLevelChoice.PersonData);
 
             gdprInput.DataSensitivityLevels = sensitivityLevels; //Must be unique
@@ -2056,7 +2083,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
         }
 
-        private IEnumerable<T> WithRandomMaster<T>(IEnumerable<T> references) where T: ExternalReferenceDataWriteRequestDTO
+        private IEnumerable<T> WithRandomMaster<T>(IEnumerable<T> references) where T : ExternalReferenceDataWriteRequestDTO
         {
             var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
             orderedRandomly.First().MasterReference = true;
@@ -2092,7 +2119,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     }).ToList());
         }
 
-        private static void AssertExternalReferenceResults(IReadOnlyCollection<ExternalReferenceDataWriteRequestDTO> expected, ItSystemUsageResponseDTO actual) 
+        private static void AssertExternalReferenceResults(IReadOnlyCollection<ExternalReferenceDataWriteRequestDTO> expected, ItSystemUsageResponseDTO actual)
         {
             Assert.Equal(expected.Count, actual.ExternalReferences.Count());
 
