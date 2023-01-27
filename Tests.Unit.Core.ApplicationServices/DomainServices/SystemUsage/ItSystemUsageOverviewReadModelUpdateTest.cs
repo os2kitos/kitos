@@ -126,7 +126,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 User = user,
                 UserId = user.Id,
-                Role = new ()
+                Role = new()
                 {
                     Id = A<int>()
                 }
@@ -286,6 +286,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Assert
             //System usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
+            Assert.Equal(systemUsage.Uuid, readModel.SourceEntityUuid);
             Assert.Equal(systemUsage.OrganizationId, readModel.OrganizationId);
             Assert.Equal(systemUsage.IsActiveAccordingToDateFields, readModel.ActiveAccordingToValidityPeriod);
             Assert.Equal(systemUsage.IsActiveAccordingToLifeCycle, readModel.ActiveAccordingToLifeCycle);
