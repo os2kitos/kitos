@@ -458,6 +458,7 @@
     <Compile Include="Models\API\V2\Request\Shared\ExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Shared\UpdateExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Shared\ResourcePermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ExternalReferenceDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasExternalReference.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
