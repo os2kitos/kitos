@@ -987,6 +987,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.RemovePersonalDataOption(id, A<GDPRPersonalDataOption>()));
         }
 
+        //TODO: Get permissions - Read only, Read+ modify, Read+ modify+delete, None (forbidden), error
+
         private static void AssertArchivePeriod(ArchivePeriod expected, ArchivePeriod actual)
         {
             Assert.Equal(expected.StartDate, actual.StartDate);
