@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -22,7 +23,22 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
     public class ItSystemUsageOverviewReadModelsTest : WithAutoFixture
     {
         [Fact]
-        public async Task Can_Query_And_Page_ReadModels()
+        public async Task Can_Query_And_Page_ReadModels_Using_Db_Id()
+        {
+            await TestQueryAndPaging(async q => await ItSystemUsageHelper.QueryReadModelByNameContent(q.orgId, q.query, q.top, q.skip));
+        }
+
+        [Fact]
+        public async Task Can_Query_And_Page_ReadModels_Using_Uuid()
+        {
+            await TestQueryAndPaging(async q =>
+            {
+                var orgUuid = DatabaseAccess.GetEntityUuid<Organization>(q.orgId);
+                return await ItSystemUsageHelper.QueryReadModelByNameContent(orgUuid, q.query, q.top, q.skip);
+            });
+        }
+
+        private async Task TestQueryAndPaging(Func<(int orgId, string query, int top, int skip), Task<IEnumerable<ItSystemUsageOverviewReadModel>>> getPage)
         {
             //Arrange
             var organizationId = TestEnvironment.DefaultOrganizationId;
@@ -41,8 +57,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
 
             //Act
-            var page1 = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 0)).ToList();
-            var page2 = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 2)).ToList();
+            var page1 = (await getPage((organizationId, suffix, 2, 0))).ToList();
+            var page2 = (await getPage((organizationId, suffix, 2, 2))).ToList();
 
             //Assert
             Assert.Equal(2, page1.Count);
@@ -53,6 +69,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(name3, page2.Single().SystemName);
         }
 
+        //TODO: Extend with the uuids
         [Fact]
         public async Task ReadModels_Contain_Correct_Content()
         {
@@ -135,7 +152,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
             var isHoldingDocument = A<bool>();
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
-             
+
             // Responsible Organization Unit
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId).DisposeAsync(); //Adding default organization as organization unit
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId).DisposeAsync(); //Using default organization as responsible organization unit
@@ -944,27 +961,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
             readModel = Assert.Single(readModels);
             Assert.Empty(readModel.RoleAssignments);
-        }
-
-        private async Task<ItSystemUsageOverviewReadModel> Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime expirationDate)
-        {
-            var systemName = A<string>();
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
-            await ItSystemUsageHelper.SendSetExpirationDateRequestAsync(systemUsage.Id, organizationId, expirationDate);
-
-            //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
-            Console.Out.WriteLine("Read models are up to date");
-
-
-            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
-
-            var readModel = Assert.Single(readModels);
-            Console.Out.WriteLine("Read model found");
-
-            return readModel;
         }
 
         private static async Task WaitForReadModelQueueDepletion()
