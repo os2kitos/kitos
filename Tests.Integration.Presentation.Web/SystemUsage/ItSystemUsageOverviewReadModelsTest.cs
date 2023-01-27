@@ -231,6 +231,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             // From System Usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
+            Assert.Equal(systemUsage.Uuid, readModel.SourceEntityUuid);
             Assert.Equal(organizationId, readModel.OrganizationId);
             Assert.Equal(systemUsageVersion, readModel.Version);
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
@@ -272,6 +273,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(businessType.Id, readModel.ItSystemBusinessTypeId);
+            Assert.Equal(businessType.Uuid, readModel.ItSystemBusinessTypeUuid);
             Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
             Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
             Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
@@ -284,6 +286,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+            Assert.Equal(systemParent.Uuid, readModel.ParentItSystemUuid);
             Assert.Equal(systemParentDisabled, readModel.ParentItSystemDisabled);
 
             // Role assignment
@@ -291,6 +294,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Found one role assignment as expected");
 
             Assert.Equal(role.Id, roleAssignment.RoleId);
+            Assert.Equal(DatabaseAccess.GetEntityUuid<ItSystemRole>(role.Id), roleAssignment.RoleUuid);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.FullName, roleAssignment.UserFullName);
             Assert.Equal(user.Email, roleAssignment.Email);
@@ -319,12 +323,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // DataProcessingRegistration
             Assert.Equal(dataProcessingRegistration.Name, readModel.DataProcessingRegistrationNamesAsCsv);
             Assert.Equal(yesNoIrrelevantOption.GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
-            Assert.Single(readModel.DataProcessingRegistrations);
+            var dpr = Assert.Single(readModel.DataProcessingRegistrations);
+            Assert.Equal(dataProcessingRegistration.Uuid, dpr.DataProcessingRegistrationUuid);
 
             // DependsOnInterfaces 
             Assert.Equal(relationInterfaceName, readModel.DependsOnInterfacesNamesAsCsv);
             var rmDependsOnInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(relationInterface.Id, rmDependsOnInterface.InterfaceId);
+            Assert.Equal(relationInterface.Uuid, rmDependsOnInterface.InterfaceUuid);
             Assert.Equal(relationInterfaceName, rmDependsOnInterface.InterfaceName);
 
             //Incoming system usages
@@ -337,6 +343,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(outgoingRelationSystemName, readModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
             var rmOutgoingRelatedItSystemUsage = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
             Assert.Equal(outgoingRelationSystemUsage.Id, rmOutgoingRelatedItSystemUsage.ItSystemUsageId);
+            Assert.Equal(outgoingRelationSystemUsage.Uuid, rmOutgoingRelatedItSystemUsage.ItSystemUsageUuid);
             Assert.Equal(outgoingRelationSystemName, rmOutgoingRelatedItSystemUsage.ItSystemUsageName);
         }
 
