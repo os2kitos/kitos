@@ -18,8 +18,10 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 {
@@ -34,17 +36,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private readonly IItSystemUsageResponseMapper _responseMapper;
         private readonly IItSystemUsageWriteService _writeService;
         private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
+        private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
 
         public ItSystemUsageV2Controller(
             IItSystemUsageService itSystemUsageService,
             IItSystemUsageResponseMapper responseMapper,
             IItSystemUsageWriteService writeService,
-            IItSystemUsageWriteModelMapper writeModelMapper)
+            IItSystemUsageWriteModelMapper writeModelMapper,
+            IResourcePermissionsResponseMapper permissionsResponseMapper)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
             _writeService = writeService;
             _writeModelMapper = writeModelMapper;
+            _permissionsResponseMapper = permissionsResponseMapper;
         }
 
         /// <summary>
@@ -124,8 +129,30 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .GetByUuid(systemUsageUuid)
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific IT-System usage (a specific IT-System in a specific Organization)
+        /// </summary>
+        /// <param name="systemUsageUuid">UUID of the system usage entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{systemUsageUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItSystemUsagePermissions([NonEmptyGuid] Guid systemUsageUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itSystemUsageService
+                .GetPermissions(systemUsageUuid)
+                .Select(_permissionsResponseMapper.Map)
                 .Match(Ok, FromOperationError);
         }
 
@@ -272,7 +299,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .GetByUuid(systemUsageUuid)
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Bind(usage =>
                     usage.GetUsageRelation(systemRelationUuid)
                         .Match<Result<SystemRelation, OperationError>>

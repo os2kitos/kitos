@@ -134,7 +134,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowReadReturns(itSystemUsage, true);
 
             //Act
-            var result = _sut.GetByUuid(uuid);
+            var result = _sut.GetReadableItSystemUsageByUuid(uuid);
 
             //Assert
             Assert.True(result.Ok);
@@ -150,7 +150,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectUsageRepositoryAsQueryable(itSystemUsage);
 
             //Act
-            var result = _sut.GetByUuid(uuid);
+            var result = _sut.GetReadableItSystemUsageByUuid(uuid);
 
             //Assert
             Assert.True(result.Failed);
@@ -167,7 +167,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowReadReturns(itSystemUsage, false);
 
             //Act
-            var result = _sut.GetByUuid(uuid);
+            var result = _sut.GetReadableItSystemUsageByUuid(uuid);
 
             //Assert
             Assert.True(result.Failed);

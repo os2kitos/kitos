@@ -425,6 +425,8 @@
     <Compile Include="Controllers\API\V2\Common\ApiV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\ExternalReferenceResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\IExternalReferenceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\IResourcePermissionsResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\ResourcePermissionsResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\GDPRPersonalDataMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
@@ -443,7 +445,7 @@
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\InternalApiV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Messages\PublicMessagesV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Mapping\PublicMessagesResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\PublicMessagesResponseMapper.cs" />
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\SubDataProcessorResponseDTO.cs" />
@@ -551,7 +553,7 @@
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\TechnicalPrecautionMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\KLE\KleOptionV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ArchiveDutyMappingExtenstions.cs" />
-    <Compile Include="Controllers\API\V2\Mapping\DtoModelV2MappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Extensions\QueryableApiResponseOrderingExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
