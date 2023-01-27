@@ -452,7 +452,7 @@ namespace Core.DomainServices.SystemUsage
                     assignment = new ItSystemUsageOverviewRoleAssignmentReadModel
                     {
                         Parent = destination,
-                        RoleId = incomingRight.RoleId,
+                        RoleId = incomingRight.Role.Id,
                         RoleUuid = incomingRight.Role.Uuid,
                         UserId = incomingRight.UserId
                     };

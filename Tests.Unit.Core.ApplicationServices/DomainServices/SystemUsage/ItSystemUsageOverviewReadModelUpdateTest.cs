@@ -126,7 +126,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 User = user,
                 UserId = user.Id,
-                RoleId = A<int>()
+                Role = new ()
+                {
+                    Id = A<int>()
+                }
             };
             var contract = new ItContract
             {
@@ -321,6 +324,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.BelongsTo.Id, readModel.ItSystemRightsHolderId);
             Assert.Equal(system.BelongsTo.Name, readModel.ItSystemRightsHolderName);
             Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);
+            Assert.Equal(system.BusinessType.Uuid, readModel.ItSystemBusinessTypeUuid);
             Assert.Equal(system.BusinessType.Name, readModel.ItSystemBusinessTypeName);
 
             //Parent System
@@ -332,11 +336,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.GetFullName(), roleAssignment.UserFullName);
-            Assert.Equal(right.RoleId, roleAssignment.RoleId);
+            Assert.Equal(right.Role.Id, roleAssignment.RoleId);
+            Assert.Equal(right.Role.Uuid, roleAssignment.RoleUuid);
             Assert.Equal(user.Email, roleAssignment.Email);
 
             //Responsible Organization Unit
             Assert.Equal(organizationUnit.Id, readModel.ResponsibleOrganizationUnitId);
+            Assert.Equal(organizationUnit.Uuid, readModel.ResponsibleOrganizationUnitUuid);
             Assert.Equal(organizationUnit.Name, readModel.ResponsibleOrganizationUnitName);
 
             //KLE
@@ -367,6 +373,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(dataProcessingRegistration.Name, readModel.DataProcessingRegistrationNamesAsCsv);
             Assert.Equal(dataProcessingRegistration.IsAgreementConcluded.GetValueOrDefault(YesNoIrrelevantOption.UNDECIDED).GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
             var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
+            Assert.Equal(dataProcessingRegistration.Uuid, rmDataProcessingRegistration.DataProcessingRegistrationUuid);
             Assert.Equal(dataProcessingRegistration.Name, rmDataProcessingRegistration.DataProcessingRegistrationName);
             Assert.Equal(dataProcessingRegistration.IsAgreementConcluded, rmDataProcessingRegistration.IsAgreementConcluded);
 
@@ -374,18 +381,21 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(outgoingRelationInterface.Name, readModel.DependsOnInterfacesNamesAsCsv);
             var rmDependsOnInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(outgoingRelationInterface.Id, rmDependsOnInterface.InterfaceId);
+            Assert.Equal(outgoingRelationInterface.Uuid, rmDependsOnInterface.InterfaceUuid);
             Assert.Equal(outgoingRelationInterface.Name, rmDependsOnInterface.InterfaceName);
 
             //Outgoing Relation systems
             Assert.Equal(outgoingRelationItSystem.Name, readModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
             var rmDependsOnSystem = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
             Assert.Equal(outgoingRelationItSystemUsage.Id, rmDependsOnSystem.ItSystemUsageId);
+            Assert.Equal(outgoingRelationItSystemUsage.Uuid, rmDependsOnSystem.ItSystemUsageUuid);
             Assert.Equal(outgoingRelationItSystem.Name, rmDependsOnSystem.ItSystemUsageName);
 
             //Incoming Relations
             Assert.Equal(incomingRelationItSystem.Name, readModel.IncomingRelatedItSystemUsagesNamesAsCsv);
             var rmIncomingRelatedSystemUsage = Assert.Single(readModel.IncomingRelatedItSystemUsages);
             Assert.Equal(incomingRelationItSystemUsage.Id, rmIncomingRelatedSystemUsage.ItSystemUsageId);
+            Assert.Equal(incomingRelationItSystemUsage.Uuid, rmIncomingRelatedSystemUsage.ItSystemUsageUuid);
             Assert.Equal(incomingRelationItSystem.Name, rmIncomingRelatedSystemUsage.ItSystemUsageName);
         }
 
