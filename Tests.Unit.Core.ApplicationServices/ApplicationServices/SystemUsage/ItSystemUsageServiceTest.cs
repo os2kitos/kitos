@@ -507,7 +507,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
             var sensitiveDataLevel = SensitiveDataLevel.PERSONALDATA;
             var usageSensitiveDataLevel = CreateSensitiveDataLevel(itSystemUsage, sensitiveDataLevel);
-            
+
             itSystemUsage.SensitiveDataLevels.Add(usageSensitiveDataLevel);
 
             var personalDataOption = new ItSystemUsagePersonalData
@@ -807,7 +807,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             itSystemUsage.Organization.OrgUnits.Add(unit);
             itSystemUsage.Organization.OrgUnits.Add(targetUnit);
 
-            itSystemUsage.UsedBy = new List<ItSystemUsageOrgUnitUsage>{ CreateItSystemUsageOrgUnitUsage(itSystemUsage, unit) };
+            itSystemUsage.UsedBy = new List<ItSystemUsageOrgUnitUsage> { CreateItSystemUsageOrgUnitUsage(itSystemUsage, unit) };
 
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
@@ -916,7 +916,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystem = CreateItSystem();
             var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
 
-            itSystemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { new(){ItSystemUsage = itSystemUsage, SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA} };
+            itSystemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { new() { ItSystemUsage = itSystemUsage, SensitivityDataLevel = SensitiveDataLevel.PERSONALDATA } };
 
             var option = A<GDPRPersonalDataOption>();
 
@@ -959,7 +959,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var personalDataOption = new ItSystemUsagePersonalData { ItSystemUsage = itSystemUsage, PersonalData = option };
             itSystemUsage.PersonalDataOptions = new List<ItSystemUsagePersonalData> { personalDataOption };
-            
+
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
@@ -980,14 +980,53 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             Test_Command_Which_Fails_With_Usage_NotFound(id => _sut.RemovePersonalDataOption(id, A<GDPRPersonalDataOption>()));
         }
-        
+
         [Fact]
         public void RemovePersonalDataOption_Returns_Forbidden()
         {
             Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess(id => _sut.RemovePersonalDataOption(id, A<GDPRPersonalDataOption>()));
         }
 
-        //TODO: Get permissions - Read only, Read+ modify, Read+ modify+delete, None (forbidden), error
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Uuid = uuid };
+            ExpectUsageRepositoryAsQueryable(itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, read);
+            ExpectAllowModifyReturns(itSystemUsage, modify);
+            _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(delete);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+        }
+
+        [Fact]
+        public void Can_Get_Permissions_Returns_Not_Found()
+        {
+            //Arrange
+            var wrongUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Uuid = A<Guid>() };
+            ExpectUsageRepositoryAsQueryable(itSystemUsage);
+
+            //Act
+            var result = _sut.GetPermissions(wrongUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
 
         private static void AssertArchivePeriod(ArchivePeriod expected, ArchivePeriod actual)
         {
