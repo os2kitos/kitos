@@ -65,9 +65,9 @@
             if (typeof this.newUser !== "object") return;
             if (!(this.newOrg && this.newUser)) return;
 
-            var user = this.newUser;
-            const userToUpdateId = user.id;
+            const userToUpdateId = this.newUser.id;
             const newOrgId = this.newOrg.id;
+            var userName = this.newUser.text;
             var orgName = this.newOrg.text;
 
             const roleId = API.Models.OrganizationRole.LocalAdmin;
@@ -76,10 +76,10 @@
             
             var msg = this.notify.addInfoMessage("Arbejder ...", false);
             const self = this;
-            this.organizationRightService.createRight(newOrgId, userToUpdateId, roleId)
+            this.organizationRightService.create(newOrgId, userToUpdateId, roleId)
                 .then(() => {
-                    msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
-                    if (this.userId === user.id) {
+                    msg.toSuccessMessage(userName + " er blevet lokal administrator for " + orgName);
+                    if (this.userId === userToUpdateId) {
                         // Reload user
                         self.userService.reAuthorize();
                     }
@@ -87,7 +87,7 @@
                         .then(() => self.emitLocalAdminRightsUpdatedEvent());
 
                 }, () => {
-                    msg.toErrorMessage("Kunne ikke gøre " + user.text + " til lokal administrator for " + orgName);
+                    msg.toErrorMessage("Kunne ikke gøre " + userName + " til lokal administrator for " + orgName);
                 });
 
             this.newOrg = null;
@@ -105,7 +105,7 @@
             const roleId = right.role;
             var userId = right.userId;
 
-            return this.organizationRightService.removeRight(this.currentOrganizationId, organizationId, roleId, userId)
+            return this.organizationRightService.remove(this.currentOrganizationId, organizationId, roleId, userId)
                 .then(() => {
                     if (userId === this.userId) {
                         this.userService.reAuthorize();
@@ -146,13 +146,13 @@
             });
         }
 
-        private emitLocalAdminRightsUpdatedEvent() {
-            this.$scope.$broadcast("LocalAdminRights_Updated");
-        }
-
         private resetLocalAdminData() {
             const arrayLength = this.localAdmins.length;
             this.localAdmins.splice(0, arrayLength);
+        }
+
+        private emitLocalAdminRightsUpdatedEvent() {
+            this.$scope.$broadcast("LocalAdminRights_Updated");
         }
     }
 

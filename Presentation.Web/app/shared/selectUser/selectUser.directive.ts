@@ -46,7 +46,7 @@
                             //and once with the object value of select2 {id, text}.
                             //we only need the last one
                             if (typeof $scope.userModel !== 'object') return;
-                            
+
                             //timeout, otherwise we get the bad version of the model.
                             $timeout($scope.onSelect);
                         };
