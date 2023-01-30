@@ -210,7 +210,7 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 Uuid = log.ExternalUnitUuid,
                 Name = log.Name,
-                Category = log.Type.ToConnectionUpdateOrganizationUnitChangeCategory(),
+                Category = log.Type,
                 Description = log.Description
             };
         }

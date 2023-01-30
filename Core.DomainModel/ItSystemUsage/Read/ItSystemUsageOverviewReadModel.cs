@@ -50,6 +50,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public Organization.Organization Organization { get; set; }
         public int Id { get; set; }
         public int SourceEntityId { get; set; }
+        public Guid SourceEntityUuid { get; set; }
         public ItSystemUsage SourceEntity { get; set; }
         public string SystemName { get; set; }
         public bool ItSystemDisabled { get; set; }
@@ -59,14 +60,17 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string Note { get; set; }
         public string ParentItSystemName { get; set; }
         public int? ParentItSystemId { get; set; }
+        public Guid? ParentItSystemUuid { get; set; }
         public bool? ParentItSystemDisabled { get; set; }
         public string Version { get; set; }
         public string LocalCallName { get; set; }
         public string LocalSystemId { get; set; }
         public virtual ICollection<ItSystemUsageOverviewRoleAssignmentReadModel> RoleAssignments { get; set; }
         public string ItSystemUuid { get; set; }
+        public Guid? ResponsibleOrganizationUnitUuid { get; set; }
         public int? ResponsibleOrganizationUnitId { get; set; }
         public string ResponsibleOrganizationUnitName { get; set; }
+        public Guid? ItSystemBusinessTypeUuid { get; set; }
         public int? ItSystemBusinessTypeId { get; set; }
         public string ItSystemBusinessTypeName { get; set; }
         public int? ItSystemRightsHolderId { get; set; }

@@ -136,7 +136,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters)
         {
-            return Update(() => _systemUsageService.GetByUuid(systemUsageUuid), parameters);
+            return Update(() => _systemUsageService.GetReadableItSystemUsageByUuid(systemUsageUuid), parameters);
         }
         private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters)
         {
@@ -624,14 +624,14 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Maybe<OperationError> Delete(Guid itSystemUsageUuid)
         {
-            return _systemUsageService.GetByUuid(itSystemUsageUuid)
+            return _systemUsageService.GetReadableItSystemUsageByUuid(itSystemUsageUuid)
                 .Bind(usage => _systemUsageService.Delete(usage.Id))
                 .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {itSystemUsageUuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
 
         public Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters)
         {
-            return _systemUsageService.GetByUuid(fromSystemUsageUuid)
+            return _systemUsageService.GetReadableItSystemUsageByUuid(fromSystemUsageUuid)
                 .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
                 .Bind(usageAndIds =>
                     _systemUsageRelationsService.AddRelation
@@ -657,7 +657,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters)
         {
-            return _systemUsageService.GetByUuid(fromSystemUsageUuid)
+            return _systemUsageService.GetReadableItSystemUsageByUuid(fromSystemUsageUuid)
                 .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
                 .Bind(usageAndIds => ResolveRequiredId<SystemRelation>(relationUuid).Select(relationId => (usageAndIds.usage, relationId, usageAndIds.ids)))
                 .Bind(usageAndIds =>
@@ -677,7 +677,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         public Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid)
         {
             return _systemUsageService
-                .GetByUuid(itSystemUsageUuid)
+                .GetReadableItSystemUsageByUuid(itSystemUsageUuid)
                 .Bind<(int usageId, int relationId)>(usage =>
                 {
                     var usageRelation = _identityResolver.ResolveDbId<SystemRelation>(itSystemUsageRelationUuid);

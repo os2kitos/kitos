@@ -4,8 +4,8 @@ using System.Net;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response;
-using Presentation.Web.Controllers.API.V2.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Messages
 {

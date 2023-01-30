@@ -41,8 +41,24 @@ namespace Core.ApplicationServices.Extensions
             logs.AddRange(MapMovedOrganizationUnits(consequences));
             logs.AddRange(MapRemovedOrganizationUnits(consequences));
             logs.AddRange(MapConvertedOrganizationUnits(consequences));
+            logs.AddRange(MapRootChange(consequences));
 
             return logs;
+        }
+
+        private static IEnumerable<StsOrganizationConsequenceLog> MapRootChange(OrganizationTreeUpdateConsequences consequences)
+        {
+            var rootChangeEntry = consequences.RootChange.Select(rootChange => new StsOrganizationConsequenceLog
+            {
+                Name = rootChange.CurrentRoot.Name,
+                Type = ConnectionUpdateOrganizationUnitChangeType.RootChanged,
+                ExternalUnitUuid = rootChange.CurrentRoot.ExternalOriginUuid.GetValueOrDefault(),
+                Description = $"Organisationsroden ændres fra '{rootChange.CurrentRoot.Name}' til '{rootChange.NewRoot.Name}'"
+            });
+            if (rootChangeEntry.HasValue)
+            {
+                yield return rootChangeEntry.Value;
+            }
         }
 
         private static IEnumerable<StsOrganizationConsequenceLog> MapConvertedOrganizationUnits(OrganizationTreeUpdateConsequences consequences)
@@ -80,12 +96,28 @@ namespace Core.ApplicationServices.Extensions
                 .Select(moved =>
                 {
                     var (movedUnit, oldParent, newParent) = moved;
+
+                    string description;
+                    if (newParent == null)
+                    {
+                        description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til at være organisationsroden";
+                    }
+                    else if (oldParent == null)
+                    {
+                        description = $"'{movedUnit.Name}' flyttes til fremover at være underenhed for {newParent.Name}";
+                    }
+                    else
+                    {
+                        description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}";
+                    }
+
+
                     return new StsOrganizationConsequenceLog
                     {
                         Name = movedUnit.Name,
                         Type = ConnectionUpdateOrganizationUnitChangeType.Moved,
                         ExternalUnitUuid = movedUnit.ExternalOriginUuid.GetValueOrDefault(),
-                        Description = $"'{movedUnit.Name}' flyttes fra at være underenhed til '{oldParent.Name}' til fremover at være underenhed for {newParent.Name}"
+                        Description = description
                     };
                 })
                 .ToList();

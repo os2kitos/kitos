@@ -18,6 +18,7 @@ namespace Core.DomainModel.ItContract.Read
         public virtual Organization.Organization Organization { get; set; }
         public int Id { get; set; }
         public int SourceEntityId { get; set; }
+        public Guid SourceEntityUuid { get; set; }
         public virtual ItContract SourceEntity { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
