@@ -5,7 +5,10 @@ using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainServices.Model.Options;
 
 namespace Core.ApplicationServices.OptionTypes
 {
@@ -23,14 +26,19 @@ namespace Core.ApplicationServices.OptionTypes
             _organizationRepository = organizationRepository;
         }
 
-        public Result<(TOption option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid optionTypeUuid)
+        public Result<(OptionDescriptor<TOption> option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid optionTypeUuid)
         {
             var orgId = ResolveOrgId(organizationUuid);
             if (orgId.Failed)
             {
                 return orgId.Error;
             }
-            var businessTypeResult = _optionsTypeService.GetOptionByUuid(orgId.Value, optionTypeUuid);
+
+            var businessTypeResult = _optionsTypeService
+                .GetAllOptionsDetails(orgId.Value)
+                .FirstOrDefault(x => x.option.Option.Uuid == optionTypeUuid)
+                .FromNullable();
+
             if (businessTypeResult.IsNone)
             {
                 return new OperationError(OperationFailure.NotFound);
@@ -39,15 +47,10 @@ namespace Core.ApplicationServices.OptionTypes
             return businessTypeResult.Value;
         }
 
-        public Result<IEnumerable<TOption>, OperationError> GetOptionTypes(Guid organizationUuid)
+        public Result<IEnumerable<OptionDescriptor<TOption>>, OperationError> GetOptionTypes(Guid organizationUuid)
         {
-            var orgId = ResolveOrgId(organizationUuid);
-            if (orgId.Failed)
-            {
-                return orgId.Error;
-            }
-
-            return Result<IEnumerable<TOption>, OperationError>.Success(_optionsTypeService.GetAvailableOptions(orgId.Value));
+            return ResolveOrgId(organizationUuid)
+                .Select(orgId=> _optionsTypeService.GetAvailableOptionsDetails(orgId));
         }
 
         private Result<int, OperationError> ResolveOrgId(Guid organizationUuid)

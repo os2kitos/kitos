@@ -1,9 +1,8 @@
 ﻿using System;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Response.Options
 {
-    public class RoleOptionResponseDTO : IdentityNamePairResponseDTO
+    public class RoleOptionResponseDTO : RegularOptionResponseDTO
     {
         /// <summary>
         /// Determines if this role grants write access to the entity through which it has been created
@@ -12,8 +11,8 @@ namespace Presentation.Web.Models.API.V2.Response.Options
 
         public RoleOptionResponseDTO() { }
 
-        public RoleOptionResponseDTO(Guid uuid, string name, bool writeAccess)
-            : base(uuid, name)
+        public RoleOptionResponseDTO(Guid uuid, string name, bool writeAccess, string description)
+            : base(uuid, name,description)
         {
             WriteAccess = writeAccess;
         }
