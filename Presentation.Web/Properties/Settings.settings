@@ -32,8 +32,5 @@
     <Setting Name="SsoServiceProviderId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://kitos-local.strongminds.dk</Value>
     </Setting>
-    <Setting Name="CorsOrigins" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:4200</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

@@ -18,6 +18,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("ItSystemUsageOverviewInterfaceReadModel_index_InterfaceId", 0);
 
+            Property(x => x.InterfaceUuid).IsRequired();
+
             Property(x => x.InterfaceName)
                 .IsRequired()
                 .HasMaxLength(ItInterface.MaxNameLength)

@@ -18,6 +18,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("ItSystemUsageOverviewArchivePeriodReadModel_index_DataProcessingRegistrationId", 0);
 
+            Property(x => x.DataProcessingRegistrationUuid).IsRequired();
+
             Property(x => x.DataProcessingRegistrationName)
                 .IsRequired()
                 .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)

@@ -400,7 +400,7 @@ namespace Core.ApplicationServices.Contract.Write
                  "system usage",
                  contract,
                  systemUsageUuids.FromNullable(),
-                 (systemUsageUuid) => _usageService.GetByUuid(systemUsageUuid),
+                 (systemUsageUuid) => _usageService.GetReadableItSystemUsageByUuid(systemUsageUuid),
                  itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage).ToList(),
                  (itContract, usage) => itContract.AssignSystemUsage(usage),
                  (itContract, usage) => itContract.RemoveSystemUsage(usage)

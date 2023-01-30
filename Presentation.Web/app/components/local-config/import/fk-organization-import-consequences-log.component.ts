@@ -48,7 +48,8 @@
                 Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.Renamed,
                 Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.Moved,
                 Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.Converted,
-                Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.Deleted
+                Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.Deleted,
+                Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.RootChanged
             ].map(optionType => {
                 return <Kitos.Utility.KendoGrid.IKendoParameter>{
                     textValue: Kitos.Models.ViewModel.Organization.ConnectionUpdateOrganizationUnitChangeCategoryOptions.getText(optionType)

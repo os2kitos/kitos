@@ -311,6 +311,10 @@ namespace Presentation.Web.Ninject
 
             //External references
             kernel.Bind<IExternalReferenceResponseMapper>().To<ExternalReferenceResponseMapper>().InCommandScope(Mode);
+
+            //Permissions
+            kernel.Bind<IResourcePermissionsResponseMapper>().To<ResourcePermissionsResponseMapper>().InCommandScope(Mode);
+
         }
 
         private void RegisterSSO(IKernel kernel)

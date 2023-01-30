@@ -6,7 +6,7 @@ using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
-namespace Presentation.Web.Controllers.API.V2.Mapping
+namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public static class DtoModelV2MappingExtensions
     {
