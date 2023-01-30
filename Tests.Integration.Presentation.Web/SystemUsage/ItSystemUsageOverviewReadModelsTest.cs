@@ -69,7 +69,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(name3, page2.Single().SystemName);
         }
 
-        //TODO: Extend with the uuids
         [Fact]
         public async Task ReadModels_Contain_Correct_Content()
         {
