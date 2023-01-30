@@ -172,11 +172,6 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
-        private static bool CanIssueTokenTo(User user)
-        {
-            return user.HasApiAccess.GetValueOrDefault(false) == false;
-        }
-
         // POST api/Authorize
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
@@ -220,7 +215,8 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [AllowAnonymous]
-        public HttpResponseMessage PostLogout(bool? logout)
+        [Route("api/authorize/log-out")]
+        public HttpResponseMessage PostLogout()
         {
             try
             {

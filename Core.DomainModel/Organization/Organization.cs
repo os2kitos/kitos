@@ -372,11 +372,16 @@ namespace Core.DomainModel.Organization
             var addedError = actualParent.AddChild(newUnit);
             if (addedError.IsNone)
             {
-                newUnit.Organization = this;
-                OrgUnits.Add(newUnit);
+                IncludeOrganizationUnit(newUnit);
             }
 
             return addedError;
+        }
+
+        private void IncludeOrganizationUnit(OrganizationUnit newUnit)
+        {
+            newUnit.Organization = this;
+            OrgUnits.Add(newUnit);
         }
 
         public Maybe<OperationError> RelocateOrganizationUnit(OrganizationUnit movedUnit, OrganizationUnit oldParentUnit, OrganizationUnit newParentUnit, bool includeSubtree)
@@ -509,6 +514,64 @@ namespace Core.DomainModel.Organization
                 .Select(x => x.User)
                 .ToList()
                 .AsReadOnly();
+        }
+
+        /// <summary>
+        /// Replaces the current root organization unit with a new one and relocates the current root hierarchy below the new root
+        /// </summary>
+        /// <param name="newRoot"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public Maybe<OperationError> ReplaceRoot(OrganizationUnit newRoot)
+        {
+            if (newRoot == null)
+            {
+                throw new ArgumentNullException(nameof(newRoot));
+            }
+
+            if (newRoot.Organization != null && newRoot.Organization != this)
+            {
+                return new OperationError("newRoot resides from a different organization", OperationFailure.BadInput);
+            }
+
+            var currentOrgRoot = GetRoot();
+            if (currentOrgRoot == newRoot)
+            {
+                return new OperationError("newRoot eq current root", OperationFailure.BadInput);
+            }
+
+            if (GetOrganizationUnit(newRoot.Uuid).IsNone)
+            {
+                //Associate if not already added
+                IncludeOrganizationUnit(newRoot);
+            }
+
+            var currentParent = newRoot.Parent;
+
+            if (currentParent != null)
+            {
+                var removeChildError = currentParent.RemoveChild(newRoot);
+                if (removeChildError.HasValue)
+                {
+                    return removeChildError.Value;
+                }
+            }
+
+            //Move current root as child of the new root
+            var addChildError = newRoot.AddChild(currentOrgRoot);
+            if (addChildError.HasValue)
+            {
+                return addChildError.Value;
+            }
+
+            //Move owned tasks (if any)
+            var ownedTasks = currentOrgRoot.OwnedTasks.ToList();
+            currentOrgRoot.OwnedTasks.Clear();
+            ownedTasks.ForEach(taskRef =>
+            {
+                newRoot.OwnedTasks.Add(taskRef);
+                taskRef.OwnedByOrganizationUnit = newRoot;
+            });
+            return Maybe<OperationError>.None;
         }
     }
 }
