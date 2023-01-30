@@ -53,6 +53,7 @@ namespace Core.DomainServices.SystemUsage
         public void Apply(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.SourceEntityId = source.Id;
+            destination.SourceEntityUuid = source.Uuid;
             destination.OrganizationId = source.OrganizationId;
             destination.SystemName = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
@@ -164,6 +165,7 @@ namespace Core.DomainServices.SystemUsage
                     destinationCollection.Add(relatedItSystemUsage);
                 }
                 relatedItSystemUsage.ItSystemUsageId = usageFromSource.Id;
+                relatedItSystemUsage.ItSystemUsageUuid = usageFromSource.Uuid;
                 relatedItSystemUsage.ItSystemUsageName = usageFromSource.ItSystem?.Name;
             }
         }
@@ -208,6 +210,7 @@ namespace Core.DomainServices.SystemUsage
                     destination.DependsOnInterfaces.Add(dependsOnInterface);
                 }
                 dependsOnInterface.InterfaceId = incomingDependsOnInterface.Id;
+                dependsOnInterface.InterfaceUuid = incomingDependsOnInterface.Uuid;
                 dependsOnInterface.InterfaceName = incomingDependsOnInterface.Name;
             }
         }
@@ -257,6 +260,7 @@ namespace Core.DomainServices.SystemUsage
                 }
 
                 dataProcessingRegistration.DataProcessingRegistrationId = incomingDataProcessingRegistration.Id;
+                dataProcessingRegistration.DataProcessingRegistrationUuid = incomingDataProcessingRegistration.Uuid;
                 dataProcessingRegistration.DataProcessingRegistrationName = incomingDataProcessingRegistration.Name;
                 dataProcessingRegistration.IsAgreementConcluded = incomingDataProcessingRegistration.IsAgreementConcluded;
             }
@@ -360,9 +364,10 @@ namespace Core.DomainServices.SystemUsage
         private void PatchItSystemBusinessType(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ItSystemBusinessTypeId = source.ItSystem.BusinessType?.Id;
+            destination.ItSystemBusinessTypeUuid = source.ItSystem.BusinessType?.Uuid;
             destination.ItSystemBusinessTypeName = GetNameOfItSystemOption(source.ItSystem, source.ItSystem.BusinessType, _businessTypeService);
         }
-        private void PatchItSystemRightsHolder(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchItSystemRightsHolder(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ItSystemRightsHolderId = source.ItSystem.BelongsTo?.Id;
             destination.ItSystemRightsHolderName = source.ItSystem.BelongsTo?.Name;
@@ -405,6 +410,7 @@ namespace Core.DomainServices.SystemUsage
         private static void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ResponsibleOrganizationUnitId = source.ResponsibleUsage?.OrganizationUnit?.Id;
+            destination.ResponsibleOrganizationUnitUuid = source.ResponsibleUsage?.OrganizationUnit?.Uuid;
             destination.ResponsibleOrganizationUnitName = source.ResponsibleUsage?.OrganizationUnit?.Name;
         }
 
@@ -412,6 +418,7 @@ namespace Core.DomainServices.SystemUsage
         {
             destination.ParentItSystemName = source.ItSystem.Parent?.Name;
             destination.ParentItSystemId = source.ItSystem.Parent?.Id;
+            destination.ParentItSystemUuid = source.ItSystem.Parent?.Uuid;
             destination.ParentItSystemDisabled = source.ItSystem.Parent?.Disabled;
         }
 
@@ -445,7 +452,8 @@ namespace Core.DomainServices.SystemUsage
                     assignment = new ItSystemUsageOverviewRoleAssignmentReadModel
                     {
                         Parent = destination,
-                        RoleId = incomingRight.RoleId,
+                        RoleId = incomingRight.Role.Id,
+                        RoleUuid = incomingRight.Role.Uuid,
                         UserId = incomingRight.UserId
                     };
                     destination.RoleAssignments.Add(assignment);

@@ -37,6 +37,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(x => x.SourceEntityId)
                 .WillCascadeOnDelete(false);
 
+            Property(x => x.SourceEntityUuid).IsRequired();
+
             //No index bc we don't know how long it might be
             Property(x => x.DataProcessorNamesAsCsv).IsOptional();
             Property(x => x.SubDataProcessorNamesAsCsv).IsOptional();
