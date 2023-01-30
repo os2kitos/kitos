@@ -5,6 +5,7 @@
         TypeId: number;
         /** Cvr number */
         Cvr: string;
+        ForeignCvr: string;
         AccessModifier: AccessModifier;
         Uuid: any;
         OrgUnits: Array<IOrganizationUnit>;
