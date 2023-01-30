@@ -3,7 +3,7 @@ using System.Linq;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Internal.Response;
 
-namespace Presentation.Web.Controllers.API.V2.Mapping
+namespace Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping
 {
     public static class PublicMessagesResponseMapper
     {

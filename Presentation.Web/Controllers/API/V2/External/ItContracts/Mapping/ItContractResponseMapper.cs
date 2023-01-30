@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.ItContract;
-using Presentation.Web.Controllers.API.V2.Mapping;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
