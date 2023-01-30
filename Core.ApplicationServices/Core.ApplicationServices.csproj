@@ -102,6 +102,7 @@
     <Compile Include="Authorization\Permissions\DefineOrganizationTypePermission.cs" />
     <Compile Include="Authorization\Permissions\SystemUsageMigrationPermission.cs" />
     <Compile Include="Authorization\Permissions\VisibilityControlPermission.cs" />
+    <Compile Include="Authorization\ResourcePermissionsResult.cs" />
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />

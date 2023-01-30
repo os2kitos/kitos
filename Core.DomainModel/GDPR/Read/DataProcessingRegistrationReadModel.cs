@@ -23,6 +23,7 @@ namespace Core.DomainModel.GDPR.Read
         public virtual Organization.Organization Organization { get; set; }
 
         public int SourceEntityId { get; set; }
+        public Guid SourceEntityUuid { get; set; }
 
         public string MainReferenceUserAssignedId { get; set; }
 

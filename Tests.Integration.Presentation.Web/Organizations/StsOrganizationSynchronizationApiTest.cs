@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Abstractions.Types;
 using Core.DomainModel;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Tracking;
 using Core.DomainServices.Extensions;
@@ -204,7 +205,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Added, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, c.Category));
         }
 
         [Fact]
@@ -224,7 +225,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Deleted, c.Category));
         }
 
         [Fact]
@@ -260,7 +261,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Renamed, c.Category));
             Assert.Equal(consequences.Consequences.Select(x => x.Uuid).OrderBy(x => x), uuidsOfRenamedUnits.OrderBy(x => x));
         }
 
@@ -296,7 +297,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeCategory.Moved, c.Category));
+            Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Moved, c.Category));
         }
 
         [Fact]
@@ -338,12 +339,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
             var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
-            var conversion = Assert.Single(consequences.Consequences.Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeCategory.Converted));
+            var conversion = Assert.Single(consequences.Consequences.Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeType.Converted));
             Assert.Equal(expectedConvertedUnit, conversion.Uuid);
         }
 
         [Fact]
-        public async Task Can_PUT_UPDATE_Consequences_With_Addition_Consequences()
+        public async Task Can_PUT_UPDATE_With_Addition_Consequences()
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -355,11 +356,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
             using var consequencesBeforePutResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, consequencesBeforePutResponse.StatusCode);
             var consequencesBeforePut = await consequencesBeforePutResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
-            var expectedAdded = consequencesBeforePut.Consequences.ToList().Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeCategory.Added).Select(x => x.Uuid).ToHashSet();
+            var expectedAdded = consequencesBeforePut.Consequences.ToList().Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeType.Added).Select(x => x.Uuid).ToHashSet();
             Assert.NotEmpty(expectedAdded);
 
             //Act
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
 
             var externalUnits = DatabaseAccess.MapFromEntitySet<OrganizationUnit, IEnumerable<Guid?>>(repository =>
@@ -375,7 +376,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
-        public async Task Can_PUT_UPDATE_Consequences_With_Removal_Consequences()
+        public async Task Can_PUT_UPDATE_With_Removal_Consequences()
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -405,7 +406,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 .ToList();
 
             //Act
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
 
             var actualUuidsLeft = DatabaseAccess.MapFromEntitySet<OrganizationUnit, IEnumerable<Guid?>>(repository =>
@@ -434,7 +435,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
-        public async Task Can_PUT_UPDATE_Consequences_With_Rename_Consequences()
+        public async Task Can_PUT_UPDATE_With_Rename_Consequences()
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -460,7 +461,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             });
 
             //Act
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, levels, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
@@ -476,7 +477,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
-        public async Task Can_PUT_UPDATE_Consequences_With_Relocation_Consequences()
+        public async Task Can_PUT_UPDATE_With_Relocation_Consequences()
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -508,7 +509,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             });
 
             //Act
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie);
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, levels, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
@@ -521,7 +522,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Can_PUT_UPDATE_Consequences_With_SubscriptionChanges(bool initiallySubscribe)
+        public async Task Can_PUT_UPDATE_With_SubscriptionChanges(bool initiallySubscribe)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -530,7 +531,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels, initiallySubscribe);
 
             //Act
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels, cookie, !initiallySubscribe);
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, levels, cookie, !initiallySubscribe);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
@@ -556,7 +557,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
-        public async Task Can_PUT_UPDATE_Consequences_With_Conversion_Consequences()
+        public async Task Can_PUT_UPDATE_With_Conversion_Consequences()
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -586,12 +587,66 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 });
 
             //Act
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, levels - 1, cookie);
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, levels - 1, cookie);
 
             //Assert
             var convertedUnit = DatabaseAccess.MapFromEntitySet<OrganizationUnit, OrganizationUnit>(repo => repo.AsQueryable().ByUuid(expectedConversionUuid));
             Assert.Equal(OrganizationUnitOrigin.Kitos, convertedUnit.Origin);
             Assert.Null(convertedUnit.ExternalOriginUuid);
+        }
+
+        [Fact]
+        public async Task Can_PUT_UPDATE_With_Hierarchy_Replacement_Consequences()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int firstRequestLevels = 2;
+            const int secondRequestLevels = 3;
+            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, firstRequestLevels);
+
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(units =>
+            {
+                var externalUnits = units.AsQueryable().Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
+                //Change uuid of all of them to provoke a swap
+                foreach (var organizationUnit in externalUnits)
+                {
+                    organizationUnit.ExternalOriginUuid = Guid.NewGuid();
+                }
+            });
+
+            //Act
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_PUT_UPDATE_With_Hierarchy_Swap()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
+            const int firstRequestLevels = 2;
+            const int secondRequestLevels = 3;
+            using var postResponse = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, firstRequestLevels);
+
+            //Swap root and random leaf in hierarchy
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(units =>
+            {
+
+                var externalUnits = units.AsQueryable().Where(x => x.Organization.Uuid == targetOrgUuid && x.Origin == OrganizationUnitOrigin.STS_Organisation).ToList();
+                var root = externalUnits.Single(x => x.Parent == null);
+                var leaf = externalUnits.Where(x => x.IsLeaf()).RandomItem();
+
+                var rootUuid = root.ExternalOriginUuid;
+                var leafUuid = leaf.ExternalOriginUuid;
+                root.ExternalOriginUuid = leafUuid;
+                leaf.ExternalOriginUuid = rootUuid;
+            });
+
+            //Act
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, secondRequestLevels, cookie);
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
         }
 
         [Fact]
@@ -611,7 +666,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var additionConsequences = additionConsequencesBody.Consequences.ToList();
 
             //Update consequences in order to log addition consequences
-            using var additionPutResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
+            using var additionPutResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, additionPutResponse.StatusCode);
 
             //Setup other consequences
@@ -661,7 +716,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var otherConsequences = otherConsequencesBody.Consequences.ToList();
 
             //Log deletion, renaming, conversion and relocation changes
-            using var putResponse = await SendPutUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
+            using var putResponse = await SendPutUpdateStsOrganizationConnectionAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
 
             //Act
@@ -690,10 +745,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             Assert.Equal(otherConsequences.Count, otherLogsConsequences.Count);
             var consequenceCategories = otherLogsConsequences.Select(x => x.Category).ToList();
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Deleted, consequenceCategories);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Renamed, consequenceCategories);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Converted, consequenceCategories);
-            Assert.Contains(ConnectionUpdateOrganizationUnitChangeCategory.Moved, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Deleted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Renamed, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Converted, consequenceCategories);
+            Assert.Contains(ConnectionUpdateOrganizationUnitChangeType.Moved, consequenceCategories);
 
             AssertConsequenceLogs(otherConsequences, otherLogs);
         }
@@ -834,7 +889,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             return await HttpApi.GetWithCookieAsync(getUrl, cookie);
         }
 
-        private static async Task<HttpResponseMessage> SendPutUpdateConsequencesAsync(Guid targetOrgUuid, int levels, Cookie cookie, bool subscribe = false)
+        private static async Task<HttpResponseMessage> SendPutUpdateStsOrganizationConnectionAsync(Guid targetOrgUuid, int levels, Cookie cookie, bool subscribe = false)
         {
             var postUrl =
                 TestEnvironment.CreateUrl(

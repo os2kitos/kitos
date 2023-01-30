@@ -18,6 +18,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("ItSystemUsageOverviewUsingSystemUsageReadModel_index_ItSystemUsageId", 0);
 
+            Property(x => x.ItSystemUsageUuid)
+                .IsRequired()
+                .HasIndexAnnotation("ItSystemUsageOverviewUsingSystemUsageReadModel_index_ItSystemUsageUuid", 0);
+
             Property(x => x.ItSystemUsageName)
                 .IsRequired()
                 .HasMaxLength(ItSystem.MaxNameLength)

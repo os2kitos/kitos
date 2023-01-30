@@ -1561,7 +1561,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var systemUsageUuid = A<Guid>();
             var systemUsageId = A<int>();
             var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
-            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
             _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(systemToBeDeleted);
 
             //Act
@@ -1576,7 +1576,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var systemUsageUuid = A<Guid>();
-            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(new OperationError(OperationFailure.NotFound));
+            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(systemUsageUuid)).Returns(new OperationError(OperationFailure.NotFound));
 
             //Act
             var deleteResult = _sut.Delete(systemUsageUuid);
@@ -1594,7 +1594,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var systemUsageId = A<int>();
             var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
             var error = new OperationError(A<OperationFailure>());
-            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
             _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(error);
 
             //Act
@@ -2569,7 +2569,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void ExpectGetSystemUsageReturns(Guid systemUuid, Result<ItSystemUsage, OperationError> result)
         {
-            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUuid)).Returns(result);
+            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(systemUuid)).Returns(result);
         }
 
         private void ExpectGetSystemReturns(Guid systemUuid, Result<ItSystem, OperationError> result)

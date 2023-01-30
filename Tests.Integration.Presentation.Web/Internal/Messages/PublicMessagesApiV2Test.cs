@@ -3,10 +3,10 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
-using Presentation.Web.Controllers.API.V2.Mapping;
 
 namespace Tests.Integration.Presentation.Web.Internal.Messages
 {

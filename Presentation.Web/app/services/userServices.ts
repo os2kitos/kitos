@@ -285,7 +285,7 @@
             this._user = null;
             this.$rootScope.user = null;
 
-            return this.$http.post("api/authorize?logout", undefined);
+            return this.$http.post("api/authorize/log-out", null);
         };
 
         loadUser = (userLoginInfo) => {

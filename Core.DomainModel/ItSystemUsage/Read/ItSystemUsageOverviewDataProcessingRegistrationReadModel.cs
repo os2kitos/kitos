@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.Shared;
+﻿using System;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
@@ -6,6 +7,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
     {
         public int Id { get; set; }
 
+        public Guid DataProcessingRegistrationUuid { get; set; }
         public int DataProcessingRegistrationId { get; set; }
         public string DataProcessingRegistrationName { get; set; }
 

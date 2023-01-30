@@ -8,8 +8,7 @@ using Core.ApplicationServices.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.KLE;
-
-using Presentation.Web.Controllers.API.V2.Mapping;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;

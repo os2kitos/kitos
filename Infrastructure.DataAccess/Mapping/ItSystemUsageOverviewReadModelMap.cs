@@ -8,7 +8,7 @@ using Core.DomainModel.Users;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewReadModelMap :  EntityTypeConfiguration<ItSystemUsageOverviewReadModel>
+    public class ItSystemUsageOverviewReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewReadModel>
     {
         public ItSystemUsageOverviewReadModelMap()
         {
@@ -37,6 +37,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(50)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemUuid", 0);
 
+            Property(x => x.ParentItSystemUuid).IsOptional();
+
             Property(x => x.ParentItSystemName)
                 .HasMaxLength(ItSystem.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemParentName", 0);
@@ -44,9 +46,16 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ResponsibleOrganizationUnitId)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId", 0);
 
+            Property(x => x.ResponsibleOrganizationUnitUuid)
+                .IsOptional()
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationUuid", 0);
+
             Property(x => x.ResponsibleOrganizationUnitName)
                 .HasMaxLength(OrganizationUnit.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName", 0);
+
+            Property(x => x.ItSystemBusinessTypeUuid)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeUuid", 0);
 
             Property(x => x.ItSystemBusinessTypeId)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeId", 0);
@@ -170,6 +179,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(x => x.OverviewReadModels)
                 .HasForeignKey(x => x.SourceEntityId)
                 .WillCascadeOnDelete(false);
+
+            Property(x => x.SourceEntityUuid).IsRequired();
         }
     }
 }
