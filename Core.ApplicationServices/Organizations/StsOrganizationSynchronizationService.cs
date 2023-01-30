@@ -270,7 +270,8 @@ namespace Core.ApplicationServices.Organizations
                 unitsToImport.Select(unit => (unit, importedTreeToParent[unit.Uuid])).ToList(),
                 Enumerable.Empty<(OrganizationUnit affectedUnit, string oldName, string newName)>(),
                 Enumerable
-                    .Empty<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>());
+                    .Empty<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>(),
+                Maybe<OrganizationRootChange>.None);
             return consequences;
         }
     }

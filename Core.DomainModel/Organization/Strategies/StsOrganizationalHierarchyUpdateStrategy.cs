@@ -120,12 +120,21 @@ namespace Core.DomainModel.Organization.Strategies
                 }
             }
 
+            //Detect root change
+            var rootChange = Maybe<OrganizationRootChange>.None;
+            var currentRoot = _organization.GetRoot();
+            if (root.Uuid != currentRoot.ExternalOriginUuid.GetValueOrDefault())
+            {
+                rootChange = new OrganizationRootChange(currentRoot, root);
+            }
+
             return new OrganizationTreeUpdateConsequences(
                 removedExternalUnitsWhichMustBeConverted,
                 removedExternalUnitsWhichMustBeRemoved,
                 additions,
                 renamedUnits.Select(x => (x.current, x.current.Name, x.imported.Name)).ToList(),
-                parentChanges);
+                parentChanges,
+                rootChange);
         }
 
         public Result<OrganizationTreeUpdateConsequences, OperationError> PerformUpdate(ExternalOrganizationUnit root)
@@ -135,6 +144,9 @@ namespace Core.DomainModel.Organization.Strategies
                 .OrgUnits
                 .Where(unit => unit.Origin == OrganizationUnitOrigin.STS_Organisation)
                 .ToDictionary(x => x.ExternalOriginUuid.GetValueOrDefault());
+
+            var organizationUnitsBeingMoved = consequences.OrganizationUnitsBeingMoved.ToList();
+            var addedExternalOrganizationUnits = consequences.AddedExternalOrganizationUnits.ToList();
 
             //Renaming
             foreach (var (affectedUnit, _, newName) in consequences.OrganizationUnitsBeingRenamed)
@@ -151,15 +163,50 @@ namespace Core.DomainModel.Organization.Strategies
                 }
             }
 
-            //Conversion to native units
-            foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
+            //If hierarchy changed 
+            if (consequences.RootChange.HasValue)
             {
-                unitToNativeUnit.organizationUnit.ConvertToNativeKitosUnit();
+                var organizationRootChange = consequences.RootChange.Value;
+                var oldRoot = _organization.GetRoot();
+
+                if (currentTreeByUuid.TryGetValue(organizationRootChange.NewRoot.Uuid, out var newRoot))
+                {
+                    //Remove the new root from potential "relocation descriptions" (already moved as part of replacement)
+                    organizationUnitsBeingMoved = organizationUnitsBeingMoved
+                        .Where(x => x.movedUnit != newRoot)
+                        .ToList();
+                }
+                else
+                {
+                    //Create from scratch if entirely new root
+                    newRoot = organizationRootChange.NewRoot.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
+                    currentTreeByUuid[newRoot.ExternalOriginUuid.GetValueOrDefault()] = newRoot;
+
+                    //Remove from regular additions since it has already been processed
+                    addedExternalOrganizationUnits = addedExternalOrganizationUnits
+                        .Where(addedUnit => addedUnit.unitToAdd.Uuid != newRoot.ExternalOriginUuid.GetValueOrDefault())
+                        .ToList();
+                }
+                
+                var rootReplacementError = _organization.ReplaceRoot(newRoot);
+                if (rootReplacementError.HasValue)
+                {
+                    return rootReplacementError.Value;
+                }
+
+                //Patch parent if replaced root is preserved and is to be moved downwards (e.g. as a descendent to the new root)
+                organizationUnitsBeingMoved = organizationUnitsBeingMoved
+                    .Select(movedUnitInfo => movedUnitInfo.movedUnit == oldRoot
+                        ? (movedUnitInfo.movedUnit, newRoot, movedUnitInfo.newParent) //Update the "oldparent" which was previously null to now point to the new root
+                        : movedUnitInfo
+                    )
+                    .ToList();
             }
 
             //Addition of new units
-            foreach (var (unitToAdd, parent) in OrderByParentToLeaf(root, consequences.AddedExternalOrganizationUnits))
+            foreach (var (unitToAdd, parent) in OrderByParentToLeaf(root, addedExternalOrganizationUnits))
             {
+
                 if (currentTreeByUuid.TryGetValue(parent.Uuid, out var parentUnit))
                 {
                     var newUnit = unitToAdd.ToOrganizationUnit(OrganizationUnitOrigin.STS_Organisation, _organization, false);
@@ -179,7 +226,7 @@ namespace Core.DomainModel.Organization.Strategies
             }
 
             //Relocation of existing units
-            var processingQueue = new Queue<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>(consequences.OrganizationUnitsBeingMoved);
+            var processingQueue = new Queue<(OrganizationUnit movedUnit, OrganizationUnit oldParent, ExternalOrganizationUnit newParent)>(organizationUnitsBeingMoved);
             while (processingQueue.Any())
             {
                 var (movedUnit, oldParent, newParent) = processingQueue.Dequeue();
@@ -207,6 +254,12 @@ namespace Core.DomainModel.Organization.Strategies
                         return relocationError.Value;
                     }
                 }
+            }
+
+            //Conversion to native units
+            foreach (var unitToNativeUnit in consequences.DeletedExternalUnitsBeingConvertedToNativeUnits)
+            {
+                unitToNativeUnit.organizationUnit.ConvertToNativeKitosUnit();
             }
 
             //Deletion of units
