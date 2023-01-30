@@ -79,7 +79,7 @@
             this.organizationRightService.create(newOrgId, userToUpdateId, roleId)
                 .then(() => {
                     msg.toSuccessMessage(userName + " er blevet lokal administrator for " + orgName);
-                    if (this.userId === userToUpdateId) {
+                    if (self.userId === userToUpdateId) {
                         // Reload user
                         self.userService.reAuthorize();
                     }
