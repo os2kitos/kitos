@@ -30,12 +30,12 @@ namespace Infrastructure.Ninject.DomainServices
             _objectCache = objectCache;
         }
 
-        private string GetCacheKey<T>(int dbId)
+        private static string GetCacheKey<T>(int dbId)
         {
             return $"DBID({dbId})->UUID:{typeof(T).FullName}";
         }
 
-        private string GetCacheKey<T>(Guid uuid)
+        private static string GetCacheKey<T>(Guid uuid)
         {
             return $"UUID({uuid:N})->DBID:{typeof(T).FullName}";
         }
@@ -89,7 +89,7 @@ namespace Infrastructure.Ninject.DomainServices
                 .Select(x =>
                 {
                     var dbId = x.Id;
-                    _objectCache.Write(new SingleValue<int>() { Value = dbId }, cacheKey, TimeSpan.FromHours(1));
+                    _objectCache.Write(new SingleValue<int> { Value = dbId }, cacheKey, TimeSpan.FromHours(1));
                     return dbId;
                 });
         }
