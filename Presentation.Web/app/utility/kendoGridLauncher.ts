@@ -66,7 +66,7 @@ module Kitos.Utility.KendoGrid {
         withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource>;
         withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
-        withoutMenu(): IKendoGridColumnBuilder<TDataSource>;
+        withoutVisibilityToggling(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
@@ -172,7 +172,7 @@ module Kitos.Utility.KendoGrid {
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
         private sortingEnabled = true;
-        private menuEnabled = true;
+        private visibilityTogglingEnabled = true;
         private isUiOnly = false;
         private visible = true;
         private dataSourceType: KendoGridColumnDataSourceType = null;
@@ -220,8 +220,8 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
         
-        withoutMenu(): IKendoGridColumnBuilder<TDataSource> {
-            this.menuEnabled = false;
+        withoutVisibilityToggling(): IKendoGridColumnBuilder<TDataSource> {
+            this.visibilityTogglingEnabled = false;
             return this;
         }
 
@@ -439,7 +439,7 @@ module Kitos.Utility.KendoGrid {
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
                 filterable: this.getFiltering(),
                 sortable: this.sortingEnabled,
-                menu: this.menuEnabled,
+                menu: this.visibilityTogglingEnabled,
                 uiOnlyColumn: this.isUiOnly,
                 schemaMutation: this.getSchemaMutation(),
                 kitosIncluded: this.inclusionCriterion()

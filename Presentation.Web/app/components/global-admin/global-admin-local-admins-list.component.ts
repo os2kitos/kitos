@@ -32,7 +32,7 @@
         static $inject: string[] = ["kendoGridLauncherFactory", "$scope", "userService"];
         constructor(
             private readonly kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
-            private readonly $scope,
+            private readonly $scope: ng.IScope,
             private readonly userService: Kitos.Services.IUserService) {
         }
 
@@ -46,6 +46,10 @@
             }
 
             this.loadGrid();
+
+            this.$scope.$on("LocalAdminRights_Updated", (evt, data) => {
+                this.mainGrid.dataSource.read();
+            });
         }
 
         private loadGrid() {
@@ -92,7 +96,7 @@
                         .withTitle(" ")
                         .withStandardWidth(30)
                         .withoutSorting()
-                        .withoutMenu()
+                        .withoutVisibilityToggling()
                         .asUiOnlyColumn()
                         .withRendering(
                             (source: ILocalAdminRow) =>
@@ -106,9 +110,7 @@
         }
 
         private deleteLocalAdmin = (rightId: number) => {
-            this.callbacks.removeRight(rightId).then(_ => {
-                this.mainGrid.dataSource.read();
-            });
+            this.callbacks.removeRight(rightId);
         }
     }
 

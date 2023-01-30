@@ -1,6 +1,8 @@
 ﻿module Kitos.Services.Organization {
+
     export interface IOrganizationRightService {
         removeRight(currentOrgId: number, roleOrgId: number, roleId: number, userId: number): ng.IPromise<boolean>;
+        createRight(newOrgId: number, userToUpdateId: number, roleId: number): ng.IPromise<void>;
         getAll(): ng.IPromise<Array<Models.Api.Organization.ILocalAdminRightsDto>>;
     }
 
@@ -24,6 +26,18 @@
         removeRight(currentOrgId: number, roleOrgId: number, roleId: number, userId: number): ng.IPromise<boolean> {
             return this.apiUseCaseFactory.createDeletion("Lokale administratorer",
                 () => this.apiWrapper.delete(this.getBaseUrlWithIds(currentOrgId, roleOrgId, roleId, userId)))
+                .executeAsync();
+        }
+
+        createRight(newOrgId: number, userToUpdateId: number, roleId: number): ng.IPromise<void> {
+
+            const data = {
+                userId: userToUpdateId,
+                role: roleId,
+                organizationId: newOrgId
+            };
+            return this.apiUseCaseFactory.createCreation("Lokale administratorer",
+                () => this.apiWrapper.post<void>(`${this.getBaseUrl()}/${newOrgId}`, data))
                 .executeAsync();
         }
 

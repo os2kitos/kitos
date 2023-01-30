@@ -32,16 +32,16 @@
         localAdmins: Array<ILocalAdminRow>;
         callbacks: IGlobalAdminLocalAdminCallbacks;
 
-        newUser: any;
-        newOrg: any;
+        newUser: Models.ViewModel.Select2.IBaseSelect2OptionViewModel;
+        newOrg: Models.ViewModel.Select2.ISelect2OrganizationOptionWithCvrViewModel;
 
-        static $inject: string[] = ["userService", "organizationRightService", "select2LoadingService", "notify", "$http", "$state"];
+        static $inject: string[] = ["userService", "organizationRightService", "select2LoadingService", "$scope", "notify"];
         constructor(
             private readonly userService: Services.IUserService,
             private readonly organizationRightService: Services.Organization.IOrganizationRightService,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
-            private readonly notify,
-            private readonly $http) {
+            private readonly $scope: ng.IScope,
+            private readonly notify) {
         }
         
         $onInit() {
@@ -66,32 +66,32 @@
             if (!(this.newOrg && this.newUser)) return;
 
             var user = this.newUser;
-            var uId = user.id;
-            const oId = this.newOrg.id;
+            const userToUpdateId = user.id;
+            const newOrgId = this.newOrg.id;
             var orgName = this.newOrg.text;
 
-            const rId = API.Models.OrganizationRole.LocalAdmin;
+            const roleId = API.Models.OrganizationRole.LocalAdmin;
 
-            if (!(uId && oId && rId)) return;
-
-            const data = {
-                userId: uId,
-                role: rId,
-                organizationId: oId
-            };
+            if (!(userToUpdateId && newOrgId && roleId)) return;
+            
             var msg = this.notify.addInfoMessage("Arbejder ...", false);
             const self = this;
-            this.$http.post(`api/OrganizationRight/${oId}`, data, { handleBusy: true })
-                .then(function onSuccess(result) {
+            this.organizationRightService.createRight(newOrgId, userToUpdateId, roleId)
+                .then(() => {
                     msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
-                    if (uId === user.id) {
+                    if (this.userId === user.id) {
                         // Reload user
                         self.userService.reAuthorize();
                     }
-                    self.loadData();
-                }, function onError(result) {
+                    self.loadData()
+                        .then(() => self.emitLocalAdminRightsUpdatedEvent());
+
+                }, () => {
                     msg.toErrorMessage("Kunne ikke gøre " + user.text + " til lokal administrator for " + orgName);
                 });
+
+            this.newOrg = null;
+            this.newUser = null;
         }
 
         deleteLocalAdmin(rightId: number) {
@@ -110,7 +110,7 @@
                     if (userId === this.userId) {
                         this.userService.reAuthorize();
                     }
-                    this.loadData();
+                    return this.loadData();
                 });
         }
         
@@ -125,9 +125,14 @@
         } 
 
         private loadData(): ng.IPromise<void> {
-            this.localAdmins = [];
-            return this.organizationRightService.getAll().then(localAdmins => {
-                this.localAdmins.pushArray(localAdmins.map((row, index) => {
+            if (!this.localAdmins) {
+                this.localAdmins = [];
+            } else {
+                this.resetLocalAdminData();
+            }
+
+            return this.organizationRightService.getAll().then(response => {
+                this.localAdmins.pushArray(response.map((row, index) => {
                     return {
                         id: index,
                         name: row.user.fullName,
@@ -136,7 +141,18 @@
                         objectContext: row
                     } as ILocalAdminRow;
                 }));
+
+                this.emitLocalAdminRightsUpdatedEvent();
             });
+        }
+
+        private emitLocalAdminRightsUpdatedEvent() {
+            this.$scope.$broadcast("LocalAdminRights_Updated");
+        }
+
+        private resetLocalAdminData() {
+            const arrayLength = this.localAdmins.length;
+            this.localAdmins.splice(0, arrayLength);
         }
     }
 
