@@ -501,8 +501,8 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\OversightIntervalMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoIrrelevantMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\YesNoIrrelevantMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\DeltaFeedV2Controller.cs" />
