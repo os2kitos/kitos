@@ -27,14 +27,14 @@ namespace Core.Abstractions.Types
         {
             return _leftToRightMap.TryGetValue(value, out var result)
                 ? result
-                : throw new ArgumentException($@"Unmapped choice:{value:G}", nameof(value));
+                : throw new ArgumentException($@"Unmapped 'Left'->'Right':{value:G}", nameof(value));
         }
 
         public TLeft FromRightToLeft(TRight value)
         {
             return _rightToLeftMap.TryGetValue(value, out var result)
                 ? result
-                : throw new ArgumentException($@"Unmapped domain value:{value:G}", nameof(value));
+                : throw new ArgumentException($@"Unmapped 'Right'->'Left' value:{value:G}", nameof(value));
         }
     }
 }
