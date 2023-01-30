@@ -11,6 +11,7 @@ using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
@@ -314,7 +315,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                     .Select(organization => organization.MapShallowOrganizationResponseDTO())
                     .ToList(),
                 LastModified = itSystem.LastChanged,
-                LastModifiedBy = itSystem.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO())
+                LastModifiedBy = itSystem.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO()),
+                Scope = itSystem.AccessModifier.ToChoice()
             };
 
             MapBaseInformation(itSystem, dto);
