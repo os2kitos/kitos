@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Types;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
@@ -9,36 +6,27 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public static class ArchiveDutyMappingExtensions
     {
-        private static readonly IReadOnlyDictionary<ArchiveDutyChoice, ArchiveDutyTypes> ApiToDataMap;
-        private static readonly IReadOnlyDictionary<ArchiveDutyTypes, ArchiveDutyChoice> DataToApiMap;
+        private static readonly EnumMap<ArchiveDutyChoice, ArchiveDutyTypes> Mapping;
 
         static ArchiveDutyMappingExtensions()
         {
-            ApiToDataMap = new Dictionary<ArchiveDutyChoice, ArchiveDutyTypes>
-            {
-                { ArchiveDutyChoice.B, ArchiveDutyTypes.B },
-                { ArchiveDutyChoice.K, ArchiveDutyTypes.K },
-                { ArchiveDutyChoice.Undecided, ArchiveDutyTypes.Undecided },
-                { ArchiveDutyChoice.Unknown, ArchiveDutyTypes.Unknown }
-            }.AsReadOnly();
-            
-            DataToApiMap = ApiToDataMap
-                .ToDictionary(kvp => kvp.Value, kvp => kvp.Key)
-                .AsReadOnly();
+            Mapping = new EnumMap<ArchiveDutyChoice, ArchiveDutyTypes>
+            (
+                (ArchiveDutyChoice.B, ArchiveDutyTypes.B),
+                (ArchiveDutyChoice.K, ArchiveDutyTypes.K),
+                (ArchiveDutyChoice.Undecided, ArchiveDutyTypes.Undecided),
+                (ArchiveDutyChoice.Unknown, ArchiveDutyTypes.Unknown)
+            );
         }
 
         public static ArchiveDutyTypes ToArchiveDutyTypes(this ArchiveDutyChoice value)
         {
-            return ApiToDataMap.TryGetValue(value, out var result)
-                ? result
-                : throw new ArgumentException($@"Unmapped choice:{value:G}", nameof(value));
+            return Mapping.FromLeftToRight(value);
         }
 
         public static ArchiveDutyChoice ToArchiveDutyChoice(this ArchiveDutyTypes value)
         {
-            return DataToApiMap.TryGetValue(value, out var result)
-                ? result
-                : throw new ArgumentException($@"Unmapped domain value:{value:G}", nameof(value));
+            return Mapping.FromRightToLeft(value);
         }
     }
 }
