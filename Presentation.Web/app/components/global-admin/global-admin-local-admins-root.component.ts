@@ -83,9 +83,8 @@
                         // Reload user
                         self.userService.reAuthorize();
                     }
-                    self.loadData()
-                        .then(() => self.emitLocalAdminRightsUpdatedEvent());
 
+                    self.loadData();
                 }, () => {
                     msg.toErrorMessage("Kunne ikke gøre " + userName + " til lokal administrator for " + orgName);
                 });
@@ -110,7 +109,7 @@
                     if (userId === this.userId) {
                         this.userService.reAuthorize();
                     }
-                    return this.loadData();
+                    this.loadData();
                 });
         }
         
