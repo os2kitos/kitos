@@ -229,7 +229,7 @@
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
-                () => this.dataProcessingRegistration.dataProcessors.sort((a, b) => a.name.localeCompare(b.name, Kitos.Shared.Localization.danishLocale)),
+                () => this.dataProcessingRegistration.dataProcessors.sort((a, b) => a.name.localeCompare(b.name, Shared.Localization.danishLocale)),
                 element => this.removeDataProcessor(element.id),
                 newElement => this.addDataProcessor(newElement),
                 this.hasWriteAccess,
@@ -244,7 +244,7 @@
         private bindSubDataProcessors() {
             this.dataProcessingRegistrationService.get(this.dataProcessingRegistration.id)
                 .then(reloadedSubDp => {
-                    this.dataProcessingRegistration.subDataProcessors = reloadedSubDp.subDataProcessors
+                    this.dataProcessingRegistration.subDataProcessors = reloadedSubDp.subDataProcessors.sort((a, b) => a.name.localeCompare(b.name, Shared.Localization.danishLocale));
                 });
         }
 
