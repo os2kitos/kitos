@@ -14,6 +14,7 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.System;
 using Presentation.Web.Models.API.V2.Response.System;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
@@ -38,6 +39,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             Assert.NotNull(system);
             Assert.Equal(entityUuid, system.Uuid);
+            Assert.Equal(RegistrationScopeChoice.Global, system.Scope);
         }
 
         [Fact]
@@ -53,6 +55,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             Assert.NotNull(system);
             Assert.Equal(entityUuid, system.Uuid);
+            Assert.Equal(RegistrationScopeChoice.Local, system.Scope);
         }
 
         [Fact]

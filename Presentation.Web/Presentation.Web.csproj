@@ -424,6 +424,7 @@
     <Compile Include="Controllers\API\V2\Common\ApiV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\ExternalReferenceResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\IExternalReferenceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\RegistrationScopeChoiceMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\IResourcePermissionsResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\ResourcePermissionsResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\GDPRPersonalDataMappingExtensions.cs" />
@@ -462,6 +463,8 @@
     <Compile Include="Models\API\V2\Response\Shared\ResourcePermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ExternalReferenceDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasExternalReference.cs" />
+    <Compile Include="Models\API\V2\SharedProperties\IHasRegistrationScope.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\RegistrationScopeChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />
@@ -498,8 +501,8 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\OversightIntervalMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoIrrelevantMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\YesNoIrrelevantMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\DeltaFeedV2Controller.cs" />
