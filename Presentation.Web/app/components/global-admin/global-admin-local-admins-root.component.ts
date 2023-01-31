@@ -17,7 +17,7 @@
         organization: string,
         name: string,
         email: string,
-        objectContext: Models.Api.Organization.ILocalAdminRightsDto,
+        objectContext: Models.Api.Organization.IAdminRightsDto,
     }
     
     interface IGlobalAdminLocalAdminRootController extends ng.IComponentController {
@@ -129,8 +129,8 @@
             } else {
                 this.resetLocalAdminData();
             }
-
-            return this.organizationRightService.getAll().then(response => {
+            
+            return this.organizationRightService.getAllByRightsType(Services.Organization.AdminRightsType.LocalAdmin).then(response => {
                 this.localAdmins.pushArray(response.map((row, index) => {
                     return {
                         id: index,

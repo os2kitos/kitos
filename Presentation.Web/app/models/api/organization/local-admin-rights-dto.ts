@@ -1,6 +1,6 @@
 ﻿module Kitos.Models.Api.Organization {
 
-    export interface ILocalAdminRightsDto {
+    export interface IAdminRightsDto {
         userName: string,
         fullName: string,
         userEmail: string,
@@ -9,5 +9,6 @@
         role: number,
         userId: number,
         user: IUser,
+        
     }
 }
