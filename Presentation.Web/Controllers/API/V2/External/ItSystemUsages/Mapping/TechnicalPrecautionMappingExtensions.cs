@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
@@ -9,36 +6,27 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public static class TechnicalPrecautionMappingExtensions
     {
-        private static readonly IReadOnlyDictionary<TechnicalPrecautionChoice, TechnicalPrecaution> ApiToDataMap;
-        private static readonly IReadOnlyDictionary<TechnicalPrecaution, TechnicalPrecautionChoice> DataToApiMap;
+        private static readonly EnumMap<TechnicalPrecautionChoice, TechnicalPrecaution> Mapping;
 
         static TechnicalPrecautionMappingExtensions()
         {
-            ApiToDataMap = new Dictionary<TechnicalPrecautionChoice, TechnicalPrecaution>
-            {
-                { TechnicalPrecautionChoice.AccessControl, TechnicalPrecaution.AccessControl },
-                { TechnicalPrecautionChoice.Encryption, TechnicalPrecaution.Encryption },
-                { TechnicalPrecautionChoice.Logging, TechnicalPrecaution.Logging },
-                { TechnicalPrecautionChoice.Pseudonymization, TechnicalPrecaution.Pseudonymization }
-            }.AsReadOnly();
-            
-            DataToApiMap = ApiToDataMap
-                .ToDictionary(kvp => kvp.Value, kvp => kvp.Key)
-                .AsReadOnly();
+            Mapping = new EnumMap<TechnicalPrecautionChoice, TechnicalPrecaution>
+            (
+                (TechnicalPrecautionChoice.AccessControl, TechnicalPrecaution.AccessControl),
+                (TechnicalPrecautionChoice.Encryption, TechnicalPrecaution.Encryption),
+                (TechnicalPrecautionChoice.Logging, TechnicalPrecaution.Logging),
+                (TechnicalPrecautionChoice.Pseudonymization, TechnicalPrecaution.Pseudonymization)
+            );
         }
 
         public static TechnicalPrecaution ToTechnicalPrecaution(this TechnicalPrecautionChoice value)
         {
-            return ApiToDataMap.TryGetValue(value, out var result)
-                ? result
-                : throw new ArgumentException($@"Unmapped choice:{value:G}", nameof(value));
+            return Mapping.FromLeftToRight(value);
         }
 
         public static TechnicalPrecautionChoice ToTechnicalPrecautionChoice(this TechnicalPrecaution value)
         {
-            return DataToApiMap.TryGetValue(value, out var result)
-                ? result
-                : throw new ArgumentException($@"Unmapped domain value:{value:G}", nameof(value));
+            return Mapping.FromRightToLeft(value);
         }
     }
 }
