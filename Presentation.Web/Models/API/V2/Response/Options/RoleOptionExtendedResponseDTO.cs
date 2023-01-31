@@ -16,8 +16,8 @@ namespace Presentation.Web.Models.API.V2.Response.Options
 
         }
 
-        public RoleOptionExtendedResponseDTO(Guid uuid, string name, bool writeAccess, bool isAvailable) 
-            : base(uuid, name, writeAccess)
+        public RoleOptionExtendedResponseDTO(Guid uuid, string name, bool writeAccess, bool isAvailable, string description)
+            : base(uuid, name, writeAccess, description)
         {
             IsAvailable = isAvailable;
         }

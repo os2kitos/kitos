@@ -5,14 +5,13 @@ using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainServices.Model.Options;
 
 namespace Core.ApplicationServices.OptionTypes
 {
-    public class OptionsApplicationService<TReference, TOption> : IOptionsApplicationService<TReference, TOption> 
+    public class OptionsApplicationService<TReference, TOption> : IOptionsApplicationService<TReference, TOption>
         where TOption : OptionEntity<TReference>
     {
         private readonly IOptionsService<TReference, TOption> _optionsTypeService;
@@ -34,23 +33,19 @@ namespace Core.ApplicationServices.OptionTypes
                 return orgId.Error;
             }
 
-            var businessTypeResult = _optionsTypeService
+            return _optionsTypeService
                 .GetAllOptionsDetails(orgId.Value)
-                .FirstOrDefault(x => x.option.Option.Uuid == optionTypeUuid)
-                .FromNullable();
-
-            if (businessTypeResult.IsNone)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
-
-            return businessTypeResult.Value;
+                .FirstOrNone(x => x.option.Option.Uuid == optionTypeUuid)
+                .Match<Result<(OptionDescriptor<TOption> option, bool available), OperationError>>
+                    (
+                        r => r,
+                        () => new OperationError(OperationFailure.NotFound)
+                        );
         }
 
         public Result<IEnumerable<OptionDescriptor<TOption>>, OperationError> GetOptionTypes(Guid organizationUuid)
         {
-            return ResolveOrgId(organizationUuid)
-                .Select(orgId=> _optionsTypeService.GetAvailableOptionsDetails(orgId));
+            return ResolveOrgId(organizationUuid).Select(_optionsTypeService.GetAvailableOptionsDetails);
         }
 
         private Result<int, OperationError> ResolveOrgId(Guid organizationUuid)

@@ -10,7 +10,9 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainServices.Model.Options;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -40,15 +42,15 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             var uuid = Guid.NewGuid();
             var orgId = A<int>();
             var numberOfBusinessTypes = A<int>() % 10;
-            var listOfBusinessTypes = new List<BusinessType>();
+            var optionDescriptors = new List<OptionDescriptor<BusinessType>>();
             for(int i = 0; i<numberOfBusinessTypes; i++)
             {
-                listOfBusinessTypes.Add(CreateBusinessType());
+                optionDescriptors.Add( new OptionDescriptor<BusinessType>(CreateBusinessType(),A<string>()));
             }
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(new Organization() { Id = orgId });
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
-            _businessTypeOptionService.Setup(x => x.GetAvailableOptions(orgId)).Returns(listOfBusinessTypes);
+            _businessTypeOptionService.Setup(x => x.GetAvailableOptionsDetails(orgId)).Returns(optionDescriptors);
 
             //Act
             var businessTypes = _sut.GetOptionTypes(uuid);
@@ -56,7 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             //Assert
             Assert.True(businessTypes.Ok);
             Assert.Equal(numberOfBusinessTypes, businessTypes.Value.Count());
-            Assert.Same(listOfBusinessTypes, businessTypes.Value);
+            Assert.Same(optionDescriptors, businessTypes.Value);
         }
 
         [Fact]
@@ -123,12 +125,12 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             var orgUuid = Guid.NewGuid();
             var orgId = A<int>();
             var typeUuid = Guid.NewGuid();
-            var businessType = CreateBusinessType();
+            var businessType = new OptionDescriptor<BusinessType>(CreateBusinessType(typeUuid),A<string>());
             var isAvailable = A<bool>();
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(new Organization() { Id = orgId });
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
-            _businessTypeOptionService.Setup(x => x.GetOptionByUuid(orgId, typeUuid)).Returns((businessType, isAvailable));
+            _businessTypeOptionService.Setup(x => x.GetAllOptionsDetails(orgId)).Returns((businessType, isAvailable).WrapAsEnumerable());
 
             //Act
             var businessTypeResult = _sut.GetOptionType(orgUuid, typeUuid);
@@ -188,24 +190,28 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             var orgUuid = Guid.NewGuid();
             var orgId = A<int>();
             var typeUuid = Guid.NewGuid();
+            var wrongUuid = Guid.NewGuid();
+            var businessType = new OptionDescriptor<BusinessType>(CreateBusinessType(typeUuid), A<string>());
+            var isAvailable = A<bool>();
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(new Organization() { Id = orgId });
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
-            _businessTypeOptionService.Setup(x => x.GetOptionByUuid(orgId, typeUuid)).Returns(Maybe<(BusinessType, bool)>.None);
+            _businessTypeOptionService.Setup(x => x.GetAllOptionsDetails(orgId)).Returns((businessType, isAvailable).WrapAsEnumerable());
 
             //Act
-            var businessTypeResult = _sut.GetOptionType(orgUuid, typeUuid);
+            var businessTypeResult = _sut.GetOptionType(orgUuid, wrongUuid);
 
             //Assert
             Assert.True(businessTypeResult.Failed);
             Assert.Equal(OperationFailure.NotFound, businessTypeResult.Error.FailureType);
         }
 
-        private BusinessType CreateBusinessType()
+        private BusinessType CreateBusinessType(Guid? uuid = null)
         {
-            return new BusinessType()
+            return new BusinessType
             {
-                Id = A<int>()
+                Id = A<int>(),
+                Uuid = uuid ?? Guid.NewGuid()
             };
         }
     }

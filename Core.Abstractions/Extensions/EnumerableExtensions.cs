@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.Abstractions.Extensions
 {
@@ -84,6 +85,28 @@ namespace Core.Abstractions.Extensions
             existingState
                 .ComputeDelta(newState, withIdentity)
                 .ApplyTo(existingState);
+        }
+
+        /// <summary>
+        /// Equivalent to FirstOrDefault but for clients using the <see cref="Maybe{T}"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="src"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public static Maybe<T> FirstOrNone<T>(this IEnumerable<T> src, Func<T, bool> predicate = null)
+        {
+            var condition = predicate ?? (_ => true);
+
+            //This works better than firstOrDefault since this works for both reference and value types
+            foreach (var item in src)
+            {
+                if (condition(item))
+                {
+                    return item; 
+                }
+            }
+            return Maybe<T>.None;
         }
     }
 }
