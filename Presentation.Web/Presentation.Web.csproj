@@ -380,7 +380,7 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
-    <TypeScriptCompile Include="app\models\Api\organization\local-admin-rights-dto.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\admin-rights-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\personal-data-option.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-dto.ts" />
