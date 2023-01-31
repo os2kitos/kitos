@@ -40,9 +40,6 @@
         callbacks: IOrgUserRolesTableCallbacks<unknown> | null = null;
         roleTypeName: string | null = null;
         selectedUser: Models.IUser | null = null;
-        constructor() {
-
-        }
 
         $onInit?(): void {
             if (this.model == null) {
@@ -57,7 +54,12 @@
             if (this.selectedUser == null) {
                 console.error("No selectedUser provided in OrgUserRolesTableController");
             }
-            this.model.rights = this.model.rights.sort((a, b) => a.right.businessObjectName.localeCompare(b.right.businessObjectName, Kitos.Shared.Localization.danishLocale));
+            this.model.rights = this.model.rights.sort((a, b) => {
+                    const businessObjectComp = a.right.businessObjectName.localeCompare(b.right.businessObjectName, Shared.Localization.danishLocale);
+                    if (businessObjectComp !== 0) return businessObjectComp;
+
+                    return a.right.roleName.localeCompare(b.right.roleName, Shared.Localization.danishLocale);
+            });
         }
     }
 
