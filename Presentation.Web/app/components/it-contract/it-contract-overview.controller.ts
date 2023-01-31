@@ -445,14 +445,15 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withContentOverflow()
                         .withFixedValueRange(orgUnits.map((unit) => {
-                            return {
-                                textValue: unit.Name,
-                                remoteValue: unit.Id,
-                                optionalContext: unit
-                            };
-                        }),
+                                return {
+                                    textValue: unit.Name,
+                                    remoteValue: unit.Id,
+                                    optionalContext: unit
+                                };
+                            }),
                             false,
-                            dataItem => '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
+                            dataItem => '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name,
+                            true)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrgUnitName)))
                 .withColumn(builder =>
                     builder
