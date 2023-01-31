@@ -46,10 +46,6 @@
             }
 
             this.loadGrid();
-
-            this.$scope.$on("LocalAdminRights_Updated", (evt, data) => {
-                this.mainGrid.dataSource.read();
-            });
         }
 
         private loadGrid() {
@@ -75,7 +71,7 @@
                         .withTitle("Organisation")
                         .withSourceValueEchoRendering()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                    )
+                     )
                     .withColumn(builder => builder
                         .withId("name")
                         .withDataSourceName("name")
@@ -106,7 +102,13 @@
                     )
                     .resetAnySavedSettings()
                     .launch();
+
+                var self = this;
+                this.$scope.$on("LocalAdminRights_Updated", (evt, data) => {
+                    self.mainGrid?.dataSource?.read();
+                });
             });
+
         }
 
         private deleteLocalAdmin = (rightId: number) => {

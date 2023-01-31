@@ -29,7 +29,7 @@
         currentOrganizationId: number | null = null;
         userId: number | null = null;
 
-        localAdmins: Array<ILocalAdminRow>;
+        localAdmins: Array<ILocalAdminRow> = [];
         callbacks: IGlobalAdminLocalAdminCallbacks;
 
         newUser: Models.ViewModel.Select2.IBaseSelect2OptionViewModel;
@@ -124,9 +124,7 @@
         } 
 
         private loadData(): ng.IPromise<void> {
-            if (!this.localAdmins) {
-                this.localAdmins = [];
-            } else {
+            if (this.localAdmins.length > 0) {
                 this.resetLocalAdminData();
             }
             
