@@ -13,6 +13,7 @@
     
     interface IGlobalAdminLocalAdminRootController extends ng.IComponentController {
         userId: number
+        loading: boolean
     }
 
     class GlobalAdminLocalAdminRootController implements IGlobalAdminLocalAdminRootController {
@@ -23,6 +24,7 @@
 
         newUser: Models.ViewModel.Generic.ISelect2Model<number>;
         newOrg: Models.ViewModel.Select2.ISelect2OrganizationOptionWithCvrViewModel;
+        loading = false;
 
         static $inject: string[] = ["userService", "organizationRightService", "select2LoadingService", "$scope"];
         constructor(
@@ -58,9 +60,7 @@
             if (!(userToUpdateId && newOrgId && roleId)) return;
             
             this.organizationRightService.create(newOrgId, userToUpdateId, roleId)
-                .then(() => {
-                    this.reauthorizeUserAndLoadData(userToUpdateId);
-                });
+                .then(() => this.reauthorizeUserAndLoadData(userToUpdateId));
 
             this.newOrg = null;
             this.newUser = null;
@@ -78,9 +78,7 @@
             var userId = right.userId;
 
             return this.organizationRightService.remove(organizationId, roleId, userId)
-                .then(() => {
-                    this.reauthorizeUserAndLoadData(userId);
-                });
+                .then(() => this.reauthorizeUserAndLoadData(userId));
         }
         
         getOrganizationSelectOptions() {
@@ -93,18 +91,18 @@
             }, "q", Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
         } 
 
-        private reauthorizeUserAndLoadData(userId: number) {
+        private reauthorizeUserAndLoadData(userId: number): ng.IPromise<void> {
             if (userId === this.userId) {
                 this.userService.reAuthorize();
             }
-            this.loadData();
+            return this.loadData();
         }
 
         private loadData(): ng.IPromise<void> {
             if (this.localAdmins.length > 0) {
                 this.resetLocalAdminData();
             }
-            
+            this.loading = true;
             return this.organizationRightService.getAllByRightsType(API.Models.OrganizationRole.LocalAdmin).then(response => {
                 this.localAdmins.pushArray(response.map((row, index) => {
                     return {
@@ -117,6 +115,7 @@
                 }));
 
                 this.publishLocalAdminRightsUpdatedEvent();
+                this.loading = false;
             });
         }
 

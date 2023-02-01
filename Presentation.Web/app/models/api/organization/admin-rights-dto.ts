@@ -9,6 +9,5 @@
         role: number
         userId: number
         user: IUser
-        
     }
 }
