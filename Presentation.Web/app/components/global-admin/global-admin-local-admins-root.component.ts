@@ -24,7 +24,7 @@
         newUser: Models.ViewModel.Generic.ISelect2Model<number>;
         newOrg: Models.ViewModel.Select2.ISelect2OrganizationOptionWithCvrViewModel;
 
-        static $inject: string[] = ["userService", "organizationRightService", "select2LoadingService", "$scope", "notify"];
+        static $inject: string[] = ["userService", "organizationRightService", "select2LoadingService", "$scope"];
         constructor(
             private readonly userService: Services.IUserService,
             private readonly organizationRightService: Services.Organization.IOrganizationRightService,
