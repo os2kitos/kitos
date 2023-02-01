@@ -354,6 +354,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\constants\local-admin-list-events.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-list.component.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-root.component.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
@@ -396,6 +397,7 @@
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-synchronization-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
+    <TypeScriptCompile Include="app\models\global-admin\global-admin-local-admin-row.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-error.ts" />
@@ -403,7 +405,6 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
-    <TypeScriptCompile Include="app\models\ViewModel\select2-options\base-select2-option-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\select2-options\select2-organization-with-cvr-view-model.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\data-processing-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\users\user-administration-permissions-dto.ts" />

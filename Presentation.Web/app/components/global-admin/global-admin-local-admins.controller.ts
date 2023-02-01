@@ -20,7 +20,6 @@
         ($rootScope, $scope, user: Kitos.Services.IUser) => {
             $rootScope.page.title = "Lokal administratorer";
             $scope.userId = user.id;
-            $scope.currentOrganizationId = user.currentOrganizationId;
         }
     ]);
 })(angular, app);
