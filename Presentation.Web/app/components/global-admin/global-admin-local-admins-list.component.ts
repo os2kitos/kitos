@@ -7,7 +7,7 @@
                 callbacks: "<"
             },
             controller: GlobalAdminLocalAdminListController,
-            controllerAs: "ctrl",
+            controllerAs: "vm",
             templateUrl: `app/components/global-admin/global-admin-local-admins-list.view.html`
         };
     }
@@ -16,24 +16,24 @@
         removeRight(rightId: number): ng.IPromise<void>;
     }
 
-    interface IGlobalAdminLocalAdminListController extends ng.IComponentController, Utility.KendoGrid.IGridViewAccess<ILocalAdminRow> {
-        localAdmins: Array<ILocalAdminRow>;
+    interface IGlobalAdminLocalAdminListController extends ng.IComponentController, Utility.KendoGrid.IGridViewAccess<Models.GlobalAdmin.ILocalAdminRow> {
+        localAdmins: Array<Models.GlobalAdmin.ILocalAdminRow>;
         callbacks: IGlobalAdminLocalAdminCallbacks;
     }
 
     class GlobalAdminLocalAdminListController implements IGlobalAdminLocalAdminListController
     {
-        localAdmins: Array<ILocalAdminRow> | null = null;
+        localAdmins: Array<Models.GlobalAdmin.ILocalAdminRow> | null = null;
         callbacks: IGlobalAdminLocalAdminCallbacks | null = null;
 
-        mainGrid: IKendoGrid<ILocalAdminRow>;
-        mainGridOptions: IKendoGridOptions<ILocalAdminRow>;
+        mainGrid: IKendoGrid<Models.GlobalAdmin.ILocalAdminRow>;
+        mainGridOptions: IKendoGridOptions<Models.GlobalAdmin.ILocalAdminRow>;
 
         static $inject: string[] = ["kendoGridLauncherFactory", "$scope", "userService"];
         constructor(
             private readonly kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             private readonly $scope: ng.IScope,
-            private readonly userService: Kitos.Services.IUserService) {
+            private readonly userService: Services.IUserService) {
         }
 
 
@@ -49,12 +49,10 @@
         }
 
         private loadGrid() {
-            
-            this.$scope.deleteRightMethod = this.deleteLocalAdmin;
 
             this.userService.getUser().then(user => {
                 this.kendoGridLauncherFactory
-                    .create<ILocalAdminRow>()
+                    .create<Models.GlobalAdmin.ILocalAdminRow>()
                     .withUser(user)
                     .withGridBinding(this)
                     .withFlexibleWidth()
@@ -95,23 +93,23 @@
                         .withoutVisibilityToggling()
                         .asUiOnlyColumn()
                         .withRendering(
-                            (source: ILocalAdminRow) =>
+                            (source: Models.GlobalAdmin.ILocalAdminRow) =>
                             `<button type='button' data-element-type='deleteLocalAdminRight' 
-                            data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click='deleteRightMethod(${source.id})' 
+                            data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click='vm.deleteRight(${source.id})' 
                             class='k-button k-button-icontext' title='Slet reference'>Slet</button>`)
                     )
                     .resetAnySavedSettings()
                     .launch();
 
                 var self = this;
-                this.$scope.$on("LocalAdminRights_Updated", (evt, data) => {
+                this.$scope.$on(Constants.LocalAdminListEvents.localAdminRightsUpdated, (evt, data) => {
                     self.mainGrid?.dataSource?.read();
                 });
             });
 
         }
 
-        private deleteLocalAdmin = (rightId: number) => {
+        deleteRight = (rightId: number) => {
             this.callbacks.removeRight(rightId);
         }
     }

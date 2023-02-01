@@ -3,7 +3,6 @@
     function setupComponent(): ng.IComponentOptions {
         return {
             bindings: {
-                currentOrganizationId: "=",
                 userId: "=",
             },
             controller: GlobalAdminLocalAdminRootController,
@@ -11,28 +10,18 @@
             templateUrl: `app/components/global-admin/global-admin-local-admins-root.view.html`
         };
     }
-
-    export interface ILocalAdminRow {
-        id: number,
-        organization: string,
-        name: string,
-        email: string,
-        objectContext: Models.Api.Organization.IAdminRightsDto,
-    }
     
     interface IGlobalAdminLocalAdminRootController extends ng.IComponentController {
-        currentOrganizationId: number;
-        userId: number;
+        userId: number
     }
 
     class GlobalAdminLocalAdminRootController implements IGlobalAdminLocalAdminRootController {
-        currentOrganizationId: number | null = null;
         userId: number | null = null;
 
-        localAdmins: Array<ILocalAdminRow> = [];
+        localAdmins: Array<Models.GlobalAdmin.ILocalAdminRow> = [];
         callbacks: IGlobalAdminLocalAdminCallbacks;
 
-        newUser: Models.ViewModel.Select2.IBaseSelect2OptionViewModel;
+        newUser: Models.ViewModel.Generic.ISelect2Model<number>;
         newOrg: Models.ViewModel.Select2.ISelect2OrganizationOptionWithCvrViewModel;
 
         static $inject: string[] = ["userService", "organizationRightService", "select2LoadingService", "$scope", "notify"];
@@ -40,14 +29,10 @@
             private readonly userService: Services.IUserService,
             private readonly organizationRightService: Services.Organization.IOrganizationRightService,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
-            private readonly $scope: ng.IScope,
-            private readonly notify) {
+            private readonly $scope: ng.IScope) {
         }
         
         $onInit() {
-            if (this.currentOrganizationId === null) {
-                throw "Missing parameter 'currentOrganizationId'";
-            }
             if (this.userId === null) {
                 throw "Missing parameter 'userId'";
             }
@@ -67,26 +52,14 @@
 
             const userToUpdateId = this.newUser.id;
             const newOrgId = this.newOrg.id;
-            var userName = this.newUser.text;
-            var orgName = this.newOrg.text;
 
             const roleId = API.Models.OrganizationRole.LocalAdmin;
 
             if (!(userToUpdateId && newOrgId && roleId)) return;
             
-            var msg = this.notify.addInfoMessage("Arbejder ...", false);
-            const self = this;
             this.organizationRightService.create(newOrgId, userToUpdateId, roleId)
                 .then(() => {
-                    msg.toSuccessMessage(userName + " er blevet lokal administrator for " + orgName);
-                    if (self.userId === userToUpdateId) {
-                        // Reload user
-                        self.userService.reAuthorize();
-                    }
-
-                    self.loadData();
-                }, () => {
-                    msg.toErrorMessage("Kunne ikke gøre " + userName + " til lokal administrator for " + orgName);
+                    this.reauthorizeUserAndLoadData(userToUpdateId);
                 });
 
             this.newOrg = null;
@@ -104,31 +77,35 @@
             const roleId = right.role;
             var userId = right.userId;
 
-            return this.organizationRightService.remove(this.currentOrganizationId, organizationId, roleId, userId)
+            return this.organizationRightService.remove(organizationId, roleId, userId)
                 .then(() => {
-                    if (userId === this.userId) {
-                        this.userService.reAuthorize();
-                    }
-                    this.loadData();
+                    this.reauthorizeUserAndLoadData(userId);
                 });
         }
         
         getOrganizationSelectOptions() {
-            return this.select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100", "orgId=" + this.currentOrganizationId], (item, items) => {
+            return this.select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100"], (item, items) => {
                 items.push({
                     id: item.id,
-                    text: item.name ? item.name : 'Unavngiven',
+                    text: item.name ? item.name : 'Intet navn',
                     cvr: item.cvrNumber
                 });
             }, "q", Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
         } 
+
+        private reauthorizeUserAndLoadData(userId: number) {
+            if (userId === this.userId) {
+                this.userService.reAuthorize();
+            }
+            this.loadData();
+        }
 
         private loadData(): ng.IPromise<void> {
             if (this.localAdmins.length > 0) {
                 this.resetLocalAdminData();
             }
             
-            return this.organizationRightService.getAllByRightsType(Services.Organization.AdminRightsType.LocalAdmin).then(response => {
+            return this.organizationRightService.getAllByRightsType(API.Models.OrganizationRole.LocalAdmin).then(response => {
                 this.localAdmins.pushArray(response.map((row, index) => {
                     return {
                         id: index,
@@ -136,10 +113,10 @@
                         organization: row.organizationName,
                         email: row.userEmail,
                         objectContext: row
-                    } as ILocalAdminRow;
+                    } as Models.GlobalAdmin.ILocalAdminRow;
                 }));
 
-                this.emitLocalAdminRightsUpdatedEvent();
+                this.publishLocalAdminRightsUpdatedEvent();
             });
         }
 
@@ -148,8 +125,8 @@
             this.localAdmins.splice(0, arrayLength);
         }
 
-        private emitLocalAdminRightsUpdatedEvent() {
-            this.$scope.$broadcast("LocalAdminRights_Updated");
+        private publishLocalAdminRightsUpdatedEvent() {
+            this.$scope.$broadcast(Constants.LocalAdminListEvents.localAdminRightsUpdated);
         }
     }
 
