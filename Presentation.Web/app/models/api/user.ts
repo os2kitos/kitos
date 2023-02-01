@@ -1,6 +1,7 @@
 ﻿module Kitos.Models.Api {
     export interface IUser extends Models.Generic.NamedEntity.NamedEntityDTO {
         lastName: string,
+        fullName: string,
         email: string,
         phoneNumber: string,
         defaultUserStartPreference: string,
