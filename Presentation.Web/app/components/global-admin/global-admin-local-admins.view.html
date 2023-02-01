@@ -5,46 +5,7 @@
         <i class="glyphicon glyphicon-user"></i>
         Lokale administratorer
     </div>
-    <table class="full-width table">
-        <thead>
-            <tr>
-                <th>Organisation</th>
-                <th>Navn</th>
-                <th>Email</th>
-                <th><!-- CONTROL --></th>
-            </tr>
-        </thead>
-        <!-- for each right -->
-        <tbody data-ng-repeat="right in adminRights">
-            <tr>
-                <td>{{ right.organizationName }}</td>
-                <td>{{ right.user.fullName }}</td>
-                <td>{{ right.userEmail }}</td>
-                <td class="text-right">
-                    <div>
-                        <a class="btn btn-link btn-sm text-danger"
-                            data-confirmed-click="deleteLocalAdmin(right)"
-                            data-confirm-click="Er du sikker på at du vil slette?">
-                            <i class="glyphicon glyphicon-trash pull-right"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-
-        <!-- add-new-right row -->
-        <tbody>
-            <tr>
-                <td>
-                    <input type="hidden" id="selectOrg" class="form-control input-sm"
-                           data-placeholder="Vælg organisation"
-                           data-ui-select2="organizationSelectOptions"
-                           data-ng-model="newOrg">
-                </td>
-                <td colspan="3" class="form-group">
-                    <input id="selectUser" data-select-user="foo" data-user-model="newUser" />
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="panel-body">
+        <global-admin-local-admins-root data-user-id="userId" />
+    </div>
 </div>

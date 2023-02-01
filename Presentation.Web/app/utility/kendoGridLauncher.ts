@@ -66,6 +66,7 @@ module Kitos.Utility.KendoGrid {
         withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource>;
         withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
+        withoutVisibilityToggling(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
@@ -74,6 +75,7 @@ module Kitos.Utility.KendoGrid {
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
         withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource>;
         withInclusionCriterion(Predicate): IKendoGridColumnBuilder<TDataSource>;
+        asUiOnlyColumn(): IKendoGridColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
@@ -170,6 +172,8 @@ module Kitos.Utility.KendoGrid {
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
         private sortingEnabled = true;
+        private visibilityTogglingEnabled = true;
+        private isUiOnly = false;
         private visible = true;
         private dataSourceType: KendoGridColumnDataSourceType = null;
         private contentOverflow: boolean | null = null;
@@ -213,6 +217,16 @@ module Kitos.Utility.KendoGrid {
 
         withoutSorting(): IKendoGridColumnBuilder<TDataSource> {
             this.sortingEnabled = false;
+            return this;
+        }
+        
+        withoutVisibilityToggling(): IKendoGridColumnBuilder<TDataSource> {
+            this.visibilityTogglingEnabled = false;
+            return this;
+        }
+
+        asUiOnlyColumn(): IKendoGridColumnBuilder<TDataSource> {
+            this.isUiOnly = true;
             return this;
         }
 
@@ -425,6 +439,8 @@ module Kitos.Utility.KendoGrid {
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
                 filterable: this.getFiltering(),
                 sortable: this.sortingEnabled,
+                menu: this.visibilityTogglingEnabled,
+                uiOnlyColumn: this.isUiOnly,
                 schemaMutation: this.getSchemaMutation(),
                 kitosIncluded: this.inclusionCriterion()
             } as IExtendedKendoGridColumn<TDataSource>;
