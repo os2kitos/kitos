@@ -58,9 +58,7 @@
             if (!(userToUpdateId && newOrgId && roleId)) return;
             
             this.organizationRightService.create(newOrgId, userToUpdateId, roleId)
-                .then(() => {
-                    this.reauthorizeUserAndLoadData(userToUpdateId);
-                });
+                .then(() => this.reauthorizeUserAndLoadData(userToUpdateId));
 
             this.newOrg = null;
             this.newUser = null;
@@ -78,9 +76,7 @@
             var userId = right.userId;
 
             return this.organizationRightService.remove(organizationId, roleId, userId)
-                .then(() => {
-                    this.reauthorizeUserAndLoadData(userId);
-                });
+                .then(() => this.reauthorizeUserAndLoadData(userId));
         }
         
         getOrganizationSelectOptions() {
@@ -93,11 +89,11 @@
             }, "q", Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
         } 
 
-        private reauthorizeUserAndLoadData(userId: number) {
+        private reauthorizeUserAndLoadData(userId: number): ng.IPromise<void> {
             if (userId === this.userId) {
                 this.userService.reAuthorize();
             }
-            this.loadData();
+            return this.loadData();
         }
 
         private loadData(): ng.IPromise<void> {
