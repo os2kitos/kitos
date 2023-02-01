@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger;
 
@@ -27,13 +26,22 @@ namespace Presentation.Web.Swagger
                     swaggerDoc.paths.Remove(path);
                 }
             }
-            var allTypes = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.Contains("Presentation.Web")).SelectMany(i => i.GetTypes()).ToList();
-            foreach (var definition in swaggerDoc.definitions)
+
+            var listOfSchemaWithReference = swaggerDoc.paths.SelectMany(x => x.Value.EnumerateOperations())//Find operation by path
+                .SelectMany(x => x.EnumerateSchema()) //Find schema by operation
+                .SelectMany(x => x.EnumerateSchema(swaggerDoc.definitions))//Find Schema by schema (dependent schema)
+                .Where(x => x?.@ref != null || x?.items?.@ref != null)//I only wany the schema that reference a definition.
+                .Select(x => ((x.@ref) ?? (x.items?.@ref))?.Replace("#/definitions/", string.Empty))//remove the path and keep the Model name
+                .Distinct()//I dont like duplicates
+                .ToHashSet();//commit to memory
+
+            //Not finding a definition in the built list of reference means its unreferenced and can be removed.
+            var listOfUnreferencedDefinition = swaggerDoc.definitions.Where(x => !listOfSchemaWithReference.Contains(x.Key))
+                .ToList();//Deleting item from source need list 
+
+            foreach (var unreferencedDefinition in listOfUnreferencedDefinition)
             {
-                var type = allTypes.FirstOrDefault(x => x.Name == definition.Key);
-                if (type != null && type.Namespace.Contains($"V{docVersion}"))
-                {
-                }
+                swaggerDoc.definitions.Remove(unreferencedDefinition.Key);
             }
         }
     }
