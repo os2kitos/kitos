@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
+using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Presentation.Web.Models.API.V2.Response.Shared;
 
@@ -34,8 +35,21 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         public IHttpActionResult Get()
         {
             var texts = _textsRepository.AsQueryable().Take(5).ToList();
-            var dto = texts.ToTDO();
+            var dto = texts.ToTDO(); //TODO: Make the app layer provide a real object back and map that to dto simpler
             return Ok(dto);
+        }
+
+        /// <summary>
+        /// Returns public messages from KITOS
+        /// </summary>
+        [HttpPatch]
+        [Route]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
+        public IHttpActionResult Patch([FromBody]PublicMessagesRequestDTO body)
+        {
+            
+            //TODO: Return the updated texts!
+            return Ok();
         }
 
         /// <summary>
