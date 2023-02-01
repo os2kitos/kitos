@@ -6,7 +6,6 @@ using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
@@ -28,7 +27,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns>A list of available IT-System business type specifics formatted as uuid and name pairs</returns>
         [HttpGet]
         [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

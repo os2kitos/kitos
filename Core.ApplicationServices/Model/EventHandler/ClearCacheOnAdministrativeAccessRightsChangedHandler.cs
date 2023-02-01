@@ -1,7 +1,7 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using Core.Abstractions.Caching;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
-using Infrastructure.Services.Caching;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {

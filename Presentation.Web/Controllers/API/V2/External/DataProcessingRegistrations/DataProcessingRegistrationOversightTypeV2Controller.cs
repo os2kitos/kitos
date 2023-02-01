@@ -6,7 +6,6 @@ using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
@@ -27,7 +26,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// <returns>A list of available Data Processing Registration oversight</returns>
         [HttpGet]
         [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
