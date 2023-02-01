@@ -13,6 +13,7 @@
     
     interface IGlobalAdminLocalAdminRootController extends ng.IComponentController {
         userId: number
+        loading: boolean
     }
 
     class GlobalAdminLocalAdminRootController implements IGlobalAdminLocalAdminRootController {
@@ -23,6 +24,7 @@
 
         newUser: Models.ViewModel.Generic.ISelect2Model<number>;
         newOrg: Models.ViewModel.Select2.ISelect2OrganizationOptionWithCvrViewModel;
+        loading = false;
 
         static $inject: string[] = ["userService", "organizationRightService", "select2LoadingService", "$scope"];
         constructor(
@@ -100,7 +102,7 @@
             if (this.localAdmins.length > 0) {
                 this.resetLocalAdminData();
             }
-            
+            this.loading = true;
             return this.organizationRightService.getAllByRightsType(API.Models.OrganizationRole.LocalAdmin).then(response => {
                 this.localAdmins.pushArray(response.map((row, index) => {
                     return {
@@ -113,6 +115,7 @@
                 }));
 
                 this.publishLocalAdminRightsUpdatedEvent();
+                this.loading = false;
             });
         }
 
