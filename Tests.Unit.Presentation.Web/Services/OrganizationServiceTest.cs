@@ -365,6 +365,33 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(allValues.Except(excluded.WrapAsEnumerable()).ToList(), organizations.ToList());
         }
 
+        [Fact]
+        public void SearchAccessibleOrganizations_Is_Filtered_By_RequestedMembership()
+        {
+            //Arrange
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.Public);
+            var org1WithMembership = A<int>();
+            var org2WithMembership = A<int>();
+            var org1WithoutMembership = A<int>();
+            var org2WithoutMembership = A<int>();
+
+            var expected1 = new Organization { Id = org1WithMembership, AccessModifier = AccessModifier.Local };
+            var expected2 = new Organization { Id = org2WithMembership, AccessModifier = AccessModifier.Public };
+            var excluded1 = new Organization { Id = org1WithoutMembership, AccessModifier = AccessModifier.Public };
+            var excluded2 = new Organization { Id = org2WithoutMembership, AccessModifier = AccessModifier.Local };
+
+            var allValues = new[] { expected1, expected2, excluded1, excluded2 };
+
+            _repositoryMock.Setup(x => x.GetAll()).Returns(allValues.AsQueryable());
+            _userContext.Setup(x => x.OrganizationIds).Returns(new[] { org1WithMembership, org2WithMembership });
+
+            //Act
+            var organizations = _sut.SearchAccessibleOrganizations(true).ToList();
+
+            //Assert
+            Assert.Equal(allValues.Except(new []{excluded1,excluded2}).ToList(), organizations.ToList());
+        }
+
         [Theory]
         [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
         [InlineData(CrossOrganizationDataReadAccessLevel.None)]
