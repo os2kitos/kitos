@@ -849,6 +849,7 @@
     <Compile Include="Swagger\CreateOperationIdOperationFilter.cs" />
     <Compile Include="Swagger\CustomCachingSwaggerProvider.cs" />
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
+    <Compile Include="Swagger\FilterTypesByApiVersionFilter.cs" />
     <Compile Include="Swagger\FixContentParameterTypesOnSwaggerSpec.cs" />
     <Compile Include="Swagger\FixNamingOfComplexQueryParametersFilter.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />

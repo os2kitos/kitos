@@ -94,6 +94,7 @@ namespace Presentation.Web
                       });
 
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
+                    c.OperationFilter(() => new FilterTypesByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
 
                     var environment = KitosEnvironmentConfiguration.FromConfiguration().Environment;
                     if (environment != KitosEnvironment.Dev)
