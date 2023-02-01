@@ -64,7 +64,7 @@ module Kitos.Utility.KendoGrid {
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
         withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource>;
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource>;
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string, withSearch?: boolean): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withoutVisibilityToggling(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
@@ -167,6 +167,7 @@ module Kitos.Utility.KendoGrid {
         private filtering: KendoGridColumnFiltering = null;
         private valueRange: IKendoParameter[] = null;
         private valueRangeMultiSelect: boolean = false;
+        private valueRangeWithSearch: boolean = false;
         private valueRangeTemplate: (dataItem: any) => string = null;
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
@@ -196,10 +197,11 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource> {
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string, withSearch: boolean = false): IKendoGridColumnBuilder<TDataSource> {
             if (possibleValues == null) throw "possibleValues must be defined";
             this.valueRange = possibleValues;
             this.valueRangeMultiSelect = multiSelect;
+            this.valueRangeWithSearch = withSearch;
             this.valueRangeTemplate = !!optionalTemplate ? optionalTemplate : null;
             return this;
         }
@@ -382,7 +384,8 @@ module Kitos.Utility.KendoGrid {
                                         dataTextField: "text",
                                         dataValueField: "remoteValue",
                                         valuePrimitive: true,
-                                        template: this.valueRangeTemplate
+                                        template: this.valueRangeTemplate,
+                                        filter: this.valueRangeWithSearch ? "contains" : null
                                     });
                                 },
                                 showOperators: false,
