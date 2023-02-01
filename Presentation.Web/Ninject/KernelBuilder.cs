@@ -117,6 +117,7 @@ using Infrastructure.STS.OrganizationUnit.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
+using Core.ApplicationServices.Messages;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
@@ -287,6 +288,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IStsOrganizationCompanyLookupService>().To<StsOrganizationCompanyLookupService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationUnitService>().To<StsOrganizationUnitService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationSynchronizationService>().To<StsOrganizationSynchronizationService>().InCommandScope(Mode);
+
+            //Public messages
+            kernel.Bind<IPublicMessagesService>().To<PublicMessagesService>().InCommandScope(Mode);
         }
 
         private void RegisterMappers(IKernel kernel)

@@ -1,28 +1,27 @@
-﻿using System.Linq;
-using Swashbuckle.Swagger.Annotations;
+﻿using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
-using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
-using Core.DomainServices;
-using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
+using Core.ApplicationServices.Messages;
 using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Messages
 {
     [RoutePrefix("api/v2/internal/public-messages")]
     public class PublicMessagesV2Controller : InternalApiV2Controller
     {
-        private readonly IGenericRepository<Text> _textsRepository;
-        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IPublicMessagesService _publicMessagesService;
+        private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
 
-        public PublicMessagesV2Controller(IGenericRepository<Text> textsRepository, IAuthorizationContext authorizationContext)
+        public PublicMessagesV2Controller(
+            IPublicMessagesService publicMessagesService,
+            IResourcePermissionsResponseMapper permissionsResponseMapper)
         {
-            _textsRepository = textsRepository;
-            _authorizationContext = authorizationContext;
+            _publicMessagesService = publicMessagesService;
+            _permissionsResponseMapper = permissionsResponseMapper;
         }
 
         /// <summary>
@@ -34,20 +33,26 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
         public IHttpActionResult Get()
         {
-            var texts = _textsRepository.AsQueryable().Take(5).ToList();
-            var dto = texts.ToTDO(); //TODO: Make the app layer provide a real object back and map that to dto simpler
+            var publicMessages = _publicMessagesService.GetPublicMessages();
+            var dto = new PublicMessagesResponseDTO
+            {
+                Guides = publicMessages.Guides,
+                Misc = publicMessages.Misc,
+                ContactInfo = publicMessages.ContactInfo,
+                About = publicMessages.About,
+                StatusMessages = publicMessages.StatusMessages
+            };
             return Ok(dto);
         }
 
         /// <summary>
-        /// Returns public messages from KITOS
+        /// Update the public messages
         /// </summary>
         [HttpPatch]
         [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
-        public IHttpActionResult Patch([FromBody]PublicMessagesRequestDTO body)
+        public IHttpActionResult Patch([FromBody] PublicMessagesRequestDTO body)
         {
-            
             //TODO: Return the updated texts!
             return Ok();
         }
@@ -60,17 +65,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         public IHttpActionResult GetPermissions()
         {
-            //TODO: Move to application service
-            var allowModify = _textsRepository
-                .AsQueryable()
-                .First()
-                .Transform(_authorizationContext.AllowModify);
-            return Ok(new ResourcePermissionsResponseDTO()
-            {
-                Delete = false, //resource cannot be deleted
-                Read = true, //public data can be read by anyone
-                Modify = allowModify
-            });
+            return _publicMessagesService
+                .GetPermissions()
+                .Transform(_permissionsResponseMapper.Map)
+                .Transform(Ok);
         }
     }
 }
