@@ -1,6 +1,5 @@
 ﻿using System;
 using Core.Abstractions.Caching;
-using Infrastructure.Services.Caching;
 
 namespace Core.ApplicationServices.Authorization
 {
