@@ -10,4 +10,9 @@
         <input id="selectUser" data-select-user="foo" data-user-model="ctrl.newUser" data-on-select="ctrl.newLocalAdmin()"/>
     </div>
 </div>
+<div class="row form-group" ng-if="ctrl.loading">
+    <div class="col-xs-12">
+        <progress-spinner data-show-text="true" />  
+    </div>
+</div>
 <global-admin-local-admins-list data-local-admins="ctrl.localAdmins" data-callbacks="ctrl.callbacks" />
