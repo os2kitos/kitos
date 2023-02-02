@@ -1,11 +1,10 @@
 ﻿using System;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Response.Options
 {
-    public class RegularOptionExtendedResponseDTO : IdentityNamePairResponseDTO, IOptionAvailability
+    public class RegularOptionExtendedResponseDTO : RegularOptionResponseDTO, IOptionAvailability
     {
-        public RegularOptionExtendedResponseDTO(Guid uuid, string name, bool isAvailable) : base(uuid, name)
+        public RegularOptionExtendedResponseDTO(Guid uuid, string name, bool isAvailable, string description) : base(uuid, name,description)
         {
             IsAvailable = isAvailable;
         }

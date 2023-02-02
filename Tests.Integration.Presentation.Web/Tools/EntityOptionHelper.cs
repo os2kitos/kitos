@@ -44,7 +44,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string DataProcessingRegistrationRoles = "DataProcessingRegistrationRoles";
         }
 
-        public static async Task<OptionDTO> CreateOptionTypeAsync(string resource, string optionName, int organizationId, Cookie optionalLogin = null)
+        public static async Task<OptionDTO> CreateOptionTypeAsync(string resource, string optionName, int organizationId, Cookie optionalLogin = null, string description = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/{resource}?organizationId={organizationId}");
@@ -53,7 +53,8 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 IsObligatory = true,
                 IsEnabled = true,
-                Name = optionName
+                Name = optionName,
+                Description = description ?? ""
             };
 
             using var response = await HttpApi.PostWithCookieAsync(url, cookie, body);

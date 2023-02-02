@@ -35,7 +35,8 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             //Arrange
             var orgId = TestEnvironment.DefaultOrganizationId;
             var name = A<string>();
-            await EntityOptionHelper.CreateOptionTypeAsync(apiv1OptionResource, name, orgId);
+            var description = A<string>();
+            var optionDto = await EntityOptionHelper.CreateOptionTypeAsync(apiv1OptionResource, name, orgId, description: description);
             var organizationDto = await OrganizationHelper.GetOrganizationAsync(orgId);
             var organizationUuid = organizationDto.Uuid;
             var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organizationUuid, 100, 0); //100 should be more than enough to get all.
@@ -46,6 +47,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
 
             //Assert
             Assert.Equal(name, result.Name);
+            Assert.Equal(description, result.Description);
             Assert.Equal(option.Uuid, result.Uuid);
             Assert.True(result.IsAvailable);
         }
