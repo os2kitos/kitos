@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Messages;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainServices;
 using Serilog;
@@ -34,7 +34,12 @@ namespace Core.ApplicationServices.Messages
 
         public PublicMessages GetPublicMessages()
         {
-            var texts = _repository.AsQueryable().ToDictionary(x => x.Id, x => x.Value ?? "");
+            var texts = GetTextsLookup();
+            return MapPublicMessages(texts);
+        }
+
+        private PublicMessages MapPublicMessages(IReadOnlyDictionary<int, Text> texts)
+        {
             return new PublicMessages(
                 MapText(texts, Text.SectionIds.About),
                 MapText(texts, Text.SectionIds.Guides),
@@ -46,14 +51,46 @@ namespace Core.ApplicationServices.Messages
 
         public Result<PublicMessages, OperationError> UpdateMessages(WritePublicMessagesParams parameters)
         {
-            throw new NotImplementedException();
+            if (!GetPermissions().Modify)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            var texts = GetTextsLookup();
+            WriteChange(parameters.About, Text.SectionIds.About, texts);
+            WriteChange(parameters.ContactInfo, Text.SectionIds.ContactInfo, texts);
+            WriteChange(parameters.Guides, Text.SectionIds.Guides, texts);
+            WriteChange(parameters.Misc, Text.SectionIds.Misc, texts);
+            WriteChange(parameters.StatusMessages, Text.SectionIds.StatusMessages, texts);
+            _repository.Save();
+
+            return MapPublicMessages(texts);
         }
 
-        private string MapText(IReadOnlyDictionary<int, string> textMap, int textId)
+        private void WriteChange(OptionalValueChange<string> change, int textId, Dictionary<int, Text> texts)
+        {
+            if (change.HasChange)
+            {
+                if (texts.TryGetValue(textId, out var text))
+                {
+                    text.Value = change.NewValue;
+                }
+                else
+                {
+                    _logger.Error("Missing text id for the front page {textId}. Not able to change unknown text", textId);
+                }
+            }
+        }
+
+        private Dictionary<int, Text> GetTextsLookup()
+        {
+            return _repository.AsQueryable().ToDictionary(x => x.Id, x => x);
+        }
+
+        private string MapText(IReadOnlyDictionary<int, Text> textMap, int textId)
         {
             if (textMap.TryGetValue(textId, out var text))
             {
-                return text;
+                return text.Value ?? string.Empty;
             }
 
             _logger.Error("Missing text id for the front page {textId}. Returning empty text", textId);
