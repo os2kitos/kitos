@@ -82,7 +82,7 @@
         }
         
         getOrganizationSelectOptions() {
-            return this.select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100"], (item, items) => {
+            return this.select2LoadingService.loadSelect2WithDataHandler("api/organization/search/all", true, ["take=100"], (item, items) => {
                 items.push({
                     id: item.id,
                     text: item.name ? item.name : 'Intet navn',
