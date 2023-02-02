@@ -68,13 +68,13 @@ namespace Presentation.Web.Swagger
             }
         }
 
-        public static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, int dept = 0)
+        public static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, List<string> visitedDefinitions, int dept = 0)
         {
-            if (schema == null)
+            if (schema?.@ref == null)
             {
                 yield break;
             }
-            if (dept > 3) //if the depth is too big, the api v1 generation won't work 
+            if (visitedDefinitions.Contains(schema.@ref)) //if definition was already visited break to avoid possible circular dependency
             {
                 yield break;
             }
@@ -87,10 +87,12 @@ namespace Presentation.Web.Swagger
             foreach (var additionalSchema in listOfAdditionalSchema)
             {
                 yield return additionalSchema;
-                foreach (var childSchema in additionalSchema.EnumerateSchema(listOfDefinition, dept+1) ?? new List<Schema>())
+                foreach (var childSchema in additionalSchema.EnumerateSchema(listOfDefinition, visitedDefinitions, dept + 1) ?? new List<Schema>())
                 {
                     yield return childSchema;
+                    visitedDefinitions.Add(additionalSchema.@ref);
                 }
+                visitedDefinitions.Add(additionalSchema.@ref);
             }
         }
     }

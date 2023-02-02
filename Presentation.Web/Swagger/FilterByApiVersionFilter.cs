@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger;
@@ -27,11 +28,12 @@ namespace Presentation.Web.Swagger
                 }
             }
 
+            var visitedDefinitions = new List<string>();
             var listOfSchemaWithReference = swaggerDoc.paths
                 .SelectMany(x => x.Value.EnumerateOperations()) //Find operation by path
                 .SelectMany(x => x.EnumerateSchema()) //Find schema by operation
                 .SelectMany(x =>
-                    x.EnumerateSchema(swaggerDoc.definitions)) //Find Schema by schema (dependent schema)
+                    x.EnumerateSchema(swaggerDoc.definitions, visitedDefinitions)) //Find Schema by schema (dependent schema)
                 .Where(x => x?.@ref != null ||
                             x?.items?.@ref != null) //I only want the schema that reference a definition.
                 .Select(x =>
