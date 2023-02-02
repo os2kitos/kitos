@@ -27,6 +27,7 @@ namespace Presentation.Web.Swagger
             {
                 yield break;
             }
+            //Response schemas
             foreach (var response in operation.responses ?? new Dictionary<string, Response>())
             {
                 yield return response.Value.schema;
@@ -35,6 +36,7 @@ namespace Presentation.Web.Swagger
                     yield return response.Value.schema.items;
                 }
             }
+            //Parameter schemas
             foreach (var parameter in operation.parameters ?? new List<Parameter>())
             {
                 yield return parameter.schema;
@@ -54,7 +56,7 @@ namespace Presentation.Web.Swagger
                     }
                 }
             }
-            if (!string.IsNullOrEmpty(schema?.items?.@ref))
+            if (!string.IsNullOrEmpty(schema.items?.@ref))
             {
                 if (listOfDefinition.TryGetValue(schema.items.@ref.Replace("#/definitions/", string.Empty), out var definition))
                 {
@@ -63,17 +65,7 @@ namespace Presentation.Web.Swagger
                         yield return propertySchema.Value;
                     }
                 }
-            }/*
-            if (!string.IsNullOrEmpty(schema?.additionalProperties?.@ref))
-            {
-                if (listOfDefinition.TryGetValue(schema.additionalProperties.@ref.Replace("#/definitions/", string.Empty), out var definition))
-                {
-                    foreach (var propertySchema in definition.properties)
-                    {
-                        yield return propertySchema.Value;
-                    }
-                }
-            }*/
+            }
         }
 
         public static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, int dept = 0)
@@ -82,7 +74,7 @@ namespace Presentation.Web.Swagger
             {
                 yield break;
             }
-            if (dept > 3)
+            if (dept > 3) //if the depth is too big, the api v1 generation won't work 
             {
                 yield break;
             }

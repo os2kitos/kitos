@@ -37,10 +37,10 @@ namespace Presentation.Web.Swagger
                 .Select(x =>
                     ((x.@ref) ?? (x.items?.@ref))?.Replace("#/definitions/",
                         string.Empty)) //remove the path and keep the Model name
-                .Distinct() //I don't like duplicates
-                .ToHashSet(); //commit to memory
+                .Distinct()
+                .ToHashSet();
 
-            //Not finding a definition in the built list of reference means its unreferenced and can be removed.
+            //Not finding a definition in the built list of references means its unreferenced and can be removed.
             var listOfUnreferencedDefinition = swaggerDoc.definitions
                 .Where(x => !listOfSchemaWithReference.Contains(x.Key))
                 .ToList();
