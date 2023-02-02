@@ -32,7 +32,7 @@ namespace Core.ApplicationServices.Messages
             return new ResourcePermissionsResult(true, allowModify, false);
         }
 
-        public PublicMessages GetPublicMessages()
+        public PublicMessages Read()
         {
             var texts = GetTextsLookup();
             return MapPublicMessages(texts);
@@ -49,7 +49,7 @@ namespace Core.ApplicationServices.Messages
             );
         }
 
-        public Result<PublicMessages, OperationError> UpdateMessages(WritePublicMessagesParams parameters)
+        public Result<PublicMessages, OperationError> Write(WritePublicMessagesParams parameters)
         {
             if (!GetPermissions().Modify)
             {

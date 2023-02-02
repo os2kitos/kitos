@@ -7,7 +7,7 @@ namespace Core.ApplicationServices.Messages
     public interface IPublicMessagesService
     {
         ResourcePermissionsResult GetPermissions();
-        PublicMessages GetPublicMessages();
-        Result<PublicMessages, OperationError> UpdateMessages(WritePublicMessagesParams parameters);
+        PublicMessages Read();
+        Result<PublicMessages, OperationError> Write(WritePublicMessagesParams parameters);
     }
 }

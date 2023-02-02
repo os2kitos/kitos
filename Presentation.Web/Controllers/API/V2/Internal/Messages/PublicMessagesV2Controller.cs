@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
         public IHttpActionResult Get()
         {
-            var publicMessages = _publicMessagesService.GetPublicMessages();
+            var publicMessages = _publicMessagesService.Read();
             var dto = ToDTO(publicMessages);
             return Ok(dto);
         }
@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
 
             return _writeModelMapper
                 .FromPATCH(body)
-                .Transform(_publicMessagesService.UpdateMessages)
+                .Transform(_publicMessagesService.Write)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }
