@@ -49,6 +49,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         [HttpPatch]
         [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         public IHttpActionResult Patch([FromBody] PublicMessagesRequestDTO body)
         {
             if (body == null)
@@ -68,6 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         /// </summary>
         [HttpGet]
         [Route("permissions")]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         public IHttpActionResult GetPermissions()
         {
