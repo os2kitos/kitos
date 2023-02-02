@@ -1,5 +1,4 @@
 ﻿using Swashbuckle.Swagger;
-using System;
 using System.Collections.Generic;
 
 namespace Presentation.Web.Swagger
@@ -15,6 +14,7 @@ namespace Presentation.Web.Swagger
             yield return pathItem.get;
             yield return pathItem.post;
             yield return pathItem.put;
+            yield return pathItem.patch;
             yield return pathItem.delete;
             yield return pathItem.options;
             yield return pathItem.head;
@@ -64,6 +64,16 @@ namespace Presentation.Web.Swagger
                     }
                 }
             }
+            if (!string.IsNullOrEmpty(schema?.additionalProperties?.@ref))
+            {
+                if (listOfDefinition.TryGetValue(schema.additionalProperties.@ref.Replace("#/definitions/", string.Empty), out var definition))
+                {
+                    foreach (var propertySchema in definition.properties)
+                    {
+                        yield return propertySchema.Value;
+                    }
+                }
+            }
         }
 
         public static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, int dept = 0)
@@ -85,7 +95,7 @@ namespace Presentation.Web.Swagger
             foreach (var additionalSchema in listOfAdditionalSchema)
             {
                 yield return additionalSchema;
-                foreach (var childSchema in additionalSchema.EnumerateSchema(listOfDefinition, dept++) ?? new List<Schema>())
+                foreach (var childSchema in additionalSchema.EnumerateSchema(listOfDefinition, dept+1) ?? new List<Schema>())
                 {
                     yield return childSchema;
                 }

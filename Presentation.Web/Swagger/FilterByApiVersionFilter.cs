@@ -30,14 +30,14 @@ namespace Presentation.Web.Swagger
             var listOfSchemaWithReference = swaggerDoc.paths.SelectMany(x => x.Value.EnumerateOperations())//Find operation by path
                 .SelectMany(x => x.EnumerateSchema()) //Find schema by operation
                 .SelectMany(x => x.EnumerateSchema(swaggerDoc.definitions))//Find Schema by schema (dependent schema)
-                .Where(x => x?.@ref != null || x?.items?.@ref != null)//I only wany the schema that reference a definition.
+                .Where(x => x?.@ref != null || x?.items?.@ref != null)//I only want the schema that reference a definition.
                 .Select(x => ((x.@ref) ?? (x.items?.@ref))?.Replace("#/definitions/", string.Empty))//remove the path and keep the Model name
-                .Distinct()//I dont like duplicates
+                .Distinct()//I don't like duplicates
                 .ToHashSet();//commit to memory
 
             //Not finding a definition in the built list of reference means its unreferenced and can be removed.
             var listOfUnreferencedDefinition = swaggerDoc.definitions.Where(x => !listOfSchemaWithReference.Contains(x.Key))
-                .ToList();//Deleting item from source need list 
+                .ToList();
 
             foreach (var unreferencedDefinition in listOfUnreferencedDefinition)
             {
