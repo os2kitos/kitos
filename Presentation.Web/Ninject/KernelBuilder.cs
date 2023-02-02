@@ -123,6 +123,7 @@ using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -320,6 +321,8 @@ namespace Presentation.Web.Ninject
             //Permissions
             kernel.Bind<IResourcePermissionsResponseMapper>().To<ResourcePermissionsResponseMapper>().InCommandScope(Mode);
 
+            //Public messages
+            kernel.Bind<IPublicMessagesWriteModelMapper>().To<PublicMessagesWriteModelMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)

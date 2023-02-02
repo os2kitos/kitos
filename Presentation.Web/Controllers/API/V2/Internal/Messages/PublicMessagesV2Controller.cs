@@ -3,10 +3,12 @@ using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Messages;
+using Core.ApplicationServices.Model.Messages;
 using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Messages
 {
@@ -15,13 +17,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
     {
         private readonly IPublicMessagesService _publicMessagesService;
         private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
+        private readonly IPublicMessagesWriteModelMapper _writeModelMapper;
 
         public PublicMessagesV2Controller(
             IPublicMessagesService publicMessagesService,
-            IResourcePermissionsResponseMapper permissionsResponseMapper)
+            IResourcePermissionsResponseMapper permissionsResponseMapper,
+            IPublicMessagesWriteModelMapper writeModelMapper)
         {
             _publicMessagesService = publicMessagesService;
             _permissionsResponseMapper = permissionsResponseMapper;
+            _writeModelMapper = writeModelMapper;
         }
 
         /// <summary>
@@ -34,14 +39,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         public IHttpActionResult Get()
         {
             var publicMessages = _publicMessagesService.GetPublicMessages();
-            var dto = new PublicMessagesResponseDTO
-            {
-                Guides = publicMessages.Guides,
-                Misc = publicMessages.Misc,
-                ContactInfo = publicMessages.ContactInfo,
-                About = publicMessages.About,
-                StatusMessages = publicMessages.StatusMessages
-            };
+            var dto = ToDTO(publicMessages);
             return Ok(dto);
         }
 
@@ -53,8 +51,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
         public IHttpActionResult Patch([FromBody] PublicMessagesRequestDTO body)
         {
-            //TODO: Return the updated texts!
-            return Ok();
+            if (body == null)
+            {
+                return BadRequest("Missing request body");
+            }
+
+            return _writeModelMapper
+                .FromPATCH(body)
+                .Transform(_publicMessagesService.UpdateMessages)
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -69,6 +75,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
                 .GetPermissions()
                 .Transform(_permissionsResponseMapper.Map)
                 .Transform(Ok);
+        }
+
+        private static PublicMessagesResponseDTO ToDTO(PublicMessages publicMessages)
+        {
+            return new PublicMessagesResponseDTO
+            {
+                Guides = publicMessages.Guides,
+                Misc = publicMessages.Misc,
+                ContactInfo = publicMessages.ContactInfo,
+                About = publicMessages.About,
+                StatusMessages = publicMessages.StatusMessages
+            };
         }
     }
 }

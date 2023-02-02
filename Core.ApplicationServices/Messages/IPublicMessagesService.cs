@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Messages;
 
 namespace Core.ApplicationServices.Messages
@@ -7,5 +8,6 @@ namespace Core.ApplicationServices.Messages
     {
         ResourcePermissionsResult GetPermissions();
         PublicMessages GetPublicMessages();
+        Result<PublicMessages, OperationError> UpdateMessages(WritePublicMessagesParams parameters);
     }
 }

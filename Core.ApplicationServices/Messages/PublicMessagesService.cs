@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -41,6 +42,11 @@ namespace Core.ApplicationServices.Messages
                 MapText(texts, Text.SectionIds.Misc),
                 MapText(texts, Text.SectionIds.ContactInfo)
             );
+        }
+
+        public Result<PublicMessages, OperationError> UpdateMessages(WritePublicMessagesParams parameters)
+        {
+            throw new NotImplementedException();
         }
 
         private string MapText(IReadOnlyDictionary<int, string> textMap, int textId)
