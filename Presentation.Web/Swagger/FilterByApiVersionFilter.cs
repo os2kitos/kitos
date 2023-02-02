@@ -20,24 +20,20 @@ namespace Presentation.Web.Swagger
         public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
         {
             var docVersion = _getApiVersion(swaggerDoc);
-            foreach (var path in swaggerDoc.paths.ToList())
+            foreach (var path in swaggerDoc.paths.Where(path => docVersion != _getPathApiVersion(path.Key)).ToList())
             {
-                if (docVersion != _getPathApiVersion(path.Key))
-                {
-                    swaggerDoc.paths.Remove(path);
-                }
+                swaggerDoc.paths.Remove(path);
             }
 
-            var visitedDefinitions = new List<string>();
             var listOfSchemaWithReference = swaggerDoc.paths
                 .SelectMany(x => x.Value.EnumerateOperations()) //Find operation by path
                 .SelectMany(x => x.EnumerateSchema()) //Find schema by operation
                 .SelectMany(x =>
-                    x.EnumerateSchema(swaggerDoc.definitions, visitedDefinitions)) //Find Schema by schema (dependent schema)
+                    x.StartSchemaEnumeration(swaggerDoc.definitions)) //Find Schema by schema (dependent schema)
                 .Where(x => x?.@ref != null ||
                             x?.items?.@ref != null) //I only want the schema that reference a definition.
                 .Select(x =>
-                    ((x.@ref) ?? (x.items?.@ref))?.Replace("#/definitions/",
+                    (x.@ref ?? x.items?.@ref)?.Replace("#/definitions/",
                         string.Empty)) //remove the path and keep the Model name
                 .Distinct()
                 .ToHashSet();

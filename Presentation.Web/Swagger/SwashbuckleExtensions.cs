@@ -20,7 +20,6 @@ namespace Presentation.Web.Swagger
             yield return pathItem.head;
         }
 
-
         public static IEnumerable<Schema> EnumerateSchema(this Operation operation)
         {
             if (operation == null)
@@ -42,9 +41,42 @@ namespace Presentation.Web.Swagger
                 yield return parameter.schema;
             }
         }
+        
+        public static IEnumerable<Schema> StartSchemaEnumeration(this Schema schema, IDictionary<string, Schema> listOfDefinition)
+        {
+            return schema.EnumerateSchema(listOfDefinition, new List<string>());
+        }
 
+        private static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, ICollection<string> visitedDefinitions, bool isRoot = true)
+        {
+            if (schema?.@ref == null)
+            {
+                yield break;
+            }
+            if (visitedDefinitions.Contains(schema.@ref)) //if definition was already visited break to avoid possible circular dependency
+            {
+                yield break;
+            }
 
-        public static IEnumerable<Schema> FindAdditionalSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition)
+            if (isRoot)
+            {
+                yield return schema;
+            }
+
+            var listOfAdditionalSchema = schema.FindAdditionalSchema(listOfDefinition) ?? new List<Schema>();
+            foreach (var additionalSchema in listOfAdditionalSchema)
+            {
+                yield return additionalSchema;
+                foreach (var childSchema in additionalSchema.EnumerateSchema(listOfDefinition, visitedDefinitions, false) ?? new List<Schema>())
+                {
+                    yield return childSchema;
+                    visitedDefinitions.Add(additionalSchema.@ref);
+                }
+                visitedDefinitions.Add(additionalSchema.@ref);
+            }
+        }
+
+        private static IEnumerable<Schema> FindAdditionalSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition)
         {
             if (!string.IsNullOrEmpty(schema.@ref))
             {
@@ -65,34 +97,6 @@ namespace Presentation.Web.Swagger
                         yield return propertySchema.Value;
                     }
                 }
-            }
-        }
-
-        public static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, List<string> visitedDefinitions, int dept = 0)
-        {
-            if (schema?.@ref == null)
-            {
-                yield break;
-            }
-            if (visitedDefinitions.Contains(schema.@ref)) //if definition was already visited break to avoid possible circular dependency
-            {
-                yield break;
-            }
-            if (dept == 0)
-            {
-                yield return schema;
-            }
-
-            var listOfAdditionalSchema = schema.FindAdditionalSchema(listOfDefinition) ?? new List<Schema>();
-            foreach (var additionalSchema in listOfAdditionalSchema)
-            {
-                yield return additionalSchema;
-                foreach (var childSchema in additionalSchema.EnumerateSchema(listOfDefinition, visitedDefinitions, dept + 1) ?? new List<Schema>())
-                {
-                    yield return childSchema;
-                    visitedDefinitions.Add(additionalSchema.@ref);
-                }
-                visitedDefinitions.Add(additionalSchema.@ref);
             }
         }
     }
