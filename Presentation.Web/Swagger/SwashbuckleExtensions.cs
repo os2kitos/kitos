@@ -63,7 +63,7 @@ namespace Presentation.Web.Swagger
                         yield return propertySchema.Value;
                     }
                 }
-            }
+            }/*
             if (!string.IsNullOrEmpty(schema?.additionalProperties?.@ref))
             {
                 if (listOfDefinition.TryGetValue(schema.additionalProperties.@ref.Replace("#/definitions/", string.Empty), out var definition))
@@ -73,7 +73,7 @@ namespace Presentation.Web.Swagger
                         yield return propertySchema.Value;
                     }
                 }
-            }
+            }*/
         }
 
         public static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, int dept = 0)
@@ -82,7 +82,7 @@ namespace Presentation.Web.Swagger
             {
                 yield break;
             }
-            if (dept > 10)
+            if (dept > 3)
             {
                 yield break;
             }
