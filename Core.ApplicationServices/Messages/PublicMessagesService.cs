@@ -35,11 +35,11 @@ namespace Core.ApplicationServices.Messages
         {
             var texts = _repository.AsQueryable().ToDictionary(x => x.Id, x => x.Value ?? "");
             return new PublicMessages(
-                MapText(texts, 1),
-                MapText(texts, 3),
-                MapText(texts, 4),
-                MapText(texts, 2),
-                MapText(texts, 5)
+                MapText(texts, Text.SectionIds.About),
+                MapText(texts, Text.SectionIds.Guides),
+                MapText(texts, Text.SectionIds.StatusMessages),
+                MapText(texts, Text.SectionIds.Misc),
+                MapText(texts, Text.SectionIds.ContactInfo)
             );
         }
 
