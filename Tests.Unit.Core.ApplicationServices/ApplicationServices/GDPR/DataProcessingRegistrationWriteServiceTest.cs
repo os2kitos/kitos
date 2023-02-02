@@ -2239,7 +2239,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             AssertTransactionNotCommitted(transaction);
         }
 
-        public void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
+        private void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Contains(errorMessageContent, result.Error.Message.GetValueOrEmptyString());

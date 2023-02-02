@@ -17,8 +17,10 @@ namespace Infrastructure.Ninject.ApplicationServices
 
         public Result<(TOption option, bool available), OperationError> GetOptionType<TReference, TOption>(Guid organizationUuid, Guid optionUuid) where TOption : OptionEntity<TReference>
         {
-            var applicationService = _kernel.Get<IOptionsApplicationService<TReference,TOption>>();
-            return applicationService.GetOptionType(organizationUuid, optionUuid);
+            var applicationService = _kernel.Get<IOptionsApplicationService<TReference, TOption>>();
+            return applicationService
+                .GetOptionType(organizationUuid, optionUuid)
+                .Select(option => (option.option.Option, option.available));
         }
     }
 }

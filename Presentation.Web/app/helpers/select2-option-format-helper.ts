@@ -4,7 +4,7 @@
             return Select2OptionsFormatHelper.formatText(user.text, user.email);
         }
 
-        public static formatOrganizationWithCvr(org: {text: string, cvr?: string}): string {
+        public static formatOrganizationWithCvr(org: Models.ViewModel.Select2.ISelect2OrganizationOptionWithCvrViewModel): string {
             return Select2OptionsFormatHelper.formatText(org.text, org.cvr);
         }
 

@@ -8,6 +8,6 @@ namespace Presentation.Web.Models.API.V1
         public Guid Uuid { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
-        public string Note { get; set; }
+        public string Description { get; set; }
     }
 }

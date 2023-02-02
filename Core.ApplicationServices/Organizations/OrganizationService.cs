@@ -218,23 +218,38 @@ namespace Core.ApplicationServices.Organizations
             return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
         }
 
-        public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions)
+        public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions)
         {
             var crossOrganizationReadAccess = _authorizationContext.GetCrossOrganizationReadAccess();
 
-            var domainQueries = conditions.ToList();
+            var initialFilters = new List<IDomainQuery<Organization>>();
+
+            //If user does not have full access to everything, we apply the membership and sharing rules
             if (crossOrganizationReadAccess < CrossOrganizationDataReadAccessLevel.All)
             {
-                //Restrict organization access
-                domainQueries =
-                    new QueryOrganizationByIdsOrSharedAccess(_userContext.OrganizationIds, crossOrganizationReadAccess == CrossOrganizationDataReadAccessLevel.Public)
-                        .WrapAsEnumerable()
-                        .Concat(domainQueries)
-                        .ToList();
+                //If requested only membership or if user cannot access shared orgs, we restrict the dataset to only include the orgs in which the user has a full membership
+                if (onlyWithMembershipAccess || crossOrganizationReadAccess < CrossOrganizationDataReadAccessLevel.Public)
+                {
+                    initialFilters.Add(new QueryByIds<Organization>(_userContext.OrganizationIds));
+                }
+                else
+                {
+                    //Refinement to restrict organization access to include only accessible organizations (membership or shared data)
+                    initialFilters.Add(new QueryOrganizationByIdsOrSharedAccess(_userContext.OrganizationIds, true));
+                }
             }
 
-            var query = new IntersectionQuery<Organization>(domainQueries);
+            var refinements = initialFilters
+                .Concat(conditions)
+                .ToList();
+
+            var query = new IntersectionQuery<Organization>(refinements);
             return _repository.GetAll().Transform(query.Apply);
+        }
+
+        public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions)
+        {
+            return SearchAccessibleOrganizations(false, conditions);
         }
 
         public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria)

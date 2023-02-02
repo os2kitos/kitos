@@ -5,11 +5,13 @@ using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
 using System;
 using System.Collections.Generic;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainServices.Model.Options;
 
 namespace Core.ApplicationServices.OptionTypes
 {
-    public class OptionsApplicationService<TReference, TOption> : IOptionsApplicationService<TReference, TOption> 
+    public class OptionsApplicationService<TReference, TOption> : IOptionsApplicationService<TReference, TOption>
         where TOption : OptionEntity<TReference>
     {
         private readonly IOptionsService<TReference, TOption> _optionsTypeService;
@@ -23,31 +25,27 @@ namespace Core.ApplicationServices.OptionTypes
             _organizationRepository = organizationRepository;
         }
 
-        public Result<(TOption option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid optionTypeUuid)
+        public Result<(OptionDescriptor<TOption> option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid optionTypeUuid)
         {
             var orgId = ResolveOrgId(organizationUuid);
             if (orgId.Failed)
             {
                 return orgId.Error;
             }
-            var businessTypeResult = _optionsTypeService.GetOptionByUuid(orgId.Value, optionTypeUuid);
-            if (businessTypeResult.IsNone)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
 
-            return businessTypeResult.Value;
+            return _optionsTypeService
+                .GetAllOptionsDetails(orgId.Value)
+                .FirstOrNone(x => x.option.Option.Uuid == optionTypeUuid)
+                .Match<Result<(OptionDescriptor<TOption> option, bool available), OperationError>>
+                    (
+                        r => r,
+                        () => new OperationError(OperationFailure.NotFound)
+                        );
         }
 
-        public Result<IEnumerable<TOption>, OperationError> GetOptionTypes(Guid organizationUuid)
+        public Result<IEnumerable<OptionDescriptor<TOption>>, OperationError> GetOptionTypes(Guid organizationUuid)
         {
-            var orgId = ResolveOrgId(organizationUuid);
-            if (orgId.Failed)
-            {
-                return orgId.Error;
-            }
-
-            return Result<IEnumerable<TOption>, OperationError>.Success(_optionsTypeService.GetAvailableOptions(orgId.Value));
+            return ResolveOrgId(organizationUuid).Select(_optionsTypeService.GetAvailableOptionsDetails);
         }
 
         private Result<int, OperationError> ResolveOrgId(Guid organizationUuid)

@@ -355,6 +355,9 @@
   <ItemGroup>
     <Compile Include="Swagger\SwashbuckleExtensions.cs" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\constants\local-admin-list-events.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-list.component.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-root.component.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
@@ -379,6 +382,7 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\admin-rights-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\personal-data-option.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-dto.ts" />
@@ -394,6 +398,7 @@
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-synchronization-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
+    <TypeScriptCompile Include="app\models\global-admin\global-admin-local-admin-row.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-error.ts" />
@@ -401,6 +406,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\select2-options\select2-organization-with-cvr-view-model.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\data-processing-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\users\user-administration-permissions-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\GDPR\sub-data-processor-view-model.ts" />
@@ -461,6 +467,7 @@
     <Compile Include="Models\API\V2\Request\Shared\ExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Shared\UpdateExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Options\RegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ResourcePermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ExternalReferenceDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasExternalReference.cs" />
@@ -717,6 +724,8 @@
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\global-admin\global-admin-local-admins-list.view.html" />
+    <Content Include="app\components\global-admin\global-admin-local-admins-root.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-organization-modal-delete.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
@@ -973,6 +982,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\it-contract\it-contract-service.ts" />
+    <TypeScriptCompile Include="app\services\Organization\organization-right-service.ts" />
     <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
     <TypeScriptCompile Include="app\services\Organization\organization-unit-service.ts" />
     <TypeScriptCompile Include="app\services\sts-organization-sync-service.ts" />

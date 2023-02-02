@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
+using Core.DomainServices.Model.Options;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
@@ -41,13 +42,13 @@ namespace Presentation.Web.Controllers.API.V2.External
                 .Match(Ok, FromOperationError);
         }
 
-        private List<TCollectionEntryDTO> ToDTOs(IEnumerable<TOption> options)
+        private List<TCollectionEntryDTO> ToDTOs(IEnumerable<OptionDescriptor<TOption>> options)
         {
             return options.Select(ToDTO).ToList();
         }
 
-        protected abstract TCollectionEntryDTO ToDTO(TOption option);
+        protected abstract TCollectionEntryDTO ToDTO(OptionDescriptor<TOption> option);
 
-        protected abstract TExtendedDto ToExtendedDTO(TOption option, bool isAvailable);
+        protected abstract TExtendedDto ToExtendedDTO(OptionDescriptor<TOption> option, bool isAvailable);
     }
 }
