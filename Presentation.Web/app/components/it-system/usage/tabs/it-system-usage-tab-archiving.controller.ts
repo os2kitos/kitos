@@ -156,7 +156,7 @@
                 };
             }
 
-            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["onlyWhereUserHasMembership=true", 'pageSize=25'], (item,
+            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler(Kitos.Constants.Organization.BaseApiPath, true, Kitos.Helpers.Select2ApiQueryHelper.getOrganizationQueryParams(true, 25), (item,
                 items) => {
                 items.push({
                     id: item.id,

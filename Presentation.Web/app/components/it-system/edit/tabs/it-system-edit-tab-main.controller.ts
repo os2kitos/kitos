@@ -42,9 +42,9 @@
                     [`excludeId=${itSystem.id}`, `orgId=${user.currentOrganizationId}`, `take=100`],
                     false);
                 $scope.organizationSelectOptions = select2LoadingService.loadSelect2(
-                    "api/organization",
+                    Kitos.Constants.Organization.BaseApiPath,
                     true,
-                    ["onlyWhereUserHasMembership=true", 'take=100'],
+                    Kitos.Helpers.Select2ApiQueryHelper.getOrganizationQueryParams(true, 100),
                     false);
 
                 $scope.hasWriteAccess = hasWriteAccess;

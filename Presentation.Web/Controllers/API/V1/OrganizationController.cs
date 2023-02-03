@@ -11,7 +11,6 @@ using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Queries;
 using Newtonsoft.Json.Linq;
@@ -61,13 +60,6 @@ namespace Presentation.Web.Controllers.API.V1
                 .ToList()
                 .Transform(Ok);
         }
-
-        /*[Route("api/organization/search/all")]
-        public HttpResponseMessage GetBySearch(string q, int take = 25)
-        {
-            return GetSearchedOrganizations(q, take);
-        }*/
-        
         protected override bool AllowCreate<T>(int organizationId, IEntity entity)
         {
             return AuthorizationContext.AllowCreate<Organization>(organizationId);
@@ -129,38 +121,6 @@ namespace Presentation.Web.Controllers.API.V1
 
             return base.Patch(id, organizationId, obj);
         }
-
-        /*private HttpResponseMessage GetSearchedOrganizations(string q, int take = 25, int? orgId = null)
-        {
-            try
-            {
-                q = HttpUtility.UrlDecode(q);
-                var canSeeAll = GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All;
-                var userId = UserId;
-                var dtos = Repository
-                    .AsQueryable()
-                    .Where(org => org.Name.Contains(q) || org.Cvr.Contains(q))
-                    .Where(org => canSeeAll || org.ObjectOwnerId == userId ||
-                                  // it's public everyone can see it
-                                  org.AccessModifier == AccessModifier.Public ||
-                                  // everyone in the same organization can see normal objects
-                                  org.AccessModifier == AccessModifier.Local &&
-                                  (orgId.HasValue && org.Id == orgId) ||
-                                  org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == userId)))
-                    .AsEnumerable()
-                    .Where(AllowRead)
-                    .OrderBy(_ => _.Name)
-                    .Take(take)
-                    .MapToShallowOrganizationDTOs()
-                    .ToList();
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }*/
 
         [NonAction]
         public override HttpResponseMessage Delete(int id, int organizationId) => throw new NotSupportedException();
