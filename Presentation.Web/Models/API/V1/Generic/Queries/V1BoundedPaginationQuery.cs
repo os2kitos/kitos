@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 using Core.ApplicationServices.Shared;
 
 namespace Presentation.Web.Models.API.V1.Generic.Queries

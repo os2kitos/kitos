@@ -44,7 +44,7 @@
                 $scope.organizationSelectOptions = select2LoadingService.loadSelect2(
                     "api/organization",
                     true,
-                    [`orgId=${user.currentOrganizationId}`, 'take=100'],
+                    ["onlyWhereUserHasMembership=true", 'take=100'],
                     false);
 
                 $scope.hasWriteAccess = hasWriteAccess;

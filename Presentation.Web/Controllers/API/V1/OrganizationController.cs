@@ -5,16 +5,21 @@ using System.Net.Http;
 using System.Security;
 using System.Web;
 using System.Web.Http;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Queries.Organization;
+using Core.DomainServices.Queries;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.Generic.Queries;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -38,16 +43,30 @@ namespace Presentation.Web.Controllers.API.V1
             return GetAll(paging);
         }
 
-        public HttpResponseMessage GetBySearchAndOrganizationId(string q, int orgId, int take = 25)
+        public HttpResponseMessage GetBySearchAndOrganizationId(string q, bool onlyWhereUserHasMembership, [FromUri] V1BoundedPaginationQuery pagination = null)
         {
-            return GetSearchedOrganizations(q, take, orgId);
+            q = HttpUtility.UrlDecode(q);
+
+            var refinements = new List<IDomainQuery<Organization>>();
+
+            if (!string.IsNullOrWhiteSpace(q))
+                refinements.Add(new QueryByNameOrCvrContent(q));
+            
+            return _organizationService
+                .SearchAccessibleOrganizations(onlyWhereUserHasMembership, refinements.ToArray())
+                .OrderBy(x => x.Id)
+                .Page(pagination)
+                .ToList()
+                .MapToShallowOrganizationDTOs()
+                .ToList()
+                .Transform(Ok);
         }
 
-        [Route("api/organization/search/all")]
+        /*[Route("api/organization/search/all")]
         public HttpResponseMessage GetBySearch(string q, int take = 25)
         {
             return GetSearchedOrganizations(q, take);
-        }
+        }*/
         
         protected override bool AllowCreate<T>(int organizationId, IEntity entity)
         {
@@ -111,7 +130,7 @@ namespace Presentation.Web.Controllers.API.V1
             return base.Patch(id, organizationId, obj);
         }
 
-        private HttpResponseMessage GetSearchedOrganizations(string q, int take = 25, int? orgId = null)
+        /*private HttpResponseMessage GetSearchedOrganizations(string q, int take = 25, int? orgId = null)
         {
             try
             {
@@ -141,7 +160,7 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 return LogError(e);
             }
-        }
+        }*/
 
         [NonAction]
         public override HttpResponseMessage Delete(int id, int organizationId) => throw new NotSupportedException();

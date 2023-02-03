@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
 
         public static ShallowOrganizationDTO MapToShallowOrganizationDTO(this Organization source)
         {
-            return new ShallowOrganizationDTO(source.Id, source.Name) { CvrNumber = source.Cvr };
+            return new ShallowOrganizationDTO(source.Id, source.Name) { CvrNumber = source.GetActiveCvr() };
         }
 
         public static IEnumerable<ShallowOrganizationDTO> MapToShallowOrganizationDTOs(this IEnumerable<Organization> source)

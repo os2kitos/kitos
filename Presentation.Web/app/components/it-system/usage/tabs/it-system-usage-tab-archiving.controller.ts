@@ -156,7 +156,7 @@
                 };
             }
 
-            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['take=25', 'orgId=' + user.currentOrganizationId], (item,
+            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["onlyWhereUserHasMembership=true", 'pageSize=25'], (item,
                 items) => {
                 items.push({
                     id: item.id,
