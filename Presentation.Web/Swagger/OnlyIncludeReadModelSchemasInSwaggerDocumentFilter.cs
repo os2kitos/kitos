@@ -40,6 +40,7 @@ namespace Presentation.Web.Swagger
             }
             else
             {
+                //If not a read model controller, purge all properties
                 foreach (var property in schema.properties)
                 {
                     RemoveCollectionTypeProperty(property, properties);
