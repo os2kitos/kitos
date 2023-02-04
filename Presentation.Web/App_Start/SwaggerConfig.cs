@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Web;
 using System.Web.Http;
 using Ninject.Infrastructure.Language;
 using Presentation.Web;
@@ -141,7 +140,12 @@ namespace Presentation.Web
                         return new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)
                             .Configure
                                 (
-                                    configure=>configure.IncludeNavigationProperties() //without navigation properties enabled, the odata model's "value" property will be omitted from swagger output
+                                    //without navigation properties enabled, the odata model's "value" property will be omitted from swagger output
+                                    //We then apply the OnlyIncludeReadModelSchemasInSwaggerDocumentFilter to ensure the page will still render.
+                                    //The entire odata model is huge because of the many circular references to large object types, so during dom update,
+                                    //the swagger ui just crashes even if the swagger json is valid
+                                    //also, the swagger odata provider does not respect that some properties have been removed from the edm model so we must remove them manually in the filter
+                                    configure => configure.IncludeNavigationProperties() 
                                 );
                     }
                     c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(CreateOdataSwaggerProvider(defaultProvider)));
