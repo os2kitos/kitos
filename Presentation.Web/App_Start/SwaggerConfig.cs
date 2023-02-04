@@ -12,6 +12,7 @@ using Presentation.Web.Models.Application.RuntimeEnv;
 using Presentation.Web.Swagger;
 using Swashbuckle.Application;
 using Swashbuckle.OData;
+using Swashbuckle.Swagger;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -135,7 +136,15 @@ namespace Presentation.Web
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
                     //Do not enable the build-in caching in the odata provider. It caches error responses which we dont want so we wrap it in a custom caching provider which bails out on errors
-                    c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)));
+                    ODataSwaggerProvider CreateOdataSwaggerProvider(ISwaggerProvider defaultProvider)
+                    {
+                        return new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)
+                            .Configure
+                                (
+                                    configure=>configure.IncludeNavigationProperties() //without navigation properties enabled, the odata model's "value" property will be omitted from swagger output
+                                );
+                    }
+                    c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(CreateOdataSwaggerProvider(defaultProvider)));
                 })
                 .EnableSwaggerUi(c =>
                 {
