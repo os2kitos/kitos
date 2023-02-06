@@ -857,6 +857,7 @@
     <Compile Include="Ninject\KernelBuilder.cs" />
     <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
+    <Compile Include="Swagger\OnlyIncludeReadModelSchemasInSwaggerDocumentFilter.cs" />
     <Compile Include="Swagger\CreateOperationIdOperationFilter.cs" />
     <Compile Include="Swagger\CustomCachingSwaggerProvider.cs" />
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
