@@ -1,8 +1,12 @@
-﻿using System.Web.Http;
+﻿using System.Net;
+using System.Web.Http;
 using Core.ApplicationServices.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -21,7 +25,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery]
-        [RequireTopOnOdataThroughKitosToken]
+        [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<DataProcessingRegistrationReadModel>))]
         [ODataRoute]
         public IHttpActionResult Get([FromODataUri]int organizationId)
         {

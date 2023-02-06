@@ -11,7 +11,7 @@ using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
 
-namespace Presentation.Web.Controllers.API.V2.External.Generic
+namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public abstract class WriteModelMapperBase
     {
