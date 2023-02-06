@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.SystemUsage.ReadModels;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -23,6 +27,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery]
+        [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<ItSystemUsageOverviewReadModel>))]
         [ODataRoute("Organizations({organizationId})/ItSystemUsageOverviewReadModels")]
         public IHttpActionResult Get([FromODataUri] int organizationId, int? responsibleOrganizationUnitId = null)
         {
@@ -36,6 +41,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         /// <param name="responsibleOrganizationUnitUuid"></param>
         /// <returns></returns>
         [EnableQuery]
+        [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<ItSystemUsageOverviewReadModel>))]
         [ODataRoute("ItSystemUsageOverviewReadModels")]
         public IHttpActionResult GetByUuid(Guid organizationUuid, Guid? responsibleOrganizationUnitUuid = null)
         {

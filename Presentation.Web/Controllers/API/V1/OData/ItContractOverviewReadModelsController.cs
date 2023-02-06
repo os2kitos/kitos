@@ -1,8 +1,12 @@
-﻿using System.Web.Http;
+﻿using System.Net;
+using System.Web.Http;
 using Core.ApplicationServices.Contract.ReadModels;
+using Core.DomainModel.ItContract.Read;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -17,7 +21,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery]
-        [RequireTopOnOdataThroughKitosToken]
+        [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<ItContractOverviewReadModel>))]
         [ODataRoute("Organizations({organizationId})/ItContractOverviewReadModels")]
         public IHttpActionResult Get([FromODataUri] int organizationId, int? responsibleOrganizationUnitId = null)
         {

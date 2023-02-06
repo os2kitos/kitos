@@ -451,8 +451,9 @@
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\InternalApiV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\IPublicMessagesWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\PublicMessagesWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Messages\PublicMessagesV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\PublicMessagesResponseMapper.cs" />
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\SubDataProcessorResponseDTO.cs" />
@@ -462,6 +463,7 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserAdministrationPermissionsDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\PublicMessagesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\PublicMessagesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessorRegistrationSubDataProcessorWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Shared\ExternalReferenceDataWriteRequestDTO.cs" />
@@ -515,9 +517,9 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\DeltaFeedV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\Mapping\TrackedEntityTypeMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\Generic\IPropertyUpdateRule.cs" />
-    <Compile Include="Controllers\API\V2\External\Generic\MustUpdateIfDefinedOrEnforcedChangeRule.cs" />
-    <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\IPropertyUpdateRule.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\MustUpdateIfDefinedOrEnforcedChangeRule.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\WriteModelMapperBase.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractCriticalityTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
@@ -856,6 +858,7 @@
     <Compile Include="Ninject\KernelBuilder.cs" />
     <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
+    <Compile Include="Swagger\OnlyIncludeReadModelSchemasInSwaggerDocumentFilter.cs" />
     <Compile Include="Swagger\CreateOperationIdOperationFilter.cs" />
     <Compile Include="Swagger\CustomCachingSwaggerProvider.cs" />
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
