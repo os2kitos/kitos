@@ -110,7 +110,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var nameOrg1 = A<string>() + "æ";
+            var nameOrg1 = A<string>();
             var cvrOrg1 = CreateNewCvr();
             const AccessModifier accessModifier = AccessModifier.Public;
 
