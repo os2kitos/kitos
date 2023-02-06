@@ -102,6 +102,7 @@ namespace Presentation.Web
                         c.DocumentFilter<RemoveInternalApiOperationsFilter>();
                         c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     }
+                    c.DocumentFilter<PurgeUnusedTypesDocumentFilter>();
                     c.OperationFilter<CreateOperationIdOperationFilter>();
                     c.OperationFilter<FixNamingOfComplexQueryParametersFilter>();
                     c.OperationFilter<FixContentParameterTypesOnSwaggerSpec>();
