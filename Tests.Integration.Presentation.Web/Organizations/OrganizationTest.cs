@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -119,13 +120,13 @@ namespace Tests.Integration.Presentation.Web.Organizations
             using var organizationsFilteredByCvr = await OrganizationHelper.SendGetOrganizationSearchRequestAsync(cvrOrg1);
             Assert.True(organizationsFilteredByCvr.IsSuccessStatusCode);
 
-            var resultFilteredByCvr = await organizationsFilteredByCvr.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
-            Assert.True(resultFilteredByCvr.Exists(prp => prp.Cvr.Contains(cvrOrg1)));
+            var resultFilteredByCvr = await organizationsFilteredByCvr.ReadResponseBodyAsKitosApiResponseAsync<List<ShallowOrganizationDTO>>();
+            Assert.True(resultFilteredByCvr.Exists(prp => prp.CvrNumber.Contains(cvrOrg1)));
 
             using var organizationsFilteredByName = await OrganizationHelper.SendGetOrganizationSearchRequestAsync(nameOrg1);
             Assert.True(organizationsFilteredByName.IsSuccessStatusCode);
 
-            var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
+            var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<ShallowOrganizationDTO>>();
             Assert.True(resultFilteredByName.Exists(prp => prp.Name.Contains(nameOrg1)));
         }
 

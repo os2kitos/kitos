@@ -87,4 +87,8 @@
             Text: "Slet",
         };
     }
+
+    export class Organization {
+        static readonly BaseApiPath = "api/organization";
+    }
 }

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Web;
 using System.Web.Http;
 using Ninject.Infrastructure.Language;
 using Presentation.Web;
@@ -12,6 +11,7 @@ using Presentation.Web.Models.Application.RuntimeEnv;
 using Presentation.Web.Swagger;
 using Swashbuckle.Application;
 using Swashbuckle.OData;
+using Swashbuckle.Swagger;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -94,7 +94,7 @@ namespace Presentation.Web
                       });
 
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
-
+                    c.DocumentFilter<OnlyIncludeReadModelSchemasInSwaggerDocumentFilter>();
                     var environment = KitosEnvironmentConfiguration.FromConfiguration().Environment;
                     if (environment != KitosEnvironment.Dev)
                     {
@@ -135,7 +135,20 @@ namespace Presentation.Web
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
                     //Do not enable the build-in caching in the odata provider. It caches error responses which we dont want so we wrap it in a custom caching provider which bails out on errors
-                    c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)));
+                    ODataSwaggerProvider CreateOdataSwaggerProvider(ISwaggerProvider defaultProvider)
+                    {
+                        return new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)
+                            .Configure
+                                (
+                                    //without navigation properties enabled, the odata model's "value" property will be omitted from swagger output
+                                    //We then apply the OnlyIncludeReadModelSchemasInSwaggerDocumentFilter to ensure the page will still render.
+                                    //The entire odata model is huge because of the many circular references to large object types, so during dom update,
+                                    //the swagger ui just crashes even if the swagger json is valid
+                                    //also, the swagger odata provider does not respect that some properties have been removed from the edm model so we must remove them manually in the filter
+                                    configure => configure.IncludeNavigationProperties() 
+                                );
+                    }
+                    c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(CreateOdataSwaggerProvider(defaultProvider)));
                 })
                 .EnableSwaggerUi(c =>
                 {

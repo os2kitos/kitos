@@ -228,7 +228,7 @@
                     };
                 }
 
-                $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ["take=100", "orgId=" + user.currentOrganizationId], (item, items) => {
+                $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler(Kitos.Constants.Organization.BaseApiPath, true, Kitos.Helpers.Select2ApiQueryHelper.getOrganizationQueryParams(100), (item, items) => {
                     items.push({
                         id: item.id,
                         text: item.name ? item.name : 'Unavngiven',

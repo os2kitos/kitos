@@ -1,19 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security;
 using System.Web;
 using System.Web.Http;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
+using Core.DomainServices.Queries.Organization;
+using Core.DomainServices.Queries;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.Generic.Queries;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -29,45 +34,23 @@ namespace Presentation.Web.Controllers.API.V1
         {
             _organizationService = organizationService;
         }
-
-        public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
+        
+        public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] V1BoundedPaginationQuery paging = null)
         {
+            q = HttpUtility.UrlDecode(q);
+            var refinements = new List<IDomainQuery<Organization>>();
+
             if (!string.IsNullOrWhiteSpace(q))
-                paging.Where(x => x.Name.Contains(q) || x.Cvr.Contains(q));
-            return GetAll(paging);
-        }
-
-        public HttpResponseMessage GetBySearch(string q, int orgId, int take = 25)
-        {
-            try
-            {
-                q = HttpUtility.UrlDecode(q);
-                var canSeeAll = GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All;
-                var userId = UserId;
-                var dtos =
-                    Repository
-                        .AsQueryable()
-                        .Where(org => org.Name.Contains(q) || org.Cvr.Contains(q))
-                        .Where(org => canSeeAll || org.ObjectOwnerId == userId ||
-                                      // it's public everyone can see it
-                                      org.AccessModifier == AccessModifier.Public ||
-                                      // everyone in the same organization can see normal objects
-                                      org.AccessModifier == AccessModifier.Local &&
-                                      org.Id == orgId ||
-                                      org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == userId)))
-                        .AsEnumerable()
-                        .Where(AllowRead)
-                        .OrderBy(_ => _.Name)
-                        .Take(take)
-                        .MapToShallowOrganizationDTOs()
-                        .ToList();
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
+                refinements.Add(new QueryByNameOrCvrContent(q));
+            
+            return _organizationService
+                .SearchAccessibleOrganizations(false, refinements.ToArray())
+                .OrderBy(x => x.Name).ThenBy(x => x.Id)
+                .Page(paging)
+                .ToList()
+                .MapToShallowOrganizationDTOs()
+                .ToList()
+                .Transform(Ok);
         }
 
         protected override bool AllowCreate<T>(int organizationId, IEntity entity)
