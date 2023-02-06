@@ -373,6 +373,7 @@
     <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
     <TypeScriptCompile Include="app\helpers\connection-change-log-helper.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\select2-api-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-mapping-helper.ts" />
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />

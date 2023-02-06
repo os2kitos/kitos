@@ -89,7 +89,7 @@
 
                 $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem", true, [`organizationId=${user.currentOrganizationId}`, `take=25`], false);
 
-                $scope.organizationSelectOptions = select2LoadingService.loadSelect2("api/organization", true, [`orgId=${user.currentOrganizationId}`, 'take=25'], false);
+                $scope.organizationSelectOptions = select2LoadingService.loadSelect2(Kitos.Constants.Organization.BaseApiPath, true, Kitos.Helpers.Select2ApiQueryHelper.getOrganizationQueryParams(100), false);
 
 
                 function reload() {
