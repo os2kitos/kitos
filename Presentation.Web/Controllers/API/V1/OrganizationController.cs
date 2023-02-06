@@ -35,14 +35,14 @@ namespace Presentation.Web.Controllers.API.V1
             _organizationService = organizationService;
         }
         
-        public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] V1BoundedPaginationQuery paging)
+        public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] V1BoundedPaginationQuery paging = null)
         {
             q = HttpUtility.UrlDecode(q);
             var refinements = new List<IDomainQuery<Organization>>();
 
             if (!string.IsNullOrWhiteSpace(q))
                 refinements.Add(new QueryByNameOrCvrContent(q));
-
+            
             return _organizationService
                 .SearchAccessibleOrganizations(false, refinements.ToArray())
                 .OrderBy(x => x.Name).ThenBy(x => x.Id)
