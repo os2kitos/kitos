@@ -34,32 +34,25 @@ namespace Presentation.Web.Controllers.API.V1
         {
             _organizationService = organizationService;
         }
-
-        public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
-        {
-            if (!string.IsNullOrWhiteSpace(q))
-                paging.Where(x => x.Name.Contains(q) || x.Cvr.Contains(q));
-            return GetAll(paging);
-        }
-
-        public HttpResponseMessage GetBySearchAndOrganizationId(string q, bool onlyWhereUserHasMembership, [FromUri] V1BoundedPaginationQuery pagination = null)
+        
+        public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] V1BoundedPaginationQuery paging)
         {
             q = HttpUtility.UrlDecode(q);
-
             var refinements = new List<IDomainQuery<Organization>>();
 
             if (!string.IsNullOrWhiteSpace(q))
                 refinements.Add(new QueryByNameOrCvrContent(q));
-            
+
             return _organizationService
-                .SearchAccessibleOrganizations(onlyWhereUserHasMembership, refinements.ToArray())
-                .OrderBy(x => x.Id)
-                .Page(pagination)
+                .SearchAccessibleOrganizations(false, refinements.ToArray())
+                .OrderBy(x => x.Name).ThenBy(x => x.Id)
+                .Page(paging)
                 .ToList()
                 .MapToShallowOrganizationDTOs()
                 .ToList()
                 .Transform(Ok);
         }
+
         protected override bool AllowCreate<T>(int organizationId, IEntity entity)
         {
             return AuthorizationContext.AllowCreate<Organization>(organizationId);

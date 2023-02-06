@@ -44,7 +44,7 @@
                 $scope.organizationSelectOptions = select2LoadingService.loadSelect2(
                     Kitos.Constants.Organization.BaseApiPath,
                     true,
-                    Kitos.Helpers.Select2ApiQueryHelper.getOrganizationQueryParams(true, 100),
+                    Kitos.Helpers.Select2ApiQueryHelper.getOrganizationQueryParams(100),
                     false);
 
                 $scope.hasWriteAccess = hasWriteAccess;

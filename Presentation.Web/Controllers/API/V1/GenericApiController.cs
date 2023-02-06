@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -26,7 +25,6 @@ namespace Presentation.Web.Controllers.API.V1
         public IDomainEvents DomainEvents { get; set; }
 
         protected readonly IGenericRepository<TModel> Repository;
-        private const int MaxEntities = 100;
 
         protected GenericApiController(IGenericRepository<TModel> repository)
         {

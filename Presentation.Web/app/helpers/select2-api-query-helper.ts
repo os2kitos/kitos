@@ -2,8 +2,8 @@
 
     export class Select2ApiQueryHelper {
 
-        static getOrganizationQueryParams(onlyWhereUserHasMembership: boolean, pageSize: number): string[] {
-            return [`onlyWhereUserHasMembership=${onlyWhereUserHasMembership}`, `pageSize=${pageSize}`];
+        static getOrganizationQueryParams(pageSize: number): string[] {
+            return [`pageSize=${pageSize}`];
         }
     }
 }
