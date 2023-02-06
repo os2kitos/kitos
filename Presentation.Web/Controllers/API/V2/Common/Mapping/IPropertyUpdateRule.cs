@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Presentation.Web.Controllers.API.V2.External.Generic
+namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public interface IPropertyUpdateRule<TRoot>
     {

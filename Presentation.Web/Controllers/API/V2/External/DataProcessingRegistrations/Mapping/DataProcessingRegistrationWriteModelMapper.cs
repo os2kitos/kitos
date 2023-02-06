@@ -9,6 +9,7 @@ using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel.Shared;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
