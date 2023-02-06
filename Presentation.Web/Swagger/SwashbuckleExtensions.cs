@@ -39,10 +39,13 @@ namespace Presentation.Web.Swagger
             //Parameter schemas
             foreach (var parameter in operation.parameters ?? new List<Parameter>())
             {
-                yield return parameter.schema;
+                if (parameter.schema != null)
+                {
+                    yield return parameter.schema;
+                }
             }
         }
-        
+
         public static IEnumerable<Schema> StartSchemaEnumeration(this Schema schema, IDictionary<string, Schema> schemaByTypeName)
         {
             return schema.EnumerateSchema(schemaByTypeName, new HashSet<string>());
@@ -54,58 +57,70 @@ namespace Presentation.Web.Swagger
             {
                 yield break;
             }
-            if (visitedDefinitions.Contains(schema.@ref)) //if definition was already visited break to avoid possible circular dependency
-            {
-                yield break;
-            }
 
             if (isRoot)
             {
+                visitedDefinitions.Add(schema.@ref);
                 yield return schema;
             }
 
-            var listOfAdditionalSchema = schema.FindAdditionalSchema(schemaByTypeName) ?? new List<Schema>();
-            foreach (var additionalSchema in listOfAdditionalSchema)
+            var referencedSchemas = (schema.FindReferencedSchemas(schemaByTypeName) ?? new List<Schema>()).ToList();
+            foreach (var additionalSchema in referencedSchemas)
             {
-                yield return additionalSchema;
-
-                foreach (var childSchema in additionalSchema.EnumerateSchema(schemaByTypeName, visitedDefinitions.ToHashSet(), false) ?? new List<Schema>())
+                if (visitedDefinitions.Add(additionalSchema.@ref))
                 {
-                    visitedDefinitions.Add(childSchema.@ref);
-                    yield return childSchema;
+                    yield return additionalSchema;
+                    foreach (var childSchema in (additionalSchema.EnumerateSchema(schemaByTypeName, visitedDefinitions.ToHashSet(), false) ?? new List<Schema>()).ToList())
+                    {
+                        if (visitedDefinitions.Add(childSchema.@ref))
+                        {
+                            yield return childSchema;
+                        }
+                    }
                 }
-
-                visitedDefinitions.Add(additionalSchema.@ref);
             }
         }
 
-        private static IEnumerable<Schema> FindAdditionalSchema(this Schema schema, IDictionary<string, Schema> schemaByTypeName)
+        private static IEnumerable<Schema> FindReferencedSchemas(this Schema schema, IDictionary<string, Schema> schemaByTypeName)
         {
-            var additionalSchemas = new List<Schema>();
-            additionalSchemas.AddRange(schema.FindPropertySchemas(schemaByTypeName));
+            var key = schema.GetSchemaTypeKey();
 
-            //If schema contains "items" schema check it for any additional schemas 
-            if (schema.items != null)
+            if (!string.IsNullOrEmpty(key))
             {
-                additionalSchemas.AddRange(schema.items.FindPropertySchemas(schemaByTypeName));
-            }
+                if (schemaByTypeName.TryGetValue(key, out var definition))
+                {
+                    var referencedRootSchemas = definition
+                        .properties
+                        .Values
+                        .Select(GetRootSchemaOrNull)
+                        .Where(x => x != null)
+                        .ToList();
 
-            return additionalSchemas;
+                    foreach (var propertySchema in referencedRootSchemas)
+                    {
+                        yield return propertySchema;
+                    }
+                }
+            }
         }
 
-        private static IEnumerable<Schema> FindPropertySchemas(this Schema schema,
-            IDictionary<string, Schema> schemaByTypeName)
+        public static string GetSchemaRefOrNull(this Schema schema)
         {
-            if (string.IsNullOrEmpty(schema.@ref)) 
-                yield break;
+            return GetRootSchemaOrNull(schema)?.@ref;
+        }
 
-            if (!schemaByTypeName.TryGetValue(schema.@ref.Replace("#/definitions/", string.Empty), out var definition))
-                yield break;
-            
-            foreach (var propertySchema in definition.properties)
-            {
-                yield return propertySchema.Value;
-            }
+        public static string GetSchemaTypeKey(this Schema schema)
+        {
+            return GetSchemaRefOrNull(schema)?.Replace("#/definitions/", string.Empty);
+        }
+
+        public static Schema GetRootSchemaOrNull(this Schema schema)
+        {
+            if (schema.@ref != null)
+                return schema;
+            if (schema.items?.@ref != null)
+                return schema.items;
+            return null;
         }
     }
 }
