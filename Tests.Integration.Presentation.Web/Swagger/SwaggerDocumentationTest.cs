@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Request.Contract;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Xunit;
@@ -47,9 +49,9 @@ namespace Tests.Integration.Presentation.Web.Swagger
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
 
             var body = await result.Content.ReadAsStringAsync();
-            Assert.DoesNotContain("ContractGeneralDataWriteRequestDTO", body);
-            Assert.Contains("Advice", body);
-            Assert.Contains("OptionDTO", body);
+            Assert.DoesNotContain(nameof(ContractGeneralDataWriteRequestDTO), body);
+            Assert.Contains(nameof(Core.DomainModel.Advice.Advice), body);
+            Assert.Contains(nameof(OptionDTO), body);
         }
 
         [Fact]
@@ -65,12 +67,12 @@ namespace Tests.Integration.Presentation.Web.Swagger
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
 
             var body = await result.Content.ReadAsStringAsync();
-            Assert.Contains("ContractGeneralDataWriteRequestDTO", body);
-            Assert.DoesNotContain("Advice", body);
-            Assert.DoesNotContain("OptionDTO", body);
+            Assert.Contains(nameof(ContractGeneralDataWriteRequestDTO), body);
+            Assert.DoesNotContain(nameof(Core.DomainModel.Advice.Advice), body);
+            Assert.DoesNotContain(nameof(OptionDTO), body);
         }
 
-        private Uri CreateUrl(int apiVersion)
+        private static Uri CreateUrl(int apiVersion)
         {
             return TestEnvironment.CreateUrl($"/swagger/docs/{apiVersion}");
         }

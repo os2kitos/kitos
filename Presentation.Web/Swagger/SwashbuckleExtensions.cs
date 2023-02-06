@@ -1,5 +1,6 @@
 ﻿using Swashbuckle.Swagger;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Presentation.Web.Swagger
 {
@@ -42,12 +43,12 @@ namespace Presentation.Web.Swagger
             }
         }
         
-        public static IEnumerable<Schema> StartSchemaEnumeration(this Schema schema, IDictionary<string, Schema> listOfDefinition)
+        public static IEnumerable<Schema> StartSchemaEnumeration(this Schema schema, IDictionary<string, Schema> schemaByTypeName)
         {
-            return schema.EnumerateSchema(listOfDefinition, new List<string>());
+            return schema.EnumerateSchema(schemaByTypeName, new HashSet<string>());
         }
 
-        private static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition, ICollection<string> visitedDefinitions, bool isRoot = true)
+        private static IEnumerable<Schema> EnumerateSchema(this Schema schema, IDictionary<string, Schema> schemaByTypeName, ISet<string> visitedDefinitions, bool isRoot = true)
         {
             if (schema?.@ref == null)
             {
@@ -63,40 +64,47 @@ namespace Presentation.Web.Swagger
                 yield return schema;
             }
 
-            var listOfAdditionalSchema = schema.FindAdditionalSchema(listOfDefinition) ?? new List<Schema>();
+            var listOfAdditionalSchema = schema.FindAdditionalSchema(schemaByTypeName) ?? new List<Schema>();
             foreach (var additionalSchema in listOfAdditionalSchema)
             {
                 yield return additionalSchema;
-                foreach (var childSchema in additionalSchema.EnumerateSchema(listOfDefinition, visitedDefinitions, false) ?? new List<Schema>())
+
+                foreach (var childSchema in additionalSchema.EnumerateSchema(schemaByTypeName, visitedDefinitions.ToHashSet(), false) ?? new List<Schema>())
                 {
+                    visitedDefinitions.Add(childSchema.@ref);
                     yield return childSchema;
-                    visitedDefinitions.Add(additionalSchema.@ref);
                 }
+
                 visitedDefinitions.Add(additionalSchema.@ref);
             }
         }
 
-        private static IEnumerable<Schema> FindAdditionalSchema(this Schema schema, IDictionary<string, Schema> listOfDefinition)
+        private static IEnumerable<Schema> FindAdditionalSchema(this Schema schema, IDictionary<string, Schema> schemaByTypeName)
         {
-            if (!string.IsNullOrEmpty(schema.@ref))
+            var additionalSchemas = new List<Schema>();
+            additionalSchemas.AddRange(schema.FindPropertySchemas(schemaByTypeName));
+
+            //If schema contains "items" schema check it for any additional schemas 
+            if (schema.items != null)
             {
-                if (listOfDefinition.TryGetValue(schema.@ref.Replace("#/definitions/", string.Empty), out var definition))
-                {
-                    foreach (var propertySchema in definition.properties)
-                    {
-                        yield return propertySchema.Value;
-                    }
-                }
+                additionalSchemas.AddRange(schema.items.FindPropertySchemas(schemaByTypeName));
             }
-            if (!string.IsNullOrEmpty(schema.items?.@ref))
+
+            return additionalSchemas;
+        }
+
+        private static IEnumerable<Schema> FindPropertySchemas(this Schema schema,
+            IDictionary<string, Schema> schemaByTypeName)
+        {
+            if (string.IsNullOrEmpty(schema.@ref)) 
+                yield break;
+
+            if (!schemaByTypeName.TryGetValue(schema.@ref.Replace("#/definitions/", string.Empty), out var definition))
+                yield break;
+            
+            foreach (var propertySchema in definition.properties)
             {
-                if (listOfDefinition.TryGetValue(schema.items.@ref.Replace("#/definitions/", string.Empty), out var definition))
-                {
-                    foreach (var propertySchema in definition.properties)
-                    {
-                        yield return propertySchema.Value;
-                    }
-                }
+                yield return propertySchema.Value;
             }
         }
     }
