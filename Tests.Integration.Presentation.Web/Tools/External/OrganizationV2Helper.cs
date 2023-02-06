@@ -38,7 +38,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
 
-            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations?{query}"), token);
+            var url = TestEnvironment.CreateUrl($"api/v2/organizations?{query}");
+            using var response = await HttpApi.GetWithTokenAsync(url, token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationResponseDTO>>();
