@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Description;
 using Core.DomainModel;
+using Swashbuckle.OData;
 
 namespace Presentation.Web.Swagger
 {
     public class OnlyIncludeReadModelSchemasInSwaggerDocumentFilter : IDocumentFilter
     {
         //Defines the real domain object references which are removed from EDM but still present in the docs unless removed like this
-        private readonly ISet<string> ExcludedProperties =
+        private readonly ISet<string> _excludedProperties =
             new[]
             {
                 nameof(IOwnedByOrganization.Organization),
@@ -19,13 +20,21 @@ namespace Presentation.Web.Swagger
 
         public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
         {
-            foreach (var definition in swaggerDoc.definitions)
+            if (MatchODataApiExplorer(apiExplorer))
             {
-                if (IsEntityType(definition))
+                foreach (var definition in swaggerDoc.definitions)
                 {
-                    OnlyIncludeReadModelDefinitions(definition);
+                    if (IsEntityType(definition))
+                    {
+                        OnlyIncludeReadModelDefinitions(definition);
+                    }
                 }
             }
+        }
+
+        private static bool MatchODataApiExplorer(IApiExplorer apiExplorer)
+        {
+            return apiExplorer.GetType().Assembly.FullName == typeof(ODataSwaggerProvider).Assembly.FullName;
         }
 
         private void OnlyIncludeReadModelDefinitions(KeyValuePair<string, Schema> definition)
@@ -35,7 +44,7 @@ namespace Presentation.Web.Swagger
             if (IsReadModel(definition))
             {
                 //Read models include lifecycle related properties which should not be in the docs since they are not in the edm model.
-                var toRemove = properties.Where(x => ExcludedProperties.Contains(x.Key)).ToList();
+                var toRemove = properties.Where(x => _excludedProperties.Contains(x.Key)).ToList();
                 toRemove.ForEach(property => properties.Remove(property));
             }
             else
