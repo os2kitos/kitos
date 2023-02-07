@@ -62,9 +62,7 @@ namespace Core.ApplicationServices.References
         public Result<ExternalReference, OperationError> AddReference(
             int rootId,
             ReferenceRootType rootType,
-            string title,
-            string externalReferenceId,
-            string url)
+            ExternalReferenceProperties externalReferenceProperties)
         {
             return _referenceRepository
                 .GetRootEntity(rootId, rootType)
@@ -80,9 +78,9 @@ namespace Core.ApplicationServices.References
                         return root
                             .AddExternalReference(new ExternalReference
                             {
-                                Title = title,
-                                ExternalReferenceId = externalReferenceId,
-                                URL = url,
+                                Title = externalReferenceProperties.Title,
+                                ExternalReferenceId = externalReferenceProperties.DocumentId,
+                                URL = externalReferenceProperties.Url,
                                 Created = _operationClock.Now,
                             })
                             .Match<Result<ExternalReference, OperationError>>
@@ -90,6 +88,10 @@ namespace Core.ApplicationServices.References
                                 onSuccess: createdReference =>
                                 {
                                     _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(createdReference));
+                                    if (externalReferenceProperties.MasterReference)
+                                    {
+                                        root.SetMasterReference(createdReference);
+                                    }
                                     RaiseRootUpdated(root);
                                     _referenceRepository.SaveRootEntity(root);
                                     return createdReference;
@@ -229,7 +231,7 @@ namespace Core.ApplicationServices.References
                             //If uuid is null a new reference is going to be created
                             else
                             {
-                                var addReferenceResult = AddReference(rootId, rootType, externalReferenceProperties.Title, externalReferenceProperties.DocumentId, externalReferenceProperties.Url);
+                                var addReferenceResult = AddReference(rootId, rootType, externalReferenceProperties);
 
                                 if (addReferenceResult.Failed)
                                     return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(externalReferenceProperties)}. Error:{addReferenceResult.Error.Message.GetValueOrEmptyString()}", addReferenceResult.Error.FailureType);

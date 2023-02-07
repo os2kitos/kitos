@@ -165,7 +165,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapUpdateReferences(IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> references)
         {
-            return references.Select(MapUpdateReference).ToList();
+            return references.Select(x => MapUpdateReference(x.Uuid, x)).ToList();
         }
 
         protected static ChangedValue<Maybe<IEnumerable<UserRolePair>>> BaseMapRoleAssignments(IReadOnlyCollection<RoleAssignmentRequestDTO> roleAssignmentResponseDtos)
@@ -179,11 +179,15 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue();
         }
 
+        public static ExternalReferenceProperties MapCreateProperties(ExternalReferenceDataWriteRequestDTO reference)
+        {
+            return MapCommonReference(reference);
+        }
 
-        private static UpdatedExternalReferenceProperties MapUpdateReference(UpdateExternalReferenceDataWriteRequestDTO reference)
+        public static UpdatedExternalReferenceProperties MapUpdateReference(Guid? uuid, ExternalReferenceDataWriteRequestDTO reference)
         {
             var updateProperties = MapCommonReference(reference);
-            updateProperties.Uuid = reference.Uuid;
+            updateProperties.Uuid = uuid;
 
             return updateProperties;
         }
@@ -191,13 +195,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         private static UpdatedExternalReferenceProperties MapCommonReference<T>(T reference)
             where T : ExternalReferenceDataWriteRequestDTO
         {
-            return new UpdatedExternalReferenceProperties
-            {
-                Title = reference.Title,
-                DocumentId = reference.DocumentId,
-                Url = reference.Url,
-                MasterReference = reference.MasterReference
-            };
+            return new UpdatedExternalReferenceProperties(reference.Title, reference.DocumentId, reference.Url, reference.MasterReference);
         }
     }
 }

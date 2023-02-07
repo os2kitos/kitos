@@ -55,7 +55,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
         private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataOptionsRepository;
-
+        
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
             ITransactionManager transactionManager,
@@ -132,6 +132,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
             }
 
             return creationResult;
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(Guid usageUuid, ExternalReferenceProperties externalReferenceProperties)
+        {
+            return _identityResolver.ResolveDbId<ItSystemUsage>(usageUuid)
+                .Match(id => _referenceService.AddReference(id, ReferenceRootType.SystemUsage, externalReferenceProperties),
+                    () => new OperationError($"ItSystemUsage with uuid: {usageUuid} was not found", OperationFailure.NotFound));
         }
 
         public Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters)
