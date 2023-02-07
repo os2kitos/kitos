@@ -157,7 +157,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                     id => _itSystemService.GetHierarchy(id),
                     () => new OperationError($"System with uuid: {uuid} was not found", OperationFailure.NotFound)
                 )
-                .Select(RegistrationHierarchyNodeMapper<ItSystem>.MapHierarchyToDtos)
+                .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtos)
                 .Match(Ok, FromOperationError);
         }
 

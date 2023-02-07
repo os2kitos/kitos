@@ -6,9 +6,9 @@ using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 
 namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
-    public class RegistrationHierarchyNodeMapper<TEntity> where TEntity : class, IHierarchy<TEntity>, IHasUuid, IHasName
+    public class RegistrationHierarchyNodeMapper 
     {
-        public static IEnumerable<RegistrationHierarchyNodeResponseDTO> MapHierarchyToDtos(IEnumerable<TEntity> hierarchy)
+        public static IEnumerable<RegistrationHierarchyNodeResponseDTO> MapHierarchyToDtos<TEntity>(IEnumerable<TEntity> hierarchy) where TEntity : class, IHierarchy<TEntity>, IHasUuid, IHasName
         {
             return hierarchy
                 .Select(x => new RegistrationHierarchyNodeResponseDTO
