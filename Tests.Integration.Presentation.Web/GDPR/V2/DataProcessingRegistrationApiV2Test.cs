@@ -1489,7 +1489,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
         private async Task<DataProcessingRegistrationDTO> CreateDPRAsync(int orgId)
         {
-            return await DataProcessingRegistrationHelper.CreateAsync(orgId, CreateName(true));
+            return await DataProcessingRegistrationHelper.CreateAsync(orgId, CreateName());
         }
 
         private async Task<(string token, User user, OrganizationDTO organization)> CreatePrerequisitesAsync()
@@ -1531,9 +1531,9 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             };
         }
 
-        private string CreateName(bool hasDanishCharacters = false)
+        private string CreateName()
         {
-            return $"{nameof(DataProcessingRegistrationApiV2Test)}{A<string>()}{(hasDanishCharacters ? "æøå" : "")}";
+            return $"{nameof(DataProcessingRegistrationApiV2Test)}ø{A<string>()}å";
         }
 
         private string CreateEmail()

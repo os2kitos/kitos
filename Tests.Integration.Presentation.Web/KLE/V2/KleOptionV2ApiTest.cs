@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
@@ -121,8 +120,8 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var content = A<string>();
             PurgePreviousTestData();
-            var match1 = CreateTaskRefInDb(100, 10, 100, description: $"{content}{A<string>()}");
-            var match2 = CreateTaskRefInDb(100, 15, 100, description: $"{A<string>()}{content}{A<string>()}");
+            var match1 = CreateTaskRefInDb(100, 10, 100, description: $"{content}æøå{A<string>()}");
+            var match2 = CreateTaskRefInDb(100, 15, 100, description: $"{A<string>()}{content}æøå{A<string>()}");
             CreateTaskRefInDb(100, 20, 101);
 
             //Act
