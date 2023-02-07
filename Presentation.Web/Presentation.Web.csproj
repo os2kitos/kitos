@@ -353,6 +353,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />
+    <Compile Include="Swagger\SwashbuckleExtensions.cs" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\constants\local-admin-list-events.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-list.component.ts" />
