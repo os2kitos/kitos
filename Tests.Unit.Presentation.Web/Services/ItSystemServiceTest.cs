@@ -1356,7 +1356,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Get_Hierarchy_Returns_Forbidden()
+        public void Get_Hierarchy_Returns_Forbidden_If_User_Doesnt_Have_ReadRights()
         {
             //Arrange
             var (root, _) = CreateHierarchy();
@@ -1373,7 +1373,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Get_Hierarchy_Returns_NotFound()
+        public void Get_Hierarchy_Returns_NotFound_If_System_With_Id_Doesnt_Exist()
         {
             //Arrange
             var (root, _) = CreateHierarchy();
