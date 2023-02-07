@@ -137,11 +137,9 @@ namespace Presentation.Web.Controllers.API.V1
                     return Forbidden();
                 }
 
-                var systems = _systemService.GetHierarchy(id);
-
-                systems = systems.Where(AllowRead);
-
-                return Ok(Map(systems));
+                return _systemService.GetHierarchy(id)
+                    .Select(Map)
+                    .Match(Ok, FromOperationError);
             }
             catch (Exception e)
             {

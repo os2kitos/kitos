@@ -5,10 +5,12 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
 using Presentation.Web.Controllers.API.V2.External.Generic;
@@ -19,6 +21,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
 using Swashbuckle.Swagger.Annotations;
 
@@ -34,13 +37,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemWriteModelMapper _writeModelMapper;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
-        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHolderSystemService rightsHolderSystemService, IAuthorizationContext authorizationContext, IItSystemWriteModelMapper writeModelMapper)
+        public ItSystemV2Controller(IItSystemService itSystemService,
+            IRightsHolderSystemService rightsHolderSystemService,
+            IAuthorizationContext authorizationContext, 
+            IItSystemWriteModelMapper writeModelMapper,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
             _authorizationContext = authorizationContext;
             _writeModelMapper = writeModelMapper;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         /// <summary>
@@ -121,6 +130,34 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             return _itSystemService
                 .GetSystem(uuid)
                 .Select(ToSystemResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+
+        /// <summary>
+        /// Returns hierarchy for the specified IT-System
+        /// </summary>
+        /// <param name="uuid">Specific IT-System UUID</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("it-systems/{uuid}/hierarchy")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetHierarchy([NonEmptyGuid] Guid uuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            return _entityIdentityResolver.ResolveDbId<ItSystem>(uuid)
+                .Match
+                (
+                    id => _itSystemService.GetHierarchy(id),
+                    () => new OperationError($"System with uuid: {uuid} was not found", OperationFailure.NotFound)
+                )
+                .Select(RegistrationHierarchyNodeMapper<ItSystem>.MapHierarchyToDtos)
                 .Match(Ok, FromOperationError);
         }
 

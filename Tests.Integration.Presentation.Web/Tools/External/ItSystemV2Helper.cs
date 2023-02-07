@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
 using Xunit;
 
@@ -23,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendGetSingleAsync(string token, Guid uuid)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-systems/{uuid:D}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseItSystemPath}/{uuid:D}"), token);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
@@ -36,7 +37,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
         {
-            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/rightsholder/it-systems"), request, token);
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(_baseRightsHolderPath), request, token);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
@@ -49,7 +50,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid}"), token, request);
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid}"), token, request);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> PatchRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
@@ -62,12 +63,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendPatchUpdateRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
         }
 
         public static async Task<HttpResponseMessage> SendDeleteRightsHolderSystemAsync(string token, Guid uuid, DeactivationReasonRequestDTO request)
         {
-            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid}"), token, request);
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid}"), token, request);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> GetSingleRightsHolderSystemAsync(string token, Guid uuid)
@@ -80,7 +81,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendGetSingleRightsHolderSystemAsync(string token, Guid uuid)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid:D}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid:D}"), token);
         }
 
         public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(
@@ -115,7 +116,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             DateTime? changedSinceGtEq = null
             )
         {
-            var path = "api/v2/it-systems";
+            var path = _baseItSystemPath;
             var queryParameters = new List<KeyValuePair<string, string>>();
 
             if (page.HasValue)
@@ -173,7 +174,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null)
         {
-            var path = "api/v2/rightsholder/it-systems";
+            var path = _baseRightsHolderPath;
             var queryParameters = new List<KeyValuePair<string, string>>();
 
             if (page.HasValue)
@@ -196,5 +197,21 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
         }
+
+        public static async Task<IEnumerable<RegistrationHierarchyNodeResponseDTO>> GetHierarchyAsync(string token, Guid systemUuid)
+        {
+            var path = $"{_baseItSystemPath}/{systemUuid}/hierarchy";
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
+
+            var msg = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeResponseDTO>>();
+        }
+
+        private const string _basePath = "api/v2";
+
+        private const string _baseRightsHolderPath = $"{_basePath}/rightsholder/it-systems";
+        private const string _baseItSystemPath = $"{_basePath}/it-systems";
+
     }
 }
