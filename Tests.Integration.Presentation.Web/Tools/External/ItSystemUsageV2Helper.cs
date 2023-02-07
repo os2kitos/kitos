@@ -147,6 +147,16 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Roles)));
         }
 
+        public static async Task<HttpResponseMessage> SendPatchAddRoleAssignment(string token, Guid uuid, RoleAssignmentRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles/add"), token, dto);
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchRemoveRoleAssignment(string token, Guid uuid, RoleAssignmentRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles/remove"), token, dto);
+        }
+
         public static async Task<HttpResponseMessage> SendPatchGDPR(string token, Guid uuid, GDPRWriteRequestDTO dto)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.GDPR)));
