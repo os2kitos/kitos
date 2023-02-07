@@ -13,7 +13,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return hierarchy
                 .Select(x => new RegistrationHierarchyNodeResponseDTO
                 {
-                    Current = x.MapIdentityNamePairDTO(), 
+                    Node = x.MapIdentityNamePairDTO(), 
                     Parent = x.Parent?.MapIdentityNamePairDTO()
                 })
                 .ToList();

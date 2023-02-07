@@ -172,7 +172,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-systems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RightsHolderItSystemResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByRightsHoldersAccess(

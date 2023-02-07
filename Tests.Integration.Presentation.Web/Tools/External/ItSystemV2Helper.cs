@@ -14,6 +14,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class ItSystemV2Helper
     {
+        private const string _basePath = "api/v2";
+
+        private const string _baseRightsHolderPath = $"{_basePath}/rightsholder/it-systems";
+        private const string _baseItSystemPath = $"{_basePath}/it-systems";
+
         public static async Task<ItSystemResponseDTO> GetSingleAsync(string token, Guid uuid)
         {
             using var response = await SendGetSingleAsync(token, uuid);
@@ -203,15 +208,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             var path = $"{_baseItSystemPath}/{systemUuid}/hierarchy";
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
 
-            var msg = await response.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeResponseDTO>>();
         }
-
-        private const string _basePath = "api/v2";
-
-        private const string _baseRightsHolderPath = $"{_basePath}/rightsholder/it-systems";
-        private const string _baseItSystemPath = $"{_basePath}/it-systems";
-
     }
 }

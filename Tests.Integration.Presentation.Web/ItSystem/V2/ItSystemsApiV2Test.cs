@@ -1076,9 +1076,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             foreach (var node in hierarchy)
             {
-                var system = createdSystems.FirstOrDefault(x => x.Uuid == node.Current.Uuid);
-                Assert.NotNull(system);
-                if (node.Current.Uuid == rootUuid)
+                var system = createdSystems.FirstOrDefault(x => x.Uuid == node.Node.Uuid);
+                Assert.Single(system);
+                if (node.Node.Uuid == rootUuid)
                 {
                     Assert.Null(node.Parent);
                 }
@@ -1213,8 +1213,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             {
                 Name = A<string>(),
                 OrganizationId = orgId,
-                ObjectOwnerId = 1,
-                LastChangedByUserId = 1,
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId
             };
         }
 
@@ -1224,8 +1224,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             {
                 Uuid = uuid,
                 TaskKey = key,
-                ObjectOwnerId = 1,
-                LastChangedByUserId = 1,
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId,
                 OwnedByOrganizationUnitId = 1
             }));
         }

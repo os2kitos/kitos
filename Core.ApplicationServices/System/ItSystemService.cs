@@ -149,7 +149,7 @@ namespace Core.ApplicationServices.System
         public Result<IEnumerable<ItSystem>, OperationError> GetHierarchy(int systemId)
         {
             return GetSystem(systemId)
-                .Bind<IEnumerable<ItSystem>>(system => system.FlattenHierarchy().ToList());
+                .Select(system => system.FlattenHierarchy());
         }
 
         public SystemDeleteResult Delete(int id, bool breakBindings = false)
