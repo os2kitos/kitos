@@ -1184,9 +1184,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
         private (Guid rootUuid, IReadOnlyList<Core.DomainModel.ItSystem.ItSystem> createdItSystems) CreateHierarchy(int orgId)
         {
-            var rootSystem = CreateNewItSystemObject(orgId);
-            var childSystem = CreateNewItSystemObject(orgId);
-            var grandchildSystem = CreateNewItSystemObject(orgId);
+            var rootSystem = CreateNewItSystem(orgId);
+            var childSystem = CreateNewItSystem(orgId);
+            var grandchildSystem = CreateNewItSystem(orgId);
 
             var createdSystems = new List<Core.DomainModel.ItSystem.ItSystem>{ rootSystem, childSystem, grandchildSystem};
 
@@ -1207,7 +1207,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return (rootSystem.Uuid, createdSystems);
         }
 
-        private Core.DomainModel.ItSystem.ItSystem CreateNewItSystemObject(int orgId)
+        private Core.DomainModel.ItSystem.ItSystem CreateNewItSystem(int orgId)
         {
             return new Core.DomainModel.ItSystem.ItSystem
             {

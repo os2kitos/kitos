@@ -1199,7 +1199,6 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var systemId = A<int>();
-            var itSystem = new ItSystem();
             ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, null);
 
@@ -1338,7 +1337,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var hierarchy = result.Value.ToList();
-            Assert.Equal(createdItSystems.Count, result.Value.Count());
+            Assert.Equal(createdItSystems.Count, hierarchy.Count());
 
             foreach (var node in hierarchy)
             {
