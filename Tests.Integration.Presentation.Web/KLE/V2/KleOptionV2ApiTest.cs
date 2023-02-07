@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
@@ -119,10 +118,10 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var content = A<string>();
+            var content = A<string>() + "æøå";
             PurgePreviousTestData();
-            var match1 = CreateTaskRefInDb(100, 10, 100, description: $"{content}{A<string>()}");
-            var match2 = CreateTaskRefInDb(100, 15, 100, description: $"{A<string>()}{content}{A<string>()}");
+            var match1 = CreateTaskRefInDb(100, 10, 100, description: CreateDescription(content));
+            var match2 = CreateTaskRefInDb(100, 15, 100, description: $"{A<string>()}{CreateDescription(content)}");
             CreateTaskRefInDb(100, 20, 101);
 
             //Act
@@ -212,6 +211,11 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
                 items.Save();
                 items.Insert(new KLEUpdateHistoryItem(date));
             });
+        }
+
+        private string CreateDescription(string content)
+        {
+            return $"{content}{A<string>()}";
         }
     }
 }
