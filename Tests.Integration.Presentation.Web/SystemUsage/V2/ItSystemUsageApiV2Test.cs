@@ -2409,7 +2409,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
         private string CreateName()
         {
-            return $"{nameof(ItSystemUsageApiV2Test)}{A<string>()}";
+            return $"{nameof(ItSystemUsageApiV2Test)}æøå{A<string>()}";
         }
 
         private static async Task<SystemRelationDTO> CreateRelationAsync(ItSystemUsageDTO fromUsage, ItSystemUsageDTO toUsage, ItContractDTO contract = null)
