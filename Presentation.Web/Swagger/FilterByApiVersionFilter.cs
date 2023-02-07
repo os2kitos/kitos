@@ -19,12 +19,9 @@ namespace Presentation.Web.Swagger
         public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
         {
             var docVersion = _getApiVersion(swaggerDoc);
-            foreach (var path in swaggerDoc.paths.ToList())
+            foreach (var path in swaggerDoc.paths.Where(path => docVersion != _getPathApiVersion(path.Key)).ToList())
             {
-                if (docVersion != _getPathApiVersion(path.Key))
-                {
-                    swaggerDoc.paths.Remove(path);
-                }
+                swaggerDoc.paths.Remove(path);
             }
         }
     }
