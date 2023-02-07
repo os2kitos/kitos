@@ -2103,7 +2103,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private string CreateName()
         {
-            return $"{nameof(ItContractsApiV2Test)}{A<string>()}";
+            return $"{nameof(ItContractsApiV2Test)}æøå{A<string>()}";
         }
 
         private string CreateEmail()

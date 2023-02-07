@@ -166,7 +166,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
         private string CreateName()
         {
-            return $"{nameof(OrganizationUnitsApiV2Test)}{A<Guid>():N}";
+            return $"{nameof(OrganizationUnitsApiV2Test)}æøå{A<Guid>():N}";
         }
 
         private string CreateEmail()
