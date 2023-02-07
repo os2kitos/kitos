@@ -118,7 +118,7 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var content = A<string>();
+            var content = A<string>() + "æøå";
             PurgePreviousTestData();
             var match1 = CreateTaskRefInDb(100, 10, 100, description: CreateDescription(content));
             var match2 = CreateTaskRefInDb(100, 15, 100, description: $"{A<string>()}{CreateDescription(content)}");
@@ -215,7 +215,7 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
 
         private string CreateDescription(string content)
         {
-            return $"{content}æøå{A<string>()}";
+            return $"{content}{A<string>()}";
         }
     }
 }
