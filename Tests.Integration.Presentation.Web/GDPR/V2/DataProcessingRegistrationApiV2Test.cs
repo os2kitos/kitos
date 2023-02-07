@@ -1533,12 +1533,12 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
         private string CreateName()
         {
-            return $"{nameof(DataProcessingRegistrationApiV2Test)}ø{A<string>()}å";
+            return $"{nameof(DataProcessingRegistrationApiV2Test)}æøå{A<string>()}";
         }
 
         private string CreateEmail()
         {
-            return $"{CreateName()}{DateTime.Now.Ticks}@kitos.dk";
+            return $"{A<string>()}{DateTime.Now.Ticks}@kitos.dk";
         }
 
         #endregion

@@ -120,8 +120,8 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var content = A<string>();
             PurgePreviousTestData();
-            var match1 = CreateTaskRefInDb(100, 10, 100, description: $"{content}æøå{A<string>()}");
-            var match2 = CreateTaskRefInDb(100, 15, 100, description: $"{A<string>()}{content}æøå{A<string>()}");
+            var match1 = CreateTaskRefInDb(100, 10, 100, description: CreateDescription(content));
+            var match2 = CreateTaskRefInDb(100, 15, 100, description: $"{A<string>()}{CreateDescription(content)}");
             CreateTaskRefInDb(100, 20, 101);
 
             //Act
@@ -211,6 +211,11 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
                 items.Save();
                 items.Insert(new KLEUpdateHistoryItem(date));
             });
+        }
+
+        private string CreateDescription(string content)
+        {
+            return $"{content}æøå{A<string>()}";
         }
     }
 }
