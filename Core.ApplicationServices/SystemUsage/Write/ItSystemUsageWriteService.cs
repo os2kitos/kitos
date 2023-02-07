@@ -77,7 +77,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
             IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
             IItsystemUsageRelationsService systemUsageRelationsService,
-            IEntityIdentityResolver identityResolver, 
+            IEntityIdentityResolver identityResolver,
             IGenericRepository<ItSystemUsagePersonalData> personalDataOptionsRepository)
         {
             _systemUsageService = systemUsageService;
@@ -138,6 +138,17 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return Update(() => _systemUsageService.GetReadableItSystemUsageByUuid(systemUsageUuid), parameters);
         }
+
+        public Result<ItSystemUsage, OperationError> AddRole(Guid systemUsageUuid, UserRolePair parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ItSystemUsage, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair parameters)
+        {
+            throw new NotImplementedException();
+        }
+
         private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
@@ -151,6 +162,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(result.Value));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
+            }
+            else
+            {
+                transaction.Rollback();
             }
 
             return result;
@@ -239,7 +254,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var result = systemUsage.UpdateDataSensitivityLevels(newLevels);
             if (result.Failed)
                 return result.Error;
-            
+
             var levelsRemoved = levelsBefore.Except(systemUsage.SensitiveDataLevels.ToList()).ToList();
 
             foreach (var removedSensitiveDataLevel in levelsRemoved)
@@ -290,7 +305,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         if (deletionError.HasValue)
                         {
                             var error = deletionError.Value;
-                            _logger.Error("Failed adding personData {personDataType} to system usage ({uuid}) Error:{errorCode}: {errorMessage}",item,systemUsage.Uuid,error.FailureType,error.Message.GetValueOrFallback(string.Empty));
+                            _logger.Error("Failed adding personData {personDataType} to system usage ({uuid}) Error:{errorCode}: {errorMessage}", item, systemUsage.Uuid, error.FailureType, error.Message.GetValueOrFallback(string.Empty));
                             return deletionError.Value;
                         }
                         break;
@@ -377,7 +392,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (orgByUuid.Failed)
                 return new OperationError($"Failed to get organization for ArchiveSupplierOrganization. Original error message: {orgByUuid.Error.Message.GetValueOrEmptyString()}", orgByUuid.Error.FailureType);
-            
+
             //Not a change from current state so do not apply availability constraint
             if (systemUsage.ArchiveSupplierId != null && systemUsage.ArchiveSupplierId == orgByUuid.Value.Id)
                 return Maybe<OperationError>.None;
