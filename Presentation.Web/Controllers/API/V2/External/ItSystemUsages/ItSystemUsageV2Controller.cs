@@ -281,7 +281,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Bind(usage => _systemRelationsService.GetRelationsTo(usage.Id))
                 .Select(relations => relations.Select(relation => _responseMapper.MapOutgoingSystemRelationDTO(relation)).ToList())
-		}
+                .Match(Ok, FromOperationError);
+        }
 
         /// Add role assignment to the it-system usage
         /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
