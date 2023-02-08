@@ -213,6 +213,21 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/system-relations/{systemRelationUuid}"), token);
         }
 
+        public static async Task<IEnumerable<IncomingSystemRelationResponseDTO>> GetIncomingRelationsAsync(string token, Guid systemUsageUuid)
+        {
+            using var response = await SendGetIncomingRelationsAsync(token, systemUsageUuid);
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<IncomingSystemRelationResponseDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetIncomingRelationsAsync(string token, Guid systemUsageUuid)
+        {
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/incoming-system-relations"), token);
+        }
+
         public static async Task<HttpResponseMessage> SendDeleteRelationAsync(string token, Guid uuid, Guid systemRelationUuid)
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/system-relations/{systemRelationUuid}"), token);
