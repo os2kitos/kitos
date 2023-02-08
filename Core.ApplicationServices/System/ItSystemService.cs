@@ -146,14 +146,10 @@ namespace Core.ApplicationServices.System
             return itSystems;
         }
 
-        public IEnumerable<ItSystem> GetHierarchy(int systemId)
+        public Result<IEnumerable<ItSystem>, OperationError> GetHierarchy(int systemId)
         {
-            var system = _itSystemRepository.GetSystem(systemId);
-
-            if (system == null)
-                throw new ArgumentException("Invalid system id");
-
-            return system.FlattenCompleteHierarchy().ToList();
+            return GetSystem(systemId)
+                .Select(system => system.FlattenHierarchy());
         }
 
         public SystemDeleteResult Delete(int id, bool breakBindings = false)

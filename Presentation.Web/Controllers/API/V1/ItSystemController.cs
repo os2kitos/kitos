@@ -126,22 +126,9 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
-                var itSystem = Repository.GetByKey(id);
-                if (itSystem == null)
-                {
-                    return NotFound();
-                }
-
-                if (!AllowRead(itSystem))
-                {
-                    return Forbidden();
-                }
-
-                var systems = _systemService.GetHierarchy(id);
-
-                systems = systems.Where(AllowRead);
-
-                return Ok(Map(systems));
+                return _systemService.GetHierarchy(id)
+                    .Select(Map)
+                    .Match(Ok, FromOperationError);
             }
             catch (Exception e)
             {
