@@ -1200,7 +1200,6 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var systemId = A<int>();
-            var itSystem = new ItSystem();
             ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, null);
 
@@ -1324,6 +1323,87 @@ namespace Tests.Unit.Presentation.Web.Services
             AssertUpdateFailure(result, OperationFailure.NotFound);
         }
 
+        [Fact]
+        public void Can_Get_Hierarchy()
+        {
+            //Arrange
+            var (root, createdItSystems) = CreateHierarchy();
+
+            ExpectAllowReadsReturns(root, true);
+            ExpectGetSystemReturns(root.Id, root);
+
+            //Act
+            var result = _sut.GetHierarchy(root.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var hierarchy = result.Value.ToList();
+            Assert.Equal(createdItSystems.Count, hierarchy.Count);
+
+            foreach (var node in hierarchy)
+            {
+                var system = createdItSystems.FirstOrDefault(x => x.Id == node.Id);
+                Assert.NotNull(system);
+                if (node.Id == root.Id)
+                {
+                    Assert.Null(node.Parent);
+                }
+                else
+                {
+                    Assert.NotNull(node.Parent);
+                    Assert.Equal(node.Parent.Id, system.Parent.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public void Get_Hierarchy_Returns_Forbidden_If_User_Doesnt_Have_ReadRights()
+        {
+            //Arrange
+            var (root, _) = CreateHierarchy();
+
+            ExpectAllowReadsReturns(root, false);
+            ExpectGetSystemReturns(root.Id, root);
+
+            //Act
+            var result = _sut.GetHierarchy(root.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Get_Hierarchy_Returns_NotFound_If_System_With_Id_Doesnt_Exist()
+        {
+            //Arrange
+            var (root, _) = CreateHierarchy();
+
+            ExpectGetSystemReturns(root.Id, null);
+
+            //Act
+            var result = _sut.GetHierarchy(root.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        private (ItSystem root, IReadOnlyList<ItSystem> createdItSystems) CreateHierarchy()
+        {
+            var root = CreateSystem();
+            var child = CreateSystem();
+            var grandchild = CreateSystem();
+
+            child.Children = new List<ItSystem> {grandchild};
+            grandchild.Parent = child;
+
+            root.Children = new List<ItSystem> {child};
+            child.Parent = root;
+
+            return (root, new List<ItSystem>{root, child, grandchild});
+        }
+
         private void UpdateName_Fails_With_BadInput(string newName)
         {
             //Arrange
@@ -1439,6 +1519,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
         }
+
         private void ExpectGetSystemReturns(Guid id, Maybe<ItSystem> system)
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);

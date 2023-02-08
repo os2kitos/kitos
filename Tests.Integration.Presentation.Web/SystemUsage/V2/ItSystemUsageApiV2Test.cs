@@ -800,6 +800,74 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Can_PATCH_Add_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var role1 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
+            var role2 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
+
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            var assignment1 = new RoleAssignmentRequestDTO { RoleUuid = role1.Uuid, UserUuid = user1.Uuid };
+            var assignment2 = new RoleAssignmentRequestDTO { RoleUuid = role2.Uuid, UserUuid = user2.Uuid };
+
+            //Act
+            using var assignmentResponse1 = await ItSystemUsageV2Helper.SendPatchAddRoleAssignment(token, createdDTO.Uuid, assignment1);
+            using var duplicateAssignment1 = await ItSystemUsageV2Helper.SendPatchAddRoleAssignment(token, createdDTO.Uuid, assignment1);
+            using var assignmentResponse2 = await ItSystemUsageV2Helper.SendPatchAddRoleAssignment(token, createdDTO.Uuid, assignment2);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse2.StatusCode);
+            var updatedDTO = await assignmentResponse2.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            var roles = updatedDTO.Roles.ToList();
+            Assert.Equal(2, roles.Count);
+            Assert.Contains(roles, r => MatchExpectedAssignment(r, assignment1));
+            Assert.Contains(roles, r => MatchExpectedAssignment(r, assignment2));
+        }
+
+        [Fact]
+        public async Task Can_PATCH_Remove_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var role1 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
+            var role2 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
+
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            var assignment2 = new RoleAssignmentRequestDTO { RoleUuid = role2.Uuid, UserUuid = user2.Uuid };
+            var assignment1 = new RoleAssignmentRequestDTO { RoleUuid = role1.Uuid, UserUuid = user1.Uuid };
+
+            //Act
+            using var assignment1Response = await ItSystemUsageV2Helper.SendPatchAddRoleAssignment(token, createdDTO.Uuid, assignment1);
+            using var assignment2Response = await ItSystemUsageV2Helper.SendPatchAddRoleAssignment(token, createdDTO.Uuid, assignment2);
+            using var removeAssignment = await ItSystemUsageV2Helper.SendPatchRemoveRoleAssignment(token, createdDTO.Uuid, assignment1);
+            using var duplicateRemoveAssignment = await ItSystemUsageV2Helper.SendPatchRemoveRoleAssignment(token, createdDTO.Uuid, assignment1);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, removeAssignment.StatusCode);
+            var updatedDTO = await removeAssignment.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            var roleAssignment = Assert.Single(updatedDTO.Roles);
+            MatchExpectedAssignment(roleAssignment, assignment2);
+        }
+
+        [Fact]
         public async Task Can_POST_With_GDPR()
         {
             //Arrange
@@ -2431,6 +2499,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Url = reference.Url,
                 Uuid = null
             };
+        }
+
+        private static bool MatchExpectedAssignment(RoleAssignmentResponseDTO actual, RoleAssignmentRequestDTO expected)
+        {
+            return actual.Role.Uuid == expected.RoleUuid && actual.User.Uuid == expected.UserUuid;
         }
     }
 }

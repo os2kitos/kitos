@@ -153,7 +153,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 return new OperationError($"Duplicates of 'User Role Pairs' are not allowed", OperationFailure.BadInput);
             }
 
-            var existingRightsList = dpr.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
+            var existingRightsList = dpr.Rights.Select(x => new UserRolePair(x.User.Uuid,x.Role.Uuid)).ToList();
 
             foreach (var (delta, item) in existingRightsList.ComputeDelta(newRightsList, x => x))
             {

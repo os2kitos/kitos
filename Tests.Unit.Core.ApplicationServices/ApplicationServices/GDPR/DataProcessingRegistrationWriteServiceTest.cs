@@ -2195,14 +2195,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private static UserRolePair CreateUserRolePair(Guid roleUuid, Guid userUuid)
         {
-            return new UserRolePair()
-            {
-                RoleUuid = roleUuid,
-                UserUuid = userUuid
-            };
+            return new UserRolePair(userUuid, roleUuid);
         }
 
-        private DataProcessingRegistrationRight CreateRight(DataProcessingRegistration dpr, Guid roleUuid, int roleId, Guid userUuid, int userId)
+        private static DataProcessingRegistrationRight CreateRight(DataProcessingRegistration dpr, Guid roleUuid, int roleId, Guid userUuid, int userId)
         {
             return new DataProcessingRegistrationRight()
             {
