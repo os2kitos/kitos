@@ -353,6 +353,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />
     <Compile Include="Swagger\SwashbuckleExtensions.cs" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
@@ -671,7 +673,7 @@
     <Compile Include="Models\API\V2\Response\SystemUsage\LocalKLEDeviationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ArchivingRegistrationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Shared\SimpleLinkDTO.cs" />
-    <Compile Include="Models\API\V2\Response\SystemUsage\SystemRelationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\OutgoingSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasUuidExternal.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasNameExternal.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\ExpectedUsersIntervalDTO.cs" />

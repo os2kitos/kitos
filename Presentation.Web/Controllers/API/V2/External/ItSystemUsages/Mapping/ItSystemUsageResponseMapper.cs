@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
@@ -131,9 +132,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private IEnumerable<SystemRelationResponseDTO> MapOutgoingSystemRelations(ItSystemUsage systemUsage)
+        private IEnumerable<OutgoingSystemRelationResponseDTO> MapOutgoingSystemRelations(ItSystemUsage systemUsage)
         {
-            return systemUsage.UsageRelations.Select(MapSystemRelationDTO).ToList();
+            return systemUsage.UsageRelations.Select(MapOutgoingSystemRelationDTO).ToList();
         }
 
         private static OrganizationUsageResponseDTO MapOrganizationUsage(ItSystemUsage systemUsage)
@@ -227,18 +228,33 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return systemUsage.LifeCycleStatus?.ToLifeCycleStatusChoice();
         }
 
-        public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation systemRelation)
+        public OutgoingSystemRelationResponseDTO MapOutgoingSystemRelationDTO(SystemRelation systemRelation)
         {
-            return new()
+            var dto = new OutgoingSystemRelationResponseDTO
             {
-                Uuid = systemRelation.Uuid,
-                Description = systemRelation.Description,
-                UrlReference = systemRelation.Reference,
-                AssociatedContract = systemRelation.AssociatedContract?.MapIdentityNamePairDTO(),
-                RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO(),
-                RelationInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO(),
                 ToSystemUsage = systemRelation.ToSystemUsage?.MapIdentityNamePairDTO()
             };
+            return MapSharedRelationProperties(systemRelation, dto);
+        }
+
+        public IncomingSystemRelationResponseDTO MapIncomingSystemRelationDTO(SystemRelation systemRelation)
+        {
+            var dto = new IncomingSystemRelationResponseDTO
+            {
+                FromSystemUsage = systemRelation.FromSystemUsage?.MapIdentityNamePairDTO()
+            };
+            return MapSharedRelationProperties(systemRelation, dto);
+        }
+
+        private static T MapSharedRelationProperties<T>(SystemRelation systemRelation, T dto) where T : BaseSystemRelationResponseDTO
+        {
+            dto.Uuid = systemRelation.Uuid;
+            dto.Description = systemRelation.Description;
+            dto.UrlReference = systemRelation.Reference;
+            dto.AssociatedContract = systemRelation.AssociatedContract?.MapIdentityNamePairDTO();
+            dto.RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO();
+            dto.RelationInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO();
+            return dto;
         }
 
         private static RoleAssignmentResponseDTO ToRoleResponseDTO(ItSystemRight right)

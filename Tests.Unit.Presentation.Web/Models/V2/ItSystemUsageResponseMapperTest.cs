@@ -441,7 +441,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }).ToList();
         }
 
-        private static void AssertRelation(SystemRelation expected, SystemRelationResponseDTO actual)
+        private static void AssertRelation(SystemRelation expected, OutgoingSystemRelationResponseDTO actual)
         {
             Assert.Equal(expected.Uuid, actual.Uuid);
             Assert.Equal(expected.Description, actual.Description);

@@ -9,6 +9,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
@@ -37,19 +38,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private readonly IItSystemUsageWriteService _writeService;
         private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
         private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
+        private readonly IItsystemUsageRelationsService _systemRelationsService;
 
         public ItSystemUsageV2Controller(
             IItSystemUsageService itSystemUsageService,
             IItSystemUsageResponseMapper responseMapper,
             IItSystemUsageWriteService writeService,
             IItSystemUsageWriteModelMapper writeModelMapper,
-            IResourcePermissionsResponseMapper permissionsResponseMapper)
+            IResourcePermissionsResponseMapper permissionsResponseMapper,
+            IItsystemUsageRelationsService systemRelationsService)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
             _writeService = writeService;
             _writeModelMapper = writeModelMapper;
             _permissionsResponseMapper = permissionsResponseMapper;
+            _systemRelationsService = systemRelationsService;
         }
 
         /// <summary>
@@ -257,13 +261,34 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
-        /// Creates a system relation
+        /// Get all system relations TO the system usage FROM another system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{systemUsageUuid}/incoming-system-relations")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(IEnumerable<IncomingSystemRelationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetIncomingSystemRelations([NonEmptyGuid] Guid systemUsageUuid)
+        {
+            return _itSystemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(usage => _systemRelationsService.GetRelationsTo(usage.Id))
+                .Select(relations => relations.Select(relation => _responseMapper.MapOutgoingSystemRelationDTO(relation)).ToList())
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Creates a system relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("{systemUsageUuid}/system-relations")]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(SystemRelationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(OutgoingSystemRelationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -276,19 +301,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .CreateSystemRelation(systemUsageUuid, systemRelationParameters)
-                .Select(_responseMapper.MapSystemRelationDTO)
+                .Select(_responseMapper.MapOutgoingSystemRelationDTO)
                 .Match(relationDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/system-relations/{relationDTO.Uuid}", relationDTO), FromOperationError);
         }
 
         /// <summary>
-        /// Gets a specific relation
+        /// Gets a specific relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <param name="systemRelationUuid"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SystemRelationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -307,19 +332,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                         systemRelation => systemRelation,
                         () => new OperationError("Relation not found on system usage", OperationFailure.NotFound))
                     )
-                .Select(_responseMapper.MapSystemRelationDTO)
+                .Select(_responseMapper.MapOutgoingSystemRelationDTO)
                 .Match(Ok, FromOperationError);
         }
 
         /// <summary>
-        /// Updates the system relation
+        /// Updates the system relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <param name="systemRelationUuid"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SystemRelationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -333,12 +358,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .UpdateSystemRelation(systemUsageUuid, systemRelationUuid, systemRelationParameters)
-                .Select(_responseMapper.MapSystemRelationDTO)
+                .Select(_responseMapper.MapOutgoingSystemRelationDTO)
                 .Match(Ok, FromOperationError);
         }
 
         /// <summary>
-        /// Deletes a system relation
+        /// Deletes a system relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <param name="systemRelationUuid"></param>

@@ -1716,7 +1716,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return token;
         }
 
-        private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, SystemRelationResponseDTO actual)
+        private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, OutgoingSystemRelationResponseDTO actual)
         {
             Assert.Equal(expected.ToSystemUsageUuid, actual.ToSystemUsage.Uuid);
             Assert.Equal(expected.RelationInterfaceUuid, actual.RelationInterface.Uuid);
