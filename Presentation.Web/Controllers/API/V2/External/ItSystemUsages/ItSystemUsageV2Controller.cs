@@ -280,7 +280,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _itSystemUsageService
                 .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Bind(usage => _systemRelationsService.GetRelationsTo(usage.Id))
-                .Select(relations => relations.Select(relation => _responseMapper.MapOutgoingSystemRelationDTO(relation)).ToList())
+                .Select(relations => relations.Select(relation => _responseMapper.MapIncomingSystemRelationDTO(relation)).ToList())
                 .Match(Ok, FromOperationError);
         }
 
