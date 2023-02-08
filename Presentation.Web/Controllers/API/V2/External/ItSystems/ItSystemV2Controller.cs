@@ -142,7 +142,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [HttpGet]
         [Route("it-systems/{uuid}/hierarchy")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
