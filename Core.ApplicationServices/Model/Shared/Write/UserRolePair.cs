@@ -4,8 +4,14 @@ namespace Core.ApplicationServices.Model.Shared.Write
 {
     public class UserRolePair
     {
-        public Guid UserUuid { get; set; }
-        public Guid RoleUuid { get; set; }
+        public Guid UserUuid { get; }
+        public Guid RoleUuid { get; }
+
+        public UserRolePair(Guid userUuid, Guid roleUuid)
+        {
+            UserUuid = userUuid;
+            RoleUuid = roleUuid;
+        }
 
         protected bool Equals(UserRolePair other)
         {
