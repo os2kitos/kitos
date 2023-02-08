@@ -1,7 +1,9 @@
 ﻿using System;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -51,6 +53,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 default:
                     throw new ArgumentOutOfRangeException(nameof(domainType), domainType, null);
             }
+        }
+
+        public static UserRolePair ToUserRolePair(this RoleAssignmentRequestDTO src)
+        {
+            return new UserRolePair(src.UserUuid, src.RoleUuid);
         }
     }
 }

@@ -171,11 +171,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         protected static ChangedValue<Maybe<IEnumerable<UserRolePair>>> BaseMapRoleAssignments(IReadOnlyCollection<RoleAssignmentRequestDTO> roleAssignmentResponseDtos)
         {
             return (roleAssignmentResponseDtos.Any() ?
-                Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => new UserRolePair
-                {
-                    RoleUuid = x.RoleUuid,
-                    UserUuid = x.UserUuid
-                }).ToList()) :
+                Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => x.ToUserRolePair()).ToList()) :
                 Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue();
         }
 
