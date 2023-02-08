@@ -1074,19 +1074,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var hierarchy = response.ToList();
             Assert.Equal(createdSystems.Count, hierarchy.Count);
 
-            foreach (var node in hierarchy)
+            var systemsWithParent = hierarchy.Where(x => x.Parent == null).ToList();
+            Assert.Single(systemsWithParent);
+
+            foreach (var node in hierarchy.Where(x => x.Parent != null))
             {
                 var system = createdSystems.FirstOrDefault(x => x.Uuid == node.Node.Uuid);
-                Assert.Single(system);
-                if (node.Node.Uuid == rootUuid)
-                {
-                    Assert.Null(node.Parent);
-                }
-                else
-                {
-                    Assert.NotNull(node.Parent);
-                    Assert.Equal(node.Parent.Uuid, system.Parent.Uuid);
-                }
+                Assert.NotNull(system);
+                Assert.NotNull(node.Parent);
+                Assert.Equal(node.Parent.Uuid, system.Parent.Uuid);
             }
         }
 
