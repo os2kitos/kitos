@@ -241,6 +241,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
+        public ExternalReferenceDataResponseDTO MapExternalReferenceDTO(ExternalReference externalReference)
+        {
+            return new ExternalReferenceDataResponseDTO
+            {
+                Uuid = externalReference.Uuid,
+                DocumentId = externalReference.ExternalReferenceId,
+                Url = externalReference.URL,
+                Title = externalReference.Title
+            };
+        }
+
         private static RoleAssignmentResponseDTO ToRoleResponseDTO(ItSystemRight right)
         {
             return new()

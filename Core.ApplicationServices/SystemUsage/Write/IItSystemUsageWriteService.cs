@@ -17,5 +17,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters);
         Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid);
         Result<ExternalReference, OperationError> AddExternalReference(Guid usageUuid, ExternalReferenceProperties externalReferenceProperties);
+        Result<ExternalReference, OperationError> UpdateExternalReference(Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceProperties externalReferenceProperties);
+        Result<ExternalReference, OperationError> DeleteExternalReference(Guid usageUuid, Guid externalReferenceUuid);
     }
 }

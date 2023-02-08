@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -18,6 +19,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class ItSystemUsageV2Helper
     {
+        private const string _baseApiPath = "api/v2/it-system-usages";
+
         public static async Task<ItSystemUsageResponseDTO> GetSingleAsync(string token, Guid uuid)
         {
             using var response = await SendGetSingleAsync(token, uuid);
@@ -28,12 +31,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendGetSingleAsync(string token, Guid uuid)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid:D}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid:D}"), token);
         }
 
         public static async Task<ResourcePermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
         {
-            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid:D}/permissions"), token);
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid:D}/permissions"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<ResourcePermissionsResponseDTO>();
@@ -82,7 +85,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             var joinedCriteria = string.Join("&", criteria.Select(x => $"{x.Key}={x.Value}"));
             var queryString = joinedCriteria.Any() ? $"?{joinedCriteria}" : string.Empty;
-            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages{queryString}"), token);
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}{queryString}"), token);
 
             if (!response.IsSuccessStatusCode)
                 Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
@@ -104,7 +107,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendPostAsync(string token, CreateItSystemUsageRequestDTO dto)
         {
-            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/it-system-usages"), dto, token);
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(_baseApiPath), dto, token);
         }
 
         public static async Task<ItSystemUsageResponseDTO> PutAsync(string token, Guid uuid, UpdateItSystemUsageRequestDTO dto)
@@ -119,53 +122,53 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendPutAsync(string token, Guid uuid, UpdateItSystemUsageRequestDTO dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto);
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto);
         }
 
         public static async Task<HttpResponseMessage> SendPatchGeneral(string token, Guid uuid, GeneralDataUpdateRequestDTO dto)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.General)));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.General)));
         }
 
         public static async Task<HttpResponseMessage> SendPatchOrganizationalUsage(string token, Guid uuid, OrganizationUsageWriteRequestDTO dto)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage)));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage)));
         }
 
         public static async Task<HttpResponseMessage> SendPatchKle(string token, Guid uuid, LocalKLEDeviationsRequestDTO dto)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations)));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations)));
         }
 
         public static async Task<HttpResponseMessage> SendPatchExternalReferences(string token, Guid uuid, IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> payload)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, (payload ?? new List<UpdateExternalReferenceDataWriteRequestDTO>()).AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.ExternalReferences)));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, (payload ?? new List<UpdateExternalReferenceDataWriteRequestDTO>()).AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.ExternalReferences)));
         }
 
         public static async Task<HttpResponseMessage> SendPatchRoles(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> dto)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Roles)));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Roles)));
         }
 
         public static async Task<HttpResponseMessage> SendPatchGDPR(string token, Guid uuid, GDPRWriteRequestDTO dto)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.GDPR)));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.GDPR)));
         }
 
         public static async Task<HttpResponseMessage> SendPatchValidity(string token, Guid uuid, ItSystemUsageValidityWriteRequestDTO dto)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto
                 .AsPatchPayloadOfMultipleProperties(nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity)));
         }
 
         public static async Task<HttpResponseMessage> SendPatchArchiving(string token, Guid uuid, ArchivingWriteRequestDTO dto)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Archiving)));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Archiving)));
         }
 
         public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
         {
-            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token);
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}"), token);
         }
 
         public static async Task<SystemRelationResponseDTO> PostRelationAsync(string token, Guid systemUsageUuid, SystemRelationWriteRequestDTO dto)
@@ -180,7 +183,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendPostRelationAsync(string token, Guid systemUsageUuid, SystemRelationWriteRequestDTO dto)
         {
-            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/system-relations"), dto, token);
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{systemUsageUuid}/system-relations"), dto, token);
         }
 
         public static async Task<SystemRelationResponseDTO> PutRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid, SystemRelationWriteRequestDTO dto)
@@ -195,7 +198,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendPutRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid, SystemRelationWriteRequestDTO dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/system-relations/{systemRelationUuid}"), token, dto);
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{systemUsageUuid}/system-relations/{systemRelationUuid}"), token, dto);
         }
 
         public static async Task<SystemRelationResponseDTO> GetRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid)
@@ -210,17 +213,39 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendGetRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/system-relations/{systemRelationUuid}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{systemUsageUuid}/system-relations/{systemRelationUuid}"), token);
         }
 
         public static async Task<HttpResponseMessage> SendDeleteRelationAsync(string token, Guid uuid, Guid systemRelationUuid)
         {
-            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/system-relations/{systemRelationUuid}"), token);
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{uuid}/system-relations/{systemRelationUuid}"), token);
         }
 
         public static async Task DeleteAsync(string token, Guid usageUuid)
         {
             using var response = await SendDeleteAsync(token, usageUuid);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> AddExternalReferenceAsync(string token, Guid usageUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{usageUuid}/external-references"), request, token);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> UpdateExternalReferenceAsync(string token, Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{usageUuid}/external-references/{externalReferenceUuid}"), token, request);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task DeleteExternalReferenceAsync(string token, Guid usageUuid, Guid externalReferenceUuid)
+        {
+            var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseApiPath}/{usageUuid}/external-references/{externalReferenceUuid}"), token);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }

@@ -22,6 +22,7 @@ using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Models.API.V2.Request.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 {
@@ -358,6 +359,62 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _writeService
                 .DeleteSystemRelation(systemUsageUuid, systemRelationUuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
+        [HttpPost]
+        [Route("{systemUsageUuid}/external-references")]
+        [SwaggerResponse(HttpStatusCode.Created)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult AddExternalReference([NonEmptyGuid] Guid systemUsageUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+            
+            return _writeService
+                .AddExternalReference(systemUsageUuid, properties)
+                .Select(_responseMapper.MapExternalReferenceDTO)
+                .Match(reference => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/external-references/{reference.Uuid}", reference), FromOperationError);
+        }
+
+
+
+        [HttpPut]
+        [Route("{systemUsageUuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult UpdateExternalReference([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid externalReferenceUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .UpdateExternalReference(systemUsageUuid, externalReferenceUuid, properties)
+                .Select(_responseMapper.MapExternalReferenceDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpDelete]
+        [Route("{systemUsageUuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteExternalReference([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid externalReferenceUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteExternalReference(systemUsageUuid, externalReferenceUuid)
+                .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)

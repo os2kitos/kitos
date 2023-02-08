@@ -376,6 +376,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 );
         }
 
+        public ExternalReferenceProperties MapExternalReference(ExternalReferenceDataWriteRequestDTO externalReferenceData)
+        {
+            return MapCommonReference(externalReferenceData);
+        }
+
         private static ChangedValue<Maybe<IEnumerable<TOut>>> MapEnumList<TIn, TOut>(IEnumerable<TIn> list, Func<TIn, TOut> mapWith)
         {
             return (list?.FromNullable().Select(dataSensitivityLevelChoices => dataSensitivityLevelChoices.Select(mapWith)) ?? Maybe<IEnumerable<TOut>>.None).AsChangedValue();

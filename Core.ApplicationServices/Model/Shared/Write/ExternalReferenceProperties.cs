@@ -10,9 +10,9 @@
             MasterReference = masterReference;
         }
 
-        public string Title { get; set; }
-        public string DocumentId { get; set; }
-        public string Url { get; set; }
-        public bool MasterReference { get; set; }
+        public string Title { get; }
+        public string DocumentId { get; }
+        public string Url { get; }
+        public bool MasterReference { get; }
     }
 }

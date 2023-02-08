@@ -24,6 +24,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Tests.Toolkit.Patterns;
@@ -963,7 +964,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference)).Returns(createdReference);
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, false))).Returns(createdReference);
 
             //Act
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);
@@ -986,7 +987,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             var operationError = A<OperationError>();
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference)).Returns(operationError);
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, false))).Returns(operationError);
 
             //Act
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);

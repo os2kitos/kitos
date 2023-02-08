@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -58,7 +59,6 @@ namespace Core.ApplicationServices.References
             _domainEvents = domainEvents;
         }
 
-
         public Result<ExternalReference, OperationError> AddReference(
             int rootId,
             ReferenceRootType rootType,
@@ -98,6 +98,45 @@ namespace Core.ApplicationServices.References
                                 },
                                 onFailure: error => error
                             );
+                    },
+                    onNone: () => new OperationError("Root entity could not be found", OperationFailure.NotFound)
+                );
+        }
+        public Result<ExternalReference, OperationError> UpdateReference(
+            int rootId,
+            ReferenceRootType rootType,
+            Guid referenceUuid,
+            ExternalReferenceProperties externalReferenceProperties)
+        {
+            return _referenceRepository
+                .GetRootEntity(rootId, rootType)
+                .Match
+                (
+                    onValue: root =>
+                    {
+                        if (!_authorizationContext.AllowModify(root))
+                        {
+                            return new OperationError("Not allowed to modify root entity", OperationFailure.Forbidden);
+                        }
+
+                        return _referenceRepository.GetByUuid(referenceUuid)
+                            .Match(reference =>
+                            {
+                                reference.Title = externalReferenceProperties.Title;
+                                reference.ExternalReferenceId = externalReferenceProperties.DocumentId;
+                                reference.URL = externalReferenceProperties.Url;
+                                reference.Created = _operationClock.Now;
+
+                                if (externalReferenceProperties.MasterReference)
+                                {
+                                    root.SetMasterReference(reference);
+                                }
+                                RaiseRootUpdated(root);
+                                _referenceRepository.SaveRootEntity(root);
+
+                                return Result<ExternalReference, OperationError>.Success(reference);
+                            },
+                            () => new OperationError($"Reference with uuid: {referenceUuid} was not found", OperationFailure.NotFound));
                     },
                     onNone: () => new OperationError("Root entity could not be found", OperationFailure.NotFound)
                 );
