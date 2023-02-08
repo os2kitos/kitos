@@ -7,7 +7,6 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Relations;

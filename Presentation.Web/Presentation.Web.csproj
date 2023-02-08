@@ -355,6 +355,8 @@
   <ItemGroup>
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
+    <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeResponseDTO.cs" />
     <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />
     <Compile Include="Swagger\SwashbuckleExtensions.cs" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />

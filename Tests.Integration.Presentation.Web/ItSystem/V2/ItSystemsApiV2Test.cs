@@ -1060,6 +1060,35 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Get_Hierarchy()
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var (rootUuid, createdSystems) = CreateHierarchy(organization.Id);
+
+            //Act
+            var response = await ItSystemV2Helper.GetHierarchyAsync(token, rootUuid);
+
+            //Assert
+            var hierarchy = response.ToList();
+            Assert.Equal(createdSystems.Count, hierarchy.Count);
+
+            foreach (var node in hierarchy)
+            {
+                var system = Assert.Single(createdSystems, x => x.Uuid == node.Node.Uuid);
+                if (system.Uuid == rootUuid)
+                {
+                    Assert.Null(node.Parent);
+                }
+                else
+                {
+                    Assert.NotNull(node.Parent);
+                    Assert.Equal(node.Parent.Uuid, system.Parent.Uuid);
+                }
+            }
+        }
+
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
         {
             var dbTaskKeys = dbSystem.TaskRefs.ToDictionary(x => x.Uuid, x => x.TaskKey);
@@ -1152,14 +1181,50 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return $"{CreateName()}@kitos.dk";
         }
 
+        private (Guid rootUuid, IReadOnlyList<Core.DomainModel.ItSystem.ItSystem> createdItSystems) CreateHierarchy(int orgId)
+        {
+            var rootSystem = CreateNewItSystem(orgId);
+            var childSystem = CreateNewItSystem(orgId);
+            var grandchildSystem = CreateNewItSystem(orgId);
+
+            var createdSystems = new List<Core.DomainModel.ItSystem.ItSystem>{ rootSystem, childSystem, grandchildSystem};
+
+            childSystem.Children = new List<Core.DomainModel.ItSystem.ItSystem>
+            {
+                grandchildSystem
+            };
+            rootSystem.Children = new List<Core.DomainModel.ItSystem.ItSystem>
+            {
+                childSystem
+            };
+
+            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(repository =>
+            {
+                repository.Insert(rootSystem);
+            });
+
+            return (rootSystem.Uuid, createdSystems);
+        }
+
+        private Core.DomainModel.ItSystem.ItSystem CreateNewItSystem(int orgId)
+        {
+            return new Core.DomainModel.ItSystem.ItSystem
+            {
+                Name = A<string>(),
+                OrganizationId = orgId,
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId
+            };
+        }
+
         private static void CreateTaskRefInDatabase(string key, Guid uuid)
         {
             DatabaseAccess.MutateEntitySet<TaskRef>(repo => repo.Insert(new TaskRef
             {
                 Uuid = uuid,
                 TaskKey = key,
-                ObjectOwnerId = 1,
-                LastChangedByUserId = 1,
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId,
                 OwnedByOrganizationUnitId = 1
             }));
         }

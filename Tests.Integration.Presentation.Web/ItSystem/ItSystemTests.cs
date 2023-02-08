@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystem;
 using Tests.Integration.Presentation.Web.Tools;
