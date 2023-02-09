@@ -492,6 +492,30 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void UpdateReference_Returns_BadInput_If_No_MasterReference_Would_Be_Present()
+        {
+            //Arrange
+            var id = A<int>();
+            var rootType = A<ReferenceRootType>();
+            var referenceUuid = A<Guid>();
+            var entity = new Mock<IEntityWithExternalReferences>();
+            var externalReference = new ExternalReference(){ Uuid = A<Guid>()};
+            SetOwnerWithMainReference(externalReference);
+
+            var externalReferenceProperties = new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false);
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
+            ExpectAllowModifyReturns(entity.Object, true);
+            ExpectGetByUuid(referenceUuid, externalReference);
+
+            //Act
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, externalReferenceProperties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(new OperationError("A master reference must be defined", OperationFailure.BadInput), result.Error);
+        }
+
+        [Fact]
         public void UpdateReference_Returns_NotFound_If_Reference_Is_Not_Found()
         {
             //Arrange
@@ -990,6 +1014,28 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 Uuid = hasUuid ? A<Guid>() : null
             };
+        }
+
+        private void SetOwnerWithMainReference(ExternalReference reference)
+        {
+            var randomType = A<ReferenceRootType>();
+            switch (randomType)
+            {
+                case ReferenceRootType.SystemUsage:
+                    reference.ItSystemUsage = new ItSystemUsage { Reference = reference };
+                    break;
+                case ReferenceRootType.Contract:
+                    reference.ItContract = new ItContract { Reference = reference };
+                    break;
+                case ReferenceRootType.DataProcessingRegistration:
+                    reference.DataProcessingRegistration = new DataProcessingRegistration { Reference = reference };
+                    break;
+                case ReferenceRootType.System:
+                    reference.ItSystem = new ItSystem { Reference = reference };
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(randomType), randomType, null);
+            }
         }
     }
 }

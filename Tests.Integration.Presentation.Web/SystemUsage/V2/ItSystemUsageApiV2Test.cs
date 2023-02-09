@@ -1839,7 +1839,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updateRequest = new ExternalReferenceDataWriteRequestDTO
             {
                 DocumentId = A<string>(),
-                MasterReference = !request.MasterReference,
+                MasterReference = request.MasterReference || A<bool>(),
                 Title = A<string>(),
                 Url = A<string>()
             };

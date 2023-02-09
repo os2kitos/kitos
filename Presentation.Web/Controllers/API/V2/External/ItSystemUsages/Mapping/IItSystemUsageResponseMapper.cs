@@ -1,6 +1,4 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.ItSystemUsage;
-using Presentation.Web.Models.API.V2.Response.Shared;
+﻿using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping

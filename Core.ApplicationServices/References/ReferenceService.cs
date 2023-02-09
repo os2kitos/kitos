@@ -106,6 +106,10 @@ namespace Core.ApplicationServices.References
                                 {
                                     root.SetMasterReference(reference);
                                 }
+                                else if (reference.IsMasterReference())
+                                {
+                                    return new OperationError("A master reference must be defined", OperationFailure.BadInput);
+                                }
 
                                 _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(reference));
                                 RaiseRootUpdated(root);
