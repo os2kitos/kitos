@@ -1826,6 +1826,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Act - delete
             await ItSystemUsageV2Helper.DeleteExternalReferenceAsync(token, usage.Uuid, createdReference.Uuid);
 
+            //Assert - delete
             var usageAfterDelete = await ItSystemUsageV2Helper.GetSingleAsync(token, usage.Uuid);
             Assert.Empty(usageAfterDelete.ExternalReferences);
         }

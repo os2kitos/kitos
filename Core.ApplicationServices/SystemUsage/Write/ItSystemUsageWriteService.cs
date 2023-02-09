@@ -138,21 +138,19 @@ namespace Core.ApplicationServices.SystemUsage.Write
         public Result<ExternalReference, OperationError> AddExternalReference(Guid usageUuid, ExternalReferenceProperties externalReferenceProperties)
         {
             return GetUsageAndAuthorizeWriteAccess(usageUuid)
-                .Match(usage => _referenceService.AddReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceProperties),
-                    error => error);
+                .Bind(usage => _referenceService.AddReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceProperties));
         }
 
         public Result<ExternalReference, OperationError> UpdateExternalReference(Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceProperties externalReferenceProperties)
         {
             return GetUsageAndAuthorizeWriteAccess(usageUuid)
-                .Match(usage => _referenceService.UpdateReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceUuid, externalReferenceProperties),
-                    error => error);
+                .Bind(usage => _referenceService.UpdateReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceUuid, externalReferenceProperties));
         }
 
         public Result<ExternalReference, OperationError> DeleteExternalReference(Guid usageUuid, Guid externalReferenceUuid)
         {
             return GetUsageAndAuthorizeWriteAccess(usageUuid)
-                .Match(_ =>
+                .Bind(_ =>
                     {
                         var getIdResult = _identityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
                         if(getIdResult.IsNone)
@@ -163,8 +161,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                             .Match(Result<ExternalReference, OperationError>.Success,
                                 operationFailure =>
                                     new OperationError($"Failed to remove the ExternalReference with uuid: {externalReferenceUuid}", operationFailure));
-                    },
-                    error => error);
+                    });
         }
 
         public Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters)
