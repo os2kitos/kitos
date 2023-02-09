@@ -2183,6 +2183,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Notes = A<string>(),
                 JournalPeriods = new Fixture()
                     .Build<JournalPeriodRequestDTO>()
+                    .Without(x => x.Uuid)
                     .Without(x => x.EndDate)
                     .Without(x => x.StartDate)
                     .Do(x =>

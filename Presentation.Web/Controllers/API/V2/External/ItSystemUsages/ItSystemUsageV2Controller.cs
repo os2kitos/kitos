@@ -11,7 +11,6 @@ using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
-using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
