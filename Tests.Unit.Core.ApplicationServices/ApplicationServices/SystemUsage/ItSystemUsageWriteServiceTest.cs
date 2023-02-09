@@ -2483,7 +2483,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 ArchiveDocumentBearing = A<bool?>().AsChangedValue(),
                 ArchiveFrequencyInMonths = new ChangedValue<int?>(A<int>()),
                 ArchiveNotes = A<string>().AsChangedValue(),
-                ArchiveJournalPeriods = Many<SystemUsageJournalPeriod>().ToList().FromNullable<IEnumerable<SystemUsageJournalPeriod>>().AsChangedValue()
+                ArchiveJournalPeriods = Many<SystemUsageJournalPeriod>().Select(p =>
+                {
+                    p.Uuid = null;
+                    return p;
+                }).ToList().FromNullable<IEnumerable<SystemUsageJournalPeriod>>().AsChangedValue()
             };
         }
 
