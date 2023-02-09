@@ -11,7 +11,6 @@ using Core.DomainServices.Repositories.GDPR;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -51,7 +50,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Roles = MapRoles(systemUsage),
                 LocalKLEDeviations = MapKle(systemUsage),
                 OrganizationUsage = MapOrganizationUsage(systemUsage),
-                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(systemUsage.ExternalReferences, systemUsage.Reference),
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(systemUsage.ExternalReferences),
                 OutgoingSystemRelations = MapOutgoingSystemRelations(systemUsage),
                 Archiving = MapArchiving(systemUsage),
                 GDPR = MapGDPR(systemUsage)
@@ -254,17 +253,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             dto.RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO();
             dto.RelationInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO();
             return dto;
-        }
-
-        public ExternalReferenceDataResponseDTO MapExternalReferenceDTO(ExternalReference externalReference)
-        {
-            return new ExternalReferenceDataResponseDTO
-            {
-                Uuid = externalReference.Uuid,
-                DocumentId = externalReference.ExternalReferenceId,
-                Url = externalReference.URL,
-                Title = externalReference.Title
-            };
         }
 
         private static RoleAssignmentResponseDTO ToRoleResponseDTO(ItSystemRight right)

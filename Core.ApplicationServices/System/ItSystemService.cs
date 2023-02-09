@@ -349,14 +349,16 @@ namespace Core.ApplicationServices.System
                     existingReference.URL = urlReference;
                     return system;
                 }
-
-                var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, false));
+                /*var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, false));
                 if (addReferenceResult.Failed)
                 {
                     return addReferenceResult.Error;
                 }
 
-                return system.SetMasterReference(addReferenceResult.Value).Match(_ => Result<ItSystem, OperationError>.Success(system), error => error);
+                return system.SetMasterReference(addReferenceResult.Value).Match(_ => Result<ItSystem, OperationError>.Success(system), error => error);*/
+
+                return _referenceService.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, true))
+                    .Bind(_ => Result<ItSystem, OperationError>.Success(system));
             });
         }
 

@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.References;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Shared;
-using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -26,36 +29,65 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void MapExternalReferences_Maps_References(bool withMaster)
         {
             //Arrange
-            var externalReferences = CreateExternalReferences();
-            var masterReference = withMaster ? externalReferences.RandomItem() : null;
+            var externalReferences = CreateExternalReferences(withMaster);
 
             //Act
-            var dto = _sut.MapExternalReferences(externalReferences, masterReference);
+            var dto = _sut.MapExternalReferences(externalReferences);
 
             //Assert
-            AssertExternalReferences(externalReferences, masterReference.FromNullable(), dto.ToList());
+            AssertExternalReferences(externalReferences, withMaster, dto.ToList());
         }
 
-        private List<ExternalReference> CreateExternalReferences()
+        [Fact]
+        public void Can_Map_ExternalReference()
         {
-            return Many<string>().Select((title, i) => new ExternalReference
+            //Arrange
+            var expected = CreateExternalReference(A<string>(), A<int>(), A<bool>());
+
+            //Act
+            var dto = _sut.MapExternalReference(expected);
+
+            //Assert
+            AssertExternalReference(expected, dto);
+        }
+
+        private List<ExternalReference> CreateExternalReferences(bool withMaster)
+        {
+            var references = Many<string>().Select((title, id) => CreateExternalReference(title, id, false)).ToList();
+            if(withMaster)
+            {
+                SetOwnerWithMainReference(references.First());
+            }
+
+            return references;
+        }
+
+        private ExternalReference CreateExternalReference(string title, int id, bool withMaster)
+        {
+            var reference = new ExternalReference
             {
                 Title = title,
                 URL = A<string>(),
                 ExternalReferenceId = A<string>(),
-                Id = i
-            }).ToList();
+                Id = id,
+            };
+
+            if (withMaster)
+            {
+                SetOwnerWithMainReference(reference);
+            }
+
+            return reference;
         }
 
         private static void AssertExternalReferences(
             IReadOnlyCollection<ExternalReference> expectedReferences,
-            Maybe<ExternalReference> expectedMasterReference,
+            bool withMasterReference,
             IReadOnlyCollection<ExternalReferenceDataResponseDTO> dtoExternalReferences)
         {
-            if (expectedMasterReference.HasValue)
+            if (withMasterReference)
             {
-                var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
-                AssertExternalReference(expectedMasterReference.Value, actualMaster);
+                Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
             }
             else
             {
@@ -73,12 +105,35 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataResponseDTO actualMaster)
+        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataResponseDTO actual)
         {
-            Assert.Equal(reference.Uuid, actualMaster.Uuid);
-            Assert.Equal(reference.Title, actualMaster.Title);
-            Assert.Equal(reference.URL, actualMaster.Url);
-            Assert.Equal(reference.ExternalReferenceId, actualMaster.DocumentId);
+            Assert.Equal(reference.Uuid, actual.Uuid);
+            Assert.Equal(reference.Title, actual.Title);
+            Assert.Equal(reference.URL, actual.Url);
+            Assert.Equal(reference.ExternalReferenceId, actual.DocumentId);
+            Assert.Equal(reference.IsMasterReference(), actual.MasterReference);
+        }
+
+        private void SetOwnerWithMainReference(ExternalReference reference)
+        {
+            var randomType = A<ReferenceRootType>();
+            switch (randomType)
+            {
+                case ReferenceRootType.SystemUsage:
+                    reference.ItSystemUsage = new ItSystemUsage { Reference = reference };
+                    break;
+                case ReferenceRootType.Contract:
+                    reference.ItContract = new ItContract { Reference = reference };
+                    break;
+                case ReferenceRootType.DataProcessingRegistration:
+                    reference.DataProcessingRegistration = new DataProcessingRegistration { Reference = reference };
+                    break;
+                case ReferenceRootType.System:
+                    reference.ItSystem = new ItSystem { Reference = reference };
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(randomType), randomType, null);
+            }
         }
     }
 }

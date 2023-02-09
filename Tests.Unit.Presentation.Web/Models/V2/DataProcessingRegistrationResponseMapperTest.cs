@@ -249,14 +249,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssignExternalReferences(dpr);
             var mappedReferences = Many<ExternalReferenceDataResponseDTO>();
             _externalReferenceResponseMapperMock
-                .Setup(x => x.MapExternalReferences(dpr.ExternalReferences, dpr.Reference))
+                .Setup(x => x.MapExternalReferences(dpr.ExternalReferences))
                 .Returns(mappedReferences);
 
             //Act
             var dto = _sut.MapDataProcessingRegistrationDTO(dpr);
 
             //Assert
-            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(dpr.ExternalReferences, dpr.Reference), Times.Once);
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(dpr.ExternalReferences), Times.Once);
             Assert.Equivalent(mappedReferences, dto.ExternalReferences);
         }
 

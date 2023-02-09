@@ -42,6 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
         private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
         private readonly IItsystemUsageRelationsService _systemRelationsService;
+        private readonly IExternalReferenceResponseMapper _externalReferenceResponseMapper;
 
         public ItSystemUsageV2Controller(
             IItSystemUsageService itSystemUsageService,
@@ -49,7 +50,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             IItSystemUsageWriteService writeService,
             IItSystemUsageWriteModelMapper writeModelMapper,
             IResourcePermissionsResponseMapper permissionsResponseMapper,
-            IItsystemUsageRelationsService systemRelationsService)
+            IItsystemUsageRelationsService systemRelationsService,
+            IExternalReferenceResponseMapper externalReferenceResponseMapper)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
@@ -57,6 +59,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             _writeModelMapper = writeModelMapper;
             _permissionsResponseMapper = permissionsResponseMapper;
             _systemRelationsService = systemRelationsService;
+            _externalReferenceResponseMapper = externalReferenceResponseMapper;
         }
 
         /// <summary>
@@ -437,9 +440,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
+        /// <summary>
+        /// Creates an external reference for the system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("{systemUsageUuid}/external-references")]
         [SwaggerResponse(HttpStatusCode.Created)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -452,15 +461,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             
             return _writeService
                 .AddExternalReference(systemUsageUuid, properties)
-                .Select(_responseMapper.MapExternalReferenceDTO)
+                .Select(_externalReferenceResponseMapper.MapExternalReference)
                 .Match(reference => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/external-references/{reference.Uuid}", reference), FromOperationError);
         }
 
-
-
+        /// <summary>
+        /// Updates a system usage external reference
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("{systemUsageUuid}/external-references/{externalReferenceUuid}")]
         [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -473,13 +487,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .UpdateExternalReference(systemUsageUuid, externalReferenceUuid, properties)
-                .Select(_responseMapper.MapExternalReferenceDTO)
+                .Select(_externalReferenceResponseMapper.MapExternalReference)
                 .Match(Ok, FromOperationError);
         }
 
+        /// <summary>
+        /// Deletes a system usage external reference
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{systemUsageUuid}/external-references/{externalReferenceUuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -490,7 +511,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .DeleteExternalReference(systemUsageUuid, externalReferenceUuid)
-                .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
+                .Match(_ => NoContent(), FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)

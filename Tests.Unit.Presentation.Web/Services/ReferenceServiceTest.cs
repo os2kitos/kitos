@@ -518,9 +518,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var id = A<int>();
             var rootType = A<ReferenceRootType>();
             var referenceUuid = A<Guid>();
-            var title = A<string>();
-            var externalReferenceId = A<string>();
-            var url = A<string>();
+            var properties = A<ExternalReferenceProperties>();
             var entity = new Mock<IEntityWithExternalReferences>();
             var externalReference = new ExternalReference(){Uuid = referenceUuid};
             ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
@@ -528,14 +526,14 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetByUuid(referenceUuid, externalReference);
 
             //Act
-            var result = _sut.UpdateReference(id, rootType, referenceUuid, new ExternalReferenceProperties(title, externalReferenceId, url, false));
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, properties);
 
             //Assert
             Assert.True(result.Ok);
             var updatedExternalReference = result.Value;
-            Assert.Equal(title, updatedExternalReference.Title);
-            Assert.Equal(externalReferenceId, updatedExternalReference.ExternalReferenceId);
-            Assert.Equal(url, updatedExternalReference.URL);
+            Assert.Equal(properties.Title, updatedExternalReference.Title);
+            Assert.Equal(properties.DocumentId, updatedExternalReference.ExternalReferenceId);
+            Assert.Equal(properties.Url, updatedExternalReference.URL);
             Assert.Equal(referenceUuid, updatedExternalReference.Uuid);
 
             _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Once);
@@ -548,9 +546,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var id = A<int>();
             var rootType = A<ReferenceRootType>();
             var referenceUuid = A<Guid>();
-            var title = A<string>();
-            var externalReferenceId = A<string>();
-            var url = A<string>();
+            var properties = A<ExternalReferenceProperties>();
             var entity = new Mock<IEntityWithExternalReferences>();
             var externalReference = new ExternalReference() { Uuid = referenceUuid };
             ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
@@ -558,14 +554,14 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetByUuid(referenceUuid, externalReference);
 
             //Act
-            var result = _sut.UpdateReference(id, rootType, referenceUuid, new ExternalReferenceProperties(title, externalReferenceId, url, true));
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, new ExternalReferenceProperties(properties.Title, properties.DocumentId, properties.Url, true));
 
             //Assert
             Assert.True(result.Ok);
             var updatedExternalReference = result.Value;
-            Assert.Equal(title, updatedExternalReference.Title);
-            Assert.Equal(externalReferenceId, updatedExternalReference.ExternalReferenceId);
-            Assert.Equal(url, updatedExternalReference.URL);
+            Assert.Equal(properties.Title, updatedExternalReference.Title);
+            Assert.Equal(properties.DocumentId, updatedExternalReference.ExternalReferenceId);
+            Assert.Equal(properties.Url, updatedExternalReference.URL);
             Assert.Equal(referenceUuid, updatedExternalReference.Uuid);
 
             _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Once);
@@ -661,7 +657,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceRepository.Verify
             (
                 repository => repository.SaveRootEntity(It.Is<IEntityWithExternalReferences>(x => x.Id == rootEntity.Id)),
-                Times.Once
+                Times.Exactly(2) //Once when updating a reference, once after performing each loop iteration
             );
         }
 

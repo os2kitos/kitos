@@ -1868,6 +1868,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(expected.DocumentId, actual.DocumentId);
             Assert.Equal(expected.Title, actual.Title);
             Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.MasterReference, actual.MasterReference);
         }
 
         private async Task<string> CreateUserInNewOrgAndGetToken()

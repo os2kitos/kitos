@@ -259,7 +259,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<ExternalReferenceDataResponseDTO> UpdateExternalReferenceAsync(string token, Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceDataWriteRequestDTO request)
         {
-            var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/{usageUuid}/external-references/{externalReferenceUuid}"), token, request);
+            using var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/{usageUuid}/external-references/{externalReferenceUuid}"), token, request);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
@@ -267,7 +267,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task DeleteExternalReferenceAsync(string token, Guid usageUuid, Guid externalReferenceUuid)
         {
-            var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/{usageUuid}/external-references/{externalReferenceUuid}"), token);
+            using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/{usageUuid}/external-references/{externalReferenceUuid}"), token);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
