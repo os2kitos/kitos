@@ -353,6 +353,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\JournalPeriodRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeResponseDTO.cs" />
@@ -675,7 +677,7 @@
     <Compile Include="Models\API\V2\Response\SystemUsage\LocalKLEDeviationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ArchivingRegistrationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Shared\SimpleLinkDTO.cs" />
-    <Compile Include="Models\API\V2\Response\SystemUsage\SystemRelationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\OutgoingSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasUuidExternal.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasNameExternal.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\ExpectedUsersIntervalDTO.cs" />

@@ -1332,6 +1332,38 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Can_GET_Incoming_SystemUsageRelation()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            var (interfaceUuid, interfaceName) = await CreateExhibitingInterface(organization.Id, system2.Id);
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var relationFrequency = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRelationFrequencies, organization.Uuid, 1, 0)).First();
+
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid,
+                RelationInterfaceUuid = interfaceUuid,
+                AssociatedContractUuid = contract.Uuid,
+                RelationFrequencyUuid = relationFrequency.Uuid,
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
+            await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
+
+            //Act
+            var retrievedRelation = await ItSystemUsageV2Helper.GetIncomingRelationsAsync(token, usage2.Uuid);
+
+            //Assert
+            var relation = Assert.Single(retrievedRelation);
+            AssertIncomingRelation(input, usage1.Uuid, interfaceName, contract.Name, relationFrequency.Name, relation);
+        }
+
+        [Fact]
         public async Task Can_POST_SystemUsageRelation_With_Just_SystemUsages()
         {
             //Arrange
@@ -1784,9 +1816,21 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return token;
         }
 
-        private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, SystemRelationResponseDTO actual)
+        private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, OutgoingSystemRelationResponseDTO actual)
         {
             Assert.Equal(expected.ToSystemUsageUuid, actual.ToSystemUsage.Uuid);
+            AssertBaseRelation(expected, expectedInterfaceName, expectedContractName, expectedFrequencyName, actual);
+        }
+
+        private static void AssertIncomingRelation(SystemRelationWriteRequestDTO expected, Guid expectedFromSystemUsageUuid, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, IncomingSystemRelationResponseDTO actual)
+        {
+            Assert.Equal(expectedFromSystemUsageUuid, actual.FromSystemUsage.Uuid);
+            AssertBaseRelation(expected, expectedInterfaceName, expectedContractName, expectedFrequencyName, actual);
+        }
+
+        private static void AssertBaseRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName,
+            string expectedContractName, string expectedFrequencyName, BaseSystemRelationResponseDTO actual)
+        {
             Assert.Equal(expected.RelationInterfaceUuid, actual.RelationInterface.Uuid);
             Assert.Equal(expectedInterfaceName, actual.RelationInterface.Name);
             Assert.Equal(expected.AssociatedContractUuid, actual.AssociatedContract.Uuid);
