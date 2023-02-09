@@ -45,6 +45,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         public int? FrequencyInMonths { get; set; }
 
         public bool? DocumentBearing { get; set; }
-        public IEnumerable<JournalPeriodDTO> JournalPeriods { get; set; }
+        public IEnumerable<JournalPeriodRequestDTO> JournalPeriods { get; set; }
     }
 }

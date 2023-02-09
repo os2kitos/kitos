@@ -236,10 +236,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     : OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriod>>>.None
             };
         }
-        private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)
+        private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodRequestDTO journalPeriod)
         {
             return new SystemUsageJournalPeriod
             {
+                Uuid = journalPeriod.Uuid,
                 Approved = journalPeriod.Approved,
                 ArchiveId = journalPeriod.ArchiveId,
                 EndDate = journalPeriod.EndDate,

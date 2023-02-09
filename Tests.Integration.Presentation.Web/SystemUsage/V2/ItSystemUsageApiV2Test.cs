@@ -1050,7 +1050,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
-            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodDTO>() });
+            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodRequestDTO>() });
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
@@ -2138,7 +2138,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 DocumentBearing = A<bool>(),
                 Notes = A<string>(),
                 JournalPeriods = new Fixture()
-                    .Build<JournalPeriodDTO>()
+                    .Build<JournalPeriodRequestDTO>()
                     .Without(x => x.EndDate)
                     .Without(x => x.StartDate)
                     .Do(x =>

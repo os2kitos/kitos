@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private ArchivingRegistrationsResponseDTO MapArchiving(ItSystemUsage systemUsage)
+        private static ArchivingRegistrationsResponseDTO MapArchiving(ItSystemUsage systemUsage)
         {
             return new ArchivingRegistrationsResponseDTO
             {
@@ -121,8 +121,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 TestLocation = systemUsage.ArchiveTestLocation?.MapIdentityNamePairDTO(),
                 Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
                 Supplier = systemUsage.ArchiveSupplier?.MapShallowOrganizationResponseDTO(),
-                JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodDTO
+                JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodResponseDTO
                 {
+                    Uuid = period.Uuid,
                     Approved = period.Approved,
                     ArchiveId = period.UniqueArchiveId,
                     StartDate = period.StartDate,
