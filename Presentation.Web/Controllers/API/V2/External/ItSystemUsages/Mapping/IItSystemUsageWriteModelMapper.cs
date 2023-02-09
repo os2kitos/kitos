@@ -10,6 +10,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request);
         SystemUsageUpdateParameters FromPATCH(UpdateItSystemUsageRequestDTO request);
         SystemRelationParameters MapRelation(SystemRelationWriteRequestDTO relationData);
-        SystemUsageJournalPeriodProperties MapJournalPeriodCreation(JournalPeriodDTO input);
+        SystemUsageJournalPeriodProperties MapJournalPeriodProperties(JournalPeriodDTO input);
     }
 }

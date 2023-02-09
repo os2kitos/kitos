@@ -907,7 +907,7 @@ namespace Core.DomainModel.ItSystemUsage
                 );
         }
 
-        private Maybe<ArchivePeriod> GetArchivePeriod(Guid archivePeriodUuid)
+        public Maybe<ArchivePeriod> GetArchivePeriod(Guid archivePeriodUuid)
         {
             return ArchivePeriods.FirstOrDefault(x => x.Uuid == archivePeriodUuid).FromNullable();
         }

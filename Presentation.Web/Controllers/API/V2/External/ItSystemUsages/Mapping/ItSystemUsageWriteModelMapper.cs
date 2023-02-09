@@ -243,7 +243,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return update;
         }
 
-        public SystemUsageJournalPeriodProperties MapJournalPeriodCreation(JournalPeriodDTO input)
+        public SystemUsageJournalPeriodProperties MapJournalPeriodProperties(JournalPeriodDTO input)
         {
             var properties = new SystemUsageJournalPeriodProperties();
             MapJournalPeriodProperties(input, properties);

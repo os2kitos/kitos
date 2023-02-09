@@ -11,6 +11,7 @@ using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
@@ -440,7 +441,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
         //TODO: Docs
         [HttpPost]
-        [Route("{systemUsageUuid}/archive-journal-periods")]
+        [Route("{systemUsageUuid}/journal-periods")]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(JournalPeriodResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -451,78 +452,78 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            var parameters = _writeModelMapper.MapJournalPeriodCreation(request);
+            var parameters = _writeModelMapper.MapJournalPeriodProperties(request);
          
             return _writeService
                 .CreateJournalPeriod(systemUsageUuid, parameters)
                 .Select(_responseMapper.MapJournalPeriodResponseDto)
-                .Match(period => CreateCreatedResourcePath(systemUsageUuid, "archive-journal-periods", period), FromOperationError);
+                .Match(period => CreateCreatedResourcePath(systemUsageUuid, "journal-periods", period), FromOperationError);
         }
 
         //TODO: Docs
-        //[HttpGet]
-        //[Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
-        //[SwaggerResponse(HttpStatusCode.BadRequest)]
-        //[SwaggerResponse(HttpStatusCode.Unauthorized)]
-        //[SwaggerResponse(HttpStatusCode.NotFound)]
-        //[SwaggerResponse(HttpStatusCode.Forbidden)]
-        //public IHttpActionResult GetSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid systemRelationUuid)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+        [HttpGet]
+        [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JournalPeriodResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return _itSystemUsageService
-        //        .GetReadableItSystemUsageByUuid(systemUsageUuid)
-        //        .Bind(usage =>
-        //            usage.GetUsageRelation(systemRelationUuid)
-        //                .Match<Result<SystemRelation, OperationError>>
-        //                (
-        //                systemRelation => systemRelation,
-        //                () => new OperationError("Relation not found on system usage", OperationFailure.NotFound))
-        //            )
-        //        .Select(_responseMapper.MapOutgoingSystemRelationDTO)
-        //        .Match(Ok, FromOperationError);
-        //}
-
-        //TODO: Docs
-        //[HttpPut]
-        //[Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
-        //[SwaggerResponse(HttpStatusCode.BadRequest)]
-        //[SwaggerResponse(HttpStatusCode.Unauthorized)]
-        //[SwaggerResponse(HttpStatusCode.NotFound)]
-        //[SwaggerResponse(HttpStatusCode.Forbidden)]
-        //public IHttpActionResult PutSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid systemRelationUuid, [FromBody] SystemRelationWriteRequestDTO request)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    var systemRelationParameters = _writeModelMapper.MapRelation(request);
-
-        //    return _writeService
-        //        .UpdateSystemRelation(systemUsageUuid, systemRelationUuid, systemRelationParameters)
-        //        .Select(_responseMapper.MapOutgoingSystemRelationDTO)
-        //        .Match(Ok, FromOperationError);
-        //}
+            return _itSystemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(usage =>
+                    usage.GetArchivePeriod(journalPeriodUuid)
+                        .Match<Result<ArchivePeriod, OperationError>>
+                        (
+                        period => period,
+                        () => new OperationError("Journal period not found on system usage", OperationFailure.NotFound))
+                    )
+                .Select(_responseMapper.MapJournalPeriodResponseDto)
+                .Match(Ok, FromOperationError);
+        }
 
         //TODO: Docs
-        //[HttpDelete]
-        //[Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
-        //[SwaggerResponse(HttpStatusCode.NoContent)]
-        //[SwaggerResponse(HttpStatusCode.BadRequest)]
-        //[SwaggerResponse(HttpStatusCode.Unauthorized)]
-        //[SwaggerResponse(HttpStatusCode.NotFound)]
-        //[SwaggerResponse(HttpStatusCode.Forbidden)]
-        //public IHttpActionResult DeleteSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid systemRelationUuid)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+        [HttpPut]
+        [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JournalPeriodResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid, [FromBody] JournalPeriodDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return _writeService
-        //        .DeleteSystemRelation(systemUsageUuid, systemRelationUuid)
-        //        .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
-        //}
+            var parameters = _writeModelMapper.MapJournalPeriodProperties(request);
+
+            return _writeService
+                .UpdateJournalPeriod(systemUsageUuid, journalPeriodUuid, parameters)
+                .Select(_responseMapper.MapJournalPeriodResponseDto)
+                .Match(Ok, FromOperationError);
+        }
+
+        //TODO: Docs
+        [HttpDelete]
+        [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteJournalPeriod(systemUsageUuid, journalPeriodUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)
         {

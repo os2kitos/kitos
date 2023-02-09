@@ -775,7 +775,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             throw new NotImplementedException();
         }
 
-        public Result<ArchivePeriod, OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid relationUuid)
+        public Maybe<OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid relationUuid)
         {
             throw new NotImplementedException();
         }

@@ -19,6 +19,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid);
         Result<ArchivePeriod, OperationError> CreateJournalPeriod(Guid systemUsageUuid, SystemUsageJournalPeriodProperties parameters);
         Result<ArchivePeriod, OperationError> UpdateJournalPeriod(Guid systemUsageUuid, Guid relationUuid, SystemUsageJournalPeriodProperties parameters);
-        Result<ArchivePeriod, OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid relationUuid);
+        Maybe<OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid relationUuid);
     }
 }
