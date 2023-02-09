@@ -4,7 +4,7 @@ using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
-    public class JournalPeriodRequestDTO : JournalPeriodDTO
+    public class JournalPeriodUpdateRequestDTO : JournalPeriodDTO
     {
         /// <summary>
         /// Optionally references an existing, specific journal period

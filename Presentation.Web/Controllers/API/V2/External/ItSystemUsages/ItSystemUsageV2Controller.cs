@@ -439,7 +439,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
-        //TODO: Docs
+        /// <summary>
+        /// Add a single journal period to the system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("{systemUsageUuid}/journal-periods")]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(JournalPeriodResponseDTO))]
@@ -447,7 +452,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] JournalPeriodDTO request)
+        public IHttpActionResult PostJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] JournalPeriodDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -460,7 +465,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(period => CreateCreatedResourcePath(systemUsageUuid, "journal-periods", period), FromOperationError);
         }
 
-        //TODO: Docs
+        /// <summary>
+        /// Get a specific journal period
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="journalPeriodUuid"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JournalPeriodResponseDTO))]
@@ -468,7 +478,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
+        public IHttpActionResult GetJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -486,7 +496,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(Ok, FromOperationError);
         }
 
-        //TODO: Docs
+        /// <summary>
+        /// Perform a FULL update of an existing journal period
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="journalPeriodUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JournalPeriodResponseDTO))]
@@ -494,7 +510,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid, [FromBody] JournalPeriodDTO request)
+        public IHttpActionResult PutJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid, [FromBody] JournalPeriodDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -507,7 +523,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(Ok, FromOperationError);
         }
 
-        //TODO: Docs
+        /// <summary>
+        /// Delete an existing journal period
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="journalPeriodUuid"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
@@ -515,7 +536,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult DeleteArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
+        public IHttpActionResult DeleteJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

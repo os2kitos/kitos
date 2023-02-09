@@ -38,7 +38,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
                 Roles = request.Roles.FromNullable().Select(MapRoles),
                 GDPR = request.GDPR.FromNullable().Select(gdpr => MapGDPR(gdpr, true)),
-                Archiving = request.Archiving.FromNullable().Select(archiving => MapArchiving(archiving, true))
+                Archiving = request.Archiving
+                    .FromNullable()
+                    .Select(archiving => MapBaseArchiving(archiving, true))
+                    .Select(archiving => MapJournalPeriods(archiving, request.Archiving, true))
             };
 
             return parameters;
@@ -67,7 +70,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapUpdateReferences),
                 Roles = roles.FromNullable().Select(MapRoles),
                 GDPR = gdpr.FromNullable().Select(gdpr => MapGDPR(gdpr, enforceFallbackOnUndefinedProperties)),
-                Archiving = archiving.FromNullable().Select(archiving => MapArchiving(archiving, enforceFallbackOnUndefinedProperties))
+                Archiving = archiving
+                    .FromNullable()
+                    .Select(a => MapBaseArchiving(a, enforceFallbackOnUndefinedProperties))
+                    .Select(a=>MapUpdatedJournalPeriods(a,request.Archiving,enforceFallbackOnUndefinedProperties))
             };
         }
 
@@ -188,7 +194,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO source, bool enforceFallbackIfNotProvided)
+        private UpdatedSystemUsageArchivingParameters MapBaseArchiving(BaseArchivingWriteRequestDTO source, bool enforceFallbackIfNotProvided)
         {
             var rule = CreateChangeRule<UpdateItSystemUsageRequestDTO>(enforceFallbackIfNotProvided);
 
@@ -229,17 +235,40 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 ArchiveDocumentBearing = rule.MustUpdate(x => x.Archiving.DocumentBearing)
                     ? source.DocumentBearing.AsChangedValue()
                     : OptionalValueChange<bool?>.None,
-
-                ArchiveJournalPeriods = rule.MustUpdate(x => x.Archiving.JournalPeriods)
-                    ? source.JournalPeriods.FromNullable().Select(periods => periods.Select(MapJournalPeriodUpdate)).AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>>.None
             };
         }
-        private static SystemUsageJournalPeriodUpdate MapJournalPeriodUpdate(JournalPeriodRequestDTO journalPeriod)
+        private UpdatedSystemUsageArchivingParameters MapJournalPeriods(UpdatedSystemUsageArchivingParameters parameters, ArchivingCreationRequestDTO source, bool enforceFallbackIfNotProvided)
+        {
+            var rule = CreateChangeRule<UpdateItSystemUsageRequestDTO>(enforceFallbackIfNotProvided);
+
+            parameters.ArchiveJournalPeriods = rule.MustUpdate(x => x.Archiving.JournalPeriods)
+                ? source.JournalPeriods.FromNullable().Select(periods => periods.Select(MapNewJournalPeriod)).AsChangedValue()
+                : OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>>.None;
+
+            return parameters;
+        }
+        private UpdatedSystemUsageArchivingParameters MapUpdatedJournalPeriods(UpdatedSystemUsageArchivingParameters parameters, ArchivingUpdateRequestDTO source, bool enforceFallbackIfNotProvided)
+        {
+            var rule = CreateChangeRule<UpdateItSystemUsageRequestDTO>(enforceFallbackIfNotProvided);
+
+            parameters.ArchiveJournalPeriods = rule.MustUpdate(x => x.Archiving.JournalPeriods)
+                ? source.JournalPeriods.FromNullable().Select(periods => periods.Select(MapUpdatedJournalPeriod)).AsChangedValue()
+                : OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>>.None;
+
+            return parameters;
+        }
+        private static SystemUsageJournalPeriodUpdate MapNewJournalPeriod(JournalPeriodDTO newJournalPeriod)
         {
             var update = new SystemUsageJournalPeriodUpdate();
-            update.Uuid = journalPeriod.Uuid;
-            MapJournalPeriodProperties(journalPeriod, update);
+            MapJournalPeriodProperties(newJournalPeriod, update);
+            return update;
+        }
+
+        private static SystemUsageJournalPeriodUpdate MapUpdatedJournalPeriod(JournalPeriodUpdateRequestDTO journalPeriodUpdate)
+        {
+            var update = new SystemUsageJournalPeriodUpdate();
+            update.Uuid = journalPeriodUpdate.Uuid;
+            MapJournalPeriodProperties(journalPeriodUpdate, update);
             return update;
         }
 

@@ -19,10 +19,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// </summary>
         public LocalKLEDeviationsRequestDTO LocalKleDeviations { get; set; }
         /// <summary>
-        /// Defines archiving related properties for this system usage
-        /// </summary>
-        public ArchivingWriteRequestDTO Archiving { get; set; }
-        /// <summary>
         /// GDPR-specific registrations
         /// </summary>
         public GDPRWriteRequestDTO GDPR { get; set; }

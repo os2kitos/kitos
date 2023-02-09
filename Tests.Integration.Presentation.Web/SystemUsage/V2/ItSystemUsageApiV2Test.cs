@@ -997,7 +997,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
             var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
 
-            var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+            var inputs = await CreateArchivingCreationRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
 
             var request = CreatePostRequest(organization.Uuid, system.Uuid, archiving: inputs);
 
@@ -1006,7 +1006,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertArchivingParametersSet(inputs, dto.Archiving);
+            AssertArchivingParametersSet<ArchivingCreationRequestDTO, JournalPeriodDTO>(inputs, dto.Archiving);
         }
 
         [Fact]
@@ -1026,7 +1026,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
             var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
 
-            var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+            var inputs = await CreateArchivingUpdateRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
 
             //Act - Add archiving data
             using var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, inputs);
@@ -1034,23 +1034,23 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert 
             Assert.Equal(HttpStatusCode.OK, addedArchivingDataUsage.StatusCode);
             var addedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertArchivingParametersSet(inputs, addedDTO.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(inputs, addedDTO.Archiving);
 
             //Act - Update archiving data
             var updatedArchiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 1)).First();
             var updatedArchiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 1)).First();
             var updatedArchiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 1)).First();
-            var updatedInputs = CreateArchivingWriteRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
+            var updatedInputs = await CreateArchivingUpdateRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
 
             using var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, updatedInputs);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, updatedArchivingDataUsage.StatusCode);
             var updatedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
-            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodRequestDTO>() });
+            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, new ArchivingUpdateRequestDTO() { JournalPeriods = new List<JournalPeriodUpdateRequestDTO>() });
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
@@ -1142,7 +1142,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             AssertGDPR(request.GDPR, createdUsage.GDPR);
 
-            AssertArchivingParametersSet(request.Archiving, createdUsage.Archiving);
+            AssertArchivingParametersSet<ArchivingCreationRequestDTO,JournalPeriodDTO>(request.Archiving, createdUsage.Archiving);
         }
 
         [Fact]
@@ -1160,7 +1160,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     referenceDataDtos: externalReferences1,
                     roles: roles1,
                     gdpr: gdpr1,
-                    archiving: archiving1);
+                    baseArchiving: archiving1);
 
             //Act - PUT on empty system usage
             var updatedUsage1 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest1);
@@ -1179,7 +1179,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             AssertGDPR(updateRequest1.GDPR, updatedUsage1.GDPR);
 
-            AssertArchivingParametersSet(updateRequest1.Archiving, updatedUsage1.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(updateRequest1.Archiving, updatedUsage1.Archiving);
 
             //Act - PUT on filled system usage
             var (generalData2, orgUnit2, organizationUsageData2, addedTaskRefs2, removedTaskRefs2, kleDeviations2,
@@ -1191,7 +1191,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     referenceDataDtos: externalReferences2,
                     roles: roles2,
                     gdpr: gdpr2,
-                    archiving: archiving2);
+                    baseArchiving: archiving2);
 
             var updatedUsage2 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest2);
 
@@ -1209,7 +1209,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             AssertGDPR(updateRequest2.GDPR, updatedUsage2.GDPR);
 
-            AssertArchivingParametersSet(updateRequest2.Archiving, updatedUsage2.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(updateRequest2.Archiving, updatedUsage2.Archiving);
 
             //Act - PUT empty on filled system usage
             var updateRequest3 = CreatePutRequest(
@@ -1219,7 +1219,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     referenceDataDtos: new List<UpdateExternalReferenceDataWriteRequestDTO>(),
                     roles: new List<RoleAssignmentRequestDTO>(),
                     gdpr: new GDPRWriteRequestDTO(),
-                    archiving: new ArchivingWriteRequestDTO());
+                    baseArchiving: new ArchivingUpdateRequestDTO());
 
             var updatedUsage3 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest3);
 
@@ -1857,10 +1857,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<UpdateExternalReferenceDataWriteRequestDTO>,
             IEnumerable<RoleAssignmentRequestDTO>,
             GDPRWriteRequestDTO,
-            ArchivingWriteRequestDTO)> CreateUpdateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system, IEnumerable<ExternalReferenceDataResponseDTO> existingExternalReferences = null)
+            ArchivingUpdateRequestDTO)> CreateUpdateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system, IEnumerable<ExternalReferenceDataResponseDTO> existingExternalReferences = null)
         {
             var fullData = await CreateFullDataRequestDTO(organization, system);
-
+            var archiving = await CreateArchivingUpdateRequestDTO(organization.Uuid);
             var mappedFullData = (
                 fullData.generalData,
                 fullData.unit1,
@@ -1871,7 +1871,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 existingExternalReferences != null ? CreateNewExternalReferenceDataWithOldUuid(existingExternalReferences) : MapExternalReferenceDtosToUpdateDtos(fullData.externalReferences),
                 fullData.roles,
                 fullData.gdpr,
-                fullData.archiving);
+                archiving);
             return mappedFullData;
         }
 
@@ -1884,7 +1884,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<ExternalReferenceDataWriteRequestDTO> externalReferences,
             IEnumerable<RoleAssignmentRequestDTO> roles,
             GDPRWriteRequestDTO gdpr,
-            ArchivingWriteRequestDTO archiving)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
+            ArchivingCreationRequestDTO archiving)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
         {
             var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
             var generalData = CreateGeneralDataWriteRequestDTO(dataClassification.Uuid);
@@ -1912,10 +1912,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var gdpr = await CreateGDPRInputAsync(organization);
 
-            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 0)).First();
-            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
-            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
-            var archiving = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+            var archiving = await CreateArchivingCreationRequestDTO(organization.Uuid);
 
             return (generalData, unit1, organizationUsageData, addedTaskRefs, removedTaskRefs, kleDeviations, externalReferences, roles, gdpr, archiving);
         }
@@ -2147,7 +2144,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Empty(actual.JournalPeriods);
         }
 
-        private static void AssertArchivingParametersSet(ArchivingWriteRequestDTO expected, ArchivingRegistrationsResponseDTO actual)
+        private static void AssertArchivingParametersSet<T, TJournalPeriod>(T expected, ArchivingRegistrationsResponseDTO actual)
+            where T : BaseArchivingWriteRequestDTO, IHasJournalPeriods<TJournalPeriod>
+            where TJournalPeriod : JournalPeriodDTO
         {
             Assert.Equal(expected.ArchiveDuty, actual.ArchiveDuty);
             Assert.Equal(expected.TypeUuid, actual.Type.Uuid);
@@ -2168,32 +2167,79 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(firstJournalPeriod.EndDate, journalPeriodFromServer.EndDate);
         }
 
-        private ArchivingWriteRequestDTO CreateArchivingWriteRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
+        private async Task<ArchivingCreationRequestDTO> CreateArchivingCreationRequestDTO(Guid organizationUuid)
         {
-            return new ArchivingWriteRequestDTO()
-            {
-                ArchiveDuty = A<ArchiveDutyChoice>(),
-                TypeUuid = archiveTypeUuid,
-                LocationUuid = archiveLocationUuid,
-                TestLocationUuid = archiveTestLocationUuid,
-                SupplierOrganizationUuid = organizationUuid,
-                Active = A<bool>(),
-                FrequencyInMonths = A<int>(),
-                DocumentBearing = A<bool>(),
-                Notes = A<string>(),
-                JournalPeriods = new Fixture()
-                    .Build<JournalPeriodRequestDTO>()
-                    .Without(x => x.Uuid)
-                    .Without(x => x.EndDate)
-                    .Without(x => x.StartDate)
-                    .Do(x =>
-                    {
-                        var startDate = A<DateTime>();
-                        x.StartDate = startDate;
-                        x.EndDate = startDate.AddDays(1);
-                    })
-                    .CreateMany()
-            };
+
+            var dto = new ArchivingCreationRequestDTO();
+            await AssignArchivingProperties(organizationUuid, dto);
+            dto.JournalPeriods = new Fixture()
+                .Build<JournalPeriodDTO>()
+                .Without(x => x.EndDate)
+                .Without(x => x.StartDate)
+                .Do(x =>
+                {
+                    var startDate = A<DateTime>();
+                    x.StartDate = startDate;
+                    x.EndDate = startDate.AddDays(1);
+                })
+                .CreateMany();
+            return dto;
+        }
+
+        private async Task<ArchivingCreationRequestDTO> CreateArchivingCreationRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
+        {
+            var requestDto = await CreateArchivingCreationRequestDTO(organizationUuid);
+            UpdateArchivingChoices(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, requestDto);
+            return requestDto;
+        }
+
+        private static void UpdateArchivingChoices(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, BaseArchivingWriteRequestDTO requestDto)
+        {
+            requestDto.TypeUuid = archiveTypeUuid;
+            requestDto.LocationUuid = archiveLocationUuid;
+            requestDto.TestLocationUuid = archiveTestLocationUuid;
+        }
+
+        private async Task AssignArchivingProperties(Guid organizationUuid, BaseArchivingWriteRequestDTO dto)
+        {
+            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organizationUuid, 1, 0)).First();
+            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organizationUuid, 1, 0)).First();
+            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organizationUuid, 1, 0)).First();
+            dto.ArchiveDuty = A<ArchiveDutyChoice>();
+            dto.TypeUuid = archiveType.Uuid;
+            dto.LocationUuid = archiveLocation.Uuid;
+            dto.TestLocationUuid = archiveTestLocation.Uuid;
+            dto.SupplierOrganizationUuid = organizationUuid;
+            dto.Active = A<bool>();
+            dto.FrequencyInMonths = A<int>();
+            dto.DocumentBearing = A<bool>();
+            dto.Notes = A<string>();
+        }
+
+        private async Task<ArchivingUpdateRequestDTO> CreateArchivingUpdateRequestDTO(Guid organizationUuid)
+        {
+            var dto = new ArchivingUpdateRequestDTO();
+            await AssignArchivingProperties(organizationUuid, dto);
+            dto.JournalPeriods = new Fixture()
+                .Build<JournalPeriodUpdateRequestDTO>()
+                .Without(x => x.Uuid)
+                .Without(x => x.EndDate)
+                .Without(x => x.StartDate)
+                .Do(x =>
+                {
+                    var startDate = A<DateTime>();
+                    x.StartDate = startDate;
+                    x.EndDate = startDate.AddDays(1);
+                })
+                .CreateMany();
+            return dto;
+        }
+
+        private async Task<ArchivingUpdateRequestDTO> CreateArchivingUpdateRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
+        {
+            var dto = await CreateArchivingUpdateRequestDTO(organizationUuid);
+            UpdateArchivingChoices(archiveLocationUuid,archiveLocationUuid,archiveTestLocationUuid,dto);
+            return dto;
         }
 
         private IEnumerable<T> WithRandomMaster<T>(IEnumerable<T> references) where T : ExternalReferenceDataWriteRequestDTO
@@ -2348,7 +2394,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<ExternalReferenceDataWriteRequestDTO> referenceDataDtos = null,
             IEnumerable<RoleAssignmentRequestDTO> roles = null,
             GDPRWriteRequestDTO gdpr = null,
-            ArchivingWriteRequestDTO archiving = null)
+            ArchivingCreationRequestDTO archiving = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
@@ -2371,7 +2417,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> referenceDataDtos = null,
             IEnumerable<RoleAssignmentRequestDTO> roles = null,
             GDPRWriteRequestDTO gdpr = null,
-            ArchivingWriteRequestDTO archiving = null)
+            ArchivingUpdateRequestDTO baseArchiving = null)
         {
             var generalUpdateRequest = new GeneralDataUpdateRequestDTO()
             {
@@ -2391,7 +2437,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 ExternalReferences = referenceDataDtos?.ToList(),
                 Roles = roles?.ToList(),
                 GDPR = gdpr,
-                Archiving = archiving
+                Archiving = baseArchiving
             };
         }
 

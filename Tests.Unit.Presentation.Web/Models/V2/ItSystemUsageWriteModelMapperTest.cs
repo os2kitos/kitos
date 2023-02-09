@@ -13,6 +13,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Toolkit.Extensions;
 using Xunit;
 
@@ -28,8 +29,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(GetAllInputPropertyNames<UpdateItSystemUsageRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.General).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<GeneralDataUpdateRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity)}.AsParameterMatch())).Returns(GetAllInputPropertyNames<ItSystemUsageValidityWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.Archiving).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ArchivingWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity) }.AsParameterMatch())).Returns(GetAllInputPropertyNames<ItSystemUsageValidityWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.Archiving).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<BaseArchivingWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.GDPR).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<GDPRWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<LocalKLEDeviationsRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<OrganizationUsageWriteRequestDTO>());
@@ -432,7 +433,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_Archiving()
         {
             //Arrange
-            var input = A<ArchivingWriteRequestDTO>();
+            var input = A<ArchivingUpdateRequestDTO>();
 
             //Act
             var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { Archiving = input });
@@ -467,7 +468,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Map_Archiving_Resets_JournalPeriods_If_Null()
         {
             //Arrange
-            var input = A<ArchivingWriteRequestDTO>();
+            var input = A<ArchivingUpdateRequestDTO>();
             input.JournalPeriods = null;
 
             //Act
@@ -499,7 +500,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 LocalKleDeviations = kleNull ? null : A<LocalKLEDeviationsRequestDTO>(),
                 OrganizationUsage = orgUsageNull ? null : A<OrganizationUsageWriteRequestDTO>(),
                 ExternalReferences = referencesNull ? null : Many<ExternalReferenceDataWriteRequestDTO>(),
-                Archiving = archivingNull ? null : A<ArchivingWriteRequestDTO>(),
+                Archiving = archivingNull ? null : A<ArchivingCreationRequestDTO>(),
                 GDPR = gdprNull ? null : A<GDPRWriteRequestDTO>(),
             };
 
@@ -535,7 +536,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 LocalKleDeviations = kleNull ? null : A<LocalKLEDeviationsRequestDTO>(),
                 OrganizationUsage = orgUsageNull ? null : A<OrganizationUsageWriteRequestDTO>(),
                 ExternalReferences = referencesNull ? null : Many<UpdateExternalReferenceDataWriteRequestDTO>(),
-                Archiving = archivingNull ? null : A<ArchivingWriteRequestDTO>(),
+                Archiving = archivingNull ? null : A<ArchivingUpdateRequestDTO>(),
                 GDPR = gdprNull ? null : A<GDPRWriteRequestDTO>(),
             };
 
@@ -918,7 +919,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noDPIADocumentation,
             bool noRetentionPeriodDefined,
             bool noNextDataRetentionEvaluationDate,
-            bool noDataRetentionEvaluationFrequencyInMonths, 
+            bool noDataRetentionEvaluationFrequencyInMonths,
             bool noPersonalData)
         {
             //Arrange
@@ -1178,17 +1179,17 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noDocumentBearing,
             bool noJournalPeriods)
         {
-            var ArchivingProperties = GetAllInputPropertyNames<ArchivingWriteRequestDTO>();
-            if (noArchiveDuty) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.ArchiveDuty));
-            if (noTypeUuid) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.TypeUuid));
-            if (noLocationUuid) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.LocationUuid));
-            if (noTestLocationUuid) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.TestLocationUuid));
-            if (noSupplierOrganizationUuid) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.SupplierOrganizationUuid));
-            if (noActive) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.Active));
-            if (noNotes) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.Notes));
-            if (noFrequencyInMonths) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.FrequencyInMonths));
-            if (noDocumentBearing) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.DocumentBearing));
-            if (noJournalPeriods) ArchivingProperties.Remove(nameof(ArchivingWriteRequestDTO.JournalPeriods));
+            var ArchivingProperties = GetAllInputPropertyNames<BaseArchivingWriteRequestDTO>();
+            if (noArchiveDuty) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.ArchiveDuty));
+            if (noTypeUuid) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.TypeUuid));
+            if (noLocationUuid) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.LocationUuid));
+            if (noTestLocationUuid) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.TestLocationUuid));
+            if (noSupplierOrganizationUuid) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.SupplierOrganizationUuid));
+            if (noActive) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.Active));
+            if (noNotes) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.Notes));
+            if (noFrequencyInMonths) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.FrequencyInMonths));
+            if (noDocumentBearing) ArchivingProperties.Remove(nameof(BaseArchivingWriteRequestDTO.DocumentBearing));
+            if (noJournalPeriods) ArchivingProperties.Remove(nameof(IHasJournalPeriods<JournalPeriodDTO>.JournalPeriods));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.Archiving).WrapAsEnumerable().AsParameterMatch())).Returns(ArchivingProperties);
         }
@@ -1242,7 +1243,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noValidTo) validityProperties.Remove(nameof(ItSystemUsageValidityWriteRequestDTO.ValidTo));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.General).WrapAsEnumerable().AsParameterMatch())).Returns(generalProperties);
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity)}.AsParameterMatch())).Returns(validityProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity) }.AsParameterMatch())).Returns(validityProperties);
         }
 
         private void ConfigureRootProperties(

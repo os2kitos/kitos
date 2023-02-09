@@ -767,17 +767,27 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ArchivePeriod, OperationError> CreateJournalPeriod(Guid systemUsageUuid, SystemUsageJournalPeriodProperties parameters)
         {
-            throw new NotImplementedException();
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(WithWriteAccess)
+                .Bind(usage => _systemUsageService.AddArchivePeriod(usage.Id, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
         }
 
-        public Result<ArchivePeriod, OperationError> UpdateJournalPeriod(Guid systemUsageUuid, Guid relationUuid, SystemUsageJournalPeriodProperties parameters)
+        public Result<ArchivePeriod, OperationError> UpdateJournalPeriod(Guid systemUsageUuid, Guid periodUuid, SystemUsageJournalPeriodProperties parameters)
         {
-            throw new NotImplementedException();
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(WithWriteAccess)
+                .Bind(usage => _systemUsageService.UpdateArchivePeriod(usage.Id, periodUuid, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
         }
 
-        public Maybe<OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid relationUuid)
+        public Maybe<OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid periodUuid)
         {
-            throw new NotImplementedException();
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(WithWriteAccess)
+                .Bind(usage => _systemUsageService.RemoveArchivePeriod(usage.Id, periodUuid))
+                .MatchFailure();
         }
 
         private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId

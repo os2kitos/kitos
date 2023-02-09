@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
-    public class ArchivingWriteRequestDTO
+    public abstract class BaseArchivingWriteRequestDTO
     {
         /// <summary>
         /// Archive duty for the system in the organization context. The recommendation from the archiving authority is found on the IT-System context.
@@ -45,6 +44,5 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         public int? FrequencyInMonths { get; set; }
 
         public bool? DocumentBearing { get; set; }
-        public IEnumerable<JournalPeriodRequestDTO> JournalPeriods { get; set; }
     }
 }
