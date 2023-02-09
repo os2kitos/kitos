@@ -374,11 +374,11 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveJournalPeriods, UpdateArchiveJournalPeriods));
         }
 
-        private Maybe<OperationError> UpdateArchiveJournalPeriods(ItSystemUsage systemUsage, Maybe<IEnumerable<SystemUsageJournalPeriod>> journalPeriods)
+        private Maybe<OperationError> UpdateArchiveJournalPeriods(ItSystemUsage systemUsage, Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>> journalPeriods)
         {
             var allJournalPeriods = journalPeriods
                 .Select(x => x.ToList())
-                .GetValueOrFallback(new List<SystemUsageJournalPeriod>());
+                .GetValueOrFallback(new List<SystemUsageJournalPeriodUpdate>());
 
 
             var systemUsageJournalPeriodsWithUuid = allJournalPeriods.Where(x => x.Uuid.HasValue).ToList();
@@ -763,6 +763,21 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 })
                 .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
                 .MatchFailure();
+        }
+
+        public Result<ArchivePeriod, OperationError> CreateJournalPeriod(Guid systemUsageUuid, SystemUsageJournalPeriodProperties parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ArchivePeriod, OperationError> UpdateJournalPeriod(Guid systemUsageUuid, Guid relationUuid, SystemUsageJournalPeriodProperties parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ArchivePeriod, OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid relationUuid)
+        {
+            throw new NotImplementedException();
         }
 
         private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId

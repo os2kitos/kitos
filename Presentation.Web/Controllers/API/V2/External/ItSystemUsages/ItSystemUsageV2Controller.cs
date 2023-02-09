@@ -11,6 +11,7 @@ using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
+using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
@@ -25,6 +26,8 @@ using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 {
@@ -353,7 +356,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _writeService
                 .CreateSystemRelation(systemUsageUuid, systemRelationParameters)
                 .Select(_responseMapper.MapOutgoingSystemRelationDTO)
-                .Match(relationDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/system-relations/{relationDTO.Uuid}", relationDTO), FromOperationError);
+                .Match(relationDTO => CreateCreatedResourcePath(systemUsageUuid, "system-relations", relationDTO), FromOperationError);
         }
 
         /// <summary>
@@ -436,9 +439,100 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
+        //TODO: Docs
+        [HttpPost]
+        [Route("{systemUsageUuid}/archive-journal-periods")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(JournalPeriodResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostArchiveJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] JournalPeriodDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var parameters = _writeModelMapper.MapJournalPeriodCreation(request);
+         
+            return _writeService
+                .CreateJournalPeriod(systemUsageUuid, parameters)
+                .Select(_responseMapper.MapJournalPeriodResponseDto)
+                .Match(period => CreateCreatedResourcePath(systemUsageUuid, "archive-journal-periods", period), FromOperationError);
+        }
+
+        //TODO: Docs
+        //[HttpGet]
+        //[Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
+        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
+        //[SwaggerResponse(HttpStatusCode.BadRequest)]
+        //[SwaggerResponse(HttpStatusCode.Unauthorized)]
+        //[SwaggerResponse(HttpStatusCode.NotFound)]
+        //[SwaggerResponse(HttpStatusCode.Forbidden)]
+        //public IHttpActionResult GetSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid systemRelationUuid)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+
+        //    return _itSystemUsageService
+        //        .GetReadableItSystemUsageByUuid(systemUsageUuid)
+        //        .Bind(usage =>
+        //            usage.GetUsageRelation(systemRelationUuid)
+        //                .Match<Result<SystemRelation, OperationError>>
+        //                (
+        //                systemRelation => systemRelation,
+        //                () => new OperationError("Relation not found on system usage", OperationFailure.NotFound))
+        //            )
+        //        .Select(_responseMapper.MapOutgoingSystemRelationDTO)
+        //        .Match(Ok, FromOperationError);
+        //}
+
+        //TODO: Docs
+        //[HttpPut]
+        //[Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
+        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
+        //[SwaggerResponse(HttpStatusCode.BadRequest)]
+        //[SwaggerResponse(HttpStatusCode.Unauthorized)]
+        //[SwaggerResponse(HttpStatusCode.NotFound)]
+        //[SwaggerResponse(HttpStatusCode.Forbidden)]
+        //public IHttpActionResult PutSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid systemRelationUuid, [FromBody] SystemRelationWriteRequestDTO request)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+
+        //    var systemRelationParameters = _writeModelMapper.MapRelation(request);
+
+        //    return _writeService
+        //        .UpdateSystemRelation(systemUsageUuid, systemRelationUuid, systemRelationParameters)
+        //        .Select(_responseMapper.MapOutgoingSystemRelationDTO)
+        //        .Match(Ok, FromOperationError);
+        //}
+
+        //TODO: Docs
+        //[HttpDelete]
+        //[Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
+        //[SwaggerResponse(HttpStatusCode.NoContent)]
+        //[SwaggerResponse(HttpStatusCode.BadRequest)]
+        //[SwaggerResponse(HttpStatusCode.Unauthorized)]
+        //[SwaggerResponse(HttpStatusCode.NotFound)]
+        //[SwaggerResponse(HttpStatusCode.Forbidden)]
+        //public IHttpActionResult DeleteSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid systemRelationUuid)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+
+        //    return _writeService
+        //        .DeleteSystemRelation(systemUsageUuid, systemRelationUuid)
+        //        .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        //}
+
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
+        }
+
+        private CreatedNegotiatedContentResult<T> CreateCreatedResourcePath<T>(Guid systemUsageUuid, string resourceUrlSegment, T resourceDTO) where T : IHasUuidExternal
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/{resourceUrlSegment}/{resourceDTO.Uuid}", resourceDTO);
         }
     }
 }

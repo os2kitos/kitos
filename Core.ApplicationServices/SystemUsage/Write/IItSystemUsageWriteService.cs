@@ -2,8 +2,8 @@
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-
 
 namespace Core.ApplicationServices.SystemUsage.Write
 {
@@ -17,5 +17,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters);
         Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters);
         Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid);
+        Result<ArchivePeriod, OperationError> CreateJournalPeriod(Guid systemUsageUuid, SystemUsageJournalPeriodProperties parameters);
+        Result<ArchivePeriod, OperationError> UpdateJournalPeriod(Guid systemUsageUuid, Guid relationUuid, SystemUsageJournalPeriodProperties parameters);
+        Result<ArchivePeriod, OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid relationUuid);
     }
 }

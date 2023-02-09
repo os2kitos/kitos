@@ -2466,7 +2466,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 ArchiveDocumentBearing = new ChangedValue<bool?>(null),
                 ArchiveFrequencyInMonths = new ChangedValue<int?>(null),
                 ArchiveNotes = "".AsChangedValue(),
-                ArchiveJournalPeriods = Maybe<IEnumerable<SystemUsageJournalPeriod>>.None.AsChangedValue()
+                ArchiveJournalPeriods = Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>.None.AsChangedValue()
             };
         }
 
@@ -2483,11 +2483,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 ArchiveDocumentBearing = A<bool?>().AsChangedValue(),
                 ArchiveFrequencyInMonths = new ChangedValue<int?>(A<int>()),
                 ArchiveNotes = A<string>().AsChangedValue(),
-                ArchiveJournalPeriods = Many<SystemUsageJournalPeriod>().Select(p =>
+                ArchiveJournalPeriods = Many<SystemUsageJournalPeriodUpdate>().Select(p =>
                 {
                     p.Uuid = null;
                     return p;
-                }).ToList().FromNullable<IEnumerable<SystemUsageJournalPeriod>>().AsChangedValue()
+                }).ToList().FromNullable<IEnumerable<SystemUsageJournalPeriodUpdate>>().AsChangedValue()
             };
         }
 
