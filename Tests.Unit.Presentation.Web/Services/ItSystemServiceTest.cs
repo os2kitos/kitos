@@ -964,7 +964,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, false))).Returns(createdReference);
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, It.Is<ExternalReferenceProperties>(x => x.Url == urlReference && x.Title == "Reference"))).Returns(createdReference);
 
             //Act
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);
@@ -987,7 +987,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             var operationError = A<OperationError>();
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, false))).Returns(operationError);
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System,  It.Is<ExternalReferenceProperties>(x => x.Url == urlReference && x.Title == "Reference"))).Returns(operationError);
 
             //Act
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);
