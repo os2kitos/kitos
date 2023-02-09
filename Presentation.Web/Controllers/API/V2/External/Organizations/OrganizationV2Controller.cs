@@ -52,13 +52,19 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <param name="onlyWhereUserHasMembership">If set to true, only organizations where the user has access and/or role(s) will be included.</param>
         /// <param name="nameContent">Optional query for name content</param>
         /// <param name="cvrContent">Optional query on CVR number</param>
+        /// <param name="nameOrCvrContent">Optional query which will query both name and CVR number using OR logic</param>
         /// <returns>A list of organizations</returns>
         [HttpGet]
         [Route("organizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public IHttpActionResult GetOrganizations(bool onlyWhereUserHasMembership = false, string nameContent = null, string cvrContent = null, [FromUri] BoundedPaginationQuery pagination = null)
+        public IHttpActionResult GetOrganizations(
+            bool onlyWhereUserHasMembership = false, 
+            string nameContent = null, 
+            string cvrContent = null,
+            string nameOrCvrContent = null, 
+            [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -70,6 +76,9 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             if (!string.IsNullOrWhiteSpace(cvrContent))
                 refinements.Add(new QueryByCvrContent(cvrContent));
+
+            if (!string.IsNullOrWhiteSpace(nameOrCvrContent))
+                refinements.Add(new QueryByNameOrCvrContent(nameOrCvrContent));
 
             return _organizationService
                 .SearchAccessibleOrganizations(onlyWhereUserHasMembership, refinements.ToArray())
@@ -166,7 +175,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
-        /// <param name="nameQuery">Query by text in name or email</param>
+        /// <param name="nameQuery">Query by text in name</param>
         /// <returns>A list og organization unit representations</returns>
         [HttpGet]
         [Route("organizations/{organizationUuid}/organization-units")]
