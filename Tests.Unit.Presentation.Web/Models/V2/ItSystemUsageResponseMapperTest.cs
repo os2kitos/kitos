@@ -198,7 +198,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
             var itSystemUsage = new ItSystemUsage();
             AssignBasicProperties(itSystemUsage);
-            AssignSystemRelations(itSystemUsage);
+            AssignOutgoingSystemRelations(itSystemUsage);
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
@@ -209,7 +209,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expectedRelations.Count, actualRelations.Count);
             foreach (var comparison in expectedRelations.OrderBy(x => x.Uuid).Zip(actualRelations.OrderBy(x => x.Uuid), (expected, actual) => new { expected, actual }).ToList())
             {
-                AssertRelation(comparison.expected, comparison.actual);
+                AssertOutgoingRelation(comparison.expected, comparison.actual);
             }
         }
 
@@ -289,20 +289,64 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(dto.GDPR.SpecificPersonalData.Count(), itSystemUsage.PersonalDataOptions.Count);
             foreach (var dataOption in dto.GDPR.SpecificPersonalData)
             {
-                Assert.Contains(dataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()));   
+                Assert.Contains(dataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()));
             }
 
-            Assert.Equal(dto.GDPR.SensitivePersonData.Count(),expectedSensitivePersonData.Count);
-            Assert.Equal(dto.GDPR.RegisteredDataCategories.Count(),expectedRegisterTypes.Count);
-            foreach (var comparison in expectedSensitivePersonData.OrderBy(x=>x.Name).Zip(dto.GDPR.SensitivePersonData.OrderBy(x=>x.Name), (expected, actual) => new { expected, actual }))
+            Assert.Equal(dto.GDPR.SensitivePersonData.Count(), expectedSensitivePersonData.Count);
+            Assert.Equal(dto.GDPR.RegisteredDataCategories.Count(), expectedRegisterTypes.Count);
+            foreach (var comparison in expectedSensitivePersonData.OrderBy(x => x.Name).Zip(dto.GDPR.SensitivePersonData.OrderBy(x => x.Name), (expected, actual) => new { expected, actual }))
             {
-                AssertIdentity(comparison.expected,comparison.actual);
+                AssertIdentity(comparison.expected, comparison.actual);
             }
 
             foreach (var comparison in expectedRegisterTypes.OrderBy(x => x.Name).Zip(dto.GDPR.RegisteredDataCategories.OrderBy(x => x.Name), (expected, actual) => new { expected, actual }))
             {
                 AssertIdentity(comparison.expected, comparison.actual);
             }
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(false, false, false)]
+        [InlineData(true, false, false)]
+        [InlineData(true, true, false)]
+        [InlineData(false, true, false)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, true)]
+        public void Can_Map_Incoming_System_Relation(bool withContract, bool withFrequency, bool withInterface)
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            var incomingSystemRelation = CreateIncomingSystemRelation(itSystemUsage, withContract, withFrequency, withInterface);
+
+            //Act
+            var dto = _sut.MapIncomingSystemRelationDTO(incomingSystemRelation);
+
+            //Assert
+            AssertIncomingRelation(incomingSystemRelation, dto);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(false, false, false)]
+        [InlineData(true, false, false)]
+        [InlineData(true, true, false)]
+        [InlineData(false, true, false)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, true)]
+        public void Can_Map_Outgoing_System_Relation(bool withContract, bool withFrequency, bool withInterface)
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            var incomingSystemRelation = CreateOutgoingSystemRelation(itSystemUsage, withContract, withFrequency, withInterface);
+
+            //Act
+            var dto = _sut.MapOutgoingSystemRelationDTO(incomingSystemRelation);
+
+            //Assert
+            AssertOutgoingRelation(incomingSystemRelation, dto);
         }
 
         private static void AssertRiskLevel(RiskLevelChoice? actual, RiskLevel? sourceValue)
@@ -319,7 +363,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, actual);
         }
 
-        private void AssertAppliedPrecautions(IEnumerable<TechnicalPrecautionChoice> actual, ItSystemUsage source)
+        private static void AssertAppliedPrecautions(IEnumerable<TechnicalPrecautionChoice> actual, ItSystemUsage source)
         {
             var expectedChoices = new List<TechnicalPrecautionChoice>();
             if (source.precautionsOptionsAccessControl)
@@ -376,7 +420,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.LinkToDirectoryUrlName = A<string>();
             itSystemUsage.LinkToDirectoryUrl = A<string>();
             itSystemUsage.SensitiveDataLevels = Many<SensitiveDataLevel>().Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel() { SensitivityDataLevel = sensitiveDataLevel }).ToList();
-            itSystemUsage.PersonalDataOptions = Many<GDPRPersonalDataOption>().Select(x => new ItSystemUsagePersonalData(){ PersonalData = x}).ToList();
+            itSystemUsage.PersonalDataOptions = Many<GDPRPersonalDataOption>().Select(x => new ItSystemUsagePersonalData() { PersonalData = x }).ToList();
             itSystemUsage.precautions = A<DataOptions>();
             itSystemUsage.precautionsOptionsAccessControl = A<bool>();
             itSystemUsage.precautionsOptionsEncryption = A<bool>();
@@ -431,7 +475,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 : null;
             itSystemUsage.ArchiveTestLocation = withOptionalCrossReferences ? new ArchiveTestLocation { Uuid = A<Guid>(), Name = A<string>() } : null;
             itSystemUsage.ArchiveType = withOptionalCrossReferences ? new ArchiveType { Uuid = A<Guid>(), Name = A<string>() } : null;
-            itSystemUsage.ArchiveSupplier = withOptionalCrossReferences ? new Organization() {Uuid = A<Guid>()} : null;
+            itSystemUsage.ArchiveSupplier = withOptionalCrossReferences ? new Organization() { Uuid = A<Guid>() } : null;
             itSystemUsage.ArchivePeriods = Many<string>().Select(id => new ArchivePeriod
             {
                 Approved = A<bool>(),
@@ -441,12 +485,23 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }).ToList();
         }
 
-        private static void AssertRelation(SystemRelation expected, SystemRelationResponseDTO actual)
+        private static void AssertOutgoingRelation(SystemRelation expected, OutgoingSystemRelationResponseDTO actual)
+        {
+            AssertIdentity(expected.ToSystemUsage, actual.ToSystemUsage);
+            AssertBaseRelation(expected, actual);
+        }
+
+        private static void AssertIncomingRelation(SystemRelation expected, IncomingSystemRelationResponseDTO actual)
+        {
+            AssertIdentity(expected.FromSystemUsage, actual.FromSystemUsage);
+            AssertBaseRelation(expected, actual);
+        }
+
+        private static void AssertBaseRelation(SystemRelation expected, BaseSystemRelationResponseDTO actual)
         {
             Assert.Equal(expected.Uuid, actual.Uuid);
             Assert.Equal(expected.Description, actual.Description);
             Assert.Equal(expected.Reference, actual.UrlReference);
-            AssertIdentity(expected.ToSystemUsage, actual.ToSystemUsage);
             AssertOptionalIdentity(expected.AssociatedContract, actual.AssociatedContract);
             AssertOptionalIdentity(expected.UsageFrequency, actual.RelationFrequency);
             AssertOptionalIdentity(expected.RelationInterface, actual.RelationInterface);
@@ -460,18 +515,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 AssertIdentity(optionalExpectedIdentity, actualIdentity);
         }
 
-        private void AssignSystemRelations(ItSystemUsage itSystemUsage)
+        private void AssignOutgoingSystemRelations(ItSystemUsage itSystemUsage)
         {
             itSystemUsage.UsageRelations = new[]
             {
-                CreateSystemRelation(itSystemUsage,false,false,false),
-                CreateSystemRelation(itSystemUsage,false,false,true),
-                CreateSystemRelation(itSystemUsage,false,true,true),
-                CreateSystemRelation(itSystemUsage,true,true,true)
+                CreateOutgoingSystemRelation(itSystemUsage,false,false,false),
+                CreateOutgoingSystemRelation(itSystemUsage,false,false,true),
+                CreateOutgoingSystemRelation(itSystemUsage,false,true,true),
+                CreateOutgoingSystemRelation(itSystemUsage,true,true,true)
             }.ToList();
         }
 
-        private SystemRelation CreateSystemRelation(ItSystemUsage itSystemUsage, bool withContract = false, bool withFrequency = false, bool withInterface = false)
+        private SystemRelation CreateOutgoingSystemRelation(ItSystemUsage itSystemUsage, bool withContract = false, bool withFrequency = false, bool withInterface = false)
         {
             return new SystemRelation(itSystemUsage)
             {
@@ -481,6 +536,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 RelationInterface = withInterface ? new ItInterface { Uuid = A<Guid>(), Name = A<string>() } : null,
                 UsageFrequency = withFrequency ? new RelationFrequencyType() { Uuid = A<Guid>(), Name = A<string>() } : null,
                 ToSystemUsage = new ItSystemUsage() { Uuid = A<Guid>(), ItSystem = new ItSystem() { Name = A<string>() } },
+                Description = A<string>()
+            };
+        }
+
+        private SystemRelation CreateIncomingSystemRelation(ItSystemUsage toItSystemUsage, bool withContract = false, bool withFrequency = false, bool withInterface = false)
+        {
+            return new SystemRelation(new ItSystemUsage() { Uuid = A<Guid>(), ItSystem = new ItSystem() { Name = A<string>() } })
+            {
+                Uuid = A<Guid>(),
+                Reference = A<string>(),
+                AssociatedContract = withContract ? new ItContract() { Uuid = A<Guid>(), Name = A<string>() } : null,
+                RelationInterface = withInterface ? new ItInterface { Uuid = A<Guid>(), Name = A<string>() } : null,
+                UsageFrequency = withFrequency ? new RelationFrequencyType() { Uuid = A<Guid>(), Name = A<string>() } : null,
+                ToSystemUsage = toItSystemUsage,
                 Description = A<string>()
             };
         }

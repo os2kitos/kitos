@@ -82,6 +82,6 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// Contains registered relations to other system usages within the organization
         /// </summary>
         [Required]
-        public IEnumerable<SystemRelationResponseDTO> OutgoingSystemRelations { get; set; }
+        public IEnumerable<OutgoingSystemRelationResponseDTO> OutgoingSystemRelations { get; set; }
     }
 }

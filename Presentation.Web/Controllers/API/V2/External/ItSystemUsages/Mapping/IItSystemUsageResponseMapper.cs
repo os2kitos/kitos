@@ -6,6 +6,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
     public interface IItSystemUsageResponseMapper
     {
         ItSystemUsageResponseDTO MapSystemUsageDTO(ItSystemUsage systemUsage);
-        SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation systemRelation);
+        OutgoingSystemRelationResponseDTO MapOutgoingSystemRelationDTO(SystemRelation systemRelation);
+        IncomingSystemRelationResponseDTO MapIncomingSystemRelationDTO(SystemRelation systemRelation);
     }
 }
