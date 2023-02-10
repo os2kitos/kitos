@@ -181,14 +181,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             var mappedReferences = Many<ExternalReferenceDataResponseDTO>();
             _externalReferenceResponseMapperMock
-                .Setup(x => x.MapExternalReferences(itSystemUsage.ExternalReferences, itSystemUsage.Reference))
+                .Setup(x => x.MapExternalReferences(itSystemUsage.ExternalReferences))
                 .Returns(mappedReferences);
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
 
             //Assert
-            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(itSystemUsage.ExternalReferences, itSystemUsage.Reference), Times.Once);
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(itSystemUsage.ExternalReferences), Times.Once);
             Assert.Equivalent(mappedReferences, dto.ExternalReferences);
         }
 
@@ -348,7 +348,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             AssertOutgoingRelation(incomingSystemRelation, dto);
         }
-
+        
         private static void AssertRiskLevel(RiskLevelChoice? actual, RiskLevel? sourceValue)
         {
             RiskLevelChoice? expected = sourceValue switch
@@ -556,14 +556,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private void AssignExternalReferences(ItSystemUsage itSystemUsage)
         {
-            itSystemUsage.ExternalReferences = Many<string>().Select((title, i) => new ExternalReference
+            itSystemUsage.ExternalReferences = Many<string>().Select(CreateExternalReference).ToList();
+            itSystemUsage.Reference = itSystemUsage.ExternalReferences.OrderBy(x => A<int>()).First();
+        }
+
+        private ExternalReference CreateExternalReference(string title, int id)
+        {
+            return new ExternalReference
             {
+
                 Title = title,
                 URL = A<string>(),
                 ExternalReferenceId = A<string>(),
-                Id = i
-            }).ToList();
-            itSystemUsage.Reference = itSystemUsage.ExternalReferences.OrderBy(x => A<int>()).First();
+                Id = id
+            };
         }
 
         private void AssignOrganizationalUsage(ItSystemUsage itSystemUsage)

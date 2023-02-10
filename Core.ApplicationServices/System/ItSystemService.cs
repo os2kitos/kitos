@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
@@ -349,13 +350,8 @@ namespace Core.ApplicationServices.System
                     return system;
                 }
 
-                var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference);
-                if (addReferenceResult.Failed)
-                {
-                    return addReferenceResult.Error;
-                }
-
-                return system.SetMasterReference(addReferenceResult.Value).Match(_ => Result<ItSystem, OperationError>.Success(system), error => error);
+                return _referenceService.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, true))
+                    .Bind(_ => Result<ItSystem, OperationError>.Success(system));
             });
         }
 

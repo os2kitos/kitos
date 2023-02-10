@@ -44,6 +44,11 @@ namespace Core.DomainModel
                 (IEntityWithExternalReferences)ItSystem;
         }
 
+        public bool IsMasterReference()
+        {
+            return GetOwner()?.Reference?.Uuid == Uuid;
+        }
+
         public virtual ICollection<BrokenLinkInExternalReference> BrokenLinkReports { get; set; }
     }
 }
