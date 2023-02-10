@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -91,9 +92,7 @@ namespace Presentation.Web.Controllers.API.V1
                             (
                                 typeAndId.Value,
                                 typeAndId.Key,
-                                dto.Title,
-                                dto.ExternalReferenceId,
-                                dto.URL
+                                new ExternalReferenceProperties(dto.Title, dto.ExternalReferenceId, dto.URL, false)
                             )
                             .Match
                             (

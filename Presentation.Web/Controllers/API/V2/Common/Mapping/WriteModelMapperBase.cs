@@ -174,7 +174,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => x.ToUserRolePair()).ToList()) :
                 Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue();
         }
-
+        protected static UpdatedExternalReferenceProperties MapCommonReference<T>(T reference)
+            where T : ExternalReferenceDataWriteRequestDTO
+        {
+            return new UpdatedExternalReferenceProperties(reference.Title, reference.DocumentId, reference.Url, reference.MasterReference);
+        }
 
         private static UpdatedExternalReferenceProperties MapUpdateReference(UpdateExternalReferenceDataWriteRequestDTO reference)
         {
@@ -182,18 +186,6 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             updateProperties.Uuid = reference.Uuid;
 
             return updateProperties;
-        }
-
-        private static UpdatedExternalReferenceProperties MapCommonReference<T>(T reference)
-            where T : ExternalReferenceDataWriteRequestDTO
-        {
-            return new UpdatedExternalReferenceProperties
-            {
-                Title = reference.Title,
-                DocumentId = reference.DocumentId,
-                Url = reference.Url,
-                MasterReference = reference.MasterReference
-            };
         }
     }
 }

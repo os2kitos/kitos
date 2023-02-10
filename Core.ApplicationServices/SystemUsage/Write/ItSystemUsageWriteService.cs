@@ -56,7 +56,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
         private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataOptionsRepository;
-
+        
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
             ITransactionManager transactionManager,
@@ -133,6 +133,35 @@ namespace Core.ApplicationServices.SystemUsage.Write
             }
 
             return creationResult;
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(Guid usageUuid, ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetUsageAndAuthorizeWriteAccess(usageUuid)
+                .Bind(usage => _referenceService.AddReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> UpdateExternalReference(Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetUsageAndAuthorizeWriteAccess(usageUuid)
+                .Bind(usage => _referenceService.UpdateReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceUuid, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> DeleteExternalReference(Guid usageUuid, Guid externalReferenceUuid)
+        {
+            return GetUsageAndAuthorizeWriteAccess(usageUuid)
+                .Bind(_ =>
+                    {
+                        var getIdResult = _identityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
+                        if(getIdResult.IsNone)
+                            return new OperationError($"ExternalReference with uuid: {externalReferenceUuid} was not found", OperationFailure.NotFound);
+                        var externalReferenceId = getIdResult.Value;
+
+                        return _referenceService.DeleteByReferenceId(externalReferenceId)
+                            .Match(Result<ExternalReference, OperationError>.Success,
+                                operationFailure =>
+                                    new OperationError($"Failed to remove the ExternalReference with uuid: {externalReferenceUuid}", operationFailure));
+                    });
         }
 
         public Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters)
@@ -653,6 +682,12 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return _roleAssignmentService
                 .BatchUpdateRoles(systemUsage, roleAssignments)
                 .Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
+        }
+
+        private Result<ItSystemUsage, OperationError> GetUsageAndAuthorizeWriteAccess(Guid uuid)
+        {
+            return _systemUsageService.GetReadableItSystemUsageByUuid(uuid)
+                .Bind(WithWriteAccess);
         }
 
         private Result<ItSystemUsage, OperationError> WithWriteAccess(ItSystemUsage systemUsage)

@@ -6,6 +6,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public interface IExternalReferenceResponseMapper
     {
-        IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(IEnumerable<ExternalReference> externalReferences, ExternalReference masterReference);
+        ExternalReferenceDataResponseDTO MapExternalReference(ExternalReference externalReference);
+        IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(IEnumerable<ExternalReference> externalReferences);
     }
 }

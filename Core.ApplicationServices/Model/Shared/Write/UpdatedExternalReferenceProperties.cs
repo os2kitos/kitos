@@ -2,12 +2,12 @@
 
 namespace Core.ApplicationServices.Model.Shared.Write
 {
-    public class UpdatedExternalReferenceProperties
+    public class UpdatedExternalReferenceProperties : ExternalReferenceProperties
     {
         public Guid? Uuid { get; set; }
-        public string Title { get; set; }
-        public string DocumentId { get; set; }
-        public string Url { get; set; }
-        public bool MasterReference { get; set; }
+
+        public UpdatedExternalReferenceProperties(string title, string documentId, string url, bool masterReference) : base(title, documentId, url, masterReference)
+        {
+        }
     }
 }

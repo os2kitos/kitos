@@ -12,7 +12,6 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
@@ -375,6 +374,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 relationData.Description,
                 relationData.UrlReference
                 );
+        }
+
+        public ExternalReferenceProperties MapExternalReference(ExternalReferenceDataWriteRequestDTO externalReferenceData)
+        {
+            return MapCommonReference(externalReferenceData);
         }
 
         private static ChangedValue<Maybe<IEnumerable<TOut>>> MapEnumList<TIn, TOut>(IEnumerable<TIn> list, Func<TIn, TOut> mapWith)
