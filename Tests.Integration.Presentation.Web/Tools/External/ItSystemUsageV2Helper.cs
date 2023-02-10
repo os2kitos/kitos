@@ -10,9 +10,7 @@ using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {

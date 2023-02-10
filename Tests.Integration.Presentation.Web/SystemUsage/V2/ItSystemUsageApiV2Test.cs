@@ -2238,7 +2238,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private async Task<ArchivingUpdateRequestDTO> CreateArchivingUpdateRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
         {
             var dto = await CreateArchivingUpdateRequestDTO(organizationUuid);
-            UpdateArchivingChoices(archiveLocationUuid,archiveLocationUuid,archiveTestLocationUuid,dto);
+            UpdateArchivingChoices(archiveTypeUuid, archiveLocationUuid,archiveTestLocationUuid,dto);
             return dto;
         }
 
