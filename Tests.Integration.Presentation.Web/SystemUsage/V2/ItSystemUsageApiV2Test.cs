@@ -1896,6 +1896,75 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Empty(usageAfterDelete.ExternalReferences);
         }
 
+        [Fact]
+        public async Task Can_POST_And_GET_Journal_Period()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var journalPeriods = CreateNewJournalPeriods(3);
+            var newJournalPeriodInput = journalPeriods.RandomItem();
+
+            //Act
+            var postResult = await ItSystemUsageV2Helper.CreateJournalPeriodAsync(token, usageDTO.Uuid, newJournalPeriodInput);
+            var getResult = await ItSystemUsageV2Helper.GetJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+
+            //Assert
+            AssertJournalPeriod(newJournalPeriodInput, postResult);
+            Assert.Equivalent(postResult, getResult);
+
+        }
+
+        [Fact]
+        public async Task Can_PUT_Journal_Period()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var journalPeriods = CreateNewJournalPeriods(3);
+            var newJournalPeriodInputs = journalPeriods.RandomItems(2);
+            var initial = newJournalPeriodInputs.First();
+            var updated = newJournalPeriodInputs.Last();
+            var postResult = await ItSystemUsageV2Helper.CreateJournalPeriodAsync(token, usageDTO.Uuid, initial);
+
+            //Act
+            var putResult = await ItSystemUsageV2Helper.UpdateJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid, updated);
+            var getResult = await ItSystemUsageV2Helper.GetJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+
+            //Assert
+            AssertJournalPeriod(updated, putResult);
+            Assert.Equivalent(putResult, getResult);
+        }
+
+        [Fact]
+        public async Task Can_DELETE_Journal_Period()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var journalPeriods = CreateNewJournalPeriods(3);
+            var newJournalPeriodInputs = journalPeriods.RandomItems(2);
+            var initial = newJournalPeriodInputs.First();
+            var updated = newJournalPeriodInputs.Last();
+            var postResult = await ItSystemUsageV2Helper.CreateJournalPeriodAsync(token, usageDTO.Uuid, initial);
+
+            //Act
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+            using var getAfterDeleteResult = await ItSystemUsageV2Helper.SendGetJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent,deleteResult.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound,getAfterDeleteResult.StatusCode);
+        }
+
+        private static void AssertJournalPeriod(JournalPeriodDTO newJournalPeriodInput, JournalPeriodResponseDTO result)
+        {
+            Assert.Equal(newJournalPeriodInput.Approved, result.Approved);
+            Assert.Equal(newJournalPeriodInput.StartDate, result.StartDate);
+            Assert.Equal(newJournalPeriodInput.EndDate, result.EndDate);
+            Assert.Equal(newJournalPeriodInput.ArchiveId, result.ArchiveId);
+        }
+
         private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
         {
             Assert.Equal(expected.DocumentId, actual.DocumentId);
@@ -2267,7 +2336,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var dto = new ArchivingCreationRequestDTO();
             await AssignArchivingProperties(organizationUuid, dto);
-            dto.JournalPeriods = new Fixture()
+            dto.JournalPeriods = CreateNewJournalPeriods(3);
+            return dto;
+        }
+
+        private IEnumerable<JournalPeriodDTO> CreateNewJournalPeriods(int count)
+        {
+            return new Fixture()
                 .Build<JournalPeriodDTO>()
                 .Without(x => x.EndDate)
                 .Without(x => x.StartDate)
@@ -2277,8 +2352,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     x.StartDate = startDate;
                     x.EndDate = startDate.AddDays(1);
                 })
-                .CreateMany();
-            return dto;
+                .CreateMany(count);
         }
 
         private async Task<ArchivingCreationRequestDTO> CreateArchivingCreationRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
@@ -2315,7 +2389,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var dto = new ArchivingUpdateRequestDTO();
             await AssignArchivingProperties(organizationUuid, dto);
-            dto.JournalPeriods = new Fixture()
+            dto.JournalPeriods = CreateJournalPeriodUpdates(3);
+            return dto;
+        }
+
+        private IEnumerable<JournalPeriodUpdateRequestDTO> CreateJournalPeriodUpdates(int count)
+        {
+            return new Fixture()
                 .Build<JournalPeriodUpdateRequestDTO>()
                 .Without(x => x.Uuid)
                 .Without(x => x.EndDate)
@@ -2326,8 +2406,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     x.StartDate = startDate;
                     x.EndDate = startDate.AddDays(1);
                 })
-                .CreateMany(3).ToList();
-            return dto;
+                .CreateMany(count).ToList();
         }
 
         private async Task<ArchivingUpdateRequestDTO> CreateArchivingUpdateRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
