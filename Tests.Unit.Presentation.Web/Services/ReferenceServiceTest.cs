@@ -692,13 +692,6 @@ namespace Tests.Unit.Presentation.Web.Services
             );
         }
 
-        private static void AssertExternalReference(ExternalReferenceProperties expected, ExternalReference actual)
-        {
-            Assert.Equal(expected.DocumentId, actual.ExternalReferenceId);
-            Assert.Equal(expected.Title, actual.Title);
-            Assert.Equal(expected.Url, actual.URL);
-        }
-
         [Fact]
         public void Cannot_UpdateExternalReferences_With_Multiple_Masters()
         {
@@ -1023,6 +1016,13 @@ namespace Tests.Unit.Presentation.Web.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(randomType), randomType, null);
             }
+        }
+
+        private static void AssertExternalReference(ExternalReferenceProperties expected, ExternalReference actual)
+        {
+            Assert.Equal(expected.DocumentId, actual.ExternalReferenceId);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.URL);
         }
     }
 }
