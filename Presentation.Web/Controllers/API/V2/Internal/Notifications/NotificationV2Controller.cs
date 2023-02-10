@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
@@ -31,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            
             //TODO: call service
             return Ok(new List<NotificationResponseDTO>());
         }
@@ -76,6 +77,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            //TODO: call service
             var resultDTO = new NotificationResponseDTO();
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/immediate/{resultDTO.Uuid}", resultDTO);
         }
@@ -98,10 +100,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            //TODO: call service
             var resultDTO = new NotificationResponseDTO();
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/scheduled/{resultDTO.Uuid}", resultDTO);
         }
 
+        /// <summary>
+        /// Updates the scheduled notification
+        /// </summary>
+        /// <param name="ownerResourceType"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("{ownerResourceType}/scheduled/{notificationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(NotificationResponseDTO))]
@@ -114,9 +123,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid) 
                 return BadRequest();
 
+            //TODO: call service
             return Ok(new NotificationResponseDTO());
         }
 
+        /// <summary>
+        /// Deletes a notification
+        /// </summary>
+        /// <param name="ownerResourceType"></param>
+        /// <param name="notificationUuid"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{ownerResourceType}/{notificationUuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
@@ -129,10 +145,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            return Ok(); //TODO: change to NoContent after merging Reference branch to master
+            //TODO: call service
+            return NoContent();
         }
 
-
+        /// <summary>
+        /// Gets sent notification information
+        /// </summary>
+        /// <param name="ownerResourceType"></param>
+        /// <param name="notificationUuid"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{ownerResourceType}/{notificationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SentNotificationResponseDTO))]
@@ -142,6 +164,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetSentNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid)
         {
+            //TODO: call service
             return Ok(new SentNotificationResponseDTO());
         }
     }

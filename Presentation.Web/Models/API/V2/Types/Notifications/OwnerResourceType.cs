@@ -7,8 +7,6 @@
     {
         ItContract = 0,
         ItSystemUsage = 1,
-        // 2 used to be itproject
-        //3 used to be itInterface
-        DataProcessingRegistration = 4
+        DataProcessingRegistration = 2
     }
 }

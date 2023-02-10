@@ -18,15 +18,15 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// <summary>
         /// Date when the notification was sent last time
         /// </summary>
-        public DateTime LastSent { get; set; }
+        public DateTime? LastSent { get; set; }
         /// <summary>
         /// Date when the notification becomes active
         /// </summary>
-        public DateTime FromDate { get; set; }
+        public DateTime? FromDate { get; set; }
         /// <summary>
         /// Date when the notification expires
         /// </summary>
-        public DateTime ToDate { get; set; }
+        public DateTime? ToDate { get; set; }
         /// <summary>
         /// Subject of the email
         /// </summary>
