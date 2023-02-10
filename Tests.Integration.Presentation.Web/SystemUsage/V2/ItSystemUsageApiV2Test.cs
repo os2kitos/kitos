@@ -1059,6 +1059,39 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Can_PATCH_With_Archiving_With_Specific_Journal_Periods()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var initialJournalPeriodInputs = await CreateArchivingUpdateRequestDTO(organization.Uuid);
+            using var firstArchiveResponse = await ItSystemUsageV2Helper.SendPatchArchiving(token, usageDTO.Uuid, initialJournalPeriodInputs);
+            Assert.Equal(HttpStatusCode.OK, firstArchiveResponse.StatusCode);
+            usageDTO = await firstArchiveResponse.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            var changedInputs = await CreateArchivingUpdateRequestDTO(organization.Uuid);
+            //Set one of the journal periods to be an update of an existing
+            var periodToChange = usageDTO.Archiving.JournalPeriods.RandomItem();
+            var inputPeriodToChange = changedInputs.JournalPeriods.RandomItem();
+            inputPeriodToChange.Uuid = periodToChange.Uuid;
+
+            var journalPeriodUuidsBefore = usageDTO.Archiving.JournalPeriods.Select(x => x.Uuid).ToList();
+
+            //Act
+            using var secondArchivingResponse = await ItSystemUsageV2Helper.SendPatchArchiving(token, usageDTO.Uuid, changedInputs);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, secondArchivingResponse.StatusCode);
+            usageDTO = await secondArchivingResponse.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            Assert.Contains(usageDTO.Archiving.JournalPeriods, x =>
+                x.Uuid == inputPeriodToChange.Uuid.GetValueOrDefault() &&
+                x.Approved == inputPeriodToChange.Approved &&
+                x.StartDate == inputPeriodToChange.StartDate &&
+                x.EndDate == inputPeriodToChange.EndDate &&
+                x.ArchiveId == inputPeriodToChange.ArchiveId);
+            Assert.Single(usageDTO.Archiving.JournalPeriods.Select(x => x.Uuid).Intersect(journalPeriodUuidsBefore));
+        }
+
+        [Fact]
         public async Task Can_Delete_ItSystemUsage()
         {
             //Arrange
@@ -1142,7 +1175,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             AssertGDPR(request.GDPR, createdUsage.GDPR);
 
-            AssertArchivingParametersSet<ArchivingCreationRequestDTO,JournalPeriodDTO>(request.Archiving, createdUsage.Archiving);
+            AssertArchivingParametersSet<ArchivingCreationRequestDTO, JournalPeriodDTO>(request.Archiving, createdUsage.Archiving);
         }
 
         [Fact]
@@ -1843,7 +1876,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Title = A<string>(),
                 Url = A<string>()
             };
-            
+
             //Act - update
             var updatedReference = await ItSystemUsageV2Helper.UpdateExternalReferenceAsync(token, usage.Uuid, createdReference.Uuid, updateRequest);
 
@@ -2293,14 +2326,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     x.StartDate = startDate;
                     x.EndDate = startDate.AddDays(1);
                 })
-                .CreateMany();
+                .CreateMany(3).ToList();
             return dto;
         }
 
         private async Task<ArchivingUpdateRequestDTO> CreateArchivingUpdateRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
         {
             var dto = await CreateArchivingUpdateRequestDTO(organizationUuid);
-            UpdateArchivingChoices(archiveTypeUuid, archiveLocationUuid,archiveTestLocationUuid,dto);
+            UpdateArchivingChoices(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, dto);
             return dto;
         }
 
