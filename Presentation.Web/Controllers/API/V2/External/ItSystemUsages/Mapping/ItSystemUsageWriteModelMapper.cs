@@ -73,7 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Archiving = archiving
                     .FromNullable()
                     .Select(a => MapBaseArchiving(a, enforceFallbackOnUndefinedProperties))
-                    .Select(a=>MapUpdatedJournalPeriods(a,request.Archiving,enforceFallbackOnUndefinedProperties))
+                    .Select(a => MapUpdatedJournalPeriods(a, archiving, enforceFallbackOnUndefinedProperties))
             };
         }
 
