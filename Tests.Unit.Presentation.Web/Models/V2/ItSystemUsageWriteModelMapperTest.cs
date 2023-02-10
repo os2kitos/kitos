@@ -63,6 +63,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_Single_ExternalReference()
+        {
+            //Arrange
+            var expected = A<ExternalReferenceDataWriteRequestDTO>();
+
+            //Act
+            var actual = _sut.MapExternalReference(expected);
+
+            //Assert
+            Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.DocumentId, actual.DocumentId);
+            Assert.Equal(expected.MasterReference, actual.MasterReference);
+        }
+
+        [Fact]
         public void Can_Map_ExternalReferences()
         {
             //Arrange

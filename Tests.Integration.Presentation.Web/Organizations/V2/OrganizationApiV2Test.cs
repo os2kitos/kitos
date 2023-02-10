@@ -163,6 +163,22 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(newOrg.Uuid, org.Uuid);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GET_Organizations_Returns_Ok_NameOrCvr_Filtering(bool inputIsCvr)
+        { //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            //Act
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100, nameOrCvrContent: inputIsCvr ? newOrg.Cvr : newOrg.Name);
+
+            //Assert
+            var org = Assert.Single(organizations.Where(x=>x.Uuid == newOrg.Uuid));
+            Assert.Equal(newOrg.Uuid, org.Uuid);
+        }
+
         private static readonly IReadOnlyDictionary<OrganizationTypeKeys, OrganizationType> InnerToExternalOrgType =
             new ReadOnlyDictionary<OrganizationTypeKeys, OrganizationType>(new Dictionary<OrganizationTypeKeys, OrganizationType>()
             {

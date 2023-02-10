@@ -19,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationResponseDTO>>();
         }
 
-        public static async Task<IEnumerable<OrganizationResponseDTO>> GetOrganizationsAsync(string token, int page = 0, int pageSize = 10, string nameContent = null, bool onlyWhereUserHasMembership = false, string cvrContent = null)
+        public static async Task<IEnumerable<OrganizationResponseDTO>> GetOrganizationsAsync(string token, int page = 0, int pageSize = 10, string nameContent = null, bool onlyWhereUserHasMembership = false, string cvrContent = null, string nameOrCvrContent = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -35,6 +35,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if(cvrContent != null)
                 queryParameters.Add(new KeyValuePair<string, string>("cvrContent",cvrContent));
+
+            if (nameOrCvrContent != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameOrCvrContent", nameOrCvrContent));
 
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
 

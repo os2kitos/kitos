@@ -1809,6 +1809,68 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Create_Update_And_Delete_ExternalReference()
+        {
+            //Arrange
+            var (token, _, organization, system1) = await CreatePrerequisitesAsync();
+            var usage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+
+            var request = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+
+            //Act
+            var createdReference = await ItSystemUsageV2Helper.AddExternalReferenceAsync(token, usage.Uuid, request);
+
+            //Assert
+            AssertExternalReference(request, createdReference);
+
+            var usageAfterCreate = await ItSystemUsageV2Helper.GetSingleAsync(token, usage.Uuid);
+
+            var checkCreatedExternalReference = Assert.Single(usageAfterCreate.ExternalReferences);
+            AssertExternalReference(request, checkCreatedExternalReference);
+
+            //Arrange - update
+            var updateRequest = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = request.MasterReference || A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+            
+            //Act - update
+            var updatedReference = await ItSystemUsageV2Helper.UpdateExternalReferenceAsync(token, usage.Uuid, createdReference.Uuid, updateRequest);
+
+            //Assert - update
+            AssertExternalReference(updateRequest, updatedReference);
+
+            var usageAfterUpdate = await ItSystemUsageV2Helper.GetSingleAsync(token, usage.Uuid);
+
+            var checkUpdatedExternalReference = Assert.Single(usageAfterUpdate.ExternalReferences);
+            AssertExternalReference(updateRequest, checkUpdatedExternalReference);
+
+            //Act - delete
+            await ItSystemUsageV2Helper.DeleteExternalReferenceAsync(token, usage.Uuid, createdReference.Uuid);
+
+            //Assert - delete
+            var usageAfterDelete = await ItSystemUsageV2Helper.GetSingleAsync(token, usage.Uuid);
+            Assert.Empty(usageAfterDelete.ExternalReferences);
+        }
+
+        private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
+        {
+            Assert.Equal(expected.DocumentId, actual.DocumentId);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.MasterReference, actual.MasterReference);
+        }
+
         private async Task<string> CreateUserInNewOrgAndGetToken()
         {
             var otherOrganization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());

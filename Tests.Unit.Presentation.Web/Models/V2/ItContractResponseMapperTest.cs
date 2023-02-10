@@ -450,7 +450,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             var mappedReferences = Many<ExternalReferenceDataResponseDTO>();
             _externalReferenceResponseMapperMock
-                .Setup(x => x.MapExternalReferences(contract.ExternalReferences, contract.Reference))
+                .Setup(x => x.MapExternalReferences(contract.ExternalReferences))
                 .Returns(mappedReferences);
 
             //Act
@@ -458,7 +458,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             Assert.Equivalent(mappedReferences, dto.ExternalReferences);
-            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(contract.ExternalReferences, contract.Reference), Times.Once);
+            _externalReferenceResponseMapperMock.Verify(x => x.MapExternalReferences(contract.ExternalReferences), Times.Once);
         }
         
         #region Creaters

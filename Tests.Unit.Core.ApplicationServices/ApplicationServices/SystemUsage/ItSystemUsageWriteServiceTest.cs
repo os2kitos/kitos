@@ -2188,6 +2188,295 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Same(operationError, result.Error);
         }
 
+        [Fact]
+        public void Can_Add_ExternalReference()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var usage = new ItSystemUsage{ Id = usageId };
+            var properties = CreateExternalReferenceProperties();
+            var externalReference = new ExternalReference();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectAddExternalReferenceReturns(usageId, properties, externalReference);
+
+            //Act
+            var result = _sut.AddExternalReference(usageUuid, properties);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(externalReference, result.Value);
+        }
+
+        [Fact]
+        public void Add_ExternalReference_Returns_Error_When_Creation_Failed()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var usage = new ItSystemUsage{ Id = usageId };
+            var properties = CreateExternalReferenceProperties();
+            var expectedOperationFailure = A<OperationFailure>();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectAddExternalReferenceReturns(usageId, properties, new OperationError(expectedOperationFailure));
+
+            //Act
+            var result = _sut.AddExternalReference(usageUuid, properties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedOperationFailure, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Add_ExternalReference_Returns_Forbidden_When_User_Has_No_Write_Access()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var usage = new ItSystemUsage{ Id = usageId };
+            var properties = CreateExternalReferenceProperties();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, false);
+
+            //Act
+            var result = _sut.AddExternalReference(usageUuid, properties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Add_ExternalReference_Returns_Error_When_Get_Usage_Failed()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var properties = CreateExternalReferenceProperties();
+            var expectedFailure = A<OperationFailure>();
+
+            ExpectGetSystemUsageReturns(usageUuid, new OperationError(expectedFailure));
+
+            //Act
+            var result = _sut.AddExternalReference(usageUuid, properties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedFailure, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Update_ExternalReference()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var referenceUuid = A<Guid>();
+            var usage = new ItSystemUsage { Id = usageId };
+            var properties = CreateExternalReferenceProperties();
+            var externalReference = new ExternalReference();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectUpdateExternalReferenceReturns(usageId, referenceUuid, properties, externalReference);
+
+            //Act
+            var result = _sut.UpdateExternalReference(usageUuid, referenceUuid, properties);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(externalReference, result.Value);
+        }
+
+        [Fact]
+        public void Update_ExternalReference_Returns_Error_When_Update_Failed()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var referenceUuid = A<Guid>();
+            var usage = new ItSystemUsage { Id = usageId };
+            var properties = CreateExternalReferenceProperties();
+            var expectedFailure = A<OperationFailure>();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectUpdateExternalReferenceReturns(usageId, referenceUuid, properties, new OperationError(expectedFailure));
+
+            //Act
+            var result = _sut.UpdateExternalReference(usageUuid, referenceUuid, properties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedFailure, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Update_ExternalReference_Returns_Forbidden_When_User_Has_No_Write_Access()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var referenceUuid = A<Guid>();
+            var usage = new ItSystemUsage { Id = usageId };
+            var properties = CreateExternalReferenceProperties();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, false);
+
+            //Act
+            var result = _sut.UpdateExternalReference(usageUuid, referenceUuid, properties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Update_ExternalReference_Returns_Error_When_GetUsage_Failed()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var referenceUuid = A<Guid>();
+            var properties = CreateExternalReferenceProperties();
+            var expectedFailure = A<OperationFailure>();
+
+            ExpectGetSystemUsageReturns(usageUuid, new OperationError(expectedFailure));
+
+            //Act
+            var result = _sut.UpdateExternalReference(usageUuid, referenceUuid, properties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedFailure, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Delete_ExternalReference()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var referenceUuid = A<Guid>();
+            var referenceId = A<int>();
+            var usage = new ItSystemUsage { Id = usageId };
+            var externalReference = new ExternalReference();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ExternalReference>(referenceUuid, referenceId);
+            ExpectRemoveExternalReferenceReturns(referenceId, externalReference);
+
+            //Act
+            var result = _sut.DeleteExternalReference(usageUuid, referenceUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(externalReference, result.Value);
+        }
+
+        [Fact]
+        public void Delete_ExternalReference_Returns_Error_When_Failed_To_Delete_Reference()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var referenceUuid = A<Guid>();
+            var referenceId = A<int>();
+            var usage = new ItSystemUsage { Id = usageId };
+            var expectedFailure = A<OperationFailure>();
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ExternalReference>(referenceUuid, referenceId);
+            ExpectRemoveExternalReferenceReturns(referenceId, expectedFailure);
+
+            //Act
+            var result = _sut.DeleteExternalReference(usageUuid, referenceUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedFailure, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Delete_ExternalReference_Returns_NotFound_When_ExternalReferenceId_Was_Not_Found()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var referenceUuid = A<Guid>();
+            var usage = new ItSystemUsage { Id = usageId };
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ExternalReference>(referenceUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.DeleteExternalReference(usageUuid, referenceUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Delete_ExternalReference_Returns_Forbidden_When_User_Has_No_Write_Access()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+            var referenceUuid = A<Guid>();
+            var usage = new ItSystemUsage { Id = usageId };
+
+            ExpectGetSystemUsageReturns(usageUuid, usage);
+            ExpectAllowModifyReturns(usage, false);
+
+            //Act
+            var result = _sut.DeleteExternalReference(usageUuid, referenceUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Delete_ExternalReference_Returns_Error_When_Failed_To_Get_Usage()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var referenceUuid = A<Guid>();
+            var expectedFailure = A<OperationFailure>();
+
+            ExpectGetSystemUsageReturns(usageUuid, new OperationError(expectedFailure));
+
+            //Act
+            var result = _sut.DeleteExternalReference(usageUuid, referenceUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(expectedFailure, result.Error.FailureType);
+        }
+
+        private void ExpectAddExternalReferenceReturns(int usageId, ExternalReferenceProperties properties, Result<ExternalReference, OperationError> result)
+        {
+            _referenceServiceMock.Setup(x => x.AddReference(usageId, ReferenceRootType.SystemUsage, properties)).Returns(result);
+        }
+
+        private void ExpectUpdateExternalReferenceReturns(int usageId, Guid externalReferenceUuid, ExternalReferenceProperties properties, Result<ExternalReference, OperationError> result)
+        {
+            _referenceServiceMock.Setup(x => x.UpdateReference(usageId, ReferenceRootType.SystemUsage, externalReferenceUuid, properties)).Returns(result);
+        }
+
+        private void ExpectRemoveExternalReferenceReturns(int externalReferenceId, Result<ExternalReference, OperationFailure> result)
+        {
+            _referenceServiceMock.Setup(x => x.DeleteByReferenceId(externalReferenceId)).Returns(result);
+        }
         private void ExpectAddSystemRelationReturns(ItSystemUsage itSystemUsage, int toSystemUsageId, int? interfaceId, int? frequencyTypeId, int? contractId, string description, string urlReference, Result<SystemRelation, OperationError> result)
         {
             _systemUsageRelationServiceMock.Setup(x => x.AddRelation(itSystemUsage.Id, toSystemUsageId, interfaceId,
@@ -2644,6 +2933,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 Organization = parentOrganization,
                 OrganizationId = parentOrganization.Id
             };
+        }
+        private ExternalReferenceProperties CreateExternalReferenceProperties()
+        {
+            return new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), A<bool>());
         }
 
         private void ExpectGetItSystemCategoryReturns(int organizationId, Guid dataClassificationId, Maybe<(ItSystemCategories, bool)> result)
