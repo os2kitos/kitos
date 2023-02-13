@@ -273,7 +273,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <returns></returns>
         [HttpGet]
         [Route("{systemUsageUuid}/incoming-system-relations")]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(IEnumerable<IncomingSystemRelationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IncomingSystemRelationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
