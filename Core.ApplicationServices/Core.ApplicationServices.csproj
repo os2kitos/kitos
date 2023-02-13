@@ -157,6 +157,11 @@
     <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
+    <Compile Include="Model\Notification\Write\EmailRecipientModificationParameters.cs" />
+    <Compile Include="Model\Notification\Write\ImmediateNotificationModificationParameters.cs" />
+    <Compile Include="Model\Notification\Write\RecipientModificationParameters.cs" />
+    <Compile Include="Model\Notification\Write\RoleRecipientModificationParameters.cs" />
+    <Compile Include="Model\Notification\Write\ScheduledNotificationModificationParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationUnitRegistrationChangeParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\PaymentChangeParameters.cs" />

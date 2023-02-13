@@ -29,17 +29,19 @@ namespace Core.DomainModel.Advice
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, ISystemModule, IContractModule
+    public class Advice : Entity, ISystemModule, IContractModule, IHasUuid
     {
         public Advice() {
             AdviceSent = new List<AdviceSent>();
             Reciepients = new List<AdviceUserRelation>();
+            Uuid = Guid.NewGuid();
         }
 
         public static string CreateJobId(int adviceId)
         {
             return $"Advice: {adviceId}";
         }
+        public Guid Uuid { get; set; }
 
         public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
