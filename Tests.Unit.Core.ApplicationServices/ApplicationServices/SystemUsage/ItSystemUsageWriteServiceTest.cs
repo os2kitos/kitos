@@ -32,9 +32,9 @@ using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Serilog;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -1726,6 +1726,93 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
+        public void Can_Update_With_Specific_Journal_Period_Update()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var archivingParameters = CreateUpdatedSystemUsageArchivingParameters();
+
+            var updatedUuid = Guid.NewGuid();
+            var periodUpdateParams = archivingParameters.ArchiveJournalPeriods.NewValue.Value.RandomItem();
+            periodUpdateParams.Uuid = updatedUuid;
+
+            Configure(f => f.Register(() => new ArchivePeriod
+            {
+                Approved = A<bool>(),
+                UniqueArchiveId = A<string>(),
+                StartDate = A<DateTime>(),
+                EndDate = A<DateTime>()
+            }));
+            itSystemUsage.ArchivePeriods.Add(A<ArchivePeriod>());
+            itSystemUsage.ArchivePeriods.Add(A<ArchivePeriod>());
+
+            var periodsBeforeUpdate = itSystemUsage.ArchivePeriods.ToList();
+            var periodToBeUpdated = periodsBeforeUpdate.RandomItem();
+            periodToBeUpdated.Uuid = updatedUuid;
+            var periodToBeReplaced = periodsBeforeUpdate.First(p => p != periodToBeUpdated);
+
+            ExpectAddArchivePeriodReturns(itSystemUsage.Id, Result<ArchivePeriod, OperationError>.Success(A<ArchivePeriod>()));
+            ExpectRemoveArchivePeriodReturns(itSystemUsage.Id, periodToBeReplaced.Uuid, periodToBeReplaced);
+            ExpectUpdateArchivePeriodReturns(itSystemUsage.Id, updatedUuid, periodUpdateParams.StartDate, periodUpdateParams.EndDate, periodUpdateParams.ArchiveId, periodUpdateParams.Approved, periodToBeUpdated);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var updateResult = _sut.Update(itSystemUsage.Uuid, input);
+
+            //Assert
+            Assert.True(updateResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Update_With_Specific_Updates_Fails_If_Duplicates_Are_Detected()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var archivingParameters = CreateUpdatedSystemUsageArchivingParameters();
+
+            var updatedUuid = Guid.NewGuid();
+            var duplicatePeriodUpdates = archivingParameters
+                .ArchiveJournalPeriods
+                .NewValue
+                .Value
+                .RandomItems(2)
+                .ToList();
+            duplicatePeriodUpdates.ForEach(x => x.Uuid = updatedUuid);
+
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var updateResult = _sut.Update(itSystemUsage.Uuid, input);
+
+            //Assert
+            Assert.True(updateResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, updateResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        //TODO: The convenience methods!
+        //TODO: Add |
+        //TODO: Remove |
+        //TODO: Update
+
+        [Fact]
         public void Can_Update_All_On_Filled_Out_ItSystemUsage()
         {
             //Arrange
@@ -2194,7 +2281,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var usageUuid = A<Guid>();
             var usageId = A<int>();
-            var usage = new ItSystemUsage{ Id = usageId };
+            var usage = new ItSystemUsage { Id = usageId };
             var properties = CreateExternalReferenceProperties();
             var externalReference = new ExternalReference();
 
@@ -2216,7 +2303,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var usageUuid = A<Guid>();
             var usageId = A<int>();
-            var usage = new ItSystemUsage{ Id = usageId };
+            var usage = new ItSystemUsage { Id = usageId };
             var properties = CreateExternalReferenceProperties();
             var expectedOperationFailure = A<OperationFailure>();
 
@@ -2238,7 +2325,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var usageUuid = A<Guid>();
             var usageId = A<int>();
-            var usage = new ItSystemUsage{ Id = usageId };
+            var usage = new ItSystemUsage { Id = usageId };
             var properties = CreateExternalReferenceProperties();
 
             ExpectGetSystemUsageReturns(usageUuid, usage);
@@ -2780,6 +2867,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
         }
 
+        private void ExpectUpdateArchivePeriodReturns(int itSystemUsageId, Guid periodUuid, DateTime startDate, DateTime endDate, string archiveId, bool approved, Result<ArchivePeriod, OperationError> updateResult)
+        {
+            _itSystemUsageServiceMock.Setup(x => x.UpdateArchivePeriod(itSystemUsageId, periodUuid, startDate, endDate, archiveId, approved)).Returns(updateResult);
+        }
+        private void ExpectRemoveArchivePeriodReturns(int itSystemUsageId, Guid periodUuid, Result<ArchivePeriod, OperationError> removeResult)
+        {
+            _itSystemUsageServiceMock.Setup(x => x.RemoveArchivePeriod(itSystemUsageId, periodUuid)).Returns(removeResult);
+        }
         private void ExpectAddArchivePeriodReturns(int itSystemUsageId, Result<ArchivePeriod, OperationError> addResult)
         {
             _itSystemUsageServiceMock.Setup(x => x.AddArchivePeriod(itSystemUsageId, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>())).Returns(addResult);
@@ -2989,6 +3084,19 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private static bool MatchExpectedAssignments(IEnumerable<(Guid roleUuid, Guid user)> actual, List<UserRolePair> expected)
         {
             return actual.SequenceEqual(expected.Select(p => (roleUuid: p.RoleUuid, user: p.UserUuid)));
+        }
+
+        private UpdatedSystemUsageArchivingParameters CreateUpdatedSystemUsageArchivingParameters()
+        {
+            var archivingParameters = new UpdatedSystemUsageArchivingParameters
+            {
+                ArchiveJournalPeriods = Many<SystemUsageJournalPeriodUpdate>(4).Select(p =>
+                {
+                    p.Uuid = null;
+                    return p;
+                }).ToList().FromNullable<IEnumerable<SystemUsageJournalPeriodUpdate>>().AsChangedValue()
+            };
+            return archivingParameters;
         }
     }
 }

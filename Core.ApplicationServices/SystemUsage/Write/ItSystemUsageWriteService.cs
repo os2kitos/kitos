@@ -413,7 +413,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var systemUsageJournalPeriodsWithUuid = allJournalPeriods.Where(x => x.Uuid.HasValue).ToList();
             if (systemUsageJournalPeriodsWithUuid.Count != systemUsageJournalPeriodsWithUuid.Select(x => x.Uuid.GetValueOrDefault()).Distinct().Count())
             {
-                return new OperationError("It's not allowed to have duplicate uuids in the journalperiods provided in the update", OperationFailure.BadInput);
+                return new OperationError("It's not allowed to have duplicate uuids in the journal periods provided in the update", OperationFailure.BadInput);
             }
             var specificJournalPeriodUpdates = systemUsageJournalPeriodsWithUuid
                 .ToDictionary(x => x.Uuid.GetValueOrDefault());
