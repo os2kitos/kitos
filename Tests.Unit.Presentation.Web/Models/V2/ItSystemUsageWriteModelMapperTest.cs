@@ -452,6 +452,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = A<ArchivingUpdateRequestDTO>();
+            input.JournalPeriods = Many<JournalPeriodUpdateRequestDTO>();
+            var allJournalPeriods = input.JournalPeriods.ToList();
+            allJournalPeriods.RandomItem().Uuid = null; //Make sure one of them has no uuid
 
             //Act
             var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { Archiving = input });
@@ -468,7 +471,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.FrequencyInMonths, AssertPropertyContainsDataChange(mappedArchiving.ArchiveFrequencyInMonths));
             Assert.Equal(input.DocumentBearing, AssertPropertyContainsDataChange(mappedArchiving.ArchiveDocumentBearing));
 
-            var inputPeriods = input.JournalPeriods.OrderBy(_ => _.ArchiveId).ToList();
+            var inputPeriods = allJournalPeriods.OrderBy(_ => _.ArchiveId).ToList();
             var mappedPeriods = AssertPropertyContainsDataChange(mappedArchiving.ArchiveJournalPeriods).OrderBy(_ => _.ArchiveId).ToList();
             Assert.Equal(inputPeriods.Count, mappedPeriods.Count);
             for (var i = 0; i < inputPeriods.Count; i++)
@@ -479,6 +482,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(inputData.ArchiveId, outputData.ArchiveId);
                 Assert.Equal(inputData.StartDate, outputData.StartDate);
                 Assert.Equal(inputData.EndDate, outputData.EndDate);
+                Assert.Equal(inputData.Uuid, outputData.Uuid);
             }
         }
 
