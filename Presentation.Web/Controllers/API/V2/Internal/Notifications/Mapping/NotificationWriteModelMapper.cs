@@ -2,109 +2,196 @@
 using System.Collections.Generic;
 using System.Linq;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
-using System.Linq.Expressions;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Notification.Write;
-using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Infrastructure.Model.Request;
-using Core.ApplicationServices.Model.Shared;
-using Core.ApplicationServices.Model.GDPR.Write;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Generic;
+using Presentation.Web.Models.API.V2.Types.Notifications;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
-    public class NotificationWriteModelMapper : WriteModelMapperBase, INotificationWriteModelMapper
+    public class NotificationWriteModelMapper : INotificationWriteModelMapper
     {
-        public NotificationWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest)
-        {
-        }
-        public ImmediateNotificationModificationParameters FromImmediatePOST(ImmediateNotificationWriteRequestDTO dto)
-        {
-            return MapImmediateNotificationWriteRequestDTO<ImmediateNotificationWriteRequestDTO, ImmediateNotificationModificationParameters>(dto, false);
-        }
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
-        public ScheduledNotificationWriteRequestDTO FromScheduledPOST(ScheduledNotificationWriteRequestDTO dto)
+        public NotificationWriteModelMapper(IEntityIdentityResolver entityIdentityResolver)
         {
-            throw new System.NotImplementedException();
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
-        public ScheduledNotificationWriteRequestDTO FromScheduledPut(UpdateScheduledNotificationWriteRequestDTO dto)
+        public Result<Advice, OperationError> FromImmediatePOST(ImmediateNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
-            throw new System.NotImplementedException();
+            return MapImmediateNotificationWriteRequestDTO(dto, ownerResourceType);
         }
 
-        private TResult MapImmediateNotificationWriteRequestDTO<TDto, TResult>(TDto dto, bool enforceFallbackIfNotProvided)
-            where TDto : ImmediateNotificationWriteRequestDTO
-            where TResult : ImmediateNotificationModificationParameters
+        public Result<Advice, OperationError> FromScheduledPOST(ScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
-            var rule = CreateChangeRule<TDto>(enforceFallbackIfNotProvided);
-            TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue,
-                Expression<Func<TDto, TSection>> propertySelection) where TSection : new() =>
-                WithResetDataIfPropertyIsDefined(deserializedValue,
-                    propertySelection, enforceFallbackIfNotProvided);
+            return MapScheduledNotificationWriteRequestDTO(dto, ownerResourceType);
+        }
 
-            TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue,
-                Expression<Func<TDto, TSection>> propertySelection,
-                Func<TSection> fallbackFactory) =>
-                WithResetDataIfPropertyIsDefined(deserializedValue,
-                    propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
+        public Result<Advice, OperationError> FromScheduledPUT(UpdateScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        {
+            return MapBaseScheduledNotificationWriteRequestDTO(dto, ownerResourceType);
+        }
 
-            dto.Ccs = WithResetDataIfSectionIsNotDefined(dto.Ccs, x => x.Ccs);
-            dto.Receivers = WithResetDataIfSectionIsNotDefined(dto.Receivers, x => x.Receivers);
-
-            return (TResult) new ImmediateNotificationModificationParameters
+        private Result<Advice, OperationError> MapImmediateNotificationWriteRequestDTO(ImmediateNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        {
+            var advice = new Advice
             {
-                Body = rule.MustUpdate(x => x.Body) ? dto.Body.AsChangedValue() : OptionalValueChange<string>.None,
-                Subject = rule.MustUpdate(x => x.Subject) ? dto.Body.AsChangedValue() : OptionalValueChange<string>.None,
-                OwnerResourceUuid = rule.MustUpdate(x => x.OwnerResource) ? dto.OwnerResource?.Uuid.AsChangedValue() : OptionalValueChange<Guid>.None,
-                Ccs = dto.Ccs.FromNullable().Select(x => MapRecipients(dto.Ccs, rule, true)),
-                Receivers = dto.Receivers.FromNullable().Select(x => MapRecipients(dto.Ccs, rule, false))
+                Body = dto.Body,
+                Subject = dto.Subject,
+                Type = ownerResourceType.ToRelatedEntityType()
             };
+            return ResolveIdForOwnerResource(dto.OwnerResource.Uuid, ownerResourceType)
+                .Bind(ownerResourceId =>
+                {
+                    advice.RelationId = ownerResourceId;
+                    return MapAllRecipients(dto, ownerResourceType);
+                })
+                .Bind<Advice>(recipients =>
+                {
+                    advice.Reciepients = recipients.ToList();
+                    return advice;
+                });
         }
 
-        private ScheduledNotificationModificationParameters MapScheduledNotificationWriteRequestDTO<TDto>(TDto dto, IPropertyUpdateRule<TDto> rule,  bool enforceFallbackIfNotProvided)
-            where TDto : ScheduledNotificationWriteRequestDTO
+        private Result<Advice, OperationError> MapBaseScheduledNotificationWriteRequestDTO(BaseScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
-            var parameters = MapImmediateNotificationWriteRequestDTO<TDto, ScheduledNotificationModificationParameters>(dto, enforceFallbackIfNotProvided);
-            /*parameters.RepetitionFrequency = rule.MustUpdate(x => x.RepetitionFrequency)
-                ? dto.RepetitionFrequency.AsChangedValue()
-                : OptionalValueChange<Scheduling>.None;*/ //TODO: Create a mapper for the enum type
-            parameters.FromDate = rule.MustUpdate(x => x.FromDate)
-                ? dto.FromDate.AsChangedValue()
-                : OptionalValueChange<DateTime>.None;
+            return MapImmediateNotificationWriteRequestDTO(dto, ownerResourceType)
+                .Select(advice =>
+                {
+                    advice.Name = dto.Name;
+                    advice.StopDate = dto.ToDate;
 
-            return parameters;
+                    return advice;
+                });
         }
 
-        private RecipientModificationParameters MapRecipients<TDto>(RecipientWriteRequestDTO dto, IPropertyUpdateRule<TDto> rule, bool isCc) where TDto : ImmediateNotificationWriteRequestDTO
+        private Result<Advice, OperationError> MapScheduledNotificationWriteRequestDTO(ScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
-            return new RecipientModificationParameters
+            return MapBaseScheduledNotificationWriteRequestDTO(dto, ownerResourceType)
+                .Select(advice =>
+                {
+                    advice.Scheduling = dto.RepetitionFrequency.ToScheduling();
+                    advice.AlarmDate = dto.FromDate;
+
+                    return advice;
+                });
+        }
+
+        private Result<IEnumerable<AdviceUserRelation>, OperationError> MapAllRecipients(ImmediateNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        {
+            return MapEmailAndRoleRecipients(dto.Ccs, ownerResourceType, RecieverType.CC)
+                .Bind(recipients =>
+                {
+                    var recipientList = (recipients ?? new List<AdviceUserRelation>()).ToList();
+                    return MapEmailAndRoleRecipients(dto.Receivers, ownerResourceType, RecieverType.RECIEVER)
+                        .Bind(receiverRecipients =>
+                        {
+                            recipientList.AddRange(receiverRecipients);
+                            return Result<IEnumerable<AdviceUserRelation>, OperationError>.Success(recipientList);
+                        });
+                });
+        }
+
+        private Result<IEnumerable<AdviceUserRelation>, OperationError> MapEmailAndRoleRecipients(RecipientWriteRequestDTO dto, OwnerResourceType ownerResourceType, RecieverType receiverType)
+        {
+            return MapRoleRecipients(dto.RoleRecipients, ownerResourceType, receiverType)
+                .Bind<IEnumerable<AdviceUserRelation>>(roleRecipients =>
+                {
+                    var recipientList = (roleRecipients ?? new List<AdviceUserRelation>()).ToList();
+                    recipientList.AddRange(MapEmailRecipients(dto.EmailRecipients, receiverType));
+                    return recipientList;
+                });
+        }
+
+        private static IEnumerable<AdviceUserRelation> MapEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO> dto, RecieverType receiverType)
+        {
+            return dto.Select(x => new AdviceUserRelation
             {
-                EmailRecipients = rule.MustUpdate(x => isCc ? x.Ccs.EmailRecipients : x.Receivers.EmailRecipients)
-                    ? dto.EmailRecipients.FromNullable().Select(MapEmailRecipients).AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<EmailRecipientModificationParameters>>>.None,
-                RoleRecipients = rule.MustUpdate(x => isCc ? x.Ccs.RoleRecipients : x.Receivers.RoleRecipients)
-                    ? dto.RoleRecipients.FromNullable().Select(MapRoleRecipients).AsChangedValue()
-                    : OptionalValueChange<Maybe<IEnumerable<RoleRecipientModificationParameters>>>.None
-            };
-        }
-
-        private IEnumerable<EmailRecipientModificationParameters> MapEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO> dto)
-        {
-            return dto.Select(x => new EmailRecipientModificationParameters
-            {
-                Email = x.Email
+                Email = x.Email,
+                RecieverType = receiverType,
+                RecpientType = RecipientType.USER
             }).ToList();
         }
 
-        private IEnumerable<RoleRecipientModificationParameters> MapRoleRecipients(IEnumerable<RoleRecipientWriteRequestDTO> dto)
+        private Result<IEnumerable<AdviceUserRelation>, OperationError> MapRoleRecipients(IEnumerable<RoleRecipientWriteRequestDTO> dtos, OwnerResourceType ownerResourceType, RecieverType receiverType)
         {
-            return dto.Select(x => new RoleRecipientModificationParameters
+            var recipients = new List<AdviceUserRelation>();
+            foreach (var dto in dtos)
             {
-                RoleUuid = x.RoleUuid
-            }).ToList();
+                var recipientResult = MapRoleRecipient(dto, ownerResourceType, receiverType);
+                if (recipientResult.Failed)
+                    return recipientResult.Error;
+
+                recipients.Add(recipientResult.Value);
+            }
+
+            return recipients;
+        }
+
+        private Result<AdviceUserRelation, OperationError> MapRoleRecipient(RoleRecipientWriteRequestDTO dto,
+            OwnerResourceType ownerResourceType, RecieverType receiverType)
+        {
+            var notificationRelation = new AdviceUserRelation
+            {
+                RecieverType = receiverType,
+                RecpientType = RecipientType.ROLE
+            };
+            return AssignRoleId(dto.RoleUuid, ownerResourceType, notificationRelation)
+                .Match<Result<AdviceUserRelation, OperationError>>(error => error, () => notificationRelation);
+        }
+
+        private Maybe<OperationError> AssignRoleId(Guid uuid, OwnerResourceType ownerResourceType, AdviceUserRelation notificationRelation)
+        {
+            var ownerIdResult = ResolveIdForOwnerResource(uuid, ownerResourceType);
+            if (ownerIdResult.Failed)
+                return ownerIdResult.Error;
+            var ownerId = ownerIdResult.Value;
+
+            switch(ownerResourceType)
+            {
+                case OwnerResourceType.DataProcessingRegistration: notificationRelation.DataProcessingRegistrationRoleId = ownerId; break;
+                case OwnerResourceType.ItContract: notificationRelation.ItContractRoleId = ownerId; break;
+                case OwnerResourceType.ItSystemUsage: notificationRelation.ItSystemRoleId = ownerId; break;
+                default: throw new ArgumentOutOfRangeException(nameof(ownerResourceType), ownerResourceType, null);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Result<int, OperationError> ResolveIdForOwnerResource(Guid uuid, OwnerResourceType ownerResourceType)
+        {
+            return ownerResourceType switch
+            {
+                OwnerResourceType.DataProcessingRegistration => _entityIdentityResolver
+                    .ResolveDbId<DataProcessingRegistration>(uuid)
+                    .Match<Result<int, OperationError>>
+                    (
+                        id => id,
+                        () => CreateIdNotFoundOperationError(uuid, nameof(DataProcessingRegistration))
+                    ),
+                OwnerResourceType.ItContract => _entityIdentityResolver.ResolveDbId<ItContract>(uuid)
+                    .Match<Result<int, OperationError>>
+                    (
+                        id => id,
+                        () => CreateIdNotFoundOperationError(uuid, nameof(ItContract))
+                    ),
+                OwnerResourceType.ItSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystemUsage>(uuid)
+                    .Match<Result<int, OperationError>>
+                    (
+                        id => id,
+                        () => CreateIdNotFoundOperationError(uuid, nameof(ItSystemUsage))
+                    ),
+                _ => throw new ArgumentOutOfRangeException(nameof(ownerResourceType), ownerResourceType, null)
+            };
+        }
+
+        private static OperationError CreateIdNotFoundOperationError(Guid uuid, string typeName)
+        {
+            return new OperationError($"Id for {typeName} with uuid: {uuid} was not found", OperationFailure.NotFound);
         }
     }
 }

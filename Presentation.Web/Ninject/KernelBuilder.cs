@@ -124,6 +124,7 @@ using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -208,6 +209,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);
             kernel.Bind<IAdviceService>().To<AdviceService>().InCommandScope(Mode);
             kernel.Bind<AdviceService>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<IRegistrationNotificationService>().To<RegistrationNotificationService>().InCommandScope(Mode);
+            kernel.Bind<INotificationService>().To<NotificationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
@@ -323,6 +326,10 @@ namespace Presentation.Web.Ninject
 
             //Public messages
             kernel.Bind<IPublicMessagesWriteModelMapper>().To<PublicMessagesWriteModelMapper>().InCommandScope(Mode);
+            
+            //Notifications
+            kernel.Bind<INotificationWriteModelMapper>().To<NotificationWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<INotificationResponseMapper>().To<NotificationResponseMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)

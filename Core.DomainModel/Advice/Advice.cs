@@ -7,7 +7,6 @@ using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.Advice
 {
-
     public enum Scheduling
     {
        Immediate = 0,

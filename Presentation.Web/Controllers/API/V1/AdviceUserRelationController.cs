@@ -14,25 +14,27 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models.API.V1;
+using Core.ApplicationServices.Notification;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
-        private readonly IGenericRepository<AdviceUserRelation> _repository;
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IAdviceRootResolution _adviceRootResolution;
+        private readonly IRegistrationNotificationService _registrationNotificationService;
 
         public AdviceUserRelationController(
             IGenericRepository<AdviceUserRelation> repository,
             IGenericRepository<Advice> adviceRepository,
-            IAdviceRootResolution adviceRootResolution)
+            IAdviceRootResolution adviceRootResolution,
+            IRegistrationNotificationService registrationNotificationService)
             : base(repository)
         {
-            _repository = repository;
             _adviceRepository = adviceRepository;
             _adviceRootResolution = adviceRootResolution;
+            _registrationNotificationService = registrationNotificationService;
         }
 
         [NonAction]
@@ -109,19 +111,8 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
-                foreach (var d in _repository.AsQueryable().Where(d => d.AdviceId == adviceId).ToList())
-                {
-                    if (AllowDelete(d))
-                    {
-                        _repository.Delete(d);
-                        _repository.Save();
-                    }
-                    else
-                    {
-                        return Forbidden();
-                    }
-                }
-                return Ok();
+                return _registrationNotificationService.DeleteUserRelationByAdviceId(adviceId)
+                    .Match(FromOperationError, Ok);
             }
             catch (Exception e)
             {

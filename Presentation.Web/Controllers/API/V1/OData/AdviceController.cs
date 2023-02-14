@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Model.Notification.Write;
+using Core.ApplicationServices.Notification;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Events;
@@ -12,8 +15,6 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
-using Core.DomainServices.Authorization;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Microsoft.AspNet.OData;
@@ -31,69 +32,30 @@ namespace Presentation.Web.Controllers.API.V1.OData
         private readonly IAdviceRootResolution _adviceRootResolution;
         private readonly IOperationClock _operationClock;
         private readonly ITransactionManager _transactionManager;
+        private readonly IRegistrationNotificationService _registrationNotificationService;
 
-        private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
+        private readonly Regex _emailValidationRegex = new("([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
             IAdviceRootResolution adviceRootResolution,
             IOperationClock operationClock,
-            ITransactionManager transactionManager
-            )
+            ITransactionManager transactionManager,
+            IRegistrationNotificationService registrationNotificationService)
             : base(repository)
         {
             _adviceService = adviceService;
             _adviceRootResolution = adviceRootResolution;
             _operationClock = operationClock;
             _transactionManager = transactionManager;
+            _registrationNotificationService = registrationNotificationService;
         }
 
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            return Ok(_adviceService.GetAdvicesAccessibleToCurrentUser());
-        }
-
-        private IEntityWithAdvices ResolveRoot(Advice advice)
-        {
-            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
-        }
-
-        protected override IControllerCrudAuthorization GetCrudAuthorization()
-        {
-            return new ChildEntityCrudAuthorization<Advice, IEntityWithAdvices>(ResolveRoot, base.GetCrudAuthorization());
-        }
-
-        protected override void RaiseCreatedDomainEvent(Advice entity)
-        {
-            RaiseAsRootModification(entity);
-        }
-
-        protected override void RaiseDeletedDomainEvent(Advice entity)
-        {
-            RaiseAsRootModification(entity);
-        }
-
-        protected override void RaiseUpdatedDomainEvent(Advice entity)
-        {
-            RaiseAsRootModification(entity);
-        }
-
-        private void RaiseAsRootModification(Advice entity)
-        {
-            switch (ResolveRoot(entity))
-            {
-                case ItContract root:
-                    DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(root));
-                    break;
-                case ItSystemUsage root:
-                    DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
-                    break;
-                case DataProcessingRegistration root:
-                    DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
-                    break;
-            }
+            return Ok(_registrationNotificationService.GetCurrentUserNotifications());
         }
 
         [EnableQuery]
@@ -129,46 +91,14 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     }
                 }
 
-                if (advice.Scheduling == null || advice.Scheduling == Scheduling.Immediate)
+                if (advice.Scheduling is null or Scheduling.Immediate)
                 {
                     return BadRequest($"Scheduling must be defined and cannot be {nameof(Scheduling.Immediate)} when creating advice of type {nameof(AdviceType.Repeat)}");
                 }
             }
 
-            //Prepare new advice
-            advice.IsActive = true;
-            if (advice.AdviceType == AdviceType.Immediate)
-            {
-                advice.Scheduling = Scheduling.Immediate;
-                advice.StopDate = null;
-                advice.AlarmDate = null;
-            }
-
-            using var transaction = _transactionManager.Begin();
-
-            var response = base.Post(organizationId, advice);
-
-            if (response.GetType() == typeof(CreatedODataResult<Advice>))
-            {
-                var createdResponse = (CreatedODataResult<Advice>)response;
-                var name = Advice.CreateJobId(createdResponse.Entity.Id);
-
-                advice = createdResponse.Entity;
-                advice.JobId = name;
-                advice.IsActive = true;
-
-                try
-                {
-                    _adviceService.CreateAdvice(advice);
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorException("Failed to add advice", e);
-                    return StatusCode(HttpStatusCode.InternalServerError);
-                }
-            }
-            transaction.Commit();
-            return response;
+            return _registrationNotificationService.Create(organizationId, MapNotification(advice))
+                .Match(Ok, FromOperationError);
         }
 
         [EnableQuery]
@@ -233,50 +163,20 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
         }
 
-        private static bool IsRecurringEditableProperty(string name)
-        {
-            return name.Equals("Name") || name.Equals("Subject") || name.Equals("StopDate");
-        }
 
         [EnableQuery]
         [ODataRoute("GetAdvicesByOrganizationId(organizationId={organizationId})")]
         public IHttpActionResult GetAdvicesByOrganizationId([FromODataUri] int organizationId)
         {
-            return GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All
-                ? Forbidden()
-                : Ok(_adviceService.GetAdvicesForOrg(organizationId));
+            return _registrationNotificationService.GetNotificationsByOrganizationId(organizationId)
+                .Match(Ok, FromOperationError);
         }
 
         [EnableQuery]
         public override IHttpActionResult Delete(int key)
         {
-            using var transaction = _transactionManager.Begin();
-            var entity = Repository.AsQueryable().ById(key);
-            if (entity == null)
-            {
-                return NotFound();
-            }
-            if (!AllowDelete(entity))
-            {
-                return Forbidden();
-            }
-
-            if (!entity.CanBeDeleted)
-            {
-                return BadRequest("Cannot delete advice which is active or has been sent");
-            }
-            try
-            {
-                RaiseAsRootModification(entity);
-                _adviceService.Delete(entity);
-            }
-            catch (Exception e)
-            {
-                Logger.ErrorException("Failed to delete advice", e);
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            transaction.Commit();
-            return StatusCode(HttpStatusCode.NoContent);
+            return _registrationNotificationService.Delete(key)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         [HttpPatch]
@@ -284,27 +184,83 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [ODataRoute("DeactivateAdvice")]
         public IHttpActionResult DeactivateAdvice([FromODataUri] int key)
         {
-            using var transaction = _transactionManager.Begin();
-            var entity = Repository.AsQueryable().ById(key);
-            if (entity == null) return NotFound();
+            return _registrationNotificationService.DeactivateNotification(key)
+                .Match(Updated, FromOperationError);
+        }
 
-            try
+
+        protected override void RaiseCreatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<Advice, IEntityWithAdvices>(ResolveRoot, base.GetCrudAuthorization());
+        }
+
+        private NotificationModificationModel MapNotification(Advice notification)
+        {
+            return new NotificationModificationModel
             {
-                if (!AllowModify(entity))
-                {
-                    return Forbidden();
-                }
-                _adviceService.Deactivate(entity);
-                RaiseAsRootModification(entity);
-            }
-            catch (Exception e)
+                Name = notification.Name,
+                Subject = notification.Subject,
+                Body = notification.Body,
+                RelationId = notification.RelationId,
+                RepetitionFrequency = notification.Scheduling,
+                FromDate = notification.AlarmDate,
+                ToDate = notification.StopDate,
+                Recipients = MapRecipients(notification.Reciepients)
+            };
+        }
+
+        private static IEnumerable<RecipientModificationModel> MapRecipients(IEnumerable<AdviceUserRelation> recipients)
+        {
+            return recipients.Select(x => new RecipientModificationModel
             {
-                transaction.Rollback();
-                Logger.ErrorException("Failed to delete advice", e);
-                return StatusCode(HttpStatusCode.InternalServerError);
+                Email = x.Email,
+                DataProcessingRegistrationRoleId = x.DataProcessingRegistrationRoleId,
+                ItContractRoleId = x.ItContractRoleId,
+                ItSystemRoleId = x.ItSystemRoleId,
+                ReceiverType = x.RecieverType,
+                RecipientType = x.RecpientType
+            });
+        }
+
+        private IEntityWithAdvices ResolveRoot(Advice advice)
+        {
+            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
+        }
+
+        private void RaiseAsRootModification(Advice entity)
+        {
+            switch (ResolveRoot(entity))
+            {
+                case ItContract root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(root));
+                    break;
+                case ItSystemUsage root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
+                    break;
+                case DataProcessingRegistration root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
+                    break;
             }
-            transaction.Commit();
-            return Updated(entity);
+        }
+
+        private static bool IsRecurringEditableProperty(string name)
+        {
+            return name.Equals("Name") || name.Equals("Subject") || name.Equals("StopDate");
         }
     }
 }

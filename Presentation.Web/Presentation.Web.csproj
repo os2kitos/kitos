@@ -358,6 +358,7 @@
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\OwnerResourceTypeMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\RepetitionFrequencyMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\NotificationV2Controller.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseScheduledNotificationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\EmailRecipientWriteRequestDTO.cs" />

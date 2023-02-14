@@ -157,11 +157,11 @@
     <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
-    <Compile Include="Model\Notification\Write\EmailRecipientModificationParameters.cs" />
-    <Compile Include="Model\Notification\Write\ImmediateNotificationModificationParameters.cs" />
-    <Compile Include="Model\Notification\Write\RecipientModificationParameters.cs" />
-    <Compile Include="Model\Notification\Write\RoleRecipientModificationParameters.cs" />
-    <Compile Include="Model\Notification\Write\ScheduledNotificationModificationParameters.cs" />
+    <Compile Include="Model\Notification\Write\BaseNotificationModificationModel.cs" />
+    <Compile Include="Model\Notification\Write\NotificationModificationModel.cs" />
+    <Compile Include="Model\Notification\Write\RecipientModificationModel.cs" />
+    <Compile Include="Model\Notification\Write\UpdateNotificationModificationModel.cs" />
+    <Compile Include="Model\Notification\Write\UpdateRecipientModificationModel.cs" />
     <Compile Include="Model\Organizations\OrganizationUnitRegistrationChangeParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\PaymentChangeParameters.cs" />
@@ -194,7 +194,9 @@
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="Notification\INotificationService.cs" />
+    <Compile Include="Notification\IRegistrationNotificationService.cs" />
     <Compile Include="Notification\NotificationService.cs" />
+    <Compile Include="Notification\RegistrationNotificationService.cs" />
     <Compile Include="OptionTypes\IOptionResolver.cs" />
     <Compile Include="OptionTypes\OptionsApplicationService.cs" />
     <Compile Include="OptionTypes\IOptionsApplicationService.cs" />
