@@ -456,7 +456,7 @@ namespace Core.DomainModel.ItSystemUsage
             {
                 return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
             }
-            
+
             var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);
 
             var removedPersonalData = new List<ItSystemUsagePersonalData>();
@@ -619,7 +619,7 @@ namespace Core.DomainModel.ItSystemUsage
             if (organizationUnits.Select(x => x.Uuid).Distinct().Count() != organizationUnits.Count)
                 return new OperationError("No duplicates allowed in using org units", OperationFailure.BadInput);
 
-            var responsibleOrgUnitIsValid = responsibleOrgUnit.Select(responsible=>organizationUnits.Any(unit=>responsible == unit)).GetValueOrFallback(true);
+            var responsibleOrgUnitIsValid = responsibleOrgUnit.Select(responsible => organizationUnits.Any(unit => responsible == unit)).GetValueOrFallback(true);
             if (!responsibleOrgUnitIsValid)
                 return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
 
@@ -867,22 +867,63 @@ namespace Core.DomainModel.ItSystemUsage
             return periodsToRemove;
         }
 
+        public Result<ArchivePeriod, OperationError> RemoveArchivePeriod(Guid archivePeriodUuid)
+        {
+            var archivePeriodResult = GetArchivePeriod(archivePeriodUuid);
+            if(archivePeriodResult.IsNone)
+                return new OperationError($"Could not find existing period with uuid {archivePeriodUuid}", OperationFailure.NotFound);
+
+            var archivePeriod = archivePeriodResult.Value;
+            ArchivePeriods.Remove(archivePeriod);
+            return archivePeriod;
+        }
+
         public Result<ArchivePeriod, OperationError> AddArchivePeriod(DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
-            if (startDate.Date > endDate.Date)
-                return new OperationError($"StartDate: {startDate.Date} cannot be before EndDate: {endDate.Date}", OperationFailure.BadInput);
-
-            var newPeriod = new ArchivePeriod()
+            var newPeriod = new ArchivePeriod
             {
-                Approved = approved,
-                UniqueArchiveId = archiveId,
-                StartDate = startDate,
-                EndDate = endDate,
                 ItSystemUsage = this
             };
 
+            var error = UpdateArchivePeriod(newPeriod, startDate, endDate, archiveId, approved);
+            if (error.HasValue)
+                return error.Value;
+
             ArchivePeriods.Add(newPeriod);
             return newPeriod;
+        }
+
+        public Result<ArchivePeriod, OperationError> UpdateArchivePeriod(Guid archivePeriodUuid, DateTime startDate, DateTime endDate, string archiveId, bool approved)
+        {
+            var periodResult = GetArchivePeriod(archivePeriodUuid);
+            if (periodResult.IsNone)
+                return new OperationError($"Could not find existing period with uuid {archivePeriodUuid}", OperationFailure.NotFound);
+
+            return UpdateArchivePeriod(periodResult.Value, startDate, endDate, archiveId, approved)
+                .Match<Result<ArchivePeriod, OperationError>>
+                (
+                    error => error,
+                    () => periodResult.Value
+                );
+        }
+
+        public Maybe<ArchivePeriod> GetArchivePeriod(Guid archivePeriodUuid)
+        {
+            return ArchivePeriods.FirstOrDefault(x => x.Uuid == archivePeriodUuid).FromNullable();
+        }
+
+        private static Maybe<OperationError> UpdateArchivePeriod(ArchivePeriod period, DateTime startDate, DateTime endDate, string archiveId, bool approved)
+        {
+            period.UniqueArchiveId = archiveId;
+            period.Approved = approved;
+
+            var error = period.UpdatePeriod(startDate, endDate);
+            if (error.HasValue)
+            {
+                return error.Value;
+            }
+
+            return Maybe<OperationError>.None;
         }
 
         public Result<IEnumerable<ItSystemUsagePersonalData>, OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
@@ -1001,7 +1042,7 @@ namespace Core.DomainModel.ItSystemUsage
                 return new OperationError($"An option with value: '{option}' already exists", OperationFailure.Conflict);
             }
 
-            var personalDataOption = new ItSystemUsagePersonalData() {ItSystemUsage = this, PersonalData = option};
+            var personalDataOption = new ItSystemUsagePersonalData() { ItSystemUsage = this, PersonalData = option };
             PersonalDataOptions.Add(personalDataOption);
             return personalDataOption;
         }

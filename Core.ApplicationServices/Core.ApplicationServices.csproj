@@ -168,7 +168,8 @@
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemRelationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
-    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriod.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriodProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriodUpdate.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
     <Compile Include="Model\Shared\Write\UpdatedExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGDPRProperties.cs" />

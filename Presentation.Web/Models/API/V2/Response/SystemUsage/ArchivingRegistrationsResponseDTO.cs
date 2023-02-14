@@ -41,7 +41,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
 
         public bool? DocumentBearing { get; set; }
         [Required]
-        public IEnumerable<JournalPeriodDTO> JournalPeriods { get; set; }
+        public IEnumerable<JournalPeriodResponseDTO> JournalPeriods { get; set; }
 
     }
 }

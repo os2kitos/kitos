@@ -268,6 +268,19 @@ namespace Core.ApplicationServices.SystemUsage
                             : error);
         }
 
+        public Result<ArchivePeriod, OperationError> RemoveArchivePeriod(int systemUsageId, Guid archivePeriodUuid)
+        {
+            return Modify<ArchivePeriod>(systemUsageId, systemUsage =>
+            {
+                var result = systemUsage.RemoveArchivePeriod(archivePeriodUuid);
+                if (result.Failed)
+                    return result.Error;
+
+                DeleteArchivePeriodsFromRepository(result.Value);
+                return result.Value;
+            });
+        }
+
         public Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId)
         {
             return Modify(systemUsageId, usage =>
@@ -279,11 +292,7 @@ namespace Core.ApplicationServices.SystemUsage
                         periodsToRemove =>
                         {
                             var removed = periodsToRemove.ToList();
-                            foreach (var removedPeriod in removed)
-                            {
-                                _archivePeriodRepository.DeleteWithReferencePreload(removedPeriod);
-                            }
-                            _archivePeriodRepository.Save();
+                            DeleteArchivePeriodsFromRepository(removed.ToArray());
                             return removed;
                         },
                         error => error);
@@ -292,9 +301,25 @@ namespace Core.ApplicationServices.SystemUsage
             });
         }
 
+        private void DeleteArchivePeriodsFromRepository(params ArchivePeriod[] toDelete)
+        {
+            foreach (var period in toDelete)
+            {
+                _archivePeriodRepository.DeleteWithReferencePreload(period);
+            }
+
+            _archivePeriodRepository.Save();
+        }
+
         public Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
+        }
+
+        public Result<ArchivePeriod, OperationError> UpdateArchivePeriod(int systemUsageId, Guid archivePeriodUuid, DateTime startDate, DateTime endDate,
+            string archiveId, bool approved)
+        {
+            return Modify(systemUsageId, usage => usage.UpdateArchivePeriod(archivePeriodUuid, startDate, endDate, archiveId, approved));
         }
 
         public Maybe<OperationError> TransferResponsibleUsage(int systemId, Guid targetUnitUuid)

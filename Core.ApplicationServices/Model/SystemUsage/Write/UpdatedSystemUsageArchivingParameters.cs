@@ -18,6 +18,6 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public OptionalValueChange<string> ArchiveNotes { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<int?> ArchiveFrequencyInMonths { get; set; } = OptionalValueChange<int?>.None;
         public OptionalValueChange<bool?> ArchiveDocumentBearing { get; set; } = OptionalValueChange<bool?>.None;
-        public OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriod>>> ArchiveJournalPeriods = OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriod>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>> ArchiveJournalPeriods = OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>>.None;
     }
 }

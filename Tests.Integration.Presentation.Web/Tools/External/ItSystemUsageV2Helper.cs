@@ -10,6 +10,7 @@ using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -168,7 +169,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 .AsPatchPayloadOfMultipleProperties(nameof(UpdateItSystemUsageRequestDTO.General), nameof(UpdateItSystemUsageRequestDTO.General.Validity)));
         }
 
-        public static async Task<HttpResponseMessage> SendPatchArchiving(string token, Guid uuid, ArchivingWriteRequestDTO dto)
+        public static async Task<HttpResponseMessage> SendPatchArchiving(string token, Guid uuid, BaseArchivingWriteRequestDTO dto)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Archiving)));
         }
@@ -269,6 +270,44 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/{usageUuid}/external-references/{externalReferenceUuid}"), token);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<JournalPeriodResponseDTO> CreateJournalPeriodAsync(string token, Guid systemUsageUuid, JournalPeriodDTO input)
+        {
+            var path = $"{_baseUsageApiPath}/{systemUsageUuid}/journal-periods";
+            using var response = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(path), input, token);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<JournalPeriodResponseDTO>();
+        }
+
+        public static async Task<JournalPeriodResponseDTO> GetJournalPeriodAsync(string token, Guid systemUsageUuid, Guid journalPeriodUuid)
+        {
+            using var response = await SendGetJournalPeriodAsync(token, systemUsageUuid, journalPeriodUuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<JournalPeriodResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetJournalPeriodAsync(string token, Guid systemUsageUuid, Guid journalPeriodUuid)
+        {
+            var path = $"{_baseUsageApiPath}/{systemUsageUuid}/journal-periods/{journalPeriodUuid}";
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
+        }
+
+        public static async Task<JournalPeriodResponseDTO> UpdateJournalPeriodAsync(string token, Guid systemUsageUuid, Guid journalPeriodUuid, JournalPeriodDTO input)
+        {
+            var path = $"{_baseUsageApiPath}/{systemUsageUuid}/journal-periods/{journalPeriodUuid}";
+            using var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl(path), token, input);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<JournalPeriodResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteJournalPeriodAsync(string token, Guid systemUsageUuid, Guid journalPeriodUuid)
+        {
+            var path = $"{_baseUsageApiPath}/{systemUsageUuid}/journal-periods/{journalPeriodUuid}";
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl(path), token);
         }
     }
 }

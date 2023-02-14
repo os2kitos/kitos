@@ -7,7 +7,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
@@ -404,21 +403,59 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveJournalPeriods, UpdateArchiveJournalPeriods));
         }
 
-        private Maybe<OperationError> UpdateArchiveJournalPeriods(ItSystemUsage systemUsage, Maybe<IEnumerable<SystemUsageJournalPeriod>> journalPeriods)
+        private Maybe<OperationError> UpdateArchiveJournalPeriods(ItSystemUsage systemUsage, Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>> journalPeriods)
         {
-            //Clear existing values
-            var removeResult = _systemUsageService.RemoveAllArchivePeriods(systemUsage.Id);
-            if (removeResult.Failed)
-                return new OperationError($"Failed to remove all ArchiveJournalPeriods as part of the update. Remove error: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+            var allJournalPeriods = journalPeriods
+                .Select(x => x.ToList())
+                .GetValueOrFallback(new List<SystemUsageJournalPeriodUpdate>());
 
-            if (journalPeriods.IsNone)
+
+            var systemUsageJournalPeriodsWithUuid = allJournalPeriods.Where(x => x.Uuid.HasValue).ToList();
+            if (systemUsageJournalPeriodsWithUuid.Count != systemUsageJournalPeriodsWithUuid.Select(x => x.Uuid.GetValueOrDefault()).Distinct().Count())
             {
-                // No new journal periods
-                return Maybe<OperationError>.None;
+                return new OperationError("It's not allowed to have duplicate uuids in the journal periods provided in the update", OperationFailure.BadInput);
+            }
+            var specificJournalPeriodUpdates = systemUsageJournalPeriodsWithUuid
+                .ToDictionary(x => x.Uuid.GetValueOrDefault());
+
+            var journalPeriodsToAddAfterReset = allJournalPeriods
+                .Except(specificJournalPeriodUpdates.Values)
+                .ToList();
+
+            if (specificJournalPeriodUpdates.Any())
+            {
+                //Update the journal periods specifically identified in the update
+                foreach (var specificJournalPeriodUpdate in specificJournalPeriodUpdates)
+                {
+                    var period = specificJournalPeriodUpdate.Value;
+                    var updateResult = _systemUsageService.UpdateArchivePeriod(systemUsage.Id, specificJournalPeriodUpdate.Key, period.StartDate, period.EndDate, period.ArchiveId, period.Approved);
+                    if (updateResult.Failed)
+                        return new OperationError($"Failed to update ArchiveJournalPeriod {period.Uuid} as part of the update. Update error: {updateResult.Error.Message.GetValueOrEmptyString()}", updateResult.Error.FailureType);
+                }
+
+                //Remove journal periods which were not identified as specific updates
+                var uuidsOfJournalPeriodsToRemove = systemUsage
+                    .ArchivePeriods
+                    .Where(period => !specificJournalPeriodUpdates.ContainsKey(period.Uuid))
+                    .Select(period => period.Uuid)
+                    .ToList();
+                foreach (var uuid in uuidsOfJournalPeriodsToRemove)
+                {
+                    var removeResult = _systemUsageService.RemoveArchivePeriod(systemUsage.Id, uuid);
+                    if (removeResult.Failed)
+                        return new OperationError($"Failed to remove ArchiveJournalPeriod {uuid} as part of the update. Remove error: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+                }
+            }
+            else
+            {
+                //If no specific updates, just remove all
+                var removeResult = _systemUsageService.RemoveAllArchivePeriods(systemUsage.Id);
+                if (removeResult.Failed)
+                    return new OperationError($"Failed to remove all ArchiveJournalPeriods as part of the update. Remove error: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
             }
 
-            var newPeriods = journalPeriods.Value.ToList();
-            foreach (var newPeriod in newPeriods)
+            //Add periods which were not part of the specific update set.
+            foreach (var newPeriod in journalPeriodsToAddAfterReset)
             {
                 var addResult = _systemUsageService.AddArchivePeriod(systemUsage.Id, newPeriod.StartDate,
                     newPeriod.EndDate, newPeriod.ArchiveId, newPeriod.Approved);
@@ -761,6 +798,30 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 })
                 .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
                 .MatchFailure();
+        }
+
+        public Result<ArchivePeriod, OperationError> CreateJournalPeriod(Guid systemUsageUuid, SystemUsageJournalPeriodProperties parameters)
+        {
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(WithWriteAccess)
+                .Bind(usage => _systemUsageService.AddArchivePeriod(usage.Id, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
+        }
+
+        public Result<ArchivePeriod, OperationError> UpdateJournalPeriod(Guid systemUsageUuid, Guid periodUuid, SystemUsageJournalPeriodProperties parameters)
+        {
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(WithWriteAccess)
+                .Bind(usage => _systemUsageService.UpdateArchivePeriod(usage.Id, periodUuid, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
+        }
+
+        public Result<ArchivePeriod, OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid periodUuid)
+        {
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(WithWriteAccess)
+                .Bind(usage => _systemUsageService.RemoveArchivePeriod(usage.Id, periodUuid));
         }
 
         private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId

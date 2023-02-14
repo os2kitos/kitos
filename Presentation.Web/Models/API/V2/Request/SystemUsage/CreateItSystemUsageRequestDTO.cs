@@ -31,5 +31,9 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         ///     - If the list is not empty one (and only one) must be marked as the master reference.
         /// </summary>
         public IEnumerable<ExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
+        /// <summary>
+        /// Defines archiving related properties for this system usage
+        /// </summary>
+        public ArchivingCreationRequestDTO Archiving { get; set; }
     }
 }
