@@ -13,6 +13,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.ItSystemUsage)
                 .WithMany(t => t.ArchivePeriods)
                 .HasForeignKey(d => d.ItSystemUsageId);
+
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasIndexAnnotation("UX_ArchivePeriod_Uuid");
         }
     }
 }
