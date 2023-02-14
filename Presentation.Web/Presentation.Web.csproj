@@ -353,7 +353,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
+    <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeResponseDTO.cs" />
+    <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />
+    <Compile Include="Swagger\SwashbuckleExtensions.cs" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\constants\local-admin-list-events.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-list.component.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins-root.component.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-data-processing.controller.ts" />
@@ -370,6 +377,7 @@
     <TypeScriptCompile Include="app\helpers\checkbox-selection-helper.ts" />
     <TypeScriptCompile Include="app\helpers\connection-change-log-helper.ts" />
     <TypeScriptCompile Include="app\helpers\kendo-overview-helper.ts" />
+    <TypeScriptCompile Include="app\helpers\select2-api-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\select2-mapping-helper.ts" />
     <TypeScriptCompile Include="app\helpers\odata-query-helper.ts" />
     <TypeScriptCompile Include="app\helpers\option-entity-helper.ts" />
@@ -378,6 +386,7 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\admin-rights-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\personal-data-option.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\connection-change-log-dto.ts" />
@@ -393,6 +402,7 @@
     <TypeScriptCompile Include="app\models\Api\organization\sts-organization-synchronization-status-response-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\organization-unit-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
+    <TypeScriptCompile Include="app\models\global-admin\global-admin-local-admin-row.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-overview-read-model.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-error.ts" />
@@ -400,6 +410,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\select2-options\select2-organization-with-cvr-view-model.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\data-processing-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\users\user-administration-permissions-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\GDPR\sub-data-processor-view-model.ts" />
@@ -419,9 +430,14 @@
     <Compile Include="Controllers\API\V1\DataProcessingRegistrationValidationController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageValidationController.cs" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
-    <Compile Include="Controllers\API\V1\Mapping\ConnectionUpdateOrganizationUnitChangeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\UserAdministrationPermissionsController.cs" />
+    <Compile Include="Controllers\API\V2\Common\ApiV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\ExternalReferenceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\IExternalReferenceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\RegistrationScopeChoiceMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\IResourcePermissionsResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\ResourcePermissionsResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\GDPRPersonalDataMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\Mapping\StsOrganizationChangeLogOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractOverviewReadModelsController.cs" />
@@ -438,6 +454,10 @@
     <Compile Include="Controllers\API\V1\UserRolesManagementController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\LifeCycleStatusMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\Internal\InternalApiV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\IPublicMessagesWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\PublicMessagesWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\PublicMessagesV2Controller.cs" />
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\ISubDataProcessorRequestDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\SubDataProcessorResponseDTO.cs" />
@@ -447,14 +467,23 @@
     <Compile Include="Models\API\V1\ItContract\ContractProcurementPlanDTO.cs" />
     <Compile Include="Models\API\V1\ItContract\ContractValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserAdministrationPermissionsDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\PublicMessagesRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\PublicMessagesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessorRegistrationSubDataProcessorWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Shared\ExternalReferenceDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Shared\UpdateExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Options\RegularOptionResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Shared\ResourcePermissionsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Shared\ExternalReferenceDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\SharedProperties\IHasExternalReference.cs" />
+    <Compile Include="Models\API\V2\SharedProperties\IHasRegistrationScope.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\RegistrationScopeChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\GDPRPersonalDataChoice.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\ItSystemUsageValidationDetailsResponseDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithUserFullNameDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitConsequenceDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectionUpdateConsequencesResponseDTO.cs" />
-    <Compile Include="Models\API\V1\Organizations\ConnectionUpdateOrganizationUnitChangeCategory.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangePaymentRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ConnectToStsOrganizationRequestDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\ChangeOrganizationUnitRegistrationRequestDTO.cs" />
@@ -486,15 +515,15 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\OversightIntervalMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoIrrelevantMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\YesNoIrrelevantMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\DeltaFeedV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\Mapping\TrackedEntityTypeMappingExtensions.cs" />
-    <Compile Include="Controllers\API\V2\External\Generic\IPropertyUpdateRule.cs" />
-    <Compile Include="Controllers\API\V2\External\Generic\MustUpdateIfDefinedOrEnforcedChangeRule.cs" />
-    <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\IPropertyUpdateRule.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\MustUpdateIfDefinedOrEnforcedChangeRule.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\WriteModelMapperBase.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractCriticalityTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
@@ -539,7 +568,7 @@
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\TechnicalPrecautionMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\KLE\KleOptionV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ArchiveDutyMappingExtenstions.cs" />
-    <Compile Include="Controllers\API\V2\Mapping\DtoModelV2MappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Extensions\QueryableApiResponseOrderingExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
@@ -618,7 +647,6 @@
     <Compile Include="Models\API\V2\Response\SystemUsage\OrganizationUsageResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasEntityCreator.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasLastModified.cs" />
-    <Compile Include="Models\API\V2\Types\Shared\ExternalReferenceDataDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Roles\RoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\BaseItSystemUsageWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\CreateItSystemUsageRequestDTO.cs" />
@@ -702,6 +730,8 @@
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\global-admin\global-admin-local-admins-list.view.html" />
+    <Content Include="app\components\global-admin\global-admin-local-admins-root.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-organization-modal-delete.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
@@ -825,11 +855,14 @@
     <Compile Include="Models\API\V1\UserWithEmailDTO.cs" />
     <Compile Include="Models\API\V1\ValueWithOptionalDateAndRemark.cs" />
     <Compile Include="Models\API\V1\ValueWithOptionalRemarkDTO.cs" />
+    <Compile Include="Models\Application\RuntimeEnv\KitosEnvironment.cs" />
+    <Compile Include="Models\Application\RuntimeEnv\KitosEnvironmentConfiguration.cs" />
     <Compile Include="Ninject\HangfireNinjectResolutionScope.cs" />
     <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
     <Compile Include="Ninject\KernelBuilder.cs" />
     <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
+    <Compile Include="Swagger\OnlyIncludeReadModelSchemasInSwaggerDocumentFilter.cs" />
     <Compile Include="Swagger\CreateOperationIdOperationFilter.cs" />
     <Compile Include="Swagger\CustomCachingSwaggerProvider.cs" />
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
@@ -956,6 +989,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\it-contract\it-contract-service.ts" />
+    <TypeScriptCompile Include="app\services\Organization\organization-right-service.ts" />
     <TypeScriptCompile Include="app\services\organization-unit-odata-service.ts" />
     <TypeScriptCompile Include="app\services\Organization\organization-unit-service.ts" />
     <TypeScriptCompile Include="app\services\sts-organization-sync-service.ts" />

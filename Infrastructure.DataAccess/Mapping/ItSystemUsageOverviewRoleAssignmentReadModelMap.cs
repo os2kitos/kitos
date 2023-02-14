@@ -25,6 +25,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("IX_RoleId", 0);
 
+            Property(x => x.RoleUuid).IsRequired();
+
             Property(x => x.Email)
                 .HasMaxLength(UserConstraints.MaxEmailLength)
                 .HasIndexAnnotation("IX_Email", 0);

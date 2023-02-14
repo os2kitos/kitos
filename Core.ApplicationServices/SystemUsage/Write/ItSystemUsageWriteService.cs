@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
@@ -77,7 +78,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
             IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
             IItsystemUsageRelationsService systemUsageRelationsService,
-            IEntityIdentityResolver identityResolver, 
+            IEntityIdentityResolver identityResolver,
             IGenericRepository<ItSystemUsagePersonalData> personalDataOptionsRepository)
         {
             _systemUsageService = systemUsageService;
@@ -136,8 +137,41 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters)
         {
-            return Update(() => _systemUsageService.GetByUuid(systemUsageUuid), parameters);
+            return Update(() => _systemUsageService.GetReadableItSystemUsageByUuid(systemUsageUuid), parameters);
         }
+
+        public Result<ItSystemUsage, OperationError> AddRole(Guid systemUsageUuid, UserRolePair assignment)
+        {
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<SystemUsageUpdateParameters>(existingRoles =>
+                {
+                    if (existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
+                })
+                .Bind(update => Update(systemUsageUuid, update));
+        }
+
+        public Result<ItSystemUsage, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
+        {
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<SystemUsageUpdateParameters>(existingRoles =>
+                {
+                    if (!existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Assignment does not exist", OperationFailure.BadInput);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Except(assignment.WrapAsEnumerable()));
+                })
+                .Bind(update => Update(systemUsageUuid, update));
+        }
+
         private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
@@ -151,6 +185,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(result.Value));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
+            }
+            else
+            {
+                transaction.Rollback();
             }
 
             return result;
@@ -239,7 +277,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var result = systemUsage.UpdateDataSensitivityLevels(newLevels);
             if (result.Failed)
                 return result.Error;
-            
+
             var levelsRemoved = levelsBefore.Except(systemUsage.SensitiveDataLevels.ToList()).ToList();
 
             foreach (var removedSensitiveDataLevel in levelsRemoved)
@@ -290,7 +328,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         if (deletionError.HasValue)
                         {
                             var error = deletionError.Value;
-                            _logger.Error("Failed adding personData {personDataType} to system usage ({uuid}) Error:{errorCode}: {errorMessage}",item,systemUsage.Uuid,error.FailureType,error.Message.GetValueOrFallback(string.Empty));
+                            _logger.Error("Failed adding personData {personDataType} to system usage ({uuid}) Error:{errorCode}: {errorMessage}", item, systemUsage.Uuid, error.FailureType, error.Message.GetValueOrFallback(string.Empty));
                             return deletionError.Value;
                         }
                         break;
@@ -312,7 +350,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             //Clear existing state
-            var updateResult = _referenceService.BatchUpdateExternalReferences(
+            var updateResult = _referenceService.UpdateExternalReferences(
                 ReferenceRootType.SystemUsage,
                 systemUsage.Id,
                 externalReferences);
@@ -377,7 +415,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (orgByUuid.Failed)
                 return new OperationError($"Failed to get organization for ArchiveSupplierOrganization. Original error message: {orgByUuid.Error.Message.GetValueOrEmptyString()}", orgByUuid.Error.FailureType);
-            
+
             //Not a change from current state so do not apply availability constraint
             if (systemUsage.ArchiveSupplierId != null && systemUsage.ArchiveSupplierId == orgByUuid.Value.Id)
                 return Maybe<OperationError>.None;
@@ -624,14 +662,14 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Maybe<OperationError> Delete(Guid itSystemUsageUuid)
         {
-            return _systemUsageService.GetByUuid(itSystemUsageUuid)
+            return _systemUsageService.GetReadableItSystemUsageByUuid(itSystemUsageUuid)
                 .Bind(usage => _systemUsageService.Delete(usage.Id))
                 .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {itSystemUsageUuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
 
         public Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters)
         {
-            return _systemUsageService.GetByUuid(fromSystemUsageUuid)
+            return _systemUsageService.GetReadableItSystemUsageByUuid(fromSystemUsageUuid)
                 .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
                 .Bind(usageAndIds =>
                     _systemUsageRelationsService.AddRelation
@@ -657,7 +695,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters)
         {
-            return _systemUsageService.GetByUuid(fromSystemUsageUuid)
+            return _systemUsageService.GetReadableItSystemUsageByUuid(fromSystemUsageUuid)
                 .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
                 .Bind(usageAndIds => ResolveRequiredId<SystemRelation>(relationUuid).Select(relationId => (usageAndIds.usage, relationId, usageAndIds.ids)))
                 .Bind(usageAndIds =>
@@ -677,7 +715,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         public Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid)
         {
             return _systemUsageService
-                .GetByUuid(itSystemUsageUuid)
+                .GetReadableItSystemUsageByUuid(itSystemUsageUuid)
                 .Bind<(int usageId, int relationId)>(usage =>
                 {
                     var usageRelation = _identityResolver.ResolveDbId<SystemRelation>(itSystemUsageRelationUuid);
@@ -710,6 +748,22 @@ namespace Core.ApplicationServices.SystemUsage.Write
             }
 
             return Maybe<int>.None;
+        }
+
+        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItSystemUsage systemUsage)
+        {
+            return systemUsage.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+        }
+
+        private static SystemUsageUpdateParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
+        {
+            return new SystemUsageUpdateParameters
+            {
+                Roles = new UpdatedSystemUsageRoles
+                {
+                    UserRolePairs = existingRoles.FromNullable().AsChangedValue()
+                }
+            };
         }
     }
 }

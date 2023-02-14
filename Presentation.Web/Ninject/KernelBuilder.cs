@@ -117,9 +117,13 @@ using Infrastructure.STS.OrganizationUnit.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
+using Core.ApplicationServices.Messages;
+using Core.Abstractions.Caching;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -286,6 +290,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IStsOrganizationCompanyLookupService>().To<StsOrganizationCompanyLookupService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationUnitService>().To<StsOrganizationUnitService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationSynchronizationService>().To<StsOrganizationSynchronizationService>().InCommandScope(Mode);
+
+            //Public messages
+            kernel.Bind<IPublicMessagesService>().To<PublicMessagesService>().InCommandScope(Mode);
         }
 
         private void RegisterMappers(IKernel kernel)
@@ -307,6 +314,15 @@ namespace Presentation.Web.Ninject
 
             //Interfaces
             kernel.Bind<IItInterfaceWriteModelMapper>().To<ItInterfaceWriteModelMapper>().InCommandScope(Mode);
+
+            //External references
+            kernel.Bind<IExternalReferenceResponseMapper>().To<ExternalReferenceResponseMapper>().InCommandScope(Mode);
+
+            //Permissions
+            kernel.Bind<IResourcePermissionsResponseMapper>().To<ResourcePermissionsResponseMapper>().InCommandScope(Mode);
+
+            //Public messages
+            kernel.Bind<IPublicMessagesWriteModelMapper>().To<PublicMessagesWriteModelMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)

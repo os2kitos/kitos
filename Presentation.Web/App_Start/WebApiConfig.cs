@@ -33,7 +33,7 @@ namespace Presentation.Web
 {
     public static class WebApiConfig
     {
-        const string ControllerSuffix = "Controller";
+        private const string ControllerSuffix = "Controller";
 
         public static void Register(HttpConfiguration config)
         {

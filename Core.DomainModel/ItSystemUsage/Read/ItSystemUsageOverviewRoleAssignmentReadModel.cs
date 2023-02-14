@@ -1,9 +1,12 @@
-﻿namespace Core.DomainModel.ItSystemUsage.Read
+﻿using System;
+
+namespace Core.DomainModel.ItSystemUsage.Read
 {
     public class ItSystemUsageOverviewRoleAssignmentReadModel : IHasId
     {
         public int Id { get; set; }
 
+        public Guid RoleUuid { get; set; }
         public int RoleId { get; set; }
 
         public int UserId { get; set; }

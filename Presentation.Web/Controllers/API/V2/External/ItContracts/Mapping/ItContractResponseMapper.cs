@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Presentation.Web.Controllers.API.V2.Mapping;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Contract;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
     public class ItContractResponseMapper : IItContractResponseMapper
     {
+        private readonly IExternalReferenceResponseMapper _externalReferenceResponseMapper;
+
+        public ItContractResponseMapper(IExternalReferenceResponseMapper externalReferenceResponseMapper)
+        {
+            _externalReferenceResponseMapper = externalReferenceResponseMapper;
+        }
+
         public ItContractResponseDTO MapContractDTO(ItContract contract)
         {
             return new ItContractResponseDTO
@@ -37,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Termination = MapTermination(contract),
                 Payments = MapPayments(contract),
                 Roles = MapRoles(contract),
-                ExternalReferences = MapExternalReferences(contract)
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(contract.ExternalReferences, contract.Reference)
             };
         }
 
@@ -100,11 +106,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         private static List<RoleAssignmentResponseDTO> MapRoles(ItContract contract)
         {
             return contract.Rights?.Select(ToRoleResponseDTO).ToList() ?? new List<RoleAssignmentResponseDTO>();
-        }
-
-        private static List<ExternalReferenceDataDTO> MapExternalReferences(ItContract contract)
-        {
-            return contract.ExternalReferences?.Select(x => MapExternalReferenceDTO(contract, x)).ToList() ?? new List<ExternalReferenceDataDTO>();
         }
 
         private static ContractPaymentModelDataResponseDTO MapPaymentModel(ItContract contract)
@@ -183,17 +184,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     ValidFrom = contract.Concluded,
                     ValidTo = contract.ExpirationDate
                 }
-            };
-        }
-
-        private static ExternalReferenceDataDTO MapExternalReferenceDTO(ItContract contract, ExternalReference reference)
-        {
-            return new()
-            {
-                DocumentId = reference.ExternalReferenceId,
-                Title = reference.Title,
-                Url = reference.URL,
-                MasterReference = contract.Reference?.Id.Equals(reference.Id) == true
             };
         }
 

@@ -19,8 +19,8 @@
     <org-unit-migration-table ng-disabled="ctrl.ngDisabled" ng-if="ctrl.relevantSystemRegistrations.root.children.length > 0" title="System (relevant organisationsenhed)" options="ctrl.relevantSystemRegistrations" configuration="ctrl.relevantSystemTableConfig" unit-uuid="{{::ctrl.unitUuid}}" organization-uuid="{{::ctrl.organizationUuid}}" state-parameters="ctrl.stateParameters"></org-unit-migration-table>
     <org-unit-migration-table ng-disabled="ctrl.ngDisabled" ng-if="ctrl.responsibleSystemRegistrations.root.children.length > 0" title="System (ansvarlig organisationsenhed)" options="ctrl.responsibleSystemRegistrations" configuration="ctrl.responsibleSystemTableConfig" unit-uuid="{{::ctrl.unitUuid}}" organization-uuid="{{::ctrl.organizationUuid}}" state-parameters="ctrl.stateParameters"></org-unit-migration-table>
 
-    <button ng-if="!ctrl.ngDisabled" class="btn btn-default" ng-click="ctrl.selectAll()" ng-if="!ctrl.allSelections">Vælg all</button>
-    <button ng-if="!ctrl.ngDisabled" class="btn btn-default" ng-click="ctrl.deselectAll()" ng-if="ctrl.allSelections">Fravælg all</button>
+    <button ng-if="!ctrl.ngDisabled" class="btn btn-default" ng-click="ctrl.selectAll()" ng-if="!ctrl.allSelections">Vælg alle</button>
+    <button ng-if="!ctrl.ngDisabled" class="btn btn-default" ng-click="ctrl.deselectAll()" ng-if="ctrl.allSelections">Fravælg alle</button>
     <div class="pull-right" ng-if="!ctrl.ngDisabled">
         <button class="btn btn-danger" ng-click="ctrl.deleteSelected()" ng-disabled="!ctrl.anySelections">Slet valgte</button>
         <button class="btn btn-warning" ng-click="ctrl.transfer()" ng-disabled="!ctrl.shouldTransferBtnBeEnabled">Overfør valgte</button>

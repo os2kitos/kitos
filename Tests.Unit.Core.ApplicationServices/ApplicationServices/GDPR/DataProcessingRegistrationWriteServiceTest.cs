@@ -2140,7 +2140,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
             _referenceServiceMock
-                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.DataProcessingRegistration, dpr.Id, externalReferences))
+                .Setup(x => x.UpdateExternalReferences(ReferenceRootType.DataProcessingRegistration, dpr.Id, externalReferences))
                 .Returns(value);
         }
 
@@ -2195,14 +2195,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private static UserRolePair CreateUserRolePair(Guid roleUuid, Guid userUuid)
         {
-            return new UserRolePair()
-            {
-                RoleUuid = roleUuid,
-                UserUuid = userUuid
-            };
+            return new UserRolePair(userUuid, roleUuid);
         }
 
-        private DataProcessingRegistrationRight CreateRight(DataProcessingRegistration dpr, Guid roleUuid, int roleId, Guid userUuid, int userId)
+        private static DataProcessingRegistrationRight CreateRight(DataProcessingRegistration dpr, Guid roleUuid, int roleId, Guid userUuid, int userId)
         {
             return new DataProcessingRegistrationRight()
             {
@@ -2239,7 +2235,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             AssertTransactionNotCommitted(transaction);
         }
 
-        public void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
+        private void AssertFailureWithKnownErrorDetails(Result<DataProcessingRegistration, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Contains(errorMessageContent, result.Error.Message.GetValueOrEmptyString());

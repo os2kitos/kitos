@@ -1,25 +1,12 @@
-﻿using System.Net.Http;
-using System.Web.Http;
-using Core.Abstractions.Types;
-using Presentation.Web.Extensions;
+﻿using System.Web.Http;
+using Presentation.Web.Controllers.API.V2.Common;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V2.External
 {
-    [PublicApi(true)]
+    [PublicApi]
     [Authorize]
-    public class ExternalBaseController: ApiController
+    public class ExternalBaseController: ApiV2Controller
     {
-        protected IHttpActionResult FromOperationFailure(OperationFailure failure)
-        {
-            return FromOperationError(failure);
-        }
-
-        protected IHttpActionResult FromOperationError(OperationError failure)
-        {
-            var statusCode = failure.FailureType.ToHttpStatusCode();
-
-            return ResponseMessage(new HttpResponseMessage(statusCode) { Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G"))) });
-        }
     }
 }

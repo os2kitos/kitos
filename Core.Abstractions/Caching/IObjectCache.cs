@@ -1,8 +1,7 @@
 ﻿using System;
 using Core.Abstractions.Types;
 
-
-namespace Infrastructure.Services.Caching
+namespace Core.Abstractions.Caching
 {
     public interface IObjectCache
     {

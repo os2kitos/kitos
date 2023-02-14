@@ -9,9 +9,9 @@ using Core.ApplicationServices.Model.Shared.Write;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Request.Shared;
 
-namespace Presentation.Web.Controllers.API.V2.External.Generic
+namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public abstract class WriteModelMapperBase
     {
@@ -158,26 +158,42 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return isPartOfScopedReset;
         }
 
-        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapCreateReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
         {
-            return references.Select(x => new UpdatedExternalReferenceProperties
-            {
-                Title = x.Title,
-                DocumentId = x.DocumentId,
-                Url = x.Url,
-                MasterReference = x.MasterReference
-            }).ToList();
+            return references.Select(MapCommonReference).ToList();
+        }
+
+        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapUpdateReferences(IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> references)
+        {
+            return references.Select(MapUpdateReference).ToList();
         }
 
         protected static ChangedValue<Maybe<IEnumerable<UserRolePair>>> BaseMapRoleAssignments(IReadOnlyCollection<RoleAssignmentRequestDTO> roleAssignmentResponseDtos)
         {
             return (roleAssignmentResponseDtos.Any() ?
-                Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => new UserRolePair
-                {
-                    RoleUuid = x.RoleUuid,
-                    UserUuid = x.UserUuid
-                }).ToList()) :
+                Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => x.ToUserRolePair()).ToList()) :
                 Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue();
+        }
+
+
+        private static UpdatedExternalReferenceProperties MapUpdateReference(UpdateExternalReferenceDataWriteRequestDTO reference)
+        {
+            var updateProperties = MapCommonReference(reference);
+            updateProperties.Uuid = reference.Uuid;
+
+            return updateProperties;
+        }
+
+        private static UpdatedExternalReferenceProperties MapCommonReference<T>(T reference)
+            where T : ExternalReferenceDataWriteRequestDTO
+        {
+            return new UpdatedExternalReferenceProperties
+            {
+                Title = reference.Title,
+                DocumentId = reference.DocumentId,
+                Url = reference.Url,
+                MasterReference = reference.MasterReference
+            };
         }
     }
 }

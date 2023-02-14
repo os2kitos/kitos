@@ -13,13 +13,17 @@ using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 {
@@ -34,17 +38,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private readonly IItSystemUsageResponseMapper _responseMapper;
         private readonly IItSystemUsageWriteService _writeService;
         private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
+        private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
 
         public ItSystemUsageV2Controller(
             IItSystemUsageService itSystemUsageService,
             IItSystemUsageResponseMapper responseMapper,
             IItSystemUsageWriteService writeService,
-            IItSystemUsageWriteModelMapper writeModelMapper)
+            IItSystemUsageWriteModelMapper writeModelMapper,
+            IResourcePermissionsResponseMapper permissionsResponseMapper)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
             _writeService = writeService;
             _writeModelMapper = writeModelMapper;
+            _permissionsResponseMapper = permissionsResponseMapper;
         }
 
         /// <summary>
@@ -124,8 +131,30 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .GetByUuid(systemUsageUuid)
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific IT-System usage (a specific IT-System in a specific Organization)
+        /// </summary>
+        /// <param name="systemUsageUuid">UUID of the system usage entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{systemUsageUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItSystemUsagePermissions([NonEmptyGuid] Guid systemUsageUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itSystemUsageService
+                .GetPermissions(systemUsageUuid)
+                .Select(_permissionsResponseMapper.Map)
                 .Match(Ok, FromOperationError);
         }
 
@@ -230,6 +259,56 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
+        /// Add role assignment to the it-system usage
+        /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{systemUsageUuid}/roles/add")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "If duplicate is detected")]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchAddRoleAssignment([NonEmptyGuid] Guid systemUsageUuid, [FromBody] RoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .AddRole(systemUsageUuid, request.ToUserRolePair())
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Remove an existing role assignment to the it-system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{systemUsageUuid}/roles/remove")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchRemoveRoleAssignment([NonEmptyGuid] Guid systemUsageUuid, [FromBody] RoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .RemoveRole(systemUsageUuid, request.ToUserRolePair())
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
         /// Creates a system relation
         /// </summary>
         /// <param name="systemUsageUuid"></param>
@@ -272,7 +351,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .GetByUuid(systemUsageUuid)
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Bind(usage =>
                     usage.GetUsageRelation(systemRelationUuid)
                         .Match<Result<SystemRelation, OperationError>>

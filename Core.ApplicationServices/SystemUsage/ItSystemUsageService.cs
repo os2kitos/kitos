@@ -45,7 +45,7 @@ namespace Core.ApplicationServices.SystemUsage
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
-            IGenericRepository<ArchivePeriod> archivePeriodRepository, 
+            IGenericRepository<ArchivePeriod> archivePeriodRepository,
             IGenericRepository<ItSystemUsagePersonalData> personalDataRepository)
         {
             _usageRepository = usageRepository;
@@ -195,13 +195,18 @@ namespace Core.ApplicationServices.SystemUsage
                 .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
         }
 
-        public Result<ItSystemUsage, OperationError> GetByUuid(Guid uuid)
+        public Result<ItSystemUsage, OperationError> GetReadableItSystemUsageByUuid(Guid uuid)
         {
             return _usageRepository
                 .AsQueryable()
                 .ByUuid(uuid)
                 .FromNullable()
                 .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
+        }
+
+        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetReadableItSystemUsageByUuid(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)

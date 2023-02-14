@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Core.Abstractions.Extensions;
 
-namespace Presentation.Web.Controllers.API.V2.External.Generic
+namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public class MustUpdateIfDefinedOrEnforced<TRoot> : IPropertyUpdateRule<TRoot>
     {

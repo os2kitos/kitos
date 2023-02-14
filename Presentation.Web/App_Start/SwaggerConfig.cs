@@ -2,13 +2,16 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Web;
 using System.Web.Http;
+using Ninject.Infrastructure.Language;
 using Presentation.Web;
 using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.Application.RuntimeEnv;
 using Presentation.Web.Swagger;
 using Swashbuckle.Application;
 using Swashbuckle.OData;
+using Swashbuckle.Swagger;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -91,19 +94,36 @@ namespace Presentation.Web
                       });
 
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
-                    c.DocumentFilter<RemoveInternalApiOperationsFilter>();
-                    c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
+                    c.DocumentFilter<OnlyIncludeReadModelSchemasInSwaggerDocumentFilter>();
+                    var environment = KitosEnvironmentConfiguration.FromConfiguration().Environment;
+                    if (environment != KitosEnvironment.Dev)
+                    {
+                        //Only remove internal api descriptions on the real environments allowing us to use the internal api docs locally and while deployed to dev (for swagger based code gen in frontend)
+                        c.DocumentFilter<RemoveInternalApiOperationsFilter>();
+                        c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
+                    }
+                    c.DocumentFilter<PurgeUnusedTypesDocumentFilter>();
                     c.OperationFilter<CreateOperationIdOperationFilter>();
                     c.OperationFilter<FixNamingOfComplexQueryParametersFilter>();
                     c.OperationFilter<FixContentParameterTypesOnSwaggerSpec>();
                     c.GroupActionsBy(apiDesc =>
                         {
                             var controllerName = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                            var suffix = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerType.HasAttribute(typeof(InternalApiAttribute)) ? "[INTERNAL]" : string.Empty;
+                            string prefix;
                             if (apiDesc.RelativePath.IsExternalApiPath())
-                                return "API V2 - " + (controllerName.EndsWith("V2", StringComparison.OrdinalIgnoreCase) ? controllerName.Substring(0, controllerName.Length - 2) : controllerName);
-                            if (apiDesc.RelativePath.Contains("api"))
-                                return "API - V1 - " + controllerName;
-                            return "API - V1 (ODATA) - " + controllerName;
+                            {
+                                prefix = "API V2 - " + (controllerName.EndsWith("V2", StringComparison.OrdinalIgnoreCase) ? controllerName.Substring(0, controllerName.Length - 2) : controllerName);
+                            }
+                            else if (apiDesc.RelativePath.Contains("api"))
+                            {
+                                prefix = "API - V1 - " + controllerName;
+                            }
+                            else
+                            {
+                                prefix = "API - V1 (ODATA) - " + controllerName;
+                            }
+                            return $"{prefix.TrimEnd()} {suffix.Trim()}";
                         }
                     );
                     c.IncludeXmlComments(commentsFile);
@@ -116,7 +136,20 @@ namespace Presentation.Web
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
                     //Do not enable the build-in caching in the odata provider. It caches error responses which we dont want so we wrap it in a custom caching provider which bails out on errors
-                    c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)));
+                    ODataSwaggerProvider CreateOdataSwaggerProvider(ISwaggerProvider defaultProvider)
+                    {
+                        return new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)
+                            .Configure
+                                (
+                                    //without navigation properties enabled, the odata model's "value" property will be omitted from swagger output
+                                    //We then apply the OnlyIncludeReadModelSchemasInSwaggerDocumentFilter to ensure the page will still render.
+                                    //The entire odata model is huge because of the many circular references to large object types, so during dom update,
+                                    //the swagger ui just crashes even if the swagger json is valid
+                                    //also, the swagger odata provider does not respect that some properties have been removed from the edm model so we must remove them manually in the filter
+                                    configure => configure.IncludeNavigationProperties() 
+                                );
+                    }
+                    c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(CreateOdataSwaggerProvider(defaultProvider)));
                 })
                 .EnableSwaggerUi(c =>
                 {

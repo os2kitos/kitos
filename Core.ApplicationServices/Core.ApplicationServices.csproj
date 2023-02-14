@@ -102,6 +102,7 @@
     <Compile Include="Authorization\Permissions\DefineOrganizationTypePermission.cs" />
     <Compile Include="Authorization\Permissions\SystemUsageMigrationPermission.cs" />
     <Compile Include="Authorization\Permissions\VisibilityControlPermission.cs" />
+    <Compile Include="Authorization\ResourcePermissionsResult.cs" />
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
@@ -131,6 +132,8 @@
     <Compile Include="Helpers\NamedEntityMappingHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Messages\IPublicMessagesService.cs" />
+    <Compile Include="Messages\PublicMessagesService.cs" />
     <Compile Include="Model\Contracts\ContractOptions.cs" />
     <Compile Include="Model\Contracts\Write\ItContractAgreementPeriodModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
@@ -150,6 +153,8 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDate.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
+    <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />
+    <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
     <Compile Include="Model\Organizations\OrganizationUnitRegistrationChangeParameters.cs" />

@@ -23,6 +23,9 @@
                         case Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.Renamed:
                             text = "Omdøbt";
                             break;
+                        case Models.Api.Organization.ConnectionUpdateOrganizationUnitChangeCategory.RootChanged:
+                            text = "Organisationsrod erstattet";
+                            break;
                         default:
                             text = "Ukendt:" + next;
                             break;

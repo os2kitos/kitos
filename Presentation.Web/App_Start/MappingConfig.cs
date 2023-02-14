@@ -53,6 +53,7 @@ namespace Presentation.Web
 
             CreateMap<ExternalReference, ExternalReferenceDTO>()
                 .ReverseMap()
+                .ForMember(x => x.Uuid, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
 
             CreateMap<AgreementElementType, OptionDTO>()

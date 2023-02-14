@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\IObjectCache.cs" />
     <Compile Include="Exceptions\OperationErrorException.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Extensions\ResultExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\DetailedOperationError.cs" />
+    <Compile Include="Types\EnumMap.cs" />
     <Compile Include="Types\Factory.cs" />
     <Compile Include="Types\Maybe.cs" />
     <Compile Include="Types\OperationError.cs" />

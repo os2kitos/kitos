@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -22,7 +23,22 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
     public class ItSystemUsageOverviewReadModelsTest : WithAutoFixture
     {
         [Fact]
-        public async Task Can_Query_And_Page_ReadModels()
+        public async Task Can_Query_And_Page_ReadModels_Using_Db_Id()
+        {
+            await TestQueryAndPaging(async q => await ItSystemUsageHelper.QueryReadModelByNameContent(q.orgId, q.query, q.top, q.skip));
+        }
+
+        [Fact]
+        public async Task Can_Query_And_Page_ReadModels_Using_Uuid()
+        {
+            await TestQueryAndPaging(async q =>
+            {
+                var orgUuid = DatabaseAccess.GetEntityUuid<Organization>(q.orgId);
+                return await ItSystemUsageHelper.QueryReadModelByNameContent(orgUuid, q.query, q.top, q.skip);
+            });
+        }
+
+        private async Task TestQueryAndPaging(Func<(int orgId, string query, int top, int skip), Task<IEnumerable<ItSystemUsageOverviewReadModel>>> getPage)
         {
             //Arrange
             var organizationId = TestEnvironment.DefaultOrganizationId;
@@ -41,8 +57,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
 
             //Act
-            var page1 = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 0)).ToList();
-            var page2 = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 2)).ToList();
+            var page1 = (await getPage((organizationId, suffix, 2, 0))).ToList();
+            var page2 = (await getPage((organizationId, suffix, 2, 2))).ToList();
 
             //Assert
             Assert.Equal(2, page1.Count);
@@ -135,7 +151,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
             var isHoldingDocument = A<bool>();
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
-             
+
             // Responsible Organization Unit
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId).DisposeAsync(); //Adding default organization as organization unit
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId).DisposeAsync(); //Using default organization as responsible organization unit
@@ -214,6 +230,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             // From System Usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
+            Assert.Equal(systemUsage.Uuid, readModel.SourceEntityUuid);
             Assert.Equal(organizationId, readModel.OrganizationId);
             Assert.Equal(systemUsageVersion, readModel.Version);
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
@@ -255,6 +272,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(businessType.Id, readModel.ItSystemBusinessTypeId);
+            Assert.Equal(businessType.Uuid, readModel.ItSystemBusinessTypeUuid);
             Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
             Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
             Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
@@ -267,6 +285,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+            Assert.Equal(systemParent.Uuid, readModel.ParentItSystemUuid);
             Assert.Equal(systemParentDisabled, readModel.ParentItSystemDisabled);
 
             // Role assignment
@@ -274,6 +293,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Found one role assignment as expected");
 
             Assert.Equal(role.Id, roleAssignment.RoleId);
+            Assert.Equal(DatabaseAccess.GetEntityUuid<ItSystemRole>(role.Id), roleAssignment.RoleUuid);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.FullName, roleAssignment.UserFullName);
             Assert.Equal(user.Email, roleAssignment.Email);
@@ -302,12 +322,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // DataProcessingRegistration
             Assert.Equal(dataProcessingRegistration.Name, readModel.DataProcessingRegistrationNamesAsCsv);
             Assert.Equal(yesNoIrrelevantOption.GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
-            Assert.Single(readModel.DataProcessingRegistrations);
+            var dpr = Assert.Single(readModel.DataProcessingRegistrations);
+            Assert.Equal(dataProcessingRegistration.Uuid, dpr.DataProcessingRegistrationUuid);
 
             // DependsOnInterfaces 
             Assert.Equal(relationInterfaceName, readModel.DependsOnInterfacesNamesAsCsv);
             var rmDependsOnInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(relationInterface.Id, rmDependsOnInterface.InterfaceId);
+            Assert.Equal(relationInterface.Uuid, rmDependsOnInterface.InterfaceUuid);
             Assert.Equal(relationInterfaceName, rmDependsOnInterface.InterfaceName);
 
             //Incoming system usages
@@ -320,6 +342,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(outgoingRelationSystemName, readModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
             var rmOutgoingRelatedItSystemUsage = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
             Assert.Equal(outgoingRelationSystemUsage.Id, rmOutgoingRelatedItSystemUsage.ItSystemUsageId);
+            Assert.Equal(outgoingRelationSystemUsage.Uuid, rmOutgoingRelatedItSystemUsage.ItSystemUsageUuid);
             Assert.Equal(outgoingRelationSystemName, rmOutgoingRelatedItSystemUsage.ItSystemUsageName);
         }
 
@@ -944,27 +967,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
             readModel = Assert.Single(readModels);
             Assert.Empty(readModel.RoleAssignments);
-        }
-
-        private async Task<ItSystemUsageOverviewReadModel> Test_For_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime expirationDate)
-        {
-            var systemName = A<string>();
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
-            await ItSystemUsageHelper.SendSetExpirationDateRequestAsync(systemUsage.Id, organizationId, expirationDate);
-
-            //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
-            Console.Out.WriteLine("Read models are up to date");
-
-
-            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
-
-            var readModel = Assert.Single(readModels);
-            Console.Out.WriteLine("Read model found");
-
-            return readModel;
         }
 
         private static async Task WaitForReadModelQueueDepletion()

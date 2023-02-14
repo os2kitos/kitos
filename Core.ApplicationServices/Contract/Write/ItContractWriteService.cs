@@ -274,7 +274,7 @@ namespace Core.ApplicationServices.Contract.Write
         private Maybe<OperationError> UpdateExternalReferences(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             return _referenceService
-                .BatchUpdateExternalReferences(
+                .UpdateExternalReferences(
                     ReferenceRootType.Contract,
                     contract.Id,
                     externalReferences.ToList())
@@ -400,7 +400,7 @@ namespace Core.ApplicationServices.Contract.Write
                  "system usage",
                  contract,
                  systemUsageUuids.FromNullable(),
-                 (systemUsageUuid) => _usageService.GetByUuid(systemUsageUuid),
+                 (systemUsageUuid) => _usageService.GetReadableItSystemUsageByUuid(systemUsageUuid),
                  itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage).ToList(),
                  (itContract, usage) => itContract.AssignSystemUsage(usage),
                  (itContract, usage) => itContract.RemoveSystemUsage(usage)

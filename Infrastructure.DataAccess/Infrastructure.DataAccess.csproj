@@ -995,10 +995,22 @@
     <Compile Include="Migrations\202301030910462_change_dpr_sub_data_processors.designer.cs">
       <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202301120832587_added_uuid_to_external_reference.cs" />
+    <Compile Include="Migrations\202301120832587_added_uuid_to_external_reference.designer.cs">
+      <DependentUpon>202301120832587_added_uuid_to_external_reference.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.cs" />
+    <Compile Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.designer.cs">
+      <DependentUpon>202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Get_Users_To_Preserve.sql" />
+    <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">
+      <DependentUpon>202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ExternalReference.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />
     <Compile Include="Services\EntityFrameworkContextDatabaseControl.cs" />
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
@@ -1011,6 +1023,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Migrations\202301030910462_change_dpr_sub_data_processors.resx">
       <DependentUpon>202301030910462_change_dpr_sub_data_processors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202301120832587_added_uuid_to_external_reference.resx">
+      <DependentUpon>202301120832587_added_uuid_to_external_reference.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Dpr_Migrate_SubDataProcessors.sql" />
   </ItemGroup>

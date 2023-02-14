@@ -5,6 +5,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using System;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
 {

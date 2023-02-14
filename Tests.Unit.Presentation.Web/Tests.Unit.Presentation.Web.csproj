@@ -287,12 +287,14 @@
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
+    <Compile Include="Models\V2\ExternalReferenceResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItInterfaceWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\PublicMessagesWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />

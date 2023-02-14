@@ -6,7 +6,6 @@ using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel;
@@ -15,7 +14,7 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Queries.User;
-using Presentation.Web.Controllers.API.V2.Mapping;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
@@ -32,20 +31,17 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
     {
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IOrganizationService _organizationService;
-        private readonly IOrganizationalUserContext _userContext;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
 
         public OrganizationV2Controller(
             IRightsHolderSystemService rightsHolderSystemService,
             IOrganizationService organizationService,
-            IOrganizationalUserContext userContext,
             IUserService userService,
             ILogger logger)
         {
             _rightsHolderSystemService = rightsHolderSystemService;
             _organizationService = organizationService;
-            _userContext = userContext;
             _userService = userService;
             _logger = logger;
         }
@@ -53,7 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <summary>
         /// Returns organizations organizations from KITOS
         /// </summary>
-        /// <param name="onlyWhereUserHasMembership">If set to true, only organizations where the user has role(s) will be included.</param>
+        /// <param name="onlyWhereUserHasMembership">If set to true, only organizations where the user has access and/or role(s) will be included.</param>
         /// <param name="nameContent">Optional query for name content</param>
         /// <param name="cvrContent">Optional query on CVR number</param>
         /// <returns>A list of organizations</returns>
@@ -69,9 +65,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             var refinements = new List<IDomainQuery<Organization>>();
 
-            if (onlyWhereUserHasMembership)
-                refinements.Add(new QueryByIds<Organization>(_userContext.OrganizationIds));
-
             if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<Organization>(nameContent));
 
@@ -79,7 +72,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 refinements.Add(new QueryByCvrContent(cvrContent));
 
             return _organizationService
-                .SearchAccessibleOrganizations(refinements.ToArray())
+                .SearchAccessibleOrganizations(onlyWhereUserHasMembership, refinements.ToArray())
                 .OrderBy(x => x.Id)
                 .Page(pagination)
                 .ToList()
