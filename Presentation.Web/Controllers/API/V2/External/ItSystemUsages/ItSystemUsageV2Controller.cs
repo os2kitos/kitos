@@ -461,7 +461,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             var properties = _writeModelMapper.MapExternalReference(dto);
-            
+
             return _writeService
                 .AddExternalReference(systemUsageUuid, properties)
                 .Select(_externalReferenceResponseMapper.MapExternalReference)
@@ -621,7 +621,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .DeleteJournalPeriod(systemUsageUuid, journalPeriodUuid)
-                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+                .Match(_ => NoContent(), FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)

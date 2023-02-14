@@ -816,13 +816,12 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => _systemUsageService.UpdateArchivePeriod(usage.Id, periodUuid, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
         }
 
-        public Maybe<OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid periodUuid)
+        public Result<ArchivePeriod, OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid periodUuid)
         {
             return _systemUsageService
                 .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Bind(WithWriteAccess)
-                .Bind(usage => _systemUsageService.RemoveArchivePeriod(usage.Id, periodUuid))
-                .MatchFailure();
+                .Bind(usage => _systemUsageService.RemoveArchivePeriod(usage.Id, periodUuid));
         }
 
         private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId

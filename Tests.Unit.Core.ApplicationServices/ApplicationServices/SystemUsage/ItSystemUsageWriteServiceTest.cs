@@ -1773,10 +1773,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void Update_With_Specific_Updates_Fails_If_Duplicates_Are_Detected()
+        public void Cannot_Update_With_Specific_Updates_If_Duplicates_Are_Detected()
         {
             //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var (_, _, transactionMock, _, _, itSystemUsage) = CreateBasicTestVariables();
 
             ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
             ExpectAllowModifyReturns(itSystemUsage, true);
@@ -1792,7 +1792,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 .ToList();
             duplicatePeriodUpdates.ForEach(x => x.Uuid = updatedUuid);
 
-
             var input = new SystemUsageUpdateParameters
             {
                 Archiving = archivingParameters
@@ -1807,10 +1806,181 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertTransactionNotCommitted(transactionMock);
         }
 
-        //TODO: The convenience methods!
-        //TODO: Add |
-        //TODO: Remove |
-        //TODO: Update
+        [Fact]
+        public void Can_Create_Journal_Period()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var input = A<SystemUsageJournalPeriodProperties>();
+            ExpectAddArchivePeriodReturns(itSystemUsage.Id, input, new ArchivePeriod());
+
+            //Act
+            var result = _sut.CreateJournalPeriod(itSystemUsage.Uuid, input);
+
+            //Assert
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public void Cannot_Create_Journal_Period_If_Removal_Fails()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var operationError = A<OperationError>();
+            var input = A<SystemUsageJournalPeriodProperties>();
+            ExpectAddArchivePeriodReturns(itSystemUsage.Id, input, operationError);
+
+            //Act
+            var result = _sut.CreateJournalPeriod(itSystemUsage.Uuid, input);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+        }
+
+        [Fact]
+        public void Cannot_Create_Journal_Period_If_Not_Authorized()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, false);
+
+            //Act
+            var result = _sut.CreateJournalPeriod(itSystemUsage.Uuid, A<SystemUsageJournalPeriodProperties>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Delete_Journal_Period()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var periodUuid = A<Guid>();
+            ExpectRemoveArchivePeriodReturns(itSystemUsage.Id, periodUuid, new ArchivePeriod());
+
+            //Act
+            var result = _sut.DeleteJournalPeriod(itSystemUsage.Uuid, periodUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public void Cannot_Delete_Journal_Period_If_Deletion_Fails()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var periodUuid = A<Guid>();
+            var operationError = A<OperationError>();
+            ExpectRemoveArchivePeriodReturns(itSystemUsage.Id, periodUuid, operationError);
+
+            //Act
+            var result = _sut.DeleteJournalPeriod(itSystemUsage.Uuid, periodUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+        }
+
+        [Fact]
+        public void Cannot_Delete_Journal_Period_If_Not_Authorized()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, false);
+            var periodUuid = A<Guid>();
+
+            //Act
+            var result = _sut.DeleteJournalPeriod(itSystemUsage.Uuid, periodUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden,result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Update_Archive_Period()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            var updatedProperties = A<SystemUsageJournalPeriodProperties>();
+
+            var periodUuid = A<Guid>();
+            ExpectUpdateArchivePeriodReturns(itSystemUsage.Id, periodUuid, updatedProperties.StartDate, updatedProperties.EndDate, updatedProperties.ArchiveId, updatedProperties.Approved, new ArchivePeriod());
+
+            //Act
+            var result = _sut.UpdateJournalPeriod(itSystemUsage.Uuid, periodUuid,updatedProperties);
+
+            //Assert
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public void Cannot_Update_Journal_Period_If_Deletion_Fails()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            var updatedProperties = A<SystemUsageJournalPeriodProperties>();
+
+            var periodUuid = A<Guid>();
+            var operationError = A<OperationError>();
+            ExpectUpdateArchivePeriodReturns(itSystemUsage.Id, periodUuid, updatedProperties.StartDate, updatedProperties.EndDate, updatedProperties.ArchiveId, updatedProperties.Approved, operationError);
+
+            //Act
+            var result = _sut.UpdateJournalPeriod(itSystemUsage.Uuid, periodUuid, updatedProperties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+        }
+
+        [Fact]
+        public void Cannot_Update_Journal_Period_If_Not_Authorized()
+        {
+            //Arrange
+            var (_, _, _, _, _, itSystemUsage) = CreateBasicTestVariables();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, false);
+            var updatedProperties = A<SystemUsageJournalPeriodProperties>();
+            var periodUuid = A<Guid>();
+
+            //Act
+            var result = _sut.UpdateJournalPeriod(itSystemUsage.Uuid, periodUuid, updatedProperties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
 
         [Fact]
         public void Can_Update_All_On_Filled_Out_ItSystemUsage()
@@ -2878,6 +3048,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private void ExpectAddArchivePeriodReturns(int itSystemUsageId, Result<ArchivePeriod, OperationError> addResult)
         {
             _itSystemUsageServiceMock.Setup(x => x.AddArchivePeriod(itSystemUsageId, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>())).Returns(addResult);
+        }
+
+        private void ExpectAddArchivePeriodReturns(int itSystemUsageId, SystemUsageJournalPeriodProperties props, Result<ArchivePeriod, OperationError> addResult)
+        {
+            _itSystemUsageServiceMock.Setup(x => x.AddArchivePeriod(itSystemUsageId, props.StartDate, props.EndDate, props.ArchiveId, props.Approved)).Returns(addResult);
         }
 
         private void ExpectRemoveAllArchivePeriodsReturns(int itSystemUsageId, IEnumerable<ArchivePeriod> removedPeriods)
