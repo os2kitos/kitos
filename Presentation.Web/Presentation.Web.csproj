@@ -877,7 +877,6 @@
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
     <Compile Include="Swagger\FixContentParameterTypesOnSwaggerSpec.cs" />
     <Compile Include="Swagger\FixNamingOfComplexQueryParametersFilter.cs" />
-    <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-it-systems.state.ts" />
