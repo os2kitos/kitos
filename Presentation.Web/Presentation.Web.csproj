@@ -353,6 +353,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\V1\Auth\BaseAuthenticationController.cs" />
+    <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />
@@ -1171,7 +1173,7 @@
     <Compile Include="Models\API\V1\ItSystemUsageSimpleDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\API\V1\AuthorizeController.cs" />
+    <Compile Include="Controllers\API\V1\Auth\TokenAuthenticationController.cs" />
     <Compile Include="Controllers\API\V1\BaseApiController.cs" />
     <Compile Include="Controllers\API\V1\GenericRightsController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemController.cs" />

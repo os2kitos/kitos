@@ -9,7 +9,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/user/delete")]
     public class UserDeletionController : BaseApiController
     {

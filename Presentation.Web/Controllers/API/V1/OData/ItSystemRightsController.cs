@@ -16,7 +16,7 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
         private readonly IItSystemUsageService _systemUsageService;

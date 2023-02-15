@@ -13,7 +13,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class DataRowController : GenericApiController<DataRow, DataRowDTO>
     {
         private readonly IGenericRepository<ItInterface> _interfaceRepository;

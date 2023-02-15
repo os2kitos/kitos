@@ -14,7 +14,7 @@ using Core.DomainModel.Events;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ItContractRightsController : BaseEntityController<ItContractRight>
     {
         private readonly IItContractRepository _itContractRepository;

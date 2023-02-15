@@ -11,7 +11,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
     /// Gives access to relations between ItContract and ItSystemUsage
     /// Primarily used for reporting
     /// </summary>
-    [PublicApi]
+    [InternalApi]
     public class ItContractItSystemUsagesController : BaseController<ItContractItSystemUsage>
     {
         public ItContractItSystemUsagesController(IGenericRepository<ItContractItSystemUsage> repository)

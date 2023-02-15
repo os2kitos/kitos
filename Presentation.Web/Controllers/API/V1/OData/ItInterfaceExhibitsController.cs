@@ -11,7 +11,7 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ItInterfaceExhibitsController : BaseEntityController<ItInterfaceExhibit>
     {
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
