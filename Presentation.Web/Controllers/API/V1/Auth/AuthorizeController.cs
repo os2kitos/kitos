@@ -9,14 +9,16 @@ using System.Web;
 using System.Web.Helpers;
 using System.Web.Http;
 using System.Web.Security;
+using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
+using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
+using Core.DomainModel.Commands;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
@@ -27,25 +29,26 @@ using AuthenticationScheme = Core.DomainModel.Users.AuthenticationScheme;
 namespace Presentation.Web.Controllers.API.V1.Auth
 {
     [InternalApi]
-    public class AuthorizeController : BaseAuthenticationController
+    public class AuthorizeController : ExtendedApiController
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
+        private readonly ICommandBus _commandBus;
 
         public AuthorizeController(
             IUserRepository userRepository,
             IUserService userService,
             IOrganizationService organizationService,
-            ICryptoService cryptoService,
-            IApplicationAuthenticationState applicationAuthenticationState)
-            :base(userRepository,cryptoService)
+            IApplicationAuthenticationState applicationAuthenticationState,
+            ICommandBus commandBus)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
             _applicationAuthenticationState = applicationAuthenticationState;
+            _commandBus = commandBus;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserDTO>))]
@@ -130,11 +133,11 @@ namespace Presentation.Web.Controllers.API.V1.Auth
 
             try
             {
-                var result = AuthenticateUser(loginDto, AuthenticationScheme.Cookie);
+                var result = _commandBus.Execute<ValidateUserCredentialsCommand, Result<User, OperationError>>(new ValidateUserCredentialsCommand(loginDto.Email, loginDto.Password, AuthenticationScheme.Cookie));
 
                 if (result.Failed)
                 {
-                    return result.Error;
+                    return Unauthorized();
                 }
 
                 var user = result.Value;

@@ -2,8 +2,10 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.DomainServices;
-using Infrastructure.Services.Cryptography;
+using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Authentication.Commands;
+using Core.DomainModel;
+using Core.DomainModel.Commands;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
@@ -13,14 +15,14 @@ using AuthenticationScheme = Core.DomainModel.Users.AuthenticationScheme;
 namespace Presentation.Web.Controllers.API.V1.Auth
 {
     [PublicApi]
-    public class TokenAuthenticationController : BaseAuthenticationController
+    public class TokenAuthenticationController : ExtendedApiController
     {
 
-        public TokenAuthenticationController(
-            IUserRepository userRepository,
-            ICryptoService cryptoService)
-            : base(userRepository, cryptoService)
+        private readonly ICommandBus _commandBus;
+
+        public TokenAuthenticationController(ICommandBus commandBus)
         {
+            _commandBus = commandBus;
         }
 
         /// <summary>
@@ -54,11 +56,11 @@ namespace Presentation.Web.Controllers.API.V1.Auth
             }
             try
             {
-                var result = AuthenticateUser(loginDto, AuthenticationScheme.Token);
+                var result = _commandBus.Execute<ValidateUserCredentialsCommand,Result<User,OperationError>>(new ValidateUserCredentialsCommand(loginDto.Email,loginDto.Password,AuthenticationScheme.Token));
 
                 if (result.Failed)
                 {
-                    return result.Error;
+                    return Unauthorized();
                 }
 
                 var user = result.Value;
