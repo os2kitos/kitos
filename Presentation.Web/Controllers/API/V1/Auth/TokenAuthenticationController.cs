@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.DomainModel;
 using Core.DomainModel.Commands;
+using Core.DomainModel.Extensions;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
@@ -51,14 +52,15 @@ namespace Presentation.Web.Controllers.API.V1.Auth
             }
             try
             {
-                var result = _commandBus.Execute<ValidateUserCredentialsCommand, Result<User, OperationError>>(new ValidateUserCredentialsCommand(loginDto.Email, loginDto.Password, AuthenticationScheme.Token));
+                var command = new ValidateUserCredentialsCommand(loginDto.Email, loginDto.Password, AuthenticationScheme.Token);
+                var validationResult = _commandBus.ExecuteWithResult<ValidateUserCredentialsCommand, User>(command);
 
-                if (result.Failed)
+                if (validationResult.Failed)
                 {
                     return Unauthorized();
                 }
 
-                var user = result.Value;
+                var user = validationResult.Value;
 
                 var token = new TokenValidator().CreateToken(user);
 

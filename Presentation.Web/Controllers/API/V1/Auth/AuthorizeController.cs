@@ -9,13 +9,13 @@ using System.Web;
 using System.Web.Helpers;
 using System.Web.Http;
 using System.Web.Security;
-using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Commands;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
@@ -133,14 +133,15 @@ namespace Presentation.Web.Controllers.API.V1.Auth
 
             try
             {
-                var result = _commandBus.Execute<ValidateUserCredentialsCommand, Result<User, OperationError>>(new ValidateUserCredentialsCommand(loginDto.Email, loginDto.Password, AuthenticationScheme.Cookie));
+                var command = new ValidateUserCredentialsCommand(loginDto.Email, loginDto.Password, AuthenticationScheme.Cookie);
+                var validationResult = _commandBus.ExecuteWithResult<ValidateUserCredentialsCommand, User>(command);
 
-                if (result.Failed)
+                if (validationResult.Failed)
                 {
                     return Unauthorized();
                 }
 
-                var user = result.Value;
+                var user = validationResult.Value;
                 if (user.GetOrganizationIdsWhereRoleIsAssigned(OrganizationRole.RightsHolderAccess).Any())
                 {
                     loginInfo = new { UserId = user.Id, LoginSuccessful = true };
