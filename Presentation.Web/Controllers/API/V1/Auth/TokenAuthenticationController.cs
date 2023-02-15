@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V1.Auth
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [IgnoreCSRFProtection]
         [AllowRightsHoldersAccess]
-        public HttpResponseMessage GetToken(LoginDTO loginDto)
+        public HttpResponseMessage GetToken(UserCredentialsDTO loginDto)
         {
             if (loginDto == null)
             {
