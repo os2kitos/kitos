@@ -45,18 +45,13 @@ namespace Presentation.Web.Controllers.API.V1.Auth
         [AllowRightsHoldersAccess]
         public HttpResponseMessage GetToken(UserCredentialsDTO loginDto)
         {
-            if (loginDto == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
-            }
-
-            if (string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
-            {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
             try
             {
-                var result = _commandBus.Execute<ValidateUserCredentialsCommand,Result<User,OperationError>>(new ValidateUserCredentialsCommand(loginDto.Email,loginDto.Password,AuthenticationScheme.Token));
+                var result = _commandBus.Execute<ValidateUserCredentialsCommand, Result<User, OperationError>>(new ValidateUserCredentialsCommand(loginDto.Email, loginDto.Password, AuthenticationScheme.Token));
 
                 if (result.Failed)
                 {

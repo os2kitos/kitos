@@ -124,9 +124,9 @@ namespace Presentation.Web.Controllers.API.V1.Auth
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            if (loginDto == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
             var loginInfo = new { UserId = -1, LoginSuccessful = false };
