@@ -1,9 +1,9 @@
 ﻿using Core.DomainModel.Advice;
 using Core.DomainServices;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Net.Http;
-using System.Web.Mvc;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
@@ -15,6 +15,8 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models.API.V1;
 using Core.ApplicationServices.Notification;
+using Core.ApplicationServices.Model.Notification;
+using System.Linq;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -23,18 +25,18 @@ namespace Presentation.Web.Controllers.API.V1
     {
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IAdviceRootResolution _adviceRootResolution;
-        private readonly IRegistrationNotificationService _registrationNotificationService;
+        private readonly IRegistrationNotificationUserRelationsService _registrationNotificationUserRelationsService;
 
         public AdviceUserRelationController(
             IGenericRepository<AdviceUserRelation> repository,
             IGenericRepository<Advice> adviceRepository,
             IAdviceRootResolution adviceRootResolution,
-            IRegistrationNotificationService registrationNotificationService)
+            IRegistrationNotificationUserRelationsService registrationNotificationUserRelationsService)
             : base(repository)
         {
             _adviceRepository = adviceRepository;
             _adviceRootResolution = adviceRootResolution;
-            _registrationNotificationService = registrationNotificationService;
+            _registrationNotificationUserRelationsService = registrationNotificationUserRelationsService;
         }
 
         [NonAction]
@@ -106,18 +108,44 @@ namespace Presentation.Web.Controllers.API.V1
         /// </summary>
         /// <param name="adviceId"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [NonAction]
         public virtual HttpResponseMessage DeleteByAdviceId(int adviceId)
         {
             try
             {
-                return _registrationNotificationService.DeleteUserRelationByAdviceId(adviceId)
+                return _registrationNotificationUserRelationsService.DeleteUserRelationsByAdviceId(adviceId)
                     .Match(FromOperationError, Ok);
             }
             catch (Exception e)
             {
                 return LogError(e);
             }
+        }
+        /// <summary>
+        /// Update range
+        /// </summary>
+        /// <param name="adviceId"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("api/AdviceUserRelation/{notificationId}/update-range")]
+        public HttpResponseMessage UpdateRange(int notificationId, [FromBody] IEnumerable<AdviceUserRelation> body)
+        {
+            return _registrationNotificationUserRelationsService.UpdateNotificationUserRelations(notificationId, MapRecipients(body))
+                .Match(FromOperationError, Ok);
+        }
+
+        private static IEnumerable<RecipientModel> MapRecipients(IEnumerable<AdviceUserRelation> recipients)
+        {
+            return recipients.Select(x => new RecipientModel
+            {
+                Email = x.Email,
+                DataProcessingRegistrationRoleId = x.DataProcessingRegistrationRoleId,
+                ItContractRoleId = x.ItContractRoleId,
+                ItSystemRoleId = x.ItSystemRoleId,
+                ReceiverType = x.RecieverType,
+                RecipientType = x.RecpientType
+            });
         }
     }
 }

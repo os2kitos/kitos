@@ -1,8 +1,8 @@
 ﻿using Core.DomainModel.Advice;
 
-namespace Core.ApplicationServices.Model.Notification.Write
+namespace Core.ApplicationServices.Model.Notification
 {
-    public class RecipientModificationModel
+    public class RecipientModel
     {
         public string Email { get; set; }
 

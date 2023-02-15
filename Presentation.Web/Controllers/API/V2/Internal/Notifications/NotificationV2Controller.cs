@@ -91,14 +91,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _writeModelMapper.FromImmediatePOST(request, ownerResourceType)
+            throw new NotImplementedException();
+            /*return _writeModelMapper.FromImmediatePOST(request, ownerResourceType)
                 .Bind(notification => _notificationService.CreateNotification(organizationUuid, notification))
                 .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
                     resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/immediate/{resultDTO.Uuid}", resultDTO),
                     FromOperationError
-                );
+                );*/
         }
 
         /// <summary>
@@ -119,14 +120,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _writeModelMapper.FromScheduledPOST(request, ownerResourceType)
+            throw new NotImplementedException();
+            /*return _writeModelMapper.FromScheduledPOST(request, ownerResourceType)
                 .Bind(notification => _notificationService.CreateNotification(organizationUuid, notification))
                 .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
                     resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/scheduled/{resultDTO.Uuid}", resultDTO),
                     FromOperationError
-                );
+                );*/
         }
 
         /// <summary>

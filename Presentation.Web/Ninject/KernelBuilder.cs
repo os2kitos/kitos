@@ -210,6 +210,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IAdviceService>().To<AdviceService>().InCommandScope(Mode);
             kernel.Bind<AdviceService>().ToSelf().InCommandScope(Mode);
             kernel.Bind<IRegistrationNotificationService>().To<RegistrationNotificationService>().InCommandScope(Mode);
+            kernel.Bind<IRegistrationNotificationUserRelationsService>().To<RegistrationNotificationUserRelationsService>().InCommandScope(Mode);
             kernel.Bind<INotificationService>().To<NotificationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);

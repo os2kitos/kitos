@@ -2,7 +2,7 @@
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Notification.Write;
+using Core.ApplicationServices.Model.Notification;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Events;
@@ -54,15 +54,14 @@ namespace Core.ApplicationServices.Notification
 
         public Result<IQueryable<Advice>, OperationError> GetNotificationsByOrganizationId(int organizationId)
         {
-            if(_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
-                return new OperationError($"User is not allowed to read organization with id: {organizationId}", OperationFailure.Forbidden);
-
-            return Result<IQueryable<Advice>, OperationError>.Success(_adviceService.GetAdvicesForOrg(organizationId));
+            return _authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All 
+                ? new OperationError($"User is not allowed to read organization with id: {organizationId}", OperationFailure.Forbidden) 
+                : Result<IQueryable<Advice>, OperationError>.Success(_adviceService.GetAdvicesForOrg(organizationId));
         }
 
-        public Result<Advice, OperationError> GetNotificationById(int id)
+        public Maybe<Advice> GetNotificationById(int id)
         {
-            throw new NotImplementedException();
+            return _adviceService.GetAdviceById(id);
         }
 
         public IQueryable<AdviceSent> GetSent()
@@ -72,14 +71,14 @@ namespace Core.ApplicationServices.Notification
                 .SelectMany(x => x.AdviceSent);
         }
 
-        public Result<Advice, OperationError> Create(int organizationId, NotificationModificationModel notificationModel)
+        public Result<Advice, OperationError> Create(int organizationId, NotificationModel notificationModel)
         {
-            if (!_authorizationContext.AllowCreate<Advice>(organizationId))
-            {
-                return new OperationError($"User is not allowed to create notification in organization with id: {organizationId}", OperationFailure.Forbidden);
-            }
+            var newNotification = MapCreateModelToEntity(notificationModel);
 
-            var newNotification = MapModelToAdvice(notificationModel);
+            if (!_authorizationContext.AllowModify(ResolveRoot(newNotification)))
+            {
+                return new OperationError($"User is not allowed to create notification in organization with id: {organizationId}, for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
+            }
 
             //Prepare new advice
             newNotification.IsActive = true;
@@ -108,9 +107,30 @@ namespace Core.ApplicationServices.Notification
             return newNotification;
         }
 
-        public Result<Advice, OperationError> Update(int organizationId, UpdateNotificationModificationModel notificationModel)
+        public Result<Advice, OperationError> Update(int notificationId, UpdateNotificationModel notificationModel)
         {
-            throw new NotImplementedException();
+            using var transaction = _transactionManager.Begin();
+
+            var entityResult = GetNotificationById(notificationId);
+            if (entityResult.IsNone)
+                return new OperationError($"Notification with Id: {notificationId} was not found", OperationFailure.NotFound);
+            var entity = entityResult.Value;
+            if (!_authorizationContext.AllowModify(entity))
+            {
+                return new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden);
+            }
+
+            BaseMapModelToEntity(notificationModel, entity);
+            
+            _adviceRepository.Update(entity);
+            RaiseAsRootModification(entity);
+            _adviceRepository.Save();
+
+            _adviceService.UpdateSchedule(entity);
+
+            transaction.Commit();
+
+            return entity;
         }
 
         public Maybe<OperationError> Delete(int notificationId)
@@ -179,23 +199,30 @@ namespace Core.ApplicationServices.Notification
 
             return entity;
         }
-
-        private Advice MapModelToAdvice(NotificationModificationModel model)
+        
+        private static Advice MapCreateModelToEntity(NotificationModel model)
         {
-            return new Advice
-            {
-                Name = model.Name,
-                StopDate = model.ToDate,
-                Subject = model.Subject,
-                Body = model.Body,
-                RelationId = model.RelationId,
-                Scheduling = model.RepetitionFrequency,
-                AlarmDate = model.FromDate,
-                Reciepients = model.Recipients.Select(MapToAdviceUserRelation).ToList()
-            };
+            var notification = new Advice();
+            BaseMapModelToEntity(model, notification);
+            notification.Scheduling = model.RepetitionFrequency;
+            notification.AlarmDate = model.FromDate;
+            notification.Reciepients = model.Recipients.Select(MapToAdviceUserRelation).ToList();
+
+            return notification;
         }
 
-        private static AdviceUserRelation MapToAdviceUserRelation(RecipientModificationModel model)
+        private static void BaseMapModelToEntity<T>(T model, Advice notification) where T: UpdateNotificationModel
+        {
+            notification.Name = model.Name;
+            notification.StopDate = model.ToDate;
+            notification.Subject = model.Subject;
+            notification.Body = model.Body;
+            notification.RelationId = model.RelationId;
+            notification.Type = model.Type;
+            notification.AdviceType = model.AdviceType;
+        }
+
+        private static AdviceUserRelation MapToAdviceUserRelation<T>(T model) where T: RecipientModel
         {
             return new AdviceUserRelation
             {
@@ -212,7 +239,7 @@ namespace Core.ApplicationServices.Notification
         {
             return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
         }
-
+ 
         private void RaiseAsRootModification(Advice entity)
         {
             switch (ResolveRoot(entity))

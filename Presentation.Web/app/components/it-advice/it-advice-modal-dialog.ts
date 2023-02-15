@@ -135,12 +135,14 @@
                     };
 
                     function patchAdviceUserRelation(adviceId, payload) {
-                        return payload.Reciepients.reduce((previousPromise, recipient) => {
+                        return $http.put(`/api/AdviceUserRelation/${adviceId}/update-range`, payload.Reciepients);
+
+                        /*payload.Reciepients.reduce((previousPromise, recipient) => {
                             recipient.adviceId = adviceId;
                             return previousPromise.then(() => $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, recipient));
                         },
                             $http.delete(`/api/AdviceUserRelation/DeleteByAdviceId?adviceId=${adviceId}`)
-                        );
+                        );*/
                     }
 
                     function isCurrentAdviceImmediate() {

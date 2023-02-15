@@ -5,7 +5,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Model.Notification.Write;
+using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Notification;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
@@ -18,7 +18,6 @@ using Core.DomainServices.Advice;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -97,8 +96,12 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 }
             }
 
+            if (AllowCreate<Advice>(organizationId, advice) == false)
+            {
+                return Forbidden();
+            }
             return _registrationNotificationService.Create(organizationId, MapNotification(advice))
-                .Match(Ok, FromOperationError);
+                .Match(Created, FromOperationError);
         }
 
         [EnableQuery]
@@ -145,16 +148,23 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     }
                 }
 
-                using var transaction = _transactionManager.Begin();
-                var response = base.Patch(key, delta);
-
-                if (response is UpdatedODataResult<Advice>)
+                var entity = Repository.GetByKey(key);
+                if (entity == null)
                 {
-                    var updatedAdvice = Repository.GetByKey(key); //Re-load
-                    _adviceService.UpdateSchedule(updatedAdvice);
+                    return NotFound();
                 }
-                transaction.Commit();
-                return response;
+
+                var validationError = ValidatePatch(delta, entity);
+                if (validationError.HasValue)
+                {
+                    return BadRequest();
+                }
+                
+                // calculate update
+                var update = delta.Patch(entity);
+                return _registrationNotificationService
+                    .Update(key, MapBaseNotification<UpdateNotificationModel>(update))
+                    .Match(Ok, FromOperationError);
             }
             catch (Exception e)
             {
@@ -209,24 +219,33 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return new ChildEntityCrudAuthorization<Advice, IEntityWithAdvices>(ResolveRoot, base.GetCrudAuthorization());
         }
 
-        private NotificationModificationModel MapNotification(Advice notification)
+        private static NotificationModel MapNotification(Advice notification)
         {
-            return new NotificationModificationModel
+            var notificationModel = MapBaseNotification<NotificationModel>(notification);
+            notificationModel.RepetitionFrequency = notification.Scheduling;
+            notificationModel.FromDate = notification.AlarmDate;
+            notificationModel.Recipients = MapRecipients(notification.Reciepients);
+
+            return notificationModel;
+        }
+
+        private static TResult MapBaseNotification<TResult>(Advice notification) where TResult : UpdateNotificationModel, new()
+        {
+            return new TResult
             {
                 Name = notification.Name,
                 Subject = notification.Subject,
                 Body = notification.Body,
-                RelationId = notification.RelationId,
-                RepetitionFrequency = notification.Scheduling,
-                FromDate = notification.AlarmDate,
+                RelationId = notification.RelationId.GetValueOrDefault(),
                 ToDate = notification.StopDate,
-                Recipients = MapRecipients(notification.Reciepients)
+                Type = notification.Type,
+                AdviceType = notification.AdviceType,
             };
         }
 
-        private static IEnumerable<RecipientModificationModel> MapRecipients(IEnumerable<AdviceUserRelation> recipients)
+        private static IEnumerable<RecipientModel> MapRecipients(IEnumerable<AdviceUserRelation> recipients)
         {
-            return recipients.Select(x => new RecipientModificationModel
+            return recipients.Select(x => new RecipientModel
             {
                 Email = x.Email,
                 DataProcessingRegistrationRoleId = x.DataProcessingRegistrationRoleId,
@@ -241,7 +260,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         {
             return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
         }
-
+        
         private void RaiseAsRootModification(Advice entity)
         {
             switch (ResolveRoot(entity))
