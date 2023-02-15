@@ -140,7 +140,9 @@
                             .replace(/(\w+\()DependsOnInterfacesNamesAsCsv(.*\))/,
                                 "DependsOnInterfaces/any(c: $1c/InterfaceName$2)")
                             .replace(/(\w+\()IncomingRelatedItSystemUsagesNamesAsCsv(.*\))/,
-                                "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)");
+                                "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)")
+                            .replace(new RegExp(`RelevantOrganizationUnitNamesAsCsv eq '(\\w+)'`, "i"),
+                                "RelevantOrganizationUnits/any(c: c/OrganizationUnitId eq $1)");
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
                         const dprUndecidedQuery =
@@ -386,6 +388,26 @@
                             true)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
                         .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.organization)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("RelevantOrganizationUnitNamesAsCsv") //Using org unit id for better search performance and org unit name is used during sorting (in the parameter mapper)
+                        .withTitle("Relevante organisationsenheder")
+                        .withId("relevantOrgunits")
+                        .withStandardWidth(220)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            orgUnits.map((unit) => {
+                                return {
+                                    textValue: unit.name,
+                                    remoteValue: unit.id,
+                                    optionalContext: unit
+                                };
+                            }),
+                            false,
+                            dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.name,
+                            true)
+                        .withSourceValueEchoRendering()
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.organization)))
                 .withStandardSorting("SystemName");
 

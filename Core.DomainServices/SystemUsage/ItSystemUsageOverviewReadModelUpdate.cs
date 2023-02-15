@@ -456,7 +456,7 @@ namespace Core.DomainServices.SystemUsage
                     case EnumerableMirrorExtensions.MirrorAction.MergeToDestination:
                         var destinationValue = mirrorActionContext.DestinationValue.Value;
                         var sourceValue = mirrorActionContext.SourceValue.Value;
-                        destinationValue.OrganizationUnitId = sourceValue.OrganizationId;
+                        destinationValue.OrganizationUnitId = sourceValue.Id;
                         destinationValue.OrganizationUnitName = sourceValue.Name;
                         break;
                     default:
