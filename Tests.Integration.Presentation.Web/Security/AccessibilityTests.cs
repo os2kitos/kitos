@@ -19,7 +19,8 @@ namespace Tests.Integration.Presentation.Web.Security
         }
 
         [Theory]
-        [InlineData("api/v2/organizations", HttpStatusCode.Forbidden)]
+        [InlineData("api/v2/organizations", HttpStatusCode.OK)]
+        [InlineData("api/organization", HttpStatusCode.Forbidden)] //v1 not allowed with token
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
             //Arrange
