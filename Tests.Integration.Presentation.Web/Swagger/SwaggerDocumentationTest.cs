@@ -51,7 +51,7 @@ namespace Tests.Integration.Presentation.Web.Swagger
             var body = await result.Content.ReadAsStringAsync();
             Assert.DoesNotContain(nameof(ContractGeneralDataWriteRequestDTO), body);
             Assert.Contains(nameof(Core.DomainModel.Advice.Advice), body);
-            Assert.Contains(nameof(OptionDTO), body);
+            Assert.Contains(nameof(GetTokenResponseDTO), body);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Tests.Integration.Presentation.Web.Swagger
             var body = await result.Content.ReadAsStringAsync();
             Assert.Contains(nameof(ContractGeneralDataWriteRequestDTO), body);
             Assert.DoesNotContain(nameof(Core.DomainModel.Advice.Advice), body);
-            Assert.DoesNotContain(nameof(OptionDTO), body);
+            Assert.DoesNotContain(nameof(GetTokenResponseDTO), body);
         }
 
         private static Uri CreateUrl(int apiVersion)
