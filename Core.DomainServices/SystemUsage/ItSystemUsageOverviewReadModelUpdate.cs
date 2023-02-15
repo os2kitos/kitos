@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -18,6 +19,7 @@ namespace Core.DomainServices.SystemUsage
     public class ItSystemUsageOverviewReadModelUpdate : IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>
     {
         private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
+        private readonly IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel> _relevantOrgUnitsRepository;
 
         private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
@@ -37,7 +39,9 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfaceReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> itSystemUsageUsedByRelationReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> itSystemUsageUsingRelationReadModelRepository,
-            IOptionsService<ItSystem, BusinessType> businessTypeService)
+            IOptionsService<ItSystem, BusinessType> businessTypeService,
+            IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel> relevantOrgUnitsRepository
+            )
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _taskRefRepository = taskRefRepository;
@@ -48,6 +52,7 @@ namespace Core.DomainServices.SystemUsage
             _itSystemUsageUsedByRelationReadModelRepository = itSystemUsageUsedByRelationReadModelRepository;
             _itSystemUsageUsingRelationReadModelRepository = itSystemUsageUsingRelationReadModelRepository;
             _businessTypeService = businessTypeService;
+            _relevantOrgUnitsRepository = relevantOrgUnitsRepository;
         }
 
         public void Apply(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -81,7 +86,7 @@ namespace Core.DomainServices.SystemUsage
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
-            PatchResponsibleOrganizationUnit(source, destination);
+            PatchOrganizationUnits(source, destination);
             PatchItSystemBusinessType(source, destination);
             PatchItSystemRightsHolder(source, destination);
             PatchKLE(source, destination);
@@ -407,7 +412,62 @@ namespace Core.DomainServices.SystemUsage
             }
         }
 
-        private static void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchOrganizationUnits(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            PatchResponsibleOrgUnit(source, destination);
+            PatchRelevantOrgUnits(source, destination);
+        }
+
+        private void PatchRelevantOrgUnits(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            //relevant units - ordering field (csv) and lookup field (collection)
+            var relevantUnits = source.UsedBy.Select(x => x.OrganizationUnit).ToList();
+            destination.RelevantOrganizationUnitNamesAsCsv =
+                string.Join(", ", relevantUnits.OrderBy(x => x.Name).Select(x => x.Name).ToList());
+
+            var actionContexts = relevantUnits.ComputeMirrorActions(
+                    destination.RelevantOrganizationUnits,
+                    incoming => incoming.Uuid.ToString(),
+                    existing => existing.OrganizationUnitUuid.ToString())
+                .ToList();
+
+
+            var removed = new List<ItSystemUsageOverviewRelevantOrgUnitReadModel>();
+            foreach (var mirrorActionContext in actionContexts)
+            {
+                switch (mirrorActionContext.Action)
+                {
+                    case EnumerableMirrorExtensions.MirrorAction.AddToDestination:
+                        var newUnitValue = mirrorActionContext.SourceValue.Value;
+                        var newUnit = new ItSystemUsageOverviewRelevantOrgUnitReadModel
+                        {
+                            OrganizationUnitUuid = newUnitValue.Uuid,
+                            Parent = destination,
+                            OrganizationUnitName = newUnitValue.Name,
+                            OrganizationUnitId = newUnitValue.Id
+                        };
+                        destination.RelevantOrganizationUnits.Add(newUnit);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.RemoveFromDestination:
+                        var toRemove = mirrorActionContext.DestinationValue.Value;
+                        destination.RelevantOrganizationUnits.Remove(toRemove);
+                        removed.Add(toRemove);
+                        break;
+                    case EnumerableMirrorExtensions.MirrorAction.MergeToDestination:
+                        var destinationValue = mirrorActionContext.DestinationValue.Value;
+                        var sourceValue = mirrorActionContext.SourceValue.Value;
+                        destinationValue.OrganizationUnitId = sourceValue.OrganizationId;
+                        destinationValue.OrganizationUnitName = sourceValue.Name;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            _relevantOrgUnitsRepository.RemoveRange(removed);
+        }
+
+        private static void PatchResponsibleOrgUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ResponsibleOrganizationUnitId = source.ResponsibleUsage?.OrganizationUnit?.Id;
             destination.ResponsibleOrganizationUnitUuid = source.ResponsibleUsage?.OrganizationUnit?.Uuid;

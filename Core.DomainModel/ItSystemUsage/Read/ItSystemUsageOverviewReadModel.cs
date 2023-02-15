@@ -19,6 +19,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
             DependsOnInterfaces = new List<ItSystemUsageOverviewInterfaceReadModel>();
             IncomingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsedBySystemUsageReadModel>();
             OutgoingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsingSystemUsageReadModel>();
+            RelevantOrganizationUnits = new List<ItSystemUsageOverviewRelevantOrgUnitReadModel>();
         }
 
 
@@ -45,7 +46,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
                 return archivePeriodWithEarliestStartDate?.EndDate;
             }
         }
-        
+
         public int OrganizationId { get; set; }
         public Organization.Organization Organization { get; set; }
         public int Id { get; set; }
@@ -115,5 +116,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel> IncomingRelatedItSystemUsages { get; set; }
         public string OutgoingRelatedItSystemUsagesNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewUsingSystemUsageReadModel> OutgoingRelatedItSystemUsages { get; set; }
+        public string RelevantOrganizationUnitNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewRelevantOrgUnitReadModel> RelevantOrganizationUnits { get; set; }
     }
 }
