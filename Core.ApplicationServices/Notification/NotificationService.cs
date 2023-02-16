@@ -8,6 +8,7 @@ using Core.ApplicationServices.Model.Notification.Write;
 using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
@@ -66,8 +67,6 @@ namespace Core.ApplicationServices.Notification
                     () => new OperationError($"Id for notification with uuid: {uuid} was not found", OperationFailure.NotFound))
                 .Match<Result<Advice,OperationError>>(notification =>
                 {
-                    if (_authorizationContext.AllowReads(notification))
-                        return new OperationError("User is not allowed to read notifications", OperationFailure.Forbidden);
                     if(notification.Type != relatedEntityType)
                         return new OperationError($"Notification related entity type is different than {relatedEntityType}", OperationFailure.BadInput);
 
@@ -164,6 +163,7 @@ namespace Core.ApplicationServices.Notification
             {
                 AdviceType = AdviceType.Immediate,
                 Body = parameters.Body,
+                Subject = parameters.Subject,
                 Type = parameters.Type,
             };
             return ResolveRelationId(parameters.OwnerResourceUuid, parameters.Type)
@@ -232,9 +232,9 @@ namespace Core.ApplicationServices.Notification
         private Maybe<OperationError> ResolveRoleIdAndAssignToRoleRecipient(Guid roleUuid,
             RelatedEntityType relatedEntityType, RecipientModel recipientModel)
         {
-            var roleIdResult = ResolveRelationId(roleUuid, relatedEntityType);
+            var roleIdResult = ResolveRoleId(roleUuid, relatedEntityType);
             if(roleIdResult.IsNone)
-                return new OperationError($"Id for {nameof(RelatedEntityType)} with uuid: {roleUuid} was not found", OperationFailure.NotFound);
+                return new OperationError($"Id for {relatedEntityType}Role with uuid: {roleUuid} was not found", OperationFailure.NotFound);
             var roleId = roleIdResult.Value;
 
             switch(relatedEntityType)
@@ -261,6 +261,17 @@ namespace Core.ApplicationServices.Notification
                 RelatedEntityType.dataProcessingRegistration => _entityIdentityResolver.ResolveDbId<DataProcessingRegistration>(relationUuid),
                 RelatedEntityType.itContract => _entityIdentityResolver.ResolveDbId<ItContract>(relationUuid),
                 RelatedEntityType.itSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystemUsage>(relationUuid),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
+            };
+        }
+
+        private Maybe<int> ResolveRoleId(Guid roleUuid, RelatedEntityType relatedEntityType)
+        {
+            return relatedEntityType switch
+            {
+                RelatedEntityType.dataProcessingRegistration => _entityIdentityResolver.ResolveDbId<DataProcessingRegistrationRole>(roleUuid),
+                RelatedEntityType.itContract => _entityIdentityResolver.ResolveDbId<ItContractRole>(roleUuid),
+                RelatedEntityType.itSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystemRole>(roleUuid),
                 _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
             };
         }

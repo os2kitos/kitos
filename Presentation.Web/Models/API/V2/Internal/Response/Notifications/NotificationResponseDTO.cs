@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Types.Notifications;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
 {
@@ -32,9 +33,17 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// </summary>
         public string Subject { get; set; }
         /// <summary>
-        /// Resource owning the notification
+        /// Body of the email
         /// </summary>
-        public IdentityNamePairResponseDTO OwnerResource { get; set; }
+        public string Body{ get; set; }
+        /// <summary>
+        /// Resource owning the notification (e.g. ItContract)
+        /// </summary>
+        public OwnerResourceType Type{ get; set; }
+        /// <summary>
+        /// Uuid of the resource owning the notification
+        /// </summary>
+        public Guid OwnerResourceUuid { get; set; }
 
         /// <summary>
         /// List of recipients

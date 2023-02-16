@@ -1,4 +1,6 @@
-﻿using Core.DomainModel.Advice;
+﻿using System.Collections.Generic;
+using Core.Abstractions.Types;
+using Core.DomainModel.Advice;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
 
@@ -6,7 +8,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
     public interface INotificationResponseMapper
     {
-        NotificationResponseDTO MapNotificationResponseDTO(Advice notification);
+        Result<NotificationResponseDTO, OperationError> MapNotificationResponseDTO(Advice notification);
+        Result<IEnumerable<NotificationResponseDTO>, OperationError> MapNotificationResponseDTOs(IEnumerable<Advice> notifications);
         NotificationSentResponseDTO MapNotificationSentResponseDTO(AdviceSent notificationSent);
     }
 }

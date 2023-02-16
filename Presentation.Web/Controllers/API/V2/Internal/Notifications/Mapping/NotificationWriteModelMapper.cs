@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
                 dto.Body,
                 dto.Subject,
                 ownerResourceType.ToRelatedEntityType(),
-                dto.OwnerResource.Uuid,
+                dto.OwnerResourceUuid,
                 MapRootRecipients(dto.Ccs),
                 MapRootRecipients(dto.Receivers)
             );
@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
                 dto.Body,
                 dto.Subject,
                 ownerResourceType.ToRelatedEntityType(),
-                dto.OwnerResource.Uuid,
+                dto.OwnerResourceUuid,
                 MapRootRecipients(dto.Ccs),
                 MapRootRecipients(dto.Receivers),
                 dto.Name,
@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
                     dto.Body,
                     dto.Subject,
                     ownerResourceType.ToRelatedEntityType(),
-                    dto.OwnerResource.Uuid,
+                    dto.OwnerResourceUuid,
                     MapRootRecipients(dto.Ccs),
                     MapRootRecipients(dto.Receivers),
                     dto.Name,
@@ -81,12 +81,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 
         private static IEnumerable<EmailRecipientModificationParameters> MapEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO> dtos)
         {
-            return dtos.Select(x => new EmailRecipientModificationParameters(x.Email)).ToList();
+            return (dtos ?? new List<EmailRecipientWriteRequestDTO>()).Select(x => new EmailRecipientModificationParameters(x.Email)).ToList();
         }
 
         public IEnumerable<RoleRecipientModificationParameters> MapRoleRecipients(IEnumerable<RoleRecipientWriteRequestDTO> dtos)
         {
-            return dtos.Select(x => new RoleRecipientModificationParameters(x.RoleUuid)).ToList();
+            return (dtos ?? new List<RoleRecipientWriteRequestDTO>()).Select(x => new RoleRecipientModificationParameters(x.RoleUuid)).ToList();
         }
     }
 }

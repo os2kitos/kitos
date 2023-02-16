@@ -62,16 +62,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 conditions.Add(new QueryBySinceNotificationFromDate(fromDate.Value));
             
             return _notificationService.GetNotifications(organizationUuid, conditions.ToArray())
-                .Match
+                .Bind
                 (
                     notifications =>
-                        notifications
+                    {
+                        var notificationList = notifications
                             .Page(paginationQuery)
-                            .ToList()
-                            .Select(_responseMapper.MapNotificationResponseDTO)
-                            .Transform(Ok), 
-                    FromOperationError
-                );
+                            .ToList();
+
+                        return _responseMapper.MapNotificationResponseDTOs(notificationList);
+                    }
+                )
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -93,7 +95,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 return BadRequest(ModelState);
 
             return _notificationService.GetNotificationByUuid(notificationUuid, ownerResourceType.ToRelatedEntityType())
-                .Select(_responseMapper.MapNotificationResponseDTO)
+                .Bind(_responseMapper.MapNotificationResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -117,10 +119,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
 
             return _writeModelMapper.FromImmediatePOST(request, ownerResourceType)
                 .Bind(notification => _notificationService.CreateImmediateNotification(organizationUuid, notification))
-                .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
-                    resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/immediate/{resultDTO.Uuid}", resultDTO),
+                    resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/immediate/{resultDTO}", resultDTO),
                     FromOperationError
                 );
         }
@@ -145,7 +147,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
 
             return _writeModelMapper.FromScheduledPOST(request, ownerResourceType)
                 .Bind(notification => _notificationService.CreateScheduledNotification(organizationUuid, notification))
-                .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
                     resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/scheduled/{resultDTO.Uuid}", resultDTO),
@@ -173,7 +175,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
 
             return _writeModelMapper.FromScheduledPUT(request, ownerResourceType)
                 .Bind(notification => _notificationService.UpdateScheduledNotification(organizationUuid, notification))
-                .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match(Ok, FromOperationError);
         }
 
@@ -206,7 +208,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// <param name="notificationUuid"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{ownerResourceType}/{notificationUuid}")]
+        [Route("{ownerResourceType}/sent/{notificationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SentNotificationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

@@ -1,7 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Shared;
+using Core.DomainServices.Generic;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
@@ -11,8 +17,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
     public class NotificationResponseMapper : INotificationResponseMapper
     {
-        public NotificationResponseDTO MapNotificationResponseDTO(Advice notification)
+        private readonly IEntityIdentityResolver _identityResolver;
+
+        public NotificationResponseMapper(IEntityIdentityResolver identityResolver)
         {
+            _identityResolver = identityResolver;
+        }
+
+        public Result<NotificationResponseDTO, OperationError> MapNotificationResponseDTO(Advice notification)
+        {
+            var type = notification.Type.GetValueOrDefault();
+            var ownerResourceUuidResult = ResolveRelationId(notification.RelationId.GetValueOrDefault(), type);
+            if(ownerResourceUuidResult.IsNone)
+                return new OperationError($"Uuid was not found for relation with id: {notification.RelationId}", OperationFailure.NotFound);
+
             return new NotificationResponseDTO
             {
                 Active = notification.IsActive,
@@ -21,11 +39,27 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
                 FromDate = notification.AlarmDate,
                 ToDate = notification.StopDate,
                 Subject = notification.Subject,
-                Receivers = MapRecipients(notification, RecieverType.RECIEVER),
-                CCs = MapRecipients(notification, RecieverType.CC),
-                OwnerResource = notification.ObjectOwner.MapIdentityNamePairDTO(),
+                Body = notification.Body,
+                Type = type.ToOwnerResourceType(),
+                Receivers = MapRecipients(notification, RecieverType.RECIEVER, type),
+                CCs = MapRecipients(notification, RecieverType.CC, type),
+                OwnerResourceUuid = ownerResourceUuidResult.Value,
                 Uuid = notification.Uuid
             };
+        }
+
+        public Result<IEnumerable<NotificationResponseDTO>, OperationError> MapNotificationResponseDTOs(IEnumerable<Advice> notifications)
+        {
+            var result = new List<NotificationResponseDTO>();
+            foreach (var notification in notifications)
+            {
+                var mappedNotification = MapNotificationResponseDTO(notification);
+                if (mappedNotification.Failed)
+                    return mappedNotification.Error;
+                result.Add(mappedNotification.Value);
+            }
+
+            return result;
         }
 
         public NotificationSentResponseDTO MapNotificationSentResponseDTO(AdviceSent notificationSent)
@@ -36,19 +70,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             };
         }
 
-        private RecipientResponseDTO MapRecipients(Advice notification, RecieverType receiverType)
+        private RecipientResponseDTO MapRecipients(Advice notification, RecieverType receiverType, RelatedEntityType relatedEntityType)
         {
             var recipientsByType = notification.Reciepients.Where(x => x.RecieverType == receiverType).ToList();
-            return MapRecipientResponseDTO(recipientsByType);
+            return MapRecipientResponseDTO(recipientsByType, relatedEntityType);
         }
 
-        private RecipientResponseDTO MapRecipientResponseDTO(IEnumerable<AdviceUserRelation> recipients)
+        private RecipientResponseDTO MapRecipientResponseDTO(IEnumerable<AdviceUserRelation> recipients, RelatedEntityType relatedEntityType)
         {
             var recipientList = recipients.ToList();
             var recipient = new RecipientResponseDTO
             {
-                EmailRecipients = MapEmailRecipientResponseDTOs(recipientList),
-                RoleRecipients = MapRoleRecipientResponseDTOs(recipientList)
+                EmailRecipients = MapEmailRecipientResponseDTOs(recipientList.Where(x => x.RecpientType == RecipientType.USER)),
+                RoleRecipients = MapRoleRecipientResponseDTOs(recipientList.Where(x => x.RecpientType == RecipientType.ROLE), relatedEntityType)
             };
             return recipient;
         }
@@ -58,7 +92,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             return recipients.Select(MapEmailRecipientResponseDTO);
         }
 
-        private EmailRecipientResponseDTO MapEmailRecipientResponseDTO(AdviceUserRelation notification)
+        private static EmailRecipientResponseDTO MapEmailRecipientResponseDTO(AdviceUserRelation notification)
         {
             return new EmailRecipientResponseDTO
             {
@@ -66,16 +100,39 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             };
         }
 
-        private IEnumerable<RoleRecipientResponseDTO> MapRoleRecipientResponseDTOs(IEnumerable<AdviceUserRelation> recipients)
+        private IEnumerable<RoleRecipientResponseDTO> MapRoleRecipientResponseDTOs(IEnumerable<AdviceUserRelation> recipients, RelatedEntityType relatedEntityType)
         {
-            return recipients.Select(MapRoleRecipientResponseDTO);
+            return recipients.Select(x => MapRoleRecipientResponseDTO(x, relatedEntityType));
         }
 
-        private RoleRecipientResponseDTO MapRoleRecipientResponseDTO(AdviceUserRelation notification)
+        private RoleRecipientResponseDTO MapRoleRecipientResponseDTO(AdviceUserRelation notificationUserRelation, RelatedEntityType relatedEntityType)
         {
             return new RoleRecipientResponseDTO
             {
-                Role = new IdentityNamePairResponseDTO(new Guid(), "")//notification.GetRole();
+                Role = GetRoleIdentityNamePair(notificationUserRelation, relatedEntityType)
+            };
+        }
+
+        private static IdentityNamePairResponseDTO GetRoleIdentityNamePair(AdviceUserRelation userRelation, RelatedEntityType relatedEntityType)
+        {
+
+            return relatedEntityType switch
+            {
+                RelatedEntityType.dataProcessingRegistration => userRelation.DataProcessingRegistrationRole.MapIdentityNamePairDTO(),
+                RelatedEntityType.itContract => userRelation.ItContractRole.MapIdentityNamePairDTO(),
+                RelatedEntityType.itSystemUsage => userRelation.ItSystemRole.MapIdentityNamePairDTO(),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
+            };
+        }
+
+        private Maybe<Guid> ResolveRelationId(int relationId, RelatedEntityType relatedEntityType)
+        {
+            return relatedEntityType switch
+            {
+                RelatedEntityType.dataProcessingRegistration => _identityResolver.ResolveUuid<DataProcessingRegistration>(relationId),
+                RelatedEntityType.itContract => _identityResolver.ResolveUuid<ItContract>(relationId),
+                RelatedEntityType.itSystemUsage => _identityResolver.ResolveUuid<ItSystemUsage>(relationId),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
             };
         }
     }
