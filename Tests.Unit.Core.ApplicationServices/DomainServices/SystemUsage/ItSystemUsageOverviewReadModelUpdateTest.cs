@@ -26,7 +26,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
     {
 
         private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeService;
-
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>> _sensitiveDataLevelRepository;
@@ -61,7 +60,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _orgUnitRepoMock.Object);
         }
 
-        public static User defaultTestUser = new User
+        public static User defaultTestUser = new()
         {
             Id = 1,
             Name = "test",
@@ -233,19 +232,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             };
 
             // Add ResponsibleOrganizationUnit
-            var organizationUnit = new OrganizationUnit
-            {
-                Id = A<int>(),
-                Name = A<string>()
-            };
-            var systemUsageOrgUnitUsage = new ItSystemUsageOrgUnitUsage
-            {
-                OrganizationUnit = organizationUnit,
-                OrganizationUnitId = organizationUnit.Id,
-                ItSystemUsage = systemUsage,
-                ItSystemUsageId = systemUsage.Id
-            };
-            systemUsage.ResponsibleUsage = systemUsageOrgUnitUsage;
+            var responsibleOrgUnitUsage = CreateOrganizationUnitUsage(systemUsage);
+            systemUsage.ResponsibleUsage = responsibleOrgUnitUsage;
+
+            // Relevant org unit usages
+            var relevantUsages = Enumerable.Range(0, 2).Select(_ => CreateOrganizationUnitUsage(systemUsage)).ToList();
+            relevantUsages.ForEach(systemUsage.UsedBy.Add);
 
             _businessTypeService.Setup(x => x.GetOption(system.OrganizationId, system.BusinessType.Id)).Returns(Maybe<(BusinessType, bool)>.Some((system.BusinessType, true)));
 
@@ -345,9 +337,19 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.Email, roleAssignment.Email);
 
             //Responsible Organization Unit
-            Assert.Equal(organizationUnit.Id, readModel.ResponsibleOrganizationUnitId);
-            Assert.Equal(organizationUnit.Uuid, readModel.ResponsibleOrganizationUnitUuid);
-            Assert.Equal(organizationUnit.Name, readModel.ResponsibleOrganizationUnitName);
+            AssertOrgUnitUsage(responsibleOrgUnitUsage, readModel);
+
+            //Relevant org unit usages
+            Assert.Equal(relevantUsages.Count, readModel.RelevantOrganizationUnits.Count);
+            var expectedAndActual = relevantUsages
+                .OrderBy(x => x.OrganizationUnit.Uuid)
+                .Zip
+                (
+                    readModel.RelevantOrganizationUnits.OrderBy(x => x.OrganizationUnitUuid),
+                    (expected, actual) => new { expected, actual }
+                )
+                .ToList();
+            expectedAndActual.ForEach(x => AssertOrgUnitUsage(x.expected, x.actual));
 
             //KLE
             Assert.Equal(system.TaskRefs.First().TaskKey, readModel.ItSystemKLEIdsAsCsv);
@@ -679,6 +681,40 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _sut.Apply(systemUsage, readModel);
 
             return readModel;
+        }
+
+        private static void AssertOrgUnitUsage(ItSystemUsageOrgUnitUsage expected, ItSystemUsageOverviewReadModel actual)
+        {
+            AssertOrgUnitUsage(expected, (actual.ResponsibleOrganizationUnitId.GetValueOrDefault(), actual.ResponsibleOrganizationUnitName, actual.ResponsibleOrganizationUnitUuid.GetValueOrDefault()));
+        }
+        private static void AssertOrgUnitUsage(ItSystemUsageOrgUnitUsage expected, ItSystemUsageOverviewRelevantOrgUnitReadModel actual)
+        {
+            AssertOrgUnitUsage(expected, (actual.OrganizationUnitId, actual.OrganizationUnitName, actual.OrganizationUnitUuid));
+        }
+
+        private static void AssertOrgUnitUsage(ItSystemUsageOrgUnitUsage expected, (int id, string name, Guid uuid) actual)
+        {
+            Assert.Equal(expected.OrganizationUnit.Id, actual.id);
+            Assert.Equal(expected.OrganizationUnit.Uuid, actual.uuid);
+            Assert.Equal(expected.OrganizationUnit.Name, actual.name);
+        }
+
+        private ItSystemUsageOrgUnitUsage CreateOrganizationUnitUsage(ItSystemUsage systemUsage)
+        {
+            var organizationUnit = new OrganizationUnit
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                Uuid = A<Guid>()
+            };
+            var systemUsageOrgUnitUsage = new ItSystemUsageOrgUnitUsage
+            {
+                OrganizationUnit = organizationUnit,
+                OrganizationUnitId = organizationUnit.Id,
+                ItSystemUsage = systemUsage,
+                ItSystemUsageId = systemUsage.Id
+            };
+            return systemUsageOrgUnitUsage;
         }
     }
 }
