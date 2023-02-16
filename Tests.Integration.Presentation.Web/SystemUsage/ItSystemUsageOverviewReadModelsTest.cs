@@ -14,6 +14,7 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -152,9 +153,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var isHoldingDocument = A<bool>();
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
 
-            // Responsible Organization Unit
-            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId).DisposeAsync(); //Adding default organization as organization unit
-            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId).DisposeAsync(); //Using default organization as responsible organization unit
+            // Responsible Organization Unit and relevant units
+            var orgUnitName1 = A<string>();
+            var orgUnitName2 = A<string>();
+            var organizationUnit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationId, orgUnitName1);
+            var organizationUnit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationId, orgUnitName2);
+            var responsibleUnit = new[] { organizationUnit1, organizationUnit2 }.RandomItem();
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId).DisposeAsync();
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId).DisposeAsync();
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, responsibleUnit.Id).DisposeAsync();
 
             //References
             var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
@@ -299,8 +306,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(user.Email, roleAssignment.Email);
 
             // Responsible Organization Unit
-            Assert.Equal(organizationId, readModel.ResponsibleOrganizationUnitId);
-            Assert.Equal(organizationName, readModel.ResponsibleOrganizationUnitName);
+            Assert.Equal(responsibleUnit.Uuid, readModel.ResponsibleOrganizationUnitUuid);
+            Assert.Equal(responsibleUnit.Id, readModel.ResponsibleOrganizationUnitId);
+            Assert.Equal(responsibleUnit.Name, readModel.ResponsibleOrganizationUnitName);
+            Assert.Contains(readModel.RelevantOrganizationUnits, orgUnitReadModel => MatchExpectedOrgUnit(orgUnitReadModel, organizationUnit1));
+            Assert.Contains(readModel.RelevantOrganizationUnits, orgUnitReadModel => MatchExpectedOrgUnit(orgUnitReadModel, organizationUnit2));
 
             // Reference
             Assert.Equal(reference.Title, readModel.LocalReferenceTitle);
@@ -409,13 +419,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         {
             //Arrange
             var systemName = A<string>();
-            var orgUnitName1 = A<string>();
-            var orgUnitName2 = A<string>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
+            var orgUnitName1 = A<string>();
+            var orgUnitName2 = A<string>();
             var organizationUnit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationId, orgUnitName1);
             var organizationUnit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organizationId, orgUnitName2);
 
@@ -972,6 +982,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         private static async Task WaitForReadModelQueueDepletion()
         {
             await ReadModelTestTools.WaitForReadModelQueueDepletion();
+        }
+
+        private static bool MatchExpectedOrgUnit(ItSystemUsageOverviewRelevantOrgUnitReadModel x, OrgUnitDTO organizationUnit1)
+        {
+            return x.OrganizationUnitId == organizationUnit1.Id && x.OrganizationUnitUuid == organizationUnit1.Uuid && x.OrganizationUnitName == organizationUnit1.Name;
         }
     }
 }

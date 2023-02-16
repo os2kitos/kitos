@@ -28,6 +28,11 @@
         ItSystemUsageName: string;
     }
 
+    export interface IItSystemUsageOverviewRelevantOrgUnitReadModel {
+        OrganizationUnitName: string;
+        OrganizationUnitId: number;
+    }
+
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
@@ -82,5 +87,7 @@
         IncomingRelatedItSystemUsages: IItSystemUsageOverviewItSystemUsageReadModel[];
         OutgoingRelatedItSystemUsagesNamesAsCsv: string | null;
         OutgoingRelatedItSystemUsages: IItSystemUsageOverviewItSystemUsageReadModel[];
+        RelevantOrganizationUnitNamesAsCsv: string;
+        RelevantOrganizationUnits: IItSystemUsageOverviewRelevantOrgUnitReadModel[];
     }
 }
