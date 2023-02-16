@@ -25,7 +25,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/data-processing-registration")]
     public class DataProcessingRegistrationController : BaseApiController
     {

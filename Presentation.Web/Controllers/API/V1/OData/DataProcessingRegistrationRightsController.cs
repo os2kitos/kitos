@@ -14,7 +14,7 @@ using Core.DomainServices.Repositories.GDPR;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class DataProcessingRegistrationRightsController : BaseEntityController<DataProcessingRegistrationRight>
     {
         private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;

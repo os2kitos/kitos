@@ -19,7 +19,7 @@ using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
         private readonly IReferenceService _referenceService;

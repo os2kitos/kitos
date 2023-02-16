@@ -5,7 +5,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class ItContractRightController : GenericRightsController<ItContract, ItContractRight, ItContractRole>
     {
         public ItContractRightController(

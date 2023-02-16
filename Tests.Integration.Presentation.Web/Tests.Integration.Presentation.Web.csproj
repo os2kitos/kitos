@@ -128,7 +128,6 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Advice\AdviceTestBase.cs" />
     <Compile Include="Authorization\GetOrganizationsTests.cs" />
-    <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
     <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
@@ -163,7 +162,6 @@
     <Compile Include="Organizations\V2\OrganizationUnitsApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
-    <Compile Include="ItSystem\ItSystemHierarchy.cs" />
     <Compile Include="Interfaces\ItInterfacesTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
