@@ -63,11 +63,11 @@ class DataProcessingRegistrationEditMainPageObject {
     }
 
     getRemoveSubDataProcessorButton(dpName: string) {
-        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}/descendant::button[2]`));
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//*/button[2]`));
     }
 
     getEditSubDataProcessorButton(dpName: string) {
-        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}/descendant::button[1]`));
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//*/button[1]`));
     }
 
     private getThirdCountryRowExpression(dpName: string) {
