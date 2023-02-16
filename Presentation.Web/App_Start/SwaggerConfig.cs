@@ -68,7 +68,7 @@ namespace Presentation.Web
                           //NOTE: Add new versions to the top so that users are always presented with the latest version by default (first one added)
                           builder.Version("2", "OS2Kitos API - V2")
                               .Description(
-                                  "<b><i>OBS: Dokumentation for V1 findes ved at skifte version på dokumentet til 1 øverst på siden</i></b><br/><br/>" +
+                                  "<b><i>OBS: Dokumentation for V1 (authorize endpoint) findes ved at skifte version på dokumentet til 1 øverst på siden</i></b><br/><br/>" +
                                   "KITOS API V2 understøtter både læse- og skriveoperationer for de væsentlige registreringsobjekter i KITOS. <br/><br/>" +
                                   "Se mere om designet og konventionerne i API'et her: <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/2059599873/API+Design+V2'>API V2</a>.<br/><br/>" +
                                   "Generelt er anvendelsen af KITOS API(er) beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/><br/>" +
@@ -77,19 +77,8 @@ namespace Presentation.Web
                           builder.Version("1", "OS2Kitos API - V1")
                               .Description(
                                   "<b><i>OBS: Dokumentation for V2 findes ved at skifte version på dokumentet til 2 øverst på siden</i></b><br/><br/>" +
-                                  "<b>BEMÆRK: ADGANG TIL API V1 LUKKES. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/><br/>" +
-                              "Denne dokumentation udstiller Kitos API'et til brug for applikationsudvikling.<br/><br/>" +
-                              "Den første udgave af API'et (V1) blev udviklet til understøttelse af projektets brugerflade og vil med tiden blive erstattet " +
-                              "af et selvstændigt API (V2) udviklet til brug for integration med udefrakommende systemer. " +
-                              "Du vil i en periode kunne anvende både V1 og V2. " +
-                              "Bemærk dog, at overflødiggjorte V1 endpoints vil blive udfaset efter en rum tid. KITOS sekretariatet vil i god tid " +
-                              "forinden varsle udfasning af overflødige endpoints.<br/><br/>" +
-                              "Særligt for V1 gælder der følgende:<br/>" +
-                              "ObjectOwnerId, LastChanged og LastChangedByUserId bliver som udgangspunkt sat af systemet automatisk.<br/>" +
-                              "Der er udelukkende adgang til læseoperationer i V1. Ved behov for adgang til funktionalitet, der ændrer i data, kontakt da venligst KITOS sekretariatet.<br/><br/>" +
-                              "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/><br/>" +
-                                "<b>BEMÆRK: ADGANG TIL API V1 LUKKES. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/><br/>" +
-                                  swaggerIssueDescription
+                                  "<b>BEMÆRK: Ekstern Adgang TIL størstedelen af API V1 LUKKES. <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/657293331/API+Design+V1#Varsling-om-lukning'>LÆS MERE HER</a>.</b><br/><br/>" +
+                                  "<b>BEMÆRK: Lukningen påvirker ikke authorize endpointet</b><br/><br/>"
                               );
                       });
 
@@ -100,7 +89,6 @@ namespace Presentation.Web
                     {
                         //Only remove internal api descriptions on the real environments allowing us to use the internal api docs locally and while deployed to dev (for swagger based code gen in frontend)
                         c.DocumentFilter<RemoveInternalApiOperationsFilter>();
-                        c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     }
                     c.DocumentFilter<PurgeUnusedTypesDocumentFilter>();
                     c.OperationFilter<CreateOperationIdOperationFilter>();

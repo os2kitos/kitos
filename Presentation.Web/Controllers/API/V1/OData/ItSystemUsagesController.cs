@@ -13,7 +13,7 @@ using System.Web.Http;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository)

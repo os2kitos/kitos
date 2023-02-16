@@ -14,7 +14,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class ContactpersonController : GenericApiController<ContactPerson, ContactPersonDTO>
     {
         private readonly IGenericRepository<ContactPerson> _repository;

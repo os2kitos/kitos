@@ -14,7 +14,7 @@ using Core.DomainServices.Extensions;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ItContractsController : BaseEntityController<ItContract>
     {
         public ItContractsController(IGenericRepository<ItContract> repository)

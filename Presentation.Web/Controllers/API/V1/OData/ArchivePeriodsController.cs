@@ -13,7 +13,7 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ArchivePeriodsController : BaseEntityController<ArchivePeriod>
     {
         private readonly IItSystemUsageService _itSystemUsageService;

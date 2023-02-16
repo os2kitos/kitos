@@ -16,7 +16,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class ItInterfaceController : GenericApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;

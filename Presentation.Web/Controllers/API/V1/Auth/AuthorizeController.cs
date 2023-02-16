@@ -1,24 +1,24 @@
 ﻿using System;
-using System.Linq;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Security;
-using Core.DomainModel;
-using Core.DomainModel.Organization;
-using Core.DomainServices;
-using Presentation.Web.Infrastructure;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
 using System.Web.Helpers;
-using Core.Abstractions.Types;
+using System.Web.Http;
+using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
+using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel;
+using Core.DomainModel.Commands;
+using Core.DomainModel.Extensions;
+using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
@@ -26,29 +26,29 @@ using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 using AuthenticationScheme = Core.DomainModel.Users.AuthenticationScheme;
 
-namespace Presentation.Web.Controllers.API.V1
+namespace Presentation.Web.Controllers.API.V1.Auth
 {
-    [PublicApi]
-    public class AuthorizeController : BaseApiController
+    [InternalApi]
+    public class AuthorizeController : ExtendedApiController
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly ICryptoService _cryptoService;
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
+        private readonly ICommandBus _commandBus;
 
         public AuthorizeController(
             IUserRepository userRepository,
             IUserService userService,
             IOrganizationService organizationService,
-            ICryptoService cryptoService,
-            IApplicationAuthenticationState applicationAuthenticationState)
+            IApplicationAuthenticationState applicationAuthenticationState,
+            ICommandBus commandBus)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
-            _cryptoService = cryptoService;
             _applicationAuthenticationState = applicationAuthenticationState;
+            _commandBus = commandBus;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserDTO>))]
@@ -120,79 +120,28 @@ namespace Presentation.Web.Controllers.API.V1
             return Ok(dto);
         }
 
-        //Post api/authorize/gettoken
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("api/authorize/GetToken")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<GetTokenResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [IgnoreCSRFProtection]
-        [AllowRightsHoldersAccess]
-        public HttpResponseMessage GetToken(LoginDTO loginDto)
-        {
-            if (loginDto == null)
-            {
-                return BadRequest();
-            }
-
-            if (string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
-            {
-                return BadRequest();
-            }
-            try
-            {
-                var result = AuthenticateUser(loginDto, AuthenticationScheme.Token);
-
-                if (result.Failed)
-                {
-                    return result.Error;
-                }
-
-                var user = result.Value;
-
-                var token = new TokenValidator().CreateToken(user);
-
-                var response = new GetTokenResponseDTO
-                {
-                    Token = token.Value,
-                    Email = loginDto.Email,
-                    LoginSuccessful = true,
-                    Expires = token.Expiration
-                };
-
-                Logger.Info($"Created token for user with Id {user.Id}");
-
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Failed to create token");
-                return LogError(e);
-            }
-        }
-
         // POST api/Authorize
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            if (loginDto == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
             var loginInfo = new { UserId = -1, LoginSuccessful = false };
 
             try
             {
-                var result = AuthenticateUser(loginDto, AuthenticationScheme.Cookie);
+                var command = new ValidateUserCredentialsCommand(loginDto.Email, loginDto.Password, AuthenticationScheme.Cookie);
+                var validationResult = _commandBus.ExecuteWithResult<ValidateUserCredentialsCommand, User>(command);
 
-                if (result.Failed)
+                if (validationResult.Failed)
                 {
-                    return result.Error;
+                    return Unauthorized();
                 }
 
-                var user = result.Value;
+                var user = validationResult.Value;
                 if (user.GetOrganizationIdsWhereRoleIsAssigned(OrganizationRole.RightsHolderAccess).Any())
                 {
                     loginInfo = new { UserId = user.Id, LoginSuccessful = true };
@@ -273,36 +222,6 @@ namespace Presentation.Web.Controllers.API.V1
             }
 
             return response;
-        }
-
-        private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto, AuthenticationScheme authenticationScheme)
-        {
-            if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
-            {
-                Logger.Info("AUTH FAILED: Attempt to login with bad credentials for {hashEmail}", _cryptoService.Encrypt(loginDto.Email ?? ""));
-                {
-                    return Unauthorized();
-                }
-            }
-
-            var user = _userRepository.GetByEmail(loginDto.Email);
-            if (user == null)
-            {
-                Logger.Error("AUTH FAILED: User found during membership validation but could not be found by email: {hashEmail}", _cryptoService.Encrypt(loginDto.Email));
-                {
-                    return Unauthorized();
-                }
-            }
-
-            if (user.GetAuthenticationSchemes().Contains(authenticationScheme))
-            {
-                return user;
-            }
-
-            Logger.Info("'AUTH FAILED: Non-global admin' User with id {userId} and no organization rights or wrong scheme {scheme} denied access", user.Id, authenticationScheme);
-            {
-                return Unauthorized();
-            }
         }
 
         private static bool CookieAlreadySet(string cookieToken)
