@@ -109,18 +109,7 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="adviceId"></param>
         /// <returns></returns>
         [NonAction]
-        public virtual HttpResponseMessage DeleteByAdviceId(int adviceId)
-        {
-            try
-            {
-                return _registrationNotificationUserRelationsService.DeleteUserRelationsByAdviceId(adviceId)
-                    .Match(FromOperationError, Ok);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
+        public virtual HttpResponseMessage DeleteByAdviceId(int adviceId) => throw new NotSupportedException();
         /// <summary>
         /// Update range
         /// </summary>

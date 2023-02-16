@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Notification;
-using Core.DomainModel.Organization;
+using Core.DomainModel.Advice;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.Notifications;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
+using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 using Swashbuckle.Swagger.Annotations;
 
@@ -42,13 +48,30 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetNotifications(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid organizationUuid, DateTime fromDate)
+        public IHttpActionResult GetNotifications(OwnerResourceType ownerResourceType, 
+            [NonEmptyGuid] Guid organizationUuid, 
+            DateTime? fromDate = null,
+            [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var conditions = new List<IDomainQuery<Advice>>();
+
+            if(fromDate.HasValue)
+                conditions.Add(new QueryBySinceNotificationFromDate(fromDate.Value));
             
-            //TODO: call service
-            return Ok(new List<NotificationResponseDTO>());
+            return _notificationService.GetNotifications(organizationUuid, conditions.ToArray())
+                .Match
+                (
+                    notifications =>
+                        notifications
+                            .Page(paginationQuery)
+                            .ToList()
+                            .Select(_responseMapper.MapNotificationResponseDTO)
+                            .Transform(Ok), 
+                    FromOperationError
+                );
         }
 
         /// <summary>
@@ -69,7 +92,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _notificationService.GetAdviceByUuid(notificationUuid, ownerResourceType.ToRelatedEntityType())
+            return _notificationService.GetNotificationByUuid(notificationUuid, ownerResourceType.ToRelatedEntityType())
+                .Select(_responseMapper.MapNotificationResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -91,15 +115,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
-            /*return _writeModelMapper.FromImmediatePOST(request, ownerResourceType)
-                .Bind(notification => _notificationService.CreateNotification(organizationUuid, notification))
+            return _writeModelMapper.FromImmediatePOST(request, ownerResourceType)
+                .Bind(notification => _notificationService.CreateImmediateNotification(organizationUuid, notification))
                 .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
                     resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/immediate/{resultDTO.Uuid}", resultDTO),
                     FromOperationError
-                );*/
+                );
         }
 
         /// <summary>
@@ -120,15 +143,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
-            /*return _writeModelMapper.FromScheduledPOST(request, ownerResourceType)
-                .Bind(notification => _notificationService.CreateNotification(organizationUuid, notification))
+            return _writeModelMapper.FromScheduledPOST(request, ownerResourceType)
+                .Bind(notification => _notificationService.CreateScheduledNotification(organizationUuid, notification))
                 .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
                     resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/scheduled/{resultDTO.Uuid}", resultDTO),
                     FromOperationError
-                );*/
+                );
         }
 
         /// <summary>
@@ -149,11 +171,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid) 
                 return BadRequest();
 
-            throw new NotImplementedException();
-            /*return _writeModelMapper.FromScheduledPUT(request, ownerResourceType)
-                .Bind(notification => _notificationService.UpdateNotification(organizationUuid, notification))
+            return _writeModelMapper.FromScheduledPUT(request, ownerResourceType)
+                .Bind(notification => _notificationService.UpdateScheduledNotification(organizationUuid, notification))
                 .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
-                .Match(Ok, FromOperationError);*/
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -174,8 +195,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            //TODO: call service
-            return NoContent();
+            return _notificationService.DeleteNotification(notificationUuid, ownerResourceType.ToRelatedEntityType())
+                .Match(FromOperationError, NoContent);
         }
 
         /// <summary>
@@ -193,8 +214,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetSentNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid)
         {
-            //TODO: call service
-            return Ok(new SentNotificationResponseDTO());
+            if(!ModelState.IsValid)
+                return BadRequest();
+
+            return _notificationService.GetNotificationSentByUuid(notificationUuid, ownerResourceType.ToRelatedEntityType())
+                .Select(_responseMapper.MapNotificationSentResponseDTO)
+                .Transform(Ok);
         }
     }
 }

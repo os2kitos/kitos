@@ -56,7 +56,7 @@ namespace Core.ApplicationServices.Notification
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> DeleteUserRelationsByAdviceId(int notificationId)
+        private Maybe<OperationError> DeleteUserRelationsByAdviceId(int notificationId)
         {
             foreach (var d in _adviceUserRelationRepository.AsQueryable().Where(d => d.AdviceId == notificationId).ToList())
             {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper.Configuration.Annotations;
 using Core.DomainModel.Advice;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
@@ -25,6 +25,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
                 CCs = MapRecipients(notification, RecieverType.CC),
                 OwnerResource = notification.ObjectOwner.MapIdentityNamePairDTO(),
                 Uuid = notification.Uuid
+            };
+        }
+
+        public NotificationSentResponseDTO MapNotificationSentResponseDTO(AdviceSent notificationSent)
+        {
+            return new NotificationSentResponseDTO
+            {
+                SentDate = notificationSent.AdviceSentDate
             };
         }
 

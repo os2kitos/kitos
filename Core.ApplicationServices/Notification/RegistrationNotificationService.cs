@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
@@ -12,7 +11,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Notification
@@ -22,7 +20,6 @@ namespace Core.ApplicationServices.Notification
         private readonly IAdviceService _adviceService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
-        private readonly IOperationClock _operationClock;
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IGenericRepository<AdviceUserRelation> _adviceUserRelationRepository;
         private readonly IDomainEvents _domainEventHandler;
@@ -32,7 +29,6 @@ namespace Core.ApplicationServices.Notification
         public RegistrationNotificationService(IAdviceService adviceService,
             IAuthorizationContext authorizationContext, 
             ITransactionManager transactionManager,
-            IOperationClock operationClock,
             IGenericRepository<Advice> adviceRepository,
             IDomainEvents domainEventHandler, 
             IAdviceRootResolution adviceRootResolution, IGenericRepository<AdviceUserRelation> adviceUserRelationRepository)
@@ -40,7 +36,6 @@ namespace Core.ApplicationServices.Notification
             _adviceService = adviceService;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
-            _operationClock = operationClock;
             _adviceRepository = adviceRepository;
             _domainEventHandler = domainEventHandler;
             _adviceRootResolution = adviceRootResolution;
