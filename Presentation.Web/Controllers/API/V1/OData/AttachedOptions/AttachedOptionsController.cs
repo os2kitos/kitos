@@ -9,7 +9,7 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData.AttachedOptions
 {
-    [PublicApi]
+    [InternalApi]
     public class AttachedOptionsController : BaseEntityController<AttachedOption>
     {
         private readonly IItSystemUsageRepository _usageRepository;

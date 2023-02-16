@@ -240,10 +240,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expectedArchivePeriods.Count, actualJournalPeriods.Count);
             foreach (var comparison in expectedArchivePeriods.Zip(actualJournalPeriods, (expected, actual) => new { expected, actual }).ToList())
             {
-                Assert.Equal(comparison.expected.Approved, comparison.actual.Approved);
-                Assert.Equal(comparison.expected.StartDate, comparison.actual.StartDate);
-                Assert.Equal(comparison.expected.EndDate, comparison.actual.EndDate);
-                Assert.Equal(comparison.expected.UniqueArchiveId, comparison.actual.ArchiveId);
+                AssertArchivePeriod(comparison.expected, comparison.actual);
             }
         }
 
@@ -348,7 +345,21 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             AssertOutgoingRelation(incomingSystemRelation, dto);
         }
-        
+
+        [Fact]
+        public void Can_Map_JournalPeriod()
+        {
+            //Arrange
+            var archivePeriod = CreateArchivePeriod();
+
+            //Act
+            var mappedArchivePeriod = _sut.MapJournalPeriodResponseDto(archivePeriod);
+
+            //Assert
+            AssertArchivePeriod(archivePeriod, mappedArchivePeriod);
+        }
+
+
         private static void AssertRiskLevel(RiskLevelChoice? actual, RiskLevel? sourceValue)
         {
             RiskLevelChoice? expected = sourceValue switch
@@ -389,7 +400,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             };
         }
 
-        private void AssertHostedAt(HostingChoice? actual, HostedAt? sourceValue)
+        private static void AssertHostedAt(HostingChoice? actual, HostedAt? sourceValue)
         {
             HostingChoice? expected = sourceValue switch
             {
@@ -476,13 +487,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.ArchiveTestLocation = withOptionalCrossReferences ? new ArchiveTestLocation { Uuid = A<Guid>(), Name = A<string>() } : null;
             itSystemUsage.ArchiveType = withOptionalCrossReferences ? new ArchiveType { Uuid = A<Guid>(), Name = A<string>() } : null;
             itSystemUsage.ArchiveSupplier = withOptionalCrossReferences ? new Organization() { Uuid = A<Guid>() } : null;
-            itSystemUsage.ArchivePeriods = Many<string>().Select(id => new ArchivePeriod
+            itSystemUsage.ArchivePeriods = Many<string>().Select(CreateArchivePeriod).ToList();
+        }
+
+        private ArchivePeriod CreateArchivePeriod(string id = null)
+        {
+            return new ArchivePeriod
             {
                 Approved = A<bool>(),
                 StartDate = A<DateTime>(),
                 EndDate = A<DateTime>(),
-                UniqueArchiveId = id
-            }).ToList();
+                UniqueArchiveId = id ?? A<string>()
+            };
         }
 
         private static void AssertOutgoingRelation(SystemRelation expected, OutgoingSystemRelationResponseDTO actual)
@@ -717,6 +733,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 LastName = A<string>(),
                 Uuid = A<Guid>()
             };
+        }
+
+        private static void AssertArchivePeriod(ArchivePeriod expected, JournalPeriodResponseDTO actual)
+        {
+            Assert.Equal(expected.Approved, actual.Approved);
+            Assert.Equal(expected.StartDate, actual.StartDate);
+            Assert.Equal(expected.EndDate, actual.EndDate);
+            Assert.Equal(expected.UniqueArchiveId, actual.ArchiveId);
+            Assert.Equal(expected.Uuid, actual.Uuid);
         }
     }
 }

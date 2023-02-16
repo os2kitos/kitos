@@ -60,6 +60,7 @@
     <Compile Include="Constants\ExternalConnectionConstants.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
+    <Compile Include="Extensions\CommandBusExtensions.cs" />
     <Compile Include="Extensions\ExternalOrganizationUnitExtensions.cs" />
     <Compile Include="Extensions\HierarchyExtensions.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />

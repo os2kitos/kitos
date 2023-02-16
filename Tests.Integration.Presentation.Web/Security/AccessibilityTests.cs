@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
@@ -22,9 +19,8 @@ namespace Tests.Integration.Presentation.Web.Security
         }
 
         [Theory]
-        [InlineData("api/User", HttpStatusCode.Forbidden)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden)]
-        [InlineData("odata/ItSystems?$top=100", HttpStatusCode.OK)]
+        [InlineData("api/v2/organizations", HttpStatusCode.OK)]
+        [InlineData("api/organization", HttpStatusCode.Forbidden)] //v1 not allowed with token
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
             //Arrange
@@ -38,59 +34,12 @@ namespace Tests.Integration.Presentation.Web.Security
         }
 
         [Theory]
-        [InlineData("api/User", HttpStatusCode.Unauthorized)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Unauthorized)]
-        [InlineData("odata/ItSystems", HttpStatusCode.Unauthorized)]
+        [InlineData("api/v2/organizations", HttpStatusCode.Unauthorized)]
         public async Task Anonymous_Api_Calls_Returns_401(string apiUrl, HttpStatusCode httpCode)
         {
             using var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl));
 
             Assert.Equal(httpCode, httpResponse.StatusCode);
-        }
-
-        [Theory]
-        [InlineData("odata/itsystems", typeof(Core.DomainModel.ItSystem.ItSystem))]
-        [InlineData("api/itsystem", typeof(Core.DomainModel.ItSystem.ItSystem))]
-        [InlineData("odata/itinterfaces", typeof(ItInterface))]
-        [InlineData("api/itinterface", typeof(ItInterface))]
-        [InlineData("odata/itsystemusages", typeof(ItSystemUsage))]
-        [InlineData("api/itsystemusage", typeof(ItSystemUsage))]
-        [InlineData("odata/itcontracts", typeof(ItContract))]
-        [InlineData("api/itcontract", typeof(ItContract))]
-        public async Task Api_V1_Is_Read_Only(string path, Type inputType)
-        {
-            //Arrange
-            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-
-            //Act
-            using var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(path), Activator.CreateInstance(inputType), globalAdminToken.Token);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, httpResponse.StatusCode);
-            var message = await httpResponse.Content.ReadAsStringAsync();
-            Assert.Equal("Write operations are not allowed on this API", message);
-        }
-
-        [Fact]
-        public async Task Post_Reference_With_Valid_Input_Returns_201()
-        {
-            //Arrange
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-            var contract = await ItContractHelper.CreateContract(A<string>(), organizationId);
-            var payload = new
-            {
-                Title = A<string>(),
-                ExternalReferenceId = A<string>(),
-                URL = "https://kitos.dk/",
-                Itcontract_Id = contract.Id
-            };
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
-
-            //Act
-            using var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/Reference?organizationId={organizationId}"), cookie, payload);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
         }
 
         [Fact]
@@ -102,7 +51,7 @@ namespace Tests.Integration.Presentation.Web.Security
             var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, OrganizationRole.User);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(email, _defaultPassword);
             var token = await HttpApi.GetTokenAsync(loginDto);
-            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/v2/organizations"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
@@ -112,7 +61,7 @@ namespace Tests.Integration.Presentation.Web.Security
             await DisableApiAccessForUserAsync(userDto, createdUserId);
 
             //Assert
-            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/v2/organizations"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);

@@ -17,8 +17,8 @@ namespace Core.ApplicationServices.SystemUsage
         Result<ItSystemUsage, OperationError> Delete(int id);
         ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId);
         ItSystemUsage GetById(int usageId);
-        Result<ItSystemUsage,OperationError> GetReadableItSystemUsageByUuid(Guid uuid);
-        Result<ResourcePermissionsResult,OperationError> GetPermissions(Guid uuid);
+        Result<ItSystemUsage, OperationError> GetReadableItSystemUsageByUuid(Guid uuid);
+        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
 
         /// <summary>
         /// Adds information about which data sensitivity levels are applied to the system usage />
@@ -36,9 +36,10 @@ namespace Core.ApplicationServices.SystemUsage
         /// <returns></returns>
         Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel);
 
-
+        Result<ArchivePeriod, OperationError> RemoveArchivePeriod(int systemUsageId,Guid archivePeriodUuid);
         Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId);
         Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved);
+        Result<ArchivePeriod, OperationError> UpdateArchivePeriod(int systemUsageId, Guid archivePeriodUuid, DateTime startDate, DateTime endDate, string archiveId, bool approved);
         Result<ItSystemUsage, OperationError> GetItSystemUsageById(int usageId);
         Maybe<OperationError> TransferResponsibleUsage(int systemId, Guid targetUnitUuid);
         Maybe<OperationError> TransferRelevantUsage(int systemId, Guid unitUuid, Guid targetUnitUuid);

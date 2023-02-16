@@ -71,6 +71,7 @@
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
+    <Compile Include="Model\Authentication\Commands\ValidateUserCredentialsCommand.cs" />
     <Compile Include="Authentication\IAuthenticationContext.cs" />
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
     <Compile Include="Authentication\IApplicationAuthenticationState.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="Model\Contracts\Write\ItContractProcurementModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractTerminationParameters.cs" />
+    <Compile Include="Model\EventHandler\ValidateUserCredentialsCommandHandler.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessorParameter.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessor\SubDataProcessorDetailsParameters.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessor\TransferToInsecureCountryParameters.cs" />
@@ -177,7 +179,8 @@
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemRelationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
-    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriod.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriodProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriodUpdate.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
     <Compile Include="Model\Shared\Write\UpdatedExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGDPRProperties.cs" />

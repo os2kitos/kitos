@@ -353,6 +353,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
+    <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
+    <Compile Include="Models\API\V1\UserCredentialsDTO.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\INotificationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\INotificationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationResponseMapper.cs" />
@@ -375,7 +381,9 @@
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\JournalPeriodUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\JournalPeriodResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\OwnerResourceType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\RepetitionFrequencyOptions.cs" />
     <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />
@@ -658,7 +666,7 @@
     <Compile Include="Models\API\V2\Types\Contract\YearSegmentChoice.cs" />
     <Compile Include="Models\API\V2\Types\DataProcessing\OversightDateDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationOversightWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\BaseArchivingWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GDPRWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GeneralDataUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GeneralDataWriteRequestDTO.cs" />
@@ -891,7 +899,6 @@
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
     <Compile Include="Swagger\FixContentParameterTypesOnSwaggerSpec.cs" />
     <Compile Include="Swagger\FixNamingOfComplexQueryParametersFilter.cs" />
-    <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-it-systems.state.ts" />
@@ -1187,7 +1194,7 @@
     <Compile Include="Models\API\V1\ItSystemUsageSimpleDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\API\V1\AuthorizeController.cs" />
+    <Compile Include="Controllers\API\V1\Auth\TokenAuthenticationController.cs" />
     <Compile Include="Controllers\API\V1\BaseApiController.cs" />
     <Compile Include="Controllers\API\V1\GenericRightsController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemController.cs" />

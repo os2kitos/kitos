@@ -20,6 +20,7 @@ using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Moq;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -586,6 +587,211 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             AssertSensitiveDataLevelError(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void AddArchivePeriod_Succeeds()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+            var newPeriod = CreateValidArchivePeriod();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var addArchivePeriodResult = _sut.AddArchivePeriod(itSystemUsage.Id, newPeriod.StartDate, newPeriod.EndDate, newPeriod.UniqueArchiveId, newPeriod.Approved);
+
+            //Assert
+            Assert.True(addArchivePeriodResult.Ok);
+            var addedPeriod = addArchivePeriodResult.Value;
+            Assert.Contains(addedPeriod, itSystemUsage.ArchivePeriods);
+            AssertArchivePeriod(newPeriod, addedPeriod);
+            VerifyChangesSaved(transaction);
+        }
+
+        [Fact]
+        public void AddArchivePeriod_Fails_If_Period_Is_Invalid()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+            var newPeriod = CreateValidArchivePeriod();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var addArchivePeriodResult = _sut.AddArchivePeriod(itSystemUsage.Id, newPeriod.StartDate, newPeriod.StartDate.Date.AddDays(-1), newPeriod.UniqueArchiveId, newPeriod.Approved);
+
+            //Assert
+            Assert.True(addArchivePeriodResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, addArchivePeriodResult.Error.FailureType);
+            VerifyChangesNotSaved(transaction);
+        }
+
+        [Fact]
+        public void AddArchivePeriod_Fails_With_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess((id) => _sut.AddArchivePeriod(id, A<DateTime>(), A<DateTime>(), A<string>(), A<bool>()).MatchFailure());
+        }
+
+        [Fact]
+        public void UpdateArchivePeriod_Succeeds()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+                CreateValidArchivePeriod(),
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+            var randomPeriodToUpdate = archivePeriods.RandomItem();
+            var updatedData = CreateValidArchivePeriod();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var updateArchivePeriodResult = _sut.UpdateArchivePeriod(itSystemUsage.Id, randomPeriodToUpdate.Uuid, updatedData.StartDate, updatedData.EndDate, updatedData.UniqueArchiveId, updatedData.Approved);
+
+            //Assert
+            Assert.True(updateArchivePeriodResult.Ok);
+            var updatedPeriod = updateArchivePeriodResult.Value;
+            Assert.Contains(updatedPeriod, itSystemUsage.ArchivePeriods);
+            AssertArchivePeriod(updatedData, updatedPeriod);
+            VerifyChangesSaved(transaction);
+        }
+
+        [Fact]
+        public void UpdateArchivePeriod_Fails_With_Invalid_Period()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+            var randomPeriodToUpdate = archivePeriods.RandomItem();
+            var updatedData = CreateValidArchivePeriod();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var updateArchivePeriodResult = _sut.UpdateArchivePeriod(itSystemUsage.Id, randomPeriodToUpdate.Uuid, updatedData.StartDate, updatedData.StartDate.Date.AddDays(-1), updatedData.UniqueArchiveId, updatedData.Approved);
+
+            //Assert
+            Assert.True(updateArchivePeriodResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, updateArchivePeriodResult.Error.FailureType);
+            VerifyChangesNotSaved(transaction);
+        }
+
+        [Fact]
+        public void UpdateArchivePeriod_Fails_With_Not_Found()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var updateArchivePeriodResult = _sut.UpdateArchivePeriod(itSystemUsage.Id, A<Guid>(), A<DateTime>(), A<DateTime>(), A<string>(), A<bool>());
+
+            //Assert
+            Assert.True(updateArchivePeriodResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, updateArchivePeriodResult.Error.FailureType);
+            VerifyChangesNotSaved(transaction);
+        }
+
+        [Fact]
+        public void UpdateArchivePeriod_Fails_With_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess((id) => _sut.UpdateArchivePeriod(id, A<Guid>(), A<DateTime>(), A<DateTime>(), A<string>(), A<bool>()).MatchFailure());
+        }
+
+        [Fact]
+        public void RemoveArchivePeriod_Succeeds()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+                CreateValidArchivePeriod()
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+            var archivePeriodToRemove = archivePeriods.RandomItem();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var removeResult = _sut.RemoveArchivePeriod(itSystemUsage.Id, archivePeriodToRemove.Uuid);
+
+            //Assert
+            Assert.True(removeResult.Ok);
+            Assert.Same(archivePeriodToRemove, removeResult.Value);
+            Assert.DoesNotContain(archivePeriodToRemove, itSystemUsage.ArchivePeriods);
+            VerifyChangesSaved(transaction);
+        }
+
+        [Fact]
+        public void RemoveArchivePeriod_Fails_With_NotFound()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var unknownUuid = A<Guid>();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var removeResult = _sut.RemoveArchivePeriod(itSystemUsage.Id, unknownUuid);
+
+            //Assert
+            Assert.True(removeResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, removeResult.Error.FailureType);
+            VerifyChangesNotSaved(transaction);
+        }
+
+        [Fact]
+        public void RemoveArchivePeriod_Fails_With_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Usage_Insufficient_WriteAccess((id) => _sut.RemoveArchivePeriod(id, A<Guid>()).MatchFailure());
         }
 
         [Fact]
@@ -1183,5 +1389,19 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
+
+        private void VerifyChangesNotSaved(Mock<IDatabaseTransaction> transaction, bool expectRollback = true)
+        {
+            transaction.Verify(x => x.Commit(), Times.Never);
+            transaction.Verify(x => x.Rollback(), expectRollback ? Times.AtLeastOnce() : Times.Never());
+            _usageRepository.Verify(x => x.Save(), Times.Never);
+        }
+
+        private void VerifyChangesSaved(Mock<IDatabaseTransaction> transaction)
+        {
+            transaction.Verify(x => x.Commit());
+            _usageRepository.Verify(x => x.Save());
+        }
+
     }
 }

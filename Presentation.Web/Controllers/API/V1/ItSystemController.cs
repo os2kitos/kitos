@@ -7,7 +7,6 @@ using System.Web.Http;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
-using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -24,7 +23,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class ItSystemController : GenericHierarchyApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;

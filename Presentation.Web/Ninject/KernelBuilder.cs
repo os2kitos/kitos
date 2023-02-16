@@ -417,6 +417,7 @@ namespace Presentation.Web.Ninject
             RegisterCommands<RemoveUserFromKitosCommandHandler>(kernel);
             RegisterCommands<RemoveOrganizationUnitRegistrationsCommandHandler>(kernel);
             RegisterCommands<AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler>(kernel);
+            RegisterCommands<ValidateUserCredentialsCommandHandler>(kernel);
         }
 
         private void RegisterCommands<THandler>(IKernel kernel)
