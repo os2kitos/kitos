@@ -95,6 +95,7 @@
     <Compile Include="ItSystemUsage\ItSystemUsageValidationResult.cs" />
     <Compile Include="ItSystemUsage\LifeCycleStatusType.cs" />
     <Compile Include="ItSystemUsage\GDPRPersonalDataOption.cs" />
+    <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewRelevantOrgUnitReadModel.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="LocalOptions\LocalCriticalityType.cs" />
