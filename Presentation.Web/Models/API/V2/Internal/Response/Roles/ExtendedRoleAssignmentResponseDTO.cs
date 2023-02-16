@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Models.API.V2.Internal.Response.User;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
-using Presentation.Web.Models.API.V2.Response.Generic.User;
 
-namespace Presentation.Web.Models.API.V2.Response.Generic.Roles
+namespace Presentation.Web.Models.API.V2.Internal.Response.Roles
 {
     /// <summary>
     /// Internal response DTO used to extend the regular role assignment dto with extended user details (email)
@@ -15,11 +15,11 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Roles
         /// KITOS user which the role has been assigned to
         /// </summary>
         [Required]
-        public IdentityNamePairResponseDTO User { get; set; }
+        public UserReferenceResponseDTO User { get; set; }
         /// <summary>
         /// Specific role option assigned to the user.
         /// </summary>
         [Required]
-        public UserReferenceResponseDTO Role { get; set; }
+        public IdentityNamePairResponseDTO Role { get; set; }
     }
 }
