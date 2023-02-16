@@ -14,6 +14,7 @@ using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -1945,7 +1946,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var journalPeriods = CreateNewJournalPeriods(3);
             var newJournalPeriodInputs = journalPeriods.RandomItems(2);
             var initial = newJournalPeriodInputs.First();
-            var updated = newJournalPeriodInputs.Last();
             var postResult = await ItSystemUsageV2Helper.CreateJournalPeriodAsync(token, usageDTO.Uuid, initial);
 
             //Act
@@ -1953,8 +1953,55 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             using var getAfterDeleteResult = await ItSystemUsageV2Helper.SendGetJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
 
             //Assert
-            Assert.Equal(HttpStatusCode.NoContent,deleteResult.StatusCode);
-            Assert.Equal(HttpStatusCode.NotFound,getAfterDeleteResult.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_GET_Roles_From_Internal_Endpoint()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var rawRoles = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole[]>(x => x.AsQueryable().AsEnumerable().RandomItems(2).ToArray());
+            var role1 = rawRoles.First();
+            var role2 = rawRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, roles: roles));
+
+            //Act
+            var assignedRoles = (await ItSystemUsageV2Helper.GetRoleAssignmentsInternalAsync(createdDTO.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, assignedRoles.Count);
+            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, role1, user1));
+            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, role2, user2));
+        }
+
+        private static bool MatchExpectedAssignment(ExtendedRoleAssignmentResponseDTO assignment, ItSystemRole expectedRole, User expectedUser)
+        {
+            return assignment.Role.Name == expectedRole.Name &&
+                   assignment.Role.Uuid == expectedRole.Uuid &&
+                   assignment.User.Email == expectedUser.Email &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid;
         }
 
         private static void AssertJournalPeriod(JournalPeriodDTO newJournalPeriodInput, JournalPeriodResponseDTO result)

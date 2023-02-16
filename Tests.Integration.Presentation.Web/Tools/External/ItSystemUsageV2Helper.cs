@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -18,6 +20,21 @@ namespace Tests.Integration.Presentation.Web.Tools.External
     public static class ItSystemUsageV2Helper
     {
         private const string _baseUsageApiPath = "api/v2/it-system-usages";
+        private const string _baseUsageInternalApiPath = "api/v2/internal/it-system-usages";
+
+        public static async Task<IEnumerable<ExtendedRoleAssignmentResponseDTO>> GetRoleAssignmentsInternalAsync(Guid uuid)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await SendGetRoleAssignmentsInternalRequestAsync(cookie, uuid);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ExtendedRoleAssignmentResponseDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetRoleAssignmentsInternalRequestAsync(Cookie cookie, Guid uuid)
+        {
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{_baseUsageInternalApiPath}/{uuid:D}/roles"), cookie);
+        }
 
         public static async Task<ItSystemUsageResponseDTO> GetSingleAsync(string token, Guid uuid)
         {
