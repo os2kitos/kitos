@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.DomainModel;
 using Core.DomainModel.Commands;
