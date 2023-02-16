@@ -1003,19 +1003,12 @@
     <Compile Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.designer.cs">
       <DependentUpon>202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202302141252291_added_uuid_to_notifications.cs" />
-    <Compile Include="Migrations\202302141252291_added_uuid_to_notifications.designer.cs">
-      <DependentUpon>202302141252291_added_uuid_to_notifications.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Get_Users_To_Preserve.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">
       <DependentUpon>202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202302141252291_added_uuid_to_notifications.resx">
-      <DependentUpon>202302141252291_added_uuid_to_notifications.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ExternalReference.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />

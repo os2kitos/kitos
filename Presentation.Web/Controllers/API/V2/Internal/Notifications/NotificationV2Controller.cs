@@ -149,10 +149,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid) 
                 return BadRequest();
 
-            return _writeModelMapper.FromScheduledPUT(request, ownerResourceType)
+            throw new NotImplementedException();
+            /*return _writeModelMapper.FromScheduledPUT(request, ownerResourceType)
                 .Bind(notification => _notificationService.UpdateNotification(organizationUuid, notification))
                 .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
-                .Match(Ok, FromOperationError);
+                .Match(Ok, FromOperationError);*/
         }
 
         /// <summary>

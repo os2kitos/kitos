@@ -50,6 +50,7 @@ namespace Core.ApplicationServices.Notification
             var relationIdResult = ResolveRelationId(parameters.OwnerResourceUuid, parameters.Type);
             if (relationIdResult.IsNone)
                 return new OperationError($"Id for owner type with uuid: {parameters.OwnerResourceUuid} was not found" , OperationFailure.NotFound);
+
             var relationId = relationIdResult.Value;
             var model = new NotificationModel()
             {
@@ -71,7 +72,7 @@ namespace Core.ApplicationServices.Notification
         {
             throw new NotImplementedException();
         }
-
+        
         private Maybe<int> ResolveRelationId(Guid relationUuid, RelatedEntityType relatedEntityType)
         {
             return relatedEntityType switch
