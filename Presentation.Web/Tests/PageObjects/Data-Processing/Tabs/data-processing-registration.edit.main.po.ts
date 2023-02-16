@@ -52,6 +52,10 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.xpath(this.getSubDpRowExpression(dpName)));
     }
 
+    getSubDataProcessorCellWithContent(dpName: string, content: string) {
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//*[contains(text(),"${content}")]`));
+    }
+
     getSaveSubDataProcessorButton() {
         console.log("Getting the save SubDataProcessor button");
         return element(by.id("save-sub-data-processor-btn"));
