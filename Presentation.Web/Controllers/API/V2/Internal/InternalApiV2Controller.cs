@@ -6,7 +6,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal
 {
     [InternalApi]
     [Authorize]
-    public class InternalApiV2Controller : ApiV2Controller
+    public abstract class InternalApiV2Controller : ApiV2Controller
     {
     }
 }

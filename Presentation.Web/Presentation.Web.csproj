@@ -355,10 +355,14 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
+    <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Models\API\V1\UserCredentialsDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Roles\ExtendedRoleAssignmentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\UserReferenceResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
