@@ -218,6 +218,14 @@
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options.options, false),
                 elementSelected: (newElement) => {
                     if (!!newElement) {
+                        const changeFromYes = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes && newElement.optionalObjectContext !== Models.Api.Shared.YesNoUndecidedOption.Yes;
+                        if (changeFromYes) {
+                            if (this.dataProcessingRegistration?.subDataProcessors?.length > 0) {
+                                if (!confirm("Alle registreringer for underdatabehandlinger fjernes. Vil du fortætte?")) {
+                                    return;
+                                }
+                            }
+                        }
                         this.changeHasSubDataProcessor(newElement.optionalObjectContext);
                     }
                 }
