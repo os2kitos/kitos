@@ -83,7 +83,7 @@
                     {
                         field: "Name",
                         title: "Navn",
-                        width: 230,
+                        width: 300,
                         persistId: "name",
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Name,
@@ -99,7 +99,7 @@
                     {
                         field: "Cvr",
                         title: "CVR",
-                        width: 230,
+                        width: 160,
                         persistId: "cvr", 
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Cvr,
@@ -115,7 +115,7 @@
                     {
                         field: "Type.Name",
                         title: "Type",
-                        width: 230,
+                        width: 160,
                         persistId: "type", 
                         hidden: false,
                         template: (dataItem) => dataItem.Type.Name,
@@ -142,7 +142,7 @@
                     {
                         field: "ForeignCvr",
                         title: "Udenlandsk virksomhed",
-                        width: 230,
+                        width: 200,
                         persistId: "foreignCvr",
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.ForeignCvr,
