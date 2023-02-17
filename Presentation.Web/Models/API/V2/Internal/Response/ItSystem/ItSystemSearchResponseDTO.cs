@@ -8,16 +8,16 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.ItSystem
     {
 
         [Required]
-        public bool Disabled { get; set; }
+        public bool Deactivated { get; set; }
 
         public ItSystemSearchResponseDTO()
         {
         }
 
-        public ItSystemSearchResponseDTO(Guid uuid, string name, bool disabled) 
+        public ItSystemSearchResponseDTO(Guid uuid, string name, bool deactivated) 
             : base(uuid, name)
         {
-            Disabled = disabled;
+            Deactivated = deactivated;
         }
     }
 }
