@@ -172,7 +172,7 @@
                 page: this.onPaging,
                 columns: [
                     {
-                        field: "Name", title: "Navn", width: 230,
+                        field: "Name", title: "Navn", width: 300,
                         persistId: "name",
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Name,
@@ -186,7 +186,7 @@
                         }
                     },
                     {
-                        field: "Cvr", title: "CVR", width: 230,
+                        field: "Cvr", title: "CVR", width: 160,
                         persistId: "cvr",
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Cvr,
@@ -200,7 +200,7 @@
                         }
                     },
                     {
-                        field: "Type.Name", title: "Type", width: 230,
+                        field: "Type.Name", title: "Type", width: 160,
                         persistId: "type",
                         hidden: false,
                         template: (dataItem) => dataItem.Type.Name,
@@ -220,25 +220,21 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 230,
-                        persistId: "synlighed",
+                        field: "ForeignCvr",
+                        title: "Udenlandsk virksomhed",
+                        width: 200,
+                        persistId: "foreignCvr",
                         hidden: false,
-                        template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
-                        excelTemplate: (dataItem) => dataItem.AccessModifier.toString(),
+                        excelTemplate: (dataItem) => dataItem.ForeignCvr,
                         filterable: {
                             cell: {
-                                template: function (args) {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Lokal", value: "Local" }, { type: "Offentlig", value: "Public" }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
                             }
                         }
-                    }
+                    },
                 ]
             };
 
