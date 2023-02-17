@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage
 {
-    public class ItSystemUsageSystemContextResponseDTO : IdentityNamePairResponseDTO
+    public class ItSystemUsageSystemContextResponseDTO : IdentityNamePairResponseDTO, IHasDeactivatedExternal
     {
         [Required]
         public bool Deactivated { get; set; }

@@ -375,6 +375,7 @@
     <Compile Include="Models\API\V2\Request\SystemUsage\JournalPeriodUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\JournalPeriodResponseDTO.cs" />
+    <Compile Include="Models\API\V2\SharedProperties\IHasDeactivatedExternal.cs" />
     <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />
     <Compile Include="Swagger\SwashbuckleExtensions.cs" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-sub-data-processor-modal.controller.ts" />
