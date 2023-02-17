@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
 
         /// <summary>
         /// Low-payload search endpoint alternative to the public endpoint which returns full objects.
-        /// This one is a convencience endpoint for UI cases returning only
+        /// This one is a convenience endpoint for UI cases returning only
         ///  - Name
         ///  - Uuid
         ///  - Valid state of the local registration
@@ -42,7 +42,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         /// <param name="relatedToSystemUuid">Query by systems with outgoing relations related to another system</param>
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
         /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
-        /// <param name="systemUuid">Query usages of a specific system</param>
         /// <param name="systemNameContent">Query usages based on system name</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <returns></returns>
@@ -57,7 +56,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             [NonEmptyGuid] Guid? relatedToSystemUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUsageUuid = null,
             [NonEmptyGuid] Guid? relatedToContractUuid = null,
-            [NonEmptyGuid] Guid? systemUuid = null,
             string systemNameContent = null,
             DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
@@ -66,7 +64,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, systemUuid, systemNameContent, changedSinceGtEq, paginationQuery)
+                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, null, systemNameContent, changedSinceGtEq, paginationQuery)
                 .Select(Map)
                 .Transform(Ok);
         }

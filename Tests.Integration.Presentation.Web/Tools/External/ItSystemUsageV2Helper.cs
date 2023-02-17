@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
@@ -57,6 +58,28 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<ResourcePermissionsResponseDTO>();
         }
 
+        public static async Task<IEnumerable<ItSystemUsageSearchResultResponseDTO>> GetManyInternalAsync(
+            Guid organizationFilter,
+            Guid? systemUuidFilter = null,
+            Guid? relationToSystemUuidFilter = null,
+            Guid? relationToSystemUsageUuidFilter = null,
+            Guid? relationToContractUuidFilter = null,
+            string systemNameContentFilter = null,
+            DateTime? changedSinceGtEq = null,
+            int? page = null,
+            int? pageSize = null)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await QueryItSystemUsages($"{_baseUsageInternalApiPath}/search", organizationFilter, systemUuidFilter, relationToSystemUuidFilter, relationToSystemUsageUuidFilter, relationToContractUuidFilter, systemNameContentFilter, changedSinceGtEq, page, pageSize,cookie:cookie);
+
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemUsageSearchResultResponseDTO>>();
+        }
+
         public static async Task<IEnumerable<ItSystemUsageResponseDTO>> GetManyAsync(
             string token,
             Guid? organizationFilter = null,
@@ -69,6 +92,20 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? page = null,
             int? pageSize = null)
         {
+            using var response = await QueryItSystemUsages(_baseUsageApiPath, organizationFilter, systemUuidFilter, relationToSystemUuidFilter, relationToSystemUsageUuidFilter, relationToContractUuidFilter, systemNameContentFilter, changedSinceGtEq, page, pageSize, token);
+
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemUsageResponseDTO>>();
+        }
+
+        private static async Task<HttpResponseMessage> QueryItSystemUsages(string basePath, Guid? organizationFilter, Guid? systemUuidFilter,
+            Guid? relationToSystemUuidFilter, Guid? relationToSystemUsageUuidFilter, Guid? relationToContractUuidFilter,
+            string systemNameContentFilter, DateTime? changedSinceGtEq, int? page, int? pageSize, string token = null, Cookie cookie = null)
+        {
             var criteria = new List<KeyValuePair<string, string>>();
 
             if (organizationFilter.HasValue)
@@ -78,13 +115,16 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 criteria.Add(new KeyValuePair<string, string>("systemUuid", systemUuidFilter.Value.ToString()));
 
             if (relationToSystemUuidFilter.HasValue)
-                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUuid", relationToSystemUuidFilter.Value.ToString()));
+                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUuid",
+                    relationToSystemUuidFilter.Value.ToString()));
 
             if (relationToSystemUsageUuidFilter.HasValue)
-                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUsageUuid", relationToSystemUsageUuidFilter.Value.ToString()));
+                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUsageUuid",
+                    relationToSystemUsageUuidFilter.Value.ToString()));
 
             if (relationToContractUuidFilter.HasValue)
-                criteria.Add(new KeyValuePair<string, string>("relatedToContractUuid", relationToContractUuidFilter.Value.ToString()));
+                criteria.Add(new KeyValuePair<string, string>("relatedToContractUuid",
+                    relationToContractUuidFilter.Value.ToString()));
 
             if (!string.IsNullOrWhiteSpace(systemNameContentFilter))
                 criteria.Add(new KeyValuePair<string, string>("systemNameContent", systemNameContentFilter));
@@ -100,14 +140,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             var joinedCriteria = string.Join("&", criteria.Select(x => $"{x.Key}={x.Value}"));
             var queryString = joinedCriteria.Any() ? $"?{joinedCriteria}" : string.Empty;
-            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}{queryString}"), token);
 
-            if (!response.IsSuccessStatusCode)
-                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-
-            return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemUsageResponseDTO>>();
+            if (token != null)
+            {
+                return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{basePath}{queryString}"), token);
+            }
+            Assert.NotNull(cookie); //if no token, a cookie must be provided
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{basePath}{queryString}"), cookie);
         }
 
         public static async Task<ItSystemUsageResponseDTO> PostAsync(string token, CreateItSystemUsageRequestDTO dto)

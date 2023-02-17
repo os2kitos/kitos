@@ -14,6 +14,7 @@ using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
+using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
@@ -59,6 +60,197 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertExpectedUsageShallow(system2UsageOrg1, dtos);
             AssertExpectedUsageShallow(system2UsageOrg2, dtos);
             AssertExpectedUsageShallow(system3UsageOrg2, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal()
+        {
+            //Arrange
+            var (_, _, organization, system1) = await CreatePrerequisitesAsync();
+
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1Usage = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization.Id);
+            var system2Usage = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var system3Usage = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+
+            var toBeDisabled = new[] { system1Usage, system2Usage, system3Usage }.RandomItem();
+            using var disabled = await ItSystemHelper.SendSetDisabledRequestAsync(toBeDisabled.ItSystem.Id, true);
+            toBeDisabled.ItSystem.Disabled = true; //line up expected result
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(3, dtos.Count);
+            AssertExpectedUsageShallow(system1Usage, dtos);
+            AssertExpectedUsageShallow(system2Usage, dtos);
+            AssertExpectedUsageShallow(system3Usage, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_With_Paging()
+        {
+            //Arrange
+            var (_, _, organization1, system1) = await CreatePrerequisitesAsync();
+
+            var system2 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var system4 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+
+            var system1Usage = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization1.Id);
+            var system2Usage = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization1.Id);
+            var system3Usage = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization1.Id);
+            var system4Usage = await ItSystemHelper.TakeIntoUseAsync(system4.dbId, organization1.Id);
+
+            //Act
+            var page1Dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization1.Uuid, page: 0, pageSize: 2)).ToList();
+            var page2Dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization1.Uuid, page: 1, pageSize: 2)).ToList();
+
+            //Assert
+            Assert.Equal(2, page1Dtos.Count);
+            Assert.Equal(2, page2Dtos.Count);
+            AssertExpectedUsageShallow(system1Usage, page1Dtos);
+            AssertExpectedUsageShallow(system2Usage, page1Dtos);
+            AssertExpectedUsageShallow(system3Usage, page2Dtos);
+            AssertExpectedUsageShallow(system4Usage, page2Dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_LastModified()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1Usage = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization.Id);
+            var system2Usage = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var system3Usage = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+
+            foreach (var systemUsageDto in new[] { system2Usage, system3Usage, system1Usage })
+            {
+                using var patchResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, systemUsageDto.Uuid, new GeneralDataUpdateRequestDTO() { Notes = A<string>() });
+                Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
+            }
+
+            var referenceChange = await ItSystemUsageV2Helper.GetSingleAsync(token, system3Usage.Uuid);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, changedSinceGtEq: referenceChange.LastModified, page: 0, pageSize: 10)).ToList();
+
+            //Assert that the correct dtos are provided in the right order
+            Assert.Equal(new[] { system3Usage.Uuid, system1Usage.Uuid }, dtos.Select(x => x.Uuid));
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_RelationToSystemUuId()
+        {
+            //Arrange - setup multiple relations across orgs
+            var (_, _, organization, system1) = await CreatePrerequisitesAsync();
+
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var relationTargetSystem = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var system4UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(relationTargetSystem.dbId, organization.Id);
+
+            await CreateRelationAsync(system1UsageOrg1, system4UsageOrg1);
+            await CreateRelationAsync(system2UsageOrg1, system4UsageOrg1);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, relationToSystemUuidFilter: relationTargetSystem.uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_RelationToSystemUsageUuId()
+        {
+            //Arrange - setup multiple relations across orgs
+            var (_, _, organization, _) = await CreatePrerequisitesAsync();
+
+            var system1 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var relationTargetSystem = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+            var relationTargetUsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(relationTargetSystem.dbId, organization.Id);
+
+            await CreateRelationAsync(system1UsageOrg1, relationTargetUsageOrg1);
+            await CreateRelationAsync(system2UsageOrg1, relationTargetUsageOrg1);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, relationToSystemUsageUuidFilter: relationTargetUsageOrg1.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_RelationContractUuId()
+        {
+            //Arrange - setup multiple relations across orgs
+            var (_, _, organization, _) = await CreatePrerequisitesAsync();
+
+            var system1 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var relationTargetSystem = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var systemUsage1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization.Id);
+            var systemUsage2 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var systemUsage3 = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+            var relationTargetUsage = await ItSystemHelper.TakeIntoUseAsync(relationTargetSystem.dbId, organization.Id);
+
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+
+            await CreateRelationAsync(systemUsage1, relationTargetUsage, contract);
+            await CreateRelationAsync(relationTargetUsage, systemUsage2, contract);
+            await CreateRelationAsync(systemUsage3, relationTargetUsage);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, relationToContractUuidFilter: contract.Uuid)).ToList();
+
+            //Assert
+            // Get by contract returns only "From" system usages
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(systemUsage1, dtos);
+            AssertExpectedUsageShallow(relationTargetUsage, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_SystemNameContent()
+        {
+            //Arrange
+            var content = $"CONTENT_{A<Guid>()}";
+            var (_, _, organization, _) = await CreatePrerequisitesAsync();
+
+            var system1 = await CreateSystemAsync(organization.Id, AccessModifier.Public, $"{content}ONE");
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public, $"TWO{content}");
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, systemNameContentFilter: content)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, dtos);
         }
 
         [Fact]
@@ -2671,6 +2863,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var dto = Assert.Single(dtos, usage => usage.Uuid == expectedContent.Uuid);
             AssertExpectedUsageShallow(expectedContent, dto);
+        }
+
+        private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, IEnumerable<ItSystemUsageSearchResultResponseDTO> dtos)
+        {
+            var dto = Assert.Single(dtos, usage => usage.Uuid == expectedContent.Uuid);
+            AssertExpectedUsageShallow(expectedContent, dto);
+        }
+        private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, ItSystemUsageSearchResultResponseDTO dto)
+        {
+            Assert.Equal(expectedContent.ItSystem.Uuid, dto.SystemContext.Uuid);
+            Assert.Equal(expectedContent.ItSystem.Name, dto.SystemContext.Name);
+            Assert.Equal(expectedContent.ItSystem.Disabled, dto.SystemContext.Deactivated);
         }
 
         private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, ItSystemUsageResponseDTO dto)
