@@ -3,7 +3,7 @@ using Presentation.Web.Models.API.V2.Types.Notifications;
 
 namespace Presentation.Web.Models.API.V2.Internal.Request.Notifications
 {
-    public class ScheduledNotificationWriteRequestDTO : BaseScheduledNotificationWriteRequestDTO
+    public class ScheduledNotificationWriteRequestDTO : UpdateScheduledNotificationWriteRequestDTO
     {
         /// <summary>
         /// Indicates how often should the notification be repeated

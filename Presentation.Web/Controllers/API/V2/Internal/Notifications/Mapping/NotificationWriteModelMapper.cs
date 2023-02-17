@@ -4,7 +4,6 @@ using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Core.Abstractions.Types;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 using Core.ApplicationServices.Model.Notification.Write;
-using Core.DomainModel.Advice;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
@@ -38,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             );
         }
 
-        private UpdateScheduledNotificationModificationParameters MapUpdateScheduledNotificationWriteRequestDTO(BaseScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        private UpdateScheduledNotificationModificationParameters MapUpdateScheduledNotificationWriteRequestDTO(UpdateScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
             return new UpdateScheduledNotificationModificationParameters
             (
@@ -72,11 +71,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 
         private RootRecipientModificationParameters MapRootRecipients(RecipientWriteRequestDTO dto)
         {
-            return new RootRecipientModificationParameters
+            return dto != null ? new RootRecipientModificationParameters
             (
                 MapEmailRecipients(dto.EmailRecipients),
                 MapRoleRecipients(dto.RoleRecipients)
-            );
+            ) : null;
         }
 
         private static IEnumerable<EmailRecipientModificationParameters> MapEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO> dtos)

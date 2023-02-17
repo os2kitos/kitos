@@ -27,7 +27,6 @@ namespace Core.ApplicationServices.Helpers
                 case Scheduling.Quarter: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} {dayComponent} {ComputeOffsetMonth(zeroTime, 4)}-12/3 *";
                 case Scheduling.Semiannual: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} {dayComponent} {ComputeOffsetMonth(zeroTime, 2)}-12/6 *";
                 case Scheduling.Year: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} {dayComponent} {zeroTime.Month} *";
-                case Scheduling.Immediate: // Fallthrough intended
                 default:
                     throw new ArgumentOutOfRangeException(nameof(interval), interval, null);
             }

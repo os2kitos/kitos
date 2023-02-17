@@ -79,7 +79,6 @@ namespace Core.ApplicationServices.Notification
             newNotification.IsActive = true;
             if (newNotification.AdviceType == AdviceType.Immediate)
             {
-                newNotification.Scheduling = Scheduling.Immediate;
                 newNotification.StopDate = null;
                 newNotification.AlarmDate = null;
             }

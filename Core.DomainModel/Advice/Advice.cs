@@ -9,7 +9,6 @@ namespace Core.DomainModel.Advice
 {
     public enum Scheduling
     {
-       Immediate = 0,
        Hour = 1,
        Day = 2,
        Week = 3,

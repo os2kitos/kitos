@@ -455,7 +455,6 @@ namespace Core.ApplicationServices
                             break;
                         //Intentional fallthrough - no corrections here
                         case Scheduling.Hour:
-                        case Scheduling.Immediate:
                         default:
                             break;
                     }

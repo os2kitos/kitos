@@ -168,13 +168,36 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult UpdateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid organizationUuid, [FromBody] UpdateScheduledNotificationWriteRequestDTO request)
+        public IHttpActionResult UpdateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid, [FromBody] UpdateScheduledNotificationWriteRequestDTO request)
         {
             if (!ModelState.IsValid) 
                 return BadRequest();
 
             return _writeModelMapper.FromScheduledPUT(request, ownerResourceType)
-                .Bind(notification => _notificationService.UpdateScheduledNotification(organizationUuid, notification))
+                .Bind(notification => _notificationService.UpdateScheduledNotification(notificationUuid, notification))
+                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Deactivates the scheduled notification
+        /// </summary>
+        /// <param name="ownerResourceType"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{ownerResourceType}/scheduled/deactivate/{notificationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(NotificationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult DeactivateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid)
+        {
+            if (!ModelState.IsValid) 
+                return BadRequest();
+
+            return _notificationService.DeactivateNotification(notificationUuid, ownerResourceType.ToRelatedEntityType())
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match(Ok, FromOperationError);
         }

@@ -5,15 +5,20 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.Notification.Write;
+using Core.DomainModel;
 using Core.DomainModel.Advice;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Notification
 {
@@ -23,16 +28,31 @@ namespace Core.ApplicationServices.Notification
         private readonly IRegistrationNotificationService _registrationNotificationService;
         private readonly IRegistrationNotificationUserRelationsService _notificationUserRelationsService;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly ITransactionManager _transactionManager;
+        private readonly IGenericRepository<ItSystemUsage> _usageRepository;
+        private readonly IGenericRepository<ItContract> _contractRepository;
+        private readonly IGenericRepository<DataProcessingRegistration> _dprRepository;
+        private readonly IDomainEvents _domainEvents;
 
         public NotificationService(IEntityIdentityResolver entityIdentityResolver,
             IRegistrationNotificationService registrationNotificationService, 
             IAuthorizationContext authorizationContext,
-            IRegistrationNotificationUserRelationsService notificationUserRelationsService)
+            IRegistrationNotificationUserRelationsService notificationUserRelationsService, 
+            ITransactionManager transactionManager,
+            IGenericRepository<ItSystemUsage> usageRepository, 
+            IGenericRepository<ItContract> contractRepository, 
+            IGenericRepository<DataProcessingRegistration> dprRepository,
+            IDomainEvents domainEvents)
         {
             _entityIdentityResolver = entityIdentityResolver;
             _registrationNotificationService = registrationNotificationService;
             _authorizationContext = authorizationContext;
             _notificationUserRelationsService = notificationUserRelationsService;
+            _transactionManager = transactionManager;
+            _usageRepository = usageRepository;
+            _contractRepository = contractRepository;
+            _dprRepository = dprRepository;
+            _domainEvents = domainEvents;
         }
 
         public Result<IQueryable<Advice>, OperationError> GetNotifications(Guid organizationUuid, params IDomainQuery<Advice>[] conditions)
@@ -82,50 +102,65 @@ namespace Core.ApplicationServices.Notification
 
         public Result<Advice, OperationError> CreateImmediateNotification(Guid organizationUuid, ImmediateNotificationModificationParameters parameters)
         {
-            return MapModelAndResolveOrgId(organizationUuid, parameters)
-                .Bind(result => _registrationNotificationService.Create(result.orgId, result.model));
+            return Modify(parameters.OwnerResourceUuid, parameters.Type, relatedEntity =>
+            {
+               return MapModelAndResolveOrgId(organizationUuid, relatedEntity.Id, parameters, AdviceType.Immediate)
+                    .Bind(result => _registrationNotificationService.Create(result.orgId, result.model));
+            });
         }
 
         public Result<Advice, OperationError> CreateScheduledNotification(Guid organizationUuid, ScheduledNotificationModificationParameters parameters)
         {
-            return MapModelAndResolveOrgId(organizationUuid, parameters)
-                .Bind(result =>
-                {
-                    var model = result.model;
-                    model.FromDate = parameters.FromDate;
-                    model.ToDate = parameters.ToDate;
-                    model.RepetitionFrequency = parameters.RepetitionFrequency;
-                    model.Name = parameters.Name;
+            return Modify(parameters.OwnerResourceUuid, parameters.Type, relatedEntity =>
+            {
+                return MapModelAndResolveOrgId(organizationUuid, relatedEntity.Id, parameters, AdviceType.Repeat)
+                    .Bind(result =>
+                    {
+                        var model = result.model;
+                        model.FromDate = parameters.FromDate;
+                        model.ToDate = parameters.ToDate;
+                        model.RepetitionFrequency = parameters.RepetitionFrequency;
+                        model.Name = parameters.Name;
 
-                    return _registrationNotificationService.Create(result.orgId, model);
-                });
+                        return _registrationNotificationService.Create(result.orgId, model);
+                    });
+            });
         }
 
         public Result<Advice, OperationError> UpdateScheduledNotification(Guid notificationUuid, UpdateScheduledNotificationModificationParameters parameters)
         {
-            return MapBaseModel(parameters)
-                .Bind(model =>
-                {
-                    model.ToDate = parameters.ToDate;
-                    model.Name = parameters.Name;
+            return Modify(parameters.OwnerResourceUuid, parameters.Type, relatedEntity =>
+            {
+                return MapBaseModel(parameters, AdviceType.Repeat, relatedEntity.Id)
+                    .Bind(model =>
+                    {
+                        model.ToDate = parameters.ToDate;
+                        model.Name = parameters.Name;
 
-                    var recipients = model.Recipients;
-                    return _entityIdentityResolver.ResolveDbId<Advice>(notificationUuid)
-                        .Match<Result<int, OperationError>>(notificationId =>
-                            {
-                                var result =
-                                    _notificationUserRelationsService.UpdateNotificationUserRelations(notificationId,
-                                        recipients);
-                                if (result.HasValue)
-                                    return result.Value;
+                        var recipients = model.Recipients;
+                        return _entityIdentityResolver.ResolveDbId<Advice>(notificationUuid)
+                            .Match<Result<int, OperationError>>(notificationId =>
+                                {
+                                    var result = _notificationUserRelationsService.UpdateNotificationUserRelations(notificationId, recipients);
+                                    if (result.HasValue)
+                                        return result.Value;
 
-                                return notificationId;
-                            },
-                            () => new OperationError($"Id for notification with uuid: {notificationUuid} was not found",
-                                OperationFailure.NotFound)
-                        )
-                        .Bind(notificationId => _registrationNotificationService.Update(notificationId, model));
-                });
+                                    return notificationId;
+                                },
+                                () => new OperationError($"Id for notification with uuid: {notificationUuid} was not found", OperationFailure.NotFound)
+                            )
+                            .Bind(notificationId => _registrationNotificationService.Update(notificationId, model));
+                    });
+            });
+        }
+
+        public Result<Advice, OperationError> DeactivateNotification(Guid notificationUuid, RelatedEntityType relatedEntityType)
+        {
+            return GetNotificationByUuid(notificationUuid, relatedEntityType)
+                .Match(notification => _authorizationContext.AllowModify(notification)
+                        ? _registrationNotificationService.DeactivateNotification(notification.Id)
+                        : new OperationError($"User is not allowed to deactivate notification with uuid: {notificationUuid}", OperationFailure.Forbidden),
+                    error => error);
         }
 
         public Maybe<OperationError> DeleteNotification(Guid notificationUuid, RelatedEntityType relatedEntityType)
@@ -137,9 +172,9 @@ namespace Core.ApplicationServices.Notification
                     error => error);
         }
 
-        private Result<(int orgId, NotificationModel model), OperationError> MapModelAndResolveOrgId(Guid organizationUuid, ImmediateNotificationModificationParameters parameters)
+        private Result<(int orgId, NotificationModel model), OperationError> MapModelAndResolveOrgId(Guid organizationUuid, int relatedEntityId, ImmediateNotificationModificationParameters parameters, AdviceType adviceType)
         {
-            return MapBaseModel(parameters)
+            return MapBaseModel(parameters, adviceType, relatedEntityId)
                 .Bind(model =>
                 {
                     return ResolveOrganizationId(organizationUuid).Select(id => (id, model));
@@ -157,30 +192,24 @@ namespace Core.ApplicationServices.Notification
                 );
         }
 
-        private Result<NotificationModel, OperationError> MapBaseModel(ImmediateNotificationModificationParameters parameters)
+        private Result<NotificationModel, OperationError> MapBaseModel(ImmediateNotificationModificationParameters parameters, AdviceType adviceType, int relatedEntityId)
         {
             var model = new NotificationModel
             {
-                AdviceType = AdviceType.Immediate,
+                AdviceType = adviceType,
                 Body = parameters.Body,
                 Subject = parameters.Subject,
+                RelationId = relatedEntityId,
                 Type = parameters.Type,
             };
-            return ResolveRelationId(parameters.OwnerResourceUuid, parameters.Type)
-                .Match
-                (
-                    relationId =>
-                    {
-                        model.RelationId = relationId;
-                        return MapRecipients(parameters);
-                    },
-                    () => new OperationError(
-                        $"Id for owner type with uuid: {parameters.OwnerResourceUuid} was not found",
-                        OperationFailure.NotFound)
-                )
+            return MapRecipients(parameters)
                 .Match<Result<NotificationModel, OperationError>>(recipients =>
                 {
-                    model.Recipients = recipients;
+                    var recipientList = recipients.ToList();
+                    if (!recipientList.Any())
+                        return new OperationError("Notification needs at least 1 recipient", OperationFailure.BadInput);
+
+                    model.Recipients = recipientList;
                     return model;
                 }, error => error);
         }
@@ -191,13 +220,16 @@ namespace Core.ApplicationServices.Notification
             return MapRootRecipientModel(parameters.Ccs, RecieverType.CC, parameters.Type)
                 .Bind(ccRecipients => 
                     MapRootRecipientModel(parameters.Receivers, RecieverType.RECIEVER, parameters.Type)
-                    .Bind<IEnumerable<RecipientModel>>(receiverRecipients => 
-                        ccRecipients.Concat(receiverRecipients).ToList()));
+                        .Bind<IEnumerable<RecipientModel>>(receiverRecipients => ccRecipients.Concat(receiverRecipients).ToList())
+                );
         }
 
         private Result<IEnumerable<RecipientModel>, OperationError> MapRootRecipientModel(
             RootRecipientModificationParameters root, RecieverType receiverType, RelatedEntityType relatedEntityType)
         {
+            if (root == null)
+                return new List<RecipientModel>();
+
             return MapRoleRecipients(root.RoleRecipients, receiverType, relatedEntityType)
                 .Bind<IEnumerable<RecipientModel>>(roleRecipients => 
                     MapEmailRecipients(root.EmailRecipients, receiverType).Concat(roleRecipients).ToList());
@@ -205,7 +237,11 @@ namespace Core.ApplicationServices.Notification
 
         private static IEnumerable<RecipientModel> MapEmailRecipients(IEnumerable<EmailRecipientModificationParameters> emailRecipients, RecieverType receiverType)
         {
-            return emailRecipients.Select(x => new RecipientModel
+            var recipientList = emailRecipients.ToList();
+            if (!recipientList.Any())
+                return new List<RecipientModel>();
+
+            return recipientList.Select(x => new RecipientModel
             {
                 Email = x.Email,
                 RecipientType = RecipientType.USER,
@@ -215,8 +251,12 @@ namespace Core.ApplicationServices.Notification
 
         private Result<IEnumerable<RecipientModel>, OperationError> MapRoleRecipients(IEnumerable<RoleRecipientModificationParameters> roleRecipients, RecieverType receiverType, RelatedEntityType relatedEntityType)
         {
+            var recipientList = roleRecipients.ToList();
+            if (!recipientList.Any())
+                return new List<RecipientModel>();
+
             var recipients = new List<RecipientModel>();
-            foreach (var recipient in roleRecipients)
+            foreach (var recipient in recipientList)
             {
                 var newRecipient = new RecipientModel{RecipientType = RecipientType.ROLE, ReceiverType = receiverType};
                 var error = ResolveRoleIdAndAssignToRoleRecipient(recipient.RoleUuid, relatedEntityType, newRecipient);
@@ -254,17 +294,6 @@ namespace Core.ApplicationServices.Notification
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<int> ResolveRelationId(Guid relationUuid, RelatedEntityType relatedEntityType)
-        {
-            return relatedEntityType switch
-            {
-                RelatedEntityType.dataProcessingRegistration => _entityIdentityResolver.ResolveDbId<DataProcessingRegistration>(relationUuid),
-                RelatedEntityType.itContract => _entityIdentityResolver.ResolveDbId<ItContract>(relationUuid),
-                RelatedEntityType.itSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystemUsage>(relationUuid),
-                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
-            };
-        }
-
         private Maybe<int> ResolveRoleId(Guid roleUuid, RelatedEntityType relatedEntityType)
         {
             return relatedEntityType switch
@@ -274,6 +303,71 @@ namespace Core.ApplicationServices.Notification
                 RelatedEntityType.itSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystemRole>(roleUuid),
                 _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
             };
+        }
+
+        private Result<TSuccess, OperationError> Modify<TSuccess>(Guid uuid, RelatedEntityType relatedEntityType, Func<IEntityWithAdvices, Result<TSuccess, OperationError>> mutation)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            var entityResult = GetRelatedEntity(uuid, relatedEntityType);
+
+            if (entityResult.IsNone)
+                return new OperationError($"Entity of type '{nameof(RelatedEntityType)}' with uuid: {uuid} was not found", OperationFailure.NotFound);
+            var entity = entityResult.Value;
+
+            if (!_authorizationContext.AllowModify(entity))
+                return new OperationError(OperationFailure.Forbidden);
+
+            var mutationResult = mutation(entity);
+
+            if (mutationResult.Failed)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                UpdateRelatedEntity(entity, relatedEntityType);
+                transaction.Commit();
+            }
+
+            return mutationResult;
+        }
+
+        private Maybe<IEntityWithAdvices> GetRelatedEntity(Guid uuid, RelatedEntityType relatedEntityType)
+        {
+            return relatedEntityType switch
+            {
+                RelatedEntityType.dataProcessingRegistration => _dprRepository.AsQueryable().ByUuid(uuid),
+                RelatedEntityType.itContract => _contractRepository.AsQueryable().ByUuid(uuid),
+                RelatedEntityType.itSystemUsage => _usageRepository.AsQueryable().ByUuid(uuid),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
+            };
+        }
+
+        private void UpdateRelatedEntity(IEntityWithAdvices entity, RelatedEntityType relatedEntityType)
+        {
+            switch (relatedEntityType)
+            {
+                case RelatedEntityType.dataProcessingRegistration:
+                    var dpr = entity as DataProcessingRegistration;
+                    _dprRepository.Update(dpr);
+                    _domainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(dpr));
+                    _dprRepository.Save();
+                    break;
+                case RelatedEntityType.itContract:
+                    var contract = entity as ItContract;
+                    _contractRepository.Update(contract);
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
+                    _contractRepository.Save();
+                    break;
+                case RelatedEntityType.itSystemUsage:
+                    var usage = entity as ItSystemUsage;
+                    _usageRepository.Update(usage);
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
+                    _usageRepository.Save();
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
+            }
         }
     }
 }

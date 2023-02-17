@@ -355,6 +355,7 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
     <Compile Include="Models\API\V1\UserCredentialsDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
@@ -367,13 +368,12 @@
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\OwnerResourceTypeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\RepetitionFrequencyMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\NotificationV2Controller.cs" />
-    <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseScheduledNotificationWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Notifications\UpdateScheduledNotificationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\EmailRecipientWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\ImmediateNotificationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\RecipientWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\RoleRecipientWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\ScheduledNotificationWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Request\Notifications\UpdateScheduledNotificationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\EmailRecipientResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\NotificationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\RecipientResponseDTO.cs" />
@@ -385,6 +385,7 @@
     <Compile Include="Models\API\V2\Request\SystemUsage\JournalPeriodUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\JournalPeriodResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Notifications\NotificationSendType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\OwnerResourceType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\RepetitionFrequencyOptions.cs" />
     <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />

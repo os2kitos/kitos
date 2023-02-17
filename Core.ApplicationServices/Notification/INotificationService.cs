@@ -17,6 +17,7 @@ namespace Core.ApplicationServices.Notification
         Result<Advice, OperationError> CreateImmediateNotification(Guid organizationUuid, ImmediateNotificationModificationParameters parameters);
         Result<Advice, OperationError> CreateScheduledNotification(Guid organizationUuid, ScheduledNotificationModificationParameters parameters);
         Result<Advice, OperationError> UpdateScheduledNotification(Guid notificationUuid, UpdateScheduledNotificationModificationParameters parameters);
+        Result<Advice, OperationError> DeactivateNotification(Guid notificationUuid, RelatedEntityType relatedEntityType);
         Maybe<OperationError> DeleteNotification(Guid notificationUuid, RelatedEntityType relatedEntityType);
     }
 }

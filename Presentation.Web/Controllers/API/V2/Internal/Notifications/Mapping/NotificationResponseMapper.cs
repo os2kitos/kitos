@@ -40,7 +40,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
                 ToDate = notification.StopDate,
                 Subject = notification.Subject,
                 Body = notification.Body,
+                RepetitionFrequency = notification.Scheduling?.ToRepetitionFrequencyOptions(),
                 Type = type.ToOwnerResourceType(),
+                NotificationType = notification.AdviceType.ToNotificationType(),
                 Receivers = MapRecipients(notification, RecieverType.RECIEVER, type),
                 CCs = MapRecipients(notification, RecieverType.CC, type),
                 OwnerResourceUuid = ownerResourceUuidResult.Value,
@@ -70,24 +72,32 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             };
         }
 
-        private RecipientResponseDTO MapRecipients(Advice notification, RecieverType receiverType, RelatedEntityType relatedEntityType)
+        private static RecipientResponseDTO MapRecipients(Advice notification, RecieverType receiverType, RelatedEntityType relatedEntityType)
         {
             var recipientsByType = notification.Reciepients.Where(x => x.RecieverType == receiverType).ToList();
             return MapRecipientResponseDTO(recipientsByType, relatedEntityType);
         }
 
-        private RecipientResponseDTO MapRecipientResponseDTO(IEnumerable<AdviceUserRelation> recipients, RelatedEntityType relatedEntityType)
+        private static RecipientResponseDTO MapRecipientResponseDTO(IEnumerable<AdviceUserRelation> recipients, RelatedEntityType relatedEntityType)
         {
             var recipientList = recipients.ToList();
-            var recipient = new RecipientResponseDTO
+            if (recipientList.Any())
             {
-                EmailRecipients = MapEmailRecipientResponseDTOs(recipientList.Where(x => x.RecpientType == RecipientType.USER)),
-                RoleRecipients = MapRoleRecipientResponseDTOs(recipientList.Where(x => x.RecpientType == RecipientType.ROLE), relatedEntityType)
-            };
-            return recipient;
+                var emailRecipients = recipientList.Where(x => x.RecpientType == RecipientType.USER).ToList();
+                var roleRecipients = recipientList.Where(x => x.RecpientType == RecipientType.ROLE).ToList();
+
+                var recipient = new RecipientResponseDTO
+                {
+                    EmailRecipients = emailRecipients.Any() ? MapEmailRecipientResponseDTOs(emailRecipients) : null,
+                    RoleRecipients = roleRecipients.Any() ? MapRoleRecipientResponseDTOs(roleRecipients, relatedEntityType) : null
+                };
+                return recipient;
+            }
+
+            return null;
         }
 
-        private IEnumerable<EmailRecipientResponseDTO> MapEmailRecipientResponseDTOs(IEnumerable<AdviceUserRelation> recipients)
+        private static IEnumerable<EmailRecipientResponseDTO> MapEmailRecipientResponseDTOs(IEnumerable<AdviceUserRelation> recipients)
         {
             return recipients.Select(MapEmailRecipientResponseDTO);
         }
@@ -100,12 +110,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             };
         }
 
-        private IEnumerable<RoleRecipientResponseDTO> MapRoleRecipientResponseDTOs(IEnumerable<AdviceUserRelation> recipients, RelatedEntityType relatedEntityType)
+        private static IEnumerable<RoleRecipientResponseDTO> MapRoleRecipientResponseDTOs(IEnumerable<AdviceUserRelation> recipients, RelatedEntityType relatedEntityType)
         {
             return recipients.Select(x => MapRoleRecipientResponseDTO(x, relatedEntityType));
         }
 
-        private RoleRecipientResponseDTO MapRoleRecipientResponseDTO(AdviceUserRelation notificationUserRelation, RelatedEntityType relatedEntityType)
+        private static RoleRecipientResponseDTO MapRoleRecipientResponseDTO(AdviceUserRelation notificationUserRelation, RelatedEntityType relatedEntityType)
         {
             return new RoleRecipientResponseDTO
             {
