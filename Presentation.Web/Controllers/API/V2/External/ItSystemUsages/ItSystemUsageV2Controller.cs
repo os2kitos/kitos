@@ -12,11 +12,8 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.SystemUsage;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
@@ -27,6 +24,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Shared;
 using Core.DomainModel.ItSystem;
+using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
@@ -73,6 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
         /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
+        /// <param name="systemNameContent">Query usages based on system name</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
@@ -93,34 +92,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var conditions = new List<IDomainQuery<ItSystemUsage>>();
-
-            if (organizationUuid.HasValue)
-                conditions.Add(new QueryByOrganizationUuid<ItSystemUsage>(organizationUuid.Value));
-
-            if (relatedToSystemUuid.HasValue)
-                conditions.Add(new QueryByRelationToSystem(relatedToSystemUuid.Value));
-
-            if (relatedToSystemUsageUuid.HasValue)
-                conditions.Add(new QueryByRelationToSystemUsage(relatedToSystemUsageUuid.Value));
-
-            if (relatedToContractUuid.HasValue)
-                conditions.Add(new QueryByRelationToContract(relatedToContractUuid.Value));
-
-            if (systemUuid.HasValue)
-                conditions.Add(new QueryBySystemUuid(systemUuid.Value));
-
-            if (changedSinceGtEq.HasValue)
-                conditions.Add(new QueryByChangedSinceGtEq<ItSystemUsage>(changedSinceGtEq.Value));
-
-            if (!string.IsNullOrWhiteSpace(systemNameContent))
-                conditions.Add(new QueryBySystemNameContent(systemNameContent));
-
             return _itSystemUsageService
-                .Query(conditions.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
-                .Page(paginationQuery).AsEnumerable()
-                .Select(_responseMapper.MapSystemUsageDTO).ToList()
+                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, systemUuid, systemNameContent, changedSinceGtEq, paginationQuery)
+                .Select(_responseMapper.MapSystemUsageDTO)
                 .Transform(Ok);
         }
 
