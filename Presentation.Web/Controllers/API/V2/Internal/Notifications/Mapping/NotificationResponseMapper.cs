@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Notification;
 using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -26,7 +27,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 
         public Result<NotificationResponseDTO, OperationError> MapNotificationResponseDTO(Advice notification)
         {
-            var type = notification.Type.GetValueOrDefault();
+            var type = notification.Type;
             var ownerResourceUuidResult = ResolveRelationId(notification.RelationId.GetValueOrDefault(), type);
             if(ownerResourceUuidResult.IsNone)
                 return new OperationError($"Uuid was not found for relation with id: {notification.RelationId}", OperationFailure.NotFound);
@@ -62,6 +63,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             }
 
             return result;
+        }
+
+        public NotificationAccessRightsResponseDTO MapNotificationAccessRightsResponseDTO(NotificationAccessRights accessRights)
+        {
+            return new NotificationAccessRightsResponseDTO
+            {
+                CanBeDeactivated = accessRights.CanBeDeactivated,
+                CanBeDeleted = accessRights.CanBeDeleted,
+                CanBeModified = accessRights.CanBeModified,
+            };
         }
 
         public NotificationSentResponseDTO MapNotificationSentResponseDTO(AdviceSent notificationSent)

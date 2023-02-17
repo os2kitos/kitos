@@ -26,12 +26,16 @@ namespace Tests.Integration.Presentation.Web.Notifications
         [Fact]
         public async Task Can_Create_ImmediateNotification()
         {
+            //Arrange
             var ownerResourceType = A<OwnerResourceType>();
-            var (relationUuid, organization) = await SetupDataAsync(ownerResourceType);
+            var (relationUuid, organization) = await CreatePrerequisitesAsync(ownerResourceType);
 
             var body = CreateBaseNotificationWriteRequest<ImmediateNotificationWriteRequestDTO>(relationUuid, ownerResourceType);
 
-            var response = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, organization.Uuid, body);
+            //Act
+            var response = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, body);
+
+            //Assert
             Assert.NotNull(response);
 
             var notification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, response.Uuid);
@@ -41,37 +45,84 @@ namespace Tests.Integration.Presentation.Web.Notifications
         [Fact]
         public async Task Can_Create_Update_Deactivate_And_Delete_ScheduledNotification()
         {
+            //Arrange
             var ownerResourceType = A<OwnerResourceType>();
-            var (relationUuid, organization) = await SetupDataAsync(ownerResourceType);
+            var (relationUuid, organization) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var body = CreateBaseScheduledNotificationWriteRequest<ScheduledNotificationWriteRequestDTO>(relationUuid, ownerResourceType);
+            var body = CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType);
+            
+            //Act
+            var response = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, body);
 
-            body.FromDate = DateTime.UtcNow.AddDays(A<int>());
-            //Make sure ToDate is larger than FromDate
-            body.ToDate = body.FromDate.AddDays(1);
-            body.RepetitionFrequency = A<RepetitionFrequencyOptions>();
-
-            var response = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, organization.Uuid, body);
+            //Assert
             Assert.NotNull(response);
 
             var notification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, response.Uuid);
             AssertScheduledNotification(expected: body, actual: notification, NotificationSendType.Repeat, notification.Uuid);
 
+            //Arrange - update
             var updateBody = CreateBaseScheduledNotificationWriteRequest<UpdateScheduledNotificationWriteRequestDTO>(relationUuid, ownerResourceType);
             
+            //Act - update
             var updateResponse = await NotificationV2Helper.UpdateScheduledNotificationAsync(ownerResourceType, notification.Uuid, updateBody);
+
+            //Assert - update
             Assert.NotNull(updateResponse);
 
             var updatedNotification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, notification.Uuid);
             AssertUpdateScheduledNotification(updateBody, updatedNotification, NotificationSendType.Repeat, notification.Uuid);
 
+            //Act - deactivate
             var deactivateResponse = await NotificationV2Helper.DeactivateNotificationAsync(ownerResourceType, notification.Uuid);
+
+            //Assert - deactivate
             Assert.NotNull(deactivateResponse);
             Assert.False(deactivateResponse.Active);
 
+            //Act - delete
             await NotificationV2Helper.DeleteNotificationAsync(ownerResourceType, notification.Uuid);
+
+            //Assert - delete
             using var getDeletedNotificationResponse = await NotificationV2Helper.SendGetNotificationByUuid(ownerResourceType, notification.Uuid);
             Assert.Equal(HttpStatusCode.NotFound, getDeletedNotificationResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_GetAll_ScheduledNotifications()
+        {
+            var ownerResourceType = A<OwnerResourceType>();
+            var (relationUuid, organization) = await CreatePrerequisitesAsync(ownerResourceType);
+
+            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType));
+            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType));
+
+            var response = await NotificationV2Helper.GetNotificationsAsync(ownerResourceType, organization.Uuid);
+            var notifications = response.ToList();
+
+            Assert.Equal(2, notifications.Count);
+            AssertNotificationList(notification1, notifications);
+            AssertNotificationList(notification2, notifications);
+        }
+
+        private static void AssertNotificationList(NotificationResponseDTO expected, IEnumerable<NotificationResponseDTO> actual)
+        {
+            var dto = Assert.Single(actual, x => x.Uuid == expected.Uuid);
+            AssertNotificationResponseDTO(expected, dto);
+        }
+
+        private static void AssertNotificationResponseDTO(NotificationResponseDTO expected,
+            NotificationResponseDTO actual)
+        {
+            Assert.Equal(expected.RepetitionFrequency, actual.RepetitionFrequency);
+            Assert.Equal(expected.ToDate, actual.ToDate);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.ToDate, actual.ToDate);
+            Assert.Equal(expected.Uuid, actual.Uuid);
+            Assert.Equal(expected.NotificationType, actual.NotificationType);
+            Assert.Equal(expected.Body, actual.Body);
+            Assert.Equal(expected.Subject, actual.Subject);
+            Assert.Equal(expected.OwnerResourceUuid, actual.OwnerResourceUuid);
+            AssertRecipients(expected, actual);
         }
 
         private static void AssertScheduledNotification(ScheduledNotificationWriteRequestDTO expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid notificationUuid)
@@ -152,6 +203,72 @@ namespace Tests.Integration.Presentation.Web.Notifications
             }
         }
 
+        private static void AssertRecipients(NotificationResponseDTO expected, NotificationResponseDTO actual)
+        {
+            if (expected?.CCs != null)
+            {
+                AssertEmailRecipients(expected.CCs.EmailRecipients, actual.CCs.EmailRecipients);
+                AssertRoleRecipients(expected.CCs.RoleRecipients, actual.CCs.RoleRecipients);
+            }
+            else
+            {
+                Assert.Null(actual?.CCs);
+            }
+
+            if (expected?.Receivers != null)
+            {
+                AssertEmailRecipients(expected.Receivers.EmailRecipients, actual.Receivers.EmailRecipients);
+                AssertRoleRecipients(expected.Receivers.RoleRecipients, actual.Receivers.RoleRecipients);
+            }
+            else
+            {
+                Assert.Null(actual?.Receivers);
+            }
+        }
+
+        private static void AssertRoleRecipients(IEnumerable<RoleRecipientResponseDTO> expected, IEnumerable<RoleRecipientResponseDTO> actual)
+        {
+            if (expected == null)
+            {
+                Assert.Null(actual);
+                return;
+            }
+
+            var actualList = actual.ToList();
+
+            foreach (var role in expected)
+            {
+                Assert.Single(actualList, x => x.Role.Uuid == role.Role.Uuid);
+            }
+        }
+
+        private static void AssertEmailRecipients(IEnumerable<EmailRecipientResponseDTO> expected, IEnumerable<EmailRecipientResponseDTO> actual)
+        {
+            if (expected == null)
+            {
+                Assert.Null(actual);
+                return;
+            }
+
+            var actualList = actual.ToList();
+            foreach (var email in expected)
+            {
+                Assert.Single(actualList, x => x.Email == email.Email);
+            }
+        }
+        
+        private ScheduledNotificationWriteRequestDTO CreateScheduledNotificationWriteRequest(Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
+        {
+            var request = CreateBaseScheduledNotificationWriteRequest<ScheduledNotificationWriteRequestDTO>(ownerResourceUuid, ownerResourceType);
+
+            request.FromDate = DateTime.UtcNow.AddDays(A<int>());
+            //Make sure ToDate is larger than FromDate
+            request.ToDate = request.FromDate.AddDays(1);
+            request.RepetitionFrequency = A<RepetitionFrequencyOptions>();
+
+            return request;
+        }
+        
         private TResult CreateBaseScheduledNotificationWriteRequest<TResult>(Guid ownerResourceUuid, OwnerResourceType ownerResourceType) where TResult : UpdateScheduledNotificationWriteRequestDTO, new()
         {
             var request = CreateBaseNotificationWriteRequest<TResult>(ownerResourceUuid, ownerResourceType);
@@ -192,7 +309,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
             };
         }
 
-        private async Task<(Guid relationUuid, OrganizationDTO organization)> SetupDataAsync(OwnerResourceType ownerResourceType)
+        private async Task<(Guid relationUuid, OrganizationDTO organization)> CreatePrerequisitesAsync(OwnerResourceType ownerResourceType)
         {
             var relationUuid = await SetupRelatedResourceAsync(ownerResourceType);
             var organization = await SetupOrganizationAsync();

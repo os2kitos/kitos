@@ -5,12 +5,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
 {
     public class NotificationResponseDTO
     {
-        //TODO: Add CanDelte,CanDeactive and CanUpdate in a property
-        //TODO: Add CanDelte,CanDeactive and CanUpdate in a property
-        //TODO: Add CanDelte,CanDeactive and CanUpdate in a property
-        //TODO: Add CanDelte,CanDeactive and CanUpdate in a property
-        //TODO: Add CanDelte,CanDeactive and CanUpdate in a property
-
         public Guid Uuid { get; set; }
         /// <summary>
         /// Indicates whether notification is active

@@ -109,22 +109,6 @@ namespace Tests.Integration.Presentation.Web.Advice
         }
 
         [Fact]
-        public async Task Cannot_Add_Advice_If_No_Type_Defined()
-        {
-            //Arrange
-            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
-
-            var createAdvice = CreateDefaultAdvice(Scheduling.Day, A<AdviceType>(), recipient);
-            createAdvice.Type = null;
-
-            //Act
-            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
-
-        [Fact]
         public async Task Cannot_Add_Advice_If_No_RelationId_Defined()
         {
             //Arrange

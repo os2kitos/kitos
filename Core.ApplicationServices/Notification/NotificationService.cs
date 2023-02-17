@@ -64,6 +64,7 @@ namespace Core.ApplicationServices.Notification
                     if (getResult.Failed)
                         return getResult.Error;
                     var baseQuery = getResult.Value;
+                    var test = baseQuery.ToList();
                     var subQueries = new List<IDomainQuery<Advice>>();
                     subQueries.AddRange(conditions);
 
@@ -100,29 +101,28 @@ namespace Core.ApplicationServices.Notification
                 .Where(x => x.Advice.Uuid == uuid && x.Advice.Type == relatedEntityType).ToList();
         }
 
-        public Result<Advice, OperationError> CreateImmediateNotification(Guid organizationUuid, ImmediateNotificationModificationParameters parameters)
+        public Result<Advice, OperationError> CreateImmediateNotification(ImmediateNotificationModificationParameters parameters)
         {
             return Modify(parameters.OwnerResourceUuid, parameters.Type, relatedEntity =>
             {
-               return MapModelAndResolveOrgId(organizationUuid, relatedEntity.Id, parameters, AdviceType.Immediate)
-                    .Bind(result => _registrationNotificationService.Create(result.orgId, result.model));
+               return MapBaseModel(parameters, AdviceType.Immediate, relatedEntity.Id)
+                    .Bind(result => _registrationNotificationService.Create(result));
             });
         }
 
-        public Result<Advice, OperationError> CreateScheduledNotification(Guid organizationUuid, ScheduledNotificationModificationParameters parameters)
+        public Result<Advice, OperationError> CreateScheduledNotification(ScheduledNotificationModificationParameters parameters)
         {
             return Modify(parameters.OwnerResourceUuid, parameters.Type, relatedEntity =>
             {
-                return MapModelAndResolveOrgId(organizationUuid, relatedEntity.Id, parameters, AdviceType.Repeat)
+                return MapBaseModel(parameters, AdviceType.Repeat, relatedEntity.Id)
                     .Bind(result =>
                     {
-                        var model = result.model;
-                        model.FromDate = parameters.FromDate;
-                        model.ToDate = parameters.ToDate;
-                        model.RepetitionFrequency = parameters.RepetitionFrequency;
-                        model.Name = parameters.Name;
+                        result.FromDate = parameters.FromDate;
+                        result.ToDate = parameters.ToDate;
+                        result.RepetitionFrequency = parameters.RepetitionFrequency;
+                        result.Name = parameters.Name;
 
-                        return _registrationNotificationService.Create(result.orgId, model);
+                        return _registrationNotificationService.Create(result);
                     });
             });
         }
@@ -172,6 +172,34 @@ namespace Core.ApplicationServices.Notification
                     error => error);
         }
 
+        public Result<NotificationAccessRights, OperationError> GetAccessRights(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType)
+        {
+            var notificationResult = GetNotificationByUuid(notificationUuid, relatedEntityType);
+            if (notificationResult.Failed)
+                return notificationResult.Error;
+            var notification = notificationResult.Value;
+
+            var relatedEntityResult = GetRelatedEntity(relatedEntityUuid, relatedEntityType);
+            if(relatedEntityResult.IsNone)
+                return new OperationError($"Related entity of type {relatedEntityType} with uuid {relatedEntityUuid} was not found", OperationFailure.NotFound);
+            var relatedEntity = relatedEntityResult.Value;
+
+            if (_authorizationContext.AllowModify(relatedEntity))
+            {
+                var canBeModified = notification.IsActive;
+                var canBeDeactivated = notification.IsActive && !notification.AdviceSent.Any();
+                var canBeDeleted = notification.CanBeDeleted;
+                if (_authorizationContext.AllowDelete(relatedEntity))
+                {
+                    canBeDeleted = false;
+                }
+
+                return new NotificationAccessRights(canBeDeleted, canBeDeactivated, canBeModified);
+            }
+
+            return NotificationAccessRights.ReadOnly();
+        }
+
         private Result<(int orgId, NotificationModel model), OperationError> MapModelAndResolveOrgId(Guid organizationUuid, int relatedEntityId, ImmediateNotificationModificationParameters parameters, AdviceType adviceType)
         {
             return MapBaseModel(parameters, adviceType, relatedEntityId)
@@ -200,7 +228,7 @@ namespace Core.ApplicationServices.Notification
                 Body = parameters.Body,
                 Subject = parameters.Subject,
                 RelationId = relatedEntityId,
-                Type = parameters.Type,
+                Type = parameters.Type
             };
             return MapRecipients(parameters)
                 .Match<Result<NotificationModel, OperationError>>(recipients =>

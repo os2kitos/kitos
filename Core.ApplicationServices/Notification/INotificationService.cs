@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Notification.Write;
 using Core.DomainModel.Advice;
 using Core.DomainServices.Queries;
+using Core.ApplicationServices.Model.Notification;
 
 namespace Core.ApplicationServices.Notification
 {
@@ -14,10 +15,11 @@ namespace Core.ApplicationServices.Notification
         Result<IQueryable<Advice>, OperationError> GetNotifications(Guid organizationUuid, params IDomainQuery<Advice>[] conditions);
         Result<Advice, OperationError> GetNotificationByUuid(Guid uuid, RelatedEntityType relatedEntityType);
         IEnumerable<AdviceSent> GetNotificationSentByUuid(Guid uuid, RelatedEntityType relatedEntityType);
-        Result<Advice, OperationError> CreateImmediateNotification(Guid organizationUuid, ImmediateNotificationModificationParameters parameters);
-        Result<Advice, OperationError> CreateScheduledNotification(Guid organizationUuid, ScheduledNotificationModificationParameters parameters);
+        Result<Advice, OperationError> CreateImmediateNotification(ImmediateNotificationModificationParameters parameters);
+        Result<Advice, OperationError> CreateScheduledNotification(ScheduledNotificationModificationParameters parameters);
         Result<Advice, OperationError> UpdateScheduledNotification(Guid notificationUuid, UpdateScheduledNotificationModificationParameters parameters);
         Result<Advice, OperationError> DeactivateNotification(Guid notificationUuid, RelatedEntityType relatedEntityType);
         Maybe<OperationError> DeleteNotification(Guid notificationUuid, RelatedEntityType relatedEntityType);
+        Result<NotificationAccessRights, OperationError> GetAccessRights(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType);
     }
 }

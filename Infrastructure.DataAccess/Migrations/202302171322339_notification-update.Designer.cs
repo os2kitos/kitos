@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class added_uuid_to_notifications : IMigrationMetadata
+    public sealed partial class notificationupdate : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(added_uuid_to_notifications));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(notificationupdate));
         
         string IMigrationMetadata.Id
         {
-            get { return "202302160704038_added_uuid_to_notifications"; }
+            get { return "202302171322339_notification-update"; }
         }
         
         string IMigrationMetadata.Source

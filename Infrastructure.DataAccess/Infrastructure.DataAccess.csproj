@@ -1007,9 +1007,9 @@
     <Compile Include="Migrations\202302081425530_Extend_Archive_Period_With_Uuid.designer.cs">
       <DependentUpon>202302081425530_Extend_Archive_Period_With_Uuid.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202302160704038_added_uuid_to_notifications.cs" />
-    <Compile Include="Migrations\202302160704038_added_uuid_to_notifications.designer.cs">
-      <DependentUpon>202302160704038_added_uuid_to_notifications.cs</DependentUpon>
+    <Compile Include="Migrations\202302171322339_notification-update.cs" />
+    <Compile Include="Migrations\202302171322339_notification-update.designer.cs">
+      <DependentUpon>202302171322339_notification-update.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1021,8 +1021,8 @@
     <EmbeddedResource Include="Migrations\202302081425530_Extend_Archive_Period_With_Uuid.resx">
       <DependentUpon>202302081425530_Extend_Archive_Period_With_Uuid.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202302160704038_added_uuid_to_notifications.resx">
-      <DependentUpon>202302160704038_added_uuid_to_notifications.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202302171322339_notification-update.resx">
+      <DependentUpon>202302171322339_notification-update.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ExternalReference.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />

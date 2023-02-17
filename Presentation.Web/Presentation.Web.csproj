@@ -358,6 +358,7 @@
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
     <Compile Include="Models\API\V1\UserCredentialsDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Notifications\NotificationAccessRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />

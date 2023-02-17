@@ -66,13 +66,13 @@ namespace Core.ApplicationServices.Notification
                 .SelectMany(x => x.AdviceSent);
         }
 
-        public Result<Advice, OperationError> Create(int organizationId, NotificationModel notificationModel)
+        public Result<Advice, OperationError> Create(NotificationModel notificationModel)
         {
             var newNotification = MapCreateModelToEntity(notificationModel);
 
             if (!_authorizationContext.AllowModify(ResolveRoot(newNotification)))
             {
-                return new OperationError($"User is not allowed to create notification in organization with id: {organizationId}, for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
+                return new OperationError($"User is not allowed to create notification for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
             }
 
             //Prepare new advice

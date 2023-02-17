@@ -159,6 +159,7 @@
     <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
+    <Compile Include="Model\Notification\NotificationAccessRights.cs" />
     <Compile Include="Model\Notification\UpdateNotificationModel.cs" />
     <Compile Include="Model\Notification\NotificationModel.cs" />
     <Compile Include="Model\Notification\RecipientModel.cs" />

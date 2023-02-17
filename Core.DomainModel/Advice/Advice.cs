@@ -44,7 +44,7 @@ namespace Core.DomainModel.Advice
         public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }
-        public RelatedEntityType? Type { get; set; }
+        public RelatedEntityType Type { get; set; }
 
         public Scheduling? Scheduling { get; set; }
 

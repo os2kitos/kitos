@@ -100,7 +100,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             {
                 return Forbidden();
             }
-            return _registrationNotificationService.Create(organizationId, MapNotification(advice))
+            return _registrationNotificationService.Create(MapNotification(advice))
                 .Match(Created, FromOperationError);
         }
 

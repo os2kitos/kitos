@@ -67,6 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                     notifications =>
                     {
                         var notificationList = notifications
+                            .OrderBy(x => x.Id)
                             .Page(paginationQuery)
                             .ToList();
 
@@ -112,13 +113,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult CreateImmediateNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid organizationUuid, [FromBody] ImmediateNotificationWriteRequestDTO request)
+        public IHttpActionResult CreateImmediateNotification(OwnerResourceType ownerResourceType, [FromBody] ImmediateNotificationWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _writeModelMapper.FromImmediatePOST(request, ownerResourceType)
-                .Bind(notification => _notificationService.CreateImmediateNotification(organizationUuid, notification))
+                .Bind(notification => _notificationService.CreateImmediateNotification(notification))
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
@@ -140,13 +141,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult CreateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid organizationUuid, [FromBody] ScheduledNotificationWriteRequestDTO request)
+        public IHttpActionResult CreateScheduledNotification(OwnerResourceType ownerResourceType, [FromBody] ScheduledNotificationWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _writeModelMapper.FromScheduledPOST(request, ownerResourceType)
-                .Bind(notification => _notificationService.CreateScheduledNotification(organizationUuid, notification))
+                .Bind(notification => _notificationService.CreateScheduledNotification(notification))
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
@@ -245,6 +246,29 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             return _notificationService.GetNotificationSentByUuid(notificationUuid, ownerResourceType.ToRelatedEntityType())
                 .Select(_responseMapper.MapNotificationSentResponseDTO)
                 .Transform(Ok);
+        }
+
+        /// <summary>
+        /// Gets a notification based on the ownerResourceType and notificationUuid
+        /// </summary>
+        /// <param name="ownerResourceType"></param>
+        /// <param name="notificationUuid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{ownerResourceType}/access-rights/{notificationUuid}/{ownerResourceUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<NotificationAccessRightsResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetAccessRights(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid, [NonEmptyGuid] Guid ownerResourceUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _notificationService.GetAccessRights(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
+                .Select(_responseMapper.MapNotificationAccessRightsResponseDTO)
+                .Match(Ok, FromOperationError);
         }
     }
 }

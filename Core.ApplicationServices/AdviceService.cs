@@ -256,7 +256,7 @@ namespace Core.ApplicationServices
                     else
                     {
                         var nameForNotification = advice.Name ?? "Ikke navngivet";
-                        _userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                        _userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.GetValueOrDefault(), nameForNotification, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.GetValueOrDefault(), advice.Type, NotificationType.Advice);
                     }
                 }
                 return false;

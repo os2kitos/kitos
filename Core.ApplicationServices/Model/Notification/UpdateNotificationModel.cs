@@ -10,7 +10,7 @@ namespace Core.ApplicationServices.Model.Notification
         public DateTime? ToDate { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
-        public RelatedEntityType? Type { get; set; }
+        public RelatedEntityType Type { get; set; }
         public AdviceType AdviceType { get; set; }
 
         /// <summary>
