@@ -245,11 +245,9 @@
                             <th width="15%" class="element-selection-list_header--padding">
                                 <p class="small">Overførsel til usikkert 3. land</p>
                             </th>
-                            <th width="15%" class="element-selection-list_header--padding noRightBorder">
+                            <th width="25%" class="element-selection-list_header--padding noRightBorder">
                                 <p class="small">Land der overføres til</p>
                             </th>
-                            <th width="5%" class="element-selection-list_header--padding noLeftBorder noRightBorder"></th>
-                            <th width="5%" class="element-selection-list_header--padding noLeftBorder"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -258,24 +256,24 @@
                             <td class="noRightBorder">{{::dataProcessor.cvrNumber }}</td>
                             <td class="noRightBorder">{{::dataProcessor.basisForTransfer.name }}</td>
                             <td class="noRightBorder">{{::vm.yesNoUndecidedOptionsViewModel.getText(dataProcessor.transferToInsecureThirdCountries) }}</td>
-                            <td class="noRightBorder">{{::dataProcessor.insecureCountry.name }}</td>
-                            <td class="text-right noLeftBorder noRightBorder">
-                                <button type="button"
-                                        class="btn btn-info btn-xs"
-                                        ng-click="vm.updateSubDataProcessor(dataProcessor.id)"
-                                        ng-if="vm.hasWriteAccess">
-                                    <i class="glyphicon glyphicon-pencil"></i>
-                                </button>
-                            </td>
-                            <td class="text-right noLeftBorder">
-                                <button type="button"
-                                        id="delete-sub-data-processor"
-                                        class="btn btn-danger btn-xs"
-                                        data-confirmed-click="vm.removeSubDataProcessor({{::dataProcessor.id}})"
-                                        data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                        ng-if="vm.hasWriteAccess">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </button>
+                            <td class="noRightBorder">
+                                {{::dataProcessor.insecureCountry.name }}
+                                <div class="pull-right" ng-if="vm.hasWriteAccess">
+                                    <button type="button"
+                                            class="btn btn-info btn-xs"
+                                            ng-click="vm.updateSubDataProcessor(dataProcessor.id)"
+                                            ng-if="vm.hasWriteAccess">
+                                        <i class="glyphicon glyphicon-pencil"></i>
+                                    </button>
+                                    <button type="button"
+                                            id="delete-sub-data-processor"
+                                            class="btn btn-danger btn-xs"
+                                            data-confirmed-click="vm.removeSubDataProcessor({{::dataProcessor.id}})"
+                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                            ng-if="vm.hasWriteAccess">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
