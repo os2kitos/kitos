@@ -7,6 +7,7 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
@@ -23,14 +24,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             return creationParameters;
         }
 
-        public RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderWritableITSystemPropertiesDTO request)
+        public RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderCreateItSystemRequestDTO request)
         {
             var parameters = new RightsHolderSystemUpdateParameters();
             MapChanges(request, parameters, true);
             return parameters;
         }
 
-        public RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderPartialUpdateSystemPropertiesRequestDTO request)
+        public RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO request)
         {
             var parameters = new RightsHolderSystemUpdateParameters();
             MapChanges(request, parameters, false);

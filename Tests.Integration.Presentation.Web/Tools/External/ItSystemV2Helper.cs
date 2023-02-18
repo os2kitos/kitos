@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
 using Xunit;
@@ -46,7 +47,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(BaseRightsHolderPath), request, token);
         }
 
-        public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
+        public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderCreateItSystemRequestDTO request)
         {
             using var response = await SendUpdateRightsHolderSystemAsync(token, uuid, request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -54,7 +55,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
+        public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderCreateItSystemRequestDTO request)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, request);
         }

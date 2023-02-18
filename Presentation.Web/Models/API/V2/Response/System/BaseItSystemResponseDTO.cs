@@ -39,7 +39,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// Url reference for further information
         /// </summary>
-        public string UrlReference { get; set; }
+        public string UrlReference { get; set; } //TODO: Replace with proper model
 
         /// <summary>
         /// List of KLE number representations as name and UUID pairs
@@ -66,7 +66,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// List of IT-Interfaces exposed by this IT-System
         /// </summary>
-        public IEnumerable<IdentityNamePairResponseDTO> ExposedInterfaces { get; set; }
+        public IEnumerable<IdentityNamePairResponseDTO> ExposedInterfaces { get; set; } //TODO: Remove this - duplicate information which should be found using the api in stead
 
         /// <summary>
         /// Date of creation (on some legacy systems , this information is not available. If so, it will be null)

@@ -369,6 +369,10 @@
     <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Roles\ExtendedRoleAssignmentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserReferenceResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\Regular\CreateItSystemRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\Regular\IItSystemWriteRequestPropertiesDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\Regular\RecommendedArchiveDutyRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\Shared\IItSystemWriteRequestCommonPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
@@ -628,8 +632,8 @@
     <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ItSystemUsageValidityWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\System\IRightsHolderWritableSystemPropertiesRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\System\RightsHolderPartialUpdateSystemPropertiesRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\RightsHolder\IRightsHolderWritableSystemPropertiesRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\RightsHolder\RightsHolderUpdateSystemPropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\IRightsHolderWritableItInterfacePropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\RightsHolderPartialUpdateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
@@ -715,7 +719,7 @@
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
     <Compile Include="Models\API\V2\Request\Interface\RightsHolderCreateItInterfaceRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\System\RightsHolderWritableITSystemPropertiesDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\RightsHolder\RightsHolderCreateItSystemRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Queries\BoundedPaginationQuery.cs" />
     <Compile Include="Models\API\V2\Response\System\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />
@@ -823,7 +827,6 @@
     <Compile Include="Models\Application\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Application\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Identity\IdentityNamePairResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Request\System\RightsHolderCreateItSystemRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Organization\OrganizationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\System\RecommendedArchiveDutyResponseDTO.cs" />
     <Compile Include="Models\Application\FeatureToggle\TemporaryFeature.cs" />

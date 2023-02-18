@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Tests.Toolkit.Extensions;
 using Xunit;
 
@@ -44,7 +45,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_FromRightsHolderPUT()
         {
             //Arrange
-            var input = A<RightsHolderWritableITSystemPropertiesDTO>();
+            var input = A<RightsHolderCreateItSystemRequestDTO>();
 
             //Act
             var output = _sut.FromRightsHolderPUT(input);
@@ -57,7 +58,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_FromRightsHolderPATCH()
         {
             //Arrange
-            var input = A<RightsHolderPartialUpdateSystemPropertiesRequestDTO>();
+            var input = A<RightsHolderUpdateSystemPropertiesRequestDTO>();
 
             //Act
             var output = _sut.FromRightsHolderPATCH(input);
@@ -84,16 +85,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noTaskRefUuids)
         {
             //Arrange
-            var emptyInput = new RightsHolderPartialUpdateSystemPropertiesRequestDTO();
-            var definedProperties = GetAllInputPropertyNames<RightsHolderPartialUpdateSystemPropertiesRequestDTO>();
-            if (noName) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.Name));
-            if (noDescription) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.UrlReference));
-            if (noParent) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.ParentUuid));
-            if (noBusinessType) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
-            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
-            if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
+            var emptyInput = new RightsHolderUpdateSystemPropertiesRequestDTO();
+            var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
+            if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
+            if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
+            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
+            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
+            if (noParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
+            if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
+            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLENumbers));
+            if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
 
@@ -125,15 +126,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var emptyInput = new RightsHolderCreateItSystemRequestDTO();
-            var definedProperties = GetAllInputPropertyNames<RightsHolderPartialUpdateSystemPropertiesRequestDTO>();
-            if (noName) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.Name));
-            if (noDescription) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.UrlReference));
-            if (npParent) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.ParentUuid));
-            if (noBusinessType) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
-            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
-            if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
+            var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
+            if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
+            if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
+            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
+            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
+            if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
+            if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
+            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLENumbers));
+            if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
 
@@ -164,16 +165,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
        bool noTaskRefUuids)
         {
             //Arrange
-            var emptyInput = new RightsHolderWritableITSystemPropertiesDTO();
-            var definedProperties = GetAllInputPropertyNames<RightsHolderPartialUpdateSystemPropertiesRequestDTO>();
-            if (noName) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.Name));
-            if (noDescription) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.UrlReference));
-            if (npParent) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.ParentUuid));
-            if (noBusinessType) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
-            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
-            if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
+            var emptyInput = new RightsHolderCreateItSystemRequestDTO();
+            var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
+            if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
+            if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
+            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
+            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
+            if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
+            if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
+            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLENumbers));
+            if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
 
