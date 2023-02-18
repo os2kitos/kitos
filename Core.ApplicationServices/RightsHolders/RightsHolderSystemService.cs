@@ -190,31 +190,14 @@ namespace Core.ApplicationServices.RightsHolders
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.UrlReference, UpdateMainUrlReference))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, UpdateParentSystem))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
-                .Bind(updatedSystem => UpdateTaskRefs(updatedSystem, updates.TaskRefKeys, updates.TaskRefUuids));
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.TaskRefUuids, UpdateTaskRefs));
         }
 
-        private Result<ItSystem, OperationError> UpdateTaskRefs(ItSystem system, OptionalValueChange<IEnumerable<string>> taskRefKeysChanges, OptionalValueChange<IEnumerable<Guid>> taskRefUuidsChanges)
+        private Result<ItSystem, OperationError> UpdateTaskRefs(ItSystem system, IEnumerable<Guid> taskRefUuidsChanges)
         {
-            if (taskRefKeysChanges.IsUnchanged && taskRefUuidsChanges.IsUnchanged)
-            {
-                //No changes requested - skip it
-                return system;
-            }
-
-            var taskRefKeys = taskRefKeysChanges.Match(keys => keys, Array.Empty<string>).ToList();
-            var taskRefUuids = taskRefUuidsChanges.Match(keys => keys, Array.Empty<Guid>).ToList();
+            var taskRefUuids = taskRefUuidsChanges.ToList();
 
             var taskRefIds = new HashSet<int>();
-            foreach (var taskRefKey in taskRefKeys)
-            {
-                var taskRef = _taskRefRepository.GetTaskRef(taskRefKey);
-
-                if (taskRef.IsNone)
-                    return new OperationError($"Invalid KLE Number:{taskRefKey}", OperationFailure.BadInput);
-
-                if (!taskRefIds.Add(taskRef.Value.Id))
-                    return new OperationError($"Overlapping KLE. Please specify the same KLE only once. KLE resolved by key {taskRefKey}", OperationFailure.BadInput);
-            }
             foreach (var uuid in taskRefUuids)
             {
                 var taskRef = _taskRefRepository.GetTaskRef(uuid);

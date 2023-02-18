@@ -69,7 +69,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(8);
+            return CreateGetUndefinedSectionsInput(7);
         }
 
         [Theory]
@@ -81,7 +81,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noUrlReference,
            bool noParent,
            bool noBusinessType,
-           bool noTaskRefKeys,
            bool noTaskRefUuids)
         {
             //Arrange
@@ -93,7 +92,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
             if (noParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
-            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
@@ -108,7 +106,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(output.UrlReference.IsUnchanged, noUrlReference);
             Assert.Equal(output.ParentSystemUuid.IsUnchanged, noParent);
             Assert.Equal(output.BusinessTypeUuid.IsUnchanged, noBusinessType);
-            Assert.Equal(output.TaskRefKeys.IsUnchanged, noTaskRefKeys);
             Assert.Equal(output.TaskRefUuids.IsUnchanged, noTaskRefUuids);
         }
 
@@ -121,7 +118,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noUrlReference,
            bool npParent,
            bool noBusinessType,
-           bool noTaskRefKeys,
            bool noTaskRefUuids)
         {
             //Arrange
@@ -133,7 +129,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
-            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
@@ -148,7 +143,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.UrlReference.HasChange);
             Assert.True(output.ParentSystemUuid.HasChange);
             Assert.True(output.BusinessTypeUuid.HasChange);
-            Assert.True(output.TaskRefKeys.HasChange);
             Assert.True(output.TaskRefUuids.HasChange);
         }
 
@@ -161,7 +155,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
        bool noUrlReference,
        bool npParent,
        bool noBusinessType,
-       bool noTaskRefKeys,
        bool noTaskRefUuids)
         {
             //Arrange
@@ -173,7 +166,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
-            if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
 
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
@@ -188,7 +180,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.UrlReference.HasChange);
             Assert.True(output.ParentSystemUuid.HasChange);
             Assert.True(output.BusinessTypeUuid.HasChange);
-            Assert.True(output.TaskRefKeys.HasChange);
             Assert.True(output.TaskRefUuids.HasChange);
         }
 
@@ -200,7 +191,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Description, AssertPropertyContainsDataChange(output.Description));
             Assert.Equal(input.UrlReference, AssertPropertyContainsDataChange(output.UrlReference));
             Assert.Equal(input.BusinessTypeUuid, AssertPropertyContainsDataChange(output.BusinessTypeUuid));
-            Assert.Equal(input.KLENumbers, AssertPropertyContainsDataChange(output.TaskRefKeys));
             Assert.Equal(input.KLEUuids, AssertPropertyContainsDataChange(output.TaskRefUuids));
             Assert.Equal(input.ParentUuid, AssertPropertyContainsDataChange(output.ParentSystemUuid));
         }

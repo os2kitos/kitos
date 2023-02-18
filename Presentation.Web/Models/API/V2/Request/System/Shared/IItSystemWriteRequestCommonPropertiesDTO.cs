@@ -11,7 +11,6 @@ namespace Presentation.Web.Models.API.V2.Request.System.Shared
         public string Description { get; set; }
         public string UrlReference { get; set; } //TODO: expose a proper external references interface
         public Guid? BusinessTypeUuid { get; set; }
-        public IEnumerable<string> KLENumbers { get; set; } //TODO: Kill this additional complexity.. UUIDs must be used by convention
         public IEnumerable<Guid> KLEUuids { get; set; }
     }
 }

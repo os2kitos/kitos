@@ -8,6 +8,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.System;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
+using Presentation.Web.Models.API.V2.Request.System.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
@@ -38,7 +39,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             return parameters;
         }
 
-        private void MapChanges(IRightsHolderWritableSystemPropertiesRequestDTO source, RightsHolderSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
+        private void MapChanges(IItSystemWriteRequestCommonPropertiesDTO source, RightsHolderSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
         {
             var rule = CreateChangeRule<IRightsHolderWritableSystemPropertiesRequestDTO>(enforceResetOnMissingProperty);
 
@@ -48,7 +49,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             destination.Description = rule.MustUpdate(x => x.Description) ? source.Description.AsChangedValue() : OptionalValueChange<string>.None;
             destination.UrlReference = rule.MustUpdate(x => x.UrlReference) ? source.UrlReference.AsChangedValue() : OptionalValueChange<string>.None;
             destination.BusinessTypeUuid = rule.MustUpdate(x => x.BusinessTypeUuid) ? source.BusinessTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
-            destination.TaskRefKeys = rule.MustUpdate(x => x.KLENumbers) ? (source.KLENumbers ?? new List<string>()).AsChangedValue() : OptionalValueChange<IEnumerable<string>>.None;
             destination.TaskRefUuids = rule.MustUpdate(x => x.KLEUuids) ? (source.KLEUuids ?? new List<Guid>()).AsChangedValue() : OptionalValueChange<IEnumerable<Guid>>.None;
         }
     }

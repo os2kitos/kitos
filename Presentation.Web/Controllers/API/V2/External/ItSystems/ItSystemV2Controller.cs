@@ -338,7 +338,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             return dto;
         }
 
-        private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
+        private static void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
         {
             dto.Uuid = arg.Uuid;
             dto.Name = arg.Name;
@@ -351,13 +351,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             dto.FormerName = arg.PreviousName;
             dto.ParentSystem = arg.Parent?.Transform(parent => parent.MapIdentityNamePairDTO());
             dto.UrlReference = arg.Reference?.URL;
-            dto.ExposedInterfaces = arg
-                .ItInterfaceExhibits
-                .Select(exhibit => exhibit.ItInterface)
-                .ToList()
-                .Where(_authorizationContext.AllowReads)// Only accessible interfaces may be referenced here
-                .Select(x => x.MapIdentityNamePairDTO())
-                .ToList();
             dto.RecommendedArchiveDuty =
                 new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType());
             dto.KLE = arg

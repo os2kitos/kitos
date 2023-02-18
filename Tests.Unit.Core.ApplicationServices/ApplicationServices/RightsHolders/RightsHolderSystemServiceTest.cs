@@ -69,7 +69,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
                 FormerName = A<string>().AsChangedValue(),
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue(),
                 BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue(),
-                TaskRefKeys = Many<string>().AsChangedValue(),
                 TaskRefUuids = Many<Guid>().AsChangedValue(),
                 RightsHolderProvidedUuid = A<Guid>()
             });
@@ -81,7 +80,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
                 FormerName = A<string>().AsChangedValue(),
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue(),
                 BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue(),
-                TaskRefKeys = Many<string>().AsChangedValue(),
                 TaskRefUuids = Many<Guid>().AsChangedValue()
             });
         }
@@ -235,12 +233,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
 
             var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in inputParameters.TaskRefKeys.NewValue)
-            {
-                var taskRef = new TaskRef { Id = A<int>() };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(taskRef);
-                taskRefs[taskRefKey] = taskRef;
-            }
             foreach (var uuid in inputParameters.TaskRefUuids.NewValue)
             {
                 var taskRef = new TaskRef { Id = A<int>() };
@@ -566,42 +558,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             Assert.Same(operationError, result.Error);
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_KLE_Duplicates_By_Key()
-        {
-            //Arrange
-            var overlapKey = A<string>();
-            var uniqueKey = A<string>();
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = new RightsHolderSystemCreationParameters
-            {
-                RightsHolderProvidedUuid = Guid.NewGuid(),
-                Name = A<string>().AsChangedValue(),
-                TaskRefKeys = new[] { overlapKey, uniqueKey, overlapKey }.AsChangedValue<IEnumerable<string>>()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uniqueKey)).Returns(new TaskRef() { Id = A<int>() });
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(overlapKey)).Returns(new TaskRef() { Id = A<int>() });
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            Assert.Contains("Overlapping KLE. Please specify the same KLE only once. KLE resolved by key ", result.Error.Message.Value);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
+      
         [Fact]
         public void CreateNewSystem_Returns_Error_If_KLE_Duplicates_By_Uuid()
         {
@@ -711,12 +668,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
             var parent = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
             var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in parameters.TaskRefKeys.NewValue)
-            {
-                var taskRef = new TaskRef { Id = A<int>() };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(taskRef);
-                taskRefs[taskRefKey] = taskRef;
-            }
             foreach (var uuid in parameters.TaskRefUuids.NewValue)
             {
                 var taskRef = new TaskRef { Id = A<int>() };
@@ -754,17 +705,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var parameters = new RightsHolderSystemUpdateParameters
             {
                 TaskRefUuids = Many<Guid>().AsChangedValue(),
-                TaskRefKeys = Many<string>().AsChangedValue()
             };
             var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
 
             var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in parameters.TaskRefKeys.NewValue)
-            {
-                var taskRef = new TaskRef { Id = 1 };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(taskRef);
-                taskRefs[taskRefKey] = taskRef;
-            }
             foreach (var uuid in parameters.TaskRefUuids.NewValue)
             {
                 var taskRef = new TaskRef { Id = 1 };
@@ -792,15 +736,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var systemUuid = A<Guid>();
             var parameters = new RightsHolderSystemUpdateParameters
             {
-                TaskRefKeys = Many<string>().AsChangedValue()
+                TaskRefUuids = Many<Guid>().AsChangedValue()
             };
             var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in parameters.TaskRefKeys.NewValue)
+            foreach (var taskRefKey in parameters.TaskRefUuids.NewValue)
             {
-                var taskRef = new TaskRef { Id = 1 };
                 _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(Maybe<TaskRef>.None);
-                taskRefs[taskRefKey] = taskRef;
             }
 
             var transaction = ExpectTransactionBegins();

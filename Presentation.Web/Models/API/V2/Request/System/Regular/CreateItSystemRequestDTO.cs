@@ -50,11 +50,6 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         public Guid? BusinessTypeUuid { get; set; }
 
         /// <summary>
-        /// KLE numbers categorizing this IT-System
-        /// </summary>
-        public IEnumerable<string> KLENumbers { get; set; } //TODO: kill
-
-        /// <summary>
         /// UUID's for KLE numbers categorizing this IT-System
         /// </summary>
         public IEnumerable<Guid> KLEUuids { get; set; }
