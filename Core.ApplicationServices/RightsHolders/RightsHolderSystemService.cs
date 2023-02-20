@@ -194,24 +194,24 @@ namespace Core.ApplicationServices.RightsHolders
                 .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.FormerName, (itSystem, newValue) => _systemService.UpdatePreviousName(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Description, (itSystem, newValue) => _systemService.UpdateDescription(itSystem.Id, newValue)))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ExternalReferences, PerformReferencesUpdate))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ExternalReferences, UpdateExternalReferences))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, UpdateParentSystem))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.TaskRefUuids, UpdateTaskRefs));
         }
 
-        private Result<ItSystem, OperationError> PerformReferencesUpdate(ItSystem systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
+        private Result<ItSystem, OperationError> UpdateExternalReferences(ItSystem system, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             //Clear existing state
             var updateResult = _referenceService.UpdateExternalReferences(
-                ReferenceRootType.SystemUsage,
-                systemUsage.Id,
+                ReferenceRootType.System,
+                system.Id,
                 externalReferences);
 
             if (updateResult.HasValue)
                 return new OperationError($"Failed to update references with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType);
 
-            return systemUsage;
+            return system;
         }
 
         private Result<ItSystem, OperationError> UpdateTaskRefs(ItSystem system, IEnumerable<Guid> taskRefUuidsChanges)
