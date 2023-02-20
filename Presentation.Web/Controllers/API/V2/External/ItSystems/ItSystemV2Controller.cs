@@ -98,6 +98,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpPost]
         [Route("it-systems")]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -122,7 +123,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpPatch]
         [Route("it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -147,12 +148,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpDelete]
         [Route("it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostItSystem([NonEmptyGuid] Guid uuid)
+        public IHttpActionResult DeleteItSystem([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
