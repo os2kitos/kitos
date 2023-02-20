@@ -14,6 +14,7 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
@@ -40,7 +41,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
         private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
-        private Mock<IReferenceService> _referenceServiceMock;
+        private readonly Mock<IReferenceService> _referenceServiceMock;
+        private readonly Mock<IAuthorizationContext> _authorizationContextMock;
+        private readonly Mock<IDatabaseControl> _dbControlMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
 
         public RightsHolderSystemServiceTest()
         {
@@ -52,6 +56,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
             _userRepositoryMock = new Mock<IUserRepository>();
             _referenceServiceMock = new Mock<IReferenceService>();
+            _authorizationContextMock = new Mock<IAuthorizationContext>();
+            _dbControlMock = new Mock<IDatabaseControl>();
+            _domainEventsMock = new Mock<IDomainEvents>();
             _sut = new RightsHolderSystemService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
@@ -62,7 +69,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
                 _userRepositoryMock.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
                 Mock.Of<ILogger>(),
-                _referenceServiceMock.Object);
+                _referenceServiceMock.Object,
+                _authorizationContextMock.Object,
+                _dbControlMock.Object,
+                _domainEventsMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

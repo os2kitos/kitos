@@ -13,6 +13,7 @@ using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
@@ -39,6 +40,9 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IOperationClock _operationClock;
         private readonly ILogger _logger;
         private readonly IReferenceService _referenceService;
+        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IDatabaseControl _databaseControl;
+        private readonly IDomainEvents _domainEvents;
 
         public RightsHolderSystemService(
             IOrganizationalUserContext userContext,
@@ -50,7 +54,10 @@ namespace Core.ApplicationServices.RightsHolders
             IUserRepository userRepository,
             IOperationClock operationClock,
             ILogger logger,
-            IReferenceService referenceService)
+            IReferenceService referenceService,
+            IAuthorizationContext authorizationContext,
+            IDatabaseControl databaseControl,
+            IDomainEvents domainEvents)
             : base(userContext, organizationRepository)
         {
             _userContext = userContext;
@@ -63,6 +70,9 @@ namespace Core.ApplicationServices.RightsHolders
             _operationClock = operationClock;
             _logger = logger;
             _referenceService = referenceService;
+            _authorizationContext = authorizationContext;
+            _databaseControl = databaseControl;
+            _domainEvents = domainEvents;
         }
 
         public Result<ItSystem, OperationError> CreateNewSystemAsRightsHolder(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters)
@@ -95,6 +105,8 @@ namespace Core.ApplicationServices.RightsHolders
 
                 if (result.Ok)
                 {
+                    RaiseSystemUpdated(result.Value);
+                    _databaseControl.SaveChanges();
                     transaction.Commit();
                 }
                 else
@@ -124,6 +136,8 @@ namespace Core.ApplicationServices.RightsHolders
 
                 if (result.Ok)
                 {
+                    RaiseSystemUpdated(result.Value);
+                    _databaseControl.SaveChanges();
                     transaction.Commit();
                 }
                 else
@@ -189,18 +203,95 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        //TODO: Extract common suff to base service and call from this service into that
-
         public Result<ItSystem, OperationError> CreateNewSystem(Guid organizationUuid, SystemUpdateParameters creationParameters)
         {
-            //TODO: Use both common and the other one
-            throw new NotImplementedException();
+            if (creationParameters == null)
+                throw new ArgumentNullException(nameof(creationParameters));
+
+            using var transaction = _transactionManager.Begin();
+            try
+            {
+                var organizationId = _organizationRepository.GetByUuid(organizationUuid).Select(x => x.Id);
+
+                if (organizationId.IsNone)
+                    return new OperationError("Invalid org uuid provided", OperationFailure.BadInput);
+
+                var name = creationParameters.Name;
+
+                if (name.IsUnchanged)
+                    return new OperationError("Error must be defined upon creation", OperationFailure.BadInput);
+
+                creationParameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
+
+                var result = _systemService
+                    .CreateNewSystem(organizationId.Value, name.NewValue)
+                    .Bind(system => ApplyCommonUpdates(system, creationParameters))
+                    .Bind(system => ApplyExtendedUpdates(system, creationParameters));
+
+                if (result.Ok)
+                {
+                    RaiseSystemUpdated(result.Value);
+                    _databaseControl.SaveChanges();
+                    transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error("Failed to create It-System {name} due to error: {errorMessage}", creationParameters.Name.NewValue, result.Error.ToString());
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed creating rightsholder system {name}", creationParameters.Name.NewValue);
+                return new OperationError(OperationFailure.UnknownError);
+            }
         }
 
         public Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters updateParameters)
         {
-            //TODO: Use both common and the other one
+            using var transaction = _transactionManager.Begin();
+            try
+            {
+                var result = _systemService
+                    .GetSystem(systemUuid)
+                    .Bind(WithWriteAccess)
+                    .Bind(system => ApplyExtendedUpdates(system, updateParameters))
+                    .Bind(system => ApplyCommonUpdates(system, updateParameters));
+
+                if (result.Ok)
+                {
+                    RaiseSystemUpdated(result.Value);
+                    _databaseControl.SaveChanges();
+                    transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "User {id} Failed updating system with uuid {uuid}", _userContext.UserId, systemUuid);
+                return new OperationError(OperationFailure.UnknownError);
+            }
+        }
+
+        private void RaiseSystemUpdated(ItSystem system)
+        {
+            _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
+        }
+
+        public Result<ItSystem, OperationError> Delete(Guid systemUuid)
+        {
             throw new NotImplementedException();
+        }
+
+        private Result<ItSystem, OperationError> WithWriteAccess(ItSystem system)
+        {
+            return _authorizationContext.AllowModify(system) ? system : new OperationError(OperationFailure.Forbidden);
         }
 
         private Result<ItSystem, OperationError> ApplyCommonUpdates(ItSystem system, SharedSystemUpdateParameters updates)

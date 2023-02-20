@@ -18,8 +18,8 @@ namespace Core.ApplicationServices.RightsHolders
         Result<ItSystem, OperationError> CreateNewSystemAsRightsHolder(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters);
         Result<ItSystem, OperationError> UpdateAsRightsHolder(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters);
         Result<ItSystem, OperationError> DeactivateAsRightsHolder(Guid systemUuid, string reason);
-
         Result<ItSystem, OperationError> CreateNewSystem(Guid organizationUuid, SystemUpdateParameters creationParameters);
         Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters updateParameters);
+        Result<ItSystem, OperationError> Delete(Guid systemUuid);
     }
 }
