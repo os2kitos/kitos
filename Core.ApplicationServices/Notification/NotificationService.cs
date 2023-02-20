@@ -199,15 +199,6 @@ namespace Core.ApplicationServices.Notification
             return NotificationAccessRights.ReadOnly();
         }
 
-        private Result<(int orgId, NotificationModel model), OperationError> MapModelAndResolveOrgId(Guid organizationUuid, int relatedEntityId, ImmediateNotificationModificationParameters parameters, AdviceType adviceType)
-        {
-            return MapBaseModel(parameters, adviceType, relatedEntityId)
-                .Bind(model =>
-                {
-                    return ResolveOrganizationId(organizationUuid).Select(id => (id, model));
-                });
-        }
-
         private Result<int, OperationError> ResolveOrganizationId(Guid organizationUuid)
         {
             return _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid)
