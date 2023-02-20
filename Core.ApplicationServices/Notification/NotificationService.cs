@@ -64,7 +64,6 @@ namespace Core.ApplicationServices.Notification
                     if (getResult.Failed)
                         return getResult.Error;
                     var baseQuery = getResult.Value;
-                    var test = baseQuery.ToList();
                     var subQueries = new List<IDomainQuery<Advice>>();
                     subQueries.AddRange(conditions);
 

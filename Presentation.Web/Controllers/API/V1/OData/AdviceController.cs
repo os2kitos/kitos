@@ -90,9 +90,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     }
                 }
 
-                if (advice.Scheduling is null)
+                if (advice.Scheduling is null or Scheduling.Immediate)
                 {
-                    return BadRequest($"Scheduling must be defined when creating advice of type {nameof(AdviceType.Repeat)}");
+                    return BadRequest($"Scheduling must be defined and cannot be {nameof(Scheduling.Immediate)} when creating advice of type {nameof(AdviceType.Repeat)}");
                 }
             }
 

@@ -9,13 +9,14 @@ namespace Core.DomainModel.Advice
 {
     public enum Scheduling
     {
-       Hour = 1,
-       Day = 2,
-       Week = 3,
-       Month = 4,
-       Year = 5,
-       Quarter = 6,
-       Semiannual = 7
+        Immediate = 0,
+        Hour = 1,
+        Day = 2,
+        Week = 3,
+        Month = 4,
+        Year = 5,
+        Quarter = 6,
+        Semiannual = 7
     }
 
     public enum AdviceType

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
-using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 using Xunit;
 
@@ -18,27 +17,27 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
     {
         private const string _basePath = "api/v2/notifications";
 
-        public static async Task<NotificationResponseDTO> CreateImmediateNotificationAsync(OwnerResourceType ownerResourceType, ImmediateNotificationWriteRequestDTO body)
+        public static async Task<NotificationResponseDTO> CreateImmediateNotificationAsync(OwnerResourceType ownerResourceType, ImmediateNotificationWriteRequestDTO body, Cookie userCookie = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/immediate"), cookie, body);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();
         }
-        public static async Task<NotificationResponseDTO> CreateScheduledNotificationAsync(OwnerResourceType ownerResourceType, ScheduledNotificationWriteRequestDTO body)
+        public static async Task<NotificationResponseDTO> CreateScheduledNotificationAsync(OwnerResourceType ownerResourceType, ScheduledNotificationWriteRequestDTO body, Cookie userCookie = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/scheduled"), cookie, body);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();
         }
-        public static async Task<NotificationResponseDTO> UpdateScheduledNotificationAsync(OwnerResourceType ownerResourceType, Guid notificationUuid, UpdateScheduledNotificationWriteRequestDTO body)
+        public static async Task<NotificationResponseDTO> UpdateScheduledNotificationAsync(OwnerResourceType ownerResourceType, Guid notificationUuid, UpdateScheduledNotificationWriteRequestDTO body, Cookie userCookie = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using var response = await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/scheduled/{notificationUuid}"), cookie, body);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -46,9 +45,9 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();
         }
 
-        public static async Task<NotificationResponseDTO> DeactivateNotificationAsync(OwnerResourceType ownerResourceType, Guid notificationUuid)
+        public static async Task<NotificationResponseDTO> DeactivateNotificationAsync(OwnerResourceType ownerResourceType, Guid notificationUuid, Cookie userCookie = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/scheduled/deactivate/{notificationUuid}"), cookie, new{});
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -56,9 +55,9 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();
         }
 
-        public static async Task DeleteNotificationAsync(OwnerResourceType ownerResourceType, Guid notificationUuid)
+        public static async Task DeleteNotificationAsync(OwnerResourceType ownerResourceType, Guid notificationUuid, Cookie userCookie = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using var response = await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/{notificationUuid}"), cookie);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -69,9 +68,10 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
             Guid organizationUuid,
             DateTime? fromDate = null,
             int? page = null,
-            int? pageSize = null)
+            int? pageSize = null,
+            Cookie userCookie = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var criteria = new List<KeyValuePair<string, string>>
             {
@@ -99,17 +99,17 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
             return await response.ReadResponseBodyAsAsync<IEnumerable<NotificationResponseDTO>>();
         }
 
-        public static async Task<NotificationResponseDTO> GetNotificationByUuid(OwnerResourceType ownerResourceType, Guid uuid)
+        public static async Task<NotificationResponseDTO> GetNotificationByUuid(OwnerResourceType ownerResourceType, Guid uuid, Cookie userCookie = null)
         {
-            using var response = await SendGetNotificationByUuid(ownerResourceType, uuid);
+            using var response = await SendGetNotificationByUuid(ownerResourceType, uuid, userCookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetNotificationByUuid(OwnerResourceType ownerResourceType, Guid uuid)
+        public static async Task<HttpResponseMessage> SendGetNotificationByUuid(OwnerResourceType ownerResourceType, Guid uuid, Cookie userCookie = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/{uuid}"), cookie);
         }

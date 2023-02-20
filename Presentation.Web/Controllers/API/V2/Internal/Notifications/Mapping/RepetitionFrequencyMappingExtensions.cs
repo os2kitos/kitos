@@ -22,8 +22,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             );
         }
 
-        public static RepetitionFrequencyOptions ToRepetitionFrequencyOptions(this Scheduling value)
+        public static RepetitionFrequencyOptions? ToRepetitionFrequencyOptions(this Scheduling value)
         {
+            if (value == Scheduling.Immediate)
+                return null;
+
             return Mapping.FromRightToLeft(value);
         }
 
