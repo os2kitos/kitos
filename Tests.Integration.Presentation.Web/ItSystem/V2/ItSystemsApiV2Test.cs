@@ -845,8 +845,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(input.Description, createdSystem.Description);
             Assert.Equal(input.Name, createdSystem.Name);
             Assert.Equal(input.FormerName, createdSystem.FormerName);
-            //Assert.Equal(input.UrlReference, createdSystem.UrlReference);
-            //TODO
+            Assert.Equivalent(input.ExternalReferences, createdSystem.ExternalReferences);
             Assert.Equal(input.BusinessTypeUuid, createdSystem.BusinessType?.Uuid);
 
             if (withKleUuid)
@@ -1078,8 +1077,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             if (updateDescription) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.Description), A<string>());
             if (updateBusinessType) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.BusinessTypeUuid), GetBusinessType(1));
             if (updateParent) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.ParentUuid), (await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public)).uuid);
-            //if (updateUrl) changes.Add(nameof(RightsHolderCreateItSystemRequestDTO.UrlReference), A<string>());
-            //TODO
+            if (updateUrl) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.ExternalReferences), A<ExternalReferenceDataWriteRequestDTO>().Transform(x =>
+            {
+                x.MasterReference = true;
+                return x;
+            }).WrapAsEnumerable().ToList());
 
             //Act
             var updatedSystem = await ItSystemV2Helper.PatchRightsHolderSystemAsync(token, createdSystem.Uuid, changes.ToArray());
@@ -1093,8 +1095,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(updateDescription ? changes[nameof(RightsHolderFullItSystemRequestDTO.Description)] : createdSystem.Description, updatedSystem.Description);
             Assert.Equal(updateBusinessType ? changes[nameof(RightsHolderFullItSystemRequestDTO.BusinessTypeUuid)] : createdSystem.BusinessType?.Uuid, updatedSystem.BusinessType?.Uuid);
             Assert.Equal(updateParent ? changes[nameof(RightsHolderFullItSystemRequestDTO.ParentUuid)] : createdSystem.ParentSystem?.Uuid, updatedSystem.ParentSystem?.Uuid);
-            //Assert.Equal(updateUrl ? changes[nameof(RightsHolderCreateItSystemRequestDTO.UrlReference)] : createdSystem.UrlReference, updatedSystem.UrlReference);
-            //TODO
+            Assert.Equivalent(updateUrl ? changes[nameof(RightsHolderFullItSystemRequestDTO.ExternalReferences)] : createdSystem.ExternalReferences, updatedSystem.ExternalReferences);
         }
 
         [Theory]

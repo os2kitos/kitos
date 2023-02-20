@@ -6,7 +6,7 @@ using Core.ApplicationServices.Model.Shared.Write;
 
 namespace Core.ApplicationServices.Model.System
 {
-    public class RightsHolderSystemUpdateParameters // TODO: Change to general update params
+    public class SystemUpdateParameters
     {
         public OptionalValueChange<string> Name { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<Guid?> ParentSystemUuid { get; set; } = OptionalValueChange<Guid?>.None;

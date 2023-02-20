@@ -183,7 +183,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
 
-        private static void AssertUpdateData(IRightsHolderWritableSystemPropertiesRequestDTO input, RightsHolderSystemUpdateParameters output)
+        private static void AssertUpdateData(IRightsHolderWritableSystemPropertiesRequestDTO input, SystemUpdateParameters output)
         {
             Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
             Assert.Equal(input.FormerName, AssertPropertyContainsDataChange(output.FormerName));

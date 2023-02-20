@@ -5,9 +5,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
     public interface IItSystemWriteModelMapper
     {
-        RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO dto);
-        RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO dto);
-        RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO dto);
+        SystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO dto);
+        SystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO dto);
+        SystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO dto);
     }
 
 }

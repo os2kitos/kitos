@@ -64,7 +64,7 @@ namespace Core.ApplicationServices.RightsHolders
             _referenceService = referenceService;
         }
 
-        public Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters)
+        public Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, SystemCreationParameters creationParameters)
         {
             if (creationParameters == null)
                 throw new ArgumentNullException(nameof(creationParameters));
@@ -110,7 +110,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters)
+        public Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters updateParameters)
         {
             using var transaction = _transactionManager.Begin();
             try
@@ -188,7 +188,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, RightsHolderSystemUpdateParameters updates)
+        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, SystemUpdateParameters updates)
         {
             return system
                 .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))

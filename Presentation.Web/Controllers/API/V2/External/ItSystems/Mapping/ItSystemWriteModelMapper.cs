@@ -19,28 +19,28 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
         {
         }
 
-        public RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO request)
+        public SystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO request)
         {
-            var creationParameters = new RightsHolderSystemCreationParameters { RightsHolderProvidedUuid = request.Uuid };
+            var creationParameters = new SystemCreationParameters { RightsHolderProvidedUuid = request.Uuid };
             MapChanges(request, creationParameters, true);
             return creationParameters;
         }
 
-        public RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO request)
+        public SystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO request)
         {
-            var parameters = new RightsHolderSystemUpdateParameters();
+            var parameters = new SystemUpdateParameters();
             MapChanges(request, parameters, true);
             return parameters;
         }
 
-        public RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO request)
+        public SystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO request)
         {
-            var parameters = new RightsHolderSystemUpdateParameters();
+            var parameters = new SystemUpdateParameters();
             MapChanges(request, parameters, false);
             return parameters;
         }
 
-        private void MapChanges(IItSystemWriteRequestCommonPropertiesDTO source, RightsHolderSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
+        private void MapChanges(IItSystemWriteRequestCommonPropertiesDTO source, SystemUpdateParameters destination, bool enforceResetOnMissingProperty)
         {
             var rule = CreateChangeRule<IRightsHolderWritableSystemPropertiesRequestDTO>(enforceResetOnMissingProperty);
 
