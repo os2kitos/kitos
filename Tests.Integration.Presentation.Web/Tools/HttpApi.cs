@@ -440,9 +440,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await GetCookieAsync(userCredentials, acceptUnAuthorized);
         }
 
-        public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)
+        public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool hasStakeHolderAccess = false)
         {
-            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess), role, organizationId);
+            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess,hasStakeHolderAccess), role, organizationId);
             var password = Guid.NewGuid().ToString("N");
             DatabaseAccess.MutateEntitySet<User>(x =>
             {
@@ -458,6 +458,21 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, string name, string lastName, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)
         {
+            var userInfo = await CreateUser(email, role, name, lastName, organizationId, apiAccess);
+
+            var cookie = await GetCookieAsync(new KitosCredentials(email, userInfo.password));
+
+            return (userInfo.userId, new KitosCredentials(email, userInfo.password), cookie);
+        }
+
+        private static async Task<(int userId, string password)> CreateUser(
+            string email,
+            OrganizationRole role,
+            string name,
+            string lastName,
+            int organizationId,
+            bool apiAccess)
+        {
             var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess), role, organizationId);
             var password = Guid.NewGuid().ToString("N");
             DatabaseAccess.MutateEntitySet<User>(x =>
@@ -468,10 +483,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 user.Name = name;
                 user.LastName = lastName;
             });
-
-            var cookie = await GetCookieAsync(new KitosCredentials(email, password));
-
-            return (userId, new KitosCredentials(email, password), cookie);
+            return (userId, password);
         }
 
         public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool stakeHolderAccess = false)
@@ -514,7 +526,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return userId;
         }
 
-        public static async Task<HttpResponseMessage> SendAssignRoleToUserAsync(int userId, OrganizationRole role,int organizationId = TestEnvironment.DefaultOrganizationId, Cookie optionalLoginCookie = null)
+        public static async Task<HttpResponseMessage> SendAssignRoleToUserAsync(int userId, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, Cookie optionalLoginCookie = null)
         {
             var cookie = optionalLoginCookie ?? await GetCookieAsync(OrganizationRole.GlobalAdmin);
 

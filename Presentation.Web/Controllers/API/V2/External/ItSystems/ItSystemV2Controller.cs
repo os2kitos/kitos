@@ -12,7 +12,7 @@ using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.ItSystem;
+using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
@@ -41,7 +41,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
-            IAuthorizationContext authorizationContext, 
+            IAuthorizationContext authorizationContext,
             IItSystemWriteModelMapper writeModelMapper,
             IEntityIdentityResolver entityIdentityResolver)
         {
@@ -82,30 +82,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refinements = new List<IDomainQuery<ItSystem>>();
-
-            if (rightsHolderUuid.HasValue)
-                refinements.Add(new QueryByRightsHolderUuid(rightsHolderUuid.Value));
-
-            if (businessTypeUuid.HasValue)
-                refinements.Add(new QueryByBusinessType(businessTypeUuid.Value));
-
-            if (kleNumber != null || kleUuid.HasValue)
-                refinements.Add(new QueryByTaskRef(kleNumber, kleUuid));
-
-            if (numberOfUsers.HasValue)
-                refinements.Add(new QueryByNumberOfUsages(numberOfUsers.Value));
-
-            if (includeDeactivated != true)
-                refinements.Add(new QueryByEnabledEntitiesOnly<ItSystem>());
-
-            if (changedSinceGtEq.HasValue)
-                refinements.Add(new QueryByChangedSinceGtEq<ItSystem>(changedSinceGtEq.Value));
-
-            return _itSystemService.GetAvailableSystems(refinements.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
-                .Page(paginationQuery)
-                .ToList()
+            return _itSystemService
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery)
                 .Select(ToSystemResponseDTO)
                 .Transform(Ok);
         }
@@ -149,7 +127,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             return _entityIdentityResolver.ResolveDbId<ItSystem>(uuid)
                 .Match
                 (
