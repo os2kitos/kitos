@@ -20,7 +20,6 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Request.System;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
@@ -36,21 +35,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
     {
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
-        private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemWriteModelMapper _writeModelMapper;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
+        private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
-            IAuthorizationContext authorizationContext,
             IItSystemWriteModelMapper writeModelMapper,
-            IEntityIdentityResolver entityIdentityResolver)
+            IEntityIdentityResolver entityIdentityResolver,
+            IExternalReferenceResponseMapper referenceResponseMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
-            _authorizationContext = authorizationContext;
             _writeModelMapper = writeModelMapper;
             _entityIdentityResolver = entityIdentityResolver;
+            _referenceResponseMapper = referenceResponseMapper;
         }
 
         /// <summary>
@@ -338,7 +337,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             return dto;
         }
 
-        private static void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
+        private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
         {
             dto.Uuid = arg.Uuid;
             dto.Name = arg.Name;
@@ -350,7 +349,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             dto.Deactivated = arg.Disabled;
             dto.FormerName = arg.PreviousName;
             dto.ParentSystem = arg.Parent?.Transform(parent => parent.MapIdentityNamePairDTO());
-            dto.UrlReference = arg.Reference?.URL;
+            dto.ExternalReferences = _referenceResponseMapper.MapExternalReferences(arg.ExternalReferences).ToList();
             dto.RecommendedArchiveDuty =
                 new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType());
             dto.KLE = arg

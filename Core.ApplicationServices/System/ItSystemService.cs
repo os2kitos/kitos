@@ -336,25 +336,6 @@ namespace Core.ApplicationServices.System
             return ValidateNewSystemName(organizationId, name).IsNone;
         }
 
-        public Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference)
-        {
-            return Mutate(systemId, system => system.Reference?.URL != urlReference, updateWithResult: system =>
-            {
-                if (string.IsNullOrWhiteSpace(urlReference))
-                    return new OperationError("Url must be defined", OperationFailure.BadInput);
-
-                var existingReference = system.Reference;
-                if (existingReference != null)
-                {
-                    existingReference.URL = urlReference;
-                    return system;
-                }
-
-                return _referenceService.AddReference(systemId, ReferenceRootType.System, new ExternalReferenceProperties("Reference", string.Empty, urlReference, true))
-                    .Bind(_ => Result<ItSystem, OperationError>.Success(system));
-            });
-        }
-
         public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> newTaskRefState)
         {
             Predicate<ItSystem> updateIfTaskRefCollectionDiffers = system => system.TaskRefs.Select(x => x.Id).OrderBy(id => id).SequenceEqual(newTaskRefState.OrderBy(id => id)) == false;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Response.System
@@ -37,9 +38,10 @@ namespace Presentation.Web.Models.API.V2.Response.System
         public string Description { get; set; }
 
         /// <summary>
-        /// Url reference for further information
+        /// User defined external references
         /// </summary>
-        public string UrlReference { get; set; } //TODO: Replace with proper model
+        [Required]
+        public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
 
         /// <summary>
         /// List of KLE number representations as name and UUID pairs

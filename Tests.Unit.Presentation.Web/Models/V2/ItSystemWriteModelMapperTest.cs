@@ -6,7 +6,6 @@ using Moq;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
-using Presentation.Web.Models.API.V2.Request.System;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Tests.Toolkit.Extensions;
 using Xunit;
@@ -89,7 +88,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
             if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
+            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (noParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
@@ -103,7 +102,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(output.Name.IsUnchanged, noName);
             Assert.Equal(output.Description.IsUnchanged, noDescription);
             Assert.Equal(output.FormerName.IsUnchanged, noFormerName);
-            Assert.Equal(output.UrlReference.IsUnchanged, noUrlReference);
+            Assert.Equal(output.ExternalReferences.HasValue, noUrlReference);
             Assert.Equal(output.ParentSystemUuid.IsUnchanged, noParent);
             Assert.Equal(output.BusinessTypeUuid.IsUnchanged, noBusinessType);
             Assert.Equal(output.TaskRefUuids.IsUnchanged, noTaskRefUuids);
@@ -126,7 +125,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
             if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
+            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
@@ -140,7 +139,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.Name.HasChange);
             Assert.True(output.Description.HasChange);
             Assert.True(output.FormerName.HasChange);
-            Assert.True(output.UrlReference.HasChange);
+            Assert.True(output.ExternalReferences.HasValue);
             Assert.True(output.ParentSystemUuid.HasChange);
             Assert.True(output.BusinessTypeUuid.HasChange);
             Assert.True(output.TaskRefUuids.HasChange);
@@ -163,7 +162,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
             if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.UrlReference));
+            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
@@ -177,7 +176,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.Name.HasChange);
             Assert.True(output.Description.HasChange);
             Assert.True(output.FormerName.HasChange);
-            Assert.True(output.UrlReference.HasChange);
+            Assert.True(output.ExternalReferences.HasValue);
             Assert.True(output.ParentSystemUuid.HasChange);
             Assert.True(output.BusinessTypeUuid.HasChange);
             Assert.True(output.TaskRefUuids.HasChange);
@@ -189,10 +188,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
             Assert.Equal(input.FormerName, AssertPropertyContainsDataChange(output.FormerName));
             Assert.Equal(input.Description, AssertPropertyContainsDataChange(output.Description));
-            Assert.Equal(input.UrlReference, AssertPropertyContainsDataChange(output.UrlReference));
             Assert.Equal(input.BusinessTypeUuid, AssertPropertyContainsDataChange(output.BusinessTypeUuid));
             Assert.Equal(input.KLEUuids, AssertPropertyContainsDataChange(output.TaskRefUuids));
             Assert.Equal(input.ParentUuid, AssertPropertyContainsDataChange(output.ParentSystemUuid));
+            //TODO - reference mapping asserted!
+
         }
     }
 }

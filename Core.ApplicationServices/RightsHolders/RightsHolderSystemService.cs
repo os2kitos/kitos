@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
@@ -33,6 +37,7 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IUserRepository _userRepository;
         private readonly IOperationClock _operationClock;
         private readonly ILogger _logger;
+        private readonly IReferenceService _referenceService;
 
         public RightsHolderSystemService(
             IOrganizationalUserContext userContext,
@@ -43,7 +48,8 @@ namespace Core.ApplicationServices.RightsHolders
             ITransactionManager transactionManager,
             IUserRepository userRepository,
             IOperationClock operationClock,
-            ILogger logger)
+            ILogger logger, 
+            IReferenceService referenceService)
             : base(userContext, organizationRepository)
         {
             _userContext = userContext;
@@ -55,6 +61,7 @@ namespace Core.ApplicationServices.RightsHolders
             _userRepository = userRepository;
             _operationClock = operationClock;
             _logger = logger;
+            _referenceService = referenceService;
         }
 
         public Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters)
@@ -187,10 +194,24 @@ namespace Core.ApplicationServices.RightsHolders
                 .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.FormerName, (itSystem, newValue) => _systemService.UpdatePreviousName(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Description, (itSystem, newValue) => _systemService.UpdateDescription(itSystem.Id, newValue)))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.UrlReference, UpdateMainUrlReference))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ExternalReferences, PerformReferencesUpdate))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, UpdateParentSystem))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.TaskRefUuids, UpdateTaskRefs));
+        }
+
+        private Result<ItSystem, OperationError> PerformReferencesUpdate(ItSystem systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
+        {
+            //Clear existing state
+            var updateResult = _referenceService.UpdateExternalReferences(
+                ReferenceRootType.SystemUsage,
+                systemUsage.Id,
+                externalReferences);
+
+            if (updateResult.HasValue)
+                return new OperationError($"Failed to update references with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType);
+
+            return systemUsage;
         }
 
         private Result<ItSystem, OperationError> UpdateTaskRefs(ItSystem system, IEnumerable<Guid> taskRefUuidsChanges)
@@ -212,14 +233,6 @@ namespace Core.ApplicationServices.RightsHolders
             }
 
             return _systemService.UpdateTaskRefs(system.Id, taskRefIds.ToList());
-        }
-
-        private Result<ItSystem, OperationError> UpdateMainUrlReference(ItSystem system, string urlReference)
-        {
-            if (string.IsNullOrWhiteSpace(urlReference))
-                return new OperationError("URL references are required for new rightsholder systems", OperationFailure.BadInput);
-
-            return _systemService.UpdateMainUrlReference(system.Id, urlReference);
         }
 
         private Result<ItSystem, OperationError> UpdateParentSystem(ItSystem system, Guid? parentSystemUuid)

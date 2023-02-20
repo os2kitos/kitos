@@ -364,11 +364,14 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSearchResultResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSystemContextResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystem\ItSystemSearchResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
+    <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Roles\ExtendedRoleAssignmentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserReferenceResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\Regular\UpdateItSystemRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Regular\CreateItSystemRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Regular\IItSystemWriteRequestPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Regular\RecommendedArchiveDutyRequestDTO.cs" />
@@ -495,8 +498,8 @@
     <Compile Include="Models\API\V2\Internal\Request\PublicMessagesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\PublicMessagesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessorRegistrationSubDataProcessorWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\Shared\ExternalReferenceDataWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\Shared\UpdateExternalReferenceDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\ExternalReferenceDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\UpdateExternalReferenceDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessorRegistrationSubDataProcessorResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Options\RegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ResourcePermissionsResponseDTO.cs" />

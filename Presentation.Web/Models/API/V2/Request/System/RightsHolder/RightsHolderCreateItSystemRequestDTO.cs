@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 
 namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
 {
-    public class RightsHolderCreateItSystemRequestDTO : IRightsHolderWritableSystemPropertiesRequestDTO
+    public class RightsHolderCreateItSystemRequestDTO : IRightsHolderWritableSystemPropertiesRequestDTO, IHasExternalReferencesCreation
     {
         /// <summary>
         /// UUID for owning organization
@@ -44,12 +45,17 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         /// </summary>
         [Required(AllowEmptyStrings = false)]
         public string Description { get; set; }
-
+        
         /// <summary>
-        /// Url reference for further information
+        /// User defined external references.
+        /// The external reference marked as "master reference" will be shown in overviews
+        /// Constraints:
+        ///     - If the list is not empty one (and only one) must be marked as the master reference.
+        ///     - If the reference has a uuid it will update an existing reference (with the same uuid), uuid must exist
+        ///     - If the reference has no uuid, a new External Reference will be created
+        ///     - Existing references will be replaced by the input data, so unless identified using uuid in the updates, the existing references will be removed.
         /// </summary>
-        [Required(AllowEmptyStrings = false)]
-        public string UrlReference { get; set; } //TODO: Proper model
+        public IEnumerable<ExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
 
         /// <summary>
         /// UUID for IT-System business type

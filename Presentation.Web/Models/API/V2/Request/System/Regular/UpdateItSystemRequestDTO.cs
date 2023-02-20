@@ -8,14 +8,8 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Request.System.Regular
 {
-    public class CreateItSystemRequestDTO : IItSystemWriteRequestCommonPropertiesDTO, IItSystemWriteRequestPropertiesDTO, IHasExternalReferencesCreation
+    public class UpdateItSystemRequestDTO : IItSystemWriteRequestCommonPropertiesDTO, IItSystemWriteRequestPropertiesDTO, IHasExternalReferencesUpdate
     {
-        /// <summary>
-        /// UUID of the organization in which the it-system will be created
-        /// </summary>
-        [Required]
-        [NonEmptyGuid]
-        public Guid OrganizationUuid { get; set; }
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>
@@ -25,7 +19,6 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         /// <summary>
         /// Name of IT-System
         /// </summary>
-        [Required(AllowEmptyStrings = false)]
         [MaxLength(Core.DomainModel.ItSystem.ItSystem.MaxNameLength)]
         public string Name { get; set; }
 
@@ -48,7 +41,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         ///     - If the reference has no uuid, a new External Reference will be created
         ///     - Existing references will be replaced by the input data, so unless identified using uuid in the updates, the existing references will be removed.
         /// </summary>
-        public IEnumerable<ExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
+        public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
 
         /// <summary>
         /// UUID for IT-System business type

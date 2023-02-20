@@ -22,9 +22,9 @@ using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Shared;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Presentation.Web.Models.API.V2.SharedProperties;
 

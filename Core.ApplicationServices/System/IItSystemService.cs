@@ -23,7 +23,6 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> UpdateDescription(int systemId, string newDescription);
         bool CanChangeNameTo(int organizationId, int systemId, string newName);
         bool CanCreateSystemWithName(int organizationId, string name);
-        Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
         Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> newTaskRefState);
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? newBusinessTypeState);
         Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? newRightsHolderState);

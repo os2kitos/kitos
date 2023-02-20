@@ -8,6 +8,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
@@ -55,7 +56,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
                 _transactionManagerMock.Object,
                 _userRepositoryMock.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
-                Mock.Of<ILogger>());
+                Mock.Of<ILogger>(),
+                new Mock<IReferenceService>().Object); //TOD: Extend test
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -65,8 +67,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             {
                 Name = A<string>().AsChangedValue(),
                 Description = A<string>().AsChangedValue(),
-                UrlReference = A<string>().AsChangedValue(),
                 FormerName = A<string>().AsChangedValue(),
+                //TODO: Add references
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue(),
                 BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue(),
                 TaskRefUuids = Many<Guid>().AsChangedValue(),
@@ -76,7 +78,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             {
                 Name = A<string>().AsChangedValue(),
                 Description = A<string>().AsChangedValue(),
-                UrlReference = A<string>().AsChangedValue(),
+                //UrlReference = A<string>().AsChangedValue(),
+                //TODO
                 FormerName = A<string>().AsChangedValue(),
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue(),
                 BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue(),
@@ -902,7 +905,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var systemUuid = A<Guid>();
             var parameters = new RightsHolderSystemUpdateParameters
             {
-                UrlReference = A<string>().AsChangedValue()
+                //TODO
+                //UrlReference = A<string>().AsChangedValue()
             };
             var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
             var error = A<OperationError>();
@@ -1139,7 +1143,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
         private void ExpectUpdateMainUrlReferenceReturns(int systemId, RightsHolderSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
         {
-            _itSystemServiceMock.Setup(x => x.UpdateMainUrlReference(systemId, inputParameters.UrlReference.NewValue)).Returns(result);
+            //TODO
+            //_itSystemServiceMock.Setup(x => x.UpdateMainUrlReference(systemId, inputParameters.UrlReference.NewValue)).Returns(result);
         }
 
         private void ExpectUpdateDescriptionReturns(int systemId, RightsHolderSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)

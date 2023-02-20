@@ -14,7 +14,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// Organizations using this IT-System
         /// </summary>
         [Required]
-        public IEnumerable<ShallowOrganizationResponseDTO> UsingOrganizations { get; set; } //TODO: Consider moving to org query to simplify mapping model
+        public IEnumerable<ShallowOrganizationResponseDTO> UsingOrganizations { get; set; }
 
         /// <summary>
         /// UTC timestamp of latest modification
