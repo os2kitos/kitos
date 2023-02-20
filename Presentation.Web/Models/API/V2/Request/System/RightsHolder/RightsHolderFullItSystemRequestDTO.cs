@@ -6,7 +6,10 @@ using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 
 namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
 {
-    public class RightsHolderCreateItSystemRequestDTO : IRightsHolderWritableSystemPropertiesRequestDTO, IHasExternalReferencesCreation
+    /// <summary>
+    /// Defines a full it-system definition used for updates and replacement operations
+    /// </summary>
+    public class RightsHolderFullItSystemRequestDTO : IRightsHolderWritableSystemPropertiesRequestDTO, IHasExternalReferencesCreation
     {
         /// <summary>
         /// UUID for owning organization

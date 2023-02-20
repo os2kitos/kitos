@@ -722,7 +722,7 @@
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
     <Compile Include="Models\API\V2\Request\Interface\RightsHolderCreateItInterfaceRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\System\RightsHolder\RightsHolderCreateItSystemRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\RightsHolder\RightsHolderFullItSystemRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\Queries\BoundedPaginationQuery.cs" />
     <Compile Include="Models\API\V2\Response\System\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />

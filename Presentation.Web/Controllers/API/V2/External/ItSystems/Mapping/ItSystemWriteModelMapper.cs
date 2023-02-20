@@ -19,14 +19,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
         {
         }
 
-        public RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderCreateItSystemRequestDTO request)
+        public RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO request)
         {
             var creationParameters = new RightsHolderSystemCreationParameters { RightsHolderProvidedUuid = request.Uuid };
             MapChanges(request, creationParameters, true);
             return creationParameters;
         }
 
-        public RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderCreateItSystemRequestDTO request)
+        public RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO request)
         {
             var parameters = new RightsHolderSystemUpdateParameters();
             MapChanges(request, parameters, true);

@@ -21,7 +21,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<RightsHolderCreateItSystemRequestDTO>());
+                .Returns(GetAllInputPropertyNames<RightsHolderFullItSystemRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new ItSystemWriteModelMapper(_currentHttpRequestMock.Object);
         }
@@ -30,7 +30,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_FromRightsHolderPOST()
         {
             //Arrange
-            var input = A<RightsHolderCreateItSystemRequestDTO>();
+            var input = A<RightsHolderFullItSystemRequestDTO>();
 
             //Act
             var output = _sut.FromRightsHolderPOST(input);
@@ -44,7 +44,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_FromRightsHolderPUT()
         {
             //Arrange
-            var input = A<RightsHolderCreateItSystemRequestDTO>();
+            var input = A<RightsHolderFullItSystemRequestDTO>();
 
             //Act
             var output = _sut.FromRightsHolderPUT(input);
@@ -102,7 +102,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(output.Name.IsUnchanged, noName);
             Assert.Equal(output.Description.IsUnchanged, noDescription);
             Assert.Equal(output.FormerName.IsUnchanged, noFormerName);
-            Assert.Equal(output.ExternalReferences.HasValue, noUrlReference);
+            Assert.Equal(output.ExternalReferences.IsNone, noUrlReference);
             Assert.Equal(output.ParentSystemUuid.IsUnchanged, noParent);
             Assert.Equal(output.BusinessTypeUuid.IsUnchanged, noBusinessType);
             Assert.Equal(output.TaskRefUuids.IsUnchanged, noTaskRefUuids);
@@ -120,7 +120,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noTaskRefUuids)
         {
             //Arrange
-            var emptyInput = new RightsHolderCreateItSystemRequestDTO();
+            var emptyInput = new RightsHolderFullItSystemRequestDTO();
             var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
@@ -157,7 +157,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
        bool noTaskRefUuids)
         {
             //Arrange
-            var emptyInput = new RightsHolderCreateItSystemRequestDTO();
+            var emptyInput = new RightsHolderFullItSystemRequestDTO();
             var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));

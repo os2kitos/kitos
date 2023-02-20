@@ -34,7 +34,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid:D}"), token);
         }
 
-        public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderFullItSystemRequestDTO request)
         {
             using var response = await SendCreateRightsHolderSystemAsync(token, request);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -42,12 +42,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderFullItSystemRequestDTO request)
         {
             return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(BaseRightsHolderPath), request, token);
         }
 
-        public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderFullItSystemRequestDTO request)
         {
             using var response = await SendUpdateRightsHolderSystemAsync(token, uuid, request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -55,7 +55,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderFullItSystemRequestDTO request)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, request);
         }
