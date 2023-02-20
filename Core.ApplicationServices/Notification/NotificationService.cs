@@ -158,7 +158,9 @@ namespace Core.ApplicationServices.Notification
             return GetNotificationByUuid(notificationUuid, relatedEntityType)
                 .Match(notification => _authorizationContext.AllowModify(notification)
                         ? _registrationNotificationService.DeactivateNotification(notification.Id)
-                        : new OperationError($"User is not allowed to deactivate notification with uuid: {notificationUuid}", OperationFailure.Forbidden),
+                        : new OperationError(
+                            $"User is not allowed to deactivate notification with uuid: {notificationUuid}",
+                            OperationFailure.Forbidden),
                     error => error);
         }
 

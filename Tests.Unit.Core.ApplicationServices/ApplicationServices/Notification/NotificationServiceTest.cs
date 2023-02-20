@@ -253,9 +253,9 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             var transaction = ExpectDatabaseTransactionReturns();
             var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
-            ExpectRoleRecipientIds(parameters);
+            var roleIds = ExpectRoleRecipientIds(parameters);
             ExpectAllowModifyReturns(relatedEntity, true);
-            ExpectCreateReturns(parameters, AdviceType.Immediate, notification);
+            ExpectCreateReturns(parameters, AdviceType.Immediate, roleIds, notification);
 
             //Act
             var result = _sut.CreateImmediateNotification(parameters);
@@ -298,9 +298,9 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             var transaction = ExpectDatabaseTransactionReturns();
             var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
-            ExpectRoleRecipientIds(parameters);
+            var roleIds = ExpectRoleRecipientIds(parameters);
             ExpectAllowModifyReturns(relatedEntity, true);
-            ExpectCreateReturns(parameters, AdviceType.Immediate, notification);
+            ExpectCreateReturns(parameters, AdviceType.Repeat, roleIds, notification);
 
             //Act
             var result = _sut.CreateScheduledNotification(parameters);
@@ -329,6 +329,248 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             var parameters = CreateNewScheduledParameters(relatedEntityType);
             Test_Command_Which_Updates_Notification_Returns_Failure_NotFound(relatedEntityType, _ => _sut.CreateScheduledNotification(parameters));
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Can_UpdateScheduledNotification(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
+            var notification = new Advice { Uuid = parameters.OwnerResourceUuid };
+
+            var transaction = ExpectDatabaseTransactionReturns();
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            var resolvedRoleIds = ExpectRoleRecipientIds(parameters);
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, Maybe<OperationError>.None);
+            ExpectUpdateReturns(id, parameters, notification);
+
+            //Act
+            var result = _sut.UpdateScheduledNotification(uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            transaction.Verify(x => x.Commit(), Times.Once);
+            VerifyDatabaseSave(parameters.Type);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void UpdateScheduledNotification_Returns_NotFound_If_NotificationId_Was_Not_Found(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
+
+            ExpectDatabaseTransactionReturns();
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            ExpectRoleRecipientIds(parameters);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectResolveIdReturns<Advice>(uuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.UpdateScheduledNotification(uuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, OperationFailure.NotFound);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void UpdateScheduledNotification_Returns_Error_If_Update_Relations_Fails(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
+            var error = A<OperationError>();
+
+            ExpectDatabaseTransactionReturns();
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            var resolvedRoleIds = ExpectRoleRecipientIds(parameters);
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, error);
+
+            //Act
+            var result = _sut.UpdateScheduledNotification(uuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void UpdateScheduledNotification_Returns_Forbidden_When_Not_Allowed_To_Modify(RelatedEntityType relatedEntityType)
+        {
+            var parameters = CreateNewScheduledParameters(relatedEntityType);
+            Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden(parameters.OwnerResourceUuid, relatedEntityType, _ => _sut.UpdateScheduledNotification(A<Guid>(), parameters));
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void UpdateScheduledNotification_Returns_Forbidden_When_RelatedEntity_Not_Found(RelatedEntityType relatedEntityType)
+        {
+            var parameters = CreateNewScheduledParameters(relatedEntityType);
+            Test_Command_Which_Updates_Notification_Returns_Failure_NotFound(relatedEntityType, _ => _sut.UpdateScheduledNotification(A<Guid>(), parameters));
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Can_DeactivateNotification(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var notification = new Advice{Id = id, Type = relatedEntityType};
+
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectGetNotificationByIdReturns(id, notification);
+            ExpectAllowModifyReturns(notification, true);
+            ExpectDeactivateReturns(id, notification);
+
+            //Act
+            var result = _sut.DeactivateNotification(uuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Ok);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void DeactivateNotification_Returns_Error_When_Deactivate_Fails(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var notification = new Advice{Id = id, Type = relatedEntityType};
+            var error = A<OperationError>();
+
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectGetNotificationByIdReturns(id, notification);
+            ExpectAllowModifyReturns(notification, true);
+            ExpectDeactivateReturns(id, error);
+
+            //Act
+            var result = _sut.DeactivateNotification(uuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void DeactivateNotification_Returns_Forbidden_If_Not_Allowed_To_Modify(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var notification = new Advice{Id = id, Type = relatedEntityType};
+
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectGetNotificationByIdReturns(id, notification);
+            ExpectAllowModifyReturns(notification, false);
+
+            //Act
+            var result = _sut.DeactivateNotification(uuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Can_DeleteNotification(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var notification = new Advice{Id = id, Type = relatedEntityType};
+
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectGetNotificationByIdReturns(id, notification);
+            ExpectAllowDeleteReturns(notification, true);
+            ExpectDeleteReturns(id, Maybe<OperationError>.None);
+
+            //Act
+            var error = _sut.DeleteNotification(uuid, relatedEntityType);
+
+            //Assert
+            Assert.True(error.IsNone);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void DeleteNotification_Returns_Error_When_Delete_Fails(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var notification = new Advice{Id = id, Type = relatedEntityType};
+            var expectedError = A<OperationError>();
+
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectGetNotificationByIdReturns(id, notification);
+            ExpectAllowDeleteReturns(notification, true);
+            ExpectDeleteReturns(id, expectedError);
+
+            //Act
+            var error = _sut.DeleteNotification(uuid, relatedEntityType);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(expectedError.FailureType, error.Value.FailureType);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void DeleteNotification_Returns_Forbidden_If_Not_Allowed_To_Modify(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var id = A<int>();
+            var notification = new Advice{Id = id, Type = relatedEntityType};
+
+            ExpectResolveIdReturns<Advice>(uuid, id);
+            ExpectGetNotificationByIdReturns(id, notification);
+            ExpectAllowDeleteReturns(notification, false);
+
+            //Act
+            var error = _sut.DeleteNotification(uuid, relatedEntityType);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
         }
 
         private void Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden<TSuccess>(Guid uuid, RelatedEntityType relatedEntityType, Func<IEntityWithAdvices, Result<TSuccess, OperationError>> command)
@@ -368,6 +610,18 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             return new ImmediateNotificationModificationParameters(A<string>(), A<string>(), relatedEntityType, A<Guid>(), A<RootRecipientModificationParameters>(), A<RootRecipientModificationParameters>());
         }
 
+        private UpdateScheduledNotificationModificationParameters CreateNewUpdateScheduledParameters(RelatedEntityType relatedEntityType)
+        {
+            return new UpdateScheduledNotificationModificationParameters(A<string>(),
+                A<string>(),
+                relatedEntityType,
+                A<Guid>(),
+                A<RootRecipientModificationParameters>(),
+                A<RootRecipientModificationParameters>(),
+                A<string>(),
+                A<DateTime>());
+        }
+
         private ScheduledNotificationModificationParameters CreateNewScheduledParameters(RelatedEntityType relatedEntityType)
         {
             return new ScheduledNotificationModificationParameters(A<string>(),
@@ -382,26 +636,32 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                 A<DateTime>());
         }
 
-        private void ExpectRoleRecipientIds(ImmediateNotificationModificationParameters parameters)
+        private IReadOnlyList<int> ExpectRoleRecipientIds(ImmediateNotificationModificationParameters parameters)
         {
-            foreach (var ccsRoleRecipient in parameters.Ccs.RoleRecipients)
+            var roleIds = new List<int>();
+
+            roleIds.AddRange(ExpectRoleRecipientIdsForType(parameters.Ccs.RoleRecipients, parameters.Type));
+            roleIds.AddRange(ExpectRoleRecipientIdsForType(parameters.Receivers.RoleRecipients, parameters.Type));
+
+            return roleIds;
+        }
+
+        private IEnumerable<int> ExpectRoleRecipientIdsForType(IEnumerable<RoleRecipientModificationParameters> roles, RelatedEntityType type)
+        {
+            var roleIds = new List<int>();
+            foreach (var ccsRoleRecipient in roles)
             {
-                ExpectResolveRoleIdReturns(ccsRoleRecipient.RoleUuid, parameters.Type, A<int>());
+                var newId = A<int>();
+                roleIds.Add(newId);
+                ExpectResolveRoleIdReturns(ccsRoleRecipient.RoleUuid, type, newId);
             }
-            foreach (var receiversRoleRecipient in parameters.Receivers.RoleRecipients)
-            {
-                ExpectResolveRoleIdReturns(receiversRoleRecipient.RoleUuid, parameters.Type, A<int>());
-            }
+
+            return roleIds;
         }
 
         private void ExpectResolveIdReturns<T>(Guid uuid, Maybe<int> result) where T: class, IHasUuid, IHasId
         {
             _entityIdentityResolver.Setup(x => x.ResolveDbId<T>(uuid)).Returns(result);
-        }
-
-        private void ExpectResolveUuidReturns<T>(int id, Maybe<Guid> result) where T: class, IHasUuid, IHasId
-        {
-            _entityIdentityResolver.Setup(x => x.ResolveUuid<T>(id)).Returns(result);
         }
 
         private void ExpectGetNotificationsByOrganizationIdReturns(int orgId, Result<IQueryable<Advice>, OperationError> result)
@@ -419,15 +679,16 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _registrationNotificationService.Setup(x => x.GetSent()).Returns(result);
         }
 
-        private void ExpectCreateReturns(ImmediateNotificationModificationParameters parameters, AdviceType adviceType, Result<Advice, OperationError> result)
+        private void ExpectCreateReturns(ImmediateNotificationModificationParameters parameters, AdviceType adviceType, IReadOnlyList<int> roleIds, Result<Advice, OperationError> result)
         {
             _registrationNotificationService.Setup(x => x.Create(It.Is<NotificationModel>(notificationModel => 
                 notificationModel.Subject == parameters.Subject && 
                 notificationModel.Body == parameters.Body && 
-                notificationModel.AdviceType == adviceType))).Returns(result);
+                notificationModel.AdviceType == adviceType && 
+                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Recipients)))).Returns(result);
         }
 
-        private void ExpectCreateReturns(ScheduledNotificationModificationParameters parameters, AdviceType adviceType, Result<Advice, OperationError> result)
+        private void ExpectCreateReturns(ScheduledNotificationModificationParameters parameters, AdviceType adviceType, IReadOnlyList<int> roleIds, Result<Advice, OperationError> result)
         {
             _registrationNotificationService.Setup(x => x.Create(It.Is<NotificationModel>(notificationModel => 
                 notificationModel.Subject == parameters.Subject && 
@@ -436,12 +697,73 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                 notificationModel.FromDate == parameters.FromDate &&
                 notificationModel.ToDate == parameters.ToDate &&
                 notificationModel.RepetitionFrequency == parameters.RepetitionFrequency && 
+                notificationModel.Name == parameters.Name &&
+                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Recipients)))).Returns(result);
+        }
+
+        private void ExpectUpdateReturns(int id, UpdateScheduledNotificationModificationParameters parameters, Result<Advice, OperationError> result)
+        {
+            _registrationNotificationService.Setup(x => x.Update(id, 
+                It.Is<NotificationModel>(notificationModel => 
+                notificationModel.Subject == parameters.Subject && 
+                notificationModel.Body == parameters.Body && 
+                notificationModel.AdviceType == AdviceType.Repeat &&
+                notificationModel.ToDate == parameters.ToDate &&
                 notificationModel.Name == parameters.Name))).Returns(result);
         }
 
-        private void ExpectUpdateReturns(int notificationId, UpdateNotificationModel model, Result<Advice, OperationError> result)
+        private void ExpectUpdateNotificationUserRelations(int notificationId, UpdateScheduledNotificationModificationParameters parameters, IReadOnlyList<int> roleIds,
+            Maybe<OperationError> result)
         {
-            _registrationNotificationService.Setup(x => x.Update(notificationId, model)).Returns(result);
+            _notificationUserRelationsService.Setup(x => x.UpdateNotificationUserRelations(notificationId,
+                    It.Is<IEnumerable<RecipientModel>>(recipientModels => CheckRecipientIsMappedCorrectly(parameters, roleIds, recipientModels))))
+                .Returns(result);
+        }
+
+        private bool CheckRecipientIsMappedCorrectly(ImmediateNotificationModificationParameters parameters,
+            IReadOnlyList<int> roleIds,
+            IEnumerable<RecipientModel> models)
+        {
+            foreach (var recipientModel in models)
+            {
+                if (parameters.Ccs.EmailRecipients.Select(x => x.Email).Contains(recipientModel.Email))
+                {
+                    continue;
+                }
+
+                if (parameters.Receivers.EmailRecipients.Select(x => x.Email).Contains(recipientModel.Email))
+                {
+                    continue;
+                }
+
+                var relationIdResult = GetRelationIdFromRecipientModel(recipientModel);
+                if (relationIdResult.IsNone)
+                    return false;
+                var relationId = relationIdResult.Value;
+
+                if (roleIds.Contains(relationId) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private Maybe<int> GetRelationIdFromRecipientModel(RecipientModel recipientModel)
+        {
+            return recipientModel.DataProcessingRegistrationRoleId ??
+                   recipientModel.ItContractRoleId ?? recipientModel.ItSystemRoleId;
+        }
+
+        private void ExpectDeactivateReturns(int id, Result<Advice, OperationError> result)
+        {
+            _registrationNotificationService.Setup(x => x.DeactivateNotification(id)).Returns(result);
+        }
+
+        private void ExpectDeleteReturns(int id, Maybe<OperationError> result)
+        {
+            _registrationNotificationService.Setup(x => x.Delete(id)).Returns(result);
         }
 
         private Mock<IDatabaseTransaction> ExpectDatabaseTransactionReturns()
@@ -537,6 +859,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         private void ExpectAllowModifyReturns(IEntity entity, bool result)
         {
             _authorizationContext.Setup(x => x.AllowModify(entity)).Returns(result);
+        }
+
+        private void ExpectAllowDeleteReturns(IEntity entity, bool result)
+        {
+            _authorizationContext.Setup(x => x.AllowDelete(entity)).Returns(result);
         }
 
         private void VerifyDatabaseSave(RelatedEntityType relatedEntityType)
