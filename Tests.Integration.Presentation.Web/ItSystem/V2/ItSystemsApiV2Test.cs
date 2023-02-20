@@ -12,13 +12,14 @@ using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request;
-using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -880,9 +881,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             {
                 RightsHolderUuid = withoutRightsHolder ? Guid.Empty : org.Uuid,
                 Name = withoutName ? null : $"Name_{A<string>()}",
-                Description = withoutDescription ? null : $"Description_{A<string>()}",
-                //UrlReference = withoutReference ? null : $"https://{A<int>()}.dk",
-            //TODO
+                Description = withoutDescription ? null : $"Description_{A<string>()}"
             };
 
             //Act
@@ -903,9 +902,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             {
                 RightsHolderUuid = defaultOrgUuid,
                 Name = $"Name_{A<string>()}",
-                Description = $"Description_{A<string>()}",
-                //UrlReference = $"https://{A<int>()}.dk"
-            //TODO
+                Description = $"Description_{A<string>()}"
             };
 
             //Act 
@@ -927,8 +924,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 RightsHolderUuid = org.Uuid,
                 Name = $"Name_{A<string>()}",
                 Description = $"Description_{A<string>()}",
-                //UrlReference = $"https://{A<int>()}.dk",
-            //TODO
                 ParentUuid = parentUuid
             };
 
@@ -953,8 +948,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 RightsHolderUuid = org.Uuid,
                 Name = $"Name_{A<string>()}",
                 Description = $"Description_{A<string>()}",
-                //UrlReference = $"https://{A<int>()}.dk",
-            //TODO
                 KLEUuids = kleUuids
             };
 
@@ -1025,17 +1018,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
             var update = await A<RightsHolderFullItSystemRequestDTO>().Transform(async dto =>
             {
+                dto.ExternalReferences.ToList().ForEach(x => x.MasterReference = false);
+                dto.ExternalReferences.RandomItem().MasterReference = true;
                 dto.Name = updateName ? dto.Name : createdSystem.Name;
                 dto.FormerName = updateFormerName ? dto.FormerName : createdSystem.FormerName;
                 dto.Description = updateDescription ? dto.Description : createdSystem.Description;
                 dto.BusinessTypeUuid = updateBusinessType ? GetBusinessType(1) : createdSystem.BusinessType.Uuid;
-                //dto.UrlReference = updateUrl ? dto.UrlReference : createdSystem.UrlReference;
-            //TODO
+                dto.ExternalReferences = updateUrl ? dto.ExternalReferences : createdSystem.ExternalReferences.Select(er => new ExternalReferenceDataWriteRequestDTO()
+                {
+                    DocumentId = er.DocumentId,
+                    MasterReference = er.MasterReference,
+                    Title = er.Title,
+                    Url = er.Url
+                });
                 dto.KLEUuids = null;
                 dto.ParentUuid = updateParent ? (await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public)).uuid : createdSystem.ParentSystem.Uuid;
                 return dto;
             });
-
+            var expectedMasterReferenceAfter = update.ExternalReferences.Single(x => x.MasterReference);
 
             //Act
             var updatedSystem = await ItSystemV2Helper.UpdateRightsHolderSystemAsync(token, createdSystem.Uuid, update);
@@ -1049,8 +1049,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(update.FormerName, updatedSystem.FormerName);
             Assert.Equal(update.BusinessTypeUuid.GetValueOrDefault(), updatedSystem.BusinessType.Uuid);
             Assert.Equal(update.ParentUuid.GetValueOrDefault(), updatedSystem.ParentSystem.Uuid);
-            //Assert.Equal(update.UrlReference, updatedSystem.UrlReference);
-            //TODO
+
+            var masterReferenceAfter = updatedSystem.ExternalReferences.Single(x => x.MasterReference);
+            Assert.Equal(expectedMasterReferenceAfter.DocumentId, masterReferenceAfter.DocumentId);
+            Assert.Equal(expectedMasterReferenceAfter.Title, masterReferenceAfter.Title);
+            Assert.Equal(expectedMasterReferenceAfter.Url, masterReferenceAfter.Url);
         }
 
         [Theory]
@@ -1095,13 +1098,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(false, false, true)]
-        [InlineData(false, true, true)]
-        [InlineData(true, true, true)]
-        [InlineData(true, true, false)]
-        [InlineData(true, false, false)]
-        [InlineData(true, false, true)]
-        public async Task Cannot_PUT_As_RightsHolder_If_Required_Properties_Are_Missing(bool nullName, bool nullUrl, bool nullDescription)
+        [InlineData(false, true)]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        public async Task Cannot_PUT_As_RightsHolder_If_Required_Properties_Are_Missing(bool nullName, bool nullDescription)
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
@@ -1110,8 +1110,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var update = A<RightsHolderFullItSystemRequestDTO>().Transform(dto =>
             {
                 dto.Name = nullName ? null : dto.Name;
-                //dto.UrlReference = nullUrl ? null : dto.UrlReference;
-            //TODO
                 dto.Description = nullDescription ? null : dto.Description;
                 dto.ParentUuid = null;
                 dto.BusinessTypeUuid = null;
@@ -1140,6 +1138,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 dto.ParentUuid = parentUuid;
                 dto.BusinessTypeUuid = null;
                 dto.KLEUuids = null;
+                dto.ExternalReferences = null;
                 return dto;
             });
 
@@ -1329,7 +1328,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(dbSystem.BusinessType.Uuid, systemDTO.BusinessType.Uuid);
             Assert.Equal(dbSystem.BusinessType.Name, systemDTO.BusinessType.Name);
             Assert.Equal(dbTaskKeys, dtoTaskKeys);
-            //Assert.Equal(dbSystem.Reference.URL, systemDTO.UrlReference); //TODO: Assert the references!
         }
 
         private static async Task TakeSystemIntoUseIn(int systemDbId, params int[] organizationIds)
@@ -1471,11 +1469,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 Name = $"Name_{A<string>()}",
                 Description = $"Description_{A<string>()}",
                 FormerName = withFormerName ? $"FormerName_{A<string>()}" : null,
-                //UrlReference = $"https://{A<int>()}.dk",
-            //TODO
                 BusinessTypeUuid = withBusinessType ? businessType : null,
                 KLEUuids = withKleUuid ? new[] { kle.uuid } : new Guid[0],
-                ParentUuid = withParent ? parentCandidate.Uuid : null
+                ParentUuid = withParent ? parentCandidate.Uuid : null,
+                ExternalReferences = A<ExternalReferenceDataWriteRequestDTO>().Transform(x =>
+                {
+                    x.MasterReference = true;
+                    return x;
+                }).WrapAsEnumerable()
             };
         }
 
@@ -1483,34 +1484,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             return DatabaseAccess.MapFromEntitySet<BusinessType, Guid>(repository =>
                 repository.AsQueryable().OrderBy(x => x.Id).Skip(skip).First(x => x.IsEnabled && x.IsObligatory).Uuid);
-        }
-
-        private string CreateNewTaskRefAndGetKey()
-        {
-            var availableKey = DatabaseAccess.MapFromEntitySet<TaskRef, string>(refs =>
-            {
-                var i = 0;
-                var success = false;
-                string key = default;
-                while (!success)
-                {
-                    key = i.ToString("X");
-                    i++;
-                    var match = key;
-                    success = refs.AsQueryable().FirstOrDefault(x => x.TaskKey == match) == null;
-                }
-
-                return key;
-            });
-            DatabaseAccess.MutateEntitySet<TaskRef>(refs => refs.Insert(new TaskRef
-            {
-                Uuid = A<Guid>(),
-                TaskKey = availableKey,
-                ObjectOwnerId = 1,
-                LastChangedByUserId = 1,
-                OwnedByOrganizationUnitId = 1
-            }));
-            return availableKey;
         }
     }
 }
