@@ -31,7 +31,8 @@ namespace Core.ApplicationServices.Notification
             ITransactionManager transactionManager,
             IGenericRepository<Advice> adviceRepository,
             IDomainEvents domainEventHandler, 
-            IAdviceRootResolution adviceRootResolution, IGenericRepository<AdviceUserRelation> adviceUserRelationRepository)
+            IAdviceRootResolution adviceRootResolution, 
+            IGenericRepository<AdviceUserRelation> adviceUserRelationRepository)
         {
             _adviceService = adviceService;
             _authorizationContext = authorizationContext;
