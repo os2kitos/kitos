@@ -239,7 +239,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Ok()
+        public void CreateNewSystemAsRightsHolder_Returns_Ok()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -281,7 +281,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_GetRightsHolderOrganizationFails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_GetRightsHolderOrganizationFails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -300,7 +300,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_No_RightsHolderAccess_In_Target_Organization()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_No_RightsHolderAccess_In_Target_Organization()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -321,7 +321,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_Create_Fails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_Create_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -345,7 +345,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateRightsHolder_Fails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UpdateRightsHolder_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -370,7 +370,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdatePreviousName_Fails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UpdatePreviousName_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -396,7 +396,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateDescription_Fails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UpdateDescription_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -423,7 +423,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateMainUrlReference_Fails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UpdateMainUrlReference_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -451,7 +451,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_GetParentSystemFails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_GetParentSystemFails()
         {
             //Arrange
             var operationFailures = Enum.GetValues(typeof(OperationFailure)).Cast<OperationFailure>().Where(x => x != OperationFailure.NotFound);
@@ -482,7 +482,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UserIsNotRightsHolderOfParentSystem()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UserIsNotRightsHolderOfParentSystem()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -512,7 +512,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateParentSystemFails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UpdateParentSystemFails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -544,7 +544,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateBusinessTypeFails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UpdateBusinessTypeFails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -577,7 +577,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_KLE_Duplicates_By_Uuid()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_KLE_Duplicates_By_Uuid()
         {
             //Arrange
             var overlapKey = A<Guid>();
@@ -612,7 +612,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_ProvidedTaskUuidIsInvalid()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_ProvidedTaskUuidIsInvalid()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -646,7 +646,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = A<SystemUpdateParameters>();
+            var parameters = A<RightsHolderSystemUpdateParameters>();
             var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
             var parent = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
             var taskRefs = new Dictionary<string, TaskRef>();
@@ -672,7 +672,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateTaskRefsReturns(itSystem.Id, expectedTaskRefIds, itSystem);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
@@ -680,11 +680,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_KLE_Has_Duplicates()
+        public void Cannot_UpdateAsRightsHolder_If_KLE_Has_Duplicates()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 TaskRefUuids = Many<Guid>().AsChangedValue(),
             };
@@ -703,7 +703,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectHasSpecificAccessReturns(itSystem, true);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -712,11 +712,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_KLE_Has_Invalid_Ids()
+        public void Cannot_UpdateAsRightsHolder_If_KLE_Has_Invalid_Ids()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 TaskRefUuids = Many<Guid>().AsChangedValue()
             };
@@ -731,7 +731,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectHasSpecificAccessReturns(itSystem, true);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -740,11 +740,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_Business_Type_Update_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_Business_Type_Update_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue()
             };
@@ -757,7 +757,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateBusinessTypeReturns(itSystem.Id, parameters, operationError);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -766,11 +766,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_Parent_Update_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_Parent_Update_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue()
             };
@@ -786,7 +786,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateParentSystemReturns(itSystem.Id, parent, operationError);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -795,7 +795,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_No_RightsHolder_Access_To_Parent()
+        public void Cannot_UpdateAsRightsHolder_If_No_RightsHolder_Access_To_Parent()
         {
             //Arrange
             var systemUuid = A<Guid>();
@@ -822,13 +822,13 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_Parent_Resolution_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_Parent_Resolution_Fails()
         {
             //Arrange
             var operationFailures = Enum.GetValues(typeof(OperationFailure)).Cast<OperationFailure>().Where(x => x != OperationFailure.NotFound);
             Configure(x => x.Inject(operationFailures.OrderBy(_ => A<int>()).First()));
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue()
             };
@@ -841,7 +841,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceGetSystemReturns(parameters.ParentSystemUuid.NewValue.GetValueOrDefault(), operationError);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -850,12 +850,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_Parent_Resolution_Fails_With_NotFound()
+        public void Cannot_UpdateAsRightsHolder_If_Parent_Resolution_Fails_With_NotFound()
         {
             //Arrange
             Configure(x => x.Inject(OperationFailure.NotFound));
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue()
             };
@@ -868,7 +868,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceGetSystemReturns(parameters.ParentSystemUuid.NewValue.GetValueOrDefault(), operationError);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -878,11 +878,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_UpdateReferences_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_UpdateReferences_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 ExternalReferences = Many<UpdatedExternalReferenceProperties>().ToList().FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
             };
@@ -895,7 +895,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectBatchUpdateReferencesReturns(itSystem.Id, parameters, error);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -904,11 +904,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_UpdateDescription_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_UpdateDescription_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 Description = A<string>().AsChangedValue()
             };
@@ -921,7 +921,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateDescriptionReturns(itSystem.Id, parameters, error);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -930,11 +930,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_UpdatePreviousName_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_UpdatePreviousName_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 FormerName = A<string>().AsChangedValue()
             };
@@ -947,7 +947,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdatePreviousNameReturns(itSystem.Id, parameters, error);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -956,11 +956,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_UpdateName_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_UpdateName_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new SystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters
             {
                 Name = A<string>().AsChangedValue()
             };
@@ -973,7 +973,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateNameReturns(itSystem.Id, parameters.Name.NewValue, error);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -982,11 +982,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_System_Is_Deactivated()
+        public void Cannot_UpdateAsRightsHolder_If_System_Is_Deactivated()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = A<SystemUpdateParameters>();
+            var parameters = A<RightsHolderSystemUpdateParameters>();
             var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>(), Disabled = true };
 
             var transaction = ExpectTransactionBegins();
@@ -994,7 +994,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectHasSpecificAccessReturns(itSystem, true);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
