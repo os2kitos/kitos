@@ -19,9 +19,11 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
+using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
@@ -86,6 +88,78 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery)
                 .Select(ToSystemResponseDTO)
                 .Transform(Ok);
+        }
+
+
+        /// <summary>
+        /// Create a new IT-System master data entity
+        /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("it-systems")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostItSystem([FromBody] CreateItSystemRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.FromPOST(request);
+            return _rightsHolderSystemService
+                .CreateNewSystem(request.OrganizationUuid, parameters)
+                .Select(ToSystemResponseDTO)
+                .Match(MapSystemCreatedResponse, FromOperationError);
+        }
+
+        /// <summary>
+        /// Update an existing it-system
+        /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource
+        /// </summary>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("it-systems/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostItSystem([NonEmptyGuid] Guid uuid, [FromBody] UpdateItSystemRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.FromPATCH(request);
+            return _rightsHolderSystemService
+                .Update(uuid, parameters)
+                .Select(ToSystemResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// DELETE an existing it-system
+        /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("it-systems/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostItSystem([NonEmptyGuid] Guid uuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _rightsHolderSystemService
+                .Delete(uuid)
+                .Match(NoContent, FromOperationError);
         }
 
         /// <summary>
@@ -356,7 +430,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Select(taskRef => taskRef.MapIdentityNamePairDTO())
                 .ToList();
         }
-        private CreatedNegotiatedContentResult<RightsHolderItSystemResponseDTO> MapSystemCreatedResponse(RightsHolderItSystemResponseDTO dto)
+        private CreatedNegotiatedContentResult<T> MapSystemCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }

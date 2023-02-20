@@ -286,7 +286,18 @@ namespace Core.ApplicationServices.RightsHolders
 
         public Result<ItSystem, OperationError> Delete(Guid systemUuid)
         {
-            throw new NotImplementedException();
+            return _systemService
+                .GetSystem(systemUuid)
+                .Bind<ItSystem>(system =>
+                {
+                    var deleteResult = _systemService.Delete(system.Id, true);
+                    if (deleteResult == SystemDeleteResult.Ok)
+                    {
+                        return system;
+                    }
+
+                    return new OperationError(deleteResult.ToString("G"), OperationFailure.UnknownError);
+                });
         }
 
         private Result<ItSystem, OperationError> WithWriteAccess(ItSystem system)
