@@ -1,13 +1,16 @@
 ﻿using Core.ApplicationServices.Model.System;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
     public interface IItSystemWriteModelMapper
     {
-        SystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO dto);
-        SystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO dto);
-        SystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO dto);
+        RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO dto);
+        RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO dto);
+        RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO dto);
+        SystemUpdateParameters FromPOST(CreateItSystemRequestDTO dto);
+        SystemUpdateParameters FromPATCH(UpdateItSystemRequestDTO dto);
     }
 
 }

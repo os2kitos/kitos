@@ -17,6 +17,11 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         public Guid? ParentUuid { get; set; }
 
         /// <summary>
+        /// Determines if the system has been deactivated from being taken into use
+        /// </summary>
+        public bool Deactivated { get; set; }
+
+        /// <summary>
         /// Name of IT-System
         /// </summary>
         [MaxLength(Core.DomainModel.ItSystem.ItSystem.MaxNameLength)]

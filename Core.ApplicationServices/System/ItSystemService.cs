@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
@@ -430,12 +431,34 @@ namespace Core.ApplicationServices.System
             });
         }
 
+        public Result<ItSystem, OperationError> Activate(int itSystemId)
+        {
+            return Mutate(itSystemId, system => system.Disabled, system =>
+            {
+                system.Activate();
+                _domainEvents.Raise(new EnabledStatusChanged<ItSystem>(system, true, false));
+            });
+        }
+
         public Result<ItSystem, OperationError> Deactivate(int systemId)
         {
             return Mutate(systemId, system => system.Disabled == false, system =>
             {
                 system.Deactivate();
                 _domainEvents.Raise(new EnabledStatusChanged<ItSystem>(system, false, true));
+            });
+        }
+
+        public Result<ItSystem, OperationError> UpdateAccessModifier(int itSystemId, AccessModifier accessModifier)
+        {
+            return Mutate(itSystemId, system => system.AccessModifier != accessModifier, updateWithResult: system =>
+            {
+                if (!_authorizationContext.HasPermission(new VisibilityControlPermission(system)))
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+                system.AccessModifier = accessModifier;
+                return system;
             });
         }
 

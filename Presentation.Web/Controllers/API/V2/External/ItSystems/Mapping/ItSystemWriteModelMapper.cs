@@ -5,11 +5,15 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
+using Core.DomainModel;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Request.System.Shared;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
@@ -19,30 +23,83 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
         {
         }
 
-        public SystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO request)
+        public RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO request)
         {
-            var creationParameters = new SystemCreationParameters { RightsHolderProvidedUuid = request.Uuid };
-            MapChanges(request, creationParameters, true);
+            var creationParameters = new RightsHolderSystemCreationParameters { RightsHolderProvidedUuid = request.Uuid };
+            MapCommonChanges(request, creationParameters, true);
             return creationParameters;
         }
 
-        public SystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO request)
+        public RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO request)
         {
-            var parameters = new SystemUpdateParameters();
-            MapChanges(request, parameters, true);
+            var parameters = new RightsHolderSystemUpdateParameters();
+            MapCommonChanges(request, parameters, true);
             return parameters;
         }
 
-        public SystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO request)
+        public RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO request)
         {
-            var parameters = new SystemUpdateParameters();
-            MapChanges(request, parameters, false);
+            var parameters = new RightsHolderSystemUpdateParameters();
+            MapCommonChanges(request, parameters, false);
             return parameters;
         }
 
-        private void MapChanges(IItSystemWriteRequestCommonPropertiesDTO source, SystemUpdateParameters destination, bool enforceResetOnMissingProperty)
+        public SystemUpdateParameters FromPOST(CreateItSystemRequestDTO dto)
         {
-            var rule = CreateChangeRule<IRightsHolderWritableSystemPropertiesRequestDTO>(enforceResetOnMissingProperty);
+            var parameters = new SystemUpdateParameters();
+            MapFullChanges(dto, parameters, true);
+            return parameters;
+        }
+
+        public SystemUpdateParameters FromPATCH(UpdateItSystemRequestDTO dto)
+        {
+            var parameters = new SystemUpdateParameters();
+            MapFullChanges(dto, parameters, false);
+            return parameters;
+        }
+
+        private void MapFullChanges<TDto>(TDto source, SystemUpdateParameters destination, bool enforceResetOnMissingProperty) where TDto :
+            IItSystemWriteRequestCommonPropertiesDTO,
+            IItSystemWriteRequestPropertiesDTO
+        {
+
+            MapCommonChanges(source, destination, enforceResetOnMissingProperty);
+
+            var rule = CreateChangeRule<TDto>(enforceResetOnMissingProperty);
+            destination.RightsHolderUuid = rule.MustUpdate(x => x.RightsHolderUuid)
+                ? source.RightsHolderUuid.AsChangedValue()
+                : OptionalValueChange<Guid?>.None;
+
+            destination.Scope = rule.MustUpdate(x => x.Scope)
+                ? (source.Scope ?? RegistrationScopeChoice.Global).FromChoice().AsChangedValue()
+                : OptionalValueChange<AccessModifier>.None;
+
+            destination.ArchivingRecommendation = rule.MustUpdate(x => x.RecommendedArchiveDuty)
+                ? MapArchivingRecommendation(source, enforceResetOnMissingProperty).AsChangedValue()
+                : OptionalValueChange<(OptionalValueChange<ArchiveDutyRecommendationTypes?> recommendation, OptionalValueChange<string> comment)>.None;
+
+            destination.Deactivated = rule.MustUpdate(x => x.Deactivated)
+                ? source.Deactivated.AsChangedValue()
+                : OptionalValueChange<bool>.None;
+        }
+
+        private (OptionalValueChange<ArchiveDutyRecommendationTypes?> recommendation, OptionalValueChange<string> comment) MapArchivingRecommendation<TDto>(TDto source, bool enforceResetOnMissingProperty) where TDto : IItSystemWriteRequestCommonPropertiesDTO, IItSystemWriteRequestPropertiesDTO
+        {
+            var rule = CreateChangeRule<TDto>(enforceResetOnMissingProperty);
+            var recommendedArchiveDutyChoice = rule.MustUpdate(x => x.RecommendedArchiveDuty.Id)
+                ? (source.RecommendedArchiveDuty?.Id?.FromChoice()).AsChangedValue()
+                : OptionalValueChange<ArchiveDutyRecommendationTypes?>.None;
+
+            var comment = rule.MustUpdate(x => x.RecommendedArchiveDuty.Comment)
+                ? (source.RecommendedArchiveDuty?.Comment).AsChangedValue()
+                : OptionalValueChange<string>.None;
+
+            return (recommendedArchiveDutyChoice, comment);
+        }
+
+        private void MapCommonChanges(IItSystemWriteRequestCommonPropertiesDTO source, SharedSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
+        {
+            var rule = CreateChangeRule<IItSystemWriteRequestCommonPropertiesDTO>(enforceResetOnMissingProperty);
 
             destination.Name = rule.MustUpdate(x => x.Name) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
             destination.ParentSystemUuid = rule.MustUpdate(x => x.ParentUuid) ? source.ParentUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
@@ -51,13 +108,24 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             destination.BusinessTypeUuid = rule.MustUpdate(x => x.BusinessTypeUuid) ? source.BusinessTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
             destination.TaskRefUuids = rule.MustUpdate(x => x.KLEUuids) ? (source.KLEUuids ?? new List<Guid>()).AsChangedValue() : OptionalValueChange<IEnumerable<Guid>>.None;
 
+            MapExternalReferences(source, destination, enforceResetOnMissingProperty);
+        }
+
+        private void MapExternalReferences(IItSystemWriteRequestCommonPropertiesDTO source, SharedSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
+        {
             switch (source)
             {
                 case IHasExternalReferencesCreation createReferences:
-                    destination.ExternalReferences = (createReferences.ExternalReferences ?? Array.Empty<ExternalReferenceDataWriteRequestDTO>()).Transform(MapReferences).FromNullable();
+                    destination.ExternalReferences =
+                        (createReferences.ExternalReferences ?? Array.Empty<ExternalReferenceDataWriteRequestDTO>())
+                        .Transform(MapReferences).FromNullable();
                     break;
                 case IHasExternalReferencesUpdate updateReferences:
-                    var externalReferenceDataDtos = WithResetDataIfPropertyIsDefined(updateReferences.ExternalReferences, nameof(IHasExternalReferencesUpdate.ExternalReferences), () => new List<UpdateExternalReferenceDataWriteRequestDTO>(),enforceResetOnMissingProperty);
+                    var externalReferenceDataDtos = WithResetDataIfPropertyIsDefined(
+                        updateReferences.ExternalReferences,
+                        nameof(IHasExternalReferencesUpdate.ExternalReferences),
+                        () => new List<UpdateExternalReferenceDataWriteRequestDTO>(),
+                        enforceResetOnMissingProperty);
                     destination.ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapUpdateReferences);
                     break;
                 default:
@@ -65,6 +133,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
                     break;
             }
         }
+
         private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
         {
             return BaseMapCreateReferences(references);

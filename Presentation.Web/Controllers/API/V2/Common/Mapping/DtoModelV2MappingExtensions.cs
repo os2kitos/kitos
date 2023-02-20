@@ -37,24 +37,6 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
         }
 
-        public static RecommendedArchiveDutyChoice ToDTOType(this ArchiveDutyRecommendationTypes? domainType)
-        {
-            switch (domainType)
-            {
-                case null:
-                case ArchiveDutyRecommendationTypes.Undecided:
-                    return RecommendedArchiveDutyChoice.Undecided;
-                case ArchiveDutyRecommendationTypes.B:
-                    return RecommendedArchiveDutyChoice.B;
-                case ArchiveDutyRecommendationTypes.K:
-                    return RecommendedArchiveDutyChoice.K;
-                case ArchiveDutyRecommendationTypes.NoRecommendation:
-                    return RecommendedArchiveDutyChoice.NoRecommendation;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(domainType), domainType, null);
-            }
-        }
-
         public static UserRolePair ToUserRolePair(this RoleAssignmentRequestDTO src)
         {
             return new UserRolePair(src.UserUuid, src.RoleUuid);

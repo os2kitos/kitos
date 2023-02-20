@@ -18,5 +18,9 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         /// Archive duty recommendation from "Rigsarkivet"
         /// </summary>
         public RecommendedArchiveDutyRequestDTO RecommendedArchiveDuty { get; set; }
+        /// <summary>
+        /// Determines if the system has been deactivated from being taken into use
+        /// </summary>
+        public bool Deactivated { get; set; }
     }
 }

@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
-using Core.ApplicationServices.Model.Shared.Write;
+using Core.DomainModel;
 
 namespace Core.ApplicationServices.Model.System
 {
-    public class SystemUpdateParameters
+    public class SystemUpdateParameters : SharedSystemUpdateParameters
     {
-        public OptionalValueChange<string> Name { get; set; } = OptionalValueChange<string>.None;
-        public OptionalValueChange<Guid?> ParentSystemUuid { get; set; } = OptionalValueChange<Guid?>.None;
-        public OptionalValueChange<string> FormerName { get; set; } = OptionalValueChange<string>.None;
-        public OptionalValueChange<string> Description { get; set; } = OptionalValueChange<string>.None;
-        public Maybe<IEnumerable<UpdatedExternalReferenceProperties>> ExternalReferences { get; set; } = Maybe<IEnumerable<UpdatedExternalReferenceProperties>>.None;
-        public OptionalValueChange<Guid?> BusinessTypeUuid { get; set; } = OptionalValueChange<Guid?>.None;
-        public OptionalValueChange<IEnumerable<Guid>> TaskRefUuids { get; set; } = OptionalValueChange<IEnumerable<Guid>>.None;
-        //TODO: Add the archive recommendation stuff here!
+        public OptionalValueChange<(OptionalValueChange<ArchiveDutyRecommendationTypes?> recommendation,OptionalValueChange<string> comment)> ArchivingRecommendation { get; set; } = OptionalValueChange<(OptionalValueChange<ArchiveDutyRecommendationTypes?> recommendation, OptionalValueChange<string> comment)>.None;
+        public OptionalValueChange<Guid?> RightsHolderUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<AccessModifier> Scope { get; set; } = OptionalValueChange<AccessModifier>.None;
+        public OptionalValueChange<bool> Deactivated { get; set; } = OptionalValueChange<bool>.None;
     }
 }

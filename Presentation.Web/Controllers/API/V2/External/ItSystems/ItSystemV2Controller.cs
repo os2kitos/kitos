@@ -22,6 +22,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
@@ -224,7 +225,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromRightsHolderPOST(request);
 
             return _rightsHolderSystemService
-                .CreateNewSystem(request.RightsHolderUuid, parameters)
+                .CreateNewSystemAsRightsHolder(request.RightsHolderUuid, parameters)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
@@ -253,7 +254,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromRightsHolderPUT(request);
 
             return _rightsHolderSystemService
-                .Update(uuid, parameters)
+                .UpdateAsRightsHolder(uuid, parameters)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -280,7 +281,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromRightsHolderPATCH(request);
 
             return _rightsHolderSystemService
-                .Update(uuid, parameters)
+                .UpdateAsRightsHolder(uuid, parameters)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -305,7 +306,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 return BadRequest(ModelState);
 
             return _rightsHolderSystemService
-                .Deactivate(uuid, request.DeactivationReason)
+                .DeactivateAsRightsHolder(uuid, request.DeactivationReason)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
@@ -349,8 +350,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             dto.FormerName = arg.PreviousName;
             dto.ParentSystem = arg.Parent?.Transform(parent => parent.MapIdentityNamePairDTO());
             dto.ExternalReferences = _referenceResponseMapper.MapExternalReferences(arg.ExternalReferences).ToList();
-            dto.RecommendedArchiveDuty =
-                new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType());
+            dto.RecommendedArchiveDuty = new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty?.ToChoice() ?? RecommendedArchiveDutyChoice.Undecided);
             dto.KLE = arg
                 .TaskRefs
                 .Select(taskRef => taskRef.MapIdentityNamePairDTO())

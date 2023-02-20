@@ -2,7 +2,7 @@
 
 namespace Core.ApplicationServices.Model.System
 {
-    public class SystemCreationParameters : SystemUpdateParameters
+    public class RightsHolderSystemCreationParameters : SharedSystemUpdateParameters
     {
         public Guid? RightsHolderProvidedUuid { get; set; }
     }

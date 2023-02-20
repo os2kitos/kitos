@@ -68,7 +68,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         protected override void OnFixtureCreated(Fixture fixture)
         {
             base.OnFixtureCreated(fixture);
-            fixture.Register(() => new SystemCreationParameters
+            fixture.Register(() => new RightsHolderSystemCreationParameters
             {
                 Name = A<string>().AsChangedValue(),
                 Description = A<string>().AsChangedValue(),
@@ -233,7 +233,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -263,7 +263,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateTaskRefsReturns(itSystem.Id, expectedTaskRefIds, itSystem);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Ok);
@@ -275,13 +275,13 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
 
             ExpectGetOrganizationReturns(rightsHolderUuid, Maybe<Organization>.None);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -294,7 +294,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
 
@@ -302,7 +302,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, false);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -315,7 +315,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
 
@@ -326,7 +326,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -339,7 +339,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -351,7 +351,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -364,7 +364,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -377,7 +377,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -390,7 +390,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -404,7 +404,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -417,7 +417,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -432,7 +432,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectBatchUpdateReferencesReturns(itSystem.Id, inputParameters, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -447,7 +447,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var operationFailures = Enum.GetValues(typeof(OperationFailure)).Cast<OperationFailure>().Where(x => x != OperationFailure.NotFound);
             Configure(x => x.Inject(operationFailures.OrderBy(_ => A<int>()).First()));
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -463,7 +463,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceGetSystemReturns(inputParameters.ParentSystemUuid.NewValue.GetValueOrDefault(), operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -476,7 +476,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -493,7 +493,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, false);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -506,7 +506,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -525,7 +525,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateParentSystemReturns(itSystem.Id, parentSystem, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -538,7 +538,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<SystemCreationParameters>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgDbId = A<int>();
             var itSystem = new ItSystem { Id = A<int>() };
@@ -558,7 +558,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateBusinessTypeReturns(itSystem.Id, inputParameters, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -573,7 +573,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var overlapKey = A<Guid>();
             var uniqueKey = A<Guid>();
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = new SystemCreationParameters
+            var inputParameters = new RightsHolderSystemCreationParameters
             {
                 RightsHolderProvidedUuid = Guid.NewGuid(),
                 Name = A<string>().AsChangedValue(),
@@ -592,7 +592,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -606,7 +606,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var inputParameters = new SystemCreationParameters
+            var inputParameters = new RightsHolderSystemCreationParameters
             {
                 RightsHolderProvidedUuid = Guid.NewGuid(),
                 Name = A<string>().AsChangedValue(),
@@ -623,7 +623,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
             ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -1009,7 +1009,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(new User { Email = A<string>() });
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Ok);
@@ -1032,7 +1032,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectDeactivateReturns(itSystem.Id, operationError);
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Failed);
@@ -1054,7 +1054,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectHasSpecificAccessReturns(itSystem, false);
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Failed);
@@ -1075,7 +1075,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceGetSystemReturns(systemUuid, operationError);
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Failed);
@@ -1099,7 +1099,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _itSystemServiceMock.Setup(x => x.UpdateTaskRefs(systemId, It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(expectedTaskRefIds)))).Returns(result);
         }
 
-        private void ExpectUpdateBusinessTypeReturns(int systemId, SystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
+        private void ExpectUpdateBusinessTypeReturns(int systemId, SharedSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
         {
             _itSystemServiceMock.Setup(x => x.UpdateBusinessType(systemId, inputParameters.BusinessTypeUuid.NewValue)).Returns(result);
         }
@@ -1109,17 +1109,17 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _itSystemServiceMock.Setup(x => x.UpdateParentSystem(systemId, parentSystem.Id)).Returns(result);
         }
 
-        private void ExpectBatchUpdateReferencesReturns(int systemId, SystemUpdateParameters inputParameters, Maybe<OperationError> error)
+        private void ExpectBatchUpdateReferencesReturns(int systemId, SharedSystemUpdateParameters inputParameters, Maybe<OperationError> error)
         {
             _referenceServiceMock.Setup(x=>x.UpdateExternalReferences(ReferenceRootType.System,systemId,inputParameters.ExternalReferences.GetValueOrDefault())).Returns(error);
         }
 
-        private void ExpectUpdateDescriptionReturns(int systemId, SystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
+        private void ExpectUpdateDescriptionReturns(int systemId, SharedSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
         {
             _itSystemServiceMock.Setup(x => x.UpdateDescription(systemId, inputParameters.Description.NewValue)).Returns(result);
         }
 
-        private void ExpectUpdatePreviousNameReturns(int systemId, SystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
+        private void ExpectUpdatePreviousNameReturns(int systemId, SharedSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
         {
             _itSystemServiceMock.Setup(x => x.UpdatePreviousName(systemId, inputParameters.FormerName.NewValue)).Returns(result);
         }
@@ -1135,7 +1135,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _itSystemServiceMock.Setup(x => x.GetSystem(uuid)).Returns(result);
         }
 
-        private void ExpectSystemServiceCreateItSystemReturns(int orgDbId, SystemCreationParameters inputParameters, Result<ItSystem, OperationError> result)
+        private void ExpectSystemServiceCreateItSystemReturns(int orgDbId, RightsHolderSystemCreationParameters inputParameters, Result<ItSystem, OperationError> result)
         {
             _itSystemServiceMock
                 .Setup(x => x.CreateNewSystem(orgDbId, inputParameters.Name.NewValue, inputParameters.RightsHolderProvidedUuid))

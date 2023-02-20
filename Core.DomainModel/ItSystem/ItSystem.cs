@@ -238,6 +238,11 @@ namespace Core.DomainModel.ItSystem
             Disabled = true;
         }
 
+        public void Activate()
+        {
+            Disabled = false;
+        }
+
         public void ChangeOrganization(Organization.Organization newOrganization)
         {
             if (newOrganization == null)
@@ -259,6 +264,18 @@ namespace Core.DomainModel.ItSystem
             {
                 throw new ArgumentException(nameof(child));
             }
+        }
+
+        public Maybe<OperationError> UpdateRecommendedArchiveDuty(ArchiveDutyRecommendationTypes? recommendation, string comment)
+        {
+            if (recommendation is null or ArchiveDutyRecommendationTypes.Undecided && comment != null)
+            {
+                return new OperationError("Comment should only be defined if an actual recommendation exists", OperationFailure.BadInput);
+            }
+
+            ArchiveDuty = recommendation;
+            ArchiveDutyComment = comment;
+            return Maybe<OperationError>.None;
         }
     }
 }

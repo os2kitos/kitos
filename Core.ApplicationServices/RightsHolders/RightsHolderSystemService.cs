@@ -12,6 +12,7 @@ using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
@@ -48,7 +49,7 @@ namespace Core.ApplicationServices.RightsHolders
             ITransactionManager transactionManager,
             IUserRepository userRepository,
             IOperationClock operationClock,
-            ILogger logger, 
+            ILogger logger,
             IReferenceService referenceService)
             : base(userContext, organizationRepository)
         {
@@ -64,7 +65,7 @@ namespace Core.ApplicationServices.RightsHolders
             _referenceService = referenceService;
         }
 
-        public Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, SystemCreationParameters creationParameters)
+        public Result<ItSystem, OperationError> CreateNewSystemAsRightsHolder(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters)
         {
             if (creationParameters == null)
                 throw new ArgumentNullException(nameof(creationParameters));
@@ -90,7 +91,7 @@ namespace Core.ApplicationServices.RightsHolders
                 var result = _systemService
                     .CreateNewSystem(organizationId.Value, name.NewValue, creationParameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
-                    .Bind(system => ApplyUpdates(system, creationParameters));
+                    .Bind(system => ApplyCommonUpdates(system, creationParameters));
 
                 if (result.Ok)
                 {
@@ -110,7 +111,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters updateParameters)
+        public Result<ItSystem, OperationError> UpdateAsRightsHolder(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters)
         {
             using var transaction = _transactionManager.Begin();
             try
@@ -119,7 +120,7 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(system => ApplyUpdates(system, updateParameters));
+                    .Bind(system => ApplyCommonUpdates(system, updateParameters));
 
                 if (result.Ok)
                 {
@@ -139,7 +140,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> Deactivate(Guid systemUuid, string reason)
+        public Result<ItSystem, OperationError> DeactivateAsRightsHolder(Guid systemUuid, string reason)
         {
             if (string.IsNullOrEmpty(reason))
                 return new OperationError("No deactivation reason provided", OperationFailure.BadInput);
@@ -188,7 +189,21 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, SystemUpdateParameters updates)
+        //TODO: Extract common suff to base service and call from this service into that
+
+        public Result<ItSystem, OperationError> CreateNewSystem(Guid organizationUuid, SystemUpdateParameters creationParameters)
+        {
+            //TODO: Use both common and the other one
+            throw new NotImplementedException();
+        }
+
+        public Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters updateParameters)
+        {
+            //TODO: Use both common and the other one
+            throw new NotImplementedException();
+        }
+
+        private Result<ItSystem, OperationError> ApplyCommonUpdates(ItSystem system, SharedSystemUpdateParameters updates)
         {
             return system
                 .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))
@@ -198,6 +213,27 @@ namespace Core.ApplicationServices.RightsHolders
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, UpdateParentSystem))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.TaskRefUuids, UpdateTaskRefs));
+        }
+
+        private Result<ItSystem, OperationError> ApplyExtendedUpdates(ItSystem system, SystemUpdateParameters updates)
+        {
+            return system
+                .WithOptionalUpdate(updates.ArchivingRecommendation, UpdateUpdateRecommendedArchiveDuty)
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.RightsHolderUuid, (itSystem, newValue) => _systemService.UpdateRightsHolder(itSystem.Id, newValue)))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Scope, (itSystem, newValue) => _systemService.UpdateAccessModifier(itSystem.Id, newValue)))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Deactivated, HandleDeactivatedState));
+        }
+
+        private Result<ItSystem, OperationError> HandleDeactivatedState(ItSystem itSystem, bool deactivated)
+        {
+            return deactivated ? _systemService.Deactivate(itSystem.Id) : _systemService.Activate(itSystem.Id);
+        }
+
+        private static Maybe<OperationError> UpdateUpdateRecommendedArchiveDuty(ItSystem system, (OptionalValueChange<ArchiveDutyRecommendationTypes?> recommendation, OptionalValueChange<string> comment) newValue)
+        {
+            var newRecommendation = newValue.recommendation.Match(changed => changed, () => system.ArchiveDuty);
+            var newComment = newValue.comment.Match(comment => comment, () => system.ArchiveDutyComment);
+            return system.UpdateRecommendedArchiveDuty(newRecommendation, newComment);
         }
 
         private Result<ItSystem, OperationError> UpdateExternalReferences(ItSystem system, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
