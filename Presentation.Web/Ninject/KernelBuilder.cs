@@ -283,7 +283,7 @@ namespace Presentation.Web.Ninject
             RegisterMappers(kernel);
 
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
-            kernel.Bind<IItSystemWriteService>().To<RightsHolderSystemService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemWriteService>().To<ItSystemWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
 

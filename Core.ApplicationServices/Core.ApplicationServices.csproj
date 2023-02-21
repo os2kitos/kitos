@@ -295,6 +295,7 @@
     <Compile Include="SingleThreadedMailClient.cs" />
     <Compile Include="References\ReferenceService.cs" />
     <Compile Include="System\Write\IItSystemWriteService.cs" />
+    <Compile Include="System\Write\ItSystemWriteService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
     <Compile Include="Users\Handlers\RemoveUserFromKitosCommandHandler.cs" />

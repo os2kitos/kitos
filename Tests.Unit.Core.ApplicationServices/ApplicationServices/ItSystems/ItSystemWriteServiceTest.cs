@@ -10,8 +10,8 @@ using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.References;
-using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
+using Core.ApplicationServices.System.Write;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -19,7 +19,6 @@ using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.TaskRefs;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -30,7 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
 {
     public class ItSystemWriteServiceTest : WithAutoFixture
     {
-        private readonly RightsHolderSystemService _sut;
+        private readonly ItSystemWriteService _sut;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IItSystemService> _itSystemServiceMock;
@@ -56,20 +55,18 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _dbControlMock = new Mock<IDatabaseControl>();
             _domainEventsMock = new Mock<IDomainEvents>();
-            _sut = new RightsHolderSystemService(
+            _sut = new ItSystemWriteService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
                 _itSystemServiceMock.Object,
                 _taskRefRepositoryMock.Object,
-                _globalAdminNotificationServiceMock.Object,
                 _transactionManagerMock.Object,
-                _userRepositoryMock.Object,
-                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
                 Mock.Of<ILogger>(),
                 _referenceServiceMock.Object,
                 _authorizationContextMock.Object,
                 _dbControlMock.Object,
-                _domainEventsMock.Object);
+                _domainEventsMock.Object
+                );
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -808,7 +805,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
 
         private void ExpectAllowModifyReturns(ItSystem itSystem, bool val)
         {
-            _authorizationContextMock.Setup(x => x.AllowModify(itSystem)).Returns(true);
+            _authorizationContextMock.Setup(x => x.AllowModify(itSystem)).Returns(val);
         }
     }
 }
