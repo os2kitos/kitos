@@ -28,6 +28,9 @@ using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
 {
+    /// <summary>
+    /// TODO :With the split the rights holder service should just delegate to the other one making sure it performs the right auths....
+    /// </summary>
     public class RightsHolderSystemService : BaseRightsHolderService, IRightsHolderSystemService
     {
         private readonly IOrganizationalUserContext _userContext;

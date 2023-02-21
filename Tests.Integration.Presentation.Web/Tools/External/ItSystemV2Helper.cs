@@ -73,6 +73,19 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, request);
         }
 
+        public static async Task<ItSystemResponseDTO> PatchSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            using var response = await SendPatchSystemAsync(token, uuid, changedProperties);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+        }
+
         public static async Task<RightsHolderItSystemResponseDTO> PatchRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
         {
             using var response = await SendPatchUpdateRightsHolderSystemAsync(token, uuid, changedProperties);

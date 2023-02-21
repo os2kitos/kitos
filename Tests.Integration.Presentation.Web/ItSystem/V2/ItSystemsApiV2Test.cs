@@ -8,10 +8,13 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.KLE;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -424,60 +427,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task Can_POST_AND_DELETE_Full_ItSystem()
         {
             //Arrange
-            var organizationDto = await CreateOrganizationAsync();
-            var rightsHolderOrgDto = await CreateOrganizationAsync();
-            var name = CreateName();
-            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var parentSystemParams = new CreateItSystemRequestDTO
-            {
-                OrganizationUuid = organizationDto.Uuid,
-                Name = $"parent_{name}"
-            };
-            var kleChoices = (await KleOptionV2Helper.GetKleNumbersAsync(token.Token)).Payload.Take(2).ToList();
-            var businessType =
-                (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.BusinessType, organizationDto.Uuid, 10, 0))
-                .RandomItem();
-            var parent = await ItSystemV2Helper.CreateSystemAsync(token.Token, parentSystemParams);
-            var references = Many<ExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
-            var fullSystemParams = new CreateItSystemRequestDTO
-            {
-                OrganizationUuid = organizationDto.Uuid,
-                Name = name,
-                ParentUuid = parent.Uuid,
-                FormerName = A<string>(),
-                Description = A<string>(),
-                ExternalReferences = references,
-                BusinessTypeUuid = businessType.Uuid,
-                Deactivated = false,
-                RecommendedArchiveDuty = new RecommendedArchiveDutyRequestDTO
-                {
-                    Id = EnumRange.AllExcept(RecommendedArchiveDutyChoice.Undecided).RandomItem(),
-                    Comment = A<string>()
-                },
-                RightsHolderUuid = rightsHolderOrgDto.Uuid,
-                Scope = A<RegistrationScopeChoice>(),
-                KLEUuids = kleChoices.Select(x => x.Uuid).ToList()
-            };
+            var context = await PrepareFullItSystem();
+            var (fullRequest, kleChoices, businessType, parent, token, organizationDto, rightsHolder) = context;
 
             //Act - POST, DELETE, GET
-            var createdSystem = await ItSystemV2Helper.CreateSystemAsync(token.Token, fullSystemParams);
-            using var deleteResponse = await ItSystemV2Helper.SendDeleteSystemAsync(token.Token, createdSystem.Uuid);
-            using var getAfterDeleteResponse = await ItSystemV2Helper.SendGetSingleAsync(token.Token, createdSystem.Uuid);
+            var createdSystem = await ItSystemV2Helper.CreateSystemAsync(token, fullRequest);
+            using var deleteResponse = await ItSystemV2Helper.SendDeleteSystemAsync(token, createdSystem.Uuid);
+            using var getAfterDeleteResponse = await ItSystemV2Helper.SendGetSingleAsync(token, createdSystem.Uuid);
 
             //Assert creation, deletion and GET after deletion
             AssertOrganization(organizationDto, createdSystem.OrganizationContext);
-            Assert.Equal(name, createdSystem.Name);
-            AssertOrganization(rightsHolderOrgDto, createdSystem.RightsHolder);
-            Assert.Equal(fullSystemParams.FormerName, createdSystem.FormerName);
-            Assert.Equal(fullSystemParams.Description, createdSystem.Description);
-            Assert.Equal(fullSystemParams.Deactivated, createdSystem.Deactivated);
+            Assert.Equal(fullRequest.Name, createdSystem.Name);
+            AssertOrganization(rightsHolder, createdSystem.RightsHolder);
+            Assert.Equal(fullRequest.FormerName, createdSystem.FormerName);
+            Assert.Equal(fullRequest.Description, createdSystem.Description);
+            Assert.Equal(fullRequest.Deactivated, createdSystem.Deactivated);
             Assert.Equivalent(businessType, createdSystem.BusinessType);
-            Assert.Equal(fullSystemParams.Scope, createdSystem.Scope);
+            Assert.Equal(fullRequest.Scope, createdSystem.Scope);
             Assert.Equivalent(kleChoices.Select(x => new IdentityNamePairResponseDTO(x.Uuid, x.KleNumber)), createdSystem.KLE);
             Assert.Equivalent(parent.Transform(x => new IdentityNamePairResponseDTO(x.Uuid, x.Name)), createdSystem.ParentSystem);
-            Assert.Equivalent(fullSystemParams.RecommendedArchiveDuty.Id, createdSystem.RecommendedArchiveDuty.Id);
-            Assert.Equivalent(fullSystemParams.RecommendedArchiveDuty.Comment, createdSystem.RecommendedArchiveDuty.Comment);
-            Assert.Equivalent(fullSystemParams.ExternalReferences, createdSystem.ExternalReferences);
+            Assert.Equivalent(fullRequest.RecommendedArchiveDuty.Id, createdSystem.RecommendedArchiveDuty.Id);
+            Assert.Equivalent(fullRequest.RecommendedArchiveDuty.Comment, createdSystem.RecommendedArchiveDuty.Comment);
+            Assert.Equivalent(fullRequest.ExternalReferences, createdSystem.ExternalReferences);
 
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
@@ -505,8 +476,59 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(HttpStatusCode.Conflict, createDuplicateResponse.StatusCode);
         }
 
-        //TODO: PATCH done test
+        public static IEnumerable<object[]> GetUndefinedItSystemSectionsInput() => CreateGetUndefinedSectionsInput(11);
 
+        [Theory]
+        [MemberData(nameof(GetUndefinedItSystemSectionsInput))]
+        public async Task Can_PATCH(
+            bool updateName,
+            bool updateFormerName,
+            bool updateDescription,
+            bool updateReferences,
+            bool updateBusinessType,
+            bool updateKle,
+            bool updateParent,
+            bool updateRightsHolder,
+            bool updateDeactivated,
+            bool updateScope,
+            bool updateArchiveDutyRecommendation)
+        {
+            //Arrange
+            var createSystemRequest = await PrepareFullItSystem();
+            var (fullRequest, _, _, _, token, organizationDto, _) = createSystemRequest;
+            var createdSystem = await ItSystemV2Helper.CreateSystemAsync(token, fullRequest);
+
+            var changes = new Dictionary<string, object>();
+            if (updateName) changes.Add(nameof(UpdateItSystemRequestDTO.Name), CreateName());
+            if (updateFormerName) changes.Add(nameof(UpdateItSystemRequestDTO.FormerName), A<string>());
+            if (updateDescription) changes.Add(nameof(UpdateItSystemRequestDTO.Description), A<string>());
+            if (updateBusinessType) changes.Add(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid), (await GetRandomBusinessType(organizationDto)).Uuid);
+            if (updateParent) changes.Add(nameof(UpdateItSystemRequestDTO.ParentUuid), (await CreateSystemAsync(organizationDto.Id, AccessModifier.Public)).uuid);
+            if (updateReferences) changes.Add(nameof(UpdateItSystemRequestDTO.ExternalReferences), CreateExternalReferences());
+            if (updateKle) changes.Add(nameof(UpdateItSystemRequestDTO.KLEUuids), (await GetRandomKleChoices(token)).Select(x => x.Uuid).ToList());
+            if (updateRightsHolder) changes.Add(nameof(UpdateItSystemRequestDTO.RightsHolderUuid), (await CreateOrganizationAsync()).Uuid);
+            if (updateDeactivated) changes.Add(nameof(UpdateItSystemRequestDTO.Deactivated), !createdSystem.Deactivated);
+            if (updateScope) changes.Add(nameof(UpdateItSystemRequestDTO.Scope), EnumRange.AllExcept(createdSystem.Scope).First());
+            if (updateArchiveDutyRecommendation) changes.Add(nameof(UpdateItSystemRequestDTO.RecommendedArchiveDuty), CreateNewArchiveDutyRecommendation());
+
+            //Act
+            var updatedSystem = await ItSystemV2Helper.PatchSystemAsync(token, createdSystem.Uuid, changes.ToArray());
+
+            //Assert that only the patched properties have changed
+            Assert.Equal(createdSystem.Uuid, updatedSystem.Uuid); //No changes expected
+            Assert.Equal(createdSystem.Created, updatedSystem.Created); //No changes expected
+            Assert.Equal(updateRightsHolder ? changes[nameof(UpdateItSystemRequestDTO.RightsHolderUuid)] : createdSystem.RightsHolder.Uuid, updatedSystem.RightsHolder.Uuid);
+            Assert.Equal(updateName ? changes[nameof(UpdateItSystemRequestDTO.Name)] : createdSystem.Name, updatedSystem.Name);
+            Assert.Equal(updateFormerName ? changes[nameof(UpdateItSystemRequestDTO.FormerName)] : createdSystem.FormerName, updatedSystem.FormerName);
+            Assert.Equal(updateDescription ? changes[nameof(UpdateItSystemRequestDTO.Description)] : createdSystem.Description, updatedSystem.Description);
+            Assert.Equal(updateBusinessType ? changes[nameof(UpdateItSystemRequestDTO.BusinessTypeUuid)] : createdSystem.BusinessType?.Uuid, updatedSystem.BusinessType?.Uuid);
+            Assert.Equal(updateParent ? changes[nameof(UpdateItSystemRequestDTO.ParentUuid)] : createdSystem.ParentSystem?.Uuid, updatedSystem.ParentSystem?.Uuid);
+            Assert.Equal(updateKle ? changes[nameof(UpdateItSystemRequestDTO.KLEUuids)] : createdSystem.KLE.Select(x => x.Uuid), updatedSystem.KLE.Select(x => x.Uuid));
+            Assert.Equivalent(updateReferences ? changes[nameof(UpdateItSystemRequestDTO.ExternalReferences)] : createdSystem.ExternalReferences, updatedSystem.ExternalReferences);
+            Assert.Equal(updateDeactivated ? changes[nameof(UpdateItSystemRequestDTO.Deactivated)] : createdSystem.Deactivated, updatedSystem.Deactivated);
+            Assert.Equal(updateScope ? changes[nameof(UpdateItSystemRequestDTO.Scope)] : createdSystem.Scope, updatedSystem.Scope);
+            Assert.Equivalent(updateArchiveDutyRecommendation ? changes[nameof(UpdateItSystemRequestDTO.RecommendedArchiveDuty)] : createdSystem.RecommendedArchiveDuty, updatedSystem.RecommendedArchiveDuty);
+        }
         private (Guid rootUuid, IReadOnlyList<Core.DomainModel.ItSystem.ItSystem> createdItSystems) CreateHierarchy(int orgId)
         {
             var rootSystem = CreateNewItSystem(orgId);
@@ -567,6 +589,86 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 externalReferenceDataDto.MasterReference = false;
 
             return orderedRandomly;
+        }
+
+        private async Task<(
+            CreateItSystemRequestDTO fullRequest,
+            List<KLEDetailsDTO> kleChoices,
+            IdentityNamePairResponseDTO businessType,
+            ItSystemResponseDTO parent,
+            string token,
+            OrganizationDTO organizationDto,
+            OrganizationDTO rightsHolder)> PrepareFullItSystem()
+        {
+            var organizationDto = await CreateOrganizationAsync();
+            var rightsHolderOrgDto = await CreateOrganizationAsync();
+            var name = CreateName();
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+            var parentSystemParams = new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationDto.Uuid,
+                Name = $"parent_{name}"
+            };
+            var kleChoices = await GetRandomKleChoices(token);
+            var businessType = await GetRandomBusinessType(organizationDto);
+            var parent = await ItSystemV2Helper.CreateSystemAsync(token, parentSystemParams);
+            var references = CreateExternalReferences();
+            var fullSystemParams = new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationDto.Uuid,
+                Name = name,
+                ParentUuid = parent.Uuid,
+                FormerName = A<string>(),
+                Description = A<string>(),
+                ExternalReferences = references,
+                BusinessTypeUuid = businessType.Uuid,
+                Deactivated = false,
+                RecommendedArchiveDuty = CreateNewArchiveDutyRecommendation(),
+                RightsHolderUuid = rightsHolderOrgDto.Uuid,
+                Scope = A<RegistrationScopeChoice>(),
+                KLEUuids = kleChoices.Select(x => x.Uuid).ToList()
+            };
+            return (fullSystemParams, kleChoices, businessType, parent, token, organizationDto, rightsHolderOrgDto);
+        }
+
+        private RecommendedArchiveDutyRequestDTO CreateNewArchiveDutyRecommendation()
+        {
+            return new RecommendedArchiveDutyRequestDTO
+            {
+                Id = EnumRange.AllExcept(RecommendedArchiveDutyChoice.Undecided).RandomItem(),
+                Comment = A<string>()
+            };
+        }
+
+        private List<ExternalReferenceDataWriteRequestDTO> CreateExternalReferences()
+        {
+            return Many<ExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+        }
+
+        private static async Task<IdentityNamePairResponseDTO> GetRandomBusinessType(OrganizationDTO organizationDto)
+        {
+            return (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.BusinessType, organizationDto.Uuid, 10,
+                    0))
+                .RandomItem();
+        }
+
+        private static async Task<List<KLEDetailsDTO>> GetRandomKleChoices(string token)
+        {
+            return (await KleOptionV2Helper.GetKleNumbersAsync(token)).Payload.Take(2).ToList();
+        }
+
+        protected static IEnumerable<object[]> CreateGetUndefinedSectionsInput(int numberOfInputParameters)
+        {
+            var referenceValues = Enumerable.Repeat(false, numberOfInputParameters).ToList();
+            yield return referenceValues.Cast<object>().ToArray();
+            for (var i = 0; i < referenceValues.Count; i++)
+            {
+                var inputs = referenceValues.ToList();
+                inputs[i] = true;
+                yield return inputs.Cast<object>().ToArray();
+            }
+
+            yield return referenceValues.Select(_ => true).Cast<object>().ToArray();
         }
     }
 }
