@@ -76,10 +76,10 @@ namespace Core.ApplicationServices.RightsHolders
             _domainEvents = domainEvents;
         }
 
-        public Result<ItSystem, OperationError> CreateNewSystemAsRightsHolder(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters)
+        public Result<ItSystem, OperationError> CreateNewSystemAsRightsHolder(Guid rightsHolderUuid, RightsHolderSystemCreationParameters parameters)
         {
-            if (creationParameters == null)
-                throw new ArgumentNullException(nameof(creationParameters));
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
 
             using var transaction = _transactionManager.Begin();
             try
@@ -92,27 +92,26 @@ namespace Core.ApplicationServices.RightsHolders
                 if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                     return new OperationError("User does not have rights holder access in the provided organization", OperationFailure.Forbidden);
 
-                var name = creationParameters.Name;
+                var name = parameters.Name;
 
                 if (name.IsUnchanged)
                     return new OperationError("Error must be defined upon creation", OperationFailure.BadInput);
 
-                creationParameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
+                parameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
 
                 var result = _systemService
-                    .CreateNewSystem(organizationId.Value, name.NewValue, creationParameters.RightsHolderProvidedUuid)
+                    .CreateNewSystem(organizationId.Value, name.NewValue, parameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
-                    .Bind(system => ApplyCommonUpdatesAsRightsHolder(system, creationParameters));
+                    .Bind(system => ApplyCommonUpdatesAsRightsHolder(system, parameters));
 
                 if (result.Ok)
                 {
-                    RaiseSystemUpdated(result.Value);
-                    _databaseControl.SaveChanges();
-                    transaction.Commit();
+                    SaveAndNotify(result.Value, transaction);
                 }
                 else
                 {
-                    _logger.Error("RightsHolder {uuid} failed to create It-System {name} due to error: {errorMessage}", rightsHolderUuid, creationParameters.Name, result.Error.ToString());
+                    transaction.Rollback();
+                    _logger.Error("RightsHolder {uuid} failed to create It-System {name} due to error: {errorMessage}", rightsHolderUuid, parameters.Name, result.Error.ToString());
                 }
 
                 return result;
@@ -124,7 +123,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> UpdateAsRightsHolder(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters)
+        public Result<ItSystem, OperationError> UpdateAsRightsHolder(Guid systemUuid, RightsHolderSystemUpdateParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
             try
@@ -133,16 +132,15 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(system => ApplyCommonUpdatesAsRightsHolder(system, updateParameters));
+                    .Bind(system => ApplyCommonUpdatesAsRightsHolder(system, parameters));
 
                 if (result.Ok)
                 {
-                    RaiseSystemUpdated(result.Value);
-                    _databaseControl.SaveChanges();
-                    transaction.Commit();
+                    SaveAndNotify(result.Value, transaction);
                 }
                 else
                 {
+                    transaction.Rollback();
                     _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
                 }
 
@@ -204,10 +202,10 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> CreateNewSystem(Guid organizationUuid, SystemUpdateParameters creationParameters)
+        public Result<ItSystem, OperationError> CreateNewSystem(Guid organizationUuid, SystemUpdateParameters parameters)
         {
-            if (creationParameters == null)
-                throw new ArgumentNullException(nameof(creationParameters));
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
 
             using var transaction = _transactionManager.Begin();
             try
@@ -217,26 +215,24 @@ namespace Core.ApplicationServices.RightsHolders
                 if (organizationId.IsNone)
                     return new OperationError("Invalid org uuid provided", OperationFailure.BadInput);
 
-                var name = creationParameters.Name;
+                var name = parameters.Name;
 
                 if (name.IsUnchanged)
                     return new OperationError("Error must be defined upon creation", OperationFailure.BadInput);
 
-                creationParameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
+                parameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
 
                 var result = _systemService
                     .CreateNewSystem(organizationId.Value, name.NewValue)
-                    .Bind(system => ApplyCommonUpdatesAsRegularUser(system, creationParameters))
-                    .Bind(system => ApplyExtendedUpdates(system, creationParameters));
+                    .Bind(system => ApplyFullUpdateAsRegularUser(system, parameters));
 
                 if (result.Ok)
                 {
-                    RaiseSystemUpdated(result.Value);
-                    _databaseControl.SaveChanges();
-                    transaction.Commit();
+                    SaveAndNotify(result.Value, transaction);
                 }
                 else
                 {
+                    transaction.Rollback();
                     _logger.Error("Failed to create It-System {name} due to error: {errorMessage}", name, result.Error.ToString());
                 }
 
@@ -249,7 +245,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters updateParameters)
+        public Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
             try
@@ -257,17 +253,15 @@ namespace Core.ApplicationServices.RightsHolders
                 var result = _systemService
                     .GetSystem(systemUuid)
                     .Bind(WithWriteAccess)
-                    .Bind(system => ApplyExtendedUpdates(system, updateParameters))
-                    .Bind(system => ApplyCommonUpdatesAsRegularUser(system, updateParameters));
+                    .Bind(system => ApplyFullUpdateAsRegularUser(system, parameters));
 
                 if (result.Ok)
                 {
-                    RaiseSystemUpdated(result.Value);
-                    _databaseControl.SaveChanges();
-                    transaction.Commit();
+                    SaveAndNotify(result.Value, transaction);
                 }
                 else
                 {
+                    transaction.Rollback();
                     _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
                 }
 
@@ -278,11 +272,6 @@ namespace Core.ApplicationServices.RightsHolders
                 _logger.Error(e, "User {id} Failed updating system with uuid {uuid}", _userContext.UserId, systemUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
-        }
-
-        private void RaiseSystemUpdated(ItSystem system)
-        {
-            _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
         }
 
         public Result<ItSystem, OperationError> Delete(Guid systemUuid)
@@ -316,6 +305,12 @@ namespace Core.ApplicationServices.RightsHolders
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, (s, newValue) => UpdateParentSystem(s, newValue, asRightsHolder)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.TaskRefUuids, UpdateTaskRefs));
+        }
+
+        private Result<ItSystem, OperationError> ApplyFullUpdateAsRegularUser(ItSystem system, SystemUpdateParameters updates)
+        {
+            return ApplyCommonUpdatesAsRegularUser(system,updates)
+                .Bind(_ => ApplyExtendedUpdates(system, updates));
         }
 
         private Result<ItSystem, OperationError> ApplyCommonUpdatesAsRegularUser(ItSystem system, SharedSystemUpdateParameters updates)
@@ -454,6 +449,12 @@ namespace Core.ApplicationServices.RightsHolders
                     error => error,
                     () => _systemService.GetSystem(systemUuid).Bind(WithRightsHolderAccessTo)
                 );
+        }
+        private void SaveAndNotify(ItSystem system, IDatabaseTransaction transaction)
+        {
+            _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
+            _databaseControl.SaveChanges();
+            transaction.Commit();
         }
     }
 }
