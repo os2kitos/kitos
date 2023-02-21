@@ -29,6 +29,7 @@ using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
 {
+    //TODO: See how we can prevent duplication of testing this one using delegation - maybe we CAN just call the write service and just prevalidate the inputs!!!!
     public class RightsHolderSystemService : BaseRightsHolderService, IRightsHolderSystemService, IItSystemWriteService
     {
         private readonly IOrganizationalUserContext _userContext;
