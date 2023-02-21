@@ -21,7 +21,6 @@ namespace Core.ApplicationServices.Notification
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<Advice> _adviceRepository;
-        private readonly IGenericRepository<AdviceUserRelation> _adviceUserRelationRepository;
         private readonly IDomainEvents _domainEventHandler;
         private readonly IAdviceRootResolution _adviceRootResolution;
 
@@ -31,8 +30,7 @@ namespace Core.ApplicationServices.Notification
             ITransactionManager transactionManager,
             IGenericRepository<Advice> adviceRepository,
             IDomainEvents domainEventHandler, 
-            IAdviceRootResolution adviceRootResolution, 
-            IGenericRepository<AdviceUserRelation> adviceUserRelationRepository)
+            IAdviceRootResolution adviceRootResolution)
         {
             _adviceService = adviceService;
             _authorizationContext = authorizationContext;
@@ -40,7 +38,6 @@ namespace Core.ApplicationServices.Notification
             _adviceRepository = adviceRepository;
             _domainEventHandler = domainEventHandler;
             _adviceRootResolution = adviceRootResolution;
-            _adviceUserRelationRepository = adviceUserRelationRepository;
         }
 
         public IQueryable<Advice> GetCurrentUserNotifications()
@@ -155,23 +152,6 @@ namespace Core.ApplicationServices.Notification
             
             transaction.Commit();
 
-            return Maybe<OperationError>.None;
-        }
-
-        public Maybe<OperationError> DeleteUserRelationByAdviceId(int notificationId)
-        {
-            foreach (var d in _adviceUserRelationRepository.AsQueryable().Where(d => d.AdviceId == notificationId).ToList())
-            {
-                if (_authorizationContext.AllowDelete(d))
-                {
-                    _adviceUserRelationRepository.Delete(d);
-                    _adviceUserRelationRepository.Save();
-                }
-                else
-                {
-                    return new OperationError($"User is not allowed to delete user relation with adviceId: {notificationId}", OperationFailure.Forbidden);
-                }
-            }
             return Maybe<OperationError>.None;
         }
 
