@@ -12,6 +12,7 @@ using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
+using Core.ApplicationServices.System.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
@@ -28,10 +29,7 @@ using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
 {
-    /// <summary>
-    /// TODO :With the split the rights holder service should just delegate to the other one making sure it performs the right auths....
-    /// </summary>
-    public class RightsHolderSystemService : BaseRightsHolderService, IRightsHolderSystemService
+    public class RightsHolderSystemService : BaseRightsHolderService, IRightsHolderSystemService, IItSystemWriteService
     {
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOrganizationRepository _organizationRepository;

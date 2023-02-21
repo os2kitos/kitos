@@ -26,6 +26,7 @@ using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
+using Core.ApplicationServices.System.Write;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 {
@@ -40,18 +41,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IItSystemWriteModelMapper _writeModelMapper;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
+        private readonly IItSystemWriteService _writeService;
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
             IItSystemWriteModelMapper writeModelMapper,
             IEntityIdentityResolver entityIdentityResolver,
-            IExternalReferenceResponseMapper referenceResponseMapper)
+            IExternalReferenceResponseMapper referenceResponseMapper,
+            IItSystemWriteService writeService)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
             _writeModelMapper = writeModelMapper;
             _entityIdentityResolver = entityIdentityResolver;
             _referenceResponseMapper = referenceResponseMapper;
+            _writeService = writeService;
         }
 
         /// <summary>
@@ -110,7 +114,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 return BadRequest(ModelState);
 
             var parameters = _writeModelMapper.FromPOST(request);
-            return _rightsHolderSystemService
+            return _writeService
                 .CreateNewSystem(request.OrganizationUuid, parameters)
                 .Select(ToSystemResponseDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
@@ -135,7 +139,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 return BadRequest(ModelState);
 
             var parameters = _writeModelMapper.FromPATCH(request);
-            return _rightsHolderSystemService
+            return _writeService
                 .Update(uuid, parameters)
                 .Select(ToSystemResponseDTO)
                 .Match(Ok, FromOperationError);
@@ -158,7 +162,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _rightsHolderSystemService
+            return _writeService
                 .Delete(uuid)
                 .Match(NoContent, FromOperationError);
         }
