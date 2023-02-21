@@ -1,5 +1,4 @@
 ﻿using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Notification.Write;

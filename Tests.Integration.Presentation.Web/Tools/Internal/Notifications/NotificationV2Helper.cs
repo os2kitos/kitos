@@ -35,6 +35,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
 
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();
         }
+
         public static async Task<NotificationResponseDTO> UpdateScheduledNotificationAsync(OwnerResourceType ownerResourceType, Guid notificationUuid, UpdateScheduledNotificationWriteRequestDTO body, Cookie userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -112,6 +113,16 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/{uuid}"), cookie);
+        }
+
+        public static async Task<NotificationAccessRightsResponseDTO> GetAccessRightsAsync(OwnerResourceType ownerResourceType, Guid notificationUuid, Guid ownerResourceUuid, Cookie userCookie = null)
+        {
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/access-rights/{notificationUuid}/{ownerResourceUuid}"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<NotificationAccessRightsResponseDTO>();
         }
     }
 }

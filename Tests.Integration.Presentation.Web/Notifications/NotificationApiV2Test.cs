@@ -167,6 +167,26 @@ namespace Tests.Integration.Presentation.Web.Notifications
             AssertNotificationList(notification3, notifications);
         }
 
+        [Fact]
+        public async Task Can_GetAccessRights()
+        {
+            //Arrange
+            var ownerResourceType = A<OwnerResourceType>();
+            var (ownerResourceUuid, _, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
+
+            var notificationRequest1 = CreateScheduledNotificationWriteRequest(ownerResourceUuid, ownerResourceType);
+
+            var notification = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, notificationRequest1, cookie);
+
+            //Act
+            var response = await NotificationV2Helper.GetAccessRightsAsync(ownerResourceType, notification.Uuid, ownerResourceUuid, userCookie: cookie);
+
+            //Assert
+            Assert.True(response.CanBeModified);
+            Assert.True(response.CanBeDeactivated);
+            Assert.False(response.CanBeDeleted);
+        }
+
         private static void AssertNotificationList(NotificationResponseDTO expected, IEnumerable<NotificationResponseDTO> actual)
         {
             var dto = Assert.Single(actual, x => x.Uuid == expected.Uuid);
