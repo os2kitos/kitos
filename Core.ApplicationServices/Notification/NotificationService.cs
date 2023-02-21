@@ -116,10 +116,9 @@ namespace Core.ApplicationServices.Notification
                 return MapBaseModel(parameters, AdviceType.Repeat, relatedEntity.Id)
                     .Bind(result =>
                     {
+                        MapUpdateScheduledNotification(parameters, result);
                         result.FromDate = parameters.FromDate;
-                        result.ToDate = parameters.ToDate;
                         result.RepetitionFrequency = parameters.RepetitionFrequency;
-                        result.Name = parameters.Name;
 
                         return _registrationNotificationService.Create(result);
                     });
@@ -133,18 +132,14 @@ namespace Core.ApplicationServices.Notification
                 return MapBaseModel(parameters, AdviceType.Repeat, relatedEntity.Id)
                     .Bind(model =>
                     {
-                        model.ToDate = parameters.ToDate;
-                        model.Name = parameters.Name;
+                        MapUpdateScheduledNotification(parameters, model);
 
                         var recipients = model.Recipients;
                         return _entityIdentityResolver.ResolveDbId<Advice>(notificationUuid)
-                            .Match<Result<int, OperationError>>(notificationId =>
+                            .Match(notificationId =>
                                 {
-                                    var result = _notificationUserRelationsService.UpdateNotificationUserRelations(notificationId, recipients);
-                                    if (result.HasValue)
-                                        return result.Value;
-
-                                    return notificationId;
+                                    return _notificationUserRelationsService.UpdateNotificationUserRelations(notificationId, recipients)
+                                        .Match<Result<int, OperationError>>(error => error, () => notificationId);
                                 },
                                 () => new OperationError($"Id for notification with uuid: {notificationUuid} was not found", OperationFailure.NotFound)
                             )
@@ -175,30 +170,27 @@ namespace Core.ApplicationServices.Notification
 
         public Result<NotificationAccessRights, OperationError> GetAccessRights(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType)
         {
-            var notificationResult = GetNotificationByUuid(notificationUuid, relatedEntityType);
-            if (notificationResult.Failed)
-                return notificationResult.Error;
-            var notification = notificationResult.Value;
-
-            var relatedEntityResult = GetRelatedEntity(relatedEntityUuid, relatedEntityType);
-            if(relatedEntityResult.IsNone)
-                return new OperationError($"Related entity of type {relatedEntityType} with uuid {relatedEntityUuid} was not found", OperationFailure.NotFound);
-            var relatedEntity = relatedEntityResult.Value;
-
-            if (_authorizationContext.AllowModify(relatedEntity))
-            {
-                var canBeModified = notification.IsActive;
-                var canBeDeactivated = notification.IsActive && !notification.AdviceSent.Any();
-                var canBeDeleted = notification.CanBeDeleted;
-                if (_authorizationContext.AllowDelete(relatedEntity))
+            return GetNotificationByUuid(notificationUuid, relatedEntityType)
+                .Bind(notification =>
                 {
-                    canBeDeleted = false;
-                }
+                    return GetRelatedEntity(relatedEntityUuid, relatedEntityType)
+                        .Match<Result<NotificationAccessRights, OperationError>>(relatedEntity =>
+                            {
+                                if (!_authorizationContext.AllowModify(relatedEntity))
+                                    return NotificationAccessRights.ReadOnly();
 
-                return new NotificationAccessRights(canBeDeleted, canBeDeactivated, canBeModified);
-            }
+                                var canBeModified = notification.IsActive;
+                                var canBeDeactivated = notification.IsActive && !notification.AdviceSent.Any();
+                                var canBeDeleted = notification.CanBeDeleted;
+                                if (_authorizationContext.AllowDelete(relatedEntity))
+                                {
+                                    canBeDeleted = false;
+                                }
 
-            return NotificationAccessRights.ReadOnly();
+                                return new NotificationAccessRights(canBeDeleted, canBeDeactivated, canBeModified);
+                            },
+                            () => new OperationError($"Related entity of type {relatedEntityType} with uuid {relatedEntityUuid} was not found", OperationFailure.NotFound));
+                });
         }
 
         private Result<int, OperationError> ResolveOrganizationId(Guid organizationUuid)
@@ -207,8 +199,7 @@ namespace Core.ApplicationServices.Notification
                 .Match<Result<int, OperationError>>
                 (
                     id => id,
-                    () => new OperationError($"Id for Organization with uuid: {organizationUuid} was not found",
-                        OperationFailure.NotFound)
+                    () => new OperationError($"Id for Organization with uuid: {organizationUuid} was not found", OperationFailure.NotFound)
                 );
         }
 
@@ -287,6 +278,12 @@ namespace Core.ApplicationServices.Notification
             }
 
             return recipients;
+        }
+
+        private static void MapUpdateScheduledNotification(UpdateScheduledNotificationModificationParameters parameters, NotificationModel model)
+        {
+            model.Name = parameters.Name;
+            model.ToDate = parameters.ToDate;
         }
 
         private Maybe<OperationError> ResolveRoleIdAndAssignToRoleRecipient(Guid roleUuid,
