@@ -101,7 +101,7 @@ namespace Core.ApplicationServices.RightsHolders
                 var result = _systemService
                     .CreateNewSystem(organizationId.Value, name.NewValue, creationParameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
-                    .Bind(system => ApplyCommonUpdates(system, creationParameters));
+                    .Bind(system => ApplyCommonUpdatesAsRightsHolder(system, creationParameters));
 
                 if (result.Ok)
                 {
@@ -132,7 +132,7 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(system => ApplyCommonUpdates(system, updateParameters));
+                    .Bind(system => ApplyCommonUpdatesAsRightsHolder(system, updateParameters));
 
                 if (result.Ok)
                 {
@@ -225,7 +225,7 @@ namespace Core.ApplicationServices.RightsHolders
 
                 var result = _systemService
                     .CreateNewSystem(organizationId.Value, name.NewValue)
-                    .Bind(system => ApplyCommonUpdates(system, creationParameters))
+                    .Bind(system => ApplyCommonUpdatesAsRegularUser(system, creationParameters))
                     .Bind(system => ApplyExtendedUpdates(system, creationParameters));
 
                 if (result.Ok)
@@ -236,14 +236,14 @@ namespace Core.ApplicationServices.RightsHolders
                 }
                 else
                 {
-                    _logger.Error("Failed to create It-System {name} due to error: {errorMessage}", creationParameters.Name.NewValue, result.Error.ToString());
+                    _logger.Error("Failed to create It-System {name} due to error: {errorMessage}", name, result.Error.ToString());
                 }
 
                 return result;
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Failed creating rightsholder system {name}", creationParameters.Name.NewValue);
+                _logger.Error(e, "Failed creating system");
                 return new OperationError(OperationFailure.UnknownError);
             }
         }
@@ -257,7 +257,7 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetSystem(systemUuid)
                     .Bind(WithWriteAccess)
                     .Bind(system => ApplyExtendedUpdates(system, updateParameters))
-                    .Bind(system => ApplyCommonUpdates(system, updateParameters));
+                    .Bind(system => ApplyCommonUpdatesAsRegularUser(system, updateParameters));
 
                 if (result.Ok)
                 {
@@ -305,16 +305,26 @@ namespace Core.ApplicationServices.RightsHolders
             return _authorizationContext.AllowModify(system) ? system : new OperationError(OperationFailure.Forbidden);
         }
 
-        private Result<ItSystem, OperationError> ApplyCommonUpdates(ItSystem system, SharedSystemUpdateParameters updates)
+        private Result<ItSystem, OperationError> ApplyCommonUpdates(ItSystem system, SharedSystemUpdateParameters updates, bool asRightsHolder)
         {
             return system
                 .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.FormerName, (itSystem, newValue) => _systemService.UpdatePreviousName(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Description, (itSystem, newValue) => _systemService.UpdateDescription(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ExternalReferences, UpdateExternalReferences))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, UpdateParentSystem))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, (s, newValue) => UpdateParentSystem(s, newValue, asRightsHolder)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.TaskRefUuids, UpdateTaskRefs));
+        }
+
+        private Result<ItSystem, OperationError> ApplyCommonUpdatesAsRegularUser(ItSystem system, SharedSystemUpdateParameters updates)
+        {
+            return ApplyCommonUpdates(system, updates, false);
+        }
+
+        private Result<ItSystem, OperationError> ApplyCommonUpdatesAsRightsHolder(ItSystem system, SharedSystemUpdateParameters updates)
+        {
+            return ApplyCommonUpdates(system, updates, true);
         }
 
         private Result<ItSystem, OperationError> ApplyExtendedUpdates(ItSystem system, SystemUpdateParameters updates)
@@ -373,16 +383,18 @@ namespace Core.ApplicationServices.RightsHolders
             return _systemService.UpdateTaskRefs(system.Id, taskRefIds.ToList());
         }
 
-        private Result<ItSystem, OperationError> UpdateParentSystem(ItSystem system, Guid? parentSystemUuid)
+        private Result<ItSystem, OperationError> UpdateParentSystem(ItSystem system, Guid? parentSystemUuid, bool asRightsHolder)
         {
             var parentSystemId = default(int?);
             if (parentSystemUuid.HasValue)
             {
+                var parentSystemResult = _systemService.GetSystem(parentSystemUuid.Value);
+
                 //Make sure that user has rightsholders access to the parent system
-                var parentSystemResult =
-                    _systemService
-                        .GetSystem(parentSystemUuid.Value)
-                        .Bind(WithRightsHolderAccessTo);
+                if (asRightsHolder)
+                {
+                    parentSystemResult = parentSystemResult.Bind(WithRightsHolderAccessTo);
+                }
 
                 if (parentSystemResult.Failed)
                     return parentSystemResult.Error.FailureType == OperationFailure.NotFound

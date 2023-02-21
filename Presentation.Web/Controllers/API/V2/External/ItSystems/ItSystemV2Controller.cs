@@ -403,8 +403,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                     .Select(organization => organization.MapShallowOrganizationResponseDTO())
                     .ToList(),
                 LastModified = itSystem.LastChanged,
-                LastModifiedBy = itSystem.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO()),
-                Scope = itSystem.AccessModifier.ToChoice()
+                LastModifiedBy = itSystem.LastChangedByUser?.MapIdentityNamePairDTO(),
+                Scope = itSystem.AccessModifier.ToChoice(),
+                OrganizationContext = itSystem.Organization?.MapShallowOrganizationResponseDTO()
             };
 
             MapBaseInformation(itSystem, dto);

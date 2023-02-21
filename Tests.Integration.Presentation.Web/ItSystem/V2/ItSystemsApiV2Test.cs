@@ -3,15 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
+using Tests.Toolkit.Extensions;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem.V2
@@ -387,6 +394,119 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             }
         }
 
+        [Fact]
+        public async Task Can_POST_And_DELETE_Minimum_ItSystem()
+        {
+            //Arrange
+            var organizationDto = await CreateOrganizationAsync();
+            var name = CreateName();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var payload = new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationDto.Uuid,
+                Name = name
+            };
+
+            //Act - POST, DELETE, GET
+            var createdSystem = await ItSystemV2Helper.CreateSystemAsync(token.Token, payload);
+            using var deleteResponse = await ItSystemV2Helper.SendDeleteSystemAsync(token.Token, createdSystem.Uuid);
+            using var getAfterDeleteResponse = await ItSystemV2Helper.SendGetSingleAsync(token.Token, createdSystem.Uuid);
+
+            //Assert creation, deletion and GET after deletion
+            AssertOrganization(organizationDto, createdSystem.OrganizationContext);
+            Assert.Equal(name, createdSystem.Name);
+            Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
+        }
+
+
+        [Fact]
+        public async Task Can_POST_AND_DELETE_Full_ItSystem()
+        {
+            //Arrange
+            var organizationDto = await CreateOrganizationAsync();
+            var rightsHolderOrgDto = await CreateOrganizationAsync();
+            var name = CreateName();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var parentSystemParams = new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationDto.Uuid,
+                Name = $"parent_{name}"
+            };
+            var kleChoices = (await KleOptionV2Helper.GetKleNumbersAsync(token.Token)).Payload.Take(2).ToList();
+            var businessType =
+                (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.BusinessType, organizationDto.Uuid, 10, 0))
+                .RandomItem();
+            var parent = await ItSystemV2Helper.CreateSystemAsync(token.Token, parentSystemParams);
+            var references = Many<ExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+            var fullSystemParams = new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationDto.Uuid,
+                Name = name,
+                ParentUuid = parent.Uuid,
+                FormerName = A<string>(),
+                Description = A<string>(),
+                ExternalReferences = references,
+                BusinessTypeUuid = businessType.Uuid,
+                Deactivated = false,
+                RecommendedArchiveDuty = new RecommendedArchiveDutyRequestDTO
+                {
+                    Id = EnumRange.AllExcept(RecommendedArchiveDutyChoice.Undecided).RandomItem(),
+                    Comment = A<string>()
+                },
+                RightsHolderUuid = rightsHolderOrgDto.Uuid,
+                Scope = A<RegistrationScopeChoice>(),
+                KLEUuids = kleChoices.Select(x => x.Uuid).ToList()
+            };
+
+            //Act - POST, DELETE, GET
+            var createdSystem = await ItSystemV2Helper.CreateSystemAsync(token.Token, fullSystemParams);
+            using var deleteResponse = await ItSystemV2Helper.SendDeleteSystemAsync(token.Token, createdSystem.Uuid);
+            using var getAfterDeleteResponse = await ItSystemV2Helper.SendGetSingleAsync(token.Token, createdSystem.Uuid);
+
+            //Assert creation, deletion and GET after deletion
+            AssertOrganization(organizationDto, createdSystem.OrganizationContext);
+            Assert.Equal(name, createdSystem.Name);
+            AssertOrganization(rightsHolderOrgDto, createdSystem.RightsHolder);
+            Assert.Equal(fullSystemParams.FormerName, createdSystem.FormerName);
+            Assert.Equal(fullSystemParams.Description, createdSystem.Description);
+            Assert.Equal(fullSystemParams.Deactivated, createdSystem.Deactivated);
+            Assert.Equivalent(businessType, createdSystem.BusinessType);
+            Assert.Equal(fullSystemParams.Scope, createdSystem.Scope);
+            Assert.Equivalent(kleChoices.Select(x => new IdentityNamePairResponseDTO(x.Uuid, x.KleNumber)), createdSystem.KLE);
+            Assert.Equivalent(parent.Transform(x => new IdentityNamePairResponseDTO(x.Uuid, x.Name)), createdSystem.ParentSystem);
+            Assert.Equivalent(fullSystemParams.RecommendedArchiveDuty.Id, createdSystem.RecommendedArchiveDuty.Id);
+            Assert.Equivalent(fullSystemParams.RecommendedArchiveDuty.Comment, createdSystem.RecommendedArchiveDuty.Comment);
+            Assert.Equivalent(fullSystemParams.ExternalReferences, createdSystem.ExternalReferences);
+
+            Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_ItSystem_With_Overlapping_Name()
+        {
+            //Arrange
+            var organizationDto = await CreateOrganizationAsync();
+            var name = CreateName();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var payload = new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationDto.Uuid,
+                Name = name
+            };
+
+            //Act 
+            using var createdSystemResponse = await ItSystemV2Helper.SendCreateSystemAsync(token.Token, payload);
+            using var createDuplicateResponse = await ItSystemV2Helper.SendCreateSystemAsync(token.Token, payload);
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.Created, createdSystemResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, createDuplicateResponse.StatusCode);
+        }
+
+        //TODO: PATCH done test
+
         private (Guid rootUuid, IReadOnlyList<Core.DomainModel.ItSystem.ItSystem> createdItSystems) CreateHierarchy(int orgId)
         {
             var rootSystem = CreateNewItSystem(orgId);
@@ -430,6 +550,23 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(),
                 OrganizationRole.User, organization.Id, true, true);
             return (token, organization);
+        }
+
+        private static void AssertOrganization(OrganizationDTO expected, ShallowOrganizationResponseDTO actual)
+        {
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Cvr, actual.Cvr);
+            Assert.Equal(expected.Uuid, actual.Uuid);
+        }
+
+        private IEnumerable<T> WithRandomMaster<T>(IEnumerable<T> references) where T : ExternalReferenceDataWriteRequestDTO
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
         }
     }
 }

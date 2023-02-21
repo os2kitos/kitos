@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request;
-using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
@@ -32,6 +32,19 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendGetSingleAsync(string token, Guid uuid)
         {
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid:D}"), token);
+        }
+
+        public static async Task<ItSystemResponseDTO> CreateSystemAsync(string token, CreateItSystemRequestDTO request)
+        {
+            using var response = await SendCreateSystemAsync(token, request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateSystemAsync(string token, CreateItSystemRequestDTO request)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(BaseItSystemPath), request, token);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderFullItSystemRequestDTO request)
@@ -71,6 +84,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPatchUpdateRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteSystemAsync(string token, Guid uuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid}"), token);
         }
 
         public static async Task<HttpResponseMessage> SendDeleteRightsHolderSystemAsync(string token, Guid uuid, DeactivationReasonRequestDTO request)
