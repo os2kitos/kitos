@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
-using Core.Abstractions.Types;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 using Core.ApplicationServices.Model.Notification.Write;
 
@@ -9,17 +8,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
     public class NotificationWriteModelMapper : INotificationWriteModelMapper
     {
-        public Result<ImmediateNotificationModificationParameters, OperationError> FromImmediatePOST(ImmediateNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        public ImmediateNotificationModificationParameters FromImmediatePOST(ImmediateNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
             return MapImmediateNotificationWriteRequestDTO(dto, ownerResourceType);
         }
 
-        public Result<ScheduledNotificationModificationParameters, OperationError> FromScheduledPOST(ScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        public ScheduledNotificationModificationParameters FromScheduledPOST(ScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
             return MapScheduledNotificationWriteRequestDTO(dto, ownerResourceType);
         }
 
-        public Result<UpdateScheduledNotificationModificationParameters, OperationError> FromScheduledPUT(UpdateScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        public UpdateScheduledNotificationModificationParameters FromScheduledPUT(UpdateScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
         {
             return MapUpdateScheduledNotificationWriteRequestDTO(dto, ownerResourceType);
         }

@@ -118,8 +118,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _writeModelMapper.FromImmediatePOST(request, ownerResourceType)
-                .Bind(notification => _notificationService.CreateImmediateNotification(notification))
+            var parameters = _writeModelMapper.FromImmediatePOST(request, ownerResourceType);
+
+            return _notificationService.CreateImmediateNotification(parameters)
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
@@ -146,8 +147,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _writeModelMapper.FromScheduledPOST(request, ownerResourceType)
-                .Bind(notification => _notificationService.CreateScheduledNotification(notification))
+            var parameters = _writeModelMapper.FromScheduledPOST(request, ownerResourceType);
+
+            return _notificationService.CreateScheduledNotification(parameters)
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
@@ -174,8 +176,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid) 
                 return BadRequest();
 
-            return _writeModelMapper.FromScheduledPUT(request, ownerResourceType)
-                .Bind(notification => _notificationService.UpdateScheduledNotification(notificationUuid, notification))
+            var parameters = _writeModelMapper.FromScheduledPUT(request, ownerResourceType);
+
+            return _notificationService.UpdateScheduledNotification(notificationUuid, parameters)
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match(Ok, FromOperationError);
         }
