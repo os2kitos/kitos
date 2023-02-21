@@ -250,7 +250,7 @@ namespace Core.ApplicationServices.RightsHolders
 
         private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, SharedSystemUpdateParameters parameters)
         {
-            var updateParameters = new SystemUpdateParameters()
+            var updateParameters = new SystemUpdateParameters
             {
                 Name = parameters.Name,
                 ExternalReferences = parameters.ExternalReferences,
