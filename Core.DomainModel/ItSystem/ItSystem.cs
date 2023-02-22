@@ -268,7 +268,8 @@ namespace Core.DomainModel.ItSystem
 
         public Maybe<OperationError> UpdateRecommendedArchiveDuty(ArchiveDutyRecommendationTypes? recommendation, string comment)
         {
-            if (recommendation is null or ArchiveDutyRecommendationTypes.Undecided && comment != null)
+            var noCommentAllowed = recommendation is null or ArchiveDutyRecommendationTypes.Undecided;
+            if (noCommentAllowed && !string.IsNullOrEmpty(comment))
             {
                 return new OperationError("Comment should only be defined if an actual recommendation exists", OperationFailure.BadInput);
             }
