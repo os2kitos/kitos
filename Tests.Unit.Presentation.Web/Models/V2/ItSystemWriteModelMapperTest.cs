@@ -218,8 +218,108 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertExtendedData(input, output);
         }
 
-        //TODO: Also verify the partial update scenarios
+        public static IEnumerable<object[]> GetUndefinedRegularSectionsInput()
+        {
+            return CreateGetUndefinedSectionsInput(11);
+        }
 
+        [Theory]
+        [MemberData(nameof(GetUndefinedRegularSectionsInput))]
+        public void FromPatch_Regular_Ignores_Root_Level_Sections_Not_Present_In_The_Request(
+            bool noName,
+            bool noDescription,
+            bool noFormerName,
+            bool noExternalReferences,
+            bool noParent,
+            bool noBusinessType,
+            bool noTaskRefUuids, 
+            bool noRecommendedArchiveDuty, 
+            bool noRightsHolderUuid, 
+            bool noScope,
+            bool noDeactivated)
+        {
+            //Arrange
+            var emptyInput = new UpdateItSystemRequestDTO();
+            var definedProperties = GetAllInputPropertyNames<UpdateItSystemRequestDTO>();
+            if (noName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Name));
+            if (noDescription) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Description));
+            if (noFormerName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.FormerName));
+            if (noExternalReferences) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ExternalReferences));
+            if (noParent) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ParentUuid));
+            if (noBusinessType) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid));
+            if (noTaskRefUuids) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.KLEUuids));
+            if (noRecommendedArchiveDuty) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.RecommendedArchiveDuty));
+            if (noRightsHolderUuid) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.RightsHolderUuid));
+            if (noScope) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Scope));
+            if (noDeactivated) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Deactivated));
+
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
+
+            //Act
+            var output = _sut.FromPATCH(emptyInput);
+
+            //Assert that all sections are mapped as changed - including undefined sections
+            Assert.Equal(output.Name.IsUnchanged, noName);
+            Assert.Equal(output.Description.IsUnchanged, noDescription);
+            Assert.Equal(output.FormerName.IsUnchanged, noFormerName);
+            Assert.Equal(output.ExternalReferences.IsNone, noExternalReferences);
+            Assert.Equal(output.ParentSystemUuid.IsUnchanged, noParent);
+            Assert.Equal(output.BusinessTypeUuid.IsUnchanged, noBusinessType);
+            Assert.Equal(output.TaskRefUuids.IsUnchanged, noTaskRefUuids);
+            Assert.Equal(output.ArchivingRecommendation.IsUnchanged, noRecommendedArchiveDuty);
+            Assert.Equal(output.RightsHolderUuid.IsUnchanged, noRightsHolderUuid);
+            Assert.Equal(output.Scope.IsUnchanged, noScope);
+            Assert.Equal(output.Deactivated.IsUnchanged, noDeactivated);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedRegularSectionsInput))]
+        public void FromPOST_Regular_Enforces_All_Properties(
+            bool noName,
+            bool noDescription,
+            bool noFormerName,
+            bool noExternalReferences,
+            bool noParent,
+            bool noBusinessType,
+            bool noTaskRefUuids,
+            bool noRecommendedArchiveDuty,
+            bool noRightsHolderUuid,
+            bool noScope,
+            bool noDeactivated)
+        {
+            //Arrange
+            var emptyInput = new CreateItSystemRequestDTO();
+            var definedProperties = GetAllInputPropertyNames<UpdateItSystemRequestDTO>();
+            if (noName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Name));
+            if (noDescription) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Description));
+            if (noFormerName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.FormerName));
+            if (noExternalReferences) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ExternalReferences));
+            if (noParent) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ParentUuid));
+            if (noBusinessType) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid));
+            if (noTaskRefUuids) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.KLEUuids));
+            if (noRecommendedArchiveDuty) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.RecommendedArchiveDuty));
+            if (noRightsHolderUuid) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.RightsHolderUuid));
+            if (noScope) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Scope));
+            if (noDeactivated) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Deactivated));
+
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
+
+            //Act
+            var output = _sut.FromPOST(emptyInput);
+
+            //Assert that all sections are mapped as changed - including undefined sections
+            Assert.True(output.Name.HasChange);
+            Assert.True(output.Description.HasChange);
+            Assert.True(output.FormerName.HasChange);
+            Assert.True(output.ExternalReferences.HasValue);
+            Assert.True(output.ParentSystemUuid.HasChange);
+            Assert.True(output.BusinessTypeUuid.HasChange);
+            Assert.True(output.TaskRefUuids.HasChange);
+            Assert.True(output.Scope.HasChange);
+            Assert.True(output.RightsHolderUuid.HasChange);
+            Assert.True(output.ArchivingRecommendation.HasChange);
+            Assert.True(output.Deactivated.HasChange);
+        }
 
         private static void AssertExtendedData(IItSystemWriteRequestPropertiesDTO input, SystemUpdateParameters output)
         {
