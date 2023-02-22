@@ -10,6 +10,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
@@ -24,6 +25,7 @@ using Presentation.Web.Models.API.V2.Request.System;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
 using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 {
@@ -38,18 +40,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemWriteModelMapper _writeModelMapper;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
+        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
             IAuthorizationContext authorizationContext,
             IItSystemWriteModelMapper writeModelMapper,
-            IEntityIdentityResolver entityIdentityResolver)
+            IEntityIdentityResolver entityIdentityResolver,
+            IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
             _authorizationContext = authorizationContext;
             _writeModelMapper = writeModelMapper;
             _entityIdentityResolver = entityIdentityResolver;
+            _permissionResponseMapper = permissionResponseMapper;
         }
 
         /// <summary>
@@ -310,7 +315,40 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Select(ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
+        
+        [HttpGet]
+        [Route("{systemUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItSystemPermissions([NonEmptyGuid] Guid systemUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            return _itSystemService
+                .GetPermissions(systemUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
+        }
+        
+        [HttpGet]
+        [Route("permissions/{organizationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItSystemCollectionPermissions([NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itSystemService.GetCollectionPermissions(organizationUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
+        }
+        
         private RightsHolderItSystemResponseDTO ToRightsHolderResponseDTO(ItSystem itSystem)
         {
             var dto = new RightsHolderItSystemResponseDTO();

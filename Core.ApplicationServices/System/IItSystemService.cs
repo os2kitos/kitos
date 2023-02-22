@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
@@ -29,5 +30,7 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? newRightsHolderState);
         Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? newParentSystemState = null);
         Result<ItSystem, OperationError> Deactivate(int systemId);
+        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
+        Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }
 }

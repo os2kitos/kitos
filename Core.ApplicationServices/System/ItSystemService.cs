@@ -321,6 +321,18 @@ namespace Core.ApplicationServices.System
             return ValidateNameChange(organizationId, systemId, newName).IsNone;
         }
 
+        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetSystem(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationRepository.GetByUuid(organizationUuid)
+                .Match<Result<ResourceCollectionPermissionsResult, OperationError>>(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystem>(organization.Id, _authorizationContext),
+                    () => new OperationError($"Organization with uuid {organizationUuid} was not found", OperationFailure.NotFound));
+        }
+
         private Maybe<OperationError> ValidateNameChange(int organizationId, int systemId, string newName)
         {
             if (!ItSystem.IsValidName(newName))

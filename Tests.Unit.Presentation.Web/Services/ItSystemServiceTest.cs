@@ -1388,6 +1388,82 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystem = new ItSystem { Uuid = uuid };
+            ExpectGetSystemReturns(uuid, itSystem);
+            ExpectAllowReadsReturns(itSystem, read);
+            ExpectAllowModifyReturns(itSystem, modify);
+            ExpectAllowDeleteReturns(itSystem, delete);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+        }
+
+        [Fact]
+        public void Get_Permissions_Returns_Not_Found()
+        {
+            //Arrange
+            var wrongUuid = A<Guid>();
+            ExpectGetSystemReturns(wrongUuid, Maybe<ItSystem>.None);
+
+            //Act
+            var result = _sut.GetPermissions(wrongUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Get_CollectionPermissions(bool create)
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organization = new Organization {Id = A<int>()};
+            
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            ExpectAllowCreateReturns(organization.Id, create);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(create, result.Value.Create);
+        }
+
+        [Fact]
+        public void Get_CollectionPermissions_Returns_NotFound()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            
+            ExpectGetOrganizationReturns(organizationUuid, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
         private (ItSystem root, IReadOnlyList<ItSystem> createdItSystems) CreateHierarchy()
         {
             var root = CreateSystem();
