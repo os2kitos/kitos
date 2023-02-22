@@ -86,6 +86,7 @@
     <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
     <Compile Include="Mapping\ItContractOverviewReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewRelevantOrgUnitReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewUsingSystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewUsedBySystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
@@ -1007,6 +1008,14 @@
     <Compile Include="Migrations\202302081425530_Extend_Archive_Period_With_Uuid.designer.cs">
       <DependentUpon>202302081425530_Extend_Archive_Period_With_Uuid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202302151310396_SystemOverview_Add_Relevant_Org_Units.cs" />
+    <Compile Include="Migrations\202302151310396_SystemOverview_Add_Relevant_Org_Units.designer.cs">
+      <DependentUpon>202302151310396_SystemOverview_Add_Relevant_Org_Units.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202302220937353_notification_uuid.cs" />
+    <Compile Include="Migrations\202302220937353_notification_uuid.designer.cs">
+      <DependentUpon>202302220937353_notification_uuid.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1016,6 +1025,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202302081425530_Extend_Archive_Period_With_Uuid.resx">
       <DependentUpon>202302081425530_Extend_Archive_Period_With_Uuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202302151310396_SystemOverview_Add_Relevant_Org_Units.resx">
+      <DependentUpon>202302151310396_SystemOverview_Add_Relevant_Org_Units.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202302220937353_notification_uuid.resx">
+      <DependentUpon>202302220937353_notification_uuid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ExternalReference.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />

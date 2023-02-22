@@ -2,12 +2,10 @@
 using System.Linq;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.GDPR;
 
 namespace Presentation.Web.Controllers.API.V1.Mapping
 {

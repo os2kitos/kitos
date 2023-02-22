@@ -27,7 +27,7 @@ describe("Data processing registration main detail tests", () => {
     }
 
     const createCvr = () => {
-        return `${new Date().getTime()}`.substring(1,9);
+        return `${new Date().getTime()}`.substring(1, 9);
     }
 
     const createRemark = (uniqueValue: string) => {
@@ -41,7 +41,7 @@ describe("Data processing registration main detail tests", () => {
     const otherBasisForTransfer = "Intet";
 
     var today = GetDateHelper.getTodayAsString();
-    
+
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
@@ -52,7 +52,7 @@ describe("Data processing registration main detail tests", () => {
         testFixture.cleanupState();
         testFixture.disableLongRunningTest();
     });
-    
+
     it("Creating and modifying, and deleting data processing registration",
         () => {
             var name = createName(10);
@@ -86,11 +86,11 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => dpaHelper.enableSubDataProcessors())
                 .then(() => dpaHelper.verifyHasSubDataProcessorsToBeEnabled())
                 .then(() => dpaHelper.assignSubDataProcessor(dataProcessorName, basisForTransfer, dropdownYes, thirdCountryName))
-                .then(() => verifySubDataProcessorContent([dataProcessorName, basisForTransfer, dropdownYes, thirdCountryName], []))
+                .then(() => verifySubDataProcessorContent(dataProcessorName, basisForTransfer, dropdownYes, thirdCountryName))
                 .then(() => dpaHelper.updateSubDataProcessor(dataProcessorName, otherBasisForTransfer, dropdownNo))
-                .then(() => verifySubDataProcessorContent([dataProcessorName, otherBasisForTransfer, dropdownNo], [basisForTransfer, dropdownYes, thirdCountryName]))
+                .then(() => verifySubDataProcessorContent(dataProcessorName, otherBasisForTransfer, dropdownNo))
                 .then(() => dpaHelper.removeSubDataProcessor(dataProcessorName))
-                .then(() => verifySubDataProcessorContent([], [dataProcessorName]))
+                .then(() => expect(pageObject.getSubDataProcessorRow(dataProcessorName).isPresent()).toBeFalsy())
                 //Changing transfer to insecure third countries
                 .then(() => dpaHelper.enableTransferToInsecureThirdCountries())
                 .then(() => dpaHelper.verifyHasTransferToInsecureThirdCountriesToBeEnabled())
@@ -130,11 +130,11 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => dpaHelper.enableSubDataProcessors())
                 .then(() => dpaHelper.verifyHasSubDataProcessorsToBeEnabled())
                 .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterName, basisForTransfer, dropdownYes, thirdCountryName))
-                .then(() => verifySubDataProcessorContent([organizationWithSpecialCharacterName], []))
+                .then(() => verifySubDataProcessorContent(organizationWithSpecialCharacterName, basisForTransfer, dropdownYes, thirdCountryName))
                 .then(() => dpaHelper.removeSubDataProcessor(organizationWithSpecialCharacterName))
-                .then(() => verifySubDataProcessorContent([], [organizationWithSpecialCharacterName]))
+                .then(() => expect(pageObject.getSubDataProcessorRow(organizationWithSpecialCharacterName).isPresent()).toBeFalsy())
                 .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterCvr, basisForTransfer, dropdownYes, thirdCountryName))
-                .then(() => verifySubDataProcessorContent([organizationWithSpecialCharacterCvr], []));
+                .then(() => verifySubDataProcessorContent(organizationWithSpecialCharacterName, basisForTransfer, dropdownYes, thirdCountryName));
         });
 
     function verifyDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
@@ -148,15 +148,16 @@ describe("Data processing registration main detail tests", () => {
         });
     }
 
-    function verifySubDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
-        presentNames.forEach(name => {
-            console.log(`Expecting value to be present in the sub data processor table:${name}`);
-            expect(pageObject.getSubDataProcessorRow(name).isPresent()).toBeTruthy();
-        });
-        unpresentNames.forEach(name => {
-            console.log(`Expecting value NOT to be present in the sub data processor table:${name}`);
-            expect(pageObject.getSubDataProcessorRow(name).isPresent()).toBeFalsy();
-        });
+    function verifySubDataProcessorContent(sdpName: string, basisForTransfer: string, transferToInsecureThirdCountry: string, thirdCountryName?: string, cvr?: string) {
+        expect(pageObject.getSubDataProcessorRow(sdpName).isPresent()).toBeTruthy();
+        expect(pageObject.getSubDataProcessorCellWithContent(sdpName, basisForTransfer).isPresent()).toBeTruthy();
+        expect(pageObject.getSubDataProcessorCellWithContent(sdpName, transferToInsecureThirdCountry).isPresent()).toBeTruthy();
+        if (thirdCountryName) {
+            expect(pageObject.getSubDataProcessorCellWithContent(sdpName, thirdCountryName).isPresent()).toBeTruthy();
+        }
+        if (cvr) {
+            expect(pageObject.getSubDataProcessorCellWithContent(sdpName, cvr).isPresent()).toBeTruthy();
+        }
     }
 
     function verifyThirdCountrySelectionContent(presentNames: string[], unpresentNames: string[]) {
@@ -212,7 +213,7 @@ describe("Data processing registration main detail tests", () => {
     }
 
     function verifyDataReponsibleRemark(dataResponsibleRemark: string) {
-        return  setFocusOnNameToActivateBlur().then(() => {
+        return setFocusOnNameToActivateBlur().then(() => {
             console.log(`Expecting DataReponsibleRemark to be set to: ${dataResponsibleRemark}`);
             expect(pageObject.getDataResponsibleRemark().getAttribute("value")).toEqual(dataResponsibleRemark);
         });

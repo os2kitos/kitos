@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.System;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
@@ -14,10 +15,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class ItSystemV2Helper
     {
-        private const string _basePath = "api/v2";
-
-        private const string _baseRightsHolderPath = $"{_basePath}/rightsholder/it-systems";
-        private const string _baseItSystemPath = $"{_basePath}/it-systems";
+        public const string BasePath = "api/v2";
+        public const string BaseRightsHolderPath = $"{BasePath}/rightsholder/it-systems";
+        public const string BaseItSystemPath = $"{BasePath}/it-systems";
+        public const string BaseItSystemInternalPath = $"{BasePath}/internal/it-systems";
 
         public static async Task<ItSystemResponseDTO> GetSingleAsync(string token, Guid uuid)
         {
@@ -29,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendGetSingleAsync(string token, Guid uuid)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseItSystemPath}/{uuid:D}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid:D}"), token);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
@@ -42,7 +43,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
         {
-            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(_baseRightsHolderPath), request, token);
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(BaseRightsHolderPath), request, token);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
@@ -55,7 +56,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid}"), token, request);
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, request);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> PatchRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
@@ -68,12 +69,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendPatchUpdateRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
         {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
         }
 
         public static async Task<HttpResponseMessage> SendDeleteRightsHolderSystemAsync(string token, Guid uuid, DeactivationReasonRequestDTO request)
         {
-            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid}"), token, request);
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, request);
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> GetSingleRightsHolderSystemAsync(string token, Guid uuid)
@@ -86,7 +87,26 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<HttpResponseMessage> SendGetSingleRightsHolderSystemAsync(string token, Guid uuid)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseRightsHolderPath}/{uuid:D}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid:D}"), token);
+        }
+
+        public static async Task<IEnumerable<ItSystemSearchResponseDTO>> GetManyInternalAsync(
+            Cookie cookie,
+            int? page = null,
+            int? pageSize = null,
+            Guid? rightsHolderId = null,
+            Guid? businessTypeId = null,
+            string kleKey = null,
+            Guid? kleUuid = null,
+            int? numberOfUsers = null,
+            bool? includeDeactivated = null,
+            DateTime? changedSinceGtEq = null
+        )
+        {
+            using var response = await SendGetManyAsync($"{BaseItSystemInternalPath}/search", page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, cookie: cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemSearchResponseDTO>>();
         }
 
         public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(
@@ -102,14 +122,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             DateTime? changedSinceGtEq = null
             )
         {
-            using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq);
+            using var response = await SendGetManyAsync(BaseItSystemPath, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
         }
 
         public static async Task<HttpResponseMessage> SendGetManyAsync(
-            string token,
+            string path,
             int? page = null,
             int? pageSize = null,
             Guid? rightsHolderId = null,
@@ -118,10 +138,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
+            DateTime? changedSinceGtEq = null,
+            string token = null,
+            Cookie cookie = null
             )
         {
-            var path = _baseItSystemPath;
             var queryParameters = new List<KeyValuePair<string, string>>();
 
             if (page.HasValue)
@@ -154,7 +175,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
 
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
+            if (token != null)
+                return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
+            Assert.NotNull(cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl(path), cookie);
         }
 
         public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyRightsHolderSystemsAsync(
@@ -179,7 +203,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null)
         {
-            var path = _baseRightsHolderPath;
+            var path = BaseRightsHolderPath;
             var queryParameters = new List<KeyValuePair<string, string>>();
 
             if (page.HasValue)
@@ -205,7 +229,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<IEnumerable<RegistrationHierarchyNodeResponseDTO>> GetHierarchyAsync(string token, Guid systemUuid)
         {
-            var path = $"{_baseItSystemPath}/{systemUuid}/hierarchy";
+            var path = $"{BaseItSystemPath}/{systemUuid}/hierarchy";
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

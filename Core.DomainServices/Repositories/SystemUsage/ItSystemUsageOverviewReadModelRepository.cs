@@ -75,7 +75,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
             //Gets all read models that have dependencies on the organization unit
             return _repository
                 .AsQueryable()
-                .Where(x => x.ResponsibleOrganizationUnitId == organizationUnitId);
+                .Where(x => x.ResponsibleOrganizationUnitId == organizationUnitId || x.RelevantOrganizationUnits.Any(ru=>ru.OrganizationUnitId == organizationUnitId));
         }
 
         public IQueryable<ItSystemUsageOverviewReadModel> GetByDependentOrganizationId(int organizationId)

@@ -7,7 +7,7 @@ using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Response.System
 {
-    public abstract class BaseItSystemResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator
+    public abstract class BaseItSystemResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator, IHasDeactivatedExternal
     {
         /// <summary>
         /// UUID for IT-System
@@ -19,7 +19,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// UUID for possible IT-System parent (if any)
         /// </summary>
         public IdentityNamePairResponseDTO ParentSystem { get; set; }
-        
+
         /// <summary>
         /// Name of IT-System
         /// </summary>
