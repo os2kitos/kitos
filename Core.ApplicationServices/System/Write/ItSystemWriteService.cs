@@ -13,6 +13,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.References;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.TaskRefs;
 using Infrastructure.Services.DataAccess;
@@ -32,6 +33,7 @@ namespace Core.ApplicationServices.System.Write
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDatabaseControl _databaseControl;
         private readonly IDomainEvents _domainEvents;
+        private readonly IEntityIdentityResolver _identityResolver;
 
         public ItSystemWriteService(
             IOrganizationalUserContext userContext,
@@ -43,7 +45,8 @@ namespace Core.ApplicationServices.System.Write
             IReferenceService referenceService,
             IAuthorizationContext authorizationContext,
             IDatabaseControl databaseControl,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IEntityIdentityResolver identityResolver)
         {
             _userContext = userContext;
             _organizationRepository = organizationRepository;
@@ -55,6 +58,7 @@ namespace Core.ApplicationServices.System.Write
             _authorizationContext = authorizationContext;
             _databaseControl = databaseControl;
             _domainEvents = domainEvents;
+            _identityResolver = identityResolver;
         }
 
         public Result<ItSystem, OperationError> CreateNewSystem(Guid organizationUuid, SystemUpdateParameters parameters)
@@ -105,9 +109,7 @@ namespace Core.ApplicationServices.System.Write
             using var transaction = _transactionManager.Begin();
             try
             {
-                var result = _systemService
-                    .GetSystem(systemUuid)
-                    .Bind(WithWriteAccess)
+                var result = GetSystemAndAuthorizeAccess(systemUuid)
                     .Bind(system => ApplyUpdates(system, parameters));
 
                 if (result.Ok)
@@ -142,6 +144,36 @@ namespace Core.ApplicationServices.System.Write
                     }
 
                     return new OperationError(deleteResult.ToString("G"), OperationFailure.UnknownError);
+                });
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(Guid systemUuid, ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetSystemAndAuthorizeAccess(systemUuid)
+                .Bind(usage => _referenceService.AddReference(usage.Id, ReferenceRootType.System, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> UpdateExternalReference(Guid systemUuid, Guid externalReferenceUuid,
+            ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetSystemAndAuthorizeAccess(systemUuid)
+                .Bind(usage => _referenceService.UpdateReference(usage.Id, ReferenceRootType.System, externalReferenceUuid, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> DeleteExternalReference(Guid systemUuid, Guid externalReferenceUuid)
+        {
+            return GetSystemAndAuthorizeAccess(systemUuid)
+                .Bind(_ =>
+                {
+                    var getIdResult = _identityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
+                    if (getIdResult.IsNone)
+                        return new OperationError($"ExternalReference with uuid: {externalReferenceUuid} was not found", OperationFailure.NotFound);
+                    var externalReferenceId = getIdResult.Value;
+
+                    return _referenceService.DeleteByReferenceId(externalReferenceId)
+                        .Match(Result<ExternalReference, OperationError>.Success,
+                            operationFailure =>
+                                new OperationError($"Failed to remove the ExternalReference with uuid: {externalReferenceUuid}", operationFailure));
                 });
         }
 
@@ -238,6 +270,13 @@ namespace Core.ApplicationServices.System.Write
             _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
             _databaseControl.SaveChanges();
             transaction.Commit();
+        }
+
+        private Result<ItSystem, OperationError> GetSystemAndAuthorizeAccess(Guid systemUuid)
+        {
+            return _systemService
+                .GetSystem(systemUuid)
+                .Bind(WithWriteAccess);
         }
     }
 }

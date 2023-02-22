@@ -8,14 +8,13 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
-using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.KLE;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
@@ -529,6 +528,76 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(updateScope ? changes[nameof(UpdateItSystemRequestDTO.Scope)] : createdSystem.Scope, updatedSystem.Scope);
             Assert.Equivalent(updateArchiveDutyRecommendation ? changes[nameof(UpdateItSystemRequestDTO.RecommendedArchiveDuty)] : createdSystem.RecommendedArchiveDuty, updatedSystem.RecommendedArchiveDuty);
         }
+
+        [Fact]
+        public async Task Can_Create_Update_And_Delete_ExternalReference()
+        {
+            //Arrange
+            var organizationDto = await CreateOrganizationAsync();
+            var name = CreateName();
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+            var payload = new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationDto.Uuid,
+                Name = name
+            };
+            var request = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+
+            var createdSystem = await ItSystemV2Helper.CreateSystemAsync(token, payload);
+
+            //Act
+            var createdReference = await ItSystemV2Helper.AddExternalReferenceAsync(token, createdSystem.Uuid, request);
+
+            //Assert
+            AssertExternalReference(request, createdReference);
+
+            var afterCreate = await ItSystemV2Helper.GetSingleAsync(token, createdSystem.Uuid);
+
+            var checkCreatedExternalReference = Assert.Single(afterCreate.ExternalReferences);
+            AssertExternalReference(request, checkCreatedExternalReference);
+
+            //Arrange - update
+            var updateRequest = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = request.MasterReference || A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+
+            //Act - update
+            var updatedReference = await ItSystemV2Helper.UpdateExternalReferenceAsync(token, createdSystem.Uuid, createdReference.Uuid, updateRequest);
+
+            //Assert - update
+            AssertExternalReference(updateRequest, updatedReference);
+
+            var afterUpdate = await ItSystemV2Helper.GetSingleAsync(token, createdSystem.Uuid);
+
+            var checkUpdatedExternalReference = Assert.Single(afterUpdate.ExternalReferences);
+            AssertExternalReference(updateRequest, checkUpdatedExternalReference);
+
+            //Act - delete
+            await ItSystemV2Helper.DeleteExternalReferenceAsync(token, createdSystem.Uuid, createdReference.Uuid);
+
+            //Assert - delete
+            var afterDelete = await ItSystemV2Helper.GetSingleAsync(token, createdSystem.Uuid);
+            Assert.Empty(afterDelete.ExternalReferences);
+        }
+
+        private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
+        {
+            Assert.Equal(expected.DocumentId, actual.DocumentId);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.MasterReference, actual.MasterReference);
+        }
+
         private (Guid rootUuid, IReadOnlyList<Core.DomainModel.ItSystem.ItSystem> createdItSystems) CreateHierarchy(int orgId)
         {
             var rootSystem = CreateNewItSystem(orgId);

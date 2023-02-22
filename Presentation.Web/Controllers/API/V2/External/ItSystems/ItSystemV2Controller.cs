@@ -25,6 +25,8 @@ using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.System.Write;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 {
@@ -40,13 +42,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IItSystemWriteService _writeService;
         private readonly IItSystemResponseMapper _systemResponseMapper;
+        private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
             IItSystemWriteModelMapper writeModelMapper,
             IEntityIdentityResolver entityIdentityResolver,
             IItSystemWriteService writeService,
-            IItSystemResponseMapper systemResponseMapper)
+            IItSystemResponseMapper systemResponseMapper,
+            IExternalReferenceResponseMapper referenceResponseMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
@@ -54,6 +58,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             _entityIdentityResolver = entityIdentityResolver;
             _writeService = writeService;
             _systemResponseMapper = systemResponseMapper;
+            _referenceResponseMapper = referenceResponseMapper;
         }
 
         /// <summary>
@@ -386,6 +391,82 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .DeactivateAsRightsHolder(uuid, request.DeactivationReason)
                 .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
+        }
+
+        /// <summary>
+        /// Creates an external reference for the system
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("it-systems/{uuid}/external-references")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostExternalReference([NonEmptyGuid] Guid uuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .AddExternalReference(uuid, properties)
+                .Select(_referenceResponseMapper.MapExternalReference)
+                .Match(reference => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{uuid}/external-references/{reference.Uuid}", reference), FromOperationError);
+        }
+
+        /// <summary>
+        /// Updates a system external reference
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("it-systems/{uuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutExternalReference([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid externalReferenceUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .UpdateExternalReference(uuid, externalReferenceUuid, properties)
+                .Select(_referenceResponseMapper.MapExternalReference)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Deletes a system external reference
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("it-systems/{uuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteExternalReference([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid externalReferenceUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteExternalReference(uuid, externalReferenceUuid)
+                .Match(_ => NoContent(), FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<T> MapSystemCreatedResponse<T>(T dto) where T : IHasUuidExternal

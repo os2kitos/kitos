@@ -58,6 +58,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             return parameters;
         }
 
+        public ExternalReferenceProperties MapExternalReference(ExternalReferenceDataWriteRequestDTO externalReferenceData)
+        {
+            return MapCommonReference(externalReferenceData);
+        }
+
         private void MapFullChanges<TDto>(TDto source, SystemUpdateParameters destination, bool enforceResetOnMissingProperty) where TDto :
             IItSystemWriteRequestCommonPropertiesDTO,
             IItSystemWriteRequestPropertiesDTO
