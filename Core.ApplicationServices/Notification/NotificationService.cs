@@ -167,7 +167,7 @@ namespace Core.ApplicationServices.Notification
                     : new OperationError($"User is not allowed to delete notification with uuid: {notificationUuid}", OperationFailure.Forbidden),
                     error => error);
         }
-
+        
         public Result<NotificationAccessRights, OperationError> GetAccessRights(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType)
         {
             return GetNotificationByUuid(notificationUuid, relatedEntityType)
@@ -179,14 +179,10 @@ namespace Core.ApplicationServices.Notification
                                 if (!_authorizationContext.AllowModify(relatedEntity))
                                     return NotificationAccessRights.ReadOnly();
 
-                                var canBeModified = notification.IsActive;
-                                var canBeDeactivated = notification.IsActive && !notification.AdviceSent.Any();
-                                var canBeDeleted = notification.CanBeDeleted;
-                                if (_authorizationContext.AllowDelete(relatedEntity))
-                                {
-                                    canBeDeleted = false;
-                                }
-
+                                var canBeModified = notification.IsActive && notification.AdviceType == AdviceType.Repeat;
+                                var canBeDeactivated = canBeModified && !notification.AdviceSent.Any();
+                                var canBeDeleted = notification.CanBeDeleted && _authorizationContext.AllowDelete(relatedEntity);
+                                
                                 return new NotificationAccessRights(canBeDeleted, canBeDeactivated, canBeModified);
                             },
                             () => new OperationError($"Related entity of type {relatedEntityType} with uuid {relatedEntityUuid} was not found", OperationFailure.NotFound));

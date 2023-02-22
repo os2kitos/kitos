@@ -133,12 +133,7 @@ namespace Core.DomainModel.Advice
                 {
                     return false;
                 }
-                if (IsActive)
-                {
-                    return false;
-                }
-
-                return true;
+                return !IsActive;
             }
         }
 

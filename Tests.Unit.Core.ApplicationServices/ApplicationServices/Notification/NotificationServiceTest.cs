@@ -573,6 +573,246 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
         }
 
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Can_GetAccessRights(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var notification = CreateNewNotification(relatedEntityType);
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectAllowDeleteReturns(relatedEntity, true);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+            Assert.True(accessRights.CanBeModified);
+            Assert.True(accessRights.CanBeDeactivated);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_CanBeDeleted_Is_True(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var notification = CreateNewNotification(relatedEntityType, false);
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectAllowDeleteReturns(relatedEntity, true);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeDeactivated);
+            Assert.True(accessRights.CanBeDeleted);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_CanBeDeleted_Is_False_When_Not_Allowed_To_Delete(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var notification = CreateNewNotification(relatedEntityType, false);
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectAllowDeleteReturns(relatedEntity, false);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeDeactivated);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_CanBeDeactivated_Is_False_When_Any_AdviceSent(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var notification = CreateNewNotification(relatedEntityType);
+            notification.AdviceSent = new List<AdviceSent> {new()};
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectAllowDeleteReturns(relatedEntity, true);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+            Assert.True(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeDeactivated);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_ReadOnly_When_Notification_Is_Immediate(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var notification = CreateNewNotification(relatedEntityType, notificationType: AdviceType.Immediate);
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            ExpectAllowModifyReturns(relatedEntity, true);
+            ExpectAllowDeleteReturns(relatedEntity, true);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeDeactivated);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_ReadOnly_When_Not_Allowed_To_Modify(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var notification = CreateNewNotification(relatedEntityType);
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            ExpectAllowModifyReturns(relatedEntity, false);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Ok);
+            var accessRights = result.Value;
+            Assert.False(accessRights.CanBeModified);
+            Assert.False(accessRights.CanBeDeactivated);
+            Assert.False(accessRights.CanBeDeleted);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_Returns_NotFound_When_Related_Entity_Is_Not_Found(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var notification = CreateNewNotification(relatedEntityType);
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            ExpectGetRelatedEntityReturnsNone(relatedEntityType);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_Returns_NotFound_When_Notification_Is_Not_Found(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var notificationId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
+            ExpectGetNotificationByIdReturns(notificationId, Maybe<Advice>.None);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void GetAccessRights_Returns_NotFound_When_NotificationId_Is_Not_Found(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var notificationUuid = A<Guid>();
+            var relatedEntityUuid = A<Guid>();
+
+            ExpectResolveIdReturns<Advice>(notificationUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
         private void Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden<TSuccess>(Guid uuid, RelatedEntityType relatedEntityType, Func<IEntityWithAdvices, Result<TSuccess, OperationError>> command)
         {
             //Arrange
@@ -605,6 +845,17 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             transaction.Verify(x => x.Commit(), Times.Never);
         }
 
+        private static Advice CreateNewNotification(RelatedEntityType relatedEntityType, bool isActive = true,
+            AdviceType notificationType = AdviceType.Repeat)
+        {
+            return new Advice
+            {
+                IsActive = isActive,
+                Type = relatedEntityType,
+                AdviceType = notificationType,
+            };
+        }
+        
         private ImmediateNotificationModificationParameters CreateNewParameters(RelatedEntityType relatedEntityType)
         {
             return new ImmediateNotificationModificationParameters(A<string>(), A<string>(), relatedEntityType, A<Guid>(), A<RootRecipientModificationParameters>(), A<RootRecipientModificationParameters>());
