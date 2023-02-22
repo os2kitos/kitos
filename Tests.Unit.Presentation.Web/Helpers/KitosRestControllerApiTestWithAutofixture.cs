@@ -7,7 +7,6 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Moq;
 using Presentation.Web.Controllers.API.V1;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -19,7 +18,7 @@ namespace Tests.Unit.Presentation.Web.Helpers
         protected User KitosUser { get; private set; }
         protected int CurrentOrganizationId { get; private set; }
 
-        protected virtual void SetupControllerFrorTest(BaseApiController sut)
+        protected virtual void SetupControllerForTest(BaseApiController sut)
         {
             //Set request context
             var userMock = new Mock<IOrganizationalUserContext>();

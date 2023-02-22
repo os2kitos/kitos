@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         protected IPropertyUpdateRule<TRoot> CreateChangeRule<TRoot>(bool enforceChangesAlways) => new MustUpdateIfDefinedOrEnforced<TRoot>(ClientRequestsChangeTo, enforceChangesAlways);
 
-        protected bool ClientRequestsChangeTo(params string[] expectedSectionKey)
+        private bool ClientRequestsChangeTo(params string[] expectedSectionKey)
         {
             string CreatePathKey(IEnumerable<string> strings)
             {
