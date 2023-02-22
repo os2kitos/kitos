@@ -357,6 +357,8 @@
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RecommendedArchiveDutyChoiceMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IItSystemResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />

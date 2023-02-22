@@ -13,7 +13,6 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Controllers.API.V2.External.Generic;
-using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -24,7 +23,6 @@ using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.SharedProperties;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.System.Write;
 
@@ -40,22 +38,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IItSystemWriteModelMapper _writeModelMapper;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
-        private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
         private readonly IItSystemWriteService _writeService;
+        private readonly IItSystemResponseMapper _systemResponseMapper;
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
             IItSystemWriteModelMapper writeModelMapper,
             IEntityIdentityResolver entityIdentityResolver,
-            IExternalReferenceResponseMapper referenceResponseMapper,
-            IItSystemWriteService writeService)
+            IItSystemWriteService writeService,
+            IItSystemResponseMapper systemResponseMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
             _writeModelMapper = writeModelMapper;
             _entityIdentityResolver = entityIdentityResolver;
-            _referenceResponseMapper = referenceResponseMapper;
             _writeService = writeService;
+            _systemResponseMapper = systemResponseMapper;
         }
 
         /// <summary>
@@ -90,7 +88,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _itSystemService
                 .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery)
-                .Select(ToSystemResponseDTO)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Transform(Ok);
         }
 
@@ -116,7 +114,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromPOST(request);
             return _writeService
                 .CreateNewSystem(request.OrganizationUuid, parameters)
-                .Select(ToSystemResponseDTO)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
 
@@ -141,7 +139,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromPATCH(request);
             return _writeService
                 .Update(uuid, parameters)
-                .Select(ToSystemResponseDTO)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -186,7 +184,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _itSystemService
                 .GetSystem(uuid)
-                .Select(ToSystemResponseDTO)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -253,7 +251,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                     .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                     .Page(paginationQuery)
                     .ToList()
-                    .Select(ToRightsHolderResponseDTO)
+                    .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                     .ToList())
                 .Match(Ok, FromOperationError);
         }
@@ -278,7 +276,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _rightsHolderSystemService
                 .GetSystemAsRightsHolder(uuid)
-                .Select(ToRightsHolderResponseDTO)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -305,7 +303,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _rightsHolderSystemService
                 .CreateNewSystemAsRightsHolder(request.RightsHolderUuid, parameters)
-                .Select(ToRightsHolderResponseDTO)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
 
@@ -334,7 +332,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _rightsHolderSystemService
                 .UpdateAsRightsHolder(uuid, parameters)
-                .Select(ToRightsHolderResponseDTO)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -361,7 +359,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _rightsHolderSystemService
                 .UpdateAsRightsHolder(uuid, parameters)
-                .Select(ToRightsHolderResponseDTO)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -386,56 +384,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _rightsHolderSystemService
                 .DeactivateAsRightsHolder(uuid, request.DeactivationReason)
-                .Select(ToRightsHolderResponseDTO)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
 
-        private RightsHolderItSystemResponseDTO ToRightsHolderResponseDTO(ItSystem itSystem)
-        {
-            var dto = new RightsHolderItSystemResponseDTO();
-            MapBaseInformation(itSystem, dto);
-            return dto;
-        }
-
-        private ItSystemResponseDTO ToSystemResponseDTO(ItSystem itSystem)
-        {
-            var dto = new ItSystemResponseDTO
-            {
-                UsingOrganizations = itSystem
-                    .Usages
-                    .Select(systemUsage => systemUsage.Organization)
-                    .Select(organization => organization.MapShallowOrganizationResponseDTO())
-                    .ToList(),
-                LastModified = itSystem.LastChanged,
-                LastModifiedBy = itSystem.LastChangedByUser?.MapIdentityNamePairDTO(),
-                Scope = itSystem.AccessModifier.ToChoice(),
-                OrganizationContext = itSystem.Organization?.MapShallowOrganizationResponseDTO()
-            };
-
-            MapBaseInformation(itSystem, dto);
-
-            return dto;
-        }
-
-        private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
-        {
-            dto.Uuid = arg.Uuid;
-            dto.Name = arg.Name;
-            dto.RightsHolder = arg.BelongsTo?.Transform(organization => organization.MapShallowOrganizationResponseDTO());
-            dto.BusinessType = arg.BusinessType?.Transform(businessType => businessType.MapIdentityNamePairDTO());
-            dto.Description = arg.Description;
-            dto.CreatedBy = arg.ObjectOwner.MapIdentityNamePairDTO();
-            dto.Created = arg.Created;
-            dto.Deactivated = arg.Disabled;
-            dto.FormerName = arg.PreviousName;
-            dto.ParentSystem = arg.Parent?.Transform(parent => parent.MapIdentityNamePairDTO());
-            dto.ExternalReferences = _referenceResponseMapper.MapExternalReferences(arg.ExternalReferences).ToList();
-            dto.RecommendedArchiveDuty = new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty?.ToChoice() ?? RecommendedArchiveDutyChoice.Undecided);
-            dto.KLE = arg
-                .TaskRefs
-                .Select(taskRef => taskRef.MapIdentityNamePairDTO())
-                .ToList();
-        }
         private CreatedNegotiatedContentResult<T> MapSystemCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
