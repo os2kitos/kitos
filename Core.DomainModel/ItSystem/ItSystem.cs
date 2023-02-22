@@ -197,7 +197,7 @@ namespace Core.DomainModel.ItSystem
             ParentId = null;
         }
 
-        public void SetUpdateParentSystem(ItSystem parent)
+        public void UpdateParentSystem(ItSystem parent)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));

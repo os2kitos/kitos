@@ -420,7 +420,7 @@ namespace Core.ApplicationServices.System
                     if (!_authorizationContext.AllowReads(parent))
                         return new OperationError("Access to parent system is denied", OperationFailure.Forbidden);
 
-                    system.SetUpdateParentSystem(parent);
+                    system.UpdateParentSystem(parent);
                 }
                 else
                 {

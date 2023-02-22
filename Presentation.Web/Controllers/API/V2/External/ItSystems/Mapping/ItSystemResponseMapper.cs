@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             dto.RightsHolder = arg.BelongsTo?.Transform(organization => organization.MapShallowOrganizationResponseDTO());
             dto.BusinessType = arg.BusinessType?.Transform(businessType => businessType.MapIdentityNamePairDTO());
             dto.Description = arg.Description;
-            dto.CreatedBy = arg.ObjectOwner.MapIdentityNamePairDTO();
+            dto.CreatedBy = arg.ObjectOwner?.MapIdentityNamePairDTO();
             dto.Created = arg.Created;
             dto.Deactivated = arg.Disabled;
             dto.FormerName = arg.PreviousName;
