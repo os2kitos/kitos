@@ -1,5 +1,4 @@
-﻿using Core.Abstractions.Types;
-using Core.DomainModel.GDPR;
+﻿using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 

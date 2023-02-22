@@ -258,6 +258,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// </summary>
         /// <param name="ownerResourceType"></param>
         /// <param name="notificationUuid"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{ownerResourceType}/access-rights/{notificationUuid}/{ownerResourceUuid}")]

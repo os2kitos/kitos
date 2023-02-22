@@ -1007,10 +1007,6 @@
     <Compile Include="Migrations\202302081425530_Extend_Archive_Period_With_Uuid.designer.cs">
       <DependentUpon>202302081425530_Extend_Archive_Period_With_Uuid.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202302171322339_notification-update.cs" />
-    <Compile Include="Migrations\202302171322339_notification-update.designer.cs">
-      <DependentUpon>202302171322339_notification-update.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1020,9 +1016,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202302081425530_Extend_Archive_Period_With_Uuid.resx">
       <DependentUpon>202302081425530_Extend_Archive_Period_With_Uuid.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202302171322339_notification-update.resx">
-      <DependentUpon>202302171322339_notification-update.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ExternalReference.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />
