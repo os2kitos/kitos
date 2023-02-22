@@ -210,7 +210,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var model = A<UpdateNotificationModel>();
+            var model = A<BaseNotificationModel>();
             var notification = new Advice{Id = id};
             var root = CreateEntityWithAdvices(relatedEntityType);
 
@@ -240,7 +240,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var model = A<UpdateNotificationModel>();
+            var model = A<BaseNotificationModel>();
             var notification = new Advice();
 
             ExpectDatabaseTransaction();
@@ -260,7 +260,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var model = A<UpdateNotificationModel>();
+            var model = A<BaseNotificationModel>();
 
             ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, Maybe<Advice>.None);
@@ -427,7 +427,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             return transaction;
         }
 
-        private void ExpectResolveRootReturns(UpdateNotificationModel notification, Maybe<IEntityWithAdvices> result)
+        private void ExpectResolveRootReturns(BaseNotificationModel notification, Maybe<IEntityWithAdvices> result)
         {
             _adviceRootResolution.Setup(x => x.Resolve(It.Is<Advice>(advice => advice.RelationId == notification.RelationId))).Returns(result);
         }

@@ -100,6 +100,7 @@
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="LocalOptions\LocalCriticalityType.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
+    <Compile Include="Notification\IHasToDate.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Organization\ConnectionUpdateOrganizationUnitChangeType.cs" />

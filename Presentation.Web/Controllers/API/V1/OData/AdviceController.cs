@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 // calculate update
                 var update = delta.Patch(entity);
                 return _registrationNotificationService
-                    .Update(key, MapBaseNotification<UpdateNotificationModel>(update))
+                    .Update(key, MapBaseNotification<BaseNotificationModel>(update))
                     .Match(Ok, FromOperationError);
             }
             catch (Exception e)
@@ -229,7 +229,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return notificationModel;
         }
 
-        private static TResult MapBaseNotification<TResult>(Advice notification) where TResult : UpdateNotificationModel, new()
+        private static TResult MapBaseNotification<TResult>(Advice notification) where TResult : BaseNotificationModel, new()
         {
             return new TResult
             {

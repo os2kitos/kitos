@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
@@ -8,6 +9,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
@@ -100,7 +102,7 @@ namespace Core.ApplicationServices.Notification
             return newNotification;
         }
 
-        public Result<Advice, OperationError> Update(int notificationId, UpdateNotificationModel notificationModel)
+        public Result<Advice, OperationError> Update(int notificationId, BaseNotificationModel notificationModel)
         {
             using var transaction = _transactionManager.Begin();
 
@@ -113,7 +115,7 @@ namespace Core.ApplicationServices.Notification
                 return new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden);
             }
 
-            BaseMapModelToEntity(notificationModel, entity);
+            MapBasePropertiesToNotification(notificationModel, entity);
             
             _adviceRepository.Update(entity);
             RaiseAsRootModification(entity);
@@ -175,39 +177,64 @@ namespace Core.ApplicationServices.Notification
 
             return entity;
         }
-        
-        private static Advice MapCreateModelToEntity(NotificationModel model)
+
+        private static Advice MapCreateSchedulingModelToEntity(ScheduledNotificationModel model)
+        {
+            notification.Name = model.Name;
+            notification.StopDate = model.ToDate;
+            return new Advice();
+        }
+
+        private static Advice MapCreateModelToEntity<T>(T model) where T : class, IHasBasePropertiesModel, IHasRecipientModels
         {
             var notification = new Advice();
-            BaseMapModelToEntity(model, notification);
+            MapBasePropertiesToNotification(model, notification);
             notification.Scheduling = model.RepetitionFrequency;
             notification.AlarmDate = model.FromDate;
+            var recipients = 
             notification.Reciepients = model.Recipients.Select(MapToAdviceUserRelation).ToList();
 
             return notification;
         }
 
-        private static void BaseMapModelToEntity<T>(T model, Advice notification) where T: UpdateNotificationModel
+        private static void MapBasePropertiesToNotification<T>(T model, Advice notification) where T: class, IHasBasePropertiesModel, IHasRecipientModels
         {
-            notification.Name = model.Name;
-            notification.StopDate = model.ToDate;
-            notification.Subject = model.Subject;
-            notification.Body = model.Body;
-            notification.RelationId = model.RelationId;
-            notification.Type = model.Type;
-            notification.AdviceType = model.AdviceType;
+            notification.Subject = model.BaseProperties.Subject;
+            notification.Body = model.BaseProperties.Body;
+            notification.RelationId = model.BaseProperties.RelationId;
+            notification.Type = model.BaseProperties.Type;
+            notification.AdviceType = model.BaseProperties.AdviceType;
         }
 
-        private static AdviceUserRelation MapToAdviceUserRelation<T>(T model) where T: RecipientModel
+        private static IEnumerable<AdviceUserRelation> MapToAdviceUserRelation(RecipientModel model, RecieverType receiverType, RelatedEntityType relatedEntityType)
+        {
+            var recipients = new List<AdviceUserRelation>();
+            
+            recipients.AddRange(model.EmailRecipients.Select(x => MapEmailRecipientToRelation(x, receiverType)).ToList());
+            recipients.AddRange(model.RoleRecipients.Select(x => MapRoleRecipientToRelation(x, receiverType, relatedEntityType)).ToList());
+
+            return recipients;
+        }
+
+        private static AdviceUserRelation MapEmailRecipientToRelation(EmailRecipientModel model, RecieverType receiverType)
         {
             return new AdviceUserRelation
             {
                 Email = model.Email,
-                DataProcessingRegistrationRoleId = model.DataProcessingRegistrationRoleId,
-                ItContractRoleId = model.ItContractRoleId,
-                ItSystemRoleId = model.ItSystemRoleId,
-                RecieverType = model.ReceiverType,
-                RecpientType = model.RecipientType
+                RecpientType = RecipientType.USER,
+                RecieverType = receiverType
+            };
+        }
+
+        private static AdviceUserRelation MapRoleRecipientToRelation(RoleRecipientModel model, RecieverType receiverType, RelatedEntityType relatedEntityType)
+        {
+            return new AdviceUserRelation
+            {
+                ItContractRoleId = relatedEntityType == RelatedEntityType.itContract ? model.RoleId : null,
+                ItSystemRoleId = relatedEntityType == RelatedEntityType.itSystemUsage ? model.RoleId : null,
+                DataProcessingRegistrationRoleId = relatedEntityType == RelatedEntityType.dataProcessingRegistration ? model.RoleId : null,
+                RecpientType = RecipientType.USER,
+                RecieverType = receiverType
             };
         }
 

@@ -13,7 +13,7 @@ namespace Core.ApplicationServices.Notification
         Maybe<Advice> GetNotificationById(int id);
         IQueryable<AdviceSent> GetSent();
         Result<Advice, OperationError> Create(NotificationModel notification);
-        Result<Advice, OperationError> Update(int notificationId, UpdateNotificationModel notification);
+        Result<Advice, OperationError> Update(int notificationId, BaseNotificationModel notification);
         Maybe<OperationError> Delete(int notificationId);
         Result<Advice, OperationError> DeactivateNotification(int id);
     }

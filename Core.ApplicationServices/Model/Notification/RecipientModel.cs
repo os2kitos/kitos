@@ -1,17 +1,11 @@
-﻿using Core.DomainModel.Advice;
+﻿using System.Collections.Generic;
 
 namespace Core.ApplicationServices.Model.Notification
 {
     public class RecipientModel
     {
-        public string Email { get; set; }
+        public IEnumerable<EmailRecipientModel> EmailRecipients { get; set; }
+        public IEnumerable<RoleRecipientModel> RoleRecipients { get; set; }
 
-        public int? ItContractRoleId { get; set; }
-        public int? ItSystemRoleId { get; set; }
-        public int? DataProcessingRegistrationRoleId { get; set; }
-
-        public RecieverType ReceiverType { get; set; }
-        public RecipientType RecipientType { get; set; }
-        
     }
 }
