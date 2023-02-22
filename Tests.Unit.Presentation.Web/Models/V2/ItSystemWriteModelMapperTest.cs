@@ -1,12 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.System;
 using Moq;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
+using Presentation.Web.Models.API.V2.Request.System.Shared;
 using Tests.Toolkit.Extensions;
 using Xunit;
 
@@ -20,8 +25,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItSystemWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<RightsHolderFullItSystemRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x
+                    .GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
+                .Returns(GetAllInputPropertyNames<RightsHolderFullItSystemRequestDTO>()
+                    .Concat(GetAllInputPropertyNames<UpdateItSystemRequestDTO>()).ToHashSet());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemRequestDTO.RecommendedArchiveDuty).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<RecommendedArchiveDutyRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new ItSystemWriteModelMapper(_currentHttpRequestMock.Object);
         }
@@ -36,7 +44,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromRightsHolderPOST(input);
 
             //Assert
-            Assert.Equal(input.Uuid,output.RightsHolderProvidedUuid);
+            Assert.Equal(input.Uuid, output.RightsHolderProvidedUuid);
             AssertUpdateData(input, output);
         }
 
@@ -77,7 +85,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noName,
            bool noDescription,
            bool noFormerName,
-           bool noUrlReference,
+           bool noExternalReferences,
            bool noParent,
            bool noBusinessType,
            bool noTaskRefUuids)
@@ -88,7 +96,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
             if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
+            if (noExternalReferences) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (noParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
@@ -102,7 +110,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(output.Name.IsUnchanged, noName);
             Assert.Equal(output.Description.IsUnchanged, noDescription);
             Assert.Equal(output.FormerName.IsUnchanged, noFormerName);
-            Assert.Equal(output.ExternalReferences.IsNone, noUrlReference);
+            Assert.Equal(output.ExternalReferences.IsNone, noExternalReferences);
             Assert.Equal(output.ParentSystemUuid.IsUnchanged, noParent);
             Assert.Equal(output.BusinessTypeUuid.IsUnchanged, noBusinessType);
             Assert.Equal(output.TaskRefUuids.IsUnchanged, noTaskRefUuids);
@@ -114,7 +122,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noName,
            bool noDescription,
            bool noFormerName,
-           bool noUrlReference,
+           bool noExternalReferences,
            bool npParent,
            bool noBusinessType,
            bool noTaskRefUuids)
@@ -125,7 +133,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
             if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
+            if (noExternalReferences) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
@@ -151,7 +159,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
        bool noName,
        bool noDescription,
        bool noFormerName,
-       bool noUrlReference,
+       bool noExternalReferences,
        bool npParent,
        bool noBusinessType,
        bool noTaskRefUuids)
@@ -162,7 +170,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
             if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
-            if (noUrlReference) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
+            if (noExternalReferences) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.KLEUuids));
@@ -182,8 +190,50 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.TaskRefUuids.HasChange);
         }
 
+        [Fact]
+        public void Can_Map_FromPOST()
+        {
+            //Arrange
+            var input = A<CreateItSystemRequestDTO>();
 
-        private static void AssertUpdateData(IRightsHolderWritableSystemPropertiesRequestDTO input, SharedSystemUpdateParameters output)
+            //Act
+            var output = _sut.FromPOST(input);
+
+            //Assert
+            AssertUpdateData(input, output);
+            AssertExtendedData(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_FromPATCH()
+        {
+            //Arrange
+            var input = A<UpdateItSystemRequestDTO>();
+
+            //Act
+            var output = _sut.FromPATCH(input);
+
+            //Assert
+            AssertUpdateData(input, output);
+            AssertExtendedData(input, output);
+        }
+
+        //TODO: Also verify the partial update scenarios
+
+
+        private static void AssertExtendedData(IItSystemWriteRequestPropertiesDTO input, SystemUpdateParameters output)
+        {
+            Assert.Equal(input.Deactivated, AssertPropertyContainsDataChange(output.Deactivated));
+            Assert.Equal(input.Scope?.FromChoice(), AssertPropertyContainsDataChange(output.Scope));
+            Assert.Equal(input.RightsHolderUuid, AssertPropertyContainsDataChange(output.RightsHolderUuid));
+            Assert.Equal(input.RecommendedArchiveDuty.Comment,
+                AssertPropertyContainsDataChange(AssertPropertyContainsDataChange(output.ArchivingRecommendation).comment));
+            Assert.Equal(input.RecommendedArchiveDuty?.Id?.FromChoice(),
+                AssertPropertyContainsDataChange(
+                    AssertPropertyContainsDataChange(output.ArchivingRecommendation).recommendation));
+        }
+
+        private static void AssertUpdateData(IItSystemWriteRequestCommonPropertiesDTO input, SharedSystemUpdateParameters output)
         {
             Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
             Assert.Equal(input.FormerName, AssertPropertyContainsDataChange(output.FormerName));
@@ -191,8 +241,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.BusinessTypeUuid, AssertPropertyContainsDataChange(output.BusinessTypeUuid));
             Assert.Equal(input.KLEUuids, AssertPropertyContainsDataChange(output.TaskRefUuids));
             Assert.Equal(input.ParentUuid, AssertPropertyContainsDataChange(output.ParentSystemUuid));
-            //TODO - reference mapping asserted!
-
+            if (input is IHasExternalReferencesCreation creation)
+            {
+                Assert.Equivalent(creation.ExternalReferences, AssertPropertyContainsDataChange(output.ExternalReferences));
+            }
+            else if (input is IHasExternalReferencesUpdate update)
+            {
+                Assert.Equivalent(update.ExternalReferences, AssertPropertyContainsDataChange(output.ExternalReferences));
+            }
         }
     }
 }
