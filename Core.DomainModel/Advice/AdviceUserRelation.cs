@@ -36,15 +36,5 @@ namespace Core.DomainModel.Advice
         public RecieverType RecieverType { get; set; }
         public RecipientType RecpientType { get; set; }
         public virtual Advice Advice { get; set; }
-
-        public Result<IRoleEntity, OperationError> GetRole()
-        {
-            if (RecpientType != RecipientType.ROLE)
-                return new OperationError($"You cannot get a role for a notification with {nameof(RecpientType)} set to Role", OperationFailure.BadState);
-
-            return Result<IRoleEntity, OperationError>.Success(DataProcessingRegistrationRole ??
-                                                               ItContractRole ?? 
-                                                               (IRoleEntity) ItSystemRole);
-        }
     }
 }

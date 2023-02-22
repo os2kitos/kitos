@@ -6,6 +6,7 @@ using Core.DomainModel.Advice;
 using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Core.ApplicationServices.Notification
 {
@@ -30,23 +31,19 @@ namespace Core.ApplicationServices.Notification
         public Maybe<OperationError> UpdateNotificationUserRelations(int notificationId, IEnumerable<RecipientModel> updateModels)
         {
             using var transaction = _transactionManager.Begin();
-            var notificationResult = _registrationNotificationService.GetNotificationById(notificationId);
-            if (notificationResult.IsNone)
-            {
-                return new OperationError($"Notification with Id: {notificationId} was not found", OperationFailure.NotFound);
-            }
 
-            var notification = notificationResult.Value;
-            if (!_authorizationContext.AllowModify(notification))
-            {
-                return new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden);
-            }
+            var error = _registrationNotificationService.GetNotificationById(notificationId)
+                .Match
+                (
+                    onValue: notification => 
+                        _authorizationContext.AllowModify(notification)
+                            ? DeleteUserRelationsByAdviceId(notificationId)
+                            : new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden),
+                    onNone: () => new OperationError($"Notification with Id: {notificationId} was not found", OperationFailure.NotFound)
+                );
 
-            var removeRelationsResult = DeleteUserRelationsByAdviceId(notificationId);
-            if (removeRelationsResult.HasValue)
-            {
-                return removeRelationsResult.Value;
-            }
+            if (error.HasValue)
+                return error;
 
             var newNotifications = updateModels.Select(updateModel => MapAdviceUserRelation(notificationId, updateModel)).ToList();
             _adviceUserRelationRepository.AddRange(newNotifications);

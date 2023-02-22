@@ -40,6 +40,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// <param name="ownerResourceType"></param>
         /// <param name="organizationUuid"></param>
         /// <param name="fromDate"></param>
+        /// <param name="paginationQuery"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{ownerResourceType}")]
@@ -162,6 +163,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Updates the scheduled notification
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="notificationUuid"></param>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut]
