@@ -61,7 +61,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
 
             //Arrange - update
             var updateBody = CreateBaseScheduledNotificationWriteRequest<UpdateScheduledNotificationWriteRequestDTO>(relationUuid, ownerResourceType);
-            
+
             //Act - update
             var updateResponse = await NotificationV2Helper.UpdateScheduledNotificationAsync(ownerResourceType, notification.Uuid, updateBody, cookie);
 

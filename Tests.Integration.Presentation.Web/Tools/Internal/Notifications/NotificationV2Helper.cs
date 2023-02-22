@@ -51,6 +51,9 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"{_basePath}/{ownerResourceType}/scheduled/deactivate/{notificationUuid}"), cookie, new{});
+
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();
