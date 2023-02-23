@@ -5,6 +5,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Presentation.Web.Infrastructure.Config;
 using Presentation.Web.Ninject;
 
 namespace Presentation.Web
@@ -38,6 +39,9 @@ namespace Presentation.Web
 
             // Add merge-patch+json as accepted media type
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/merge-patch+json"));
+
+            //Configure the V2 json formatter (uses string enum serialization to align with exposed docs)
+            V2JsonSerializationConfig.Configure(GlobalConfiguration.Configuration.Formatters.JsonFormatter);
 
             //Add to MVC pipeline
             ControllerBuilder.Current.SetControllerFactory(new DefaultControllerFactory(new NinjectControllerActivator()));
