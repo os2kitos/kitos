@@ -16,8 +16,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
-using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping

@@ -12,8 +12,8 @@ using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.M
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Tests.Toolkit.Extensions;
 using Xunit;

@@ -6,7 +6,6 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Interface;
-using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;

@@ -14,7 +14,6 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Time;
 using Moq;
 using Presentation.Web.Controllers.API.V1;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystem;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -41,7 +40,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now)
                 );
 
-            SetupControllerFrorTest(_sut);
+            SetupControllerForTest(_sut);
             _sut.AuthorizationContext = _authorizationContext.Object;
         }
 

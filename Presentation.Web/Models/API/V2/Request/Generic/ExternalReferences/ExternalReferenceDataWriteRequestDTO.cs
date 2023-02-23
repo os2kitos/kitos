@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.Web.Models.API.V2.Request.Shared
+namespace Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences
 {
     /// <summary>
     /// User defined external references attached to a KITOS entity

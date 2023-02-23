@@ -9,7 +9,7 @@ namespace Presentation.Web.Controllers.API.V2.Common
 {
     [Authorize]
     [V2StyleJsonResponseSerialization]
-    public abstract class ApiV2Controller: ApiController
+    public abstract class ApiV2Controller : ApiController
     {
         protected IHttpActionResult FromOperationFailure(OperationFailure failure)
         {
@@ -26,6 +26,16 @@ namespace Presentation.Web.Controllers.API.V2.Common
         protected IHttpActionResult NoContent()
         {
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
+        /// Convenience wrapper for <see cref="NoContent()"/>
+        /// </summary>
+        /// <param name="ignored"></param>
+        /// <returns></returns>
+        protected IHttpActionResult NoContent(object ignored)
+        {
+            return NoContent();
         }
     }
 }

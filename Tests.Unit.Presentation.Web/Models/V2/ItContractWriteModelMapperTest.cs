@@ -16,7 +16,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
 using Xunit;
 using Presentation.Web.Controllers.API.V2.External.Generic;
-using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
