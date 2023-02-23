@@ -119,6 +119,7 @@ using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
 using Core.ApplicationServices.Messages;
 using Core.Abstractions.Caching;
+using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
@@ -285,6 +286,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
             kernel.Bind<IItSystemWriteService>().To<ItSystemWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceWriteService>().To<ItInterfaceWriteService>().InCommandScope(Mode);
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
 
             //STS Organization

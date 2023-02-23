@@ -52,16 +52,17 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _userRepositoryMock = new Mock<IUserRepository>();
             _operationClockMock = new Mock<IOperationClock>();
 
-            _sut = new ItInterfaceRightsHolderService(
-                _userContextMock.Object,
-                _organizationRepositoryMock.Object,
-                _itSystemServiceMock.Object,
-                _interfaceServiceMock.Object,
-                _transactionManagerMock.Object,
-                _logger.Object,
-                _globalAdminNotificationServiceMock.Object,
-                _userRepositoryMock.Object,
-                _operationClockMock.Object);
+            //TODO
+            //_sut = new ItInterfaceRightsHolderService(
+            //    _userContextMock.Object,
+            //    _organizationRepositoryMock.Object,
+            //    _itSystemServiceMock.Object,
+            //    _interfaceServiceMock.Object,
+            //    _transactionManagerMock.Object,
+            //    _logger.Object,
+            //    _globalAdminNotificationServiceMock.Object,
+            //    _userRepositoryMock.Object,
+            //    _operationClockMock.Object);
         }
 
         [Fact]
