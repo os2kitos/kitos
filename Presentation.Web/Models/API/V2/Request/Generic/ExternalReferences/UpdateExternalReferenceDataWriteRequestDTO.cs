@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Presentation.Web.Models.API.V2.Request.Shared
+namespace Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences
 {
     public class UpdateExternalReferenceDataWriteRequestDTO : ExternalReferenceDataWriteRequestDTO
     {

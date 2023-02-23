@@ -8,8 +8,8 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Model.Request;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         protected IPropertyUpdateRule<TRoot> CreateChangeRule<TRoot>(bool enforceChangesAlways) => new MustUpdateIfDefinedOrEnforced<TRoot>(ClientRequestsChangeTo, enforceChangesAlways);
 
-        protected bool ClientRequestsChangeTo(params string[] expectedSectionKey)
+        private bool ClientRequestsChangeTo(params string[] expectedSectionKey)
         {
             string CreatePathKey(IEnumerable<string> strings)
             {
