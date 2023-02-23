@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
-using Core.ApplicationServices;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Notification;
 using Core.DomainModel;
@@ -13,10 +13,11 @@ using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Notification;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Time;
-using Infrastructure.Services.DataAccess;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
@@ -27,31 +28,24 @@ namespace Presentation.Web.Controllers.API.V1.OData
     [InternalApi]
     public class AdviceController : BaseEntityController<Advice>
     {
-        private readonly IAdviceService _adviceService;
         private readonly IAdviceRootResolution _adviceRootResolution;
         private readonly IOperationClock _operationClock;
-        private readonly ITransactionManager _transactionManager;
         private readonly IRegistrationNotificationService _registrationNotificationService;
 
-        private readonly Regex _emailValidationRegex = new("([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
-
         public AdviceController(
-            IAdviceService adviceService,
             IGenericRepository<Advice> repository,
             IAdviceRootResolution adviceRootResolution,
             IOperationClock operationClock,
-            ITransactionManager transactionManager,
             IRegistrationNotificationService registrationNotificationService)
             : base(repository)
         {
-            _adviceService = adviceService;
             _adviceRootResolution = adviceRootResolution;
             _operationClock = operationClock;
-            _transactionManager = transactionManager;
             _registrationNotificationService = registrationNotificationService;
         }
 
         [EnableQuery]
+        //TODO: Kill once frontend is updated
         public override IHttpActionResult Get()
         {
             return Ok(_registrationNotificationService.GetCurrentUserNotifications());
@@ -65,10 +59,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 //Advice cannot be an orphan - it must belong to a root
                 return BadRequest($"Both {nameof(advice.RelationId)} AND {nameof(advice.Type)} MUST be defined");
             }
-            if (advice.Reciepients.Where(x => x.RecpientType == RecipientType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
-            {
-                return BadRequest("Invalid email exists among receivers or CCs");
-            }
 
             if (advice.AdviceType == AdviceType.Repeat)
             {
@@ -76,31 +66,29 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 {
                     return BadRequest("Start date is not set!");
                 }
-
-                if (advice.AlarmDate.Value.Date < _operationClock.Now.Date)
-                {
-                    return BadRequest("Start date is set before today");
-                }
-
-                if (advice.StopDate != null)
-                {
-                    if (advice.StopDate.Value.Date < advice.AlarmDate.Value.Date)
-                    {
-                        return BadRequest("Stop date is set before Start date");
-                    }
-                }
-
-                if (advice.Scheduling is null or Scheduling.Immediate)
-                {
-                    return BadRequest($"Scheduling must be defined and cannot be {nameof(Scheduling.Immediate)} when creating advice of type {nameof(AdviceType.Repeat)}");
-                }
             }
 
             if (AllowCreate<Advice>(organizationId, advice) == false)
             {
                 return Forbidden();
             }
-            return _registrationNotificationService.Create(MapNotification(advice))
+
+            if (advice.AdviceType == AdviceType.Immediate)
+            {
+                return MapCreateNotification<ImmediateNotificationModel>(advice)
+                    .Bind(model => _registrationNotificationService.CreateImmediateNotification(model))
+                    .Match(Created, FromOperationError);
+            }
+
+            return MapCreateNotification<ScheduledNotificationModel>(advice)
+                .Bind(model =>
+                {
+                    MapBaseScheduledModel(model, advice);
+
+                    model.FromDate = advice.AlarmDate.GetValueOrDefault();
+                    model.RepetitionFrequency = advice.Scheduling.GetValueOrDefault();
+                    return _registrationNotificationService.CreateScheduledNotification(model);
+                })
                 .Match(Created, FromOperationError);
         }
 
@@ -120,12 +108,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 if (existingAdvice.Type != deltaAdvice.Type)
                 {
                     return BadRequest("Cannot change advice type");
-                }
-
-                if (!existingAdvice.IsActive)
-                {
-                    throw new ArgumentException(
-                        "Cannot update inactive advice ");
                 }
                 if (existingAdvice.AdviceType == AdviceType.Immediate)
                 {
@@ -163,7 +145,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 // calculate update
                 var update = delta.Patch(entity);
                 return _registrationNotificationService
-                    .Update(key, MapBaseNotification<BaseNotificationModel>(update))
+                    .Update(key, MapUpdateModel(update))
                     .Match(Ok, FromOperationError);
             }
             catch (Exception e)
@@ -219,41 +201,101 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return new ChildEntityCrudAuthorization<Advice, IEntityWithAdvices>(ResolveRoot, base.GetCrudAuthorization());
         }
 
-        private static NotificationModel MapNotification(Advice notification)
+        private static Result<TResult, OperationError> MapCreateNotification<TResult>(Advice notification) where TResult : class, IHasBaseNotificationPropertiesModel, IHasRecipientModels, new()
         {
-            var notificationModel = MapBaseNotification<NotificationModel>(notification);
-            notificationModel.RepetitionFrequency = notification.Scheduling;
-            notificationModel.FromDate = notification.AlarmDate;
-            notificationModel.Recipients = MapRecipients(notification.Reciepients);
+            var notificationModel = new TResult
+            {
+                BaseProperties = MapBaseNotification(notification)
+            };
 
-            return notificationModel;
+            return MapRecipients(notification.Reciepients, RecieverType.CC, notificationModel.BaseProperties.Type)
+                .Bind(ccs =>
+                {
+                    notificationModel.Ccs = ccs;
+                    return MapRecipients(notification.Reciepients, RecieverType.RECIEVER,
+                        notificationModel.BaseProperties.Type);
+                })
+                .Select(receivers =>
+                {
+                    notificationModel.Receivers = receivers;
+                    return notificationModel;
+                });
         }
 
-        private static TResult MapBaseNotification<TResult>(Advice notification) where TResult : BaseNotificationModel, new()
+        private static UpdateScheduledNotificationModel MapUpdateModel(Advice notification)
         {
-            return new TResult
+            var model = new UpdateScheduledNotificationModel
             {
-                Name = notification.Name,
+                BaseProperties = MapBaseNotification(notification)
+            };
+            MapBaseScheduledModel(model, notification);
+
+            return model;
+        }
+
+        private static void MapBaseScheduledModel<T>(T model, Advice notification) where T : class, IHasName, IHasToDate
+        {
+            model.Name = notification.Name;
+            model.ToDate = notification.StopDate;
+        }
+
+        private static BaseNotificationPropertiesModel MapBaseNotification(Advice notification)
+        {
+            return new BaseNotificationPropertiesModel
+            {
                 Subject = notification.Subject,
                 Body = notification.Body,
                 RelationId = notification.RelationId.GetValueOrDefault(),
-                ToDate = notification.StopDate,
                 Type = notification.Type,
                 AdviceType = notification.AdviceType,
             };
         }
 
-        private static IEnumerable<RecipientModel> MapRecipients(IEnumerable<AdviceUserRelation> recipients)
+        private static Result<RecipientModel, OperationError> MapRecipients(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType, RelatedEntityType type)
         {
-            return recipients.Select(x => new RecipientModel
+            var recipientList = recipients.ToList();
+            var recipient = new RecipientModel
             {
-                Email = x.Email,
-                DataProcessingRegistrationRoleId = x.DataProcessingRegistrationRoleId,
-                ItContractRoleId = x.ItContractRoleId,
-                ItSystemRoleId = x.ItSystemRoleId,
-                ReceiverType = x.RecieverType,
-                RecipientType = x.RecpientType
-            });
+                EmailRecipients = recipientList.Where(x => x.RecpientType == RecipientType.USER && x.RecieverType == receiverType).Select(x => new EmailRecipientModel{Email = x.Email})
+            };
+
+            var roleRecipientsResult = MapRoleModels(recipientList, receiverType, type);
+            if (roleRecipientsResult.Failed)
+                return roleRecipientsResult.Error;
+
+            recipient.RoleRecipients = roleRecipientsResult.Value;
+            return recipient;
+        }
+
+        private static Result<IEnumerable<RoleRecipientModel>, OperationError> MapRoleModels(IEnumerable<AdviceUserRelation> recipients,
+            RecieverType receiverType, RelatedEntityType type)
+        {
+            var result = new List<RoleRecipientModel>();
+            foreach (var adviceUserRelation in recipients.Where(x => x.RecpientType == RecipientType.ROLE && x.RecieverType == receiverType))
+            {
+                var idResult = ResolveRoleId(adviceUserRelation, type);
+                if (idResult.IsNone)
+                    return new OperationError("Role id cannot be null", OperationFailure.BadInput);
+
+                result.Add(new RoleRecipientModel{RoleId = idResult.Value});
+            }
+
+            return result;
+        }
+
+        private static Maybe<int> ResolveRoleId(AdviceUserRelation recipient, RelatedEntityType relatedEntityType)
+        {
+            switch (relatedEntityType)
+            {
+                case RelatedEntityType.dataProcessingRegistration:
+                    return recipient.DataProcessingRegistrationRoleId;
+                case RelatedEntityType.itSystemUsage:
+                    return recipient.ItSystemRoleId;
+                case RelatedEntityType.itContract:
+                    return recipient.ItContractRoleId;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
+            }
         }
 
         private IEntityWithAdvices ResolveRoot(Advice advice)

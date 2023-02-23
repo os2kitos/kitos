@@ -3,69 +3,65 @@ using System.Linq;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 using Core.ApplicationServices.Model.Notification.Write;
+using System;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
     public class NotificationWriteModelMapper : INotificationWriteModelMapper
     {
-        public ImmediateNotificationModificationParameters FromImmediatePOST(ImmediateNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        public ImmediateNotificationModificationParameters FromImmediatePOST(ImmediateNotificationWriteRequestDTO dto, Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
         {
-            return MapImmediateNotificationWriteRequestDTO(dto, ownerResourceType);
+            return MapImmediateNotificationWriteRequestDTO(dto, ownerResourceUuid, ownerResourceType);
         }
 
-        public ScheduledNotificationModificationParameters FromScheduledPOST(ScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        public CreateScheduledNotificationModificationParameters FromScheduledPOST(ScheduledNotificationWriteRequestDTO dto, Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
         {
-            return MapScheduledNotificationWriteRequestDTO(dto, ownerResourceType);
+            return MapScheduledNotificationWriteRequestDTO(dto, ownerResourceUuid, ownerResourceType);
         }
 
-        public UpdateScheduledNotificationModificationParameters FromScheduledPUT(UpdateScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        public UpdateScheduledNotificationModificationParameters FromScheduledPUT(UpdateScheduledNotificationWriteRequestDTO dto, Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
         {
-            return MapUpdateScheduledNotificationWriteRequestDTO(dto, ownerResourceType);
+            return MapUpdateScheduledNotificationWriteRequestDTO(dto, ownerResourceUuid, ownerResourceType);
         }
 
-        private ImmediateNotificationModificationParameters MapImmediateNotificationWriteRequestDTO(ImmediateNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        private ImmediateNotificationModificationParameters MapImmediateNotificationWriteRequestDTO(ImmediateNotificationWriteRequestDTO dto, Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
         {
             return new ImmediateNotificationModificationParameters
             (
-                dto.Body,
-                dto.Subject,
-                ownerResourceType.ToRelatedEntityType(),
-                dto.OwnerResourceUuid,
-                MapRootRecipients(dto.Ccs),
-                MapRootRecipients(dto.Receivers)
+                MapBaseProperties(dto, ownerResourceUuid, ownerResourceType)
             );
         }
 
-        private UpdateScheduledNotificationModificationParameters MapUpdateScheduledNotificationWriteRequestDTO(UpdateScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        private UpdateScheduledNotificationModificationParameters MapUpdateScheduledNotificationWriteRequestDTO(UpdateScheduledNotificationWriteRequestDTO dto, Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
         {
             return new UpdateScheduledNotificationModificationParameters
             (
-                dto.Body,
-                dto.Subject,
-                ownerResourceType.ToRelatedEntityType(),
-                dto.OwnerResourceUuid,
-                MapRootRecipients(dto.Ccs),
-                MapRootRecipients(dto.Receivers),
-                dto.Name,
-                dto.ToDate
+                MapBaseProperties(dto, ownerResourceUuid, ownerResourceType),
+                dto.Name, dto.ToDate
             );
         }
 
-        private ScheduledNotificationModificationParameters MapScheduledNotificationWriteRequestDTO(ScheduledNotificationWriteRequestDTO dto, OwnerResourceType ownerResourceType)
+        private CreateScheduledNotificationModificationParameters MapScheduledNotificationWriteRequestDTO(ScheduledNotificationWriteRequestDTO dto, Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
         {
-            return new ScheduledNotificationModificationParameters
-                (
-                    dto.Body,
-                    dto.Subject,
-                    ownerResourceType.ToRelatedEntityType(),
-                    dto.OwnerResourceUuid,
-                    MapRootRecipients(dto.Ccs),
-                    MapRootRecipients(dto.Receivers),
-                    dto.Name,
-                    dto.ToDate,
-                    dto.RepetitionFrequency.ToScheduling(),
-                    dto.FromDate
-                );
+            return new CreateScheduledNotificationModificationParameters
+            (
+                MapBaseProperties(dto, ownerResourceUuid, ownerResourceType),
+                dto.Name, 
+                dto.ToDate, 
+                dto.RepetitionFrequency.ToScheduling(),
+                dto.FromDate
+            );
+        }
+
+        private BaseNotificationPropertiesModificationParameters MapBaseProperties<T>(T dto, Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
+            where T : class, IHasBaseWriteProperties
+        {
+            return new BaseNotificationPropertiesModificationParameters(dto.BaseProperties.Body,
+                dto.BaseProperties.Subject,
+                ownerResourceType.ToRelatedEntityType(),
+                ownerResourceUuid,
+                MapRootRecipients(dto.BaseProperties.Ccs),
+                MapRootRecipients(dto.BaseProperties.Receivers));
         }
 
         private RootRecipientModificationParameters MapRootRecipients(RecipientWriteRequestDTO dto)

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Core.ApplicationServices.Model.Notification
 {
-    public interface IHasBasePropertiesModel
+    public interface IHasBaseNotificationPropertiesModel
     {
-        public BaseNotificationModel BaseProperties { get; set; }
+        public BaseNotificationPropertiesModel BaseProperties { get; set; }
     }
 }

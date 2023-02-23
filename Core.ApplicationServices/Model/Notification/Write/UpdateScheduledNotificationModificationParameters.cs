@@ -1,17 +1,19 @@
 ﻿using System;
-using Core.DomainModel.Advice;
-using Core.DomainModel.Shared;
+using Core.DomainModel;
+using Core.DomainModel.Notification;
 
 namespace Core.ApplicationServices.Model.Notification.Write
 {
-    public class UpdateScheduledNotificationModificationParameters: ImmediateNotificationModificationParameters
+    public class UpdateScheduledNotificationModificationParameters: IHasBaseNotificationPropertiesParameters, IHasReadonlyName, IHasReadonlyToDate
     {
-        public UpdateScheduledNotificationModificationParameters(string body, string subject, RelatedEntityType type, Guid ownerResourceUuid, RootRecipientModificationParameters ccs, RootRecipientModificationParameters receivers, string name, DateTime? toDate) : base(body, subject, type, ownerResourceUuid, ccs, receivers)
+        public UpdateScheduledNotificationModificationParameters(BaseNotificationPropertiesModificationParameters baseProperties, string name, DateTime? toDate)
         {
+            BaseProperties = baseProperties;
             Name = name;
             ToDate = toDate;
         }
 
+        public BaseNotificationPropertiesModificationParameters BaseProperties { get; }
         public string Name { get; }
         public DateTime? ToDate { get; }
 

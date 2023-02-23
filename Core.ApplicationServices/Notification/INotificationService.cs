@@ -13,13 +13,13 @@ namespace Core.ApplicationServices.Notification
     public interface INotificationService
     {
         Result<IQueryable<Advice>, OperationError> GetNotifications(Guid organizationUuid, params IDomainQuery<Advice>[] conditions);
-        Result<Advice, OperationError> GetNotificationByUuid(Guid uuid, RelatedEntityType relatedEntityType);
-        IEnumerable<AdviceSent> GetNotificationSentByUuid(Guid uuid, RelatedEntityType relatedEntityType);
+        Result<Advice, OperationError> GetNotificationByUuid(Guid uuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType);
+        Result<IEnumerable<AdviceSent>, OperationError> GetNotificationSentByUuid(Guid uuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType);
         Result<Advice, OperationError> CreateImmediateNotification(ImmediateNotificationModificationParameters parameters);
-        Result<Advice, OperationError> CreateScheduledNotification(ScheduledNotificationModificationParameters parameters);
+        Result<Advice, OperationError> CreateScheduledNotification(CreateScheduledNotificationModificationParameters parameters);
         Result<Advice, OperationError> UpdateScheduledNotification(Guid notificationUuid, UpdateScheduledNotificationModificationParameters parameters);
-        Result<Advice, OperationError> DeactivateNotification(Guid notificationUuid, RelatedEntityType relatedEntityType);
-        Maybe<OperationError> DeleteNotification(Guid notificationUuid, RelatedEntityType relatedEntityType);
-        Result<NotificationAccessRights, OperationError> GetAccessRights(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType);
+        Result<Advice, OperationError> DeactivateNotification(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType);
+        Maybe<OperationError> DeleteNotification(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType);
+        Result<NotificationPermissions, OperationError> GetPermissions(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType);
     }
 }

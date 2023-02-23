@@ -17,6 +17,8 @@ using Presentation.Web.Models.API.V1;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.Model.Notification;
 using System.Linq;
+using Core.Abstractions.Types;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -117,24 +119,52 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("api/AdviceUserRelation/{notificationId}/update-range")]
-        public HttpResponseMessage UpdateRange(int notificationId, [FromBody] IEnumerable<AdviceUserRelation> body)
+        [Route("api/AdviceUserRelation/{{notificationId}}/{relatedEntityType}/update-range")]
+        public HttpResponseMessage UpdateRange(int notificationId, RelatedEntityType relatedEntityType, [FromBody] IEnumerable<AdviceUserRelation> body)
         {
-            return _registrationNotificationUserRelationsService.UpdateNotificationUserRelations(notificationId, MapRecipients(body))
+            var recipients = body.ToList();
+            return MapRecipients(recipients, RecieverType.CC)
+                .Bind(ccs => MapRecipients(recipients, RecieverType.RECIEVER)
+                    .Select(receivers => (ccs, receivers)))
+                .Match(result => _registrationNotificationUserRelationsService.UpdateNotificationUserRelations(notificationId, result.ccs, result.receivers, relatedEntityType),
+                    error => error)
                 .Match(FromOperationError, Ok);
         }
-
-        private static IEnumerable<RecipientModel> MapRecipients(IEnumerable<AdviceUserRelation> recipients)
+        private static Result<RecipientModel, OperationError> MapRecipients(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType)
         {
-            return recipients.Select(x => new RecipientModel
+            var recipientList = recipients.ToList();
+            var recipient = new RecipientModel
             {
-                Email = x.Email,
-                DataProcessingRegistrationRoleId = x.DataProcessingRegistrationRoleId,
-                ItContractRoleId = x.ItContractRoleId,
-                ItSystemRoleId = x.ItSystemRoleId,
-                ReceiverType = x.RecieverType,
-                RecipientType = x.RecpientType
-            });
+                EmailRecipients = recipientList.Where(x => x.RecpientType == RecipientType.USER && x.RecieverType == receiverType).Select(x => new EmailRecipientModel { Email = x.Email })
+            };
+
+            var roleRecipientsResult = MapRoleModels(recipientList, receiverType);
+            if (roleRecipientsResult.Failed)
+                return roleRecipientsResult.Error;
+
+            recipient.RoleRecipients = roleRecipientsResult.Value;
+            return recipient;
+        }
+
+        private static Result<IEnumerable<RoleRecipientModel>, OperationError> MapRoleModels(IEnumerable<AdviceUserRelation> recipients,
+            RecieverType receiverType)
+        {
+            var result = new List<RoleRecipientModel>();
+            foreach (var adviceUserRelation in recipients.Where(x => x.RecpientType == RecipientType.ROLE && x.RecieverType == receiverType))
+            {
+                var idResult = ResolveRoleId(adviceUserRelation);
+                if (idResult.IsNone)
+                    return new OperationError("Role id cannot be null", OperationFailure.BadInput);
+
+                result.Add(new RoleRecipientModel { RoleId = idResult.Value });
+            }
+
+            return result;
+        }
+
+        private static Maybe<int> ResolveRoleId(AdviceUserRelation recipient)
+        {
+            return recipient.DataProcessingRegistrationRoleId ?? recipient.ItContractRoleId ?? recipient.ItSystemRoleId;
         }
     }
 }

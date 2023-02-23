@@ -62,7 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         private static void AssertScheduledRequest(ScheduledNotificationWriteRequestDTO request,
-            ScheduledNotificationModificationParameters parameters, OwnerResourceType ownerResourceType)
+            CreateScheduledNotificationModificationParameters parameters, OwnerResourceType ownerResourceType)
         {
             AssertImmediateRequest(request, parameters, ownerResourceType);
 

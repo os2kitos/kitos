@@ -2,7 +2,6 @@
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Notification;
 using Core.DomainModel.Advice;
-using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.Notification
 {
@@ -10,10 +9,11 @@ namespace Core.ApplicationServices.Notification
     {
         IQueryable<Advice> GetCurrentUserNotifications();
         Result<IQueryable<Advice>, OperationError> GetNotificationsByOrganizationId(int organizationId);
-        Maybe<Advice> GetNotificationById(int id);
+        Result<Advice, OperationError> GetNotificationById(int id);
         IQueryable<AdviceSent> GetSent();
-        Result<Advice, OperationError> Create(NotificationModel notification);
-        Result<Advice, OperationError> Update(int notificationId, BaseNotificationModel notification);
+        Result<Advice, OperationError> CreateImmediateNotification(ImmediateNotificationModel notificationModel);
+        Result<Advice, OperationError> CreateScheduledNotification(ScheduledNotificationModel notificationModel);
+        Result<Advice, OperationError> Update(int notificationId, UpdateScheduledNotificationModel notification);
         Maybe<OperationError> Delete(int notificationId);
         Result<Advice, OperationError> DeactivateNotification(int id);
     }

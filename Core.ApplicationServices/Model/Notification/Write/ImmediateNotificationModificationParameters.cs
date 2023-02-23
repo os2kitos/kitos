@@ -1,25 +1,12 @@
-﻿using System;
-using Core.DomainModel.Shared;
-
-namespace Core.ApplicationServices.Model.Notification.Write
+﻿namespace Core.ApplicationServices.Model.Notification.Write
 {
-    public class ImmediateNotificationModificationParameters
+    public class ImmediateNotificationModificationParameters : IHasBaseNotificationPropertiesParameters
     {
-        public ImmediateNotificationModificationParameters(string body, string subject, RelatedEntityType type, Guid ownerResourceUuid, RootRecipientModificationParameters ccs, RootRecipientModificationParameters receivers)
+        public ImmediateNotificationModificationParameters(BaseNotificationPropertiesModificationParameters baseProperties)
         {
-            Body = body;
-            Subject = subject;
-            Type = type;
-            OwnerResourceUuid = ownerResourceUuid;
-            Ccs = ccs;
-            Receivers = receivers;
+            BaseProperties = baseProperties;
         }
 
-        public string Body { get; }
-        public string Subject { get; }
-        public virtual RelatedEntityType Type{ get; }
-        public Guid OwnerResourceUuid { get; }
-        public RootRecipientModificationParameters Ccs { get; }
-        public RootRecipientModificationParameters Receivers { get; }
+        public BaseNotificationPropertiesModificationParameters BaseProperties { get; }
     }
 }

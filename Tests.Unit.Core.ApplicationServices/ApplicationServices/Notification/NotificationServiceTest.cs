@@ -88,10 +88,10 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Arrange
             var orgUuid = A<Guid>();
             var orgId = A<int>();
-            var fromDate = A<DateTime>();
-            var notification = new Advice() {AlarmDate = fromDate};
+            var relationId = A<int>();
+            var notification = new Advice() {RelationId = A<int>()};
             var notifications = new List<Advice> { notification, new()}.AsQueryable();
-            var condition = new QueryBySinceNotificationFromDate(fromDate);
+            var condition = new QueryByOwnerResourceId(relationId);
 
             ExpectResolveIdReturns<Organization>(orgUuid, orgId);
             ExpectGetNotificationsByOrganizationIdReturns(orgId, Result<IQueryable<Advice>, OperationError>.Success(notifications));
@@ -149,6 +149,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relatedUuid = A<Guid>();
             var id = A<int>();
             var notification = new Advice {Id = id, Type = relatedEntityType};
 
@@ -156,7 +157,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetNotificationByIdReturns(id, notification);
 
             //Act
-            var result = _sut.GetNotificationByUuid(uuid, relatedEntityType);
+            var result = _sut.GetNotificationByUuid(uuid, relatedUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
@@ -171,6 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relatedUuid = A<Guid>();
             var id = A<int>();
             var notification = new Advice {Id = id, Type = actualType };
 
@@ -178,7 +180,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetNotificationByIdReturns(id, notification);
 
             //Act
-            var result = _sut.GetNotificationByUuid(uuid, relatedEntityType);
+            var result = _sut.GetNotificationByUuid(uuid, relatedUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Failed);
@@ -186,21 +188,23 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         }
 
         [Fact]
-        public void GetNotificationByUuid_Returns_NotFound_When_Notification_Was_Not_Found()
+        public void GetNotificationByUuid_Returns_Error_When_GetNotification_Failed()
         {
             //Arrange
             var uuid = A<Guid>();
+            var relatedUuid = A<Guid>();
             var id = A<int>();
+            var error = A<OperationError>();
 
             ExpectResolveIdReturns<Advice>(uuid, id);
-            ExpectGetNotificationByIdReturns(id, Maybe<Advice>.None);
+            ExpectGetNotificationByIdReturns(id, error);
 
             //Act
-            var result = _sut.GetNotificationByUuid(uuid, A<RelatedEntityType>());
+            var result = _sut.GetNotificationByUuid(uuid, relatedUuid, A<RelatedEntityType>());
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
         }
 
         [Fact]
@@ -208,11 +212,12 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relatedUuid = A<Guid>();
 
             ExpectResolveIdReturns<Advice>(uuid, Maybe<int>.None);
 
             //Act
-            var result = _sut.GetNotificationByUuid(uuid, A<RelatedEntityType>());
+            var result = _sut.GetNotificationByUuid(uuid, relatedUuid, A<RelatedEntityType>());
 
             //Assert
             Assert.True(result.Failed);
@@ -227,16 +232,18 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relatedUuid = A<Guid>();
             var notification = new Advice { Uuid = uuid, Type = relatedEntityType };
             var notificationSentIQueryable = new List<AdviceSent> { new() { Advice = notification }, new() { Advice = new Advice() } }.AsQueryable();
 
             ExpectGetSentReturns(notificationSentIQueryable);
 
             //Act
-            var result = _sut.GetNotificationSentByUuid(uuid, relatedEntityType);
+            var result = _sut.GetNotificationSentByUuid(uuid, relatedUuid, relatedEntityType);
 
             //Assert
-            var notificationSent = Assert.Single(result);
+            Assert.True(result.Ok);
+            var notificationSent = Assert.Single(result.Value);
             Assert.Equal(notification.Uuid, notificationSent.Advice.Uuid);
             Assert.Equal(notification.Type, notificationSent.Advice.Type);
         }
@@ -249,10 +256,10 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var parameters = CreateNewParameters(relatedEntityType);
-            var notification = new Advice {Uuid = parameters.OwnerResourceUuid};
+            var notification = new Advice {Uuid = parameters.BaseProperties.OwnerResourceUuid};
 
             var transaction = ExpectDatabaseTransactionReturns();
-            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
             var roleIds = ExpectRoleRecipientIds(parameters);
             ExpectAllowModifyReturns(relatedEntity, true);
             ExpectCreateReturns(parameters, AdviceType.Immediate, roleIds, notification);
@@ -263,7 +270,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Assert
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Once);
-            VerifyDatabaseSave(parameters.Type);
+            VerifyDatabaseSave(parameters.BaseProperties.Type);
         }
 
         [Theory]
@@ -273,7 +280,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         public void CreateImmediateNotification_Returns_Forbidden_When_Not_Allowed_To_Modify(RelatedEntityType relatedEntityType)
         {
             var parameters = CreateNewParameters(relatedEntityType);
-            Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden(parameters.OwnerResourceUuid, relatedEntityType, _ => _sut.CreateImmediateNotification(parameters));
+            Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden(parameters.BaseProperties.OwnerResourceUuid, relatedEntityType, _ => _sut.CreateImmediateNotification(parameters));
         }
 
         [Theory]
@@ -294,10 +301,10 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var parameters = CreateNewScheduledParameters(relatedEntityType);
-            var notification = new Advice {Uuid = parameters.OwnerResourceUuid};
+            var notification = new Advice {Uuid = parameters.BaseProperties.OwnerResourceUuid};
 
             var transaction = ExpectDatabaseTransactionReturns();
-            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
             var roleIds = ExpectRoleRecipientIds(parameters);
             ExpectAllowModifyReturns(relatedEntity, true);
             ExpectCreateReturns(parameters, AdviceType.Repeat, roleIds, notification);
@@ -308,7 +315,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Assert
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Once);
-            VerifyDatabaseSave(parameters.Type);
+            VerifyDatabaseSave(parameters.BaseProperties.Type);
         }
 
         [Theory]
@@ -318,7 +325,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         public void CreateScheduledNotification_Returns_Forbidden_When_Not_Allowed_To_Modify(RelatedEntityType relatedEntityType)
         {
             var parameters = CreateNewScheduledParameters(relatedEntityType);
-            Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden(parameters.OwnerResourceUuid, relatedEntityType, _ => _sut.CreateScheduledNotification(parameters));
+            Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden(parameters.BaseProperties.OwnerResourceUuid, relatedEntityType, _ => _sut.CreateScheduledNotification(parameters));
         }
 
         [Theory]
@@ -341,14 +348,14 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var uuid = A<Guid>();
             var id = A<int>();
             var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
-            var notification = new Advice { Uuid = parameters.OwnerResourceUuid };
+            var notification = new Advice { Uuid = parameters.BaseProperties.OwnerResourceUuid };
 
             var transaction = ExpectDatabaseTransactionReturns();
-            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
             var resolvedRoleIds = ExpectRoleRecipientIds(parameters);
             ExpectResolveIdReturns<Advice>(uuid, id);
             ExpectAllowModifyReturns(relatedEntity, true);
-            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, Maybe<OperationError>.None);
+            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, parameters.BaseProperties.Type, Maybe<OperationError>.None);
             ExpectUpdateReturns(id, parameters, notification);
 
             //Act
@@ -357,7 +364,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Assert
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Once);
-            VerifyDatabaseSave(parameters.Type);
+            VerifyDatabaseSave(parameters.BaseProperties.Type);
         }
 
         [Theory]
@@ -371,7 +378,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
 
             ExpectDatabaseTransactionReturns();
-            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
             ExpectRoleRecipientIds(parameters);
             ExpectAllowModifyReturns(relatedEntity, true);
             ExpectResolveIdReturns<Advice>(uuid, Maybe<int>.None);
@@ -397,11 +404,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var error = A<OperationError>();
 
             ExpectDatabaseTransactionReturns();
-            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.OwnerResourceUuid, parameters.Type);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
             var resolvedRoleIds = ExpectRoleRecipientIds(parameters);
             ExpectResolveIdReturns<Advice>(uuid, id);
             ExpectAllowModifyReturns(relatedEntity, true);
-            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, error);
+            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, parameters.BaseProperties.Type, error);
 
             //Act
             var result = _sut.UpdateScheduledNotification(uuid, parameters);
@@ -417,8 +424,8 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         [InlineData(RelatedEntityType.itContract)]
         public void UpdateScheduledNotification_Returns_Forbidden_When_Not_Allowed_To_Modify(RelatedEntityType relatedEntityType)
         {
-            var parameters = CreateNewScheduledParameters(relatedEntityType);
-            Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden(parameters.OwnerResourceUuid, relatedEntityType, _ => _sut.UpdateScheduledNotification(A<Guid>(), parameters));
+            var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
+            Test_Command_Which_Updates_Notification_Returns_Failure_Forbidden(parameters.BaseProperties.OwnerResourceUuid, relatedEntityType, _ => _sut.UpdateScheduledNotification(A<Guid>(), parameters));
         }
 
         [Theory]
@@ -427,7 +434,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         [InlineData(RelatedEntityType.itContract)]
         public void UpdateScheduledNotification_Returns_Forbidden_When_RelatedEntity_Not_Found(RelatedEntityType relatedEntityType)
         {
-            var parameters = CreateNewScheduledParameters(relatedEntityType);
+            var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
             Test_Command_Which_Updates_Notification_Returns_Failure_NotFound(relatedEntityType, _ => _sut.UpdateScheduledNotification(A<Guid>(), parameters));
         }
 
@@ -439,6 +446,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relationUuid = A<Guid>();
             var id = A<int>();
             var notification = new Advice{Id = id, Type = relatedEntityType};
 
@@ -448,7 +456,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectDeactivateReturns(id, notification);
 
             //Act
-            var result = _sut.DeactivateNotification(uuid, relatedEntityType);
+            var result = _sut.DeactivateNotification(uuid, relationUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
@@ -462,6 +470,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relationUuid = A<Guid>();
             var id = A<int>();
             var notification = new Advice{Id = id, Type = relatedEntityType};
             var error = A<OperationError>();
@@ -472,7 +481,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectDeactivateReturns(id, error);
 
             //Act
-            var result = _sut.DeactivateNotification(uuid, relatedEntityType);
+            var result = _sut.DeactivateNotification(uuid, relationUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Failed);
@@ -487,6 +496,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relationUuid = A<Guid>();
             var id = A<int>();
             var notification = new Advice{Id = id, Type = relatedEntityType};
 
@@ -495,7 +505,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowModifyReturns(notification, false);
 
             //Act
-            var result = _sut.DeactivateNotification(uuid, relatedEntityType);
+            var result = _sut.DeactivateNotification(uuid, relationUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Failed);
@@ -510,6 +520,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relationUuid = A<Guid>();
             var id = A<int>();
             var notification = new Advice{Id = id, Type = relatedEntityType};
 
@@ -519,7 +530,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectDeleteReturns(id, Maybe<OperationError>.None);
 
             //Act
-            var error = _sut.DeleteNotification(uuid, relatedEntityType);
+            var error = _sut.DeleteNotification(uuid, relationUuid, relatedEntityType);
 
             //Assert
             Assert.True(error.IsNone);
@@ -533,7 +544,8 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
-            var id = A<int>();
+            var relationUuid = A<Guid>();
+            var id = A<int>(); 
             var notification = new Advice{Id = id, Type = relatedEntityType};
             var expectedError = A<OperationError>();
 
@@ -543,7 +555,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectDeleteReturns(id, expectedError);
 
             //Act
-            var error = _sut.DeleteNotification(uuid, relatedEntityType);
+            var error = _sut.DeleteNotification(uuid, relationUuid, relatedEntityType);
 
             //Assert
             Assert.True(error.HasValue);
@@ -558,6 +570,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var uuid = A<Guid>();
+            var relationUuid = A<Guid>();
             var id = A<int>();
             var notification = new Advice{Id = id, Type = relatedEntityType};
 
@@ -566,7 +579,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteReturns(notification, false);
 
             //Act
-            var error = _sut.DeleteNotification(uuid, relatedEntityType);
+            var error = _sut.DeleteNotification(uuid, relationUuid, relatedEntityType);
 
             //Assert
             Assert.True(error.HasValue);
@@ -592,14 +605,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteReturns(relatedEntity, true);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
             var accessRights = result.Value;
-            Assert.True(accessRights.CanBeModified);
-            Assert.True(accessRights.CanBeDeactivated);
-            Assert.False(accessRights.CanBeDeleted);
+            Assert.True(accessRights.Read);
+            Assert.True(accessRights.Modify);
+            Assert.True(accessRights.Deactivate);
+            Assert.False(accessRights.Delete);
         }
 
         [Theory]
@@ -621,14 +635,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteReturns(relatedEntity, true);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
             var accessRights = result.Value;
-            Assert.False(accessRights.CanBeModified);
-            Assert.False(accessRights.CanBeDeactivated);
-            Assert.True(accessRights.CanBeDeleted);
+            Assert.True(accessRights.Read);
+            Assert.False(accessRights.Modify);
+            Assert.False(accessRights.Deactivate);
+            Assert.True(accessRights.Delete);
         }
 
         [Theory]
@@ -650,14 +665,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteReturns(relatedEntity, false);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
             var accessRights = result.Value;
-            Assert.False(accessRights.CanBeModified);
-            Assert.False(accessRights.CanBeDeactivated);
-            Assert.False(accessRights.CanBeDeleted);
+            Assert.True(accessRights.Read);
+            Assert.False(accessRights.Modify);
+            Assert.False(accessRights.Deactivate);
+            Assert.False(accessRights.Delete);
         }
 
         [Theory]
@@ -680,14 +696,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteReturns(relatedEntity, true);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
             var accessRights = result.Value;
-            Assert.True(accessRights.CanBeModified);
-            Assert.False(accessRights.CanBeDeactivated);
-            Assert.False(accessRights.CanBeDeleted);
+            Assert.True(accessRights.Read);
+            Assert.True(accessRights.Modify);
+            Assert.False(accessRights.Deactivate);
+            Assert.False(accessRights.Delete);
         }
 
         [Theory]
@@ -709,14 +726,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteReturns(relatedEntity, true);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
             var accessRights = result.Value;
-            Assert.False(accessRights.CanBeModified);
-            Assert.False(accessRights.CanBeDeactivated);
-            Assert.False(accessRights.CanBeDeleted);
+            Assert.True(accessRights.Read);
+            Assert.False(accessRights.Modify);
+            Assert.False(accessRights.Deactivate);
+            Assert.False(accessRights.Delete);
         }
 
         [Theory]
@@ -737,14 +755,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowModifyReturns(relatedEntity, false);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
             var accessRights = result.Value;
-            Assert.False(accessRights.CanBeModified);
-            Assert.False(accessRights.CanBeDeactivated);
-            Assert.False(accessRights.CanBeDeleted);
+            Assert.True(accessRights.Read);
+            Assert.False(accessRights.Modify);
+            Assert.False(accessRights.Deactivate);
+            Assert.False(accessRights.Delete);
         }
 
         [Theory]
@@ -764,7 +783,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetRelatedEntityReturnsNone(relatedEntityType);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Failed);
@@ -775,22 +794,23 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         [InlineData(RelatedEntityType.itSystemUsage)]
         [InlineData(RelatedEntityType.dataProcessingRegistration)]
         [InlineData(RelatedEntityType.itContract)]
-        public void GetAccessRights_Returns_NotFound_When_Notification_Is_Not_Found(RelatedEntityType relatedEntityType)
+        public void GetAccessRights_Returns_Error_When_GetNotification_Fails(RelatedEntityType relatedEntityType)
         {
             //Arrange
             var notificationUuid = A<Guid>();
             var notificationId = A<int>();
             var relatedEntityUuid = A<Guid>();
+            var error = A<OperationError>();
 
             ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
-            ExpectGetNotificationByIdReturns(notificationId, Maybe<Advice>.None);
+            ExpectGetNotificationByIdReturns(notificationId, error);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
         }
 
         [Theory]
@@ -806,7 +826,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectResolveIdReturns<Advice>(notificationUuid, Maybe<int>.None);
 
             //Act
-            var result = _sut.GetAccessRights(notificationUuid, relatedEntityUuid, relatedEntityType);
+            var result = _sut.GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType);
 
             //Assert
             Assert.True(result.Failed);
@@ -858,41 +878,47 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         
         private ImmediateNotificationModificationParameters CreateNewParameters(RelatedEntityType relatedEntityType)
         {
-            return new ImmediateNotificationModificationParameters(A<string>(), A<string>(), relatedEntityType, A<Guid>(), A<RootRecipientModificationParameters>(), A<RootRecipientModificationParameters>());
+            return new ImmediateNotificationModificationParameters(new BaseNotificationPropertiesModificationParameters(A<string>(), A<string>(), relatedEntityType, A<Guid>(), A<RootRecipientModificationParameters>(), A<RootRecipientModificationParameters>()));
         }
 
         private UpdateScheduledNotificationModificationParameters CreateNewUpdateScheduledParameters(RelatedEntityType relatedEntityType)
         {
-            return new UpdateScheduledNotificationModificationParameters(A<string>(),
-                A<string>(),
-                relatedEntityType,
-                A<Guid>(),
-                A<RootRecipientModificationParameters>(),
-                A<RootRecipientModificationParameters>(),
+            return new UpdateScheduledNotificationModificationParameters(new BaseNotificationPropertiesModificationParameters(
+                    A<string>(),
+                    A<string>(),
+                    relatedEntityType,
+                    A<Guid>(),
+                    A<RootRecipientModificationParameters>(),
+                    A<RootRecipientModificationParameters>()
+                ),
                 A<string>(),
                 A<DateTime>());
         }
 
-        private ScheduledNotificationModificationParameters CreateNewScheduledParameters(RelatedEntityType relatedEntityType)
+        private CreateScheduledNotificationModificationParameters CreateNewScheduledParameters(RelatedEntityType relatedEntityType)
         {
-            return new ScheduledNotificationModificationParameters(A<string>(),
-                A<string>(),
-                relatedEntityType,
-                A<Guid>(),
-                A<RootRecipientModificationParameters>(),
-                A<RootRecipientModificationParameters>(),
+            return new CreateScheduledNotificationModificationParameters(
+                new BaseNotificationPropertiesModificationParameters
+                (
+                    A<string>(),
+                    A<string>(),
+                    relatedEntityType,
+                    A<Guid>(),
+                    A<RootRecipientModificationParameters>(),
+                    A<RootRecipientModificationParameters>()
+                ),
                 A<string>(),
                 A<DateTime>(),
                 A<Scheduling>(),
                 A<DateTime>());
         }
 
-        private IReadOnlyList<int> ExpectRoleRecipientIds(ImmediateNotificationModificationParameters parameters)
+        private IReadOnlyList<int> ExpectRoleRecipientIds<T>(T parameters) where T : class, IHasBaseNotificationPropertiesParameters
         {
             var roleIds = new List<int>();
 
-            roleIds.AddRange(ExpectRoleRecipientIdsForType(parameters.Ccs.RoleRecipients, parameters.Type));
-            roleIds.AddRange(ExpectRoleRecipientIdsForType(parameters.Receivers.RoleRecipients, parameters.Type));
+            roleIds.AddRange(ExpectRoleRecipientIdsForType(parameters.BaseProperties.Ccs.RoleRecipients, parameters.BaseProperties.Type));
+            roleIds.AddRange(ExpectRoleRecipientIdsForType(parameters.BaseProperties.Receivers.RoleRecipients, parameters.BaseProperties.Type));
 
             return roleIds;
         }
@@ -920,7 +946,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _registrationNotificationService.Setup(x => x.GetNotificationsByOrganizationId(orgId)).Returns(result);
         }
 
-        private void ExpectGetNotificationByIdReturns(int notificationId, Maybe<Advice> result)
+        private void ExpectGetNotificationByIdReturns(int notificationId, Result<Advice, OperationError> result)
         {
             _registrationNotificationService.Setup(x => x.GetNotificationById(notificationId)).Returns(result);
         }
@@ -932,79 +958,82 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
         private void ExpectCreateReturns(ImmediateNotificationModificationParameters parameters, AdviceType adviceType, IReadOnlyList<int> roleIds, Result<Advice, OperationError> result)
         {
-            _registrationNotificationService.Setup(x => x.Create(It.Is<NotificationModel>(notificationModel => 
-                notificationModel.Subject == parameters.Subject && 
-                notificationModel.Body == parameters.Body && 
-                notificationModel.AdviceType == adviceType && 
-                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Recipients)))).Returns(result);
+            _registrationNotificationService.Setup(x => x.CreateImmediateNotification(It.Is<ImmediateNotificationModel>(notificationModel => 
+                notificationModel.BaseProperties.Subject == parameters.BaseProperties.Subject && 
+                notificationModel.BaseProperties.Body == parameters.BaseProperties.Body && 
+                notificationModel.BaseProperties.AdviceType == adviceType &&
+                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Ccs) &&
+                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Receivers)))).Returns(result);
         }
 
-        private void ExpectCreateReturns(ScheduledNotificationModificationParameters parameters, AdviceType adviceType, IReadOnlyList<int> roleIds, Result<Advice, OperationError> result)
+        private void ExpectCreateReturns(CreateScheduledNotificationModificationParameters parameters, AdviceType adviceType, IReadOnlyList<int> roleIds, Result<Advice, OperationError> result)
         {
-            _registrationNotificationService.Setup(x => x.Create(It.Is<NotificationModel>(notificationModel => 
-                notificationModel.Subject == parameters.Subject && 
-                notificationModel.Body == parameters.Body && 
-                notificationModel.AdviceType == adviceType &&
+            _registrationNotificationService.Setup(x => x.CreateScheduledNotification(It.Is<ScheduledNotificationModel>(notificationModel => 
+                notificationModel.BaseProperties.Subject == parameters.BaseProperties.Subject && 
+                notificationModel.BaseProperties.Body == parameters.BaseProperties.Body && 
+                notificationModel.BaseProperties.AdviceType == adviceType &&
                 notificationModel.FromDate == parameters.FromDate &&
                 notificationModel.ToDate == parameters.ToDate &&
                 notificationModel.RepetitionFrequency == parameters.RepetitionFrequency && 
                 notificationModel.Name == parameters.Name &&
-                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Recipients)))).Returns(result);
+                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Ccs) &&
+                CheckRecipientIsMappedCorrectly(parameters, roleIds, notificationModel.Receivers)
+                ))).Returns(result);
         }
 
         private void ExpectUpdateReturns(int id, UpdateScheduledNotificationModificationParameters parameters, Result<Advice, OperationError> result)
         {
             _registrationNotificationService.Setup(x => x.Update(id, 
-                It.Is<NotificationModel>(notificationModel => 
-                notificationModel.Subject == parameters.Subject && 
-                notificationModel.Body == parameters.Body && 
-                notificationModel.AdviceType == AdviceType.Repeat &&
+                It.Is<UpdateScheduledNotificationModel>(notificationModel => 
+                notificationModel.BaseProperties.Subject == parameters.BaseProperties.Subject && 
+                notificationModel.BaseProperties.Body == parameters.BaseProperties.Body && 
+                notificationModel.BaseProperties.AdviceType == AdviceType.Repeat &&
                 notificationModel.ToDate == parameters.ToDate &&
                 notificationModel.Name == parameters.Name))).Returns(result);
         }
 
-        private void ExpectUpdateNotificationUserRelations(int notificationId, UpdateScheduledNotificationModificationParameters parameters, IReadOnlyList<int> roleIds,
-            Maybe<OperationError> result)
+        private void ExpectUpdateNotificationUserRelations(int notificationId, UpdateScheduledNotificationModificationParameters parameters, IReadOnlyList<int> roleIds, RelatedEntityType relatedEntityType, Maybe<OperationError> result)
         {
-            _notificationUserRelationsService.Setup(x => x.UpdateNotificationUserRelations(notificationId,
-                    It.Is<IEnumerable<RecipientModel>>(recipientModels => CheckRecipientIsMappedCorrectly(parameters, roleIds, recipientModels))))
+            _notificationUserRelationsService.Setup(x => x.UpdateNotificationUserRelations
+                (
+                    notificationId,
+                    It.Is<RecipientModel>(ccs => CheckRecipientIsMappedCorrectly(parameters, roleIds, ccs)),
+                    It.Is<RecipientModel>(ccs => CheckRecipientIsMappedCorrectly(parameters, roleIds, ccs)),
+                    relatedEntityType
+                )
+            )
                 .Returns(result);
         }
 
-        private bool CheckRecipientIsMappedCorrectly(ImmediateNotificationModificationParameters parameters,
+        private static bool CheckRecipientIsMappedCorrectly<T>(T parameters,
             IReadOnlyList<int> roleIds,
-            IEnumerable<RecipientModel> models)
+            RecipientModel model) where T : class, IHasBaseNotificationPropertiesParameters
         {
-            foreach (var recipientModel in models)
+
+            foreach (var recipientModel in model.EmailRecipients)
             {
-                if (parameters.Ccs.EmailRecipients.Select(x => x.Email).Contains(recipientModel.Email))
+                if (parameters.BaseProperties.Ccs.EmailRecipients.Select(x => x.Email).Contains(recipientModel.Email))
                 {
                     continue;
                 }
 
-                if (parameters.Receivers.EmailRecipients.Select(x => x.Email).Contains(recipientModel.Email))
+                if (parameters.BaseProperties.Receivers.EmailRecipients.Select(x => x.Email).Contains(recipientModel.Email))
                 {
                     continue;
                 }
 
-                var relationIdResult = GetRelationIdFromRecipientModel(recipientModel);
-                if (relationIdResult.IsNone)
-                    return false;
-                var relationId = relationIdResult.Value;
+                return false;
+            }
 
-                if (roleIds.Contains(relationId) == false)
+            foreach (var recipientModel in model.RoleRecipients)
+            {
+                if (roleIds.Contains(recipientModel.RoleId) == false)
                 {
                     return false;
                 }
             }
 
             return true;
-        }
-
-        private Maybe<int> GetRelationIdFromRecipientModel(RecipientModel recipientModel)
-        {
-            return recipientModel.DataProcessingRegistrationRoleId ??
-                   recipientModel.ItContractRoleId ?? recipientModel.ItSystemRoleId;
         }
 
         private void ExpectDeactivateReturns(int id, Result<Advice, OperationError> result)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
@@ -9,10 +10,12 @@ using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Notification
@@ -24,15 +27,18 @@ namespace Core.ApplicationServices.Notification
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IDomainEvents _domainEventHandler;
+        private readonly IOperationClock _operationClock;
         private readonly IAdviceRootResolution _adviceRootResolution;
 
+        private readonly Regex _emailValidationRegex = new("([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public RegistrationNotificationService(IAdviceService adviceService,
             IAuthorizationContext authorizationContext, 
             ITransactionManager transactionManager,
             IGenericRepository<Advice> adviceRepository,
             IDomainEvents domainEventHandler, 
-            IAdviceRootResolution adviceRootResolution)
+            IAdviceRootResolution adviceRootResolution, 
+            IOperationClock operationClock)
         {
             _adviceService = adviceService;
             _authorizationContext = authorizationContext;
@@ -40,6 +46,7 @@ namespace Core.ApplicationServices.Notification
             _adviceRepository = adviceRepository;
             _domainEventHandler = domainEventHandler;
             _adviceRootResolution = adviceRootResolution;
+            _operationClock = operationClock;
         }
 
         public IQueryable<Advice> GetCurrentUserNotifications()
@@ -54,9 +61,11 @@ namespace Core.ApplicationServices.Notification
                 : Result<IQueryable<Advice>, OperationError>.Success(_adviceService.GetAdvicesForOrg(organizationId));
         }
 
-        public Maybe<Advice> GetNotificationById(int id)
+        public Result<Advice, OperationError> GetNotificationById(int id)
         {
-            return _adviceService.GetAdviceById(id);
+            return _adviceService.GetAdviceById(id)
+                .Match(AuthorizeReadAccessAndReturnNotification,
+                    () => new OperationError($"Notification with id: {id} was not found", OperationFailure.NotFound));
         }
 
         public IQueryable<AdviceSent> GetSent()
@@ -66,56 +75,54 @@ namespace Core.ApplicationServices.Notification
                 .SelectMany(x => x.AdviceSent);
         }
 
-        public Result<Advice, OperationError> Create(NotificationModel notificationModel)
+        public Result<Advice, OperationError> CreateImmediateNotification(ImmediateNotificationModel notificationModel)
         {
-            var newNotification = MapCreateModelToEntity(notificationModel);
-
-            if (!_authorizationContext.AllowModify(ResolveRoot(newNotification)))
-            {
-                return new OperationError($"User is not allowed to create notification for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
-            }
-
-            //Prepare new advice
-            newNotification.IsActive = true;
-            if (newNotification.AdviceType == AdviceType.Immediate)
-            {
-                newNotification.Scheduling = Scheduling.Immediate;
-                newNotification.StopDate = null;
-                newNotification.AlarmDate = null;
-            }
-
-            using var transaction = _transactionManager.Begin();
-
-            _adviceRepository.Insert(newNotification);
-            _domainEventHandler.Raise(new EntityCreatedEvent<Advice>(newNotification));
-            _adviceRepository.Save();
-
-            var name = Advice.CreateJobId(newNotification.Id);
-
-            newNotification.JobId = name;
-            newNotification.IsActive = true;
-            
-            //Sends a notification and updates the job id
-            _adviceService.CreateAdvice(newNotification);
-
-            transaction.Commit();
-            return newNotification;
+            var newNotification = MapCreateImmediateModelToEntity(notificationModel);
+            return Create(newNotification);
         }
 
-        public Result<Advice, OperationError> Update(int notificationId, BaseNotificationModel notificationModel)
+        public Result<Advice, OperationError> CreateScheduledNotification(ScheduledNotificationModel notificationModel)
+        {
+            var newNotification = MapCreateSchedulingModelToEntity(notificationModel);
+
+            if (newNotification.AlarmDate == null)
+            {
+                return new OperationError("Start date is not set!", OperationFailure.BadInput);
+
+            }
+            if (newNotification.Scheduling is null or Scheduling.Immediate)
+            {
+                return new OperationError($"Scheduling must be defined and cannot be {nameof(Scheduling.Immediate)} when creating advice of type {nameof(AdviceType.Repeat)}", OperationFailure.BadInput);
+            }
+            if (newNotification.AlarmDate.Value.Date < _operationClock.Now.Date)
+            {
+                return new OperationError("Start date is set before today", OperationFailure.BadInput);
+            }
+            
+            if (newNotification.StopDate != null && newNotification.StopDate.Value.Date < newNotification.AlarmDate.Value.Date)
+            {
+                return new OperationError("Stop date is set before Start date", OperationFailure.BadInput);
+            }
+            
+            return Create(newNotification);
+        }
+
+        public Result<Advice, OperationError> Update(int notificationId, UpdateScheduledNotificationModel notificationModel)
         {
             using var transaction = _transactionManager.Begin();
 
             var entityResult = GetNotificationById(notificationId);
-            if (entityResult.IsNone)
-                return new OperationError($"Notification with Id: {notificationId} was not found", OperationFailure.NotFound);
+            if (entityResult.Failed)
+                return entityResult.Error;
             var entity = entityResult.Value;
-            if (!_authorizationContext.AllowModify(entity))
-            {
+            if (!entity.IsActive)
+                return new OperationError("Cannot update inactive advice", OperationFailure.BadInput);
+            if (entity.AdviceType == AdviceType.Immediate)
+                return new OperationError("Immediate notification cannot be updated!", OperationFailure.BadInput);
+            if (!_authorizationContext.AllowModify(ResolveRoot(entity)))
                 return new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden);
-            }
 
-            MapBasePropertiesToNotification(notificationModel, entity);
+            MapUpdateSchedulingModelToEntity(notificationModel, entity);
             
             _adviceRepository.Update(entity);
             RaiseAsRootModification(entity);
@@ -139,7 +146,7 @@ namespace Core.ApplicationServices.Notification
 
             var entity = entityResult.Value;
 
-            if (!_authorizationContext.AllowDelete(entity))
+            if (!_authorizationContext.AllowModify(ResolveRoot(entity)))
             {
                 return new OperationError($"User is not allowed to delete notification with id: {notificationId}", OperationFailure.Forbidden);
             }
@@ -167,7 +174,7 @@ namespace Core.ApplicationServices.Notification
             }
             var entity = entityResult.Value;
 
-            if (!_authorizationContext.AllowModify(entity))
+            if (!_authorizationContext.AllowModify(ResolveRoot(entity)))
             {
                 return new OperationError($"User is not allowed to deactivate notification with id: {adviceId}", OperationFailure.Forbidden);
             }
@@ -178,26 +185,90 @@ namespace Core.ApplicationServices.Notification
             return entity;
         }
 
-        private static Advice MapCreateSchedulingModelToEntity(ScheduledNotificationModel model)
+        private Result<Advice, OperationError> Create(Advice newNotification)
         {
-            notification.Name = model.Name;
-            notification.StopDate = model.ToDate;
-            return new Advice();
+            if (!_authorizationContext.AllowModify(ResolveRoot(newNotification)))
+            {
+                return new OperationError($"User is not allowed to create notification for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
+            }
+
+            if (newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
+            {
+                return new OperationError("Invalid email exists among receivers or CCs", OperationFailure.BadInput);
+            }
+
+            using var transaction = _transactionManager.Begin();
+
+            newNotification.IsActive = true;
+
+            _adviceRepository.Insert(newNotification);
+            _domainEventHandler.Raise(new EntityCreatedEvent<Advice>(newNotification));
+            _adviceRepository.Save();
+
+            var name = Advice.CreateJobId(newNotification.Id);
+
+            newNotification.JobId = name;
+
+            //Sends a notification and updates the job id
+            _adviceService.CreateAdvice(newNotification);
+
+            transaction.Commit();
+
+            return newNotification;
         }
 
-        private static Advice MapCreateModelToEntity<T>(T model) where T : class, IHasBasePropertiesModel, IHasRecipientModels
+        private Result<Advice, OperationError> AuthorizeReadAccessAndReturnNotification(Advice notification)
+        {
+            return _authorizationContext.AllowReads(ResolveRoot(notification))
+                ? notification
+                : new OperationError("User is not allowed to read the notification", OperationFailure.Forbidden);
+        }
+
+        private static void MapUpdateSchedulingModelToEntity(UpdateScheduledNotificationModel model, Advice notification)
+        {
+            MapBasePropertiesWithNameAndStopDate(model, notification);
+        }
+
+        private static Advice MapCreateSchedulingModelToEntity(ScheduledNotificationModel model)
         {
             var notification = new Advice();
-            MapBasePropertiesToNotification(model, notification);
-            notification.Scheduling = model.RepetitionFrequency;
+            MapBasePropertiesWithNameAndStopDate(model, notification);
+            MapRecipients(model, notification);
             notification.AlarmDate = model.FromDate;
-            var recipients = 
-            notification.Reciepients = model.Recipients.Select(MapToAdviceUserRelation).ToList();
+            notification.Scheduling = model.RepetitionFrequency;
 
             return notification;
         }
 
-        private static void MapBasePropertiesToNotification<T>(T model, Advice notification) where T: class, IHasBasePropertiesModel, IHasRecipientModels
+        private static Advice MapCreateImmediateModelToEntity(ImmediateNotificationModel model)
+        {
+            var notification = new Advice();
+            MapBasePropertiesToNotification(model, notification);
+            MapRecipients(model, notification);
+
+            notification.Scheduling = Scheduling.Immediate;
+            notification.StopDate = null;
+            notification.AlarmDate = null;
+
+            return notification;
+        }
+
+        private static void MapRecipients<T>(T model, Advice notification) where T : class, IHasBaseNotificationPropertiesModel, IHasRecipientModels
+        {
+            var recipients = MapRecipientModelToRelation(model.Ccs, RecieverType.CC, model.BaseProperties.Type).ToList();
+            var joinedRecipients = recipients.Concat(MapRecipientModelToRelation(model.Receivers, RecieverType.RECIEVER, model.BaseProperties.Type)).ToList();
+            notification.Reciepients = joinedRecipients;
+        }
+
+        private static void MapBasePropertiesWithNameAndStopDate<T>(T model, Advice notification)
+            where T : class, IHasName, IHasToDate, IHasBaseNotificationPropertiesModel
+        {
+            MapBasePropertiesToNotification(model, notification);
+            notification.Name = model.Name;
+            notification.StopDate = model.ToDate;
+        }
+
+        private static void MapBasePropertiesToNotification<T>(T model, Advice notification) where T: class, IHasBaseNotificationPropertiesModel
         {
             notification.Subject = model.BaseProperties.Subject;
             notification.Body = model.BaseProperties.Body;
@@ -206,7 +277,7 @@ namespace Core.ApplicationServices.Notification
             notification.AdviceType = model.BaseProperties.AdviceType;
         }
 
-        private static IEnumerable<AdviceUserRelation> MapToAdviceUserRelation(RecipientModel model, RecieverType receiverType, RelatedEntityType relatedEntityType)
+        private static IEnumerable<AdviceUserRelation> MapRecipientModelToRelation(RecipientModel model, RecieverType receiverType, RelatedEntityType relatedEntityType)
         {
             var recipients = new List<AdviceUserRelation>();
             

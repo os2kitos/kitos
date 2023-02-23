@@ -6,6 +6,7 @@ using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Notification;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -42,9 +43,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var notificationId = A<int>();
-            var models = A<IReadOnlyList<RecipientModel>>();
+            var ccs = A<RecipientModel>();
+            var receivers = A<RecipientModel>();
             var notification = new Advice();
             var userRelations = new List<AdviceUserRelation>{ new() {AdviceId = notificationId}, new() { AdviceId = notificationId } };
+            var relatedEntityType = A<RelatedEntityType>();
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetNotificationByIdReturns(notificationId, notification);
@@ -53,12 +56,12 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteUserRelationsReturns(userRelations, true);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, models);
+            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
             Assert.False(error.HasValue);
             _adviceUserRelationRepository.Verify(x => x.AddRange(It.Is<IEnumerable<AdviceUserRelation>>(entities =>
-                    VerifyUserRelationsAreCorrect(models, entities))), Times.Once);
+                    VerifyUserRelationsAreCorrect(ccs, receivers, entities))), Times.Once);
             _adviceUserRelationRepository.Verify(x => x.Save(), Times.Exactly(userRelations.Count + 1));
             transaction.Verify(x => x.Commit(), Times.Once);
         }
@@ -68,9 +71,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var notificationId = A<int>();
-            var models = A<IReadOnlyList<RecipientModel>>();
+            var ccs = A<RecipientModel>();
+            var receivers = A<RecipientModel>();
             var notification = new Advice();
             var userRelations = new List<AdviceUserRelation>{ new() {AdviceId = notificationId}, new() { AdviceId = notificationId } };
+            var relatedEntityType = A<RelatedEntityType>();
 
             ExpectDatabaseTransaction();
             ExpectGetNotificationByIdReturns(notificationId, notification);
@@ -79,7 +84,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteUserRelationsReturns(userRelations, false);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, models);
+            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
             Assert.True(error.HasValue);
@@ -91,15 +96,17 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var notificationId = A<int>();
-            var models = A<IReadOnlyList<RecipientModel>>();
+            var ccs = A<RecipientModel>();
+            var receivers = A<RecipientModel>();
             var notification = new Advice();
+            var relatedEntityType = A<RelatedEntityType>();
 
             ExpectDatabaseTransaction();
             ExpectGetNotificationByIdReturns(notificationId, notification);
             ExpectAllowModifyReturns(notification, false);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, models);
+            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
             Assert.True(error.HasValue);
@@ -107,35 +114,45 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         }
 
         [Fact]
-        public void UpdateNotificationUserRelations_Returns_NotFound_When_Notification_NotFound()
+        public void UpdateNotificationUserRelations_Returns_Error_When_GetNotification_Fails()
         {
             //Arrange
             var notificationId = A<int>();
-            var models = A<IReadOnlyList<RecipientModel>>();
+            var ccs = A<RecipientModel>();
+            var receivers = A<RecipientModel>();
+            var relatedEntityType = A<RelatedEntityType>();
+            var expectedError = A<OperationError>();
 
             ExpectDatabaseTransaction();
-            ExpectGetNotificationByIdReturns(notificationId, Maybe<Advice>.None);
+            ExpectGetNotificationByIdReturns(notificationId, expectedError);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, models);
+            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
             Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
+            Assert.Equal(expectedError.FailureType, error.Value.FailureType);
         }
 
-        private static bool VerifyUserRelationsAreCorrect(IEnumerable<RecipientModel> models, IEnumerable<AdviceUserRelation> relations)
+        private static bool VerifyUserRelationsAreCorrect(RecipientModel ccs, RecipientModel receivers, IEnumerable<AdviceUserRelation> relations)
         {
             var relationsList = relations.ToList();
-            foreach (var model in models)
+
+            var emailResult = VerifyEmailsAreCorrect(ccs.EmailRecipients, relationsList) &&
+                              VerifyEmailsAreCorrect(receivers.EmailRecipients, relationsList);
+            var roleResult = VerifyRolesAreCorrect(ccs.RoleRecipients, relationsList) &&
+                              VerifyRolesAreCorrect(receivers.RoleRecipients, relationsList);
+
+            return emailResult && roleResult;
+        }
+
+        private static bool VerifyEmailsAreCorrect(IEnumerable<EmailRecipientModel> recipients,
+            IEnumerable<AdviceUserRelation> relations)
+        {
+            var relationsList = relations.ToList();
+            foreach (var model in recipients)
             {
-                if(relationsList.Any(x => x.Email == model.Email))
-                    continue;
-                if(relationsList.Any(x => x.DataProcessingRegistrationRoleId == model.DataProcessingRegistrationRoleId))
-                    continue;
-                if(relationsList.Any(x => x.ItContractRoleId == model.ItContractRoleId))
-                    continue;
-                if(relationsList.Any(x => x.ItSystemRoleId == model.ItSystemRoleId))
+                if (relationsList.Any(x => x.Email == model.Email))
                     continue;
 
                 return false;
@@ -144,6 +161,24 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             return true;
         }
 
+        private static bool VerifyRolesAreCorrect(IEnumerable<RoleRecipientModel> recipients,
+            IEnumerable<AdviceUserRelation> relations)
+        {
+            var relationsList = relations.ToList();
+            foreach (var model in recipients)
+            {
+                if (relationsList.Any(x => x.DataProcessingRegistrationRoleId == model.RoleId))
+                    continue;
+                if (relationsList.Any(x => x.ItContractRoleId == model.RoleId))
+                    continue;
+                if (relationsList.Any(x => x.ItSystemRoleId == model.RoleId))
+                    continue;
+
+                return false;
+            }
+
+            return true;
+        }
         private void ExpectAllowDeleteUserRelationsReturns(IEnumerable<AdviceUserRelation> list, bool result)
         {
             foreach (var adviceUserRelation in list)
@@ -167,7 +202,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _authorizationContext.Setup(x => x.AllowModify(entity)).Returns(result);
         }
 
-        private void ExpectGetNotificationByIdReturns(int id, Maybe<Advice> result)
+        private void ExpectGetNotificationByIdReturns(int id, Result<Advice, OperationError> result)
         {
             _registrationNotificationService.Setup(x => x.GetNotificationById(id)).Returns(result);
         }

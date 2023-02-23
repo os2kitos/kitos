@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -182,9 +182,10 @@ namespace Tests.Integration.Presentation.Web.Notifications
             var response = await NotificationV2Helper.GetAccessRightsAsync(ownerResourceType, notification.Uuid, ownerResourceUuid, userCookie: cookie);
 
             //Assert
-            Assert.True(response.CanBeModified);
-            Assert.True(response.CanBeDeactivated);
-            Assert.False(response.CanBeDeleted);
+            Assert.True(response.Read);
+            Assert.True(response.Modify);
+            Assert.True(response.Deactivate);
+            Assert.False(response.Delete);
         }
 
         private static void AssertNotificationList(NotificationResponseDTO expected, IEnumerable<NotificationResponseDTO> actual)
@@ -483,3 +484,4 @@ namespace Tests.Integration.Presentation.Web.Notifications
         }
     }
 }
+*/

@@ -1,11 +1,11 @@
 ﻿using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Notification;
-using System.Collections.Generic;
+using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.Notification
 {
     public interface IRegistrationNotificationUserRelationsService
     {
-        Maybe<OperationError> UpdateNotificationUserRelations(int notificationId, IEnumerable<RecipientModel> updateModels);
+        Maybe<OperationError> UpdateNotificationUserRelations(int notificationId, RecipientModel ccRecipients, RecipientModel receiverRecipients, RelatedEntityType relatedEntityType);
     }
 }

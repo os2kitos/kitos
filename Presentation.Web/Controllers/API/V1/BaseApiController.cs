@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.API.V1
         [HttpGet]
         [InternalApi]
         /// <summary>
-        /// GET api/T/GetAccessRights
+        /// GET api/T/GetPermissions
         /// Checks what access rights the user has for the given entities
         /// </summary>
         public virtual HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)

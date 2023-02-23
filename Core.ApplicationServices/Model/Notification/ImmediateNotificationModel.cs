@@ -1,8 +1,8 @@
 ﻿namespace Core.ApplicationServices.Model.Notification
 {
-    public class ImmediateNotificationModel : IHasBasePropertiesModel, IHasRecipientModels
+    public class ImmediateNotificationModel : IHasBaseNotificationPropertiesModel, IHasRecipientModels
     {
-        public BaseNotificationModel BaseProperties { get; set; }
+        public BaseNotificationPropertiesModel BaseProperties { get; set; }
         public RecipientModel Ccs { get; set; }
         public RecipientModel Receivers { get; set; }
     }

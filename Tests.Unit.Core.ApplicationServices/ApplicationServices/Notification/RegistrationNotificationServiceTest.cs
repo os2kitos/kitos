@@ -18,6 +18,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Time;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -32,6 +33,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         private readonly Mock<IGenericRepository<Advice>> _adviceRepository;
         private readonly Mock<IDomainEvents> _domainEventHandler;
         private readonly Mock<IAdviceRootResolution> _adviceRootResolution;
+        private readonly Mock<IOperationClock> _operationClock;
 
         private readonly RegistrationNotificationService _sut;
 
@@ -43,6 +45,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _adviceRepository = new Mock<IGenericRepository<Advice>>();
             _domainEventHandler = new Mock<IDomainEvents>();
             _adviceRootResolution = new Mock<IAdviceRootResolution>();
+            _operationClock = new Mock<IOperationClock>();
 
             _sut = new RegistrationNotificationService(
                 _adviceService.Object,
@@ -50,7 +53,8 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                 _transactionManager.Object,
                 _adviceRepository.Object,
                 _domainEventHandler.Object,
-                _adviceRootResolution.Object);
+                _adviceRootResolution.Object,
+                _operationClock.Object);
         }
 
         [Fact]
@@ -120,12 +124,12 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var result = _sut.GetNotificationById(id);
 
             //Assert
-            Assert.True(result.HasValue);
+            Assert.True(result.Ok);
             Assert.Equal(notification.Id, result.Value.Id);
         }
 
         [Fact]
-        public void GetNotificationById_Returns_None_If_NotFound()
+        public void GetNotificationById_Returns_NotFound_If_NotFound()
         {
             //Arrange
             var id = A<int>();
@@ -136,7 +140,8 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var result = _sut.GetNotificationById(id);
 
             //Assert
-            Assert.True(result.IsNone);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -159,23 +164,23 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         [InlineData(RelatedEntityType.dataProcessingRegistration)]
         [InlineData(RelatedEntityType.itSystemUsage)]
         [InlineData(RelatedEntityType.itContract)]
-        public void Can_Create(RelatedEntityType relatedEntityType)
+        public void Can_CreateImmediateNotification(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var model = A<NotificationModel>();
+            var model = A<ImmediateNotificationModel>();
             var entity = CreateEntityWithAdvices(relatedEntityType);
 
-            ExpectResolveRootReturns(model, Maybe<IEntityWithAdvices>.Some(entity));
+            ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
             ExpectAllowModifyReturns(entity, true);
             var transaction = ExpectDatabaseTransaction();
 
             //Act
-            var result = _sut.Create(model);
+            var result = _sut.CreateImmediateNotification(model);
 
             //Assert
             Assert.True(result.Ok);
-            _adviceRepository.Verify(x => x.Insert(It.Is<Advice>(advice => advice.RelationId == model.RelationId)), Times.Once);
-            _domainEventHandler.Verify(x => x.Raise(It.Is<EntityCreatedEvent<Advice>>(createdEvent => createdEvent.Entity.RelationId == model.RelationId)));
+            _adviceRepository.Verify(x => x.Insert(It.Is<Advice>(advice => advice.RelationId == model.BaseProperties.RelationId)), Times.Once);
+            _domainEventHandler.Verify(x => x.Raise(It.Is<EntityCreatedEvent<Advice>>(createdEvent => createdEvent.Entity.RelationId == model.BaseProperties.RelationId)));
             _adviceRepository.Verify(x => x.Save());
 
             transaction.Verify(x => x.Commit(),Times.Once);
@@ -185,17 +190,64 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         [InlineData(RelatedEntityType.dataProcessingRegistration)]
         [InlineData(RelatedEntityType.itSystemUsage)]
         [InlineData(RelatedEntityType.itContract)]
-        public void Create_Returns_Forbidden_When_User_Not_Allowed_To_Modify_RootEntity(RelatedEntityType relatedEntityType)
+        public void Can_CreateScheduledNotification(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var model = A<NotificationModel>();
+            var model = A<ScheduledNotificationModel>();
             var entity = CreateEntityWithAdvices(relatedEntityType);
 
-            ExpectResolveRootReturns(model, Maybe<IEntityWithAdvices>.Some(entity));
+            ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
+            ExpectAllowModifyReturns(entity, true);
+            var transaction = ExpectDatabaseTransaction();
+
+            //Act
+            var result = _sut.CreateScheduledNotification(model);
+
+            //Assert
+            Assert.True(result.Ok);
+            _adviceRepository.Verify(x => x.Insert(It.Is<Advice>(advice => advice.RelationId == model.BaseProperties.RelationId)), Times.Once);
+            _domainEventHandler.Verify(x => x.Raise(It.Is<EntityCreatedEvent<Advice>>(createdEvent => createdEvent.Entity.RelationId == model.BaseProperties.RelationId)));
+            _adviceRepository.Verify(x => x.Save());
+
+            transaction.Verify(x => x.Commit(),Times.Once);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void CreateImmediate_Returns_Forbidden_When_User_Not_Allowed_To_Modify_RootEntity(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var model = A<ImmediateNotificationModel>();
+            var entity = CreateEntityWithAdvices(relatedEntityType);
+
+            ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
             ExpectAllowModifyReturns(entity, false);
 
             //Act
-            var result = _sut.Create(model);
+            var result = _sut.CreateImmediateNotification(model);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void CreateScheduled_Returns_Forbidden_When_User_Not_Allowed_To_Modify_RootEntity(RelatedEntityType relatedEntityType)
+        {
+            //Arrange
+            var model = A<ScheduledNotificationModel>();
+            var entity = CreateEntityWithAdvices(relatedEntityType);
+
+            ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
+            ExpectAllowModifyReturns(entity, false);
+
+            //Act
+            var result = _sut.CreateScheduledNotification(model);
 
             //Assert
             Assert.True(result.Failed);
@@ -210,14 +262,14 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var model = A<BaseNotificationModel>();
+            var model = A<UpdateScheduledNotificationModel>();
             var notification = new Advice{Id = id};
             var root = CreateEntityWithAdvices(relatedEntityType);
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
             ExpectAllowModifyReturns(notification, true);
-            ExpectResolveRootReturns(model, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(root));
 
             //Act
             var result = _sut.Update(id, model);
@@ -226,7 +278,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.True(result.Ok);
             Assert.Equal(id, result.Value.Id);
 
-            _adviceRepository.Verify(x => x.Update(It.Is<Advice>(notificationParam => notificationParam.RelationId == model.RelationId)), Times.Once);
+            _adviceRepository.Verify(x => x.Update(It.Is<Advice>(notificationParam => notificationParam.RelationId == model.BaseProperties.RelationId)), Times.Once);
             ValidateRootModificationWasCalled(relatedEntityType, root);
             _adviceRepository.Verify(x => x.Save());
 
@@ -240,7 +292,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var model = A<BaseNotificationModel>();
+            var model = A<UpdateScheduledNotificationModel>();
             var notification = new Advice();
 
             ExpectDatabaseTransaction();
@@ -260,7 +312,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var model = A<BaseNotificationModel>();
+            var model = A<UpdateScheduledNotificationModel>();
 
             ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, Maybe<Advice>.None);
@@ -427,9 +479,9 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             return transaction;
         }
 
-        private void ExpectResolveRootReturns(BaseNotificationModel notification, Maybe<IEntityWithAdvices> result)
+        private void ExpectResolveRootReturns(BaseNotificationPropertiesModel notificationProperties, Maybe<IEntityWithAdvices> result)
         {
-            _adviceRootResolution.Setup(x => x.Resolve(It.Is<Advice>(advice => advice.RelationId == notification.RelationId))).Returns(result);
+            _adviceRootResolution.Setup(x => x.Resolve(It.Is<Advice>(advice => advice.RelationId == notificationProperties.RelationId))).Returns(result);
         }
 
         private void ExpectResolveRootReturns(int id, Maybe<IEntityWithAdvices> result)

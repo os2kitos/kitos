@@ -4,8 +4,14 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Notification;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.Shared;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Notifications;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
@@ -19,19 +25,23 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
 {
-    [RoutePrefix("api/v2/notifications")]
+    [RoutePrefix("api/v2/internal/notifications")]
     public class NotificationV2Controller : InternalApiV2Controller
     {
         private readonly INotificationWriteModelMapper _writeModelMapper;
         private readonly INotificationResponseMapper _responseMapper;
         private readonly INotificationService _notificationService;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
+
         public NotificationV2Controller(INotificationWriteModelMapper writeModelMapper,
             INotificationResponseMapper responseMapper,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _writeModelMapper = writeModelMapper;
             _responseMapper = responseMapper;
             _notificationService = notificationService;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         /// <summary>
@@ -51,7 +61,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetNotifications(OwnerResourceType ownerResourceType, 
             [NonEmptyGuid] Guid organizationUuid, 
-            DateTime? fromDate = null,
+            Guid? ownerResourceUuid = null,
+            bool onlyActive = false,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -59,9 +70,21 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
 
             var conditions = new List<IDomainQuery<Advice>>();
 
-            if(fromDate.HasValue)
-                conditions.Add(new QueryBySinceNotificationFromDate(fromDate.Value));
-            
+            if (ownerResourceUuid.HasValue)
+            {
+                var unpackedOwnerResourceUuid = ownerResourceUuid.Value;
+                var idResult = ResolveOwnerId(unpackedOwnerResourceUuid, ownerResourceType);
+                if (idResult.IsNone)
+                    return BadRequest($"OwnerResource with uuid: {unpackedOwnerResourceUuid} was not found");
+
+                conditions.Add(new QueryByOwnerResourceId(idResult.Value));
+            }
+
+            if (onlyActive)
+            {
+                conditions.Add(new QueryByActiveNotification(true));
+            }
+
             return _notificationService.GetNotifications(organizationUuid, conditions.ToArray())
                 .Bind
                 (
@@ -82,21 +105,22 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Gets a notification based on the ownerResourceType and notificationUuid
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <param name="notificationUuid"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{ownerResourceType}/{notificationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<NotificationResponseDTO>))]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/{notificationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(NotificationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetNotificationByUuid(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid)
+        public IHttpActionResult GetNotificationByUuid(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _notificationService.GetNotificationByUuid(notificationUuid, ownerResourceType.ToRelatedEntityType())
+            return _notificationService.GetNotificationByUuid(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
                 .Bind(_responseMapper.MapNotificationResponseDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -105,21 +129,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Creates an immediate notifications, which is being sent after creation
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{ownerResourceType}/immediate")]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/immediate")]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(NotificationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult CreateImmediateNotification(OwnerResourceType ownerResourceType, [FromBody] ImmediateNotificationWriteRequestDTO request)
+        public IHttpActionResult CreateImmediateNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [FromBody] ImmediateNotificationWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var parameters = _writeModelMapper.FromImmediatePOST(request, ownerResourceType);
+            var parameters = _writeModelMapper.FromImmediatePOST(request, ownerResourceUuid, ownerResourceType);
 
             return _notificationService.CreateImmediateNotification(parameters)
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
@@ -134,21 +160,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Creates a scheduled notification. The notification will be sent on a specified date, and will repeat for a specified time
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{ownerResourceType}/scheduled")]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/scheduled")]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(NotificationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult CreateScheduledNotification(OwnerResourceType ownerResourceType, [FromBody] ScheduledNotificationWriteRequestDTO request)
+        public IHttpActionResult CreateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [FromBody] ScheduledNotificationWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var parameters = _writeModelMapper.FromScheduledPOST(request, ownerResourceType);
+            var parameters = _writeModelMapper.FromScheduledPOST(request, ownerResourceUuid, ownerResourceType);
 
             return _notificationService.CreateScheduledNotification(parameters)
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
@@ -163,22 +191,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Updates the scheduled notification
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <param name="notificationUuid"></param>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("{ownerResourceType}/scheduled/{notificationUuid}")]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/scheduled/{notificationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(NotificationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult UpdateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid, [FromBody] UpdateScheduledNotificationWriteRequestDTO request)
+        public IHttpActionResult UpdateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid, [FromBody] UpdateScheduledNotificationWriteRequestDTO request)
         {
             if (!ModelState.IsValid) 
                 return BadRequest();
 
-            var parameters = _writeModelMapper.FromScheduledPUT(request, ownerResourceType);
+            var parameters = _writeModelMapper.FromScheduledPUT(request, ownerResourceUuid, ownerResourceType);
 
             return _notificationService.UpdateScheduledNotification(notificationUuid, parameters)
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
@@ -189,21 +218,22 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Deactivates the scheduled notification
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPatch]
-        [Route("{ownerResourceType}/scheduled/deactivate/{notificationUuid}")]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/scheduled/deactivate/{notificationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(NotificationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeactivateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid)
+        public IHttpActionResult DeactivateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
             if (!ModelState.IsValid) 
                 return BadRequest();
 
-            return _notificationService.DeactivateNotification(notificationUuid, ownerResourceType.ToRelatedEntityType())
+            return _notificationService.DeactivateNotification(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
                 .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match(Ok, FromOperationError);
         }
@@ -212,21 +242,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Deletes a notification
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <param name="notificationUuid"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("{ownerResourceType}/{notificationUuid}")]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/{notificationUuid}")]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid)
+        public IHttpActionResult DeleteNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            return _notificationService.DeleteNotification(notificationUuid, ownerResourceType.ToRelatedEntityType())
+            return _notificationService.DeleteNotification(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
                 .Match(FromOperationError, NoContent);
         }
 
@@ -234,22 +266,25 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Gets sent notification information
         /// </summary>
         /// <param name="ownerResourceType"></param>
+        /// <param name="ownerResourceUuid"></param>
         /// <param name="notificationUuid"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{ownerResourceType}/sent/{notificationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SentNotificationResponseDTO))]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/sent/{notificationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<SentNotificationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetSentNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid)
+        public IHttpActionResult GetSentNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
             if(!ModelState.IsValid)
                 return BadRequest();
 
-            return _notificationService.GetNotificationSentByUuid(notificationUuid, ownerResourceType.ToRelatedEntityType())
-                .Select(_responseMapper.MapNotificationSentResponseDTO)
+            return _notificationService.GetNotificationSentByUuid(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
+                .Select(x => x.Select(_responseMapper.MapNotificationSentResponseDTO)
+                    .ToList()
+                )
                 .Transform(Ok);
         }
 
@@ -257,24 +292,35 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// Gets a notification based on the ownerResourceType and notificationUuid
         /// </summary>
         /// <param name="ownerResourceType"></param>
-        /// <param name="notificationUuid"></param>
         /// <param name="ownerResourceUuid"></param>
+        /// <param name="notificationUuid"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{ownerResourceType}/access-rights/{notificationUuid}/{ownerResourceUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<NotificationAccessRightsResponseDTO>))]
+        [Route("{ownerResourceType}/{ownerResourceUuid}/{notificationUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(NotificationResourcePermissionsDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetAccessRights(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid notificationUuid, [NonEmptyGuid] Guid ownerResourceUuid)
+        public IHttpActionResult GetAccessRights(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _notificationService.GetAccessRights(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
+            return _notificationService.GetPermissions(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
                 .Select(_responseMapper.MapNotificationAccessRightsResponseDTO)
                 .Match(Ok, FromOperationError);
+        }
+
+        private Maybe<int> ResolveOwnerId(Guid roleUuid, OwnerResourceType relatedEntityType)
+        {
+            return relatedEntityType switch
+            {
+                OwnerResourceType.DataProcessingRegistration => _entityIdentityResolver.ResolveDbId<DataProcessingRegistration>(roleUuid),
+                OwnerResourceType.ItContract => _entityIdentityResolver.ResolveDbId<ItContract>(roleUuid),
+                OwnerResourceType.ItSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystem>(roleUuid),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
+            };
         }
     }
 }

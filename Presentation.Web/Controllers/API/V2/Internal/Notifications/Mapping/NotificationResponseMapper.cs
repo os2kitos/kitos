@@ -65,13 +65,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             return result;
         }
 
-        public NotificationAccessRightsResponseDTO MapNotificationAccessRightsResponseDTO(NotificationAccessRights accessRights)
+        public NotificationResourcePermissionsDTO MapNotificationAccessRightsResponseDTO(NotificationPermissions permissions)
         {
-            return new NotificationAccessRightsResponseDTO
+            return new NotificationResourcePermissionsDTO
             {
-                CanBeDeactivated = accessRights.CanBeDeactivated,
-                CanBeDeleted = accessRights.CanBeDeleted,
-                CanBeModified = accessRights.CanBeModified,
+                Read = permissions.Read,
+                Modify = permissions.Modify,
+                Deactivate = permissions.Deactivate,
+                Delete = permissions.Delete,
             };
         }
 

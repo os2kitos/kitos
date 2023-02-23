@@ -6,7 +6,7 @@ using Core.DomainModel.Advice;
 using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.Notification
 {
@@ -28,25 +28,27 @@ namespace Core.ApplicationServices.Notification
             _authorizationContext = authorizationContext;
         }
 
-        public Maybe<OperationError> UpdateNotificationUserRelations(int notificationId, IEnumerable<RecipientModel> updateModels)
+        public Maybe<OperationError> UpdateNotificationUserRelations(int notificationId, RecipientModel ccRecipients, RecipientModel receiverRecipients, RelatedEntityType relatedEntityType)
         {
             using var transaction = _transactionManager.Begin();
 
             var error = _registrationNotificationService.GetNotificationById(notificationId)
                 .Match
                 (
-                    onValue: notification => 
+                    notification => 
                         _authorizationContext.AllowModify(notification)
                             ? DeleteUserRelationsByAdviceId(notificationId)
                             : new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden),
-                    onNone: () => new OperationError($"Notification with Id: {notificationId} was not found", OperationFailure.NotFound)
-                );
+                    error => error);
 
             if (error.HasValue)
                 return error;
 
-            var newNotifications = updateModels.Select(updateModel => MapAdviceUserRelation(notificationId, updateModel)).ToList();
-            _adviceUserRelationRepository.AddRange(newNotifications);
+            var recipients = new List<AdviceUserRelation>();
+            recipients.AddRange(MapAdviceUserRelation(notificationId, ccRecipients, RecieverType.CC, relatedEntityType));
+            recipients.AddRange(MapAdviceUserRelation(notificationId, receiverRecipients, RecieverType.RECIEVER, relatedEntityType));
+
+            _adviceUserRelationRepository.AddRange(recipients);
             _adviceUserRelationRepository.Save();
             transaction.Commit();
 
@@ -70,18 +72,27 @@ namespace Core.ApplicationServices.Notification
             return Maybe<OperationError>.None;
         }
         
-        private static AdviceUserRelation MapAdviceUserRelation(int notificationId, RecipientModel model)
+        private static IEnumerable<AdviceUserRelation> MapAdviceUserRelation(int notificationId, RecipientModel model, RecieverType receiverType, RelatedEntityType relatedEntityType)
         {
-            return new AdviceUserRelation
+            var recipients = new List<AdviceUserRelation>();
+            recipients.AddRange(model.RoleRecipients.Select(x => new AdviceUserRelation
             {
                 AdviceId = notificationId,
-                Email = model.Email,
-                DataProcessingRegistrationRoleId = model.DataProcessingRegistrationRoleId,
-                ItContractRoleId = model.ItContractRoleId,
-                ItSystemRoleId = model.ItSystemRoleId,
-                RecieverType = model.ReceiverType,
-                RecpientType = model.RecipientType
-            };
+                DataProcessingRegistrationRoleId = relatedEntityType == RelatedEntityType.dataProcessingRegistration ? x.RoleId : null,
+                ItContractRoleId = relatedEntityType == RelatedEntityType.itContract? x.RoleId : null,
+                ItSystemRoleId = relatedEntityType == RelatedEntityType.itSystemUsage ? x.RoleId : null,
+                RecieverType = receiverType,
+                RecpientType = RecipientType.ROLE
+            }));
+            recipients.AddRange(model.EmailRecipients.Select(x => new AdviceUserRelation
+            {
+                AdviceId = notificationId,
+                Email = x.Email,
+                RecieverType = receiverType,
+                RecpientType = RecipientType.USER
+            }));
+
+            return recipients;
         }
     }
 }

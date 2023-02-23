@@ -128,15 +128,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void MapNotificationAccessRightsResponseDTO_Maps_AccessRights()
         {
             //Arrange
-            var accessRights = A<NotificationAccessRights>();
+            var accessRights = A<NotificationPermissions>();
 
             //Act
             var dto = _sut.MapNotificationAccessRightsResponseDTO(accessRights);
 
             //Assert
-            Assert.Equal(accessRights.CanBeDeactivated, dto.CanBeDeactivated);
-            Assert.Equal(accessRights.CanBeDeleted, dto.CanBeDeleted);
-            Assert.Equal(accessRights.CanBeModified, dto.CanBeModified);
+            Assert.Equal(accessRights.Read, dto.Read);
+            Assert.Equal(accessRights.Deactivate, dto.Deactivate);
+            Assert.Equal(accessRights.Delete, dto.Delete);
+            Assert.Equal(accessRights.Modify, dto.Modify);
 
         }
 

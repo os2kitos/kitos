@@ -3,7 +3,7 @@ using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.Model.Notification
 {
-    public class BaseNotificationModel
+    public class BaseNotificationPropertiesModel
     {
         public string Subject { get; set; }
         public string Body { get; set; }
