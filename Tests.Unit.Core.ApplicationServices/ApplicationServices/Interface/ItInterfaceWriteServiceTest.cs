@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -7,6 +8,7 @@ using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -58,6 +60,13 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var inputParameters = A<ItInterfaceWriteModel>();
+
+            //TODO: Remove these resets and cover the new fields
+            inputParameters.Note = OptionalValueChange<string>.None;
+            inputParameters.Data = OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>>.None;
+            inputParameters.Scope = OptionalValueChange<AccessModifier>.None;
+            inputParameters.InterfaceTypeUuid = OptionalValueChange<Guid?>.None;
+
             var transactionMock = ExpectTransactionBegins();
             var orgId = A<int>();
             var itInterface = new ItInterface { Id = A<int>() };
@@ -72,9 +81,9 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters, itInterface);
             ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters, itInterface);
             if (inputParameters.Deactivated.NewValue)
-                _interfaceServiceMock.Setup(x => x.Deactivate(itInterface.Id)).Returns(itInterface);
+                ExpectDeactivateReturns(itInterface, itInterface);
             else
-                _interfaceServiceMock.Setup(x => x.Activate(itInterface.Id)).Returns(itInterface);
+                ExpectActivateReturns(itInterface, itInterface);
 
             //Act
             var result = _sut.Create(organizationUuid, inputParameters);
@@ -348,6 +357,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
                 Description = withDescriptionChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
                 UrlReference = withUrlReferenceChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
             };
+            //TODO: Extend with the new params
             var transactionMock = ExpectTransactionBegins();
             var originalExposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = originalExposingSystem }, ItInterfaceId = A<string>() };
@@ -754,6 +764,16 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         private void ExpectHasWriteAccess(ItInterface itInterface, bool value)
         {
             _authorizationContextMock.Setup(x => x.AllowModify(itInterface)).Returns(value);
+        }
+
+        private void ExpectDeactivateReturns(ItInterface itInterface, Result<ItInterface, OperationError> result)
+        {
+            _interfaceServiceMock.Setup(x => x.Deactivate(itInterface.Id)).Returns(result);
+        }
+
+        private void ExpectActivateReturns(ItInterface itInterface, Result<ItInterface, OperationError> result)
+        {
+            _interfaceServiceMock.Setup(x => x.Activate(itInterface.Id)).Returns(result);
         }
     }
 }
