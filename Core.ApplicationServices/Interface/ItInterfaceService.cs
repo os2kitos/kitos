@@ -269,13 +269,24 @@ namespace Core.ApplicationServices.Interface
             });
         }
 
-        private bool ValidateName(string name)
+        public Result<ItInterface, OperationError> Activate(int id)
+        {
+            return Mutate(id,
+                itInterface => itInterface.Disabled,
+                itInterface =>
+                {
+                    itInterface.Activate();
+                    _domainEvents.Raise(new EnabledStatusChanged<ItInterface>(itInterface, false, true));
+                });
+        }
+
+        private static bool ValidateName(string name)
         {
             return string.IsNullOrWhiteSpace(name) == false &&
                    name.Length <= ItInterface.MaxNameLength;
         }
 
-        private bool ValidateItInterfaceId(string itInterfaceId)
+        private static bool ValidateItInterfaceId(string itInterfaceId)
         {
             return itInterfaceId != null;
         }

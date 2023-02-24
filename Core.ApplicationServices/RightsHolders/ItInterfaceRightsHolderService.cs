@@ -120,6 +120,10 @@ namespace Core.ApplicationServices.RightsHolders
             if (string.IsNullOrEmpty(reason))
                 return new OperationError("No deactivation reason provided", OperationFailure.BadInput);
 
+            var deactivationParameters = new ItInterfaceWriteModel
+            {
+                Deactivated = true.AsChangedValue()
+            };
             using var transaction = _transactionManager.Begin();
             try
             {
@@ -127,8 +131,7 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetInterface(interfaceUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    //TODO: Must use the write service in stead
-                    .Bind(itInterface => _itInterfaceService.Deactivate(itInterface.Id)); //TODO: Migrate to use the write service once we have it
+                    .Bind(itInterface => _writeService.Update(itInterface.Uuid, deactivationParameters));
 
                 if (result.Ok)
                 {
@@ -244,7 +247,7 @@ namespace Core.ApplicationServices.RightsHolders
 
         private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
         {
-            var parameters = new ItInterfaceWriteModelParameters
+            var parameters = new ItInterfaceWriteModel
             {
                 Name = updateParameters.Name,
                 Description = updateParameters.Description,

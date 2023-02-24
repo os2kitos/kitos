@@ -157,7 +157,7 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDate.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
-    <Compile Include="Model\Interface\ItInterfaceWriteModelParameters.cs" />
+    <Compile Include="Model\Interface\ItInterfaceWriteModel.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModelParametersBase.cs" />
     <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />
     <Compile Include="Model\Messages\PublicMessages.cs" />

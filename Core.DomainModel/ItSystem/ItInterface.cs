@@ -124,5 +124,10 @@ namespace Core.DomainModel.ItSystem
             Organization = newOrganization;
             OrganizationId = newOrganization.Id;
         }
+
+        public void Activate()
+        {
+            Disabled = false;
+        }
     }
 }

@@ -44,22 +44,28 @@ namespace Core.ApplicationServices.Interface.Write
             _domainEvents = domainEvents;
         }
 
-        private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, ItInterfaceWriteModelParameters updateParameters)
+        private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, ItInterfaceWriteModel update)
         {
-            return originalInterface.WithOptionalUpdate(updateParameters.Version, (itInterface, newVersion) => _itInterfaceService.UpdateVersion(itInterface.Id, newVersion))
-                .Bind(itInterface => UpdateNameAndInterfaceId(itInterface, updateParameters))
-                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.ExposingSystemUuid, UpdateExposingSystem))
-                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.Description, (interfaceToUpdate, newDescription) => _itInterfaceService.UpdateDescription(interfaceToUpdate.Id, newDescription)))
-                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.UrlReference, (interfaceToUpdate, newUrlReference) => _itInterfaceService.UpdateUrlReference(interfaceToUpdate.Id, newUrlReference)));
+            return originalInterface.WithOptionalUpdate(update.Version, (itInterface, newVersion) => _itInterfaceService.UpdateVersion(itInterface.Id, newVersion))
+                .Bind(itInterface => UpdateNameAndInterfaceId(itInterface, update))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.ExposingSystemUuid, UpdateExposingSystem))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.Description, (interfaceToUpdate, newDescription) => _itInterfaceService.UpdateDescription(interfaceToUpdate.Id, newDescription)))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.UrlReference, (interfaceToUpdate, newUrlReference) => _itInterfaceService.UpdateUrlReference(interfaceToUpdate.Id, newUrlReference)))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.Deactivated, UpdateActivatedState));
         }
 
-        private Result<ItInterface, OperationError> UpdateNameAndInterfaceId(ItInterface itInterface, ItInterfaceWriteModelParameters updateParameters)
+        private Result<ItInterface, OperationError> UpdateActivatedState(ItInterface interfaceToUpdate, bool deactivated)
         {
-            if (updateParameters.Name.IsUnchanged && updateParameters.InterfaceId.IsUnchanged)
+            return deactivated ? _itInterfaceService.Deactivate(interfaceToUpdate.Id) : _itInterfaceService.Activate(interfaceToUpdate.Id);
+        }
+
+        private Result<ItInterface, OperationError> UpdateNameAndInterfaceId(ItInterface itInterface, ItInterfaceWriteModel update)
+        {
+            if (update.Name.IsUnchanged && update.InterfaceId.IsUnchanged)
                 return itInterface; //No changes found
 
-            var newName = updateParameters.Name.MapOptionalChangeWithFallback(itInterface.Name);
-            var newInterfaceId = updateParameters.InterfaceId.MapOptionalChangeWithFallback(itInterface.ItInterfaceId);
+            var newName = update.Name.MapOptionalChangeWithFallback(itInterface.Name);
+            var newInterfaceId = update.InterfaceId.MapOptionalChangeWithFallback(itInterface.ItInterfaceId);
 
             return _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, newName, newInterfaceId);
         }
@@ -78,7 +84,7 @@ namespace Core.ApplicationServices.Interface.Write
             return _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystem.Value.Id);
         }
 
-        public Result<ItInterface, OperationError> Create(Guid organizationUuid, ItInterfaceWriteModelParameters parameters)
+        public Result<ItInterface, OperationError> Create(Guid organizationUuid, ItInterfaceWriteModel parameters)
         {
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
@@ -124,7 +130,7 @@ namespace Core.ApplicationServices.Interface.Write
             }
         }
 
-        public Result<ItInterface, OperationError> Update(Guid interfaceUuid, ItInterfaceWriteModelParameters parameters)
+        public Result<ItInterface, OperationError> Update(Guid interfaceUuid, ItInterfaceWriteModel parameters)
         {
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));

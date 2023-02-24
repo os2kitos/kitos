@@ -58,7 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         {
             //Arrange
             var organizationUuid = A<Guid>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
             var orgId = A<int>();
             var itInterface = new ItInterface { Id = A<int>() };
@@ -72,6 +72,10 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             ExpectUpdateVersionReturns(itInterface.Id, inputParameters, itInterface);
             ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters, itInterface);
             ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters, itInterface);
+            if (inputParameters.Deactivated.NewValue)
+                _interfaceServiceMock.Setup(x => x.Deactivate(itInterface.Id)).Returns(itInterface);
+            else
+                _interfaceServiceMock.Setup(x => x.Activate(itInterface.Id)).Returns(itInterface);
 
             //Act
             var result = _sut.Create(organizationUuid, inputParameters);
@@ -86,7 +90,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         {
             //Arrange
             var organizationUuid = A<Guid>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
 
             inputParameters.Name = OptionalValueChange<string>.None;
@@ -105,7 +109,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         {
             //Arrange
             var organizationUuid = A<Guid>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
 
             ExpectGetOrganizationReturns(organizationUuid, Maybe<Organization>.None);
@@ -125,7 +129,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var orgId = A<int>();
-            var inputParameters = new ItInterfaceWriteModelParameters
+            var inputParameters = new ItInterfaceWriteModel
             {
                 ExposingSystemUuid = A<Guid>().AsChangedValue(),
                 Name = A<string>().AsChangedValue(),
@@ -153,7 +157,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var orgId = A<int>();
-            var inputParameters = new ItInterfaceWriteModelParameters
+            var inputParameters = new ItInterfaceWriteModel
             {
                 ExposingSystemUuid = A<Guid>().AsChangedValue(),
                 Name = A<string>().AsChangedValue(),
@@ -181,7 +185,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var orgId = A<int>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
@@ -205,7 +209,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         {
             //Arrange
             var organizationUuid = A<Guid>();
-            var orgId = A<int>(); var inputParameters = new ItInterfaceWriteModelParameters
+            var orgId = A<int>(); var inputParameters = new ItInterfaceWriteModel
             {
                 ExposingSystemUuid = A<Guid>().AsChangedValue(),
                 Name = A<string>().AsChangedValue(),
@@ -237,7 +241,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var orgId = A<int>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
@@ -265,7 +269,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var orgId = A<int>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
@@ -294,7 +298,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var orgId = A<int>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
@@ -336,7 +340,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             bool withUrlReferenceChange)
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters
+            var inputParameters = new ItInterfaceWriteModel
             {
                 Name = withNameChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
                 InterfaceId = withInterfaceIdChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
@@ -414,7 +418,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_BadInput_If_GetExposingSystemFails_With_NotFound()
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters
+            var inputParameters = new ItInterfaceWriteModel
             {
                 ExposingSystemUuid = A<Guid>().AsChangedValue()
             };
@@ -439,7 +443,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Forbidden_If_GetExposingSystemFails_With_Forbidden()
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters
+            var inputParameters = new ItInterfaceWriteModel
             {
                 ExposingSystemUuid = A<Guid>().AsChangedValue()
             };
@@ -464,7 +468,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Error_If_GetInterface_Fails()
         {
             //Arrange
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
@@ -487,7 +491,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Forbidden_If_Not_RightsHolder_Access()
         {
             //Arrange
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
+            var inputParameters = A<ItInterfaceWriteModel>();
             var transactionMock = ExpectTransactionBegins();
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
@@ -509,7 +513,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Error_If_UpdateNameAndInterfaceId_Fails()
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters()
+            var inputParameters = new ItInterfaceWriteModel()
             {
                 Name = A<string>().AsChangedValue(),
                 InterfaceId = A<string>().AsChangedValue()
@@ -537,7 +541,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Error_If_UpdateExposingSystem_Fails()
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters()
+            var inputParameters = new ItInterfaceWriteModel()
             {
                 ExposingSystemUuid = A<Guid>().AsChangedValue()
             };
@@ -565,7 +569,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Error_If_UpdateVersion_Fails()
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters()
+            var inputParameters = new ItInterfaceWriteModel()
             {
                 Version = A<string>().AsChangedValue()
             };
@@ -592,7 +596,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Error_If_UpdateDescription_Fails()
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters()
+            var inputParameters = new ItInterfaceWriteModel()
             {
                 Description = A<string>().AsChangedValue()
             };
@@ -619,7 +623,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         public void Update_Returns_Error_If_UpdateUrlReference_Fails()
         {
             //Arrange
-            var inputParameters = new ItInterfaceWriteModelParameters()
+            var inputParameters = new ItInterfaceWriteModel()
             {
                 UrlReference = A<string>().AsChangedValue()
             };
@@ -704,30 +708,30 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             _interfaceServiceMock.Setup(x => x.UpdateExposingSystem(interfaceId, exposingSystemId)).Returns(result);
         }
 
-        private void ExpectUpdateNameAndInterfaceIdReturns(int interfaceId, ItInterfaceWriteModelParameters inputParameters, Result<ItInterface, OperationError> result)
+        private void ExpectUpdateNameAndInterfaceIdReturns(int interfaceId, ItInterfaceWriteModel input, Result<ItInterface, OperationError> result)
         {
-            _interfaceServiceMock.Setup(x => x.UpdateNameAndInterfaceId(interfaceId, inputParameters.Name.NewValue, inputParameters.InterfaceId.NewValue)).Returns(result);
+            _interfaceServiceMock.Setup(x => x.UpdateNameAndInterfaceId(interfaceId, input.Name.NewValue, input.InterfaceId.NewValue)).Returns(result);
         }
 
-        private void ExpectUpdateUrlReferenceReturns(int interfaceId, ItInterfaceWriteModelParameters inputParameters, Result<ItInterface, OperationError> result)
+        private void ExpectUpdateUrlReferenceReturns(int interfaceId, ItInterfaceWriteModel input, Result<ItInterface, OperationError> result)
         {
-            _interfaceServiceMock.Setup(x => x.UpdateUrlReference(interfaceId, inputParameters.UrlReference.NewValue)).Returns(result);
+            _interfaceServiceMock.Setup(x => x.UpdateUrlReference(interfaceId, input.UrlReference.NewValue)).Returns(result);
         }
 
-        private void ExpectUpdateVersionReturns(int interfaceId, ItInterfaceWriteModelParameters inputParameters, Result<ItInterface, OperationError> result)
+        private void ExpectUpdateVersionReturns(int interfaceId, ItInterfaceWriteModel input, Result<ItInterface, OperationError> result)
         {
-            _interfaceServiceMock.Setup(x => x.UpdateVersion(interfaceId, inputParameters.Version.NewValue)).Returns(result);
+            _interfaceServiceMock.Setup(x => x.UpdateVersion(interfaceId, input.Version.NewValue)).Returns(result);
         }
 
-        private void ExpectUpdateDescriptionReturns(int interfaceId, ItInterfaceWriteModelParameters inputParameters, Result<ItInterface, OperationError> result)
+        private void ExpectUpdateDescriptionReturns(int interfaceId, ItInterfaceWriteModel input, Result<ItInterface, OperationError> result)
         {
-            _interfaceServiceMock.Setup(x => x.UpdateDescription(interfaceId, inputParameters.Description.NewValue)).Returns(result);
+            _interfaceServiceMock.Setup(x => x.UpdateDescription(interfaceId, input.Description.NewValue)).Returns(result);
         }
 
-        private void ExpectItInterfaceServiceCreateItInterfaceReturns(int orgId, ItInterfaceWriteModelParameters inputParameters, Result<ItInterface, OperationError> result)
+        private void ExpectItInterfaceServiceCreateItInterfaceReturns(int orgId, ItInterfaceWriteModel input, Result<ItInterface, OperationError> result)
         {
             _interfaceServiceMock
-                .Setup(x => x.CreateNewItInterface(orgId, inputParameters.Name.NewValue, inputParameters.InterfaceId.NewValue, null, null))
+                .Setup(x => x.CreateNewItInterface(orgId, input.Name.NewValue, input.InterfaceId.NewValue, null, null))
                 .Returns(result);
         }
 

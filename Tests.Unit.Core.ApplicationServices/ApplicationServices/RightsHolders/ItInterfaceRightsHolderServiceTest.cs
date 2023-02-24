@@ -209,7 +209,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.Is<ItInterfaceWriteModelParameters>(p =>
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.Is<ItInterfaceWriteModel>(p =>
                 //First two are used during creation and reset before calling update
                 p.Name.IsUnchanged &&
                 p.InterfaceId.IsUnchanged &&
@@ -288,7 +288,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.IsAny<ItInterfaceWriteModelParameters>())).Returns(operationError);
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.IsAny<ItInterfaceWriteModel>())).Returns(operationError);
 
             //Act
             var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
@@ -305,11 +305,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit(){ItSystem = new ItSystem(){BelongsToId = A<int>()}}};
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() { BelongsToId = A<int>() } } };
 
             ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.Is<ItInterfaceWriteModelParameters>(p =>
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.Is<ItInterfaceWriteModel>(p =>
                 p.Name == inputParameters.Name &&
                 p.InterfaceId == inputParameters.InterfaceId &&
                 p.Description == inputParameters.Description &&
@@ -340,7 +340,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasSpecificAccessReturns(itInterface, true);
-            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.IsAny<ItInterfaceWriteModelParameters>())).Returns(operationError);
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.IsAny<ItInterfaceWriteModel>())).Returns(operationError);
 
             //Act
             var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
@@ -377,7 +377,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Disabled = true,Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem { BelongsToId = A<int>() } } };
+            var itInterface = new ItInterface { Disabled = true, Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem { BelongsToId = A<int>() } } };
 
             ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
@@ -403,7 +403,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectDeactivateReturns(itInterface.Id, itInterface);
+            ExpectDeactivateReturns(itInterface.Uuid, itInterface);
             _userContextMock.Setup(x => x.UserId).Returns(userId);
             _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(new User { Email = A<string>() });
 
@@ -429,7 +429,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectDeactivateReturns(itInterface.Id, operationError);
+            ExpectDeactivateReturns(itInterface.Uuid, operationError);
 
             //Act
             var result = _sut.Deactivate(itInterface.Uuid, reason);
@@ -506,10 +506,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             transaction.Verify(x => x.Commit(), Times.Never);
         }
 
-        private void ExpectDeactivateReturns(int itInterfaceId, Result<ItInterface, OperationError> result)
+        private void ExpectDeactivateReturns(Guid interfaceUuid, Result<ItInterface, OperationError> result)
         {
-            //TODO: Rewrite for write service integration
-            _interfaceServiceMock.Setup(x => x.Deactivate(itInterfaceId)).Returns(result);
+            _writeServiceMock.Setup(x => x.Update(interfaceUuid, It.Is<ItInterfaceWriteModel>(wm => wm.Deactivated.HasChange && wm.Deactivated.NewValue))).Returns(result);
         }
 
         private void ExpectGetItInterfaceReturns(Guid itInterfaceUuid, Result<ItInterface, OperationError> result)
