@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
@@ -13,7 +13,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Time;
@@ -37,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IInterfaceRepository> _repository;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOperationClock> _operationClock;
+        private readonly Mock<IOptionResolver> _optionResolverMock;
 
         public ItInterfaceServiceTest()
         {
@@ -48,6 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _userContext = new Mock<IOrganizationalUserContext>();
             _repository = new Mock<IInterfaceRepository>();
             _operationClock = new Mock<IOperationClock>();
+            _optionResolverMock = new Mock<IOptionResolver>();
             _sut = new ItInterfaceService(
                 _dataRowRepository.Object,
                 _systemRepository.Object,
@@ -56,7 +57,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _domainEvents.Object,
                 _repository.Object,
                 _userContext.Object,
-                _operationClock.Object);
+                _operationClock.Object,
+                _optionResolverMock.Object);
         }
 
         [Fact]

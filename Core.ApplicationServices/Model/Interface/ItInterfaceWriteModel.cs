@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 
@@ -10,6 +11,6 @@ namespace Core.ApplicationServices.Model.Interface
         public OptionalValueChange<AccessModifier> Scope { get; set; } = OptionalValueChange<AccessModifier>.None;
         public OptionalValueChange<Guid?> InterfaceTypeUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<string> Note { get; set; } = OptionalValueChange<string>.None;
-        public OptionalValueChange<ItInterfaceDataWriteModel> Data { get; set; } = OptionalValueChange<ItInterfaceDataWriteModel>.None;
+        public OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>> Data { get; set; } = OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>>.None;
     }
 }

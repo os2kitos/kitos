@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
@@ -51,16 +53,32 @@ namespace Core.ApplicationServices.Interface.Write
                 .Bind(itInterface => itInterface.WithOptionalUpdate(update.ExposingSystemUuid, UpdateExposingSystem))
                 .Bind(itInterface => itInterface.WithOptionalUpdate(update.Description, (interfaceToUpdate, newDescription) => _itInterfaceService.UpdateDescription(interfaceToUpdate.Id, newDescription)))
                 .Bind(itInterface => itInterface.WithOptionalUpdate(update.UrlReference, (interfaceToUpdate, newUrlReference) => _itInterfaceService.UpdateUrlReference(interfaceToUpdate.Id, newUrlReference)))
-                .Bind(itInterface => itInterface.WithOptionalUpdate(update.Deactivated, UpdateActivatedState));
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.Deactivated, UpdateActivatedState))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.Scope, UpdateScope))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.InterfaceTypeUuid, UpdateInterfaceType))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.Note, UpdateNote))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(update.Data, UpdateInterfaceData));
         }
 
-        /*
-         *public OptionalValueChange<AccessModifier> Scope { get; set; } = OptionalValueChange<AccessModifier>.None;
-        public OptionalValueChange<Guid?> InterfaceTypeUuid { get; set; } = OptionalValueChange<Guid?>.None;
-        public OptionalValueChange<string> Note { get; set; } = OptionalValueChange<string>.None;
-        public OptionalValueChange<ItInterfaceDataWriteModel> Data { get; set; } = OptionalValueChange<ItInterfaceDataWriteModel>.None;
-         *
-         */
+        private Result<ItInterface, OperationError> UpdateInterfaceData(ItInterface interfaceToUpdate, IEnumerable<ItInterfaceDataWriteModel> data)
+        {
+            return _itInterfaceService.ReplaceInterfaceData(interfaceToUpdate.Id, data);
+        }
+
+        private Result<ItInterface, OperationError> UpdateNote(ItInterface interfaceToUpdate, string note)
+        {
+            return _itInterfaceService.UpdateNote(interfaceToUpdate.Id, note);
+        }
+
+        private Result<ItInterface, OperationError> UpdateInterfaceType(ItInterface interfaceToUpdate, Guid? interfaceTypeUuid)
+        {
+            return _itInterfaceService.UpdateInterfaceType(interfaceToUpdate.Id, interfaceTypeUuid);
+        }
+
+        private Result<ItInterface, OperationError> UpdateScope(ItInterface interfaceToUpdate, AccessModifier newAccessModifier)
+        {
+            return _itInterfaceService.UpdateAccessModifier(interfaceToUpdate.Id, newAccessModifier);
+        }
 
         private Result<ItInterface, OperationError> UpdateActivatedState(ItInterface interfaceToUpdate, bool deactivated)
         {
