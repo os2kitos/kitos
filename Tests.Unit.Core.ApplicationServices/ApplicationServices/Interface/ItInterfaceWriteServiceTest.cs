@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -17,6 +18,7 @@ using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
+using Tests.Toolkit.TestInputs;
 using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.Interface
@@ -60,13 +62,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var organizationUuid = A<Guid>();
             var inputParameters = A<ItInterfaceWriteModel>();
-
-            //TODO: Remove these resets and cover the new fields
-            inputParameters.Note = OptionalValueChange<string>.None;
-            inputParameters.Data = OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>>.None;
-            inputParameters.Scope = OptionalValueChange<AccessModifier>.None;
-            inputParameters.InterfaceTypeUuid = OptionalValueChange<Guid?>.None;
-
             var transactionMock = ExpectTransactionBegins();
             var orgId = A<int>();
             var itInterface = new ItInterface { Id = A<int>() };
@@ -74,12 +69,15 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
             ExpectUpdateVersionReturns(itInterface.Id, inputParameters, itInterface);
             ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters, itInterface);
             ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters, itInterface);
+            ExpectUpdateNoteReturns(itInterface.Id, inputParameters, itInterface);
+            ExpectUpdateDataReturns(itInterface.Id, inputParameters, itInterface);
+            ExpectUpdateAccessModifierReturns(itInterface.Id, inputParameters, itInterface);
+            ExpectUpdateInterfaceType(itInterface.Id, inputParameters, itInterface);
             if (inputParameters.Deactivated.NewValue)
                 ExpectDeactivateReturns(itInterface, itInterface);
             else
@@ -330,22 +328,23 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
 
-        [Theory]
-        [InlineData(true, true, true, true, true, true)]
-        [InlineData(false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, true, false)]
-        [InlineData(false, false, false, true, false, false)]
-        [InlineData(false, false, true, false, false, false)]
-        [InlineData(false, true, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false)]
+        public static IEnumerable<object[]> UpdateParameterInputs()
+        {
+            return BooleanInputMatrixFactory.Create(10);
+        }
+
+        [Theory, MemberData(nameof(UpdateParameterInputs))]
         public void Update_Returns_Ok_And_Only_Updates_Parameters_With_Changes(
             bool withNameChange,
             bool withInterfaceIdChange,
             bool withExposingSystemChange,
             bool withVersionChange,
             bool withDescriptionChange,
-            bool withUrlReferenceChange)
+            bool withUrlReferenceChange,
+            bool withNote,
+            bool withScope,
+            bool withData,
+            bool withInterfaceType)
         {
             //Arrange
             var inputParameters = new ItInterfaceWriteModel
@@ -356,8 +355,11 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
                 Version = withVersionChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
                 Description = withDescriptionChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
                 UrlReference = withUrlReferenceChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
+                Note = withNote ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
+                Scope = withScope ? A<AccessModifier>().AsChangedValue() : OptionalValueChange<AccessModifier>.None,
+                Data = withData ? Many<ItInterfaceDataWriteModel>().ToList().AsChangedValue<IReadOnlyList<ItInterfaceDataWriteModel>>() : OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>>.None,
+                InterfaceTypeUuid = withInterfaceType ? A<Guid?>().AsChangedValue() : OptionalValueChange<Guid?>.None,
             };
-            //TODO: Extend with the new params
             var transactionMock = ExpectTransactionBegins();
             var originalExposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = originalExposingSystem }, ItInterfaceId = A<string>() };
@@ -384,6 +386,18 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             if (withUrlReferenceChange)
                 ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters, itInterface);
 
+            if (withNote)
+                ExpectUpdateNoteReturns(itInterface.Id, inputParameters, itInterface);
+
+            if (withData)
+                ExpectUpdateDataReturns(itInterface.Id, inputParameters, itInterface);
+
+            if (withScope)
+                ExpectUpdateAccessModifierReturns(itInterface.Id, inputParameters, itInterface);
+
+            if (withInterfaceType)
+                ExpectUpdateInterfaceType(itInterface.Id, inputParameters, itInterface);
+
 
             //Act
             var result = _sut.Update(itInterface.Uuid, inputParameters);
@@ -397,30 +411,45 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             else
                 _interfaceServiceMock.Verify(x => x.UpdateNameAndInterfaceId(itInterface.Id, It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 
-
             if (withExposingSystemChange)
                 _interfaceServiceMock.Verify(x => x.UpdateExposingSystem(itInterface.Id, newExposingSystem.Id), Times.Once);
             else
                 _interfaceServiceMock.Verify(x => x.UpdateExposingSystem(itInterface.Id, It.IsAny<int?>()), Times.Never);
-
 
             if (withVersionChange)
                 _interfaceServiceMock.Verify(x => x.UpdateVersion(itInterface.Id, inputParameters.Version.NewValue), Times.Once);
             else
                 _interfaceServiceMock.Verify(x => x.UpdateVersion(itInterface.Id, It.IsAny<string>()), Times.Never);
 
-
             if (withDescriptionChange)
                 _interfaceServiceMock.Verify(x => x.UpdateDescription(itInterface.Id, inputParameters.Description.NewValue), Times.Once);
             else
                 _interfaceServiceMock.Verify(x => x.UpdateDescription(itInterface.Id, It.IsAny<string>()), Times.Never);
-
 
             if (withUrlReferenceChange)
                 _interfaceServiceMock.Verify(x => x.UpdateUrlReference(itInterface.Id, inputParameters.UrlReference.NewValue), Times.Once);
             else
                 _interfaceServiceMock.Verify(x => x.UpdateUrlReference(itInterface.Id, It.IsAny<string>()), Times.Never);
 
+            if (withNote)
+                _interfaceServiceMock.Verify(x => x.UpdateNote(itInterface.Id, inputParameters.Note.NewValue), Times.Once);
+            else
+                _interfaceServiceMock.Verify(x => x.UpdateNote(itInterface.Id, It.IsAny<string>()), Times.Never);
+
+            if (withScope)
+                _interfaceServiceMock.Verify(x => x.UpdateAccessModifier(itInterface.Id, inputParameters.Scope.NewValue), Times.Once);
+            else
+                _interfaceServiceMock.Verify(x => x.UpdateAccessModifier(itInterface.Id, It.IsAny<AccessModifier>()), Times.Never);
+
+            if (withData)
+                _interfaceServiceMock.Verify(x => x.ReplaceInterfaceData(itInterface.Id, inputParameters.Data.NewValue), Times.Once);
+            else
+                _interfaceServiceMock.Verify(x => x.ReplaceInterfaceData(itInterface.Id, It.IsAny<IEnumerable<ItInterfaceDataWriteModel>>()), Times.Never);
+
+            if (withInterfaceType)
+                _interfaceServiceMock.Verify(x => x.UpdateInterfaceType(itInterface.Id, inputParameters.InterfaceTypeUuid.NewValue), Times.Once);
+            else
+                _interfaceServiceMock.Verify(x => x.UpdateInterfaceType(itInterface.Id, It.IsAny<Guid?>()), Times.Never);
         }
 
         [Fact]
@@ -774,6 +803,34 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         private void ExpectActivateReturns(ItInterface itInterface, Result<ItInterface, OperationError> result)
         {
             _interfaceServiceMock.Setup(x => x.Activate(itInterface.Id)).Returns(result);
+        }
+
+        private void ExpectUpdateInterfaceType(int itInterfaceId, ItInterfaceWriteModel inputParameters, Result<ItInterface, OperationError> result)
+        {
+            _interfaceServiceMock
+                .Setup(x => x.UpdateInterfaceType(itInterfaceId, inputParameters.InterfaceTypeUuid.NewValue))
+                .Returns(result);
+        }
+
+        private void ExpectUpdateAccessModifierReturns(int itInterfaceId, ItInterfaceWriteModel inputParameters, Result<ItInterface, OperationError> result)
+        {
+            _interfaceServiceMock
+                .Setup(x => x.UpdateAccessModifier(itInterfaceId, inputParameters.Scope.NewValue))
+                .Returns(result);
+        }
+
+        private void ExpectUpdateDataReturns(int itInterfaceId, ItInterfaceWriteModel inputParameters, Result<ItInterface, OperationError> result)
+        {
+            _interfaceServiceMock
+                .Setup(x => x.ReplaceInterfaceData(itInterfaceId, inputParameters.Data.NewValue))
+                .Returns(result);
+        }
+
+        private void ExpectUpdateNoteReturns(int itInterfaceId, ItInterfaceWriteModel inputParameters, Result<ItInterface, OperationError> result)
+        {
+            _interfaceServiceMock
+                .Setup(x => x.UpdateNote(itInterfaceId, inputParameters.Note.NewValue))
+                .Returns(result);
         }
     }
 }
