@@ -641,7 +641,11 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
 
-        //TODO: Test delete       
+        [Fact]
+        public void Can_Delete()
+        {
+            Assert.Fail("Not implemented yet");
+        }
 
         private void ExpectGetItInterfaceReturns(Guid itInterfaceUuid, Result<ItInterface, OperationError> result)
         {

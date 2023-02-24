@@ -157,10 +157,9 @@ namespace Core.ApplicationServices.Interface.Write
 
         public Result<ItInterface, OperationError> Delete(Guid interfaceUuid)
         {
-            using var transaction = _transactionManager.Begin();
             try
             {
-                var result = GetItInterfaceAndAuthorizeAccess(interfaceUuid)
+                return _itInterfaceService.GetInterface(interfaceUuid)
                     .Select(itInterface => (itInterface, _systemService.Delete(itInterface.Id, true)))
                     .Bind<ItInterface>(result =>
                     {
@@ -172,18 +171,6 @@ namespace Core.ApplicationServices.Interface.Write
                             _ => new OperationError($"Failed with:{result.Item2:G}", OperationFailure.UnknownError)
                         };
                     });
-
-                if (result.Ok)
-                {
-                    SaveAndNotify(result.Value, transaction);
-                }
-                else
-                {
-                    transaction.Rollback();
-                    _logger.Error("Failed to deleting It-Interface with uuid: {uuid} due to error: {errorMessage}", interfaceUuid, result.Error.ToString());
-                }
-
-                return result;
             }
             catch (Exception e)
             {

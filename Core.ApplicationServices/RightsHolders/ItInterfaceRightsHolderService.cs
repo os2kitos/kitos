@@ -243,7 +243,7 @@ namespace Core.ApplicationServices.RightsHolders
 
         private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
         {
-            return _writeService.Update(originalInterface.Uuid, new ItInterfaceWriteModelParameters()
+            var parameters = new ItInterfaceWriteModelParameters
             {
                 Name = updateParameters.Name,
                 Description = updateParameters.Description,
@@ -251,7 +251,8 @@ namespace Core.ApplicationServices.RightsHolders
                 Version = updateParameters.Version,
                 UrlReference = updateParameters.UrlReference,
                 ExposingSystemUuid = updateParameters.ExposingSystemUuid
-            });
+            };
+            return _writeService.Update(originalInterface.Uuid, parameters);
         }
 
         private void SaveAndNotify(ItInterface itInterface, IDatabaseTransaction transaction)
