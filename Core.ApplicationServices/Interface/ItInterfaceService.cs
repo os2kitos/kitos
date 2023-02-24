@@ -15,7 +15,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Repositories.Interface;
@@ -63,49 +62,47 @@ namespace Core.ApplicationServices.Interface
         }
         public Result<ItInterface, OperationFailure> Delete(int id, bool breakBindings = false)
         {
-            using (var transaction = _transactionManager.Begin())
+            using var transaction = _transactionManager.Begin();
+            var getItInterfaceResult = _interfaceRepository.GetInterface(id);
+
+            if (getItInterfaceResult.IsNone)
             {
-                var getItInterfaceResult = _interfaceRepository.GetInterface(id);
-
-                if (getItInterfaceResult.IsNone)
-                {
-                    return OperationFailure.NotFound;
-                }
-
-                var itInterface = getItInterfaceResult.Value;
-                if (!_authorizationContext.AllowDelete(itInterface))
-                {
-                    return OperationFailure.Forbidden;
-                }
-
-                if (itInterface.ExhibitedBy != null)
-                {
-                    if (breakBindings)
-                    {
-                        var updateExposingSystemResult = UpdateExposingSystem(id, null);
-                        if (updateExposingSystemResult.Failed)
-                            return updateExposingSystemResult.Error.FailureType;
-                    }
-                    else
-                    {
-                        return OperationFailure.Conflict;
-                    }
-                }
-
-                var dataRows = itInterface.DataRows.ToList();
-                foreach (var dataRow in dataRows)
-                {
-                    _dataRowRepository.DeleteByKey(dataRow.Id);
-                }
-                _dataRowRepository.Save();
-
-                // delete it interface
-                _domainEvents.Raise(new EntityBeingDeletedEvent<ItInterface>(itInterface));
-                _interfaceRepository.Delete(itInterface);
-
-                transaction.Commit();
-                return itInterface;
+                return OperationFailure.NotFound;
             }
+
+            var itInterface = getItInterfaceResult.Value;
+            if (!_authorizationContext.AllowDelete(itInterface))
+            {
+                return OperationFailure.Forbidden;
+            }
+
+            if (itInterface.ExhibitedBy != null)
+            {
+                if (breakBindings)
+                {
+                    var updateExposingSystemResult = UpdateExposingSystem(id, null);
+                    if (updateExposingSystemResult.Failed)
+                        return updateExposingSystemResult.Error.FailureType;
+                }
+                else
+                {
+                    return OperationFailure.Conflict;
+                }
+            }
+
+            var dataRows = itInterface.DataRows.ToList();
+            foreach (var dataRow in dataRows)
+            {
+                _dataRowRepository.DeleteByKey(dataRow.Id);
+            }
+            _dataRowRepository.Save();
+
+            // delete it interface
+            _domainEvents.Raise(new EntityBeingDeletedEvent<ItInterface>(itInterface));
+            _interfaceRepository.Delete(itInterface);
+
+            transaction.Commit();
+            return itInterface;
         }
 
         public IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions)
