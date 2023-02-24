@@ -6,13 +6,11 @@ using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Shared;
-using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.System;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainServices;
 using Core.DomainServices.Repositories.Organization;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -24,39 +22,34 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
     public class ItInterfaceWriteServiceTest : WithAutoFixture
     {
         private readonly ItInterfaceWriteService _sut;
-        private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<ILogger> _logger;
-        private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
-        private readonly Mock<IUserRepository> _userRepositoryMock;
-        private readonly Mock<IOperationClock> _operationClockMock;
+        private readonly Mock<IAuthorizationContext> _authorizationContextMock;
+        private readonly Mock<IDatabaseControl> _databaseControlMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
 
         public ItInterfaceWriteServiceTest()
         {
-            _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _itSystemServiceMock = new Mock<IItSystemService>();
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _logger = new Mock<ILogger>();
-            _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
-            _userRepositoryMock = new Mock<IUserRepository>();
-            _operationClockMock = new Mock<IOperationClock>();
-
-            //TODO
-            //_sut = new ItInterfaceRightsHolderService(
-            //    _userContextMock.Object,
-            //    _organizationRepositoryMock.Object,
-            //    _itSystemServiceMock.Object,
-            //    _interfaceServiceMock.Object,
-            //    _transactionManagerMock.Object,
-            //    _logger.Object,
-            //    _globalAdminNotificationServiceMock.Object,
-            //    _userRepositoryMock.Object,
-            //    _operationClockMock.Object);
+            _authorizationContextMock = new Mock<IAuthorizationContext>();
+            _databaseControlMock = new Mock<IDatabaseControl>();
+            _domainEventsMock = new Mock<IDomainEvents>();
+            _sut = new ItInterfaceWriteService(
+                _organizationRepositoryMock.Object,
+                _itSystemServiceMock.Object,
+                _interfaceServiceMock.Object,
+                _transactionManagerMock.Object,
+                _logger.Object,
+                _authorizationContextMock.Object,
+                _databaseControlMock.Object,
+                _domainEventsMock.Object);
         }
 
         [Fact]
@@ -72,7 +65,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
 
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
@@ -86,25 +78,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Assert
             Assert.True(result.Ok);
             transactionMock.Verify(x => x.Commit(), Times.Once);
-        }
-
-        [Fact]
-        public void Create_Returns_BadInput_If_ExposingSystem_Has_No_Changes()
-        {
-            //Arrange
-            var organizationUuid = A<Guid>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
-            var transactionMock = ExpectTransactionBegins();
-
-            inputParameters.ExposingSystemUuid = OptionalValueChange<Guid>.None;
-
-            //Act
-            var result = _sut.Create(organizationUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -161,7 +134,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var itInterface = new ItInterface { Id = A<int>() };
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.NotFound));
 
@@ -190,32 +162,8 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var itInterface = new ItInterface { Id = A<int>() };
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.Forbidden));
-
-            //Act
-            var result = _sut.Create(organizationUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Create_Returns_Forbidden_If_No_WriteAccess()
-        {
-            //Arrange
-            var organizationUuid = A<Guid>();
-            var orgId = A<int>();
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
-
-            ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, false);
 
             //Act
             var result = _sut.Create(organizationUuid, inputParameters);
@@ -240,7 +188,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, operationError);
 
             //Act
@@ -271,7 +218,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, operationError);
 
@@ -299,7 +245,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
             ExpectUpdateVersionReturns(itInterface.Id, inputParameters, operationError);
@@ -328,7 +273,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
             ExpectUpdateVersionReturns(itInterface.Id, inputParameters, itInterface);
@@ -358,7 +302,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
             ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
             ExpectUpdateVersionReturns(itInterface.Id, inputParameters, itInterface);
@@ -406,7 +349,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = originalExposingSystem }, ItInterfaceId = A<string>() };
             var newExposingSystem = new ItSystem { Id = A<int>(), Uuid = withExposingSystemChange ? inputParameters.ExposingSystemUuid.NewValue : A<Guid>(), BelongsToId = A<int>() };
 
-            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
 
             if (withNameChange || withInterfaceIdChange)
@@ -479,7 +422,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.NotFound));
 
             //Act
@@ -504,7 +447,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.Forbidden));
 
             //Act
@@ -548,7 +491,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
-            ExpectHasSpecificAccessReturns(itInterface, false);
+            ExpectHasWriteAccess(itInterface, false);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
 
@@ -558,28 +501,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Update_Returns_BadState_If_ItInterface_Is_Disabled()
-        {
-            //Arrange
-            var inputParameters = A<ItInterfaceWriteModelParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem }, Disabled = true };
-
-            ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-
-            //Act
-            var result = _sut.Update(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
 
@@ -598,8 +519,8 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             var operationError = A<OperationError>();
 
-            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, operationError);
 
             //Act
@@ -625,7 +546,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             var operationError = A<OperationError>();
 
-            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, operationError);
@@ -653,7 +574,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             var operationError = A<OperationError>();
 
-            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateVersionReturns(itInterface.Id, inputParameters, operationError);
 
@@ -680,7 +601,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             var operationError = A<OperationError>();
 
-            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters, operationError);
 
@@ -707,7 +628,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             var operationError = A<OperationError>();
 
-            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectHasWriteAccess(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters, operationError);
 
@@ -769,11 +690,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             _organizationRepositoryMock.Setup(x => x.GetByUuid(organizationUuid)).Returns(organization);
         }
 
-        private void ExpectUserHasRightsHolderAccessInOrganizationReturns(int orgId, bool value)
-        {
-            _userContextMock.Setup(x => x.HasRole(orgId, OrganizationRole.RightsHolderAccess)).Returns(value);
-        }
-
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
         {
             var transactionMock = new Mock<IDatabaseTransaction>();
@@ -781,10 +697,9 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             return transactionMock;
         }
 
-        private void ExpectHasSpecificAccessReturns(ItInterface itInterface, bool value)
+        private void ExpectHasWriteAccess(ItInterface itInterface, bool value)
         {
-            _userContextMock.Setup(x => x.HasRole(itInterface.ExhibitedBy.ItSystem.BelongsToId.Value, OrganizationRole.RightsHolderAccess))
-                .Returns(value);
+            _authorizationContextMock.Setup(x => x.AllowModify(itInterface)).Returns(value);
         }
     }
 }

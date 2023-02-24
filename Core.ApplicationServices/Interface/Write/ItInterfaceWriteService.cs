@@ -81,7 +81,6 @@ namespace Core.ApplicationServices.Interface.Write
 
         public Result<ItInterface, OperationError> Create(Guid organizationUuid, ItInterfaceWriteModelParameters parameters)
         {
-            //TODO: Validate done do
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
 
