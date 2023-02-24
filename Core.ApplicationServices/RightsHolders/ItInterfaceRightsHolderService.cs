@@ -127,6 +127,7 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetInterface(interfaceUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
+                    //TODO: Must use the write service in stead
                     .Bind(itInterface => _itInterfaceService.Deactivate(itInterface.Id)); //TODO: Migrate to use the write service once we have it
 
                 if (result.Ok)

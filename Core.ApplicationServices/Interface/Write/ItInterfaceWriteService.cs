@@ -4,7 +4,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Shared;
-using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Repositories.Organization;
@@ -159,18 +158,16 @@ namespace Core.ApplicationServices.Interface.Write
         {
             try
             {
-                return _itInterfaceService.GetInterface(interfaceUuid)
-                    .Select(itInterface => (itInterface, _systemService.Delete(itInterface.Id, true)))
-                    .Bind<ItInterface>(result =>
-                    {
-                        return result.Item2 switch
-                        {
-                            SystemDeleteResult.Ok => result.itInterface,
-                            SystemDeleteResult.Forbidden => new OperationError(OperationFailure.Forbidden),
-                            SystemDeleteResult.NotFound => new OperationError(OperationFailure.NotFound),
-                            _ => new OperationError($"Failed with:{result.Item2:G}", OperationFailure.UnknownError)
-                        };
-                    });
+                return GetItInterfaceAndAuthorizeAccess(interfaceUuid)
+                    .Select(itInterface => _itInterfaceService.Delete(itInterface.Id, true))
+                    .Match
+                    (deleteResult => deleteResult.Match<Result<ItInterface, OperationError>>
+                        (
+                            deletedInterface => deletedInterface,
+                            failure => new OperationError(failure)
+                        )
+                        , error => error
+                    );
             }
             catch (Exception e)
             {

@@ -6,6 +6,7 @@ using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
@@ -644,7 +645,53 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         [Fact]
         public void Can_Delete()
         {
-            Assert.Fail("Not implemented yet");
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, true);
+            _interfaceServiceMock.Setup(x => x.Delete(itInterface.Id, true)).Returns(itInterface).Verifiable();
+
+            //Act
+            var result = _sut.Delete(itInterface.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            _interfaceServiceMock.VerifyAll();
+        }
+
+        [Fact]
+        public void Cannot_Delete_If_DeleteInService_Fails()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, true);
+            var failure = A<OperationFailure>();
+            _interfaceServiceMock.Setup(x => x.Delete(itInterface.Id, true)).Returns(failure);
+
+            //Act
+            var result = _sut.Delete(itInterface.Uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(failure, result.Error.FailureType);
+        }
+
+
+        [Fact]
+        public void Cannot_Delete_If_Unauthorized_To_Modify()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, false);
+
+            //Act
+            var result = _sut.Delete(itInterface.Uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         private void ExpectGetItInterfaceReturns(Guid itInterfaceUuid, Result<ItInterface, OperationError> result)
