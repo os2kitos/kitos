@@ -330,7 +330,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
         public static IEnumerable<object[]> UpdateParameterInputs()
         {
-            return BooleanInputMatrixFactory.Create(10);
+            return BooleanInputMatrixFactory.Create(11);
         }
 
         [Theory, MemberData(nameof(UpdateParameterInputs))]
@@ -344,7 +344,8 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             bool withNote,
             bool withScope,
             bool withData,
-            bool withInterfaceType)
+            bool withInterfaceType,
+            bool withDeactivated)
         {
             //Arrange
             var inputParameters = new ItInterfaceWriteModel
@@ -359,6 +360,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
                 Scope = withScope ? A<AccessModifier>().AsChangedValue() : OptionalValueChange<AccessModifier>.None,
                 Data = withData ? Many<ItInterfaceDataWriteModel>().ToList().AsChangedValue<IReadOnlyList<ItInterfaceDataWriteModel>>() : OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>>.None,
                 InterfaceTypeUuid = withInterfaceType ? A<Guid?>().AsChangedValue() : OptionalValueChange<Guid?>.None,
+                Deactivated = withDeactivated ? A<bool>().AsChangedValue() : OptionalValueChange<bool>.None,
             };
             var transactionMock = ExpectTransactionBegins();
             var originalExposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
@@ -397,6 +399,18 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
             if (withInterfaceType)
                 ExpectUpdateInterfaceType(itInterface.Id, inputParameters, itInterface);
+
+            if (withDeactivated)
+            {
+                if (inputParameters.Deactivated.NewValue)
+                {
+                    ExpectDeactivateReturns(itInterface, itInterface);
+                }
+                else
+                {
+                    ExpectActivateReturns(itInterface, itInterface);
+                }
+            }
 
 
             //Act
@@ -450,6 +464,25 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
                 _interfaceServiceMock.Verify(x => x.UpdateInterfaceType(itInterface.Id, inputParameters.InterfaceTypeUuid.NewValue), Times.Once);
             else
                 _interfaceServiceMock.Verify(x => x.UpdateInterfaceType(itInterface.Id, It.IsAny<Guid?>()), Times.Never);
+
+            if (withDeactivated)
+            {
+                if (inputParameters.Deactivated.NewValue)
+                {
+                    _interfaceServiceMock.Verify(x => x.Deactivate(itInterface.Id), Times.Once());
+                    _interfaceServiceMock.Verify(x => x.Activate(itInterface.Id), Times.Never());
+                }
+                else
+                {
+                    _interfaceServiceMock.Verify(x => x.Deactivate(itInterface.Id), Times.Never());
+                    _interfaceServiceMock.Verify(x => x.Activate(itInterface.Id), Times.Once());
+                }
+            }
+            else
+            {
+                _interfaceServiceMock.Verify(x=>x.Deactivate(itInterface.Id),Times.Never());
+                _interfaceServiceMock.Verify(x=>x.Activate(itInterface.Id),Times.Never());
+            }
         }
 
         [Fact]
