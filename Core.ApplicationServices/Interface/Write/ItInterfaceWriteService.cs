@@ -54,6 +54,14 @@ namespace Core.ApplicationServices.Interface.Write
                 .Bind(itInterface => itInterface.WithOptionalUpdate(update.Deactivated, UpdateActivatedState));
         }
 
+        /*
+         *public OptionalValueChange<AccessModifier> Scope { get; set; } = OptionalValueChange<AccessModifier>.None;
+        public OptionalValueChange<Guid?> InterfaceTypeUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<string> Note { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<ItInterfaceDataWriteModel> Data { get; set; } = OptionalValueChange<ItInterfaceDataWriteModel>.None;
+         *
+         */
+
         private Result<ItInterface, OperationError> UpdateActivatedState(ItInterface interfaceToUpdate, bool deactivated)
         {
             return deactivated ? _itInterfaceService.Deactivate(interfaceToUpdate.Id) : _itInterfaceService.Activate(interfaceToUpdate.Id);

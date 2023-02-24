@@ -6,7 +6,6 @@ using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Shared;
-using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
