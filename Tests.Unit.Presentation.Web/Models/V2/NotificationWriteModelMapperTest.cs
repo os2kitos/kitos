@@ -1,4 +1,5 @@
-﻿using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
+﻿using System;
+using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Notification.Write;
@@ -21,12 +22,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var request = A<ImmediateNotificationWriteRequestDTO>();
+            var ownerResourceUuid = A<Guid>();
 
             //Act
-            var parameters = _sut.FromImmediatePOST(request, ownerResourceType);
+            var parameters = _sut.FromImmediatePOST(request, ownerResourceUuid, ownerResourceType);
 
             //Assert
-            AssertImmediateRequest(request, parameters, ownerResourceType);
+            AssertImmediateRequest(ownerResourceUuid, request, parameters, ownerResourceType);
         }
 
         [Theory]
@@ -37,12 +39,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var request = A<ScheduledNotificationWriteRequestDTO>();
+            var ownerResourceUuid = A<Guid>();
 
             //Act
-            var parameters = _sut.FromScheduledPOST(request, ownerResourceType);
+            var parameters = _sut.FromScheduledPOST(request, ownerResourceUuid, ownerResourceType);
 
             //Assert
-            AssertScheduledRequest(request, parameters, ownerResourceType);
+            AssertScheduledRequest(ownerResourceUuid, request, parameters, ownerResourceType);
         }
 
         [Theory]
@@ -53,40 +56,43 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var request = A<UpdateScheduledNotificationWriteRequestDTO>();
+            var ownerResourceUuid = A<Guid>();
 
             //Act
-            var parameters = _sut.FromScheduledPUT(request, ownerResourceType);
+            var parameters = _sut.FromScheduledPUT(request, ownerResourceUuid, ownerResourceType);
 
             //Assert
-            AssertUpdateScheduledRequest(request, parameters, ownerResourceType);
+            AssertUpdateScheduledRequest(ownerResourceUuid, request, parameters, ownerResourceType);
         }
 
-        private static void AssertScheduledRequest(ScheduledNotificationWriteRequestDTO request,
+        private static void AssertScheduledRequest(Guid ownerResourceUuid, ScheduledNotificationWriteRequestDTO request,
             CreateScheduledNotificationModificationParameters parameters, OwnerResourceType ownerResourceType)
         {
-            AssertImmediateRequest(request, parameters, ownerResourceType);
+            AssertImmediateRequest(ownerResourceUuid, request, parameters, ownerResourceType);
 
             Assert.Equal(request.FromDate, parameters.FromDate);
             Assert.Equal(request.RepetitionFrequency.ToScheduling(), parameters.RepetitionFrequency);
         }
 
-        private static void AssertUpdateScheduledRequest(UpdateScheduledNotificationWriteRequestDTO request,
+        private static void AssertUpdateScheduledRequest(Guid ownerResourceUuid, UpdateScheduledNotificationWriteRequestDTO request,
             UpdateScheduledNotificationModificationParameters parameters, OwnerResourceType ownerResourceType)
         {
-            AssertImmediateRequest(request, parameters, ownerResourceType);
+            AssertImmediateRequest(ownerResourceUuid, request, parameters, ownerResourceType);
 
             Assert.Equal(request.Name, parameters.Name);
             Assert.Equal(request.ToDate, parameters.ToDate);
         }
 
-        private static void AssertImmediateRequest(ImmediateNotificationWriteRequestDTO request, ImmediateNotificationModificationParameters parameters, OwnerResourceType ownerResourceType)
+        private static void AssertImmediateRequest<TDTO, TParameters>(Guid ownerResourceUuid, TDTO request, TParameters parameters, OwnerResourceType ownerResourceType)
+        where TDTO: class, IHasBaseWriteProperties
+        where TParameters: class, IHasBaseNotificationPropertiesParameters
         {
-            Assert.Equal(request.Body, parameters.Body);
-            Assert.Equal(request.Subject, parameters.Subject);
-            Assert.Equal(request.OwnerResourceUuid, parameters.OwnerResourceUuid);
-            Assert.Equal(ownerResourceType, parameters.Type.ToOwnerResourceType());
-            AssertRootRecipients(request.Ccs, parameters.Ccs);
-            AssertRootRecipients(request.Receivers, parameters.Receivers);
+            Assert.Equal(request.BaseProperties.Body, parameters.BaseProperties.Body);
+            Assert.Equal(request.BaseProperties.Subject, parameters.BaseProperties.Subject);
+            Assert.Equal(ownerResourceUuid, parameters.BaseProperties.OwnerResourceUuid);
+            Assert.Equal(ownerResourceType, parameters.BaseProperties.Type.ToOwnerResourceType());
+            AssertRootRecipients(request.BaseProperties.Ccs, parameters.BaseProperties.Ccs);
+            AssertRootRecipients(request.BaseProperties.Receivers, parameters.BaseProperties.Receivers);
         }
 
         private static void AssertRootRecipients(RecipientWriteRequestDTO request, RootRecipientModificationParameters parameters)

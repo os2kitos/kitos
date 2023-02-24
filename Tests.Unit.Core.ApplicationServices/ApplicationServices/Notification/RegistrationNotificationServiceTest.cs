@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices;
@@ -111,14 +110,20 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
-        [Fact]
-        public void Can_GetNotificationById()
+        [Theory]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Can_GetNotificationById(RelatedEntityType relatedEntityType)
         {
             //Arrange
             var id = A<int>();
             var notification = new Advice {Id = id};
+            var entity = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectGetByIdReturns(id, notification);
+            ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(entity));
+            ExpectAllowReadsReturns(entity, true);
 
             //Act
             var result = _sut.GetNotificationById(id);
@@ -167,7 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         public void Can_CreateImmediateNotification(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var model = A<ImmediateNotificationModel>();
+            var model = CreateImmediateModel();
             var entity = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
@@ -193,7 +198,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         public void Can_CreateScheduledNotification(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var model = A<ScheduledNotificationModel>();
+            var model = CreateScheduledModel();
             var entity = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
@@ -219,7 +224,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         public void CreateImmediate_Returns_Forbidden_When_User_Not_Allowed_To_Modify_RootEntity(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var model = A<ImmediateNotificationModel>();
+            var model = CreateImmediateModel();
             var entity = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
@@ -240,7 +245,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         public void CreateScheduled_Returns_Forbidden_When_User_Not_Allowed_To_Modify_RootEntity(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var model = A<ScheduledNotificationModel>();
+            var model = CreateScheduledModel();
             var entity = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(entity));
@@ -262,14 +267,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var model = A<UpdateScheduledNotificationModel>();
-            var notification = new Advice{Id = id};
+            var model = CreateUpdateScheduledModel();
+            var notification = new Advice{Id = id, IsActive = true, AdviceType = AdviceType.Repeat};
             var root = CreateEntityWithAdvices(relatedEntityType);
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
-            ExpectAllowModifyReturns(notification, true);
-            ExpectResolveRootReturns(model.BaseProperties, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectAllowReadsReturns(root, true);
+            ExpectAllowModifyReturns(root, true);
+            ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
 
             //Act
             var result = _sut.Update(id, model);
@@ -287,17 +293,22 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
-        [Fact]
-        public void Update_Returns_Forbidden_When_Not_Allowed_To_Modify_Root()
+        [Theory]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Update_Returns_Forbidden_When_Not_Allowed_To_Modify_Root(RelatedEntityType relatedEntityType)
         {
             //Arrange
             var id = A<int>();
             var model = A<UpdateScheduledNotificationModel>();
-            var notification = new Advice();
+            var notification = new Advice{Id = id};
+            var root = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
-            ExpectAllowModifyReturns(notification, false);
+            ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectAllowModifyReturns(root, false);
 
             //Act
             var result = _sut.Update(id, model);
@@ -338,7 +349,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
-            ExpectAllowDeleteReturns(notification, true);
+            ExpectAllowModifyReturns(root, true);
             ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
 
             //Act
@@ -352,16 +363,21 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
-        [Fact]
-        public void Delete_Returns_BadState_If_Entity_Cannot_Be_Deleted()
+        [Theory]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Delete_Returns_BadState_If_Entity_Cannot_Be_Deleted(RelatedEntityType relatedEntityType)
         {
             //Arrange
             var id = A<int>();
             var notification = new Advice{Id = id, IsActive = true};
+            var root = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
-            ExpectAllowDeleteReturns(notification, true);
+            ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectAllowModifyReturns(root, true);
 
             //Act
             var error = _sut.Delete(id);
@@ -370,17 +386,22 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.True(error.HasValue);
             Assert.Equal(OperationFailure.BadState, error.Value.FailureType);
         }
-
-        [Fact]
-        public void Delete_Returns_Forbidden_If_Entity_Is_Not_Allowed_To_Be_Deleted()
+        
+        [Theory]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Delete_Returns_Forbidden_If_Entity_Is_Not_Allowed_To_Be_Deleted(RelatedEntityType relatedEntityType)
         {
             //Arrange
             var id = A<int>();
-            var notification = new Advice();
+            var notification = new Advice{ Id = id };
+            var root = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
-            ExpectAllowDeleteReturns(notification, false);
+            ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectAllowModifyReturns(root, false);
 
             //Act
             var error = _sut.Delete(id);
@@ -420,7 +441,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
-            ExpectAllowModifyReturns(notification, true);
+            ExpectAllowModifyReturns(root, true);
             ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
 
             //Act
@@ -435,16 +456,21 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
-        [Fact]
-        public void Deactivate_Returns_Forbidden_If_Entity_Is_Not_Allowed_To_Be_Deleted()
+        [Theory]
+        [InlineData(RelatedEntityType.dataProcessingRegistration)]
+        [InlineData(RelatedEntityType.itSystemUsage)]
+        [InlineData(RelatedEntityType.itContract)]
+        public void Deactivate_Returns_Forbidden_If_Entity_Is_Not_Allowed_To_Be_Deleted(RelatedEntityType relatedEntityType)
         {
             //Arrange
             var id = A<int>();
-            var notification = new Advice();
+            var notification = new Advice{Id = id};
+            var root = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
-            ExpectAllowModifyReturns(notification, false);
+            ExpectAllowModifyReturns(root, false);
+            ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
 
             //Act
             var result = _sut.DeactivateNotification(id);
@@ -494,9 +520,9 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _authorizationContext.Setup(x => x.AllowModify(entity)).Returns(result);
         }
 
-        private void ExpectAllowDeleteReturns(IEntity entity, bool result)
+        private void ExpectAllowReadsReturns(IEntity entity, bool result)
         {
-            _authorizationContext.Setup(x => x.AllowDelete(entity)).Returns(result);
+            _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(result);
         }
 
         private void ExpectGetByIdReturns(int id, Maybe<Advice> result)
@@ -546,6 +572,53 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                 default:
                     throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
             }
+        }
+
+        private ImmediateNotificationModel CreateImmediateModel()
+        {
+            var model = A<ImmediateNotificationModel>();
+            CreateEmailRecipients(model);
+            model.BaseProperties.AdviceType = AdviceType.Immediate;
+
+            return model;
+        }
+
+        private ScheduledNotificationModel CreateScheduledModel()
+        {
+            var model = A<ScheduledNotificationModel>();
+            CreateEmailRecipients(model);
+            var random = new Random();
+            model.RepetitionFrequency = (Scheduling) random.Next(1, 8);
+            model.ToDate = model.FromDate.AddDays(A<int>());
+            model.BaseProperties.AdviceType = AdviceType.Repeat;
+
+            return model;
+        }
+
+        private UpdateScheduledNotificationModel CreateUpdateScheduledModel()
+        {
+            var model = A<UpdateScheduledNotificationModel>();
+            model.BaseProperties.AdviceType = AdviceType.Repeat;
+            return model;
+        }
+
+        private void CreateEmailRecipients<T>(T model) where T : class, IHasRecipientModels
+        {
+            CreateEmailsForListOfEmailRecipients(model.Ccs.EmailRecipients);
+            CreateEmailsForListOfEmailRecipients(model.Receivers.EmailRecipients);
+        }
+
+        private void CreateEmailsForListOfEmailRecipients(IEnumerable<EmailRecipientModel> emailRecipients)
+        {
+            foreach (var emailRecipientModel in emailRecipients)
+            {
+                emailRecipientModel.Email = CreateEmail();
+            }
+        }
+
+        private string CreateEmail()
+        {
+            return $"{A<Guid>()}@kitos.dk";
         }
     }
 }

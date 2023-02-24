@@ -139,7 +139,7 @@ namespace Core.DomainModel.Advice
 
         public bool HasInvalidState()
         {
-            return ObjectOwnerId == null || RelationId == null || Type == null;
+            return ObjectOwnerId == null || RelationId == null;
         }
 
         public static string CreatePartitionJobId(int adviceId,int partition)

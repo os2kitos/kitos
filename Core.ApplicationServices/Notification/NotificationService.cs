@@ -82,12 +82,6 @@ namespace Core.ApplicationServices.Notification
                 );
         }
 
-        private IEnumerable<AdviceSent> GetSentFilteredByNotificationUuidAndType(Guid uuid, int? relationId, RelatedEntityType relatedEntityType)
-        {
-            return _registrationNotificationService.GetSent()
-                .Where(x => x.Advice.Uuid == uuid && x.Advice.RelationId == relationId && x.Advice.Type == relatedEntityType).ToList();
-        }
-
         public Result<Advice, OperationError> CreateImmediateNotification(ImmediateNotificationModificationParameters parameters)
         {
             return Modify(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type, relatedEntity =>
@@ -139,7 +133,12 @@ namespace Core.ApplicationServices.Notification
         
         public Result<NotificationPermissions, OperationError> GetPermissions(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType)
         {
-            return GetNotificationByUuid(notificationUuid, relatedEntityUuid, relatedEntityType)
+            return _entityIdentityResolver.ResolveDbId<Advice>(notificationUuid)
+                .Match
+                (
+                    _registrationNotificationService.GetNotificationById,
+                    () => new OperationError($"Id for notification with uuid: {notificationUuid} was not found", OperationFailure.NotFound)
+                )
                 .Bind(notification =>
                 {
                     return GetRelatedEntity(relatedEntityUuid, relatedEntityType)
@@ -160,23 +159,23 @@ namespace Core.ApplicationServices.Notification
 
         private Result<Advice, OperationError> VerifyCanNotificationBeReadAndReturnNotification(Advice notification, Guid relatedEntityUuid, RelatedEntityType relatedEntityType)
         {
-            return GetPermissions(notification.Uuid, relatedEntityUuid, relatedEntityType)
-                .Bind<Advice>(permissions =>
+            return GetRelatedEntity(relatedEntityUuid, relatedEntityType)
+                .Match<Result<Advice, OperationError>>(relatedEntity =>
                 {
-                    if (!permissions.Read)
+                    if (!_authorizationContext.AllowReads(relatedEntity))
                         return new OperationError($"User not allowed to read the notification with uuid: {notification.Uuid}", OperationFailure.Forbidden);
 
                     if (notification.Type != relatedEntityType)
                         return new OperationError($"Notification related entity type is different than {relatedEntityType}", OperationFailure.BadInput);
 
                     return notification;
-                });
+                }, () => new OperationError("Related entity was not found", OperationFailure.NotFound));
         }
 
         private Result<(Advice notification, NotificationPermissions permissions), OperationError> GetPermissionsWithNotification(Guid notificationUuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType)
         {
             return GetNotificationByUuid(notificationUuid, relatedEntityUuid, relatedEntityType)
-                .Bind(notification => GetPermissions(notification.Uuid, relatedEntityUuid, relatedEntityType)
+                .Bind(notification => GetPermissions(notificationUuid, relatedEntityUuid, relatedEntityType)
                     .Select(permissions => (notification, permissions))
                 );
         }
@@ -205,6 +204,8 @@ namespace Core.ApplicationServices.Notification
         private Result<ScheduledNotificationModel, OperationError> MapCreateScheduledModel(CreateScheduledNotificationModificationParameters parameters, int relatedEntityId)
         {
             var model = MapScheduledBaseProperties<CreateScheduledNotificationModificationParameters, ScheduledNotificationModel>(parameters, relatedEntityId);
+            model.FromDate = parameters.FromDate;
+            model.RepetitionFrequency = parameters.RepetitionFrequency;
             return MapRecipientsToModel(parameters, model);
         }
 
@@ -313,6 +314,12 @@ namespace Core.ApplicationServices.Notification
             }
 
             return recipients;
+        }
+
+        private IEnumerable<AdviceSent> GetSentFilteredByNotificationUuidAndType(Guid uuid, int? relationId, RelatedEntityType relatedEntityType)
+        {
+            return _registrationNotificationService.GetSent()
+                .Where(x => x.Advice.Uuid == uuid && x.Advice.RelationId == relationId && x.Advice.Type == relatedEntityType).ToList();
         }
 
         private Maybe<int> ResolveRoleId(Guid roleUuid, RelatedEntityType relatedEntityType)

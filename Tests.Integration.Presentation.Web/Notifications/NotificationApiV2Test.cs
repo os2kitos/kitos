@@ -1,4 +1,4 @@
-﻿/*using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -8,6 +8,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Notification;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
@@ -29,16 +30,16 @@ namespace Tests.Integration.Presentation.Web.Notifications
             var ownerResourceType = A<OwnerResourceType>();
             var (relationUuid, _, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var body = CreateBaseNotificationWriteRequest<ImmediateNotificationWriteRequestDTO>(relationUuid, ownerResourceType);
+            var body = CreateImmediateNotificationWriteRequest(ownerResourceType);
 
             //Act
-            var response = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, body, cookie);
+            var response = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid, body, cookie);
 
             //Assert
             Assert.NotNull(response);
 
-            var notification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, response.Uuid, cookie);
-            AssertBaseNotification(body, notification, NotificationSendType.Immediate, notification.Uuid);
+            var notification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, relationUuid, response.Uuid, cookie);
+            AssertBaseNotification(body, notification, NotificationSendType.Immediate, relationUuid, notification.Uuid);
         }
 
         [Fact]
@@ -48,41 +49,41 @@ namespace Tests.Integration.Presentation.Web.Notifications
             var ownerResourceType = A<OwnerResourceType>();
             var (relationUuid, _, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var body = CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType);
-            
+            var body = CreateScheduledNotificationWriteRequest(ownerResourceType);
+
             //Act
-            var response = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, body, cookie);
+            var response = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, body, cookie);
 
             //Assert
             Assert.NotNull(response);
 
-            var notification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, response.Uuid, cookie);
-            AssertScheduledNotification(expected: body, actual: notification, NotificationSendType.Repeat, notification.Uuid);
+            var notification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, relationUuid, response.Uuid, cookie);
+            AssertScheduledNotification(expected: body, actual: notification, NotificationSendType.Repeat, relationUuid, notification.Uuid);
 
             //Arrange - update
-            var updateBody = CreateBaseScheduledNotificationWriteRequest<UpdateScheduledNotificationWriteRequestDTO>(relationUuid, ownerResourceType);
+            var updateBody = CreateUpdateScheduledNotificationWriteRequest(ownerResourceType);
 
             //Act - update
-            var updateResponse = await NotificationV2Helper.UpdateScheduledNotificationAsync(ownerResourceType, notification.Uuid, updateBody, cookie);
+            var updateResponse = await NotificationV2Helper.UpdateScheduledNotificationAsync(ownerResourceType, relationUuid, notification.Uuid, updateBody, cookie);
 
             //Assert - update
             Assert.NotNull(updateResponse);
 
-            var updatedNotification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, notification.Uuid, cookie);
-            AssertUpdateScheduledNotification(updateBody, updatedNotification, NotificationSendType.Repeat, notification.Uuid);
+            var updatedNotification = await NotificationV2Helper.GetNotificationByUuid(ownerResourceType, relationUuid, notification.Uuid, cookie);
+            AssertUpdateScheduledNotification(updateBody, updatedNotification, NotificationSendType.Repeat, relationUuid, notification.Uuid);
 
             //Act - deactivate
-            var deactivateResponse = await NotificationV2Helper.DeactivateNotificationAsync(ownerResourceType, notification.Uuid, cookie);
+            var deactivateResponse = await NotificationV2Helper.DeactivateNotificationAsync(ownerResourceType, relationUuid, notification.Uuid, cookie);
 
             //Assert - deactivate
             Assert.NotNull(deactivateResponse);
             Assert.False(deactivateResponse.Active);
 
             //Act - delete
-            await NotificationV2Helper.DeleteNotificationAsync(ownerResourceType, notification.Uuid, cookie);
+            await NotificationV2Helper.DeleteNotificationAsync(ownerResourceType, relationUuid, notification.Uuid, cookie);
 
             //Assert - delete
-            using var getDeletedNotificationResponse = await NotificationV2Helper.SendGetNotificationByUuid(ownerResourceType, notification.Uuid, cookie);
+            using var getDeletedNotificationResponse = await NotificationV2Helper.SendGetNotificationByUuid(ownerResourceType, relationUuid, notification.Uuid, cookie);
             Assert.Equal(HttpStatusCode.NotFound, getDeletedNotificationResponse.StatusCode);
         }
 
@@ -93,10 +94,10 @@ namespace Tests.Integration.Presentation.Web.Notifications
             var ownerResourceType = A<OwnerResourceType>();
             var (relationUuid, organization, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType), cookie);
-            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType), cookie);
-            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, CreateBaseNotificationWriteRequest<ImmediateNotificationWriteRequestDTO>(relationUuid, ownerResourceType), cookie);
-            var notification4 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, CreateBaseNotificationWriteRequest<ImmediateNotificationWriteRequestDTO>(relationUuid, ownerResourceType), cookie);
+            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
+            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid,  CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
+            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid,  CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
+            var notification4 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid, CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
 
             //Act
             var response = await NotificationV2Helper.GetNotificationsAsync(ownerResourceType, organization.Uuid, userCookie: cookie);
@@ -117,10 +118,10 @@ namespace Tests.Integration.Presentation.Web.Notifications
             var ownerResourceType = A<OwnerResourceType>();
             var (relationUuid, organization, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType), cookie);
-            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType), cookie);
-            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, CreateBaseNotificationWriteRequest<ImmediateNotificationWriteRequestDTO>(relationUuid, ownerResourceType), cookie);
-            var notification4 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, CreateBaseNotificationWriteRequest<ImmediateNotificationWriteRequestDTO>(relationUuid, ownerResourceType), cookie);
+            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid,  CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
+            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid,  CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
+            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid,  CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
+            var notification4 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid, CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
 
             //Act
             var responsePage1 = await NotificationV2Helper.GetNotificationsAsync(ownerResourceType, organization.Uuid, page: 0, pageSize: 2, userCookie: cookie);
@@ -139,47 +140,68 @@ namespace Tests.Integration.Presentation.Web.Notifications
         }
 
         [Fact]
-        public async Task Can_GetAll_Notifications_Filtered_By_FromDate()
+        public async Task Can_GetAll_Notifications_Filtered_By_OwnerResourceUuid()
+        {
+            //Arrange
+            var ownerResourceType = A<OwnerResourceType>();
+            var (relationUuid, organization, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
+            var relation2Uuid = await SetupRelatedResourceAsync(ownerResourceType, organization.Id);
+
+            var notificationRequest1 = CreateScheduledNotificationWriteRequest(ownerResourceType);
+            var notificationRequest2 = CreateScheduledNotificationWriteRequest(ownerResourceType);
+            var notificationRequest3 = CreateScheduledNotificationWriteRequest(ownerResourceType);
+            
+            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, notificationRequest1, cookie);
+            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, notificationRequest2, cookie);
+            await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relation2Uuid, notificationRequest3, cookie);
+
+            //Act
+            var response = await NotificationV2Helper.GetNotificationsAsync(ownerResourceType, organization.Uuid, ownerResourceUuid: relationUuid, userCookie: cookie);
+            var notifications = response.ToList();
+
+            //Assert
+            Assert.Equal(2, notifications.Count);
+            AssertNotificationList(notification1, notifications);
+            AssertNotificationList(notification2, notifications);
+        }
+
+        [Fact]
+        public async Task Can_GetAll_Notifications_Filtered_By_Active()
         {
             //Arrange
             var ownerResourceType = A<OwnerResourceType>();
             var (relationUuid, organization, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var notificationRequest1 = CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType);
-            var notificationRequest2 = CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType);
-            var notificationRequest3 = CreateScheduledNotificationWriteRequest(relationUuid, ownerResourceType);
+            var notificationRequest1 = CreateScheduledNotificationWriteRequest(ownerResourceType);
+            var notificationRequest2 = CreateScheduledNotificationWriteRequest(ownerResourceType);
 
-            notificationRequest2.FromDate = notificationRequest1.FromDate.AddDays(-1);
-            notificationRequest3.FromDate = notificationRequest1.FromDate.AddDays(1);
+            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, notificationRequest1, cookie);
+            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, notificationRequest2, cookie);
 
-            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, notificationRequest1, cookie);
-            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, notificationRequest2, cookie);
-            var notification3 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, notificationRequest3, cookie);
+            await NotificationV2Helper.DeactivateNotificationAsync(ownerResourceType, relationUuid, notification2.Uuid, cookie);
 
             //Act
-            var response = await NotificationV2Helper.GetNotificationsAsync(ownerResourceType, organization.Uuid, userCookie: cookie);
+            var response = await NotificationV2Helper.GetNotificationsAsync(ownerResourceType, organization.Uuid, onlyActive: true, userCookie: cookie);
             var notifications = response.ToList();
 
             //Assert
-            Assert.Equal(3, notifications.Count);
+            Assert.Single(notifications);
             AssertNotificationList(notification1, notifications);
-            AssertNotificationList(notification2, notifications);
-            AssertNotificationList(notification3, notifications);
         }
 
         [Fact]
-        public async Task Can_GetAccessRights()
+        public async Task Can_GetPermissions()
         {
             //Arrange
             var ownerResourceType = A<OwnerResourceType>();
             var (ownerResourceUuid, _, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var notificationRequest1 = CreateScheduledNotificationWriteRequest(ownerResourceUuid, ownerResourceType);
+            var notificationRequest1 = CreateScheduledNotificationWriteRequest(ownerResourceType);
 
-            var notification = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, notificationRequest1, cookie);
+            var notification = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, ownerResourceUuid, notificationRequest1, cookie);
 
             //Act
-            var response = await NotificationV2Helper.GetAccessRightsAsync(ownerResourceType, notification.Uuid, ownerResourceUuid, userCookie: cookie);
+            var response = await NotificationV2Helper.GetPermissionsAsync(ownerResourceType, ownerResourceUuid, notification.Uuid, userCookie: cookie);
 
             //Assert
             Assert.True(response.Read);
@@ -209,46 +231,46 @@ namespace Tests.Integration.Presentation.Web.Notifications
             AssertRecipients(expected, actual);
         }
 
-        private static void AssertScheduledNotification(ScheduledNotificationWriteRequestDTO expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid notificationUuid)
+        private static void AssertScheduledNotification(ScheduledNotificationWriteRequestDTO expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid relationUuid, Guid notificationUuid)
         {
             Assert.Equal(expected.RepetitionFrequency, actual.RepetitionFrequency);
             Assert.Equal(expected.ToDate, actual.ToDate);
-            AssertUpdateScheduledNotification(expected, actual, notificationType, notificationUuid);
+            AssertUpdateScheduledNotification(expected, actual, notificationType, relationUuid, notificationUuid);
         }
 
-        private static void AssertUpdateScheduledNotification(UpdateScheduledNotificationWriteRequestDTO expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid notificationUuid)
+        private static void AssertUpdateScheduledNotification<T>(T expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid relationUuid, Guid notificationUuid) where T : class, IHasBaseWriteProperties, IHasName, IHasToDate
         {
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.ToDate, actual.ToDate);
-            AssertBaseNotification(expected, actual, notificationType, notificationUuid);
+            AssertBaseNotification(expected, actual, notificationType, relationUuid, notificationUuid);
         }
 
-        private static void AssertBaseNotification(ImmediateNotificationWriteRequestDTO expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid notificationUuid)
+        private static void AssertBaseNotification<T>(T expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid relationUuid, Guid notificationUuid) where T: class, IHasBaseWriteProperties
         {
             Assert.Equal(notificationUuid, actual.Uuid);
             Assert.Equal(notificationType, actual.NotificationType);
-            Assert.Equal(expected.Body, actual.Body);
-            Assert.Equal(expected.Subject, actual.Subject);
-            Assert.Equal(expected.OwnerResourceUuid, actual.OwnerResourceUuid);
+            Assert.Equal(expected.BaseProperties.Body, actual.Body);
+            Assert.Equal(expected.BaseProperties.Subject, actual.Subject);
+            Assert.Equal(relationUuid, actual.OwnerResourceUuid);
             AssertRecipients(expected, actual);
         }
 
-        private static void AssertRecipients(ImmediateNotificationWriteRequestDTO expected, NotificationResponseDTO actual)
+        private static void AssertRecipients<T>(T expected, NotificationResponseDTO actual) where T : class, IHasBaseWriteProperties
         {
-            if (expected?.Ccs != null)
+            if (expected?.BaseProperties.Ccs != null)
             {
-                AssertEmailRecipients(expected.Ccs.EmailRecipients, actual.CCs.EmailRecipients);
-                AssertRoleRecipients(expected.Ccs.RoleRecipients, actual.CCs.RoleRecipients);
+                AssertEmailRecipients(expected.BaseProperties.Ccs.EmailRecipients, actual.CCs.EmailRecipients);
+                AssertRoleRecipients(expected.BaseProperties.Ccs.RoleRecipients, actual.CCs.RoleRecipients);
             }
             else
             {
                 Assert.Null(actual?.CCs);
             }
 
-            if (expected?.Receivers != null)
+            if (expected?.BaseProperties.Receivers != null)
             {
-                AssertEmailRecipients(expected.Receivers.EmailRecipients, actual.Receivers.EmailRecipients);
-                AssertRoleRecipients(expected.Receivers.RoleRecipients, actual.Receivers.RoleRecipients);
+                AssertEmailRecipients(expected.BaseProperties.Receivers.EmailRecipients, actual.Receivers.EmailRecipients);
+                AssertRoleRecipients(expected.BaseProperties.Receivers.RoleRecipients, actual.Receivers.RoleRecipients);
             }
             else
             {
@@ -340,57 +362,72 @@ namespace Tests.Integration.Presentation.Web.Notifications
                 Assert.Single(actualList, x => x.Email == email.Email);
             }
         }
-        
-        private ScheduledNotificationWriteRequestDTO CreateScheduledNotificationWriteRequest(Guid ownerResourceUuid, OwnerResourceType ownerResourceType)
+
+        private ImmediateNotificationWriteRequestDTO CreateImmediateNotificationWriteRequest(OwnerResourceType ownerResourceType)
         {
-            var request = CreateBaseScheduledNotificationWriteRequest<ScheduledNotificationWriteRequestDTO>(ownerResourceUuid, ownerResourceType);
+            var request = new ImmediateNotificationWriteRequestDTO();
+            CreateBaseProperties(request, ownerResourceType);
+
+            return request;
+        }
+
+        private ScheduledNotificationWriteRequestDTO CreateScheduledNotificationWriteRequest(OwnerResourceType ownerResourceType)
+        {
+            var request = new ScheduledNotificationWriteRequestDTO();
+            CreateBaseScheduledProperties(request, ownerResourceType);
 
             request.FromDate = DateTime.UtcNow.AddDays(A<int>());
             //Make sure ToDate is larger than FromDate
-            request.ToDate = request.FromDate.AddDays(1);
+            request.ToDate = request.FromDate.AddDays(A<int>());
             request.RepetitionFrequency = A<RepetitionFrequencyOptions>();
 
             return request;
         }
-        
-        private TResult CreateBaseScheduledNotificationWriteRequest<TResult>(Guid ownerResourceUuid, OwnerResourceType ownerResourceType) where TResult : UpdateScheduledNotificationWriteRequestDTO, new()
+
+        private UpdateScheduledNotificationWriteRequestDTO CreateUpdateScheduledNotificationWriteRequest(OwnerResourceType ownerResourceType)
         {
-            var request = CreateBaseNotificationWriteRequest<TResult>(ownerResourceUuid, ownerResourceType);
-            request.Name = A<string>();
-            request.ToDate = A<DateTime>();
+            var request = new UpdateScheduledNotificationWriteRequestDTO();
+            CreateBaseScheduledProperties(request, ownerResourceType);
+
             return request;
         }
 
-        private TResult CreateBaseNotificationWriteRequest<TResult>(Guid ownerResourceUuid, OwnerResourceType ownerResourceType) where TResult : ImmediateNotificationWriteRequestDTO, new()
+        private void CreateBaseScheduledProperties<T>(T request, OwnerResourceType ownerResourceType) where T : class, IHasBaseWriteProperties, IHasName, IHasToDate, new()
         {
-            return new TResult
-            {
-                Subject = A<string>(),
-                Body = A<string>(),
-                OwnerResourceUuid = ownerResourceUuid,
-                Ccs = new RecipientWriteRequestDTO
+            CreateBaseProperties(request, ownerResourceType);
+            request.Name = A<string>();
+            request.ToDate = A<DateTime>();
+        }
+
+        private void CreateBaseProperties<TModel>(TModel model, OwnerResourceType ownerResourceType) where TModel : class, IHasBaseWriteProperties, new()
+        {
+            model.BaseProperties = new BaseNotificationPropertiesWriteRequestDTO
                 {
-                    EmailRecipients = new List<EmailRecipientWriteRequestDTO>
+                    Subject = A<string>(),
+                    Body = A<string>(),
+                    Ccs = new RecipientWriteRequestDTO
                     {
-                        new() {Email = CreateEmail()}
+                        EmailRecipients = new List<EmailRecipientWriteRequestDTO>
+                        {
+                            new() {Email = CreateEmail()}
+                        },
+                        RoleRecipients = new List<RoleRecipientWriteRequestDTO>
+                        {
+                            new() {RoleUuid = CreateNewRole(ownerResourceType).Uuid}
+                        }
                     },
-                    RoleRecipients = new List<RoleRecipientWriteRequestDTO>
+                    Receivers = new RecipientWriteRequestDTO
                     {
-                        new() {RoleUuid = CreateNewRole(ownerResourceType).Uuid}
+                        EmailRecipients = new List<EmailRecipientWriteRequestDTO>
+                        {
+                            new() {Email = CreateEmail()}
+                        },
+                        RoleRecipients = new List<RoleRecipientWriteRequestDTO>
+                        {
+                            new() {RoleUuid = CreateNewRole(ownerResourceType).Uuid}
+                        }
                     }
-                },
-                Receivers = new RecipientWriteRequestDTO
-                {
-                    EmailRecipients = new List<EmailRecipientWriteRequestDTO>
-                    {
-                        new() {Email = CreateEmail()}
-                    },
-                    RoleRecipients = new List<RoleRecipientWriteRequestDTO>
-                    {
-                        new() {RoleUuid = CreateNewRole(ownerResourceType).Uuid}
-                    }
-                }
-            };
+                };
         }
 
         private async Task<(Guid relationUuid, OrganizationDTO organization, Cookie cookie)> CreatePrerequisitesAsync(OwnerResourceType ownerResourceType, OrganizationRole role = OrganizationRole.GlobalAdmin)
@@ -410,7 +447,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
                     return result.Uuid;
                 case OwnerResourceType.ItSystemUsage:
                     var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-                    var usageResult = ItSystemUsageHelper.CreateItSystemUsageAsync(new ItSystemUsage {ItSystemId = system.Id, OrganizationId = organizationId });
+                    var usageResult = ItSystemUsageHelper.CreateItSystemUsageAsync(new ItSystemUsage { ItSystemId = system.Id, OrganizationId = organizationId });
                     return usageResult.Uuid;
                 case OwnerResourceType.DataProcessingRegistration:
                     var dpr = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
@@ -433,15 +470,15 @@ namespace Tests.Integration.Presentation.Web.Notifications
             switch (ownerResourceType)
             {
                 case OwnerResourceType.ItContract:
-                    var contractRoleEntity = new ItContractRole {Name = CreateName()};
+                    var contractRoleEntity = new ItContractRole { Name = CreateName() };
                     InsertContractRole(contractRoleEntity);
                     return contractRoleEntity;
                 case OwnerResourceType.ItSystemUsage:
-                    var systemRoleEntity = new ItSystemRole {Name = CreateName()};
+                    var systemRoleEntity = new ItSystemRole { Name = CreateName() };
                     InsertSystemRole(systemRoleEntity);
                     return systemRoleEntity;
                 case OwnerResourceType.DataProcessingRegistration:
-                    var dprRoleEntity = new DataProcessingRegistrationRole {Name = CreateName()};
+                    var dprRoleEntity = new DataProcessingRegistrationRole { Name = CreateName() };
                     InsertDprRole(dprRoleEntity);
                     return dprRoleEntity;
                 default:
@@ -484,4 +521,3 @@ namespace Tests.Integration.Presentation.Web.Notifications
         }
     }
 }
-*/

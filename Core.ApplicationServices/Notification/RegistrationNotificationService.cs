@@ -192,6 +192,9 @@ namespace Core.ApplicationServices.Notification
                 return new OperationError($"User is not allowed to create notification for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
             }
 
+            var res = newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).ToList();
+            var res2 = res.Any(x => !_emailValidationRegex.IsMatch(x.Email));
+
             if (newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
             {
                 return new OperationError("Invalid email exists among receivers or CCs", OperationFailure.BadInput);
@@ -304,7 +307,7 @@ namespace Core.ApplicationServices.Notification
                 ItContractRoleId = relatedEntityType == RelatedEntityType.itContract ? model.RoleId : null,
                 ItSystemRoleId = relatedEntityType == RelatedEntityType.itSystemUsage ? model.RoleId : null,
                 DataProcessingRegistrationRoleId = relatedEntityType == RelatedEntityType.dataProcessingRegistration ? model.RoleId : null,
-                RecpientType = RecipientType.USER,
+                RecpientType = RecipientType.ROLE,
                 RecieverType = receiverType
             };
         }

@@ -10,7 +10,6 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Notifications;
@@ -49,7 +48,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// </summary>
         /// <param name="ownerResourceType"></param>
         /// <param name="organizationUuid"></param>
-        /// <param name="fromDate"></param>
+        /// <param name="ownerResourceUuid"></param>
+        /// <param name="onlyActive"></param>
         /// <param name="paginationQuery"></param>
         /// <returns></returns>
         [HttpGet]
@@ -302,7 +302,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetAccessRights(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
+        public IHttpActionResult GetPermissions(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
