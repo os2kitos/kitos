@@ -7,7 +7,6 @@ namespace Core.ApplicationServices.Notification
 {
     public interface IRegistrationNotificationService
     {
-        IQueryable<Advice> GetCurrentUserNotifications();
         Result<IQueryable<Advice>, OperationError> GetNotificationsByOrganizationId(int organizationId);
         Result<Advice, OperationError> GetNotificationById(int id);
         IQueryable<AdviceSent> GetSent();

@@ -5,6 +5,9 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
 {
     public class NotificationResponseDTO
     {
+        /// <summary>
+        /// Uuid of the Notification
+        /// </summary>
         public Guid Uuid { get; set; }
         /// <summary>
         /// Indicates whether notification is active

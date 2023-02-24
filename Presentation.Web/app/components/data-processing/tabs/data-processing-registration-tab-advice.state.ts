@@ -12,7 +12,11 @@
                 type: [() => Kitos.Models.Advice.AdviceType.DataProcessingRegistration],
                 advicename: ["dataProcessingRegistration",
                     (dataProcessingRegistration: Kitos.Models.DataProcessing.IDataProcessingRegistrationDTO) => <any>{ name: dataProcessingRegistration.name }
-                ]
+                ],
+                currentUser: [
+                    "userService",
+                    (userService: Kitos.Services.IUserService) => userService.getUser()
+                ],
             }
         });
     }]);

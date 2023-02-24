@@ -1,7 +1,6 @@
 ﻿using System;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
-using Core.DomainModel.Notification;
 
 namespace Core.ApplicationServices.Model.Notification.Write
 {

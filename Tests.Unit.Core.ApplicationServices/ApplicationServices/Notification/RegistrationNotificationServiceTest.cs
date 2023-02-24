@@ -55,23 +55,6 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                 _adviceRootResolution.Object,
                 _operationClock.Object);
         }
-
-        [Fact]
-        public void Can_GetCurrentUserNotifications()
-        {
-            //Arrange
-            var notifications = new List<Advice> {new(), new()};
-
-            ExpectGetAdvicesAccessibleToCurrentUserReturns(notifications.AsQueryable());
-            //Act
-            var result = _sut.GetCurrentUserNotifications();
-
-            //Assert
-            Assert.NotNull(result);
-            var resultList = result.ToList();
-            Assert.Equal(notifications.Count, resultList.Count);
-        }
-
         [Fact]
         public void Can_GetNotificationsByOrganizationId()
         {

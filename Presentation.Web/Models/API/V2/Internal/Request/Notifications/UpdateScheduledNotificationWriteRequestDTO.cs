@@ -16,6 +16,9 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Notifications
         /// </summary>
         public DateTime? ToDate { get; set; }
 
+        /// <summary>
+        /// Common Notification properties
+        /// </summary>
         [Required]
         public BaseNotificationPropertiesWriteRequestDTO BaseProperties { get; set; }
     }

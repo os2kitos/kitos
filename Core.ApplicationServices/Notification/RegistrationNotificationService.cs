@@ -49,11 +49,6 @@ namespace Core.ApplicationServices.Notification
             _operationClock = operationClock;
         }
 
-        public IQueryable<Advice> GetCurrentUserNotifications()
-        {
-            return _adviceService.GetAdvicesAccessibleToCurrentUser();
-        }
-
         public Result<IQueryable<Advice>, OperationError> GetNotificationsByOrganizationId(int organizationId)
         {
             return _authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All 

@@ -18,6 +18,7 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Time;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
@@ -44,12 +45,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
             _registrationNotificationService = registrationNotificationService;
         }
 
-        [EnableQuery]
+        [NonAction]
         //TODO: Kill once frontend is updated
-        public override IHttpActionResult Get()
-        {
-            return Ok(_registrationNotificationService.GetCurrentUserNotifications());
-        }
+        public override IHttpActionResult Get() => throw new NotImplementedException();
 
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
