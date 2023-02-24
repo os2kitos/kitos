@@ -32,8 +32,6 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Notifications
 
             using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"{BasePath}/{ownerResourceType}/{ownerResourceUuid}/scheduled"), cookie, body);
 
-            //TODO: remove
-            var res = await response.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<NotificationResponseDTO>();

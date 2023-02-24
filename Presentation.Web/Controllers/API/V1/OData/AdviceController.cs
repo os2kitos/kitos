@@ -46,7 +46,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [NonAction]
-        //TODO: Kill once frontend is updated
         public override IHttpActionResult Get() => throw new NotImplementedException();
 
         [EnableQuery]
