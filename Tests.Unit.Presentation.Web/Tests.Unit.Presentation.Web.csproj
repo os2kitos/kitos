@@ -285,12 +285,14 @@
     <Compile Include="Infrastructure\CurrentAspNetRequestTest.cs" />
     <Compile Include="Infrastructure\NonEmptyGuidAttributeTest.cs" />
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
+    <Compile Include="Models\V2\BaseResponseMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ExternalReferenceResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItInterfaceWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\ItSystemResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {

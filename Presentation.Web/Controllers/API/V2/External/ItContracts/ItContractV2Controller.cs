@@ -135,6 +135,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <returns></returns>
         [HttpPost]
         [Route]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItContractResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

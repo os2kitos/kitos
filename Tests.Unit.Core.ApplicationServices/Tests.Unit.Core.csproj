@@ -204,6 +204,7 @@
     <Compile Include="ApplicationServices\Organizations\OrganizationUnitServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
     <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
+    <Compile Include="ApplicationServices\ItSystems\ItSystemWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="Model\ItAdvice\ItAdviceTests.cs" />
     <Compile Include="Model\ItContractTest.cs" />
     <Compile Include="Model\ItInterfaceTest.cs" />
+    <Compile Include="Model\ItSystemTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\References\AddReferenceCommandTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
@@ -327,10 +329,6 @@
     <ProjectReference Include="..\Infrastructure.STS.Organization\Infrastructure.STS.Organization.csproj">
       <Project>{3DC91665-93BB-442D-B186-7E90C7CD6E32}</Project>
       <Name>Infrastructure.STS.Organization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
-      <Project>{e75385a3-ea7c-4dff-b989-bee64bc506ed}</Project>
-      <Name>Presentation.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
       <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>

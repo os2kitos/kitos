@@ -1,6 +1,6 @@
 ﻿using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
-using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 

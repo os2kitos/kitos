@@ -40,7 +40,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now)
                 );
 
-            SetupControllerFrorTest(_sut);
+            SetupControllerForTest(_sut);
             _sut.AuthorizationContext = _authorizationContext.Object;
         }
 

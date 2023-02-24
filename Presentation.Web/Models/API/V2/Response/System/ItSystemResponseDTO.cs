@@ -8,7 +8,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.System
 {
-    public class ItSystemResponseDTO : BaseItSystemResponseDTO, IHasLastModified, IHasRegistrationScope
+    public class ItSystemResponseDTO : BaseItSystemResponseDTO, IHasLastModified, IHasRegistrationScope, IHasOrganizationContext
     {
         /// <summary>
         /// Organizations using this IT-System
@@ -34,5 +34,10 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// </summary>
         [Required]
         public RegistrationScopeChoice Scope { get; set; }
+        /// <summary>
+        /// Organization in which this it-system master data was created
+        /// </summary>
+        [Required]
+        public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
     }
 }

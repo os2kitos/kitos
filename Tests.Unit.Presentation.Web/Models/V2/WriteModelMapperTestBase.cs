@@ -4,6 +4,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 
 using Tests.Toolkit.Patterns;
+using Tests.Toolkit.TestInputs;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -40,16 +41,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         protected static IEnumerable<object[]> CreateGetUndefinedSectionsInput(int numberOfInputParameters)
         {
-            var referenceValues = Enumerable.Repeat(false, numberOfInputParameters).ToList();
-            yield return referenceValues.Cast<object>().ToArray();
-            for (var i = 0; i < referenceValues.Count; i++)
-            {
-                var inputs = referenceValues.ToList();
-                inputs[i] = true;
-                yield return inputs.Cast<object>().ToArray();
-            }
-
-            yield return referenceValues.Select(_ => true).Cast<object>().ToArray();
+            return BooleanInputMatrixFactory.Create(numberOfInputParameters);
         }
 
         protected static HashSet<string> GetAllInputPropertyNames<T>()

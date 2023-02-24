@@ -201,6 +201,8 @@
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageRoles.cs" />
     <Compile Include="Model\Shared\Write\UserRolePair.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
+    <Compile Include="Model\System\SharedSystemUpdateParameters.cs" />
+    <Compile Include="Model\System\SystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
@@ -317,6 +319,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SingleThreadedMailClient.cs" />
     <Compile Include="References\ReferenceService.cs" />
+    <Compile Include="System\Write\IItSystemWriteService.cs" />
+    <Compile Include="System\Write\ItSystemWriteService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
     <Compile Include="Users\Handlers\RemoveUserFromKitosCommandHandler.cs" />

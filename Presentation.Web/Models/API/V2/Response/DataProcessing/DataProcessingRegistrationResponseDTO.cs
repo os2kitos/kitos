@@ -10,7 +10,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.DataProcessing
 {
-    public class DataProcessingRegistrationResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator, IHasLastModified
+    public class DataProcessingRegistrationResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator, IHasLastModified, IHasOrganizationContext
     {
         [Required]
         public string Name { get; set; }

@@ -6,7 +6,6 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
@@ -14,16 +13,20 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Controllers.API.V2.External.Generic;
-using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
+using Presentation.Web.Models.API.V2.SharedProperties;
 using Swashbuckle.Swagger.Annotations;
+using Core.ApplicationServices.System.Write;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 {
@@ -35,21 +38,27 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
     {
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
-        private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemWriteModelMapper _writeModelMapper;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
+        private readonly IItSystemWriteService _writeService;
+        private readonly IItSystemResponseMapper _systemResponseMapper;
+        private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
-            IAuthorizationContext authorizationContext,
             IItSystemWriteModelMapper writeModelMapper,
-            IEntityIdentityResolver entityIdentityResolver)
+            IEntityIdentityResolver entityIdentityResolver,
+            IItSystemWriteService writeService,
+            IItSystemResponseMapper systemResponseMapper,
+            IExternalReferenceResponseMapper referenceResponseMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
-            _authorizationContext = authorizationContext;
             _writeModelMapper = writeModelMapper;
             _entityIdentityResolver = entityIdentityResolver;
+            _writeService = writeService;
+            _systemResponseMapper = systemResponseMapper;
+            _referenceResponseMapper = referenceResponseMapper;
         }
 
         /// <summary>
@@ -84,8 +93,81 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _itSystemService
                 .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery)
-                .Select(ToSystemResponseDTO)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Transform(Ok);
+        }
+
+
+        /// <summary>
+        /// Create a new IT-System master data entity
+        /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("it-systems")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostItSystem([FromBody] CreateItSystemRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.FromPOST(request);
+            return _writeService
+                .CreateNewSystem(request.OrganizationUuid, parameters)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
+                .Match(MapSystemCreatedResponse, FromOperationError);
+        }
+
+        /// <summary>
+        /// Update an existing it-system
+        /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource
+        /// </summary>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("it-systems/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostItSystem([NonEmptyGuid] Guid uuid, [FromBody] UpdateItSystemRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.FromPATCH(request);
+            return _writeService
+                .Update(uuid, parameters)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// DELETE an existing it-system
+        /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("it-systems/{uuid}")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteItSystem([NonEmptyGuid] Guid uuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .Delete(uuid)
+                .Match(NoContent, FromOperationError);
         }
 
         /// <summary>
@@ -107,7 +189,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _itSystemService
                 .GetSystem(uuid)
-                .Select(ToSystemResponseDTO)
+                .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -174,7 +256,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                     .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                     .Page(paginationQuery)
                     .ToList()
-                    .Select(ToRightsHolderResponseDTO)
+                    .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                     .ToList())
                 .Match(Ok, FromOperationError);
         }
@@ -199,7 +281,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _rightsHolderSystemService
                 .GetSystemAsRightsHolder(uuid)
-                .Select(ToRightsHolderResponseDTO)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -217,7 +299,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItSystemAsRightsHolder([FromBody] RightsHolderCreateItSystemRequestDTO request)
+        public IHttpActionResult PostItSystemAsRightsHolder([FromBody] RightsHolderFullItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -225,8 +307,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromRightsHolderPOST(request);
 
             return _rightsHolderSystemService
-                .CreateNewSystem(request.RightsHolderUuid, parameters)
-                .Select(ToRightsHolderResponseDTO)
+                .CreateNewSystemAsRightsHolder(request.RightsHolderUuid, parameters)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
 
@@ -246,7 +328,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
+        public IHttpActionResult PutItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderFullItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -254,8 +336,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromRightsHolderPUT(request);
 
             return _rightsHolderSystemService
-                .Update(uuid, parameters)
-                .Select(ToRightsHolderResponseDTO)
+                .UpdateAsRightsHolder(uuid, parameters)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -273,7 +355,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderPartialUpdateSystemPropertiesRequestDTO request)
+        public IHttpActionResult PatchItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderUpdateSystemPropertiesRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -281,8 +363,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             var parameters = _writeModelMapper.FromRightsHolderPATCH(request);
 
             return _rightsHolderSystemService
-                .Update(uuid, parameters)
-                .Select(ToRightsHolderResponseDTO)
+                .UpdateAsRightsHolder(uuid, parameters)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -306,65 +388,88 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 return BadRequest(ModelState);
 
             return _rightsHolderSystemService
-                .Deactivate(uuid, request.DeactivationReason)
-                .Select(ToRightsHolderResponseDTO)
+                .DeactivateAsRightsHolder(uuid, request.DeactivationReason)
+                .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
 
-        private RightsHolderItSystemResponseDTO ToRightsHolderResponseDTO(ItSystem itSystem)
+        /// <summary>
+        /// Creates an external reference for the system
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("it-systems/{uuid}/external-references")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostExternalReference([NonEmptyGuid] Guid uuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
         {
-            var dto = new RightsHolderItSystemResponseDTO();
-            MapBaseInformation(itSystem, dto);
-            return dto;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .AddExternalReference(uuid, properties)
+                .Select(_referenceResponseMapper.MapExternalReference)
+                .Match(reference => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{uuid}/external-references/{reference.Uuid}", reference), FromOperationError);
         }
 
-        private ItSystemResponseDTO ToSystemResponseDTO(ItSystem itSystem)
+        /// <summary>
+        /// Updates a system external reference
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("it-systems/{uuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutExternalReference([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid externalReferenceUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
         {
-            var dto = new ItSystemResponseDTO
-            {
-                UsingOrganizations = itSystem
-                    .Usages
-                    .Select(systemUsage => systemUsage.Organization)
-                    .Select(organization => organization.MapShallowOrganizationResponseDTO())
-                    .ToList(),
-                LastModified = itSystem.LastChanged,
-                LastModifiedBy = itSystem.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO()),
-                Scope = itSystem.AccessModifier.ToChoice()
-            };
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            MapBaseInformation(itSystem, dto);
+            var properties = _writeModelMapper.MapExternalReference(dto);
 
-            return dto;
+            return _writeService
+                .UpdateExternalReference(uuid, externalReferenceUuid, properties)
+                .Select(_referenceResponseMapper.MapExternalReference)
+                .Match(Ok, FromOperationError);
         }
 
-        private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
+        /// <summary>
+        /// Deletes a system external reference
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("it-systems/{uuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteExternalReference([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid externalReferenceUuid)
         {
-            dto.Uuid = arg.Uuid;
-            dto.Name = arg.Name;
-            dto.RightsHolder = arg.BelongsTo?.Transform(organization => organization.MapShallowOrganizationResponseDTO());
-            dto.BusinessType = arg.BusinessType?.Transform(businessType => businessType.MapIdentityNamePairDTO());
-            dto.Description = arg.Description;
-            dto.CreatedBy = arg.ObjectOwner.MapIdentityNamePairDTO();
-            dto.Created = arg.Created;
-            dto.Deactivated = arg.Disabled;
-            dto.FormerName = arg.PreviousName;
-            dto.ParentSystem = arg.Parent?.Transform(parent => parent.MapIdentityNamePairDTO());
-            dto.UrlReference = arg.Reference?.URL;
-            dto.ExposedInterfaces = arg
-                .ItInterfaceExhibits
-                .Select(exhibit => exhibit.ItInterface)
-                .ToList()
-                .Where(_authorizationContext.AllowReads)// Only accessible interfaces may be referenced here
-                .Select(x => x.MapIdentityNamePairDTO())
-                .ToList();
-            dto.RecommendedArchiveDuty =
-                new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType());
-            dto.KLE = arg
-                .TaskRefs
-                .Select(taskRef => taskRef.MapIdentityNamePairDTO())
-                .ToList();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteExternalReference(uuid, externalReferenceUuid)
+                .Match(_ => NoContent(), FromOperationError);
         }
-        private CreatedNegotiatedContentResult<RightsHolderItSystemResponseDTO> MapSystemCreatedResponse(RightsHolderItSystemResponseDTO dto)
+
+        private CreatedNegotiatedContentResult<T> MapSystemCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }

@@ -28,7 +28,7 @@ using Xunit;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
-using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2

@@ -6,8 +6,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
