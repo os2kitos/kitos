@@ -685,6 +685,114 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         }
 
         [Fact]
+        public void Update_Returns_Error_If_UpdateNote_Fails()
+        {
+            //Arrange
+            var inputParameters = new ItInterfaceWriteModel()
+            {
+                Note = A<string>().AsChangedValue()
+            };
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            var operationError = A<OperationError>();
+
+            ExpectHasWriteAccess(itInterface, true);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectUpdateNoteReturns(itInterface.Id, inputParameters, operationError);
+
+            //Act
+            var result = _sut.Update(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Update_Returns_Error_If_UpdateAccessModifier_Fails()
+        {
+            //Arrange
+            var inputParameters = new ItInterfaceWriteModel()
+            {
+                Scope = A<AccessModifier>().AsChangedValue()
+            };
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            var operationError = A<OperationError>();
+
+            ExpectHasWriteAccess(itInterface, true);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectUpdateAccessModifierReturns(itInterface.Id, inputParameters, operationError);
+
+            //Act
+            var result = _sut.Update(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Update_Returns_Error_If_UpdateInterfaceType_Fails()
+        {
+            //Arrange
+            var inputParameters = new ItInterfaceWriteModel()
+            {
+                InterfaceTypeUuid = A<Guid?>().AsChangedValue()
+            };
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            var operationError = A<OperationError>();
+
+            ExpectHasWriteAccess(itInterface, true);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectUpdateInterfaceType(itInterface.Id, inputParameters, operationError);
+
+            //Act
+            var result = _sut.Update(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Update_Returns_Error_If_ReplaceInterfaceData_Fails()
+        {
+            //Arrange
+            var inputParameters = new ItInterfaceWriteModel()
+            {
+                Data = Many<ItInterfaceDataWriteModel>().ToList().AsChangedValue<IReadOnlyList<ItInterfaceDataWriteModel>>()
+            };
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            var operationError = A<OperationError>();
+
+            ExpectHasWriteAccess(itInterface, true);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectUpdateDataReturns(itInterface.Id, inputParameters, operationError);
+
+            //Act
+            var result = _sut.Update(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
         public void Can_Delete()
         {
             //Arrange
