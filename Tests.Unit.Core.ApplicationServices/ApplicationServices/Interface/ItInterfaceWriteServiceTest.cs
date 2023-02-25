@@ -832,7 +832,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var itInterface = new ItInterface() { Id = A<int>() };
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasWriteAccess(itInterface, true);
-            _interfaceServiceMock.Setup(x => x.Delete(itInterface.Id, true)).Returns(itInterface).Verifiable();
+            _interfaceServiceMock.Setup(x => x.Delete(itInterface.Id, false)).Returns(itInterface).Verifiable();
 
             //Act
             var result = _sut.Delete(itInterface.Uuid);
@@ -850,7 +850,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasWriteAccess(itInterface, true);
             var failure = A<OperationFailure>();
-            _interfaceServiceMock.Setup(x => x.Delete(itInterface.Id, true)).Returns(failure);
+            _interfaceServiceMock.Setup(x => x.Delete(itInterface.Id, false)).Returns(failure);
 
             //Act
             var result = _sut.Delete(itInterface.Uuid);
