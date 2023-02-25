@@ -357,6 +357,8 @@
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RecommendedArchiveDutyChoiceMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceDataTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemInternalV2Controller.cs" />
@@ -369,6 +371,11 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystem\ItSystemSearchResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
+    <Compile Include="Models\API\V2\Request\Interface\CreateItInterfaceRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Interface\ICommonItInterfaceRequestPropertiesDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Interface\IItInterfaceWritablePropertiesRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Interface\ItInterfaceDataRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Interface\UpdateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />

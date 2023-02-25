@@ -4,24 +4,23 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
+namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 {
-    [RoutePrefix("api/v2/it-system-usage-archive-location-types")]
-    public class ItInterfaceInterfaceTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ArchiveLocation>
+    [RoutePrefix("api/v2/it-interface-interface-types")]
+    public class ItInterfaceInterfaceTypeV2Controller : BaseRegularOptionTypeV2Controller<ItInterface, InterfaceType>
     {
-        public ItInterfaceInterfaceTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveLocation> optionService)
+        public ItInterfaceInterfaceTypeV2Controller(IOptionsApplicationService<ItInterface, InterfaceType> optionService)
             : base(optionService)
         {
         }
 
         /// <summary>
-        /// Returns It-System Usage archive location options which are available for new registrations within the organization
+        /// Returns IT-Interface 'interface-type' options which are available for new registrations within the organization
         /// </summary>
         /// <param name="organizationUuid">organization context for the archive locations availability</param>
         /// <returns>A list of available It-System Usage archive locations</returns>
@@ -38,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns requested It-System Usage archive location
+        /// Returns requested IT-Interface 'interface-type'
         /// </summary>
         /// <param name="archiveLocationUuid">archive location identifier</param>
         /// <param name="organizationUuid">organization context for the archive location availability</param>

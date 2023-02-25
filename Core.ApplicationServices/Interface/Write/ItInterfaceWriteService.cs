@@ -191,7 +191,7 @@ namespace Core.ApplicationServices.Interface.Write
             try
             {
                 return GetItInterfaceAndAuthorizeAccess(interfaceUuid)
-                    .Select(itInterface => _itInterfaceService.Delete(itInterface.Id, true))
+                    .Select(itInterface => _itInterfaceService.Delete(itInterface.Id, false /*Do not break binding. Dependencies must be removed before deleting master data through this service*/))
                     .Match
                     (deleteResult => deleteResult.Match<Result<ItInterface, OperationError>>
                         (

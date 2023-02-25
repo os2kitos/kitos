@@ -45,6 +45,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             return parameters;
         }
 
+        public ItInterfaceWriteModel FromPOST(CreateItInterfaceRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ItInterfaceWriteModel FromPATCH(UpdateItInterfaceRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
         private void Map(IRightsHolderWritableItInterfacePropertiesDTO source, RightsHolderItInterfaceUpdateParameters destination, bool enforceFallbackIfNotProvided)
         {
             var rule = CreateChangeRule<IRightsHolderWritableItInterfacePropertiesDTO>(enforceFallbackIfNotProvided);

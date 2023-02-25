@@ -18,5 +18,7 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
         /// </summary>
         [Required]
         public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
+
+        //TODO: Extend with the new properties!
     }
 }
