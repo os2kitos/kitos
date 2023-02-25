@@ -332,7 +332,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = new RightsHolderItInterfaceUpdateParameters()
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue()
+                ExposingSystemUuid = A<Guid?>().AsChangedValue()
             };
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() { BelongsToId = A<int>() } } };

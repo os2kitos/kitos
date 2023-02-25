@@ -137,7 +137,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var orgId = A<int>();
             var inputParameters = new ItInterfaceWriteModel
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue(),
+                ExposingSystemUuid = A<Guid?>().AsChangedValue(),
                 Name = A<string>().AsChangedValue(),
                 InterfaceId = A<string>().AsChangedValue()
             };
@@ -165,7 +165,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var orgId = A<int>();
             var inputParameters = new ItInterfaceWriteModel
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue(),
+                ExposingSystemUuid = A<Guid?>().AsChangedValue(),
                 Name = A<string>().AsChangedValue(),
                 InterfaceId = A<string>().AsChangedValue()
             };
@@ -217,7 +217,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var organizationUuid = A<Guid>();
             var orgId = A<int>(); var inputParameters = new ItInterfaceWriteModel
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue(),
+                ExposingSystemUuid = A<Guid?>().AsChangedValue(),
                 Name = A<string>().AsChangedValue(),
                 InterfaceId = A<string>().AsChangedValue()
             };
@@ -352,7 +352,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             {
                 Name = withNameChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
                 InterfaceId = withInterfaceIdChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
-                ExposingSystemUuid = withExposingSystemChange ? A<Guid>().AsChangedValue() : OptionalValueChange<Guid>.None,
+                ExposingSystemUuid = withExposingSystemChange ? A<Guid?>().AsChangedValue() : OptionalValueChange<Guid?>.None,
                 Version = withVersionChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
                 Description = withDescriptionChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
                 UrlReference = withUrlReferenceChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
@@ -365,7 +365,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var transactionMock = ExpectTransactionBegins();
             var originalExposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = originalExposingSystem }, ItInterfaceId = A<string>() };
-            var newExposingSystem = new ItSystem { Id = A<int>(), Uuid = withExposingSystemChange ? inputParameters.ExposingSystemUuid.NewValue : A<Guid>(), BelongsToId = A<int>() };
+            var newExposingSystem = new ItSystem { Id = A<int>(), Uuid = withExposingSystemChange ? inputParameters.ExposingSystemUuid.NewValue.Value : A<Guid>(), BelongsToId = A<int>() };
 
             ExpectHasWriteAccess(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
@@ -491,7 +491,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var inputParameters = new ItInterfaceWriteModel
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue()
+                ExposingSystemUuid = A<Guid?>().AsChangedValue()
             };
             var transactionMock = ExpectTransactionBegins();
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
@@ -516,7 +516,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var inputParameters = new ItInterfaceWriteModel
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue()
+                ExposingSystemUuid = A<Guid?>().AsChangedValue()
             };
             var transactionMock = ExpectTransactionBegins();
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
@@ -614,7 +614,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Arrange
             var inputParameters = new ItInterfaceWriteModel()
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue()
+                ExposingSystemUuid = A<Guid?>().AsChangedValue()
             };
             var transactionMock = ExpectTransactionBegins();
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
@@ -914,9 +914,9 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
                 .Returns(result);
         }
 
-        private void ExpectGetSystemReturns(Guid systemUuid, Result<ItSystem, OperationError> system)
+        private void ExpectGetSystemReturns(Guid? systemUuid, Result<ItSystem, OperationError> system)
         {
-            _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid)).Returns(system);
+            _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid.Value)).Returns(system);
         }
 
         private void ExpectGetOrganizationReturns(Guid organizationUuid, Maybe<Organization> organization)

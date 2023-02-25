@@ -1,5 +1,8 @@
 ﻿namespace Presentation.Web.Models.API.V2.Request.Interface
 {
+    /// <summary>
+    /// Properties of the write model which are shared by rightsholder and regular write models
+    /// </summary>
     public interface ICommonItInterfaceRequestPropertiesDTO
     {
         public string Name { get; set; }

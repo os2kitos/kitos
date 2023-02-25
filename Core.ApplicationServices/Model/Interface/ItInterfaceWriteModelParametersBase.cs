@@ -5,7 +5,7 @@ namespace Core.ApplicationServices.Model.Interface
 {
     public abstract class ItInterfaceWriteModelParametersBase
     {
-        public OptionalValueChange<Guid> ExposingSystemUuid { get; set; } = OptionalValueChange<Guid>.None;
+        public OptionalValueChange<Guid?> ExposingSystemUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<string> Name { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<string> InterfaceId { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<string> Version { get; set; } = OptionalValueChange<string>.None;

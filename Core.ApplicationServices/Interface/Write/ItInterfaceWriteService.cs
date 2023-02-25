@@ -96,18 +96,23 @@ namespace Core.ApplicationServices.Interface.Write
             return _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, newName, newInterfaceId);
         }
 
-        private Result<ItInterface, OperationError> UpdateExposingSystem(ItInterface itInterface, Guid exposingSystemUuid)
+        private Result<ItInterface, OperationError> UpdateExposingSystem(ItInterface itInterface, Guid? exposingSystemUuid)
         {
-            var exposingSystem = _systemService.GetSystem(exposingSystemUuid);
+            ItSystem exposingSystem = null;
 
-            if (exposingSystem.Failed)
+            if (exposingSystemUuid.HasValue)
             {
-                return exposingSystem.Error.FailureType == OperationFailure.NotFound
-                    ? new OperationError("Invalid exposing system id provided", OperationFailure.BadInput)
-                    : exposingSystem.Error;
+                var result = _systemService.GetSystem(exposingSystemUuid.Value);
+                if (result.Failed)
+                {
+                    return result.Error.FailureType == OperationFailure.NotFound
+                        ? new OperationError("Invalid exposing system id provided", OperationFailure.BadInput)
+                        : result.Error;
+                }
+                exposingSystem = result.Value;
             }
 
-            return _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystem.Value.Id);
+            return _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystem?.Id);
         }
 
         public Result<ItInterface, OperationError> Create(Guid organizationUuid, ItInterfaceWriteModel parameters)
