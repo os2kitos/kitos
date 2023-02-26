@@ -146,6 +146,10 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { EntityOptionHelper.ResourceNames.AgreementExtensionOptionTypes, OptionV2ApiHelper.ResourceName.ItContractAgreementExtensionOptionTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.NoticePeriodMonthTypes, OptionV2ApiHelper.ResourceName.ItContractNoticePeriodMonthTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.CriticalityTypes, OptionV2ApiHelper.ResourceName.CriticalityTypes };
+
+            yield return new[] { EntityOptionHelper.ResourceNames.ItInterfaceTypes, OptionV2ApiHelper.ResourceName.ItInterfaceTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.ItInterfaceDataTypes, OptionV2ApiHelper.ResourceName.ItInterfaceDataTypes };
+
         }
     }
 }

@@ -13,9 +13,9 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-archive-location-types")]
-    public class ItInterfaceInterfaceTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ArchiveLocation>
+    public class ItSystemUsageArchiveLocationTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ArchiveLocation>
     {
-        public ItInterfaceInterfaceTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveLocation> optionService)
+        public ItSystemUsageArchiveLocationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveLocation> optionService)
             : base(optionService)
         {
         }

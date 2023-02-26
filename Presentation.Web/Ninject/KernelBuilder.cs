@@ -430,6 +430,11 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
+            //IT-interface
+            RegisterOptionsService<ItInterface, InterfaceType, LocalInterfaceType>(kernel);
+            
+            RegisterOptionsService<DataRow, DataType, LocalDataType>(kernel);
+
             //Data processing registrations
             RegisterOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>(kernel);
 
