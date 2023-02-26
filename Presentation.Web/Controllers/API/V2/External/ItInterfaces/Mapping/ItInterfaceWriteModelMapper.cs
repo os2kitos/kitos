@@ -69,10 +69,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             MapCommon(source, destination, enforceFallbackIfNotProvided);
             destination.ExposingSystemUuid = rule.MustUpdate(x => x.ExposedBySystemUuid) ? source.ExposedBySystemUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
             destination.Note = rule.MustUpdate(x => x.Note) ? source.Note.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.Deactivated = rule.MustUpdate(x => x.Disabled) ? source.Disabled.AsChangedValue() : OptionalValueChange<bool>.None;
+            destination.Deactivated = rule.MustUpdate(x => x.Deactivated) ? source.Deactivated.AsChangedValue() : OptionalValueChange<bool>.None;
             destination.InterfaceTypeUuid = rule.MustUpdate(x => x.ItInterfaceTypeUuid) ? source.ItInterfaceTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
             destination.Scope = rule.MustUpdate(x => x.Scope) ? source.Scope.FromChoice().AsChangedValue() : OptionalValueChange<AccessModifier>.None;
-            destination.Data = rule.MustUpdate(x => x.Scope)
+            destination.Data = rule.MustUpdate(x => x.Data)
                 ? (source.Data ?? Array.Empty<ItInterfaceDataRequestDTO>())
                 .Select(x => new ItInterfaceDataWriteModel(x.Description, x.DataTypeUuid))
                 .ToList()

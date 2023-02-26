@@ -319,6 +319,7 @@ namespace Presentation.Web.Ninject
 
             //Interfaces
             kernel.Bind<IItInterfaceWriteModelMapper>().To<ItInterfaceWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceResponseMapper>().To<ItInterfaceResponseMapper>().InCommandScope(Mode);
 
             //External references
             kernel.Bind<IExternalReferenceResponseMapper>().To<ExternalReferenceResponseMapper>().InCommandScope(Mode);

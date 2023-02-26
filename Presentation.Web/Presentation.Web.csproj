@@ -359,6 +359,8 @@
     <Compile Include="Controllers\API\V2\External\Generic\RecommendedArchiveDutyChoiceMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceDataTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\IItInterfaceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\ItInterfaceResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemInternalV2Controller.cs" />
@@ -386,6 +388,7 @@
     <Compile Include="Models\API\V2\Request\System\Regular\IItSystemWriteRequestPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Regular\RecommendedArchiveDutyRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Shared\IItSystemWriteRequestCommonPropertiesDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Interface\ItInterfaceDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />

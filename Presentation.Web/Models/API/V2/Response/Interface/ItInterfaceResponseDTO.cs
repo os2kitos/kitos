@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.Interface
 {
@@ -19,6 +21,18 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
         [Required]
         public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
 
-        //TODO: Extend with the new properties!
+        [Required]
+        public RegistrationScopeChoice Scope { get; set; }
+        
+        /// <summary>
+        /// Cross reference to the interface-type used by the it-interface
+        /// </summary>
+        public IdentityNamePairResponseDTO ItInterfaceTypeUuid { get; set; }
+        
+        /// <summary>
+        /// Optional interface data descriptions
+        /// </summary>
+        [Required]
+        public IEnumerable<ItInterfaceDataResponseDTO> Data { get; set; }
     }
 }

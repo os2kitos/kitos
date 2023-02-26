@@ -7,7 +7,7 @@ namespace Presentation.Web.Models.API.V2.Request.Interface
     public interface IItInterfaceWritablePropertiesRequestDTO : ICommonItInterfaceRequestPropertiesDTO
     {
         public Guid? ExposedBySystemUuid { get; set; }
-        public bool Disabled { get; set; }
+        public bool Deactivated { get; set; }
         public RegistrationScopeChoice Scope { get; set; }
         public Guid? ItInterfaceTypeUuid { get; set; }
         public IEnumerable<ItInterfaceDataRequestDTO> Data { get; set; }

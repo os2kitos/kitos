@@ -18,7 +18,7 @@ namespace Presentation.Web.Models.API.V2.Request.Interface
         /// <summary>
         /// Determines if the it-interface has been disabled
         /// </summary>
-        public bool Disabled { get; set; }
+        public bool Deactivated { get; set; }
 
         /// <summary>
         /// Scope (shared globally or only available for members of the owning org)

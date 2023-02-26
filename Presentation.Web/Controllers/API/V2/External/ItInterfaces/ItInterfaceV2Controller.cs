@@ -11,7 +11,6 @@ using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
-using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -31,17 +30,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         private readonly IItInterfaceService _itInterfaceService;
         private readonly IItInterfaceWriteModelMapper _writeModelMapper;
         private readonly IItInterfaceWriteService _writeService;
+        private readonly IItInterfaceResponseMapper _responseMapper;
 
         public ItInterfaceV2Controller(
             IItInterfaceRightsHolderService rightsHolderService, 
             IItInterfaceService itInterfaceService, 
             IItInterfaceWriteModelMapper writeModelMapper,
-            IItInterfaceWriteService writeService)
+            IItInterfaceWriteService writeService,
+            IItInterfaceResponseMapper responseMapper)
         {
             _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;
             _writeModelMapper = writeModelMapper;
             _writeService = writeService;
+            _responseMapper = responseMapper;
         }
 
         /// <summary>
@@ -355,37 +357,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
                 .Match(Ok, FromOperationError);
         }
 
-        private static RightsHolderItInterfaceResponseDTO ToRightsHolderItInterfaceResponseDTO(ItInterface itInterface)
+        private RightsHolderItInterfaceResponseDTO ToRightsHolderItInterfaceResponseDTO(ItInterface itInterface)
         {
-            var dto = new RightsHolderItInterfaceResponseDTO();
-            MapBaseInformation(itInterface, dto);
-            return dto;
+            return _responseMapper.ToRightsHolderItInterfaceResponseDTO(itInterface);
+          
         }
 
-        private static ItInterfaceResponseDTO ToItInterfaceResponseDTO(ItInterface itInterface)
+        private ItInterfaceResponseDTO ToItInterfaceResponseDTO(ItInterface itInterface)
         {
-            var dto = new ItInterfaceResponseDTO
-            {
-                LastModified = itInterface.LastChanged,
-                LastModifiedBy = itInterface.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO())
-            };
-            MapBaseInformation(itInterface, dto);
-            return dto;
-        }
-
-        private static void MapBaseInformation<T>(ItInterface input, T outputDTO) where T : BaseItInterfaceResponseDTO
-        {
-            outputDTO.Uuid = input.Uuid;
-            outputDTO.ExposedBySystem = input.ExhibitedBy?.ItSystem?.Transform(exposingSystem => exposingSystem.MapIdentityNamePairDTO());
-            outputDTO.Name = input.Name;
-            outputDTO.InterfaceId = input.ItInterfaceId;
-            outputDTO.Version = input.Version;
-            outputDTO.Description = input.Description;
-            outputDTO.Notes = input.Note;
-            outputDTO.UrlReference = input.Url;
-            outputDTO.Deactivated = input.Disabled;
-            outputDTO.Created = input.Created;
-            outputDTO.CreatedBy = input.ObjectOwner.MapIdentityNamePairDTO();
+            return _responseMapper.ToItInterfaceResponseDTO(itInterface);
         }
 
         private CreatedNegotiatedContentResult<T> MapItInterfaceCreatedResponse<T>(T dto) where T: IHasUuidExternal
