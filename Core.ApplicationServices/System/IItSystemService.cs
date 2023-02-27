@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.System;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 
@@ -24,12 +25,13 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> UpdateDescription(int systemId, string newDescription);
         bool CanChangeNameTo(int organizationId, int systemId, string newName);
         bool CanCreateSystemWithName(int organizationId, string name);
-        Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
         Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> newTaskRefState);
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? newBusinessTypeState);
         Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? newRightsHolderState);
         Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? newParentSystemState = null);
+        Result<ItSystem, OperationError> Activate(int itSystemId);
         Result<ItSystem, OperationError> Deactivate(int systemId);
+        Result<ItSystem, OperationError> UpdateAccessModifier(int itSystemId, AccessModifier accessModifier);
         Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
         Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }

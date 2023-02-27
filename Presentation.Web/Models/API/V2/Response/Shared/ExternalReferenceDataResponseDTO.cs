@@ -1,5 +1,5 @@
 ﻿using System;
-using Presentation.Web.Models.API.V2.Request.Shared;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 
 namespace Presentation.Web.Models.API.V2.Response.Shared
 {

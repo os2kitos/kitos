@@ -133,6 +133,9 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
+    <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
+    <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
+    <Compile Include="ItSystem\V2\ItSystemsApiV2RightsHoldersTest.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
     <Compile Include="Users\OrganizationRightApiTest.cs" />
     <Compile Include="Organizations\OrganizationUnitTests.cs" />
@@ -257,10 +260,6 @@
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
-      <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
-      <Name>Presentation.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
       <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>

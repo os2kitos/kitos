@@ -6,8 +6,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request;
-using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.System;
 using Xunit;
 
@@ -33,7 +36,20 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid:D}"), token);
         }
 
-        public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<ItSystemResponseDTO> CreateSystemAsync(string token, CreateItSystemRequestDTO request)
+        {
+            using var response = await SendCreateSystemAsync(token, request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateSystemAsync(string token, CreateItSystemRequestDTO request)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(BaseItSystemPath), request, token);
+        }
+
+        public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderFullItSystemRequestDTO request)
         {
             using var response = await SendCreateRightsHolderSystemAsync(token, request);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -41,12 +57,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderFullItSystemRequestDTO request)
         {
             return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(BaseRightsHolderPath), request, token);
         }
 
-        public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
+        public static async Task<RightsHolderItSystemResponseDTO> UpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderFullItSystemRequestDTO request)
         {
             using var response = await SendUpdateRightsHolderSystemAsync(token, uuid, request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -54,9 +70,22 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderWritableITSystemPropertiesDTO request)
+        public static async Task<HttpResponseMessage> SendUpdateRightsHolderSystemAsync(string token, Guid uuid, RightsHolderFullItSystemRequestDTO request)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, request);
+        }
+
+        public static async Task<ItSystemResponseDTO> PatchSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            using var response = await SendPatchSystemAsync(token, uuid, changedProperties);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
         }
 
         public static async Task<RightsHolderItSystemResponseDTO> PatchRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
@@ -70,6 +99,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPatchUpdateRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{BaseRightsHolderPath}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteSystemAsync(string token, Guid uuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid}"), token);
         }
 
         public static async Task<HttpResponseMessage> SendDeleteRightsHolderSystemAsync(string token, Guid uuid, DeactivationReasonRequestDTO request)
@@ -234,6 +268,28 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeResponseDTO>>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> AddExternalReferenceAsync(string token, Guid systemUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{systemUuid}/external-references"), request, token);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> UpdateExternalReferenceAsync(string token, Guid systemUuid, Guid externalReferenceUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{systemUuid}/external-references/{externalReferenceUuid}"), token, request);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task DeleteExternalReferenceAsync(string token, Guid systemUuid, Guid externalReferenceUuid)
+        {
+            using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{systemUuid}/external-references/{externalReferenceUuid}"), token);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 }

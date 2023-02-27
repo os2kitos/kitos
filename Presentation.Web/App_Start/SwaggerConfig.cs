@@ -83,8 +83,11 @@ namespace Presentation.Web
                       });
 
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
+                    c.DocumentFilter(() => new RemoveUnneededMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     c.DocumentFilter<OnlyIncludeReadModelSchemasInSwaggerDocumentFilter>();
+
                     var environment = KitosEnvironmentConfiguration.FromConfiguration().Environment;
+
                     if (environment != KitosEnvironment.Dev)
                     {
                         //Only remove internal api descriptions on the real environments allowing us to use the internal api docs locally and while deployed to dev (for swagger based code gen in frontend)

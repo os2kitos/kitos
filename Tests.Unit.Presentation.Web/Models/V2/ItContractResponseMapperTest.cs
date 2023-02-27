@@ -9,20 +9,17 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Moq;
-using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
-using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Types.Contract;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
-    public class ItContractResponseMapperTest : WithAutoFixture
+    public class ItContractResponseMapperTest : BaseResponseMapperTest
     {
         private readonly ItContractResponseMapper _sut;
         private readonly Mock<IExternalReferenceResponseMapper> _externalReferenceResponseMapperMock;
@@ -782,69 +779,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 AssertOptionalIdentities(agreementElements.Select(x => x.AgreementElementType), actualIdentities);
             }
         }
-
-        private static void AssertOptionalIdentities<T>(IEnumerable<T> optionalExpectedIdentities, IEnumerable<IdentityNamePairResponseDTO> actualIdentities) where T : IHasUuid, IHasName
-        {
-            if (optionalExpectedIdentities == null)
-            {
-                Assert.Null(actualIdentities);
-            }
-            else
-            {
-                var orderedOptionalExpectedIdentities = optionalExpectedIdentities.OrderBy(x => x.Uuid).ToList();
-                var orderedActualIdentities = actualIdentities.OrderBy(x => x.Uuid).ToList();
-
-                Assert.Equal(orderedOptionalExpectedIdentities.Count, orderedActualIdentities.Count);
-
-                foreach (var comparison in orderedOptionalExpectedIdentities
-                    .Zip(orderedActualIdentities, (expected, actual) => new { expected, actual })
-                    .ToList())
-                {
-                    AssertOptionalIdentity(comparison.expected, comparison.actual);
-                }
-            }
-        }
-
-        private static void AssertOptionalIdentity<T>(T optionalExpectedIdentity, IdentityNamePairResponseDTO actualIdentity) where T : IHasUuid, IHasName
-        {
-            if (optionalExpectedIdentity == null)
-                Assert.Null(actualIdentity);
-            else
-                AssertIdentity(optionalExpectedIdentity, actualIdentity);
-        }
-
-        private static void AssertUser(User user, IdentityNamePairResponseDTO dtoValue)
-        {
-            Assert.Equal((user.GetFullName(), user.Uuid), (dtoValue.Name, dtoValue.Uuid));
-        }
-
-        private static void AssertOrganization(Organization organization, ShallowOrganizationResponseDTO shallowOrganizationDTO)
-        {
-            AssertIdentity(organization, shallowOrganizationDTO);
-            Assert.Equal(organization.Cvr, shallowOrganizationDTO.Cvr);
-        }
-
-        private static void AssertIdentities<T>(IEnumerable<T> sourceIdentities, IEnumerable<IdentityNamePairResponseDTO> dto) where T : IHasUuid, IHasName
-        {
-            var orderedOptionalExpectedIdentities = sourceIdentities.OrderBy(x => x.Uuid).ToList();
-            var orderedActualIdentities = dto.OrderBy(x => x.Uuid).ToList();
-
-            Assert.Equal(orderedOptionalExpectedIdentities.Count, orderedActualIdentities.Count);
-
-            foreach (var comparison in orderedOptionalExpectedIdentities
-                .Zip(orderedActualIdentities, (expected, actual) => new { expected, actual })
-                .ToList())
-            {
-                AssertIdentity(comparison.expected, comparison.actual);
-            }
-        }
-
-        private static void AssertIdentity<T>(T sourceIdentity, IdentityNamePairResponseDTO dto) where T : IHasUuid, IHasName
-        {
-            Assert.Equal(sourceIdentity.Name, dto.Name);
-            Assert.Equal(sourceIdentity.Uuid, dto.Uuid);
-        }
-
         #endregion
     }
 }

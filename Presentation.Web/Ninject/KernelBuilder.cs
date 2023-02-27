@@ -124,6 +124,7 @@ using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
+using Core.ApplicationServices.System.Write;
 
 namespace Presentation.Web.Ninject
 {
@@ -282,6 +283,7 @@ namespace Presentation.Web.Ninject
             RegisterMappers(kernel);
 
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemWriteService>().To<ItSystemWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
 
@@ -299,6 +301,7 @@ namespace Presentation.Web.Ninject
         {
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemResponseMapper>().To<ItSystemResponseMapper>().InCommandScope(Mode);
 
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
