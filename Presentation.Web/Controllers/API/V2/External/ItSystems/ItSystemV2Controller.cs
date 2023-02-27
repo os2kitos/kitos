@@ -397,7 +397,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
-        
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific IT-System (a specific IT-System in a specific Organization)
+        /// </summary>
+        /// <param name="systemUuid">UUID of the system entity</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("it-systems/{systemUuid}/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
@@ -414,10 +419,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Select(_permissionResponseMapper.Map)
                 .Match(Ok, FromOperationError);
         }
-        
+
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client for the IT-System in the context of an organization (IT-System permissions in a specific Organization)
+        /// </summary>
+        /// <param name="organizationUuid">UUID of the organization</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("it-systems/permissions/{organizationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
