@@ -24,6 +24,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Tests.Toolkit.Patterns;
@@ -47,6 +48,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<IItSystemUsageService> _systemUsageServiceMock;
+        private readonly Mock<IOrganizationService> _organizationServiceMock;
 
         public ItSystemServiceTest()
         {
@@ -63,6 +65,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _domainEventsMock = new Mock<IDomainEvents>();
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _systemUsageServiceMock = new Mock<IItSystemUsageService>();
+            _organizationServiceMock = new Mock<IOrganizationService>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
@@ -76,7 +79,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _domainEventsMock.Object,
                 Mock.Of<IOperationClock>(),
                 _interfaceServiceMock.Object,
-                _systemUsageServiceMock.Object
+                _systemUsageServiceMock.Object,
+                _organizationServiceMock.Object
                 );
         }
 
@@ -1473,8 +1477,8 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var organizationUuid = A<Guid>();
             var organization = new Organization {Id = A<int>()};
-            
-            ExpectGetOrganizationReturns(organizationUuid, organization);
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, organization);
             ExpectAllowCreateReturns(organization.Id, create);
 
             //Act
@@ -1486,19 +1490,20 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Get_CollectionPermissions_Returns_NotFound()
+        public void Get_CollectionPermissions_Returns_OperationError_When_GetOrganization_Fails()
         {
             //Arrange
             var organizationUuid = A<Guid>();
-            
-            ExpectGetOrganizationReturns(organizationUuid, Maybe<Organization>.None);
+            var error = A<OperationError>();
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, error);
 
             //Act
             var result = _sut.GetCollectionPermissions(organizationUuid);
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
         }
 
         private (ItSystem root, IReadOnlyList<ItSystem> createdItSystems) CreateHierarchy()
@@ -1547,9 +1552,14 @@ namespace Tests.Unit.Presentation.Web.Services
             _businessTypeServiceMock.Setup(x => x.GetOptionByUuid(organizationId, businessTypeId)).Returns(result);
         }
 
-        private void ExpectGetOrganizationReturns(Guid id, Maybe<Organization> response)
+        private void ExpectGetOrganizationReturns(Guid uuid, Maybe<Organization> response)
         {
-            _organizationRepositoryMock.Setup(x => x.GetByUuid(id)).Returns(response);
+            _organizationRepositoryMock.Setup(x => x.GetByUuid(uuid)).Returns(response);
+        }
+
+        private void ExpectOrganizationServiceGetOrganizationReturns(Guid uuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? organizationDataReadAccessLevel = null)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, organizationDataReadAccessLevel)).Returns(result);
         }
 
         private void ExpectAllowModifyReturns(ItSystem itSystem, bool value)
