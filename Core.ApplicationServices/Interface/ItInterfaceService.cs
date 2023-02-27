@@ -285,13 +285,13 @@ namespace Core.ApplicationServices.Interface
                 .Bind<ResourceCollectionPermissionsResult>(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItInterface>(organization.Id, _authorizationContext));
         }
 
-        private bool ValidateName(string name)
+        private static bool ValidateName(string name)
         {
             return string.IsNullOrWhiteSpace(name) == false &&
                    name.Length <= ItInterface.MaxNameLength;
         }
 
-        private bool ValidateItInterfaceId(string itInterfaceId)
+        private static bool ValidateItInterfaceId(string itInterfaceId)
         {
             return itInterfaceId != null;
         }

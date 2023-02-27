@@ -11,6 +11,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -18,6 +19,7 @@ using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Response.Interface;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
@@ -28,12 +30,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         private readonly IItInterfaceRightsHolderService _rightsHolderService;
         private readonly IItInterfaceService _itInterfaceService;
         private readonly IItInterfaceWriteModelMapper _writeModelMapper;
+        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
 
-        public ItInterfaceV2Controller(IItInterfaceRightsHolderService rightsHolderService, IItInterfaceService itInterfaceService, IItInterfaceWriteModelMapper writeModelMapper)
+        public ItInterfaceV2Controller(IItInterfaceRightsHolderService rightsHolderService,
+            IItInterfaceService itInterfaceService,
+            IItInterfaceWriteModelMapper writeModelMapper,
+            IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;
             _writeModelMapper = writeModelMapper;
+            _permissionResponseMapper = permissionResponseMapper;
         }
 
 
@@ -266,6 +273,39 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _itInterfaceService
                 .GetInterface(uuid)
                 .Select(ToStakeHolderItInterfaceResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("it-interfaces/{interfaceUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItInterfacePermissions([NonEmptyGuid] Guid interfaceUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itInterfaceService
+                .GetPermissions(interfaceUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("it-interfaces/permissions/{organizationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItInterfaceCollectionPermissions([NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itInterfaceService.GetCollectionPermissions(organizationUuid)
+                .Select(_permissionResponseMapper.Map)
                 .Match(Ok, FromOperationError);
         }
 
