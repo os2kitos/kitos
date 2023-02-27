@@ -102,6 +102,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 .Page(paginationQuery)
                 .ToList()
                 .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .ToList()
                 .Transform(Ok);
         }
 

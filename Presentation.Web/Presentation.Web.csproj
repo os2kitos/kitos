@@ -367,6 +367,8 @@
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
+    <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
+    <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
     <Compile Include="Models\API\V1\UserCredentialsDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSearchResultResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSystemContextResponseDTO.cs" />
