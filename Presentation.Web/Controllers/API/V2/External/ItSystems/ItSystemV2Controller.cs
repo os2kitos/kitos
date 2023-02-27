@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             IEntityIdentityResolver entityIdentityResolver,
             IItSystemWriteService writeService,
             IItSystemResponseMapper systemResponseMapper,
-            IExternalReferenceResponseMapper referenceResponseMapper
+            IExternalReferenceResponseMapper referenceResponseMapper,
             IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _itSystemService = itSystemService;
@@ -399,7 +399,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         }
         
         [HttpGet]
-        [Route("{systemUuid}/permissions")]
+        [Route("it-systems/{systemUuid}/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -416,7 +416,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         }
         
         [HttpGet]
-        [Route("permissions/{organizationUuid}")]
+        [Route("it-systems/permissions/{organizationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

@@ -590,6 +590,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Empty(afterDelete.ExternalReferences);
         }
 
+        [Fact]
+        public async Task Can_Get_Specific_ItSystem_Permissions()
+        {
+            //Arrange
+            var orgId = TestEnvironment.DefaultOrganizationId;
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
+            
+            //Act
+            var permissionsResponseDto = await ItSystemV2Helper.GetPermissionsAsync(token, system.Uuid);
+
+            //Assert
+            var expected = new ResourcePermissionsResponseDTO
+            {
+                Read = true,
+                Modify = true,
+                Delete = true
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
         private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
         {
             Assert.Equal(expected.DocumentId, actual.DocumentId);
