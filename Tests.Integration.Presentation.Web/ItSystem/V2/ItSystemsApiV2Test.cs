@@ -591,7 +591,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task Can_Get_Specific_ItSystem_Permissions()
+        public async Task Can_Get_ItSystem_Permissions()
         {
             //Arrange
             var orgId = TestEnvironment.DefaultOrganizationId;
@@ -608,6 +608,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 Read = true,
                 Modify = true,
                 Delete = true
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Fact]
+        public async Task Can_Get_ItSystem_CollectionPermissions()
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+
+            //Act
+            var permissionsResponseDto = await ItSystemV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = true
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }
