@@ -9,6 +9,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
@@ -48,6 +49,7 @@ namespace Core.ApplicationServices.System
         private readonly IOperationClock _operationClock;
         private readonly IItInterfaceService _interfaceService;
         private readonly IItSystemUsageService _systemUsageService;
+        private readonly IOrganizationService _organizationService;
 
         public ItSystemService(
             IItSystemRepository itSystemRepository,
@@ -62,8 +64,8 @@ namespace Core.ApplicationServices.System
             IDomainEvents domainEvents,
             IOperationClock operationClock,
             IItInterfaceService interfaceService,
-            IItSystemUsageService systemUsageService
-            )
+            IItSystemUsageService systemUsageService,
+            IOrganizationService organizationService)
         {
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
@@ -78,6 +80,7 @@ namespace Core.ApplicationServices.System
             _operationClock = operationClock;
             _interfaceService = interfaceService;
             _systemUsageService = systemUsageService;
+            _organizationService = organizationService;
         }
 
         public Result<ItSystem, OperationError> GetSystem(Guid uuid)
@@ -327,9 +330,8 @@ namespace Core.ApplicationServices.System
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
         {
-            return _organizationRepository.GetByUuid(organizationUuid)
-                .Match<Result<ResourceCollectionPermissionsResult, OperationError>>(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystem>(organization.Id, _authorizationContext),
-                    () => new OperationError($"Organization with uuid {organizationUuid} was not found", OperationFailure.NotFound));
+            return _organizationService.GetOrganization(organizationUuid)
+                .Bind<ResourceCollectionPermissionsResult>(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystem>(organization.Id, _authorizationContext));
         }
 
         private Maybe<OperationError> ValidateNameChange(int organizationId, int systemId, string newName)
