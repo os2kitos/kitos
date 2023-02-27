@@ -517,7 +517,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Act
             var permissionsResponseDto = await ItSystemUsageV2Helper.GetCollectionPermissionsAsync(token, organization.Uuid);
 
-            //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
+            //Assert
             var expected = new ResourceCollectionPermissionsResponseDTO()
             {
                 Create = true
