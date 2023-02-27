@@ -17,6 +17,7 @@ using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
@@ -952,6 +953,46 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Get_ItInterface_Permissions()
+        {
+            //Arrange
+            var orgId = TestEnvironment.DefaultOrganizationId;
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public));
+
+            //Act
+            var permissionsResponseDto = await InterfaceV2Helper.GetPermissionsAsync(token, itInterface.Uuid);
+
+            //Assert
+            var expected = new ResourcePermissionsResponseDTO
+            {
+                Read = true,
+                Modify = true,
+                Delete = true
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Fact]
+        public async Task Can_Get_ItInterface_CollectionPermissions()
+        {
+            //Arrange
+            var org = await CreateOrganization();
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+
+            //Act
+            var permissionsResponseDto = await InterfaceV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = true
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
         }
 
         private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, OrganizationDTO rightsHolderOrganization)
