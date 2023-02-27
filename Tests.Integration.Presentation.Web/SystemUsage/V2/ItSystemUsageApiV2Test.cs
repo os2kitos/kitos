@@ -507,6 +507,25 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Can_Get_ItSystemUsage_CollectionPermissions()
+        {
+            //Arrange
+            var (token, _, organization, system) = await CreatePrerequisitesAsync();
+
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
+
+            //Act
+            var permissionsResponseDto = await ItSystemUsageV2Helper.GetCollectionPermissionsAsync(token, organization.Uuid);
+
+            //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
+            var expected = new ResourceCollectionPermissionsResponseDTO()
+            {
+                Create = true
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Fact]
         public async Task Can_Get_Specific_ItSystemUsage()
         {
             //Arrange
