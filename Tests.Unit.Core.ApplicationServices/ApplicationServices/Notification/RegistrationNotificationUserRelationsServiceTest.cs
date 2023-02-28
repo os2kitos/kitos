@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web.Http.Results;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
@@ -8,6 +9,7 @@ using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
+using Core.DomainServices.Advice;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -21,6 +23,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         private readonly Mock<IRegistrationNotificationService> _registrationNotificationService;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
+        private readonly Mock<IAdviceRootResolution> _adviceRootResolution;
 
         private readonly RegistrationNotificationUserRelationsService _sut;
 
@@ -30,12 +33,14 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _registrationNotificationService = new Mock<IRegistrationNotificationService>();
             _transactionManager = new Mock<ITransactionManager>();
             _authorizationContext = new Mock<IAuthorizationContext>();
+            _adviceRootResolution = new Mock<IAdviceRootResolution>();
 
             _sut = new RegistrationNotificationUserRelationsService(
                 _adviceUserRelationRepository.Object,
                 _registrationNotificationService.Object,
                 _transactionManager.Object,
-                _authorizationContext.Object);
+                _authorizationContext.Object,
+                _adviceRootResolution.Object);
         }
 
         [Fact]
@@ -56,10 +61,10 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteUserRelationsReturns(userRelations, true);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
+            var result = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
-            Assert.False(error.HasValue);
+            Assert.True(result.Ok);
             _adviceUserRelationRepository.Verify(x => x.AddRange(It.Is<IEnumerable<AdviceUserRelation>>(entities =>
                     VerifyUserRelationsAreCorrect(ccs, receivers, entities))), Times.Once);
             _adviceUserRelationRepository.Verify(x => x.Save(), Times.Exactly(userRelations.Count + 1));
@@ -84,11 +89,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowDeleteUserRelationsReturns(userRelations, false);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
+            var result = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -106,11 +111,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectAllowModifyReturns(notification, false);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
+            var result = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(OperationFailure.Forbidden, error.Value.FailureType);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType); ;
         }
 
         [Fact]
@@ -127,11 +132,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetNotificationByIdReturns(notificationId, expectedError);
 
             //Act
-            var error = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
+            var result = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
 
             //Assert
-            Assert.True(error.HasValue);
-            Assert.Equal(expectedError.FailureType, error.Value.FailureType);
+            Assert.True(result.Failed);
+            Assert.Equal(expectedError.FailureType, result.Error.FailureType);
         }
 
         private static bool VerifyUserRelationsAreCorrect(RecipientModel ccs, RecipientModel receivers, IEnumerable<AdviceUserRelation> relations)

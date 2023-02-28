@@ -126,23 +126,24 @@ namespace Presentation.Web.Controllers.API.V1
             return MapRecipients(recipients, RecieverType.CC)
                 .Bind(ccs => MapRecipients(recipients, RecieverType.RECIEVER)
                     .Select(receivers => (ccs, receivers)))
-                .Match(result => _registrationNotificationUserRelationsService.UpdateNotificationUserRelations(notificationId, result.ccs, result.receivers, relatedEntityType),
-                    error => error)
-                .Match(FromOperationError, Ok);
+                .Bind(result => _registrationNotificationUserRelationsService.UpdateNotificationUserRelations(notificationId, result.ccs, result.receivers, relatedEntityType))
+                .Match(Ok, FromOperationError);
         }
+
         private static Result<RecipientModel, OperationError> MapRecipients(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType)
         {
             var recipientList = recipients.ToList();
-            var recipient = new RecipientModel
-            {
-                EmailRecipients = recipientList.Where(x => x.RecpientType == RecipientType.USER && x.RecieverType == receiverType).Select(x => new EmailRecipientModel { Email = x.Email })
-            };
-
             var roleRecipientsResult = MapRoleModels(recipientList, receiverType);
             if (roleRecipientsResult.Failed)
                 return roleRecipientsResult.Error;
 
-            recipient.RoleRecipients = roleRecipientsResult.Value;
+            var emailRecipients = recipientList
+                .Where(x => x.RecpientType == RecipientType.USER && x.RecieverType == receiverType)
+                .Select(x => new EmailRecipientModel (x.Email))
+                .ToList();
+
+            var recipient = new RecipientModel(emailRecipients, roleRecipientsResult.Value);
+            
             return recipient;
         }
 
@@ -156,7 +157,7 @@ namespace Presentation.Web.Controllers.API.V1
                 if (idResult.IsNone)
                     return new OperationError("Role id cannot be null", OperationFailure.BadInput);
 
-                result.Add(new RoleRecipientModel { RoleId = idResult.Value });
+                result.Add(new RoleRecipientModel(idResult.Value));
             }
 
             return result;

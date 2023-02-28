@@ -2,6 +2,11 @@
 {
     public class RoleRecipientModel
     {
-        public int RoleId { get; set; }
+        public RoleRecipientModel(int roleId)
+        {
+            RoleId = roleId;
+        }
+
+        public int RoleId { get; }
     }
 }

@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Types;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Model.Notification;
+using Core.ApplicationServices.Model.Notification.Read;
+using Core.DomainModel;
 using Core.DomainModel.Advice;
-using Core.DomainModel.GDPR;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
-using Core.DomainServices.Generic;
-using Moq;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
 using Tests.Toolkit.Patterns;
@@ -20,15 +14,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 {
     public class NotificationResponseMapperTest : WithAutoFixture
     {
-        private readonly Mock<IEntityIdentityResolver> _identityResolver;
-
         private readonly NotificationResponseMapper _sut;
 
         public NotificationResponseMapperTest()
         {
-            _identityResolver = new Mock<IEntityIdentityResolver>();
-
-            _sut = new NotificationResponseMapper(_identityResolver.Object);
+            _sut = new NotificationResponseMapper();
         }
 
         [Theory]
@@ -41,15 +31,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var notification = CreateNotification(relatedEntityType);
             var relationUuid = A<Guid>();
 
-            ExpectResolveRelationIdReturns(notification.RelationId.GetValueOrDefault(), relatedEntityType, relationUuid);
-
             //Act
-            var result = _sut.MapNotificationResponseDTO(notification);
+            var dto = _sut.MapNotificationResponseDTO(notification);
 
             //Assert
-            Assert.True(result.Ok);
-            var dto = result.Value;
-            Assert.Equal(relationUuid, dto.OwnerResourceUuid);
+            Assert.Equal(relationUuid, dto.OwnerResource.Uuid);
             AssertNotificationResponse(notification, dto);
         }
 
@@ -60,17 +46,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void MapNotificationResponseDTO_Maps_No_Properties(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var notification = new Advice() {RelationId = A<int>(), Type = relatedEntityType};
-            var relationUuid = A<Guid>();
-
-            ExpectResolveRelationIdReturns(notification.RelationId.GetValueOrDefault(), relatedEntityType, relationUuid);
+            var notification = new NotificationResultModel(A<int>(), A<Guid>(), A<bool>(), null, null, null, null, null, null, null, null, relatedEntityType, A<AdviceType>(), null, null);
 
             //Act
-            var result = _sut.MapNotificationResponseDTO(notification);
+            var dto = _sut.MapNotificationResponseDTO(notification);
 
             //Assert
-            Assert.True(result.Ok);
-            var dto = result.Value;
             Assert.Null(dto.Name);
             Assert.Null(dto.LastSent);
             Assert.Null(dto.FromDate);
@@ -80,47 +61,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(dto.CCs);
             Assert.Null(dto.Receivers);
             Assert.Null(dto.RepetitionFrequency);
-        }
-
-        [Theory]
-        [InlineData(RelatedEntityType.itSystemUsage)]
-        [InlineData(RelatedEntityType.dataProcessingRegistration)]
-        [InlineData(RelatedEntityType.itContract)]
-        public void MapNotificationResponseDTO_Returns_NotFound_When_RelatedUuid_NotFound(RelatedEntityType relatedEntityType)
-        {
-            //Arrange
-            var notification = new Advice() {RelationId = A<int>(), Type = relatedEntityType};
-
-            ExpectResolveRelationIdReturns(notification.RelationId.GetValueOrDefault(), relatedEntityType, Maybe<Guid>.None);
-
-            //Act
-            var result = _sut.MapNotificationResponseDTO(notification);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-        }
-
-        [Theory]
-        [InlineData(RelatedEntityType.itSystemUsage)]
-        [InlineData(RelatedEntityType.dataProcessingRegistration)]
-        [InlineData(RelatedEntityType.itContract)]
-        public void MapNotificationResponseDTOs_Returns_NotFound_When_RelatedUuid_NotFound(RelatedEntityType relatedEntityType)
-        {
-            //Arrange
-            var notifications = new List<Advice>{ CreateNotification(relatedEntityType), CreateNotification(relatedEntityType)};
-
-            foreach (var notification in notifications)
-            {
-                ExpectResolveRelationIdReturns(notification.RelationId.GetValueOrDefault(), relatedEntityType, Maybe<Guid>.None);
-            }
-
-            //Act
-            var response = _sut.MapNotificationResponseDTOs(notifications);
-
-            //Assert
-            Assert.True(response.Failed);
-            Assert.Equal(OperationFailure.NotFound, response.Error.FailureType);
         }
 
 
@@ -155,130 +95,89 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         }
 
-        private static void AssertNotificationResponse(Advice notification, NotificationResponseDTO dto)
+        private static void AssertNotificationResponse(NotificationResultModel notification, NotificationResponseDTO dto)
         {
             Assert.Equal(notification.Uuid, dto.Uuid);
             Assert.Equal(notification.IsActive, dto.Active);
             Assert.Equal(notification.Name, dto.Name);
             Assert.Equal(notification.SentDate, dto.LastSent);
-            Assert.Equal(notification.AlarmDate, dto.FromDate);
-            Assert.Equal(notification.StopDate, dto.ToDate);
+            Assert.Equal(notification.FromDate, dto.FromDate);
+            Assert.Equal(notification.ToDate, dto.ToDate);
             Assert.Equal(notification.Subject, dto.Subject);
             Assert.Equal(notification.Body, dto.Body);
-            Assert.Equal(notification.Type, dto.Type.ToRelatedEntityType());
-            Assert.Equal(notification.AdviceType.ToNotificationType(), dto.NotificationType);
+            Assert.Equal(notification.RelatedEntityType, dto.OwnerResourceType.ToRelatedEntityType());
+            Assert.Equal(notification.NotificationType.ToNotificationType(), dto.NotificationType);
 
             AssertRecipients(notification, dto);
 
-            if (notification.Scheduling == Scheduling.Immediate)
+            if (notification.RepetitionFrequency == Scheduling.Immediate)
             {
                 Assert.Null(dto.RepetitionFrequency);
             }
             else
             {
-                Assert.Equal(notification.Scheduling, dto.RepetitionFrequency.GetValueOrDefault().ToScheduling());
+                Assert.Equal(notification.RepetitionFrequency, dto.RepetitionFrequency.GetValueOrDefault().ToScheduling());
             }
         }
 
-        private static void AssertRecipients(Advice notification, NotificationResponseDTO dto)
+        private static void AssertRecipients(NotificationResultModel notification, NotificationResponseDTO dto)
         {
-            AssertRecipientsByRoot(notification.Reciepients, dto.CCs);
-            AssertRecipientsByRoot(notification.Reciepients, dto.Receivers);
+            AssertRecipientsByRoot(notification.Ccs, dto.CCs);
+            AssertRecipientsByRoot(notification.Receivers, dto.Receivers);
         }
 
-        private static void AssertRecipientsByRoot(IEnumerable<AdviceUserRelation> relations,
-            RecipientResponseDTO dto)
+        private static void AssertRecipientsByRoot(RecipientResultModel relations, RecipientResponseDTO dto)
         {
-            var adviceUserRelations = relations.ToList();
             foreach (var roleRecipient in dto.RoleRecipients)
             {
-                Assert.Single(adviceUserRelations,
-                    x => x.DataProcessingRegistrationRole?.Uuid == roleRecipient.Role.Uuid ||
-                         x.ItContractRole?.Uuid == roleRecipient.Role.Uuid ||
-                         x.ItSystemRole?.Uuid == roleRecipient.Role.Uuid);
+                Assert.Single(relations.RoleRecipients,
+                    x => x.Role.Uuid == roleRecipient.Role.Uuid);
             }
             foreach (var emailRecipient in dto.EmailRecipients)
             {
-                Assert.Single(adviceUserRelations,
+                Assert.Single(relations.EmailRecipients,
                     x => x.Email == emailRecipient.Email);
             }
         }
 
-        private void ExpectResolveRelationIdReturns(int relationId, RelatedEntityType relatedEntityType, Maybe<Guid> result)
+        private NotificationResultModel CreateNotification(RelatedEntityType relatedEntityType)
         {
-            switch (relatedEntityType)
-            {
-                case RelatedEntityType.dataProcessingRegistration:
-                    _identityResolver.Setup(x => x.ResolveUuid<DataProcessingRegistration>(relationId)).Returns(result);
-                    break;
-                case RelatedEntityType.itSystemUsage:
-                    _identityResolver.Setup(x => x.ResolveUuid<ItSystemUsage>(relationId)).Returns(result);
-                    break;
-                case RelatedEntityType.itContract:
-                    _identityResolver.Setup(x => x.ResolveUuid<ItContract>(relationId)).Returns(result);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
-            }
+            return new NotificationResultModel
+            (
+                A<int>(),
+                A<Guid>(),
+                A<bool>(),
+                A<string>(),
+                A<DateTime>(),
+                A<DateTime>(),
+                A<DateTime>(),
+                A<string>(),
+                A<string>(),
+                A<Scheduling>(),
+                A<IEntityWithAdvices>(),
+                relatedEntityType,
+                A<AdviceType>(),
+                CreateRecipients(),
+                CreateRecipients()
+            );
         }
 
-        private Advice CreateNotification(RelatedEntityType relatedEntityType)
+        private RecipientResultModel CreateRecipients()
         {
-            return new Advice
-            {
-                Uuid = A<Guid>(),
-                RelationId = A<int>(),
-                IsActive = A<bool>(),
-                Name = A<string>(),
-                SentDate = A<DateTime>(),
-                AlarmDate = A<DateTime>(),
-                StopDate = A<DateTime>(),
-                Subject = A<string>(),
-                Body = A<string>(),
-                Scheduling = A<Scheduling>(),
-                Type = relatedEntityType,
-                AdviceType = A<AdviceType>(),
-                Reciepients = CreateRecipients(relatedEntityType)
-            };
+            return new RecipientResultModel(
+                CreateEmailRecipient().WrapAsEnumerable(),
+                CreateRoleRecipient().WrapAsEnumerable()
+            );
         }
 
-        private ICollection<AdviceUserRelation> CreateRecipients(RelatedEntityType relatedEntityType)
+        private EmailRecipientResultModel CreateEmailRecipient()
         {
-            return new List<AdviceUserRelation>
-            {
-                CreateEmailRecipient(RecieverType.CC),
-                CreateEmailRecipient(RecieverType.RECIEVER),
-                CreateRoleRecipient(RecieverType.CC, relatedEntityType),
-                CreateRoleRecipient(RecieverType.RECIEVER, relatedEntityType)
-            };
+            return new EmailRecipientResultModel(CreateEmail());
         }
 
-        private AdviceUserRelation CreateEmailRecipient(RecieverType receiverType)
+        private RoleRecipientResultModel CreateRoleRecipient()
         {
-            return new AdviceUserRelation
-            {
-                RecieverType = receiverType,
-                RecpientType = RecipientType.USER,
-                Email = CreateEmail()
-            };
-        }
-
-        private AdviceUserRelation CreateRoleRecipient(RecieverType receiverType, RelatedEntityType relatedEntityType)
-        {
-            return new AdviceUserRelation
-            {
-                RecieverType = receiverType,
-                RecpientType = RecipientType.ROLE,
-                ItContractRole = relatedEntityType == RelatedEntityType.itContract 
-                    ? new ItContractRole {Uuid = A<Guid>(), Name = A<string>()}
-                    : null,
-                DataProcessingRegistrationRole = relatedEntityType == RelatedEntityType.dataProcessingRegistration
-                    ? new DataProcessingRegistrationRole {Uuid = A<Guid>(), Name = A<string>()}
-                    : null,
-                ItSystemRole = relatedEntityType == RelatedEntityType.itSystemUsage
-                    ? new ItSystemRole {Uuid = A<Guid>(), Name = A<string>()}
-                    : null
-            };
+            return new RoleRecipientResultModel(A<IRoleEntity>());
         }
 
         private string CreateEmail()

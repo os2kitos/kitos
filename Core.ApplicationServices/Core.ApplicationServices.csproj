@@ -164,6 +164,10 @@
     <Compile Include="Model\Notification\IHasRecipientModels.cs" />
     <Compile Include="Model\Notification\ImmediateNotificationModel.cs" />
     <Compile Include="Model\Notification\NotificationPermissions.cs" />
+    <Compile Include="Model\Notification\Read\EmailRecipientResultModel.cs" />
+    <Compile Include="Model\Notification\Read\NotificationResultModel.cs" />
+    <Compile Include="Model\Notification\Read\RecipientResultModel.cs" />
+    <Compile Include="Model\Notification\Read\RoleRecipientResultModel.cs" />
     <Compile Include="Model\Notification\RoleRecipientModel.cs" />
     <Compile Include="Model\Notification\ScheduledNotificationModel.cs" />
     <Compile Include="Model\Notification\BaseNotificationPropertiesModel.cs" />

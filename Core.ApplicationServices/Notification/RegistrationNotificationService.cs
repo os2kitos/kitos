@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
+using Core.ApplicationServices.Model.Notification.Write;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Events;
@@ -59,7 +60,7 @@ namespace Core.ApplicationServices.Notification
         public Result<Advice, OperationError> GetNotificationById(int id)
         {
             return _adviceService.GetAdviceById(id)
-                .Match(AuthorizeReadAccessAndReturnNotification,
+                .Match(WithReadAccess,
                     () => new OperationError($"Notification with id: {id} was not found", OperationFailure.NotFound));
         }
 
@@ -186,10 +187,6 @@ namespace Core.ApplicationServices.Notification
             {
                 return new OperationError($"User is not allowed to create notification for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
             }
-
-            var res = newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).ToList();
-            var res2 = res.Any(x => !_emailValidationRegex.IsMatch(x.Email));
-
             if (newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
             {
                 return new OperationError("Invalid email exists among receivers or CCs", OperationFailure.BadInput);
@@ -200,7 +197,7 @@ namespace Core.ApplicationServices.Notification
             newNotification.IsActive = true;
 
             _adviceRepository.Insert(newNotification);
-            _domainEventHandler.Raise(new EntityCreatedEvent<Advice>(newNotification));
+            RaiseAsRootModification(newNotification);
             _adviceRepository.Save();
 
             var name = Advice.CreateJobId(newNotification.Id);
@@ -215,7 +212,7 @@ namespace Core.ApplicationServices.Notification
             return newNotification;
         }
 
-        private Result<Advice, OperationError> AuthorizeReadAccessAndReturnNotification(Advice notification)
+        private Result<Advice, OperationError> WithReadAccess(Advice notification)
         {
             return _authorizationContext.AllowReads(ResolveRoot(notification))
                 ? notification
@@ -259,7 +256,7 @@ namespace Core.ApplicationServices.Notification
         }
 
         private static void MapBasePropertiesWithNameAndStopDate<T>(T model, Advice notification)
-            where T : class, IHasName, IHasToDate, IHasBaseNotificationPropertiesModel
+            where T : class, IHasReadonlyName, IHasReadonlyToDate, IHasBaseNotificationPropertiesModel
         {
             MapBasePropertiesToNotification(model, notification);
             notification.Name = model.Name;

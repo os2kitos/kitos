@@ -2,8 +2,15 @@
 {
     public class ImmediateNotificationModel : IHasBaseNotificationPropertiesModel, IHasRecipientModels
     {
-        public BaseNotificationPropertiesModel BaseProperties { get; set; }
-        public RecipientModel Ccs { get; set; }
-        public RecipientModel Receivers { get; set; }
+        public ImmediateNotificationModel(BaseNotificationPropertiesModel baseProperties, RecipientModel ccs, RecipientModel receivers)
+        {
+            BaseProperties = baseProperties;
+            Ccs = ccs;
+            Receivers = receivers;
+        }
+
+        public BaseNotificationPropertiesModel BaseProperties { get; }
+        public RecipientModel Ccs { get; }
+        public RecipientModel Receivers { get; }
     }
 }

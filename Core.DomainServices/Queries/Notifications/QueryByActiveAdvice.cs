@@ -2,11 +2,11 @@
 
 namespace Core.DomainServices.Queries.Notifications
 {
-    public class QueryByActiveNotification : IDomainQuery<DomainModel.Advice.Advice>
+    public class QueryByActiveAdvice : IDomainQuery<DomainModel.Advice.Advice>
     {
         private readonly bool _active;
 
-        public QueryByActiveNotification(bool active)
+        public QueryByActiveAdvice(bool active)
         {
             _active = active;
         }

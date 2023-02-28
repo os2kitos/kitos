@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Model.Notification.Write
 
         public string Body { get; }
         public string Subject { get; }
-        public virtual RelatedEntityType Type { get; }
+        public RelatedEntityType Type { get; }
         public Guid OwnerResourceUuid { get; }
         public RootRecipientModificationParameters Ccs { get; }
         public RootRecipientModificationParameters Receivers { get; }

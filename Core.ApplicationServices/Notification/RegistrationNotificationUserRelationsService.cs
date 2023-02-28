@@ -7,6 +7,8 @@ using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 using System.Linq;
 using Core.DomainModel.Shared;
+using Core.DomainModel;
+using Core.DomainServices.Advice;
 
 namespace Core.ApplicationServices.Notification
 {
@@ -16,33 +18,34 @@ namespace Core.ApplicationServices.Notification
         private readonly IRegistrationNotificationService _registrationNotificationService;
         private readonly ITransactionManager _transactionManager;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IAdviceRootResolution _adviceRootResolution;
 
         public RegistrationNotificationUserRelationsService(IGenericRepository<AdviceUserRelation> adviceUserRelationRepository, 
             IRegistrationNotificationService registrationNotificationService,
             ITransactionManager transactionManager, 
-            IAuthorizationContext authorizationContext)
+            IAuthorizationContext authorizationContext, 
+            IAdviceRootResolution adviceRootResolution)
         {
             _adviceUserRelationRepository = adviceUserRelationRepository;
             _registrationNotificationService = registrationNotificationService;
             _transactionManager = transactionManager;
             _authorizationContext = authorizationContext;
+            _adviceRootResolution = adviceRootResolution;
         }
 
-        public Maybe<OperationError> UpdateNotificationUserRelations(int notificationId, RecipientModel ccRecipients, RecipientModel receiverRecipients, RelatedEntityType relatedEntityType)
+        public Result<Advice, OperationError> UpdateNotificationUserRelations(int notificationId, RecipientModel ccRecipients, RecipientModel receiverRecipients, RelatedEntityType relatedEntityType)
         {
             using var transaction = _transactionManager.Begin();
 
-            var error = _registrationNotificationService.GetNotificationById(notificationId)
-                .Match
-                (
-                    notification => 
-                        _authorizationContext.AllowModify(notification)
-                            ? DeleteUserRelationsByAdviceId(notificationId)
-                            : new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden),
-                    error => error);
-
-            if (error.HasValue)
-                return error;
+            var notificationResult = _registrationNotificationService.GetNotificationById(notificationId)
+                .Bind(notification => 
+                        _authorizationContext.AllowModify(ResolveRoot(notification))
+                            ? DeleteUserRelationsByAdviceId(notification)
+                            : new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden)
+                );
+            if (notificationResult.Failed)
+                return notificationResult.Error;
+            var notification = notificationResult.Value;
 
             var recipients = new List<AdviceUserRelation>();
             recipients.AddRange(MapAdviceUserRelation(notificationId, ccRecipients, RecieverType.CC, relatedEntityType));
@@ -52,12 +55,12 @@ namespace Core.ApplicationServices.Notification
             _adviceUserRelationRepository.Save();
             transaction.Commit();
 
-            return Maybe<OperationError>.None;
+            return notification;
         }
 
-        private Maybe<OperationError> DeleteUserRelationsByAdviceId(int notificationId)
+        private Result<Advice, OperationError> DeleteUserRelationsByAdviceId(Advice notification)
         {
-            foreach (var d in _adviceUserRelationRepository.AsQueryable().Where(d => d.AdviceId == notificationId).ToList())
+            foreach (var d in _adviceUserRelationRepository.AsQueryable().Where(d => d.AdviceId == notification.Id).ToList())
             {
                 if (_authorizationContext.AllowDelete(d))
                 {
@@ -66,10 +69,10 @@ namespace Core.ApplicationServices.Notification
                 }
                 else
                 {
-                    return new OperationError($"User is not allowed to delete user relation with adviceId: {notificationId}", OperationFailure.Forbidden);
+                    return new OperationError($"User is not allowed to delete user relation with adviceId: {notification.Id}", OperationFailure.Forbidden);
                 }
             }
-            return Maybe<OperationError>.None;
+            return notification;
         }
         
         private static IEnumerable<AdviceUserRelation> MapAdviceUserRelation(int notificationId, RecipientModel model, RecieverType receiverType, RelatedEntityType relatedEntityType)
@@ -93,6 +96,10 @@ namespace Core.ApplicationServices.Notification
             }));
 
             return recipients;
+        }
+        private IEntityWithAdvices ResolveRoot(Advice advice)
+        {
+            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
         }
     }
 }

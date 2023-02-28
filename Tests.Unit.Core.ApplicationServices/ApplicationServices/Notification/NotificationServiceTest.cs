@@ -90,9 +90,10 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var orgUuid = A<Guid>();
             var orgId = A<int>();
             var relationId = A<int>();
-            var notification = new Advice() {RelationId = relationId };
+            var type = A<RelatedEntityType>();
+            var notification = new Advice {RelationId = relationId, Type = type};
             var notifications = new List<Advice> { notification, new()}.AsQueryable();
-            var condition = new QueryByOwnerResourceId(relationId);
+            var condition = new QueryByOwnerResourceId(relationId, type);
 
             ExpectResolveIdReturns<Organization>(orgUuid, orgId);
             ExpectGetNotificationsByOrganizationIdReturns(orgId, Result<IQueryable<Advice>, OperationError>.Success(notifications));
@@ -104,7 +105,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.True(result.Ok);
             var resultList = result.Value.ToList();
             var resultNotification = Assert.Single(resultList);
-            Assert.Equal(notification.AlarmDate, resultNotification.AlarmDate);
+            Assert.Equal(notification.RelationId, resultNotification.OwnerResource.Id);
         }
 
         [Fact]
@@ -264,12 +265,13 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var parameters = CreateNewParameters(relatedEntityType);
-            var notification = new Advice {Uuid = parameters.BaseProperties.OwnerResourceUuid};
 
             var transaction = ExpectDatabaseTransactionReturns();
             var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
             var roleIds = ExpectRoleRecipientIds(parameters);
             ExpectAllowModifyReturns(relatedEntity, true);
+
+            var notification = new Advice {RelationId = relatedEntity.Id, Uuid = parameters.BaseProperties.OwnerResourceUuid, Type = relatedEntityType};
             ExpectImmediateCreateReturns(parameters, AdviceType.Immediate, roleIds, notification);
 
             //Act
@@ -309,12 +311,13 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var parameters = CreateNewScheduledParameters(relatedEntityType);
-            var notification = new Advice {Uuid = parameters.BaseProperties.OwnerResourceUuid};
 
             var transaction = ExpectDatabaseTransactionReturns();
-            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
+            var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, relatedEntityType);
             var roleIds = ExpectRoleRecipientIds(parameters);
             ExpectAllowModifyReturns(relatedEntity, true);
+
+            var notification = new Advice {RelationId = relatedEntity.Id, Uuid = parameters.BaseProperties.OwnerResourceUuid, Type = relatedEntityType};
             ExpectScheduledCreateReturns(parameters, AdviceType.Repeat, roleIds, notification);
 
             //Act
@@ -356,14 +359,14 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var uuid = A<Guid>();
             var id = A<int>();
             var parameters = CreateNewUpdateScheduledParameters(relatedEntityType);
-            var notification = new Advice { Uuid = parameters.BaseProperties.OwnerResourceUuid };
+            var notification = new Advice { Id = id, Uuid = parameters.BaseProperties.OwnerResourceUuid };
 
             var transaction = ExpectDatabaseTransactionReturns();
             var relatedEntity = ExpectGetRelatedEntityReturnsEntity(parameters.BaseProperties.OwnerResourceUuid, parameters.BaseProperties.Type);
             var resolvedRoleIds = ExpectRoleRecipientIds(parameters);
             ExpectResolveIdReturns<Advice>(uuid, id);
             ExpectAllowModifyReturns(relatedEntity, true);
-            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, parameters.BaseProperties.Type, Maybe<OperationError>.None);
+            ExpectUpdateNotificationUserRelations(id, parameters, resolvedRoleIds, parameters.BaseProperties.Type, notification);
             ExpectUpdateReturns(id, parameters, notification);
 
             //Act
@@ -456,9 +459,11 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var uuid = A<Guid>();
             var relationUuid = A<Guid>();
             var id = A<int>();
-            var notification = CreateNewNotification(relatedEntityType, id: id);
 
             ExpectResolveIdReturns<Advice>(uuid, id);
+            var entity = ExpectGetRelatedEntityReturnsEntity(uuid, relatedEntityType);
+            var notification = CreateNewNotification(relatedEntityType, id: id, uuid: uuid, relationId: entity.Id);
+
             ExpectGetNotificationByIdReturns(id, notification);
             ExpectGetPermissionReturnsTrue(relationUuid, relatedEntityType);
             ExpectDeactivateReturns(id, notification);
@@ -837,13 +842,13 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             transaction.Verify(x => x.Commit(), Times.Never);
         }
 
-        private Advice CreateNewNotification(RelatedEntityType relatedEntityType, bool isActive = true, AdviceType notificationType = AdviceType.Repeat, Guid? uuid =null, int? id = null)
+        private Advice CreateNewNotification(RelatedEntityType relatedEntityType, bool isActive = true, AdviceType notificationType = AdviceType.Repeat, Guid? uuid =null, int? id = null, int? relationId = null)
         {
             return new Advice
             {
                 Id = id ?? A<int>(),
                 Uuid = uuid ?? A<Guid>(),
-                RelationId = A<int>(),
+                RelationId = relationId ?? A<int>(),
                 IsActive = isActive,
                 Type = relatedEntityType,
                 AdviceType = notificationType,
@@ -975,7 +980,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                 notificationModel.Name == parameters.Name))).Returns(result);
         }
 
-        private void ExpectUpdateNotificationUserRelations(int notificationId, UpdateScheduledNotificationModificationParameters parameters, IReadOnlyList<int> roleIds, RelatedEntityType relatedEntityType, Maybe<OperationError> result)
+        private void ExpectUpdateNotificationUserRelations(int notificationId, UpdateScheduledNotificationModificationParameters parameters, IReadOnlyList<int> roleIds, RelatedEntityType relatedEntityType, Result<Advice, OperationError> result)
         {
             _notificationUserRelationsService.Setup(x => x.UpdateNotificationUserRelations
                 (
@@ -1059,20 +1064,38 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             switch (relatedEntityType)
             {
                 case RelatedEntityType.dataProcessingRegistration:
-                    var dpr = new DataProcessingRegistration(){Uuid = uuid};
+                    var dpr = new DataProcessingRegistration { Id = A<int>(), Uuid = uuid};
                     _dprRepository.Setup(x => x.AsQueryable()).Returns(new List<DataProcessingRegistration>{dpr}.AsQueryable);
                     return dpr;
                 case RelatedEntityType.itContract:
-                    var contract = new ItContract() { Uuid = uuid };
+                    var contract = new ItContract { Id = A<int>(), Uuid = uuid };
                     _contractRepository.Setup(x => x.AsQueryable()).Returns(new List<ItContract> { contract }.AsQueryable);
                     return contract;
                 case RelatedEntityType.itSystemUsage:
-                    var usage = new ItSystemUsage() { Uuid = uuid };
+                    var usage = new ItSystemUsage { Id = A<int>(), Uuid = uuid };
                     _usageRepository.Setup(x => x.AsQueryable()).Returns(new List<ItSystemUsage> { usage }.AsQueryable);
                     return usage;
                 default: throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
             }
-        }
+        }/*
+
+        private void ExpectGetRelatedEntityReturns(IEntityWithAdvices entity, RelatedEntityType relatedEntityType)
+        {
+
+            switch (relatedEntityType)
+            {
+                case RelatedEntityType.dataProcessingRegistration:
+                    _dprRepository.Setup(x => x.AsQueryable()).Returns(new List<DataProcessingRegistration> { (DataProcessingRegistration)entity }.AsQueryable);
+                    break;
+                case RelatedEntityType.itContract:
+                    _contractRepository.Setup(x => x.AsQueryable()).Returns(new List<ItContract> { (ItContract)entity }.AsQueryable);
+                    break;
+                case RelatedEntityType.itSystemUsage:
+                    _usageRepository.Setup(x => x.AsQueryable()).Returns(new List<ItSystemUsage> { (ItSystemUsage)entity }.AsQueryable);
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
+            }
+        }*/
 
         private void ExpectGetRelatedEntityReturnsNone(RelatedEntityType relatedEntityType)
         {

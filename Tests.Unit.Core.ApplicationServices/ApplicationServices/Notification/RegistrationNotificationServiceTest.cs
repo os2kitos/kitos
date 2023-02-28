@@ -559,44 +559,45 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
         private ImmediateNotificationModel CreateImmediateModel()
         {
-            var model = A<ImmediateNotificationModel>();
-            CreateEmailRecipients(model);
-            model.BaseProperties.AdviceType = AdviceType.Immediate;
-
-            return model;
+            return new ImmediateNotificationModel(CreateBaseProperties(AdviceType.Immediate), CreateRecipientModel(), CreateRecipientModel());
         }
 
         private ScheduledNotificationModel CreateScheduledModel()
         {
-            var model = A<ScheduledNotificationModel>();
-            CreateEmailRecipients(model);
             var random = new Random();
-            model.RepetitionFrequency = (Scheduling) random.Next(1, 8);
-            model.ToDate = model.FromDate.AddDays(A<int>());
-            model.BaseProperties.AdviceType = AdviceType.Repeat;
-
-            return model;
+            var fromDate = A<DateTime>();
+            var toDate = fromDate.AddDays(A<int>());
+            var repetitionFrequency = (Scheduling) random.Next(1, 8);
+            return new ScheduledNotificationModel(A<string>(), toDate, repetitionFrequency, fromDate, CreateBaseProperties(AdviceType.Repeat), CreateRecipientModel(), CreateRecipientModel());
         }
 
         private UpdateScheduledNotificationModel CreateUpdateScheduledModel()
         {
-            var model = A<UpdateScheduledNotificationModel>();
-            model.BaseProperties.AdviceType = AdviceType.Repeat;
-            return model;
+            return new UpdateScheduledNotificationModel(A<string>(), A<DateTime>(), CreateBaseProperties(AdviceType.Repeat));
         }
 
-        private void CreateEmailRecipients<T>(T model) where T : class, IHasRecipientModels
+        private BaseNotificationPropertiesModel CreateBaseProperties(AdviceType type)
         {
-            CreateEmailsForListOfEmailRecipients(model.Ccs.EmailRecipients);
-            CreateEmailsForListOfEmailRecipients(model.Receivers.EmailRecipients);
+            return new BaseNotificationPropertiesModel(
+                A<string>(),
+                A<string>(),
+                A<RelatedEntityType>(),
+                type,
+                A<int>());
         }
 
-        private void CreateEmailsForListOfEmailRecipients(IEnumerable<EmailRecipientModel> emailRecipients)
+        private RecipientModel CreateRecipientModel()
         {
-            foreach (var emailRecipientModel in emailRecipients)
+            return new RecipientModel(CreateEmailRecipients(), A<IEnumerable<RoleRecipientModel>>());
+        }
+
+        private IEnumerable<EmailRecipientModel> CreateEmailRecipients()
+        {
+            return new List<EmailRecipientModel>
             {
-                emailRecipientModel.Email = CreateEmail();
-            }
+                new (CreateEmail()),
+                new (CreateEmail())
+            };
         }
 
         private string CreateEmail()

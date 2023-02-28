@@ -63,7 +63,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             [NonEmptyGuid] Guid organizationUuid, 
             Guid? ownerResourceUuid = null,
             bool onlyActive = false,
-            [FromUri] BoundedPaginationQuery paginationQuery = null)
+            [FromUri] UnboundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -77,26 +77,24 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 if (idResult.IsNone)
                     return BadRequest($"OwnerResource with uuid: {unpackedOwnerResourceUuid} was not found");
 
-                conditions.Add(new QueryByOwnerResourceId(idResult.Value));
+                conditions.Add(new QueryByOwnerResourceId(idResult.Value, ownerResourceType.ToRelatedEntityType()));
             }
 
             if (onlyActive)
             {
-                conditions.Add(new QueryByActiveNotification(true));
+                conditions.Add(new QueryByActiveAdvice(true));
             }
 
             return _notificationService.GetNotifications(organizationUuid, conditions.ToArray())
-                .Bind
+                .Select
                 (
                     notifications =>
-                    {
-                        var notificationList = notifications
+                        notifications
                             .OrderBy(x => x.Id)
                             .Page(paginationQuery)
-                            .ToList();
-
-                        return _responseMapper.MapNotificationResponseDTOs(notificationList);
-                    }
+                            .ToList()
+                            .Select(_responseMapper.MapNotificationResponseDTO)
+                            .ToList()
                 )
                 .Match(Ok, FromOperationError);
         }
@@ -121,7 +119,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 return BadRequest(ModelState);
 
             return _notificationService.GetNotificationByUuid(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
-                .Bind(_responseMapper.MapNotificationResponseDTO)
+                .Select(_responseMapper.MapNotificationResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -148,7 +146,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             var parameters = _writeModelMapper.FromImmediatePOST(request, ownerResourceUuid, ownerResourceType);
 
             return _notificationService.CreateImmediateNotification(parameters)
-                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
                     resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/immediate/{resultDTO}", resultDTO),
@@ -179,7 +177,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             var parameters = _writeModelMapper.FromScheduledPOST(request, ownerResourceUuid, ownerResourceType);
 
             return _notificationService.CreateScheduledNotification(parameters)
-                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match
                 (
                     resultDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{ownerResourceType}/scheduled/{resultDTO.Uuid}", resultDTO),
@@ -210,7 +208,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             var parameters = _writeModelMapper.FromScheduledPUT(request, ownerResourceUuid, ownerResourceType);
 
             return _notificationService.UpdateScheduledNotification(notificationUuid, parameters)
-                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match(Ok, FromOperationError);
         }
 
@@ -234,7 +232,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 return BadRequest();
 
             return _notificationService.DeactivateNotification(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
-                .Bind(notification => _responseMapper.MapNotificationResponseDTO(notification))
+                .Select(notification => _responseMapper.MapNotificationResponseDTO(notification))
                 .Match(Ok, FromOperationError);
         }
 

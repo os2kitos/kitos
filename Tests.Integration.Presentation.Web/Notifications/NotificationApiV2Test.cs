@@ -227,7 +227,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
             Assert.Equal(expected.NotificationType, actual.NotificationType);
             Assert.Equal(expected.Body, actual.Body);
             Assert.Equal(expected.Subject, actual.Subject);
-            Assert.Equal(expected.OwnerResourceUuid, actual.OwnerResourceUuid);
+            Assert.Equal(expected.OwnerResource, actual.OwnerResource);
             AssertRecipients(expected, actual);
         }
 
@@ -251,7 +251,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
             Assert.Equal(notificationType, actual.NotificationType);
             Assert.Equal(expected.BaseProperties.Body, actual.Body);
             Assert.Equal(expected.BaseProperties.Subject, actual.Subject);
-            Assert.Equal(relationUuid, actual.OwnerResourceUuid);
+            Assert.Equal(relationUuid, actual.OwnerResource.Uuid);
             AssertRecipients(expected, actual);
         }
 

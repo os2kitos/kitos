@@ -2,6 +2,6 @@
 {
     public interface IHasBaseNotificationPropertiesParameters
     {
-        public BaseNotificationPropertiesModificationParameters BaseProperties { get; }
+        BaseNotificationPropertiesModificationParameters BaseProperties { get; }
     }
 }
