@@ -7,7 +7,6 @@ using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries.ItSystem;
 using Presentation.Web.Extensions;
-using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 {
@@ -18,14 +17,14 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
     {
         public static IEnumerable<ItSystem> ExecuteItSystemsQuery(
             this IItSystemService service,
-            [NonEmptyGuid] Guid? rightsHolderUuid = null,
-            [NonEmptyGuid] Guid? businessTypeUuid = null,
+            Guid? rightsHolderUuid = null,
+            Guid? businessTypeUuid = null,
             string kleNumber = null,
-            [NonEmptyGuid] Guid? kleUuid = null,
+            Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
-            [NonEmptyGuid] Guid? usedInOrganizationUuid = null,
+            Guid? usedInOrganizationUuid = null,
             BoundedPaginationQuery paginationQuery = null)
         {
             var refinements = new List<IDomainQuery<ItSystem>>();
