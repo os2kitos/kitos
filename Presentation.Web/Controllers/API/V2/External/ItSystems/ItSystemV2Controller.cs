@@ -71,7 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
-        /// <param name="usedInOrganizationUuid">Uuid of the organization owning the System</param>
+        /// <param name="usedInOrganizationUuid">Uuid of the organization containing systems in use</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
