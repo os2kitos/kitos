@@ -590,14 +590,19 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Empty(afterDelete.ExternalReferences);
         }
 
-        [Fact]
-        public async Task Can_Get_ItSystem_Permissions()
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_ItSystem_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
         {
             //Arrange
-            var orgId = TestEnvironment.DefaultOrganizationId;
-            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUser(org.Id);
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
             
             //Act
             var permissionsResponseDto = await ItSystemV2Helper.GetPermissionsAsync(token, system.Uuid);
@@ -605,19 +610,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             var expected = new ResourcePermissionsResponseDTO
             {
-                Read = true,
-                Modify = true,
-                Delete = true
+                Read = read,
+                Modify = modify,
+                Delete = delete
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }
-
-        [Fact]
-        public async Task Can_Get_ItSystem_CollectionPermissions()
+        
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, false)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItSystem_CollectionPermissions(OrganizationRole role, bool create)
         {
             //Arrange
             var org = await CreateOrganizationAsync();
-            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+            var (user, token) = await CreateApiUser(org.Id);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
 
             //Act
             var permissionsResponseDto = await ItSystemV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
@@ -625,9 +635,16 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             var expected = new ResourceCollectionPermissionsResponseDTO
             {
-                Create = true
+                Create = create
             };
             Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        private async Task<(User user, string token)> CreateApiUser(int organizationId)
+        {
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organizationId, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            return (user, userAndGetToken.token);
         }
 
         private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)

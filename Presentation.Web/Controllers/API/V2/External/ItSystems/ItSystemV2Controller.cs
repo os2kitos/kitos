@@ -399,7 +399,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         }
 
         /// <summary>
-        /// Returns the permissions of the authenticated client in the context of a specific IT-System (a specific IT-System in a specific Organization)
+        /// Returns the permissions of the authenticated client in the context of a specific IT-System
         /// </summary>
         /// <param name="systemUuid">UUID of the system entity</param>
         /// <returns></returns>
@@ -422,7 +422,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
 
         /// <summary>
-        /// Returns the permissions of the authenticated client for the IT-System in the context of an organization (IT-System permissions in a specific Organization)
+        /// Returns the permissions of the authenticated client for the IT-System resources collection in the context of an organization (IT-System permissions in a specific Organization)
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
         /// <returns></returns>
