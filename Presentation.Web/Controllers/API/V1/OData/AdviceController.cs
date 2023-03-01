@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
 
             var scheduledNotificationModel = new ScheduledNotificationModel(advice.Name, advice.StopDate,
-                advice.Scheduling, advice.AlarmDate,
+                advice.Scheduling.Value, advice.AlarmDate.Value,
                 MapBaseNotificationProperties(advice), recipients.ccs, recipients.receivers);
             return _registrationNotificationService.CreateScheduledNotification(scheduledNotificationModel).Match(Created, FromOperationError);
         }
