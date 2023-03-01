@@ -133,13 +133,19 @@ namespace Core.ApplicationServices.Interface.Write
                     return new OperationError("Invalid org id provided", OperationFailure.BadInput);
 
                 var interfaceId = parameters.InterfaceId;
+                AccessModifier? accessModifier = null;
+                if (parameters.Scope.HasChange)
+                {
+                    accessModifier = parameters.Scope.NewValue;
+                }
 
                 //Remove changes for any values used during the creation process
                 parameters.Name = OptionalValueChange<string>.None;
                 parameters.InterfaceId = OptionalValueChange<string>.None;
+                parameters.Scope = OptionalValueChange<AccessModifier>.None;
 
                 var result = _itInterfaceService
-                    .CreateNewItInterface(organizationId.Value, name.NewValue, interfaceId.MapOptionalChangeWithFallback(string.Empty))
+                    .CreateNewItInterface(organizationId.Value, name.NewValue, interfaceId.MapOptionalChangeWithFallback(string.Empty),accessModifier: accessModifier)
                     .Bind(itInterface => ApplyUpdates(itInterface, parameters));
 
                 if (result.Ok)

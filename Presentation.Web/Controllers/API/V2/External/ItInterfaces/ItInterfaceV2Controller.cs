@@ -98,8 +98,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
                 .Match(Ok, FromOperationError);
         }
 
-        //TODO: Get deletion conflicts? - add story to add the endpoint - better than trial and error for the user
-
         /// <summary>
         /// Delete an It-interface
         /// Constraints:
@@ -107,7 +105,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// </summary>
         /// <param name="uuid">UUID of the interface in KITOS</param>
         /// <returns></returns>
-        [HttpPatch]
+        [HttpDelete]
         [Route("it-interfaces/{uuid}")]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.NoContent)]
@@ -115,7 +113,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Patch([NonEmptyGuid] Guid uuid)
+        public IHttpActionResult Delete([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -733,7 +733,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
             //Act
-            using var result = await InterfaceV2Helper.SendGetStakeholderInterfacesAsync(token);
+            using var result = await InterfaceV2Helper.SendGetInterfacesAsync(token);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);

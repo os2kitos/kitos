@@ -148,7 +148,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Match(Ok, FromOperationError);
         }
 
-        //TODO: Add deletion conflicts endpoint to assist deletion
         /// <summary>
         /// DELETE an existing it-system
         /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource

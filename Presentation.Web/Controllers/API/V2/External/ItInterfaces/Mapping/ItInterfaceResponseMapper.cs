@@ -15,8 +15,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
                 LastModified = itInterface.LastChanged,
                 LastModifiedBy = itInterface.LastChangedByUser?.MapIdentityNamePairDTO(),
                 Scope = itInterface.AccessModifier.ToChoice(),
-                ItInterfaceTypeUuid = itInterface.Interface?.MapIdentityNamePairDTO(),
-                Data = itInterface.DataRows.Select(ToDTO).ToList()
+                ItInterfaceType = itInterface.Interface?.MapIdentityNamePairDTO(),
+                Data = itInterface.DataRows.Select(ToDTO).ToList(),
+                OrganizationContext = itInterface.Organization?.MapShallowOrganizationResponseDTO()
             };
             MapBaseInformation(itInterface, dto);
             return dto;
