@@ -73,6 +73,7 @@
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
+    <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />
     <Compile Include="Model\Authentication\Commands\ValidateUserCredentialsCommand.cs" />
     <Compile Include="Authentication\IAuthenticationContext.cs" />
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />

@@ -391,6 +391,7 @@
     <Compile Include="Models\API\V2\Request\System\Regular\RecommendedArchiveDutyRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Shared\IItSystemWriteRequestCommonPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\ItInterfaceDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Shared\ResourceCollectionPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
