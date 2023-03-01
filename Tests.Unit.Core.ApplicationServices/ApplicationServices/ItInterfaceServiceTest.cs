@@ -17,7 +17,6 @@ using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -960,6 +959,89 @@ namespace Tests.Unit.Core.ApplicationServices
             _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
         }
 
+        [Fact]
+        public void Activate_Returns_Ok()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet(true);
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true);
+
+            //Act
+            var result = _sut.Activate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.False(result.Select(x => x.Disabled).Value);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Once);
+        }
+
+        [Fact]
+        public void Cannot_Activate_If_No_Access()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet(true);
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(false);
+
+            //Act
+            var result = _sut.Activate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
+        }
+
+        [Fact]
+        public void Cannot_Activate_If_Not_Found()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet(true);
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(Maybe<ItInterface>.None);
+
+            //Act
+            var result = _sut.Activate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
+        }
+
+        [Fact]
+        public void Activate_Returns_Interface_With_No_Changes_If_Already_Activated()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet(false);
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true);
+
+            //Act
+            var result = _sut.Activate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.False(result.Select(x => x.Disabled).Value);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
+        }
+
         private void Test_Command_Which_Mutates_ItInterface_With_Success(
             Func<ItInterface, Result<ItInterface, OperationError>> command)
         {
@@ -1012,7 +1094,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never);
         }
 
-        private ItInterface CreateInterfaceWithAllBasicPropertiesSet()
+        private ItInterface CreateInterfaceWithAllBasicPropertiesSet(bool disabled = false)
         {
             return new ItInterface()
             {
@@ -1025,7 +1107,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Note = A<string>(),
                 Url = A<string>(),
                 Uuid = A<Guid>(),
-                OrganizationId = A<int>()
+                OrganizationId = A<int>(),
+                Disabled = disabled
             };
         }
 
