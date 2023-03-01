@@ -75,7 +75,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                         objectId = orgUnit.Id;
                     }
                     return $"api/organizationunitright/{objectId.Value}?organizationId={orgId}";
-                default: throw new Exception("Incorrect Rights OwnerResourceType");
+                default: throw new Exception("Incorrect Rights Type");
             }
         }
 
@@ -107,7 +107,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     Assert.NotNull(singleOrganizationUnit);
 
                     return singleOrganizationUnit.Id;
-                default: throw new Exception("Incorrect Rights OwnerResourceType");
+                default: throw new Exception("Incorrect Rights Type");
             }
         }
     }

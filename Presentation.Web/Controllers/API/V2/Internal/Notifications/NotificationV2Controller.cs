@@ -90,7 +90,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 (
                     notifications =>
                         notifications
-                            .OrderBy(x => x.Id)
+                            .OrderBy(x => x.FromDate)
                             .Page(paginationQuery)
                             .ToList()
                             .Select(_responseMapper.MapNotificationResponseDTO)

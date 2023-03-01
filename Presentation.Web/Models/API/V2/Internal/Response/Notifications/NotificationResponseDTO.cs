@@ -43,7 +43,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// </summary>
         public OwnerResourceType OwnerResourceType { get; set; }
         /// <summary>
-        /// OwnerResourceType of the notification (Immediate/Scheduled)
+        /// Type of the notification (Immediate/Scheduled)
         /// </summary>
         public NotificationSendType NotificationType { get; set; }
         /// <summary>

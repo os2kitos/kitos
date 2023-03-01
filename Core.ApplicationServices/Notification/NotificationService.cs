@@ -318,7 +318,7 @@ namespace Core.ApplicationServices.Notification
             };
         }
 
-        private static IQueryable<Advice> ApplyQuery(IQueryable<Advice> baseQuery, params IDomainQuery<Advice>[] conditions)
+        private static IEnumerable<Advice> ApplyQuery(IQueryable<Advice> baseQuery, params IDomainQuery<Advice>[] conditions)
         {
             var subQueries = new List<IDomainQuery<Advice>>();
             subQueries.AddRange(conditions);

@@ -21,7 +21,7 @@ namespace Presentation.Web.Controllers.API.V1
     [RoutePrefix("api/v1/kle")]
     public class KLEController : BaseApiController
     {
-        private const string KLETypeColumnName = "OwnerResourceType";
+        private const string KLETypeColumnName = "Type";
         private const string KLETaskKeyColumnName = "TaskKey";
         private const string KLEDescriptionColumnName = "Description";
         private const string KLEChangeColumnName = "Change";
@@ -84,7 +84,7 @@ namespace Presentation.Web.Controllers.API.V1
         private static void CreateCsvHeader(ICollection<dynamic> list)
         {
             var header = new ExpandoObject() as IDictionary<string, object>;
-            header.Add(KLETypeColumnName, "KLE OwnerResourceType");
+            header.Add(KLETypeColumnName, "KLE Type");
             header.Add(KLETaskKeyColumnName, "KLE nummer");
             header.Add(KLEDescriptionColumnName, "KLE beskrivelse");
             header.Add(KLEChangeColumnName, "Ændring");

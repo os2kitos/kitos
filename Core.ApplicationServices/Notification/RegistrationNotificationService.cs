@@ -11,7 +11,6 @@ using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
@@ -80,13 +79,8 @@ namespace Core.ApplicationServices.Notification
         public Result<Advice, OperationError> CreateScheduledNotification(ScheduledNotificationModel notificationModel)
         {
             var newNotification = MapCreateSchedulingModelToEntity(notificationModel);
-
-            if (newNotification.AlarmDate == null)
-            {
-                return new OperationError("Start date is not set!", OperationFailure.BadInput);
-
-            }
-            if (newNotification.Scheduling is null or Scheduling.Immediate)
+            
+            if (newNotification.Scheduling == Scheduling.Immediate)
             {
                 return new OperationError($"Scheduling must be defined and cannot be {nameof(Scheduling.Immediate)} when creating advice of type {nameof(AdviceType.Repeat)}", OperationFailure.BadInput);
             }
