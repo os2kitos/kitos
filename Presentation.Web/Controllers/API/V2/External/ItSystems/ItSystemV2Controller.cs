@@ -43,6 +43,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IItSystemWriteService _writeService;
         private readonly IItSystemResponseMapper _systemResponseMapper;
         private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
+        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
 
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
@@ -50,7 +51,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             IEntityIdentityResolver entityIdentityResolver,
             IItSystemWriteService writeService,
             IItSystemResponseMapper systemResponseMapper,
-            IExternalReferenceResponseMapper referenceResponseMapper)
+            IExternalReferenceResponseMapper referenceResponseMapper,
+            IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
@@ -59,6 +61,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             _writeService = writeService;
             _systemResponseMapper = systemResponseMapper;
             _referenceResponseMapper = referenceResponseMapper;
+            _permissionResponseMapper = permissionResponseMapper;
         }
 
         /// <summary>
@@ -394,6 +397,51 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific IT-System
+        /// </summary>
+        /// <param name="systemUuid">UUID of the system entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("it-systems/{systemUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItSystemPermissions([NonEmptyGuid] Guid systemUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itSystemService
+                .GetPermissions(systemUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
+        }
+
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client for the IT-System resources collection in the context of an organization (IT-System permissions in a specific Organization)
+        /// </summary>
+        /// <param name="organizationUuid">UUID of the organization</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("it-systems/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItSystemCollectionPermissions([NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itSystemService.GetCollectionPermissions(organizationUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
+        }
+        
 
         /// <summary>
         /// Creates an external reference for the system
