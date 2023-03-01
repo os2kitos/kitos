@@ -507,16 +507,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.User, false)]
         public async Task Can_Get_ItSystemUsage_CollectionPermissions(OrganizationRole userRole, bool expectCreate)
         {
             //Arrange
-            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var (token, user, _, _) = await CreatePrerequisitesAsync();
             var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
             await HttpApi.SendAssignRoleToUserAsync(user.Id, userRole, organization2.Id).DisposeAsync();
-            await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
 
             //Act
             var permissionsResponseDto = await ItSystemUsageV2Helper.GetCollectionPermissionsAsync(token, organization2.Uuid);
