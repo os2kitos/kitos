@@ -263,6 +263,9 @@ namespace Core.ApplicationServices.Notification
         private Result<RecipientModel, OperationError> MapRootRecipientModel(
             RootRecipientModificationParameters root, RelatedEntityType relatedEntityType)
         {
+            if (root == null)
+                return RecipientModel.Empty();
+
             return MapRoleRecipients(root.RoleRecipients, relatedEntityType)
                 .Bind<RecipientModel>(roleRecipients => new RecipientModel
                     (
@@ -274,10 +277,9 @@ namespace Core.ApplicationServices.Notification
         private static IEnumerable<EmailRecipientModel> MapEmailRecipients(IEnumerable<EmailRecipientModificationParameters> emailRecipients)
         {
             var recipientList = emailRecipients.ToList();
-            if (!recipientList.Any())
-                return new List<EmailRecipientModel>();
-
-            return recipientList.Select(x => new EmailRecipientModel(x.Email));
+            return !recipientList.Any() 
+                ? new List<EmailRecipientModel>() 
+                : recipientList.Select(x => new EmailRecipientModel(x.Email));
         }
 
         private Result<IEnumerable<RoleRecipientModel>, OperationError> MapRoleRecipients(IEnumerable<RoleRecipientModificationParameters> roleRecipients, RelatedEntityType relatedEntityType)
@@ -423,7 +425,7 @@ namespace Core.ApplicationServices.Notification
         {
             if (!notification.RelationId.HasValue)
                 return new OperationError($"Notification with uuid: {notification.Uuid} has no RelationId", OperationFailure.BadState);
-
+            
             return GetRelatedEntity(notification.RelationId.Value, notification.Type)
                 .Match(ownerResource => MapRecipientsToResult(notification)
                     .Select(recipientResult => 

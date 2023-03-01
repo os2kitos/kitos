@@ -62,8 +62,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
         {
             return new RecipientResponseDTO
             {
-                EmailRecipients = recipients.EmailRecipients.Any() ? MapEmailRecipientResponseDTOs(recipients.EmailRecipients) : null,
-                RoleRecipients = recipients.RoleRecipients.Any() ? MapRoleRecipientResponseDTOs(recipients.RoleRecipients) : null
+                EmailRecipients = recipients?.EmailRecipients != null ? MapEmailRecipientResponseDTOs(recipients.EmailRecipients) : null,
+                RoleRecipients = recipients?.RoleRecipients != null ? MapRoleRecipientResponseDTOs(recipients.RoleRecipients) : null
             };
         }
 
@@ -98,10 +98,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             return notification.RelatedEntityType switch
             {
                 RelatedEntityType.dataProcessingRegistration =>
-                    ((DataProcessingRegistration) notification.OwnerResource).MapIdentityNamePairDTO(),
-                RelatedEntityType.itContract => ((ItContract) notification.OwnerResource).MapIdentityNamePairDTO(),
-                RelatedEntityType.itSystemUsage =>
-                    ((ItSystemUsage) notification.OwnerResource).MapIdentityNamePairDTO(),
+                    ((DataProcessingRegistration) notification.OwnerResource)?.MapIdentityNamePairDTO(),
+                RelatedEntityType.itContract => ((ItContract) notification.OwnerResource)?.MapIdentityNamePairDTO(),
+                RelatedEntityType.itSystemUsage => ((ItSystemUsage)notification.OwnerResource)?.MapIdentityNamePairDTO(),
                 _ => throw new ArgumentOutOfRangeException(nameof(notification.RelatedEntityType), notification.RelatedEntityType,
                     $"NotificationResponseMapper:MapIEntityWithAdvicesToResponseDTO doesn't support value: {notification.RelatedEntityType}")
             };

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Results;
 using Core.Abstractions.Types;
@@ -7,6 +8,9 @@ using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Notification;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
@@ -50,13 +54,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var notificationId = A<int>();
             var ccs = A<RecipientModel>();
             var receivers = A<RecipientModel>();
-            var notification = new Advice();
+            var notification = new Advice{RelationId = A<int>()};
             var userRelations = new List<AdviceUserRelation>{ new() {AdviceId = notificationId}, new() { AdviceId = notificationId } };
             var relatedEntityType = A<RelatedEntityType>();
+            var root = CreateEntityWithAdvices(relatedEntityType);
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetNotificationByIdReturns(notificationId, notification);
-            ExpectAllowModifyReturns(notification, true);
+            ExpectResolveRootReturns(notification.RelationId.Value, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectAllowModifyReturns(root, true);
             ExpectUserRelationsAsQueryableReturns(userRelations.AsQueryable());
             ExpectAllowDeleteUserRelationsReturns(userRelations, true);
 
@@ -67,35 +73,10 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.True(result.Ok);
             _adviceUserRelationRepository.Verify(x => x.AddRange(It.Is<IEnumerable<AdviceUserRelation>>(entities =>
                     VerifyUserRelationsAreCorrect(ccs, receivers, entities))), Times.Once);
-            _adviceUserRelationRepository.Verify(x => x.Save(), Times.Exactly(userRelations.Count + 1));
+            _adviceUserRelationRepository.Verify(x => x.Save(), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }
-
-        [Fact]
-        public void UpdateNotificationUserRelations_Returns_Forbidden_When_NotAllowed_To_Delete_Relation()
-        {
-            //Arrange
-            var notificationId = A<int>();
-            var ccs = A<RecipientModel>();
-            var receivers = A<RecipientModel>();
-            var notification = new Advice();
-            var userRelations = new List<AdviceUserRelation>{ new() {AdviceId = notificationId}, new() { AdviceId = notificationId } };
-            var relatedEntityType = A<RelatedEntityType>();
-
-            ExpectDatabaseTransaction();
-            ExpectGetNotificationByIdReturns(notificationId, notification);
-            ExpectAllowModifyReturns(notification, true);
-            ExpectUserRelationsAsQueryableReturns(userRelations.AsQueryable());
-            ExpectAllowDeleteUserRelationsReturns(userRelations, false);
-
-            //Act
-            var result = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
+        
         [Fact]
         public void UpdateNotificationUserRelations_Returns_Forbidden_When_NotAllowed_To_Modify_Relation()
         {
@@ -103,12 +84,14 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var notificationId = A<int>();
             var ccs = A<RecipientModel>();
             var receivers = A<RecipientModel>();
-            var notification = new Advice();
+            var notification = new Advice{RelationId = A<int>()};
             var relatedEntityType = A<RelatedEntityType>();
+            var root = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectDatabaseTransaction();
             ExpectGetNotificationByIdReturns(notificationId, notification);
-            ExpectAllowModifyReturns(notification, false);
+            ExpectResolveRootReturns(notification.RelationId.Value, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectAllowModifyReturns(root, false);
 
             //Act
             var result = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
@@ -116,6 +99,28 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType); ;
+        }
+        
+        [Fact]
+        public void UpdateNotificationUserRelations_Returns_NotFound_When_Root_Entity_Was_Not_Found()
+        {
+            //Arrange
+            var notificationId = A<int>();
+            var ccs = A<RecipientModel>();
+            var receivers = A<RecipientModel>();
+            var notification = new Advice{RelationId = A<int>()};
+            var relatedEntityType = A<RelatedEntityType>();
+
+            ExpectDatabaseTransaction();
+            ExpectGetNotificationByIdReturns(notificationId, notification);
+            ExpectResolveRootReturns(notification.RelationId.Value, Maybe<IEntityWithAdvices>.None);
+
+            //Act
+            var result = _sut.UpdateNotificationUserRelations(notificationId, ccs, receivers, relatedEntityType);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -218,6 +223,22 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             return transaction;
+        }
+
+        private void ExpectResolveRootReturns(int relationId, Maybe<IEntityWithAdvices> result)
+        {
+            _adviceRootResolution.Setup(x => x.Resolve(It.Is<Advice>(advice => advice.RelationId == relationId))).Returns(result);
+        }
+
+        private static IEntityWithAdvices CreateEntityWithAdvices(RelatedEntityType relatedEntityType)
+        {
+            return relatedEntityType switch
+            {
+                RelatedEntityType.dataProcessingRegistration => new DataProcessingRegistration(),
+                RelatedEntityType.itSystemUsage => new ItSystemUsage(),
+                RelatedEntityType.itContract => new ItContract(),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
+            };
         }
     }
 }

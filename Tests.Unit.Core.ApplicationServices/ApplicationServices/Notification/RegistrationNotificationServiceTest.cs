@@ -168,7 +168,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Assert
             Assert.True(result.Ok);
             _adviceRepository.Verify(x => x.Insert(It.Is<Advice>(advice => advice.RelationId == model.BaseProperties.RelationId)), Times.Once);
-            _domainEventHandler.Verify(x => x.Raise(It.Is<EntityCreatedEvent<Advice>>(createdEvent => createdEvent.Entity.RelationId == model.BaseProperties.RelationId)));
+            ValidateRootModificationWasCalled(relatedEntityType, entity);
             _adviceRepository.Verify(x => x.Save());
 
             transaction.Verify(x => x.Commit(),Times.Once);
@@ -194,7 +194,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Assert
             Assert.True(result.Ok);
             _adviceRepository.Verify(x => x.Insert(It.Is<Advice>(advice => advice.RelationId == model.BaseProperties.RelationId)), Times.Once);
-            _domainEventHandler.Verify(x => x.Raise(It.Is<EntityCreatedEvent<Advice>>(createdEvent => createdEvent.Entity.RelationId == model.BaseProperties.RelationId)));
+            ValidateRootModificationWasCalled(relatedEntityType, entity);
             _adviceRepository.Verify(x => x.Save());
 
             transaction.Verify(x => x.Commit(),Times.Once);

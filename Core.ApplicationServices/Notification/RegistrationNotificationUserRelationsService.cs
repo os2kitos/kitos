@@ -38,11 +38,9 @@ namespace Core.ApplicationServices.Notification
             using var transaction = _transactionManager.Begin();
 
             var notificationResult = _registrationNotificationService.GetNotificationById(notificationId)
-                .Bind(notification => 
-                        _authorizationContext.AllowModify(ResolveRoot(notification))
-                            ? DeleteUserRelationsByAdviceId(notification)
-                            : new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden)
-                );
+                .Bind(WithModifyAccess)
+                .Select(DeleteUserRelationsByAdviceId);
+
             if (notificationResult.Failed)
                 return notificationResult.Error;
             var notification = notificationResult.Value;
@@ -58,19 +56,12 @@ namespace Core.ApplicationServices.Notification
             return notification;
         }
 
-        private Result<Advice, OperationError> DeleteUserRelationsByAdviceId(Advice notification)
+        private Advice DeleteUserRelationsByAdviceId(Advice notification)
         {
             foreach (var d in _adviceUserRelationRepository.AsQueryable().Where(d => d.AdviceId == notification.Id).ToList())
             {
-                if (_authorizationContext.AllowDelete(d))
-                {
                     _adviceUserRelationRepository.Delete(d);
                     _adviceUserRelationRepository.Save();
-                }
-                else
-                {
-                    return new OperationError($"User is not allowed to delete user relation with adviceId: {notification.Id}", OperationFailure.Forbidden);
-                }
             }
             return notification;
         }
@@ -97,9 +88,14 @@ namespace Core.ApplicationServices.Notification
 
             return recipients;
         }
-        private IEntityWithAdvices ResolveRoot(Advice advice)
+        private Result<Advice, OperationError> WithModifyAccess(Advice notification)
         {
-            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
+            return _adviceRootResolution.Resolve(notification)
+                .Match<Result<Advice, OperationError>>(root => _authorizationContext.AllowModify(root)
+                        ? notification
+                        : new OperationError($"User is not allowed to modify notification with id: {notification.Id}", OperationFailure.Forbidden),
+                    () => new OperationError($"Root entity for notification with id: {notification.Id} was not found", OperationFailure.NotFound)
+                );
         }
     }
 }

@@ -227,7 +227,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
             Assert.Equal(expected.NotificationType, actual.NotificationType);
             Assert.Equal(expected.Body, actual.Body);
             Assert.Equal(expected.Subject, actual.Subject);
-            Assert.Equal(expected.OwnerResource, actual.OwnerResource);
+            Assert.Equal(expected.OwnerResource.Uuid, actual.OwnerResource.Uuid);
             AssertRecipients(expected, actual);
         }
 

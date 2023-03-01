@@ -4,6 +4,10 @@ using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.Notification.Read;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
@@ -29,13 +33,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var notification = CreateNotification(relatedEntityType);
-            var relationUuid = A<Guid>();
 
             //Act
             var dto = _sut.MapNotificationResponseDTO(notification);
 
             //Assert
-            Assert.Equal(relationUuid, dto.OwnerResource.Uuid);
             AssertNotificationResponse(notification, dto);
         }
 
@@ -58,8 +60,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(dto.ToDate);
             Assert.Null(dto.Subject);
             Assert.Null(dto.Body);
-            Assert.Null(dto.CCs);
-            Assert.Null(dto.Receivers);
+            Assert.Null(dto.CCs.EmailRecipients);
+            Assert.Null(dto.CCs.RoleRecipients);
+            Assert.Null(dto.Receivers.EmailRecipients);
+            Assert.Null(dto.Receivers.RoleRecipients);
             Assert.Null(dto.RepetitionFrequency);
         }
 
@@ -98,6 +102,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private static void AssertNotificationResponse(NotificationResultModel notification, NotificationResponseDTO dto)
         {
             Assert.Equal(notification.Uuid, dto.Uuid);
+            Assert.Equal(notification.OwnerResource.Uuid, dto.OwnerResource.Uuid);
             Assert.Equal(notification.IsActive, dto.Active);
             Assert.Equal(notification.Name, dto.Name);
             Assert.Equal(notification.SentDate, dto.LastSent);
@@ -154,19 +159,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 A<string>(),
                 A<string>(),
                 A<Scheduling>(),
-                A<IEntityWithAdvices>(),
+                CreateEntityWithAdvices(relatedEntityType),
                 relatedEntityType,
                 A<AdviceType>(),
-                CreateRecipients(),
-                CreateRecipients()
+                CreateRecipients(relatedEntityType),
+                CreateRecipients(relatedEntityType)
             );
         }
 
-        private RecipientResultModel CreateRecipients()
+        private RecipientResultModel CreateRecipients(RelatedEntityType relatedEntityType)
         {
             return new RecipientResultModel(
                 CreateEmailRecipient().WrapAsEnumerable(),
-                CreateRoleRecipient().WrapAsEnumerable()
+                CreateRoleRecipient(relatedEntityType).WrapAsEnumerable()
             );
         }
 
@@ -175,9 +180,31 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return new EmailRecipientResultModel(CreateEmail());
         }
 
-        private RoleRecipientResultModel CreateRoleRecipient()
+        private static RoleRecipientResultModel CreateRoleRecipient(RelatedEntityType relatedEntityType)
         {
-            return new RoleRecipientResultModel(A<IRoleEntity>());
+            return new RoleRecipientResultModel(CreateRoleEntityWithAdvices(relatedEntityType));
+        }
+
+        private static IEntityWithAdvices CreateEntityWithAdvices(RelatedEntityType relatedEntityType)
+        {
+            return relatedEntityType switch
+            {
+                RelatedEntityType.dataProcessingRegistration => new DataProcessingRegistration(),
+                RelatedEntityType.itSystemUsage => new ItSystemUsage(){ItSystem = new ItSystem()},
+                RelatedEntityType.itContract => new ItContract(),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
+            };
+        }
+
+        private static IRoleEntity CreateRoleEntityWithAdvices(RelatedEntityType relatedEntityType)
+        {
+            return relatedEntityType switch
+            {
+                RelatedEntityType.dataProcessingRegistration => new DataProcessingRegistrationRole(),
+                RelatedEntityType.itSystemUsage => new ItSystemRole(),
+                RelatedEntityType.itContract => new ItContractRole(),
+                _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
+            };
         }
 
         private string CreateEmail()

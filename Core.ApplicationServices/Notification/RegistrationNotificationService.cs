@@ -115,13 +115,16 @@ namespace Core.ApplicationServices.Notification
                 return new OperationError("Cannot update inactive advice", OperationFailure.BadInput);
             if (entity.AdviceType == AdviceType.Immediate)
                 return new OperationError("Immediate notification cannot be updated!", OperationFailure.BadInput);
-            if (!_authorizationContext.AllowModify(ResolveRoot(entity)))
-                return new OperationError($"User is not allowed to modify notification with id: {notificationId}", OperationFailure.Forbidden);
+            var validationError = WithModifyAccess(entity);
+            if (validationError.HasValue)
+                return validationError.Value;
 
             MapUpdateSchedulingModelToEntity(notificationModel, entity);
             
             _adviceRepository.Update(entity);
-            RaiseAsRootModification(entity);
+            var error = RaiseAsRootModification(entity);
+            if (error.HasValue)
+                return error.Value;
             _adviceRepository.Save();
 
             _adviceService.UpdateSchedule(entity);
@@ -142,17 +145,18 @@ namespace Core.ApplicationServices.Notification
 
             var entity = entityResult.Value;
 
-            if (!_authorizationContext.AllowModify(ResolveRoot(entity)))
-            {
-                return new OperationError($"User is not allowed to delete notification with id: {notificationId}", OperationFailure.Forbidden);
-            }
+            var validationError = WithModifyAccess(entity);
+            if (validationError.HasValue)
+                return validationError.Value;
 
             if (!entity.CanBeDeleted)
             {
                 return new OperationError("Cannot delete advice which is active or has been sent", OperationFailure.BadState);
             }
 
-            RaiseAsRootModification(entity);
+            var error = RaiseAsRootModification(entity);
+            if (error.HasValue)
+                return error.Value;
             _adviceService.Delete(entity);
             
             transaction.Commit();
@@ -170,12 +174,16 @@ namespace Core.ApplicationServices.Notification
             }
             var entity = entityResult.Value;
 
-            if (!_authorizationContext.AllowModify(ResolveRoot(entity)))
-            {
-                return new OperationError($"User is not allowed to deactivate notification with id: {adviceId}", OperationFailure.Forbidden);
-            }
+            var validationError = WithModifyAccess(entity);
+            if (validationError.HasValue)
+                return validationError.Value;
+
             _adviceService.Deactivate(entity);
-            RaiseAsRootModification(entity);
+
+            var error = RaiseAsRootModification(entity);
+            if (error.HasValue)
+                return error.Value;
+
             transaction.Commit();
 
             return entity;
@@ -183,10 +191,10 @@ namespace Core.ApplicationServices.Notification
 
         private Result<Advice, OperationError> Create(Advice newNotification)
         {
-            if (!_authorizationContext.AllowModify(ResolveRoot(newNotification)))
-            {
-                return new OperationError($"User is not allowed to create notification for root type with id: {newNotification.RelationId}", OperationFailure.Forbidden);
-            }
+            var validationError = WithModifyAccess(newNotification);
+            if (validationError.HasValue)
+                return validationError.Value;
+
             if (newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
             {
                 return new OperationError("Invalid email exists among receivers or CCs", OperationFailure.BadInput);
@@ -197,7 +205,11 @@ namespace Core.ApplicationServices.Notification
             newNotification.IsActive = true;
 
             _adviceRepository.Insert(newNotification);
-            RaiseAsRootModification(newNotification);
+
+            var error = RaiseAsRootModification(newNotification);
+            if (error.HasValue)
+                return error.Value;
+
             _adviceRepository.Save();
 
             var name = Advice.CreateJobId(newNotification.Id);
@@ -210,13 +222,6 @@ namespace Core.ApplicationServices.Notification
             transaction.Commit();
 
             return newNotification;
-        }
-
-        private Result<Advice, OperationError> WithReadAccess(Advice notification)
-        {
-            return _authorizationContext.AllowReads(ResolveRoot(notification))
-                ? notification
-                : new OperationError("User is not allowed to read the notification", OperationFailure.Forbidden);
         }
 
         private static void MapUpdateSchedulingModelToEntity(UpdateScheduledNotificationModel model, Advice notification)
@@ -304,25 +309,50 @@ namespace Core.ApplicationServices.Notification
             };
         }
 
-        private IEntityWithAdvices ResolveRoot(Advice advice)
+        private Result<Advice, OperationError> WithReadAccess(Advice notification)
         {
-            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
+            return ResolveRoot(notification)
+                .Bind(root => _authorizationContext.AllowReads(root)
+                    ? Result<Advice, OperationError>.Success(notification)
+                    : new OperationError("User is not allowed to read the notification", OperationFailure.Forbidden));
+        }
+
+        private Maybe<OperationError> WithModifyAccess(Advice notification)
+        {
+            return ResolveRoot(notification)
+                .Match(root => _authorizationContext.AllowModify(root) 
+                    ? Maybe<OperationError>.None 
+                    : new OperationError($"User is not allowed to modify notification with id: {notification.Id}", OperationFailure.Forbidden),
+                    error => error);
+        }
+
+        private Result<IEntityWithAdvices, OperationError> ResolveRoot(Advice notification)
+        {
+            return _adviceRootResolution.Resolve(notification)
+                .Match(Result<IEntityWithAdvices, OperationError>.Success,
+                    () => new OperationError($"Root entity for notification with id: {notification.Id} was not found", OperationFailure.NotFound));
         }
  
-        private void RaiseAsRootModification(Advice entity)
+        private Maybe<OperationError> RaiseAsRootModification(Advice entity)
         {
-            switch (ResolveRoot(entity))
-            {
-                case ItContract root:
-                    _domainEventHandler.Raise(new EntityUpdatedEvent<ItContract>(root));
-                    break;
-                case ItSystemUsage root:
-                    _domainEventHandler.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
-                    break;
-                case DataProcessingRegistration root:
-                    _domainEventHandler.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
-                    break;
-            }
+            return ResolveRoot(entity)
+                .Match(root =>
+                    {
+                        switch (root)
+                        {
+                            case ItContract contract:
+                                _domainEventHandler.Raise(new EntityUpdatedEvent<ItContract>(contract));
+                                break;
+                            case ItSystemUsage usage:
+                                _domainEventHandler.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
+                                break;
+                            case DataProcessingRegistration registration:
+                                _domainEventHandler.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(registration));
+                                break;
+                        }
+
+                        return Maybe<OperationError>.None;
+                    }, error => error);
         }
     }
 }
