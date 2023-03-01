@@ -330,8 +330,9 @@ namespace Core.ApplicationServices.System
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
         {
-            return _organizationService.GetOrganization(organizationUuid)
-                .Bind<ResourceCollectionPermissionsResult>(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystem>(organization.Id, _authorizationContext));
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystem>(organization.Id, _authorizationContext));
         }
 
         private Maybe<OperationError> ValidateNameChange(int organizationId, int systemId, string newName)

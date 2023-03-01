@@ -9,7 +9,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
@@ -27,7 +26,6 @@ using Presentation.Web.Models.API.V2.SharedProperties;
 using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.System.Write;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
@@ -76,6 +74,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="usedInOrganizationUuid">Filter by UUID of an organization which has taken the it-system into use through an it-system-usage resource</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
@@ -91,13 +90,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            [NonEmptyGuid] Guid? usedInOrganizationUuid = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, paginationQuery)
                 .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Transform(Ok);
         }
@@ -399,7 +399,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         }
 
         /// <summary>
-        /// Returns the permissions of the authenticated client in the context of a specific IT-System (a specific IT-System in a specific Organization)
+        /// Returns the permissions of the authenticated client in the context of a specific IT-System
         /// </summary>
         /// <param name="systemUuid">UUID of the system entity</param>
         /// <returns></returns>
@@ -422,12 +422,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
 
         /// <summary>
-        /// Returns the permissions of the authenticated client for the IT-System in the context of an organization (IT-System permissions in a specific Organization)
+        /// Returns the permissions of the authenticated client for the IT-System resources collection in the context of an organization (IT-System permissions in a specific Organization)
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("it-systems/permissions/{organizationUuid}")]
+        [Route("it-systems/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
