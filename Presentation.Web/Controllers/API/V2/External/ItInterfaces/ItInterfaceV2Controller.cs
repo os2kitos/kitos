@@ -278,7 +278,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
 
         /// <summary>
-        /// Returns the permissions of the authenticated client in the context of a specific IT-Interface (a specific IT-Interface in a specific Organization)
+        /// Returns the permissions of the authenticated client in the context of a specific IT-Interface
         /// </summary>
         /// <param name="interfaceUuid">UUID of the interface entity</param>
         /// <returns></returns>
@@ -301,12 +301,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
 
         /// <summary>
-        /// Returns the permissions of the authenticated client for the IT-Interface in the context of an organization (IT-Interface permissions in a specific Organization)
+        /// Returns the permissions of the authenticated client for the IT-Interface resources collection in the context of an organization (IT-Interface permissions in a specific Organization)
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("it-interfaces/permissions/{organizationUuid}")]
+        [Route("it-interfaces/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

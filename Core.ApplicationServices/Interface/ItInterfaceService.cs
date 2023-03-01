@@ -281,8 +281,9 @@ namespace Core.ApplicationServices.Interface
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
         {
-            return _organizationService.GetOrganization(organizationUuid)
-                .Bind<ResourceCollectionPermissionsResult>(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItInterface>(organization.Id, _authorizationContext));
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItInterface>(organization.Id, _authorizationContext));
         }
 
         private static bool ValidateName(string name)

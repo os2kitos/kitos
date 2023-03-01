@@ -18,6 +18,7 @@ using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using System.Data;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
@@ -946,7 +947,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Invoke_Endpoint_Blocked_From_rightsHolders()
         {
             //Arrange
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
 
             //Act
             using var result = await InterfaceV2Helper.SendGetStakeholderInterfacesAsync(token);
@@ -955,14 +956,19 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
-        [Fact]
-        public async Task Can_Get_ItInterface_Permissions()
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_ItInterface_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
         {
             //Arrange
-            var orgId = TestEnvironment.DefaultOrganizationId;
-            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+            var org = await CreateOrganization();
+            var (user, token) = await CreateApiUser(org.Id);
 
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public));
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
 
             //Act
             var permissionsResponseDto = await InterfaceV2Helper.GetPermissionsAsync(token, itInterface.Uuid);
@@ -970,27 +976,31 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Assert
             var expected = new ResourcePermissionsResponseDTO
             {
-                Read = true,
-                Modify = true,
-                Delete = true
+                Read = read,
+                Modify = modify,
+                Delete = delete
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }
 
-        [Fact]
-        public async Task Can_Get_ItInterface_CollectionPermissions()
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItInterface_CollectionPermissions(OrganizationRole role, bool create)
         {
             //Arrange
             var org = await CreateOrganization();
-            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+            var (user, token) = await CreateApiUser(org.Id);
 
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
             //Act
             var permissionsResponseDto = await InterfaceV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
 
             //Assert
             var expected = new ResourceCollectionPermissionsResponseDTO
             {
-                Create = true
+                Create = create
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }
@@ -1035,6 +1045,13 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Id).DisposeAsync();
 
             return (token, org1, org2);
+        }
+
+        private async Task<(User user, string token)> CreateApiUser(int organizationId)
+        {
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organizationId, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            return (user, userAndGetToken.token);
         }
 
         private async Task<OrganizationDTO> CreateOrganization()
