@@ -138,7 +138,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             string nameEquals = null
         )
         {
-            using var response = await SendGetManyAsync($"{BaseItSystemInternalPath}/search", page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals, cookie: cookie);
+            using var response = await SendGetManyAsync($"{BaseItSystemInternalPath}/search", page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals: nameEquals, cookie: cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemSearchResponseDTO>>();
