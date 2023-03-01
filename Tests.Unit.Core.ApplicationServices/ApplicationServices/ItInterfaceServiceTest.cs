@@ -754,6 +754,110 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
+        public void UpdateAccessModifier_Returns_Updated_Interface()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var newAccessModifier = itInterface.AccessModifier == AccessModifier.Local ? AccessModifier.Public : AccessModifier.Local;
+                _authorizationContext.Setup(x => x.HasPermission(It.Is<VisibilityControlPermission>(p => p.Target == itInterface))).Returns(true);
+
+                //Act
+                var updatedInterface = _sut.UpdateAccessModifier(itInterface.Id, newAccessModifier);
+
+                //Assert
+                Assert.Equal(newAccessModifier, updatedInterface.Value.AccessModifier);
+
+                return updatedInterface; // Return to complete generic assertions
+            });
+        }
+
+        [Fact]
+        public void UpdateAccessModifier_Fails_If_Not_Visibility_Control_Permission()
+        {
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                var newAccessModifier = itInterface.AccessModifier == AccessModifier.Local ? AccessModifier.Public : AccessModifier.Local;
+                _authorizationContext.Setup(x => x.HasPermission(It.Is<VisibilityControlPermission>(p => p.Target == itInterface))).Returns(false);
+
+                return _sut.UpdateAccessModifier(itInterface.Id, newAccessModifier);
+            }, error => Assert.Equal(OperationFailure.Forbidden, error.FailureType));
+        }
+
+        [Fact]
+        public void UpdateAccessModifier_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateAccessModifier(itInterface.Id, A<AccessModifier>()));
+        }
+
+        [Fact]
+        public void UpdateAccessModifier_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateAccessModifier(itInterface.Id, A<AccessModifier>()));
+        }
+
+        [Fact]
+        public void UpdateInterfaceType_Returns_Updated_Interface()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var interfaceType = new InterfaceType {Uuid = A<Guid>()};
+                _optionResolverMock
+                    .Setup(x => x.GetOptionType<ItInterface, InterfaceType>(itInterface.Organization.Uuid,
+                        interfaceType.Uuid)).Returns((interfaceType, true));
+
+                //Act
+                var updatedInterface = _sut.UpdateInterfaceType(itInterface.Id, interfaceType.Uuid);
+
+                //Assert
+                Assert.Equal(interfaceType, updatedInterface.Value.Interface);
+
+                return updatedInterface; // Return to complete generic assertions
+            });
+        }
+
+        [Fact]
+        public void Cannot_UpdateInterfaceType_If_InterfaceType_Is_Not_Available()
+        {
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                var interfaceType = new InterfaceType { Uuid = A<Guid>() };
+                _optionResolverMock
+                    .Setup(x => x.GetOptionType<ItInterface, InterfaceType>(itInterface.Organization.Uuid,
+                        interfaceType.Uuid)).Returns((interfaceType, false));
+
+                return _sut.UpdateInterfaceType(itInterface.Id, interfaceType.Uuid);
+            },error=>Assert.Equal(OperationFailure.BadInput,error.FailureType));
+        }
+
+        [Fact]
+        public void Cannot_UpdateInterfaceType_If_InterfaceType_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                var interfaceType = new InterfaceType { Uuid = A<Guid>() };
+                _optionResolverMock
+                    .Setup(x => x.GetOptionType<ItInterface, InterfaceType>(itInterface.Organization.Uuid,
+                        interfaceType.Uuid)).Returns(A<OperationError>());
+
+                return _sut.UpdateInterfaceType(itInterface.Id, interfaceType.Uuid);
+            }, error => Assert.Equal(OperationFailure.BadInput, error.FailureType));
+        }
+
+        [Fact]
+        public void UpdateInterfaceType_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateInterfaceType(itInterface.Id, A<Guid>()));
+        }
+
+        [Fact]
+        public void UpdateInterfaceType_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateInterfaceType(itInterface.Id, A<Guid>()));
+        }
+
+        [Fact]
         public void UpdateDescription_Returns_Updated_Interface()
         {
             Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
@@ -781,6 +885,36 @@ namespace Tests.Unit.Core.ApplicationServices
         public void UpdateDescription_Returns_NotFound()
         {
             Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateDescription(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateNote_Returns_Updated_Interface()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var newNote = A<string>();
+
+                //Act
+                var updatedInterface = _sut.UpdateNote(itInterface.Id, newNote);
+
+                //Assert
+                Assert.Equal(newNote, updatedInterface.Value.Note);
+
+                return updatedInterface; // Return to complete generic assertions
+            });
+        }
+
+        [Fact]
+        public void UpdateNote_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateNote(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateNote_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateNote(itInterface.Id, A<string>()));
         }
 
         [Fact]
@@ -1057,6 +1191,27 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(updated.Ok);
             _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        private void Test_Command_Which_Fails_Mutating_ItInterface(
+            Func<ItInterface, Result<ItInterface, OperationError>> command,
+            Action<OperationError> verifyError)
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true);
+
+            //Act
+            var updated = command(itInterface);
+
+            //Assert
+            Assert.True(updated.Failed);
+            verifyError(updated.Error);
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never());
         }
 
         private void Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(
@@ -1074,7 +1229,8 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(updated.Failed);
             Assert.Equal(OperationFailure.Forbidden, updated.Error.FailureType);
-            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never);
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never());
+            transaction.Verify(x=>x.Commit(),Times.Never());
         }
 
         private void Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(
@@ -1096,6 +1252,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private ItInterface CreateInterfaceWithAllBasicPropertiesSet(bool disabled = false)
         {
+            var organizationId = A<int>();
             return new ItInterface()
             {
                 Id = A<int>(),
@@ -1107,8 +1264,13 @@ namespace Tests.Unit.Core.ApplicationServices
                 Note = A<string>(),
                 Url = A<string>(),
                 Uuid = A<Guid>(),
-                OrganizationId = A<int>(),
-                Disabled = disabled
+                OrganizationId = organizationId,
+                Disabled = disabled,
+                Organization = new Organization()
+                {
+                    Uuid = A<Guid>(),
+                    Id = organizationId
+                }
             };
         }
 
