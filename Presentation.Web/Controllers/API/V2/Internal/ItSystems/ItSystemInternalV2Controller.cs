@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery: paginationQuery)
                 .Select(Map)
                 .Transform(Ok);
         }

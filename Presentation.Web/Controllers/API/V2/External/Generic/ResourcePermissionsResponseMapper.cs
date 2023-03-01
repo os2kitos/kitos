@@ -14,5 +14,12 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 Read = permissionsResult.Read
             };
         }
+        public ResourceCollectionPermissionsResponseDTO Map(ResourceCollectionPermissionsResult permissionsResult)
+        {
+            return new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = permissionsResult.Create
+            };
+        }
     }
 }

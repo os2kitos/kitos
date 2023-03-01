@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
@@ -313,6 +314,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
+        public async Task GET_Many_As_StakeHolder_With_UsedInOrganizationUuid_Filter()
+        {
+            //Assert
+            var (token, org) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var org2 = await CreateOrganizationAsync();
+
+            var system1 = await CreateSystemAsync(org.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(org.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(org.Id, AccessModifier.Public);
+
+            await ItSystemHelper.TakeIntoUseAsync(system1.dbId, org.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system2.dbId, org.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system3.dbId, org2.Id);
+            
+            //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, usedInOrganizationUuid: org.Uuid)).ToList();
+
+            //Arrange
+            Assert.Equal(2, systems.Count);
+            Assert.Contains(systems, x => x.Uuid == system1.uuid);
+            Assert.Contains(systems, x => x.Uuid == system2.uuid);
+            Assert.DoesNotContain(systems, x => x.Uuid == system3.uuid);
+        }
+
+        [Fact]
         public async Task GET_Many_As_StakeHolder_With_NumberOfUsers_Filter()
         {
             //Arrange - Scope the test with additional rightsHolder filter so that we can control which response we get
@@ -588,6 +614,63 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert - delete
             var afterDelete = await ItSystemV2Helper.GetSingleAsync(token, createdSystem.Uuid);
             Assert.Empty(afterDelete.ExternalReferences);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_ItSystem_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUser(org.Id);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            
+            //Act
+            var permissionsResponseDto = await ItSystemV2Helper.GetPermissionsAsync(token, system.Uuid);
+
+            //Assert
+            var expected = new ResourcePermissionsResponseDTO
+            {
+                Read = read,
+                Modify = modify,
+                Delete = delete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+        
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, false)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItSystem_CollectionPermissions(OrganizationRole role, bool create)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUser(org.Id);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            //Act
+            var permissionsResponseDto = await ItSystemV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = create
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        private async Task<(User user, string token)> CreateApiUser(int organizationId)
+        {
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organizationId, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            return (user, userAndGetToken.token);
         }
 
         private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
