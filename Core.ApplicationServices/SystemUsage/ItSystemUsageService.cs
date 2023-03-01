@@ -215,8 +215,9 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
         {
-            return _organizationService.GetOrganization(organizationUuid)
-                .Bind<ResourceCollectionPermissionsResult>(result => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystemUsage>(result.Id, _authorizationContext));
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(result => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystemUsage>(result.Id, _authorizationContext));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)

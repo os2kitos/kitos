@@ -506,21 +506,25 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equivalent(expected, permissionsResponseDto);
         }
 
-        [Fact]
-        public async Task Can_Get_ItSystemUsage_CollectionPermissions()
+        [Theory]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItSystemUsage_CollectionPermissions(OrganizationRole userRole, bool expectCreate)
         {
             //Arrange
-            var (token, _, organization, system) = await CreatePrerequisitesAsync();
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, userRole, organization2.Id).DisposeAsync();
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
 
             //Act
-            var permissionsResponseDto = await ItSystemUsageV2Helper.GetCollectionPermissionsAsync(token, organization.Uuid);
+            var permissionsResponseDto = await ItSystemUsageV2Helper.GetCollectionPermissionsAsync(token, organization2.Uuid);
 
             //Assert
             var expected = new ResourceCollectionPermissionsResponseDTO()
             {
-                Create = true
+                Create = expectCreate
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }

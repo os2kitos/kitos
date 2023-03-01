@@ -60,7 +60,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
         {
-            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/permissions/{organizationUuid:D}"), token);
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{_baseUsageApiPath}/permissions?organizationUuid={organizationUuid:D}"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
