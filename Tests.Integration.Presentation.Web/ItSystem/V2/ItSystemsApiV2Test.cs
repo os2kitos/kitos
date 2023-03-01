@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
@@ -310,6 +311,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(2, systems.Count);
             Assert.Contains(systems, x => x.Uuid == system1WithCorrectRef.uuid);
             Assert.Contains(systems, x => x.Uuid == system2WithCorrectRef.uuid);
+        }
+
+        [Fact]
+        public async Task GET_Many_As_StakeHolder_With_UsedInOrganizationUuid_Filter()
+        {
+            //Assert
+            var (token, org) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var org2 = await CreateOrganizationAsync();
+
+            var system1 = await CreateSystemAsync(org.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(org.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(org.Id, AccessModifier.Public);
+
+            await ItSystemHelper.TakeIntoUseAsync(system1.dbId, org.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system2.dbId, org.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system3.dbId, org2.Id);
+            
+            //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, usedInOrganizationUuid: org.Uuid)).ToList();
+
+            //Arrange
+            Assert.Equal(2, systems.Count);
+            Assert.Contains(systems, x => x.Uuid == system1.uuid);
+            Assert.Contains(systems, x => x.Uuid == system2.uuid);
+            Assert.DoesNotContain(systems, x => x.Uuid == system3.uuid);
         }
 
         [Fact]

@@ -74,6 +74,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="usedInOrganizationUuid">Filter by UUID of an organization which has taken the it-system into use through an it-system-usage resource</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
@@ -89,13 +90,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            [NonEmptyGuid] Guid? usedInOrganizationUuid = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, paginationQuery)
                 .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Transform(Ok);
         }
