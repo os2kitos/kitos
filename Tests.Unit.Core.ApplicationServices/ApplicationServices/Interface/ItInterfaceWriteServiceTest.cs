@@ -910,7 +910,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         private void ExpectItInterfaceServiceCreateItInterfaceReturns(int orgId, ItInterfaceWriteModel input, Result<ItInterface, OperationError> result)
         {
             _interfaceServiceMock
-                .Setup(x => x.CreateNewItInterface(orgId, input.Name.NewValue, input.InterfaceId.NewValue, null, null))
+                .Setup(x => x.CreateNewItInterface(orgId, input.Name.NewValue, input.InterfaceId.NewValue, null, input.Scope.HasChange ? input.Scope.NewValue : null))
                 .Returns(result);
         }
 
