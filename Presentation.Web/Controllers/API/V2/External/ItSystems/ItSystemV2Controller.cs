@@ -9,7 +9,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
@@ -27,7 +26,6 @@ using Presentation.Web.Models.API.V2.SharedProperties;
 using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.System.Write;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
@@ -427,7 +425,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="organizationUuid">UUID of the organization</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("it-systems/permissions/{organizationUuid}")]
+        [Route("it-systems/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
