@@ -24,6 +24,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            Guid? usedInOrganizationUuid = null,
             string nameEquals = null,
             BoundedPaginationQuery paginationQuery = null)
         {
@@ -46,6 +47,9 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 
             if (changedSinceGtEq.HasValue)
                 refinements.Add(new QueryByChangedSinceGtEq<ItSystem>(changedSinceGtEq.Value));
+
+            if(usedInOrganizationUuid.HasValue)
+                refinements.Add(new QuerySystemByUsedInOrganizationUuid(usedInOrganizationUuid.Value));
 
             if(nameEquals != null)
                 refinements.Add(new QueryByName<ItSystem>(nameEquals));
