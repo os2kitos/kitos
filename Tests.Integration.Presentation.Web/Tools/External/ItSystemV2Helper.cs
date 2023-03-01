@@ -153,10 +153,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
+            DateTime? changedSinceGtEq = null,
+            Guid? usedInOrganizationUuid = null
             )
         {
-            using var response = await SendGetManyAsync(BaseItSystemPath, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, token);
+            using var response = await SendGetManyAsync(BaseItSystemPath, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
@@ -173,6 +174,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            Guid? usedInOrganizationUuid = null,
             string token = null,
             Cookie cookie = null
             )
@@ -197,6 +199,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (kleUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("kleUuid", kleUuid.Value.ToString("D")));
 
+
             if (numberOfUsers.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("numberOfUsers", numberOfUsers.Value.ToString("D")));
 
@@ -205,6 +208,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (changedSinceGtEq.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
+
+            if (usedInOrganizationUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("usedInOrganizationUuid", usedInOrganizationUuid.Value.ToString("D")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
@@ -302,7 +308,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
         {
-            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/permissions/{organizationUuid:D}"), token);
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/permissions?organizationUuid={organizationUuid:D}"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
